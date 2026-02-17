@@ -36,6 +36,44 @@ dcl-proc cust_get export;
 
 end-proc;
 
+dcl-proc cust_update export;
+  dcl-pi *n varchar(80);
+    customer likeds(cust_rec) const;
+  end-pi;
+
+  exec sql
+    update custp
+      set
+        cname = :customer.cname,
+        caddr1 = :customer.caddr1,
+        caddr2 = :customer.caddr2,
+        ccity = :customer.ccity,
+        cstate = :customer.cstate,
+        czip = :customer.czip,
+        cphone = :customer.cphone,
+        cemail = :customer.cemail,
+        cstatus = :customer.cstatus,
+        ctype = :customer.ctype,
+        climit = :customer.climit,
+        cbalance = :customer.cbalance,
+        clastord = :customer.clastord,
+        ccreated = :customer.ccreated
+    where
+      custno = :customer.custno;
+  exsr checkError;
+  if sqlcode = 100;
+    return 'Customer ' + %char(customer.custno) + ' not found.';
+  endif;
+  return '';
+
+  begsr checkError;
+    if sqlcode < 0;
+      return 'Error updating customer. SQLCODE = ' + %char(sqlcode) + ', SQLSTATE = ' + sqlstate;
+    endif;
+  endsr;
+
+end-proc;
+
 dcl-proc cust_list export;
   dcl-pi *n varchar(80);
     customers like(cust_rec) dim(9999);
