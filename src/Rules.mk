@@ -1,7 +1,6 @@
 # Display files
 hellod.file: hellod.dspf
 menu.file: menu.dspf
-garymenu.file: garymenu.dspf
 wrkcustd.file: wrkcustd.dspf
 wrkcust1d.file: wrkcust1d.dspf
 
@@ -18,8 +17,6 @@ prodp.file: prodp.pf
 # Message file and menu
 menu.msgf: menu.msgf
 menu.menu: menu.file menu.msgf
-garymenu.msgf: garymenu.msgf
-garymenu.menu: garymenu.file garymenu.msgf
 
 # Simple program
 hellor.pgm: hellor.rpgle hellod.file
