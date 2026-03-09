@@ -2,7 +2,7 @@
      H DFTACTGRP(*NO)
 
      FCLAIM01D  CF   E             WORKSTN
-     F                                     SFile(CLAIMSFL : RRN)
+     F                                     SFile(CLAIMSFL : RRN) 
      F**                                   Handler('PROFOUNDUI(HANDLER)')
 
      FCLAIMSP   UF A E           K DISK
