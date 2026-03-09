@@ -13,7 +13,7 @@
      D action          S             10A   Varying
      D done            S               N
 
-     C* Keep running until F3=Exit is used
+     C* Keep running until F3=Exit is used 
      C                   Dow       Not *In03
      C
      C* Load claims subfile
