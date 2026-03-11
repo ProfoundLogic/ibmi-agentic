@@ -1,5 +1,7 @@
 **free
 
+// Hello World display program
+
 dcl-f hellod workstn;
 
 dow not *in03;

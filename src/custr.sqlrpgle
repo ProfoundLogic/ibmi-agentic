@@ -2,7 +2,7 @@
 
 ctl-opt nomain;
 
-exec sql set option commit = *none;
+exec sql set option commit   = *none;
 exec sql set option closqlcsr = *endmod;
 
 /copy custr_pr.rpgle
