@@ -23,7 +23,7 @@ hellor.pgm: hellor.rpgle hellod.file
 
 # Module and service program
 custr.module: custr.sqlrpgle custr_pr.rpgle | custp.file
-custr.srvpgm: custr.module custr.exports
+custr.srvpgm: custr.module custr.bnd
 
 # Binding directory
 cust.bnddir: cust.bnddir | custr.srvpgm
