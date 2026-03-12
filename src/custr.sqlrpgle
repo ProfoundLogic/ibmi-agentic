@@ -87,3 +87,33 @@ dcl-proc cust_list export;
   endsr;
 
 end-proc;
+
+dcl-proc cust_update export;
+  dcl-pi *n varchar(80);
+    customer likeds(cust_rec) const;
+  end-pi;
+
+  exec sql
+    update custp set
+      cname = :customer.cname,
+      caddr1 = :customer.caddr1,
+      caddr2 = :customer.caddr2,
+      ccity = :customer.ccity,
+      cstate = :customer.cstate,
+      czip = :customer.czip,
+      cphone = :customer.cphone,
+      cemail = :customer.cemail,
+      cstatus = :customer.cstatus,
+      ctype = :customer.ctype,
+      climit = :customer.climit
+    where
+      custno = :customer.custno;
+
+  if sqlcode < 0;
+    return 'Error updating customer. SQLCODE = ' + %char(sqlcode)
+           + ', SQLSTATE = ' + sqlstate;
+  endif;
+
+  return '';
+
+end-proc;
