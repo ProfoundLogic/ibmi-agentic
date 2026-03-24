@@ -34,7 +34,7 @@ dcl-s foundCustomer ind;
 
 dow not *in03;
 
-  // Clear error messages.
+  // Reset error messages.
   exsr clearMSGSFL;
 
   // Get customer list.

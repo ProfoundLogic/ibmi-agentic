@@ -1,5 +1,5 @@
        
-       dcl-ds cust_rec extname('CUSTP') qualified template end-ds;
+       dcl-ds cust_rec extname('CUSTP') qualified template end-ds; // Customer record layout
 
        dcl-pr cust_get varchar(80);
          custno like(cust_rec.custno) const;

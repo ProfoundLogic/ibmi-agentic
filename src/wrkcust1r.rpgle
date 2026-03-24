@@ -25,7 +25,7 @@ enddo;
 
 *inlr = *on;
 
-// Loads customer record and displays screen.
+// Load customer record and display screen.
 begsr showScreen;
 
   error = cust_get(custno : customer : customerFound);

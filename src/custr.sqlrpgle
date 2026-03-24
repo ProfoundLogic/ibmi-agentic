@@ -30,7 +30,7 @@ dcl-proc cust_get export;
 
   begsr checkError;
     if sqlcode < 0;
-      return 'Error retrieving customer. SQLCODE = ' + %char(sqlcode) + ', SQLSTATE = ' + sqlstate;
+      return 'Customer retrieval error. SQLCODE = ' + %char(sqlcode) + ', SQLSTATE = ' + sqlstate;
     endif;
   endsr;
 

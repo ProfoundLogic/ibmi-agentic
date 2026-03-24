@@ -1,4 +1,4 @@
-# Display files
+# Display file definitions
 hellod.file: hellod.dspf
 menu.file: menu.dspf
 wrkcustd.file: wrkcustd.dspf
