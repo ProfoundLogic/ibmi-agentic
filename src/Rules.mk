@@ -20,6 +20,7 @@ menu.menu: menu.file menu.msgf
 
 # Simple program
 hellor.pgm: hellor.rpgle hellod.file
+claim01r.pgm: claim01r.rpgle claim01d.file | claimsp.file claims2l.file
 
 # Module and service program
 custr.module: custr.sqlrpgle custr_pr.rpgle | custp.file
@@ -43,3 +44,7 @@ wrkcust1eo.file: wrkcust1eo.json
 # EJS RPGOA Programs
 wrkcusteo.pgm: wrkcusteo.rpgle custr_pr.rpgle wrkcusteo.file custr.srvpgm | cust.bnddir
 wrkcust1eo.pgm: wrkcust1eo.rpgle custr_pr.rpgle wrkcust1eo.file custr.srvpgm | cust.bnddir
+claim01d.file: claim01d.dspf
+claimsp.file: claimsp.pf
+claims2l.file: claims2l.lf | claimsp.file
+insert_claims.pgm: insert_claims.proc.sql | claimsp.file
