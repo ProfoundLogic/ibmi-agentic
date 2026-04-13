@@ -69,7 +69,7 @@ dow not *in03;
   if numCustomers = 0;
     soptdesc = '';
   else;
-    soptdesc = '5=Display';
+    soptdesc = '2=Edit 5=Display';
   endif;
 
   // Display the screen.
@@ -131,6 +131,10 @@ dow not *in03;
     select;
       when %trim(sopt) = '5';
         wrkcust1r(scustno);
+      when %trim(sopt) = '2';
+        dow %trim(sopt) = '2';
+          wrkcust1r(selrrn);
+        enddo;
     endsl;
   endif;
 
@@ -234,7 +238,7 @@ dcl-proc isValidOption;
   end-pi;
 
   select;
-    when %trim(option) = '5';
+    when %trim(option) = '5' or %trim(option) = '2';
       return *on;
     other;
       return *off;
