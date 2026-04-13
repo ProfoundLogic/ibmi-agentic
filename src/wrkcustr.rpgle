@@ -19,6 +19,10 @@ dcl-pr wrkcust1r extpgm;
   custno like(cust_rec.custno) const;
 end-pr;
 
+dcl-pr wrkcust2r extpgm;
+  custno like(cust_rec.custno) const;
+end-pr;
+
 dcl-s numCustomers int(10);
 dcl-ds customers likeds(cust_rec) dim(9999);
 dcl-s custerror varchar(80);
@@ -69,7 +73,7 @@ dow not *in03;
   if numCustomers = 0;
     soptdesc = '';
   else;
-    soptdesc = '5=Display';
+    soptdesc = '5=Display  6=Edit Credit Limit';
   endif;
 
   // Display the screen.
@@ -131,6 +135,8 @@ dow not *in03;
     select;
       when %trim(sopt) = '5';
         wrkcust1r(scustno);
+      when %trim(sopt) = '6';
+        wrkcust2r(scustno);
     endsl;
   endif;
 
@@ -235,6 +241,8 @@ dcl-proc isValidOption;
 
   select;
     when %trim(option) = '5';
+      return *on;
+    when %trim(option) = '6';
       return *on;
     other;
       return *off;

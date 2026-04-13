@@ -87,3 +87,40 @@ dcl-proc cust_list export;
   endsr;
 
 end-proc;
+
+dcl-proc cust_update_climit export;
+  dcl-pi *n varchar(80);
+    custno like(cust_rec.custno) const;
+    climit like(cust_rec.climit) const;
+  end-pi;
+
+  dcl-s pgmLib varchar(10);
+  dcl-s sqlStmt varchar(500);
+
+  // Get the service program's library from the call stack.
+  // This allows the update to target the correct library's CUSTP.
+  exec sql
+    set :pgmLib = (
+      select program_library_name
+      from table(qsys2.stack_info('*'))
+      where program_name = 'CUSTR'
+      fetch first 1 row only
+    );
+
+  if pgmLib <> '';
+    sqlStmt = 'UPDATE ' + %trim(pgmLib)
+            + '.CUSTP SET CLIMIT = ? WHERE CUSTNO = ?';
+  else;
+    sqlStmt = 'UPDATE CUSTP SET CLIMIT = ? WHERE CUSTNO = ?';
+  endif;
+
+  exec sql prepare CLIMITSTMT from :sqlStmt;
+  exec sql execute CLIMITSTMT using :climit, :custno;
+
+  if sqlcode < 0;
+    return 'Error updating credit limit. SQLCODE = ' + %char(sqlcode) + ', SQLSTATE = ' + sqlstate;
+  endif;
+
+  return '';
+
+end-proc;

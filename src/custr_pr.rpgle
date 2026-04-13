@@ -13,3 +13,8 @@
          returned int(10);
          filter varchar(50) const options(*omit : *nopass);
        end-pr;
+
+       dcl-pr cust_update_climit varchar(80);
+         custno like(cust_rec.custno) const;
+         climit like(cust_rec.climit) const;
+       end-pr;

@@ -15,6 +15,10 @@ dcl-pr wrkcust1eo extpgm;
   custno like(cust_rec.custno) const;
 end-pr;
 
+dcl-pr wrkcust2eo extpgm;
+  custno like(cust_rec.custno) const;
+end-pr;
+
 dcl-s numCustomers int(10);
 dcl-ds customers likeds(cust_rec) dim(9999);
 dcl-s custerror varchar(80);
@@ -36,7 +40,7 @@ dow action <> 'EXIT';
     soptdesc = '';
     msg = 'No customers found.';
   else;
-    soptdesc = '5=Display';
+    soptdesc = '5=Display  6=Edit Credit Limit';
     msg = '';
   endif;
 
@@ -88,6 +92,8 @@ dow action <> 'EXIT';
       select;
         when %trim(sopt) = '5';
           wrkcust1eo(scustno);
+        when %trim(sopt) = '6';
+          wrkcust2eo(scustno);
       endsl;
     endif;
   endif;
