@@ -43,3 +43,11 @@ wrkcust1eo.file: wrkcust1eo.json
 # EJS RPGOA Programs
 wrkcusteo.pgm: wrkcusteo.rpgle custr_pr.rpgle wrkcusteo.file custr.srvpgm | cust.bnddir
 wrkcust1eo.pgm: wrkcust1eo.rpgle custr_pr.rpgle wrkcust1eo.file custr.srvpgm | cust.bnddir
+
+# Ajay (EJS) Rich Display Files
+wrkcustao.file: wrkcustao.json
+wrkcust1ao.file: wrkcust1ao.json
+
+# Ajay (EJS) RPGOA Programs
+wrkcustao.pgm: wrkcustao.rpgle custr_pr.rpgle wrkcustao.file custr.srvpgm | cust.bnddir
+wrkcust1ao.pgm: wrkcust1ao.rpgle custr_pr.rpgle wrkcust1ao.file custr.srvpgm | cust.bnddir
