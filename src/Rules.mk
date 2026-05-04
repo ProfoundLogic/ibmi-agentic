@@ -20,6 +20,8 @@ proprtyp.file: proprtyp.table.sql
 
 # SQL Indexes
 tenantl1.file: tenantl1.index.sql tenantp.file
+proprtl1.file: proprtl1.index.sql proprtyp.file
+proprtl2.file: proprtl2.index.sql proprtyp.file
 
 # Message file and menu
 menu.msgf: menu.msgf
