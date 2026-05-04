@@ -16,6 +16,7 @@ prodp.file: prodp.pf
 
 # SQL Tables
 tenantp.file: tenantp.table.sql
+proprtyp.file: proprtyp.table.sql
 
 # SQL Indexes
 tenantl1.file: tenantl1.index.sql tenantp.file
