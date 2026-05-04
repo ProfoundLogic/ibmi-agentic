@@ -17,6 +17,9 @@ prodp.file: prodp.pf
 # SQL Tables
 tenantp.file: tenantp.table.sql
 
+# SQL Indexes
+tenantl1.file: tenantl1.index.sql tenantp.file
+
 # Message file and menu
 menu.msgf: menu.msgf
 menu.menu: menu.file menu.msgf
