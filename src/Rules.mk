@@ -14,6 +14,9 @@ ordhdrp.file: ordhdrp.pf
 orddtlp.file: orddtlp.pf
 prodp.file: prodp.pf
 
+# SQL Tables
+tenantp.file: tenantp.table.sql
+
 # Message file and menu
 menu.msgf: menu.msgf
 menu.menu: menu.file menu.msgf
