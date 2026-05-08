@@ -21,6 +21,10 @@ menu.menu: menu.file menu.msgf
 # Simple program
 hellor.pgm: hellor.rpgle hellod.file
 
+
+# Simple COBOL program
+tn510l.pgm: tn510l.cblle
+
 # Module and service program
 custr.module: custr.sqlrpgle custr_pr.rpgle | custp.file
 custr.srvpgm: custr.module custr.bnd
