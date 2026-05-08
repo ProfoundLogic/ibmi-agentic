@@ -1,0 +1,191 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      INDARA
+     A                                      PRINT(*LIBL/QSYSPRT)
+      *
+      * Screen 1 - Customer list with order count and total amount
+      *
+     A          R CUSTSFL                   SFL
+     A  51                                  SFLNXTCHG
+     A            SOPT           2A  B  8  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SCUSTNO        6S 0O  8  6
+     A            SCNAME        28A  O  8 14
+     A            SCSTATE        2A  O  8 44
+     A            SCSTATUS       1A  O  8 49
+     A            SCORDCNT       5Y 0O  8 53EDTCDE(Z)
+     A            SCORDTOT      11Y 2O  8 62EDTCDE(J)
+     A          R CUSTCTL                   SFLCTL(CUSTSFL)
+     A                                      SFLSIZ(0014)
+     A                                      SFLPAG(0013)
+     A                                      OVERLAY
+     A                                      CA03(03 'Exit')
+     A N31 30                               SFLDSP
+     A                                      SFLDSPCTL
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 27'Customer Order Inquiry'
+     A                                      DSPATR(HI)
+     A                                      COLOR(WHT)
+     A                                  3  2'Find customer . :'
+     A            SFNDCUST       6Y 0B  3 21EDTCDE(Z)
+     A                                  3 36'Filter . :'
+     A            SFILTER       30A  B  3 47CHECK(LC)
+     A                                  6  2'Opt'
+     A                                      COLOR(WHT)
+     A                                  6  6'Cust#'
+     A                                      COLOR(WHT)
+     A                                  6 14'Customer Name'
+     A                                      COLOR(WHT)
+     A                                  6 44'ST'
+     A                                      COLOR(WHT)
+     A                                  6 49'St'
+     A                                      COLOR(WHT)
+     A                                  6 53'Ords'
+     A                                      COLOR(WHT)
+     A                                  6 65'Total'
+     A                                      COLOR(WHT)
+     A            SCOPTDESC     77A  O  5  2COLOR(BLU)
+     A          R CUSTNONE
+     A                                      OVERLAY
+     A                                  8 26'** No customers to display **'
+      *
+      * Screen 2 - Orders for the selected customer
+      *
+     A          R ORDSFL                    SFL
+     A  53                                  SFLNXTCHG
+     A            SOOPT          2A  B 10  2
+     A  52                                  DSPATR(RI)
+     A  52                                  DSPATR(PC)
+     A            SOORDNO        8S 0O 10  6
+     A            SOORDDT       10A  O 10 16
+     A            SOSTAT         1A  O 10 28
+     A            SOLINS         3Y 0O 10 32EDTCDE(Z)
+     A            SOTOTAL       11Y 2O 10 38EDTCDE(J)
+     A            SOPONO        14A  O 10 56
+     A            SOSLSP         6A  O 10 71
+     A          R ORDCTL                    SFLCTL(ORDSFL)
+     A                                      SFLSIZ(0011)
+     A                                      SFLPAG(0010)
+     A                                      OVERLAY
+     A                                      CA03(03 'Exit')
+     A                                      CA12(12 'Cancel')
+     A N33 32                               SFLDSP
+     A                                      SFLDSPCTL
+     A  33                                  SFLCLR
+     A N33 32                               SFLEND(*MORE)
+     A                                  1 31'Orders for Customer'
+     A                                      DSPATR(HI)
+     A                                      COLOR(WHT)
+     A                                  3  2'Customer:'
+     A                                      COLOR(WHT)
+     A            SOCUSTNO       6S 0O  3 13
+     A            SOCNAME       40A  O  3 21
+     A                                  4  2'Total orders:'
+     A                                      COLOR(WHT)
+     A            SOCNT          5Y 0O  4 17EDTCDE(Z)
+     A                                  4 26'Grand total:'
+     A                                      COLOR(WHT)
+     A            SOGRNDTOT     13Y 2O  4 40EDTCDE(J)
+     A                                  8  2'Opt'
+     A                                      COLOR(WHT)
+     A                                  8  6'Order#'
+     A                                      COLOR(WHT)
+     A                                  8 16'Order Date'
+     A                                      COLOR(WHT)
+     A                                  8 28'St'
+     A                                      COLOR(WHT)
+     A                                  8 32'Lns'
+     A                                      COLOR(WHT)
+     A                                  8 41'Order Total'
+     A                                      COLOR(WHT)
+     A                                  8 56'PO Number'
+     A                                      COLOR(WHT)
+     A                                  8 71'SlsPer'
+     A                                      COLOR(WHT)
+     A            SOOPTDESC     77A  O  7  2COLOR(BLU)
+     A          R ORDNONE
+     A                                      OVERLAY
+     A                                 11 24'** No orders for this customer **'
+      *
+      * Screen 3 - Order line detail
+      *
+     A          R DTLSFL                    SFL
+     A            SDLINENO       3S 0O 11  2
+     A            SDITEMNO      12A  O 11  6
+     A            SDITEMDS      22A  O 11 19
+     A            SDQTYORD       7Y 2O 11 43EDTCDE(J)
+     A            SDUNITPR       7Y 2O 11 54EDTCDE(J)
+     A            SDEXTPR        9Y 2O 11 65EDTCDE(J)
+     A          R DTLCTL                    SFLCTL(DTLSFL)
+     A                                      SFLSIZ(0011)
+     A                                      SFLPAG(0010)
+     A                                      OVERLAY
+     A                                      CA03(03 'Exit')
+     A                                      CA12(12 'Cancel')
+     A N35 34                               SFLDSP
+     A                                      SFLDSPCTL
+     A  35                                  SFLCLR
+     A N35 34                               SFLEND(*MORE)
+     A                                  1 31'Order Line Detail'
+     A                                      DSPATR(HI)
+     A                                      COLOR(WHT)
+     A                                  3  2'Order:'
+     A                                      COLOR(WHT)
+     A            SDORDNO        8S 0O  3 10
+     A                                  3 21'Date:'
+     A                                      COLOR(WHT)
+     A            SDORDDT       10A  O  3 27
+     A                                  3 41'Status:'
+     A                                      COLOR(WHT)
+     A            SDORDST        1A  O  3 49
+     A                                  3 53'Order Total:'
+     A                                      COLOR(WHT)
+     A            SDORDTOT      11Y 2O  3 66EDTCDE(J)
+     A                                  4  2'Customer:'
+     A                                      COLOR(WHT)
+     A            SDCUSTNO       6S 0O  4 13
+     A            SDCNAME       40A  O  4 21
+     A                                  5  2'PO #:'
+     A                                      COLOR(WHT)
+     A            SDPONO        20A  O  5 13
+     A                                  5 36'Sls:'
+     A                                      COLOR(WHT)
+     A            SDSLSP         6A  O  5 41
+     A                                  5 50'Ship via:'
+     A                                      COLOR(WHT)
+     A            SDSHIPV        2A  O  5 60
+     A                                  9  2'Ln#'
+     A                                      COLOR(WHT)
+     A                                  9  6'Item Number'
+     A                                      COLOR(WHT)
+     A                                  9 19'Description'
+     A                                      COLOR(WHT)
+     A                                  9 45'Qty Ord'
+     A                                      COLOR(WHT)
+     A                                  9 56'Unit $'
+     A                                      COLOR(WHT)
+     A                                  9 68'Ext $'
+     A                                      COLOR(WHT)
+     A          R DTLNONE
+     A                                      OVERLAY
+     A                                 12 27'** No detail lines **'
+      *
+      * Shared footer (function keys)
+      *
+     A          R FOOTER
+     A            SFKEYS        77A  O 23  2COLOR(BLU)
+      *
+      * Shared message subfile
+      *
+     A          R MSGSFL                    SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R MSGCTL                    SFLCTL(MSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)

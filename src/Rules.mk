@@ -3,6 +3,7 @@ hellod.file: hellod.dspf
 menu.file: menu.dspf
 wrkcustd.file: wrkcustd.dspf
 wrkcust1d.file: wrkcust1d.dspf
+custordd.file: custordd.dspf
 
 # Rich Display Files
 wrkcustdo.file: wrkcustdo.json
@@ -43,3 +44,6 @@ wrkcust1eo.file: wrkcust1eo.json
 # EJS RPGOA Programs
 wrkcusteo.pgm: wrkcusteo.rpgle custr_pr.rpgle wrkcusteo.file custr.srvpgm | cust.bnddir
 wrkcust1eo.pgm: wrkcust1eo.rpgle custr_pr.rpgle wrkcust1eo.file custr.srvpgm | cust.bnddir
+
+# Customer Order Inquiry (drill-down: customers -> orders -> order lines)
+custordr.pgm: custordr.sqlrpgle custordd.file
