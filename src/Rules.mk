@@ -3,6 +3,7 @@ hellod.file: hellod.dspf
 menu.file: menu.dspf
 wrkcustd.file: wrkcustd.dspf
 wrkcust1d.file: wrkcust1d.dspf
+inq01d.file: inq01d.dspf
 
 # Rich Display Files
 wrkcustdo.file: wrkcustdo.json
