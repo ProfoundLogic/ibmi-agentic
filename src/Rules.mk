@@ -14,6 +14,14 @@ custp.file: custp.pf
 ordhdrp.file: ordhdrp.pf
 orddtlp.file: orddtlp.pf
 prodp.file: prodp.pf
+productsp.file: productsp.pf
+categp.file: categp.pf
+prodfeatp.file: prodfeatp.pf
+featuresp.file: featuresp.pf
+
+# Logical files
+products1l.file: products1l.lf | productsp.file
+products2l.file: products2l.lf | productsp.file
 
 # Message file and menu
 menu.msgf: menu.msgf
