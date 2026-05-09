@@ -3,6 +3,7 @@ hellod.file: hellod.dspf
 menu.file: menu.dspf
 wrkcustd.file: wrkcustd.dspf
 wrkcust1d.file: wrkcust1d.dspf
+inq01d.file: inq01d.dspf
 
 # Rich Display Files
 wrkcustdo.file: wrkcustdo.json
@@ -13,6 +14,14 @@ custp.file: custp.pf
 ordhdrp.file: ordhdrp.pf
 orddtlp.file: orddtlp.pf
 prodp.file: prodp.pf
+productsp.file: productsp.pf
+categp.file: categp.pf
+prodfeatp.file: prodfeatp.pf
+featuresp.file: featuresp.pf
+
+# Logical files
+products1l.file: products1l.lf | productsp.file
+products2l.file: products2l.lf | productsp.file
 
 # Message file and menu
 menu.msgf: menu.msgf
@@ -20,6 +29,13 @@ menu.menu: menu.file menu.msgf
 
 # Simple program
 hellor.pgm: hellor.rpgle hellod.file
+
+
+# Simple COBOL program
+tn510l.pgm: tn510l.cblle
+
+# COBOL inquiry program
+inq01l.pgm: inq01l.cblle inq01d.file | productsp.file products1l.file products2l.file categp.file prodfeatp.file featuresp.file
 
 # Module and service program
 custr.module: custr.sqlrpgle custr_pr.rpgle | custp.file
