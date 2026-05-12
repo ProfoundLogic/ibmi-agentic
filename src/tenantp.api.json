@@ -1,0 +1,920 @@
+{
+  "apiFileID": "e18777eb-4388-4218-9231-15dcc89c19cf",
+  "apiType": "rest",
+  "routes": [
+    {
+      "apiRouteID": "8a3e0abb-32b3-4eb6-a95a-3540332b716d",
+      "name": "Get List",
+      "enableCors": true,
+      "summary": "Get list of tenantps",
+      "description": "Get a list of tenantps based on criteria",
+      "method": "get",
+      "tag": "tenantps",
+      "path": "/tenantps",
+      "outputdescription": "Returns an array of tenantps along with total count if requested.",
+      "inputs": [
+        {
+          "type": "boolean",
+          "from": "query",
+          "name": "countOnly",
+          "description": "Send true to only return the total count of the matching records"
+        },
+        {
+          "type": "string",
+          "from": "query",
+          "name": "select",
+          "multipleValues": true,
+          "description": "Array of all the fields to be returned."
+        },
+        {
+          "type": "string",
+          "from": "query",
+          "name": "filter",
+          "description": "Enter the query filter."
+        },
+        {
+          "type": "string",
+          "from": "query",
+          "name": "orderby",
+          "multipleValues": true,
+          "description": "Array of all the fields to be sorted by."
+        },
+        {
+          "type": "boolean",
+          "from": "query",
+          "name": "count",
+          "description": "Send true if you want the total count of the matching records"
+        },
+        {
+          "type": "integer",
+          "from": "query",
+          "name": "limit",
+          "description": "Enter the number of records to return"
+        },
+        {
+          "type": "integer",
+          "from": "query",
+          "name": "skip",
+          "description": "Enter the number of records to skip. This is useful when loading a page of records at a time."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "totalCount",
+          "type": "integer",
+          "httpStatus": "200"
+        },
+        {
+          "name": "data",
+          "type": "object",
+          "children": [
+            {
+              "name": "tguid",
+              "type": "integer",
+              "description": "Tenant ID (auto-generated identity)",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tfname",
+              "type": "string",
+              "description": "First Name",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tmname",
+              "type": "string",
+              "description": "Middle Name",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tlname",
+              "type": "string",
+              "description": "Last Name",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tdob",
+              "type": "date",
+              "description": "Date of Birth",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tssn4",
+              "type": "string",
+              "description": "Last 4 of SSN",
+              "httpStatus": "200"
+            },
+            {
+              "name": "taddr1",
+              "type": "string",
+              "description": "Current Address Line 1",
+              "httpStatus": "200"
+            },
+            {
+              "name": "taddr2",
+              "type": "string",
+              "description": "Current Address Line 2",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tcity",
+              "type": "string",
+              "description": "City",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tstate",
+              "type": "string",
+              "description": "State Code",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tzip",
+              "type": "string",
+              "description": "Zip/Postal Code",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tphone",
+              "type": "string",
+              "description": "Phone Number",
+              "httpStatus": "200"
+            },
+            {
+              "name": "temail",
+              "type": "string",
+              "description": "Email Address",
+              "httpStatus": "200"
+            },
+            {
+              "name": "thhsize",
+              "type": "integer",
+              "description": "Household Size",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tincome",
+              "type": "decimal",
+              "description": "Annual Income",
+              "httpStatus": "200"
+            },
+            {
+              "name": "temploy",
+              "type": "string",
+              "description": "Employer",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tecname",
+              "type": "string",
+              "description": "Emergency Contact Name",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tecphn",
+              "type": "string",
+              "description": "Emergency Contact Phone",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tcreated",
+              "type": "string",
+              "description": "Created Timestamp",
+              "httpStatus": "200"
+            }
+          ],
+          "multipleValues": true,
+          "httpStatus": "200"
+        }
+      ],
+      "steps": [
+        {
+          "text": "Count requested?",
+          "answers": {
+            "plugin": "Conditions:comparison",
+            "variable": "input[\"count\"]",
+            "type": "truthy",
+            "and-or": "or",
+            "variable2": "input[\"countOnly\"]",
+            "type2": "truthy",
+            "and-or2": ""
+          },
+          "isStructureStart": true
+        },
+        {
+          "text": "Get record count",
+          "answers": {
+            "plugin": "Database:get-record-count",
+            "connection": "",
+            "tables": "TENANTP",
+            "criteria": "${input[\"filter\"]}",
+            "destination": "API output",
+            "api_output": "output[\"totalCount\"]"
+          }
+        },
+        {
+          "isStructureEnd": true
+        },
+        {
+          "text": "Records requested?",
+          "answers": {
+            "plugin": "Conditions:comparison",
+            "variable": "input[\"countOnly\"]",
+            "type": "falsy",
+            "and-or": ""
+          },
+          "isStructureStart": true
+        },
+        {
+          "text": "Get records",
+          "answers": {
+            "plugin": "Database:get-records",
+            "connection": "",
+            "tables": "TENANTP",
+            "columns": "${input[\"select\"]}",
+            "criteria": "${input[\"filter\"]}",
+            "add_order_by": true,
+            "order_by": "${input[\"orderby\"]}",
+            "limit": "${input[\"limit\"]}",
+            "skip": "${input[\"skip\"]}",
+            "destination": "API output",
+            "api_output": "output[\"data\"]"
+          }
+        },
+        {
+          "isStructureEnd": true
+        }
+      ],
+      "httpStatuses": [
+        "200"
+      ],
+      "subcategory": ""
+    },
+    {
+      "apiRouteID": "b85a457c-64ce-474d-a994-7934f4794f0b",
+      "name": "Get One",
+      "enableCors": true,
+      "summary": "Get one tenantp",
+      "description": "Get one tenantp",
+      "method": "get",
+      "tag": "tenantps",
+      "path": "/tenantps/:tguid",
+      "outputdescription": "Returns one tenantp.",
+      "inputs": [
+        {
+          "name": "tguid",
+          "type": "integer",
+          "description": "Tenant ID (auto-generated identity)",
+          "from": "path",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "name": "data",
+          "type": "object",
+          "children": [
+            {
+              "name": "tguid",
+              "type": "integer",
+              "description": "Tenant ID (auto-generated identity)",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tfname",
+              "type": "string",
+              "description": "First Name",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tmname",
+              "type": "string",
+              "description": "Middle Name",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tlname",
+              "type": "string",
+              "description": "Last Name",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tdob",
+              "type": "date",
+              "description": "Date of Birth",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tssn4",
+              "type": "string",
+              "description": "Last 4 of SSN",
+              "httpStatus": "200"
+            },
+            {
+              "name": "taddr1",
+              "type": "string",
+              "description": "Current Address Line 1",
+              "httpStatus": "200"
+            },
+            {
+              "name": "taddr2",
+              "type": "string",
+              "description": "Current Address Line 2",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tcity",
+              "type": "string",
+              "description": "City",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tstate",
+              "type": "string",
+              "description": "State Code",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tzip",
+              "type": "string",
+              "description": "Zip/Postal Code",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tphone",
+              "type": "string",
+              "description": "Phone Number",
+              "httpStatus": "200"
+            },
+            {
+              "name": "temail",
+              "type": "string",
+              "description": "Email Address",
+              "httpStatus": "200"
+            },
+            {
+              "name": "thhsize",
+              "type": "integer",
+              "description": "Household Size",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tincome",
+              "type": "decimal",
+              "description": "Annual Income",
+              "httpStatus": "200"
+            },
+            {
+              "name": "temploy",
+              "type": "string",
+              "description": "Employer",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tecname",
+              "type": "string",
+              "description": "Emergency Contact Name",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tecphn",
+              "type": "string",
+              "description": "Emergency Contact Phone",
+              "httpStatus": "200"
+            },
+            {
+              "name": "tcreated",
+              "type": "string",
+              "description": "Created Timestamp",
+              "httpStatus": "200"
+            }
+          ],
+          "httpStatus": "200"
+        }
+      ],
+      "steps": [
+        {
+          "text": "Get record",
+          "answers": {
+            "plugin": "Database:get-record",
+            "connection": "",
+            "tables": "TENANTP",
+            "columns": "tguid,tfname,tmname,tlname,tdob,tssn4,taddr1,taddr2,tcity,tstate,tzip,tphone,temail,thhsize,tincome,temploy,tecname,tecphn,tcreated",
+            "criteria": "tguid = ?",
+            "destination": "API output",
+            "api_output": "output[\"data\"]",
+            "parameter": "input[\"tguid\"]"
+          }
+        }
+      ],
+      "httpStatuses": [
+        "200"
+      ],
+      "subcategory": ""
+    },
+    {
+      "apiRouteID": "076a4eb9-b07e-40ec-9ebc-97b6e23f3f86",
+      "name": "Add One",
+      "enableCors": true,
+      "summary": "Add one tenantp",
+      "description": "Add one tenantp",
+      "method": "post",
+      "tag": "tenantps",
+      "path": "/tenantps",
+      "outputdescription": "Returns the status of the request.",
+      "inputs": [
+        {
+          "name": "data",
+          "type": "object",
+          "from": "body",
+          "required": true,
+          "children": [
+            {
+              "name": "tfname",
+              "type": "string",
+              "required": true,
+              "description": "First Name"
+            },
+            {
+              "name": "tmname",
+              "type": "string",
+              "required": true,
+              "description": "Middle Name"
+            },
+            {
+              "name": "tlname",
+              "type": "string",
+              "required": true,
+              "description": "Last Name"
+            },
+            {
+              "name": "tdob",
+              "type": "date",
+              "required": false,
+              "description": "Date of Birth"
+            },
+            {
+              "name": "tssn4",
+              "type": "string",
+              "required": true,
+              "description": "Last 4 of SSN"
+            },
+            {
+              "name": "taddr1",
+              "type": "string",
+              "required": true,
+              "description": "Current Address Line 1"
+            },
+            {
+              "name": "taddr2",
+              "type": "string",
+              "required": true,
+              "description": "Current Address Line 2"
+            },
+            {
+              "name": "tcity",
+              "type": "string",
+              "required": true,
+              "description": "City"
+            },
+            {
+              "name": "tstate",
+              "type": "string",
+              "required": true,
+              "description": "State Code"
+            },
+            {
+              "name": "tzip",
+              "type": "string",
+              "required": true,
+              "description": "Zip/Postal Code"
+            },
+            {
+              "name": "tphone",
+              "type": "string",
+              "required": true,
+              "description": "Phone Number"
+            },
+            {
+              "name": "temail",
+              "type": "string",
+              "required": true,
+              "description": "Email Address"
+            },
+            {
+              "name": "thhsize",
+              "type": "integer",
+              "required": true,
+              "description": "Household Size"
+            },
+            {
+              "name": "tincome",
+              "type": "decimal",
+              "required": true,
+              "description": "Annual Income"
+            },
+            {
+              "name": "temploy",
+              "type": "string",
+              "required": true,
+              "description": "Employer"
+            },
+            {
+              "name": "tecname",
+              "type": "string",
+              "required": true,
+              "description": "Emergency Contact Name"
+            },
+            {
+              "name": "tecphn",
+              "type": "string",
+              "required": true,
+              "description": "Emergency Contact Phone"
+            },
+            {
+              "name": "tcreated",
+              "type": "string",
+              "required": true,
+              "description": "Created Timestamp"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "object",
+          "name": "status",
+          "children": [
+            {
+              "type": "boolean",
+              "name": "success",
+              "httpStatus": "200"
+            },
+            {
+              "type": "integer",
+              "name": "affectedRows",
+              "example": 1,
+              "httpStatus": "200"
+            }
+          ],
+          "httpStatus": "200"
+        }
+      ],
+      "steps": [
+        {
+          "text": "Insert",
+          "answers": {
+            "plugin": "Database:insert-record",
+            "connection": "",
+            "table": "TENANTP",
+            "record_source": "From API input",
+            "api_input": "input[\"data\"]",
+            "results": "output[\"status\"]"
+          }
+        }
+      ],
+      "httpStatuses": [
+        "200"
+      ],
+      "subcategory": ""
+    },
+    {
+      "apiRouteID": "8af7cfc7-4ce8-4357-aac8-817842434191",
+      "name": "Update One",
+      "enableCors": true,
+      "summary": "Update one tenantp",
+      "description": "Update one tenantp",
+      "tag": "tenantps",
+      "method": "put",
+      "path": "/tenantps/:tguid",
+      "outputdescription": "Returns the status of the request.",
+      "inputs": [
+        {
+          "name": "tguid",
+          "type": "integer",
+          "description": "Tenant ID (auto-generated identity)",
+          "from": "path",
+          "required": true
+        },
+        {
+          "name": "data",
+          "type": "object",
+          "from": "body",
+          "required": true,
+          "children": [
+            {
+              "name": "tfname",
+              "type": "string",
+              "description": "First Name"
+            },
+            {
+              "name": "tmname",
+              "type": "string",
+              "description": "Middle Name"
+            },
+            {
+              "name": "tlname",
+              "type": "string",
+              "description": "Last Name"
+            },
+            {
+              "name": "tdob",
+              "type": "date",
+              "description": "Date of Birth"
+            },
+            {
+              "name": "tssn4",
+              "type": "string",
+              "description": "Last 4 of SSN"
+            },
+            {
+              "name": "taddr1",
+              "type": "string",
+              "description": "Current Address Line 1"
+            },
+            {
+              "name": "taddr2",
+              "type": "string",
+              "description": "Current Address Line 2"
+            },
+            {
+              "name": "tcity",
+              "type": "string",
+              "description": "City"
+            },
+            {
+              "name": "tstate",
+              "type": "string",
+              "description": "State Code"
+            },
+            {
+              "name": "tzip",
+              "type": "string",
+              "description": "Zip/Postal Code"
+            },
+            {
+              "name": "tphone",
+              "type": "string",
+              "description": "Phone Number"
+            },
+            {
+              "name": "temail",
+              "type": "string",
+              "description": "Email Address"
+            },
+            {
+              "name": "thhsize",
+              "type": "integer",
+              "description": "Household Size"
+            },
+            {
+              "name": "tincome",
+              "type": "decimal",
+              "description": "Annual Income"
+            },
+            {
+              "name": "temploy",
+              "type": "string",
+              "description": "Employer"
+            },
+            {
+              "name": "tecname",
+              "type": "string",
+              "description": "Emergency Contact Name"
+            },
+            {
+              "name": "tecphn",
+              "type": "string",
+              "description": "Emergency Contact Phone"
+            },
+            {
+              "name": "tcreated",
+              "type": "string",
+              "description": "Created Timestamp"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "type": "object",
+          "name": "status",
+          "children": [
+            {
+              "type": "boolean",
+              "name": "success",
+              "httpStatus": "200"
+            },
+            {
+              "type": "integer",
+              "name": "affectedRows",
+              "example": 1,
+              "httpStatus": "200"
+            }
+          ],
+          "httpStatus": "200"
+        }
+      ],
+      "steps": [
+        {
+          "text": "Update",
+          "answers": {
+            "plugin": "Database:update-records",
+            "connection": "",
+            "table": "TENANTP",
+            "criteria": "tguid = ?",
+            "record_source": "From API input",
+            "api_input": "input[\"data\"]",
+            "results": "output[\"status\"]",
+            "parameter": "input[\"tguid\"]"
+          }
+        }
+      ],
+      "httpStatuses": [
+        "200"
+      ],
+      "subcategory": ""
+    },
+    {
+      "apiRouteID": "15ca1ed6-cd39-43a7-9b5e-d739d4224fff",
+      "name": "Delete One",
+      "enableCors": true,
+      "summary": "Delete one tenantp",
+      "description": "Delete one tenantp",
+      "method": "delete",
+      "tag": "tenantps",
+      "path": "/tenantps/:tguid",
+      "outputdescription": "Returns the status of the request.",
+      "inputs": [
+        {
+          "name": "tguid",
+          "type": "integer",
+          "description": "Tenant ID (auto-generated identity)",
+          "from": "path",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "type": "object",
+          "name": "status",
+          "children": [
+            {
+              "type": "boolean",
+              "name": "success",
+              "httpStatus": "200"
+            },
+            {
+              "type": "integer",
+              "name": "affectedRows",
+              "example": 1,
+              "httpStatus": "200"
+            }
+          ],
+          "httpStatus": "200"
+        }
+      ],
+      "steps": [
+        {
+          "text": "Delete",
+          "answers": {
+            "plugin": "Database:delete-records",
+            "connection": "",
+            "table": "TENANTP",
+            "criteria": "tguid = ?",
+            "results": "output[\"status\"]",
+            "parameter": "input[\"tguid\"]"
+          }
+        }
+      ],
+      "httpStatuses": [
+        "200"
+      ],
+      "subcategory": ""
+    },
+    {
+      "apiRouteID": "c4d2f1a8-9e6b-4f3c-8d2a-1b5c7e9f0a44",
+      "name": "Typeahead",
+      "enableCors": true,
+      "summary": "Typeahead suggestions for tenants",
+      "description": "Returns up to 10 matching tenants in the JSON shape required by the Profound UI textbox 'choices URL' (autocomplete) feature: { success, response: { results, colWidths } }. Profound UI sends the user's typed text automatically as the 'query' query-string parameter. Configure the textbox 'choice values field' to 'tguid' so that selecting a row returns the tenant GUID to the bound field. Searches against last name, first name, address line 1, city, last 4 of SSN, and the digits of the phone number (spaces and non-digit characters are ignored when matching the phone).",
+      "method": "post",
+      "tag": "tenantps",
+      "path": "/tenantps/typeahead",
+      "outputdescription": "Returns autocomplete suggestions in the Profound UI 'choices URL' JSON format.",
+      "inputs": [
+        {
+          "type": "string",
+          "from": "query",
+          "name": "query",
+          "required": false,
+          "description": "Text typed by the user. Sent automatically as 'query' by the Profound UI textbox 'choices URL' feature. Matched against last name, first name, address line 1, city, last 4 of SSN, and digits of the phone number."
+        },
+        {
+          "type": "integer",
+          "from": "query",
+          "name": "limit",
+          "description": "Maximum number of suggestions to return. Capped at 10 (the effective limit is the lesser of this value or 10)."
+        }
+      ],
+      "outputs": [
+        {
+          "name": "success",
+          "type": "boolean",
+          "httpStatus": "200"
+        },
+        {
+          "name": "response",
+          "type": "object",
+          "children": [
+            {
+              "name": "results",
+              "type": "object",
+              "multipleValues": true,
+              "children": [
+                {
+                  "name": "tguid",
+                  "type": "integer",
+                  "description": "Tenant ID (auto-generated identity). Use this as the textbox 'choice values field'.",
+                  "httpStatus": "200"
+                },
+                {
+                  "name": "tlname",
+                  "type": "string",
+                  "description": "Last Name",
+                  "httpStatus": "200"
+                },
+                {
+                  "name": "tfname",
+                  "type": "string",
+                  "description": "First Name",
+                  "httpStatus": "200"
+                },
+                {
+                  "name": "tcity",
+                  "type": "string",
+                  "description": "City",
+                  "httpStatus": "200"
+                },
+                {
+                  "name": "tstate",
+                  "type": "string",
+                  "description": "State Code",
+                  "httpStatus": "200"
+                },
+                {
+                  "name": "tzip",
+                  "type": "string",
+                  "description": "Zip/Postal Code",
+                  "httpStatus": "200"
+                }
+              ],
+              "httpStatus": "200"
+            }
+          ],
+          "httpStatus": "200"
+        }
+      ],
+      "httpStatuses": [
+        "200"
+      ],
+      "subcategory": "",
+      "steps": [
+        {
+          "text": "Custom Node.js",
+          "answers": {
+            "plugin": "Custom:code",
+            "custom-code": "console.log(`API Inputs`, input[\"query\"]);\r\nconsole.log(`API Inputs`, input[\"limit\"]);\r\n",
+            "comment": ""
+          }
+        },
+        {
+          "text": "Get matching records",
+          "answers": {
+            "plugin": "Database:get-records",
+            "connection": "",
+            "tables": "TENANTP",
+            "columns": "tguid,tlname,tfname,tcity,tstate,tzip",
+            "criteria": "(UPPER(TLNAME) LIKE UPPER('%${input[\"query\"]}%')) OR (UPPER(TFNAME) LIKE UPPER('%${input[\"query\"]}%')) OR (UPPER(TADDR1) LIKE UPPER('%${input[\"query\"]}%')) OR (UPPER(TCITY) LIKE UPPER('%${input[\"query\"]}%')) OR (TSSN4 = '${input[\"query\"]}') OR (REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(TPHONE, ' ', ''), '-', ''), '(', ''), ')', ''), '.', ''), '+', '') LIKE '%${input[\"query\"]}%')",
+            "add_order_by": true,
+            "order_by": "tlname,tfname",
+            "limit": "${(parseInt(input[\"limit\"]) < 10) ? input[\"limit\"] : 10}",
+            "skip": "0",
+            "destination": "API output",
+            "api_output": "output[\"response\"][\"results\"]",
+            "comment": "",
+            "_qualifiedTables": "TENANTP"
+          }
+        },
+        {
+          "text": "Custom Node.js",
+          "answers": {
+            "plugin": "Custom:code",
+            "custom-code": "console.log(`API Result`, JSON.stringify(output[\"response\"][\"results\"]));",
+            "comment": ""
+          }
+        }
+      ]
+    }
+  ]
+}
