@@ -172,6 +172,7 @@ begsr loadSFL;
             %trim(customers(i).ccity) + ', ' + customers(i).cstate + ' ' + customers(i).czip;
     semail = customers(i).cemail;
     sphone = customers(i).cphone;
+    sstatus = customers(i).cstatus;
     rrn += 1;
     write custsfl;
   endfor;
