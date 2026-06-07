@@ -1,0 +1,42 @@
+-- =====================================================================
+-- runall.sql - Refresh all sample data for the reverse-engineered
+-- Sapiens Agency tables.  REVERSE-ENGINEERED PLACEHOLDER DATA.
+--
+-- How to run on the IBM i:
+--
+--   1. Ship this folder to the IBM i (e.g. /tmp/seed/):
+--        scp -r src/Sapiens/sqlScripts/*.sql dev:/tmp/seed/
+--
+--   2. Run via RUNSQLSTM (each file individually - RUNSQLSTM doesn't
+--      include other files from a script):
+--        system "RUNSQLSTM SRCSTMF('/tmp/seed/smcop.sql') \
+--                          COMMIT(*NONE) DFTRDBCOL(AITSK00030)"
+--        system "RUNSQLSTM SRCSTMF('/tmp/seed/wmczp.sql') ..."
+--        ...repeat for each file...
+--
+--      Or use the shell helper in this folder:
+--        ssh dev "/tmp/seed/runall.sh"
+--
+-- Order matters when foreign-key-like dependencies exist: PFs first,
+-- then LFs (which are over the PFs), then any tables that reference
+-- the PFs. The current schema is flat (no FKs declared), so any
+-- order works. Recommended order kept here for clarity:
+--
+--   smcop.sql   - Company Master  (referenced by other AG/AA tables via co#)
+--   wmczp.sql   - Zip/County      (referenced by WTAGTCFG via co#/st/zip)
+--   wdf2p.sql   - Group Auxiliary (carriers - referenced by co#/fnd)
+--   wmaap.sql   - Agency Assignments
+--   wdelp.sql   - Employer Detail (REFFLD target for the DSPF)
+--   wmagp.sql   - Agency Master   (the grid the user actually sees)
+--
+-- To CLEAR + RESEED (idempotent): the individual SQL files only INSERT,
+-- they do not clear. To refresh, manually clear first:
+--
+--   system "CLRPFM FILE(AITSK00030/WMAGP)"
+--   system "CLRPFM FILE(AITSK00030/SMCOP)"
+--   system "CLRPFM FILE(AITSK00030/WMAAP)"
+--   system "CLRPFM FILE(AITSK00030/WDF2P)"
+--   system "CLRPFM FILE(AITSK00030/WMCZP)"
+--   system "CLRPFM FILE(AITSK00030/WDELP)"
+--
+-- =====================================================================
