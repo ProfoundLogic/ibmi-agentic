@@ -17,6 +17,7 @@ end-ds;
 
 dcl-pr wrkcust1r extpgm;
   custno like(cust_rec.custno) const;
+  mode char(1) const options(*nopass);
 end-pr;
 
 dcl-s numCustomers int(10);
@@ -69,7 +70,7 @@ dow not *in03;
   if numCustomers = 0;
     soptdesc = '';
   else;
-    soptdesc = '5=Display';
+    soptdesc = '2=Edit   5=Display';
   endif;
 
   // Display the screen.
@@ -130,7 +131,9 @@ dow not *in03;
     enddo;
     select;
       when %trim(sopt) = '5';
-        wrkcust1r(scustno);
+        wrkcust1r(scustno : 'D');
+      when %trim(sopt) = '2';
+        wrkcust1r(scustno : 'E');
     endsl;
   endif;
 
@@ -234,7 +237,7 @@ dcl-proc isValidOption;
   end-pi;
 
   select;
-    when %trim(option) = '5';
+    when %trim(option) = '5' or %trim(option) = '2';
       return *on;
     other;
       return *off;

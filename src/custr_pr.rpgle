@@ -13,3 +13,7 @@
          returned int(10);
          filter varchar(50) const options(*omit : *nopass);
        end-pr;
+
+       dcl-pr cust_update varchar(80);
+         customer likeds(cust_rec) const;
+       end-pr;
