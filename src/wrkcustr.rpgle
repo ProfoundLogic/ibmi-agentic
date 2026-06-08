@@ -41,6 +41,7 @@ dow not *in03;
   exsr getCustomers;
 
   // Write function key label footer.
+  //// yet another commnet
   sfkeys = 'F3=Exit';
   if numCustomers <> 0;
     sfkeys = %trim(sfkeys) + '  F11=Fold/Unfold';
@@ -167,6 +168,7 @@ begsr loadSFL;
     *in51 = *off;
     sopt = '';
     scustno = customers(i).custno;
+    sstatus = customers(i).cstatus;
     sname = customers(i).cname;
     saddr = %trim(customers(i).caddr1) + ' ' + %trim(customers(i).caddr2) + ' ' +
             %trim(customers(i).ccity) + ', ' + customers(i).cstate + ' ' + customers(i).czip;
