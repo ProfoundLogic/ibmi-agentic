@@ -1,0 +1,719 @@
+     A*****************************************************************
+     A* (c) 2014 StoneRiver, Inc. All rights Reserved.                     *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*****************************************************************
+     A** FEE SCHEDULE - EOB WORK FILE ***
+     A****************************************************************
+     A** REVISIONS:
+     A*
+     A*  11/22/16 C:309 Project: 25MUJ
+     A*                 Add new field "Bill Import Error Flag"
+     A*
+     A****************************************************************
+     A**  IMPORTANT NOTE:
+     A**   CHANGES TO THIS FILE MAY REQUIRE CHANGES TO THE FOLLOWING:
+     A**
+     A**          FDEOP
+     A**          FNEOP
+     A**          FWEOP
+     A**          FWEOP1
+     A**          FXEOP
+     A**          HAEOP
+     A**          PAEOP
+     A**          PDEOP
+     A**          TAEOP
+     A**          MAEOP
+     A**
+     A****************************************************************
+     A** NOTE: Though PBILLS no longer hard deletes EOMBs, 'M' type
+     A**       EOMBs(Case Management T/Ms) will be hard deleted if
+     A**       EOMB is uninvoiced and there are no T/M activity
+     A**       line items.  This happens if 1)An 'M' type EOMB is
+     A**       created but no T/M activity added. or 2)An 'M' type
+     A**       EOMB had T/M activity, but then all activity is deleted.
+     A**       This will result in breaks in the sequence of EOMB#s.
+     A****************************************************************
+     A**
+     A****************************************************************
+     A** REVISIONS:
+     A*
+     A* 05/24/16  C:307  Support: 40844
+     A*                  Change field heading on EOFLG8 to be
+     A*                  'Provider Agreement Code'
+     A*
+     A* 03/03/15  C:296  PROJECT: 114MRD
+     A*                  ADDED NEW LOGICALS:
+     A*                  1) FAEOL82
+     A*                  2) FAEOL83
+     A*                  3) FAEOL84
+     A*                  4) FAEOL85
+     A*                  5) FAEOL86
+     A*
+     A* 01/07/15  C:296  Project: FL079
+     A*                  Add new field "County Code Modifier Rate".
+     A*
+     A* 09/23/14  C:296  Project: 114MPQ
+     A*                  Add new field "Network Sent Flag (EONSNT)".
+     A*
+     A* 08/01/14  C:212  Project: 114MNV
+     A*                  Procura/Bill review
+     A*
+     A* 05/06/14  C:212  Project: SEQ85408
+     A*                  Added field EORGN#
+     A*                  The sources and object in V14 were not in sync.
+     A*                  Objects had EORGN# that was probably added in
+     A*                  project IL004 but was not in V14 sources
+     A*
+     A* 01/10/12  C:251  Project: 25MSO
+     A*                  Added  new fields EOAREA and EOPHN
+     A*
+     A* 04/05/11  C:198  Project: 45MHZ
+     A*                  Added EOFEE
+     A*
+     A* 07/25/11  C:273  Project: 114MYX
+     A*                  Added a new fields EONDPS and EODPCT
+     A*
+     A* 09/29/10  C:257  Project: 133MJN
+     A*                  ADD EOTAX
+     A*
+     A* 09/07/10  C:220  Project: FS365
+     A*                  Added a new fields EOWIND and EOGAF
+     A*
+     A* 08/12/10  C:198  Project: 114MWS
+     A*                  Added a new field "Network discount type".
+     A*
+     A* 03/11/10  C:227  Project: FL083
+     A*                  Add MEIG Revision indicator
+     A*
+     A* 10/23/07  C:062  Project: 139MIF
+     A*                  ADD NETWORK COMMENT
+     A*
+     A*  05/16/07 C:062 Project: MC294
+     A*                 - Add BILLING PROVIDER NPI #
+     A*
+     A*  04/04/07 C:199 Project: FL061
+     A*                 - Added fields EOPOST and EOCPST
+     A*
+     A* 11/15/06 C:181 PROJECT: 135MFX
+     A*                ADD FIELD EONWNM TO END OF FILE.
+     A*
+     A*  01/04/06 C:163 Project: 10MIE
+     A*                 FL EDI Employee Payments
+     A*
+     A*  10/25/05 C:163 Project: 136MBR
+     A*                 Managed Care/Prov Bill Interface Process
+     A*
+     A*  08/08/05 C:79  PROJECT: 135MET
+     A*                 Add pended by medical bill upload
+     A*
+     A*  02/18/05 C:79  PROJECT: 25MNZ
+     A*                 Add referring provider last/first name
+     A*                 FEIN/Mod
+     A*
+     A*  03/07/04 C:15  PROJECT: WC1269
+     A*                 Added out of country address field.
+     A*
+     A*  05/12/03 C:062 Project: 129MBO
+     A*                 -ADDED EOINPE
+     A*                 -ADDED EOINPN
+     A*                 -ADDED EOOUTE
+     A*                 -ADDED EOOUTN
+     A*                 -ADDED EOASCE
+     A*                 -ADDED EOASCN
+     A*                 -ADDED EOCLNE
+     A*                 -ADDED EOCLNN
+     A*                 -ADDED EOLABE
+     A*                 -ADDED EOLABN
+     A*                 -ADDED EOGRPE
+     A*                 -ADDED EOGRPN
+     A*                 -ADDED EOINDE
+     A*                 -ADDED EOINDN
+     A*
+     A*  12/20/02 C:079 Project: NW075
+     A*                 ADD MANUAL FEE SCHEDULE FIELD
+     A*
+     A*  12/06/02 C:062 Project: 114MEO
+     A*                 ADD SOURCE COMMENT TO EOCRPE
+     A*
+     A*  11/14/02 C:079 Project: 114MEI
+     A*                 ADD IMAGE DOCUMENT ID FIELD
+     A*
+     A*  08/01/02 C:062 Project: 48MFB
+     A*                 ADD FEE SCHEDULE ADJUDICATION STATE FIELD.
+     A*
+     A*  06/12/02 C:062 Project: 48MFA
+     A*                 Add EOBRDT
+     A*
+     A*  04/25/02 C:079 Project: 114MDC
+     A*                 Add EOCRNE,EOCRDO,EOCRPE for CodeReview
+     A*
+     A*  04/12/02 C:79  Project: TX019
+     A*                 Add field for sending EOB to phys/claimant
+     A*
+     A*  10/04/01 C:79  Project: MCMNT
+     A*                 Update source comments for EOFLIC,EOFLG7
+     A*                 EOEOB1, EOEOB2
+     A*
+     A*  08/10/01 C:62  Project: 95MBA
+     A*                 ADDED SERVICE FROM/TO DATES
+     A*
+     A*  04/10/01 C:62  Project: FS224
+     A*                 ADDED SOURCE INVOICE DATE.
+     A*
+     A*  11/30/00 C:79  Project: PA008
+     A*                 EOFLIC-add description for Pbills usage
+     A*
+     A*  11/30/00 C:79  Project: 25MMR
+     A*                 EOEOB3-change column heading and comments
+     A*
+     A*  06/07/99 C:31  Project: 48MCW
+     A*                 Network contract pop-up window
+     A*                 1. Add network control number
+     A*
+     A*  06/17/99 C:117 Project: FL021
+     A*                 Adding fields EOCNTL & EOSBDT for the FL
+     A*                 Tape Submission project
+     A*
+     A*  04/01/98 C:56 Project: MC152
+     A*                Add various fields for Work with Provider
+     A*                Bills
+     A****************************************************************
+     A                                      REF(FSREFP)
+     A          R PEO01                     TEXT('EOB WORK FILE')
+     A            EOCO#     R               REFFLD(CO#)
+     A            EOFND     R               REFFLD(FND)
+     A            EOFYR     R               REFFLD(FYR)
+     A            EOCASE    R               REFFLD(CASE)
+     A            EOTRDT    R               REFFLD(DT)
+     A                                      COLHDG('TRANSACTION' 'DATE')
+     A            EOFEIN    R               REFFLD(FEIN)
+     A                                      COLHDG('PAYEE' 'FEDERAL' 'ID #')
+     A            EOMOD     R               REFFLD(MOD)
+     A            EOAMT     R               REFFLD(A92)
+     A                                      COLHDG('RECOMMENDED' 'ALLOWANCE')
+     A            EOFRDT    R               REFFLD(DT)
+     A                                      COLHDG('FROM' 'DATE')
+     A            EOTODT    R               REFFLD(DT)
+     A                                      COLHDG('TO' 'DATE')
+     A            EOTRCD    R               REFFLD(CODE)
+     A                                      COLHDG('TRANSACTION' 'CODE')
+     A            EOPNAM    R               REFFLD(NAME)
+     A            EOADR1    R               REFFLD(ADR1)
+     A            EOADR2    R               REFFLD(ADR2)
+     A            EOCTY     R               REFFLD(CTY)
+     A            EOST      R               REFFLD(ST)
+     A            EOZIP     R               REFFLD(ZIP)
+     A            EOEOB1    R               REFFLD(SPEC)
+     A                                      COLHDG('EOMB TABLE' 'CODE 1')
+     A*                                        Provider Specialty code from
+     A*                                        screen
+     A            EOEOB2    R               REFFLD(SPEC)
+     A                                      COLHDG('EOMB TABLE' 'CODE 2')
+     A            EOEOB3    R               REFFLD(SPEC)
+     A                                      COLHDG('AUXILIARY' 'NTWK CODE')
+     A*                                      CLT025:
+     A*                                        Valid values via NMNWP
+     A            EOCHK#    R               REFFLD(CHK#) COLHDG('EOB# AFTR'+
+     A                                      'PROCESSED')
+     A            EOEOB#    R               REFFLD(EOB#) COLHDG('EOB# BE-4'+
+     A                                      'PROCESSED')
+     A            EOSYS     R               REFFLD(FLAG) COLHDG('SYSTEM ID')
+     A                                      TEXT('NOT USED YET FLAG')
+     A            EOFLG1    R               REFFLD(FLAG)
+     A*   Client: 03/40
+     A*   Download Status Flag
+     A*               X = Not Sent
+     A*           blank = Waiting to be written to FANDPxxxx
+     A*               D = written to FANDPxxx, waiting to be downloaded
+     A*               S = Sent
+     A*               R = Returned
+     A********
+     A            EOFLG2    R               REFFLD(FLAG)
+     A*   Client: 03/40
+     A*   Download H/R Flag
+     A*               H = Held
+     A*               R = Released
+     A***
+     A*** CLT114: Prudent Buy dicount algorithm. Determine (for recoververy
+     A*** puposes) how the bill was previously discounted (i.e. per FS or
+     A*** Prudent Buy
+     A            EOFLG3    R               REFFLD(FLAG) COLHDG('FLAG 3')
+     A                                      TEXT('PRUDENT BUY FLAG')
+     A*                                     P = PRUDENT BUY
+     A*                                     S = STATE FEE SCHEDULE
+     A*                                     BLANK = N/A
+     A********
+     A            EOFLG4    R               REFFLD(FLAG) COLHDG('FLAG 4')
+     A                                      TEXT('Y=DO NOT ALLOW EOMB DELETE  +
+     A                                           OR REPRINT')
+     A********
+     A            EOFLG5    R               REFFLD(FLAG) COLHDG('FLAG 5')
+     A                                      TEXT('Y=T/M ASSOCIATED BILLING')
+     A********
+     A            EOFLG6    R               REFFLD(FLAG) COLHDG('FLAG 6')
+     A                                      TEXT('BILL TYPE')
+     A*                                     H = HOSPITAL
+     A*                                     P = PHYSICIAN
+     A*                                     X = PHARMACY
+     A********
+     A*** Field used to track if user overrode FL data submission
+     A*** edit for valid FL license#
+     A            EOFLG7    R               REFFLD(FLAG) COLHDG('FLAG 7')
+     A                                      TEXT('NOT USED YET FLAG')
+     A*                                     Y = User overrode
+     A********
+     A*** Beg Chg *** 05/24/16 ****************************************
+     A********    EOFLG8    R               REFFLD(FLAG) COLHDG('FLAG 8')
+     A            EOFLG8    R               REFFLD(FLAG) COLHDG('Provider' +
+     A                                      'Agreement Code')
+     A*** End Chg *** 05/24/16 ****************************************
+     A                                      TEXT('USED IN F0150R - EOMB DELETE')
+     A********
+     A            EOFLG9    R               REFFLD(FLAG) COLHDG('FLAG 9')
+     A                                      TEXT('USED IN CLIENT INVOICING')
+     A********
+     A            EOAMTC    R               REFFLD(A92)
+     A                                      COLHDG('AMOUNT' 'CHARGED')
+     A            EOSTAT    R               REFFLD(STAT) TEXT('P=PRINTED')
+     A                                      COLHDG('PRINTED' 'FLAG')
+     A            EOUSER    R               REFFLD(USER)
+     A            EOPGM     R               REFFLD(PGM)
+     A            EOTIME    R               REFFLD(TIME)
+     A            EODT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            EOIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            EOIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'ENTRY' 'DATE')
+     A*** ADDED FOR WC/FS INTERFACE ********************************************
+     A*** The following field is no longer used for Prov Ck# in
+     A***     PBILLS.  It is now used in PBILLS for FL Tape
+     A***     Submission to indicate completion of a bill &
+     A***     ready for data submission.
+     A*
+     A            EOWCCK    R               REFFLD(CHK#)
+     A                                      COLHDG('WC' 'CHECK' 'NUMBER')
+     A*** ADDED FOR ELECTRONIC TAPE SUBMISSION *********************************
+     A            EODIA1    R               REFFLD(DIA)
+     A                                      TEXT('DIAGNOSTIC CODE 1')
+     A            EODIA2    R               REFFLD(DIA)
+     A                                      TEXT('DIAGNOSTIC CODE 2')
+     A            EODIA3    R               REFFLD(DIA)
+     A                                      TEXT('DIAGNOSTIC CODE 3')
+     A            EODIA4    R               REFFLD(DIA)
+     A                                      TEXT('DIAGNOSTIC CODE 4')
+     A            EOEMPL    R               REFFLD(FLAG)
+     A                                      TEXT('PATIENT EMPLMNT')
+     A            EODFC     R               REFFLD(DT)
+     A                                      TEXT('DATE 1ST CONSULTED')
+     A*** ADDED FOR PBILLS USAGE ***********************************************
+     A*** The following field is no longer used for FL Physician Lic# in
+     A***     PBILLS.  It is now used in PBILLS for servicing zip
+     A***     code, the 1st 5 positions contain the service zip of
+     A***     the provider.
+     A*
+     A            EOFLIC    R               REFFLD(FEI2)
+     A                                      COLHDG('PHYS FL LIC#')
+     A            EOTAPE    R               REFFLD(FLAG)
+     A                                      TEXT('SUBMIT ON TAPE FLAG')
+     A*** ADD FOR INVOICING SYSTEM *********************************************
+     A            EO#BLL    R               REFFLD(A30)
+     A                                      COLHDG('# OF' 'BILLS')
+     A            EOCLSF    R               REFFLD(FLAG)
+     A                                      COLHDG('CLOSED' 'FILE' 'FLAG')
+     A*** ADD FOR MULTIPLE STATE ADJUDICATION **********************************
+     A            EOAST     R               REFFLD(ST)
+     A                                      COLHDG('ADJUDICATION' 'STATE')
+     A            EOSUB#    R               REFFLD(SUB#)
+     A                                      COLHDG('SUBSCRIBER')
+     A*** ADD FOR NETWORK PROCESSING SYSTEM ************************************
+     A            EOAUDT    R               REFFLD(FLAG)
+     A                                      COLHDG('HBA HAS BEEN' 'PERFORMED')
+     A            EOBTFL    R               REFFLD(FLAG)
+     A                                      COLHDG('BILLING TYPE' 'D=DETAIL' +
+     A                                             'S=SUMMARY')
+     A            EOHRFL    R               REFFLD(FLAG)
+     A                                      COLHDG('HOLD/RELEASE' 'FLAG')
+     A            EOBLFL    R               REFFLD(FLAG)
+     A                                      COLHDG('BILLING' 'FLAG')
+     A            EONLFL    R               REFFLD(FLAG)
+     A                                      COLHDG('NO LOST' 'TIME FLAG')
+     A            EODIFL    R               REFFLD(FLAG)
+     A                                      COLHDG('DEL FROM' 'INV FLAG')
+     A            EOINV#    R               REFFLD(EOB#)
+     A                                      COLHDG('INVOICE' 'NUMBER')
+     A            EORMDS    R               REFFLD(DS30)
+     A                                      TEXT('REMARKS')
+     A*****                                        Clt 48: Patient Invoice #
+     A            EORMK1    R               REFFLD(CODE)
+     A                                      TEXT('REMARK CODE 1')
+     A            EORMK2    R               REFFLD(CODE)
+     A                                      TEXT('REMARK CODE 2')
+     A            EORMK3    R               REFFLD(CODE)
+     A                                      TEXT('REMARK CODE 3')
+     A            EOCKCN    R               REFFLD(CODE)
+     A                                      COLHDG('CHECK CONTROL')
+     A            EOOTHR    R               REFFLD(A92)
+     A                                      COLHDG('OTHER' 'REDUCTIONS' +
+     A                                      'AMOUNT')
+     A            EONDIS    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'DISCOUNT' +
+     A                                      'REDUCTION')
+     A            EOSB01    R               REFFLD(FLAG) COLHDG('SYSTEMS' +
+     A                                      'BILLED' 'FLAG')
+     A            EOSB02    R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEMS' 'BILLED' 'FLAG')
+     A            EOSB03    R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEMS' 'BILLED' 'FLAG')
+     A            EOSB04    R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEMS' 'BILLED' 'FLAG')
+     A            EOSB05    R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEMS' 'BILLED' 'FLAG')
+     A            EOSB06    R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEMS' 'BILLED' 'FLAG')
+     A            EOSB07    R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEMS' 'BILLED' 'FLAG')
+     A            EOSB08    R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEMS' 'BILLED' 'FLAG')
+     A            EOSB09    R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEMS' 'BILLED' 'FLAG')
+     A            EOSB10    R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEMS' 'BILLED' 'FLAG')
+     A            EOBAMT    R               REFFLD(A92)
+     A                                      COLHDG('BILLING' 'AMOUNT')
+     A*** ADDED NEW FIELDS GEO AREA, AND A NETWORK SYSTEM FIELD FL LIC#
+     A            EOZIPA    R               REFFLD(ZIPA)
+     A                                      COLHDG('GEO ZIP AREA')
+     A            EOCERT    R               REFFLD(CERT)
+     A                                      COLHDG('PRE-CERT #')
+     A            EOEXT     R               REFFLD(EXT)
+     A                                      COLHDG('PRE-CERT EXTENSION')
+     A*** BEGIN ADD *** 04/01/98 **************************************
+     A            EOSS#     R               REFFLD(SS#)
+     A                                      COLHDG('SOCIAL SECURITY#')
+     A            EOACDT    R               REFFLD(DT)
+     A                                      COLHDG('ACCIDENT DATE')
+     A            EOIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL PROGRAM')
+     A            EOITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL TIME')
+     A            EOSFEI    R               REFFLD(FEIN)
+     A                                      COLHDG('SERVICING PROVIDER')
+     A            EOSMOD    R               REFFLD(MOD)
+     A                                      COLHDG('SERVICING PROV MOD')
+     A            EOBTYP    R               REFFLD(BTYP)
+     A                                      COLHDG('BILL TYPE')
+     A**                              xref FTGTP via "BTYP"
+     A            EOSTYP    R               REFFLD(STYP)
+     A                                      COLHDG('BILL SUB-TYPE')
+     A**                              xref FTGTP via "STYP"
+     A            EOBLST    R               REFFLD(FLAG)
+     A                                      COLHDG('BILL STATUS FLAG')
+     A**                              Loosely based on old EOSTAT
+     A**                              P=Pend, will have record in FAEPP to
+     A**                                      indicate type of pend, date, etc.
+     A**                              D=Deleted
+     A**                              H=History
+     A            EOCSCD    R               REFFLD(CODE3)
+     A                                      COLHDG('ADJUDICATION CODE')
+     A**                              Old Claim Status Code
+     A            EOSTCD    R               REFFLD(CODE3)
+     A                                      COLHDG('BILL STATUS CODE')
+     A            EORCN     R               REFFLD(RCN)
+     A                                      COLHDG('NUMBER OF RECONS')
+     A            EOCSDT    R               REFFLD(DT7)
+     A                                      COLHDG('DATE SENT TO CARRIER')
+     A            EOCRDT    R               REFFLD(DT7)
+     A                                      COLHDG('DATE RCVD BY CARRIER')
+     A            EOSID#    R               REFFLD(SID)
+     A                                      COLHDG('SOURCE ID')
+     A            EOSINV    R               REFFLD(DS35)
+     A                                      COLHDG('SOURCE INVOICE#')
+     A            EOSEFT    R               REFFLD(DS35)
+     A                                      COLHDG('SRC EFT TRANSMISS#')
+     A            EOBID#    R               REFFLD(DS35)
+     A                                      COLHDG('SOURCEs BATCH ID')
+     A            EOCID#    R               REFFLD(DS35)
+     A                                      COLHDG('SOURCEs CLAIM ID')
+     A            EOEID#    R               REFFLD(DS35)
+     A                                      COLHDG('SOURCEs BILL/EOMB ID')
+     A            EOPID#    R               REFFLD(DS35)
+     A                                      COLHDG('SOURCEs PROVIDER ID')
+     A            EOSPAY    R               REFFLD(A112)
+     A                                      COLHDG('SOURCEs PAYMENT AMT')
+     A            EOCHRG    R               REFFLD(A112)
+     A                                      COLHDG('TOTAL AMOUNT CHARGED')
+     A            EOMRA     R               REFFLD(A112)
+     A                                      COLHDG('TOTAL MRA REDUCTIONS')
+     A            EOOTH2    R               REFFLD(A112)
+     A                                      COLHDG('TTL OTHR 2 REDUCTION')
+     A            EOPAID    R               REFFLD(A112)
+     A                                      COLHDG('TOTAL PAID')
+     A            EONAMT    R               REFFLD(A112)
+     A                                      COLHDG('NWS BILLING AMOUNT')
+     A            EONTWK    R               REFFLD(NWCD)
+     A                                      COLHDG('NETWORK CODE')
+     A            EONMTC    R               REFFLD(FLAG)
+     A                                      COLHDG('NM GROS RCPT TAX CDE')
+     A            EONMTP    R               REFFLD(PC52)
+     A                                      COLHDG('NM GROS RECEIPT TAX%')
+     A            EOSPCD    R               REFFLD(SPEC)
+     A                                      COLHDG('BILL/PROVIDER SPC CD')
+     A            EOOHPT    R               REFFLD(CODE)
+     A                                      COLHDG('OH PHYSICIAN TYPE')
+     A            EOOHIW    R               REFFLD(FLAG)
+     A                                      COLHDG('OH INJ WRK REIMB Y/N')
+     A            EOOHPI    R               REFFLD(FLAG)
+     A                                      COLHDG('OH PAT MED REL Y/N')
+     A            EOOHTN    R               REFFLD(A112)
+     A                                      COLHDG('OH TTL NON-COV CHRGS')
+     A            EOPEOB    R               REFFLD(EOB#)
+     A                                      COLHDG('PREVIOUS EOMB#')
+     A            EOROOM    R               REFFLD(A92)
+     A                                      COLHDG('LINE ITEM ROOM CHRG')
+     A            EOLSN     R               REFFLD(LSN)
+     A                                      COLHDG('CLAIMANT LAST NAME')
+     A            EOFSN     R               REFFLD(FSN)
+     A                                      COLHDG('CLAIMANT FIRST NAME')
+     A            EOMID     R               REFFLD(MID)
+     A                                      COLHDG('CLAIMANT MIDDLE INIT')
+     A*** END ADD *** 04/01/98 ****************************************
+     A*** BEG ADD *** 06/17/99 ** FL TAPE SUBMISSION ******************
+     A            EOCNTL    R               REFFLD(DS20)
+     A                                      COLHDG('DATA SUBM EOMB ')
+     A            EOSBDT    R               REFFLD(DS8)
+     A                                      COLHDG('SUBM DATE')
+     A*                                 This date will be updated in
+     A*                                 F9511R with date EOMB is sent
+     A*                                 to state.  If "processed" thru
+     A*                                 F0348R correction program,
+     A*                                 this date will be blanked out.
+     A*** END ADD *** 06/17/99 ****************************************
+     A*** BEGIN ADD *** 06/07/99 **************************************
+     A            EONC#     R               REFFLD(DS15)
+     A                                      COLHDG('NETWORK CONTROL #')
+     A*** END ADD *** 06/07/99 ****************************************
+     A*** BEGIN ADD *** 04/10/01 **************************************
+     A            EOSIDT    R               REFFLD(DT8)
+     A                                      COLHDG('SOURCE INVOICE DATE')
+     A*** END   ADD *** 04/10/01 **************************************
+     A*** BEGIN ADD *** 08/10/01 **************************************
+     A            EOSFDT    R               REFFLD(DS8)
+     A                                      COLHDG('SERVICE FROM DATE')
+     A            EOSTDT    R               REFFLD(DS8)
+     A                                      COLHDG('SERVICE TO DATE')
+     A*** END   ADD *** 08/10/01 **************************************
+     A*** BEG ADD *** 04/12/02 ****************************************
+     A            EOSEOB    R               REFFLD(FLAG)
+     A                                      COLHDG('SEND EOB TO' 'PHY/CLMNT')
+     A*** END ADD *** 04/12/02 ****************************************
+     A*** BEG ADD *** 04/24/02 ****************************************
+     A            EOCRNE    R               REFFLD(FLAG)
+     A                                      COLHDG('Needs to' 'go thru'+
+     A                                      'CodeReview')
+     A*                                 Field Usage:
+     A*                                     Y = Needs to go thru CR
+     A*                                     N = Does not go thru CR
+     A            EOCRDO    R               REFFLD(FLAG)
+     A                                      COLHDG('Has gone' 'thru'+
+     A                                      'CodeReview')
+     A*                                 Field Usage:
+     A*                                     Y = Has gone thru CR
+     A*                                     N = Has NOT gone thru CR
+     A            EOCRPE    R               REFFLD(FLAG)
+     A                                      COLHDG('Batch Process')
+     A*                                 Field Usage:
+     A*                                     T = 10-day cover letter
+     A*                                     Y = Pended by CR
+     A*                                     *blanks = Not pended
+     A*** END ADD *** 04/24/02 ****************************************
+     A*** BEGIN ADD *** 06/12/02 **************************************
+     A            EOBRDT    R               REFFLD(DT8)
+     A                                      COLHDG('BILL RVW BILL' +
+     A                                      'RCVD DATE')
+     A*                                 Format: CCYYMMDD
+     A*** END   ADD *** 06/12/02 **************************************
+     A*** BEGIN ADD *** 08/01/02 **************************************
+     A            EOFSST    R               REFFLD(ST)
+     A                                      COLHDG('FEE SCHEDULE' +
+     A                                      'STATE')
+     A*** END   ADD *** 08/01/02 **************************************
+     A*** BEGIN ADD *** 11/14/02 **************************************
+     A            EOIDOC    R               REFFLD(DCID)
+     A                                      COLHDG('IMAGE DOC' 'ID')
+     A*** END   ADD *** 11/14/02 **************************************
+     A*** BEG ADD *** 12/20/02 ****************************************
+     A            EOFSFL    R               REFFLD(FLAG)
+     A                                      COLHDG('MANUAL FS')
+     A*                                 Field Usage:
+     A*                                     Y = Manual Fee Schedule
+     A*                                     blank = Not manual FS
+     A*** END ADD *** 12/20/02 ****************************************
+     A*** BEGIN ADD *** 05/12/03 **************************************
+     A            EOINPE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'INPAT ELECTOR')
+     A            EOINPN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'INPAT NON-ELECTOR')
+     A            EOOUTE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'OUTP ELECTOR')
+     A            EOOUTN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'OUTP NON-ELECTOR')
+     A            EOASCE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'ASC ELECTOR')
+     A            EOASCN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'ASC NON-ELECTOR')
+     A            EOCLNE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'CLN ELECTOR')
+     A            EOCLNN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'CLN NON-ELECTOR')
+     A            EOLABE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'LAB ELECTOR')
+     A            EOLABN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'LAB NON-ELECTOR')
+     A            EOGRPE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'GROUP ELECTOR')
+     A            EOGRPN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'GROUP NON-ELECTOR')
+     A            EOINDE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'IND ELECTOR')
+     A            EOINDN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'IND NON-ELECTOR')
+     A*** END   ADD *** 05/12/03 **************************************
+     A*** Begin add *** 03/07/05 **************************************
+     A            EOADR3    R               REFFLD(DS40)
+     A                                      COLHDG('CITY/PROV/POSTAL CD')
+     A*** End add ***** 03/07/05 **************************************
+     A*** Begin add *** 02/18/05 **************************************
+     A            EORLNM    R               REFFLD(LSN)
+     A                                      COLHDG('REFER PROV' 'LAST NAME')
+     A            EORFNM    R               REFFLD(FSN)
+     A                                      COLHDG('REFER PROV' 'FIRST NAME')
+     A            EORFEI         9S 0       COLHDG('REFER' 'FEDERAL' 'ID #')
+     A            EORMOD         3S 0       COLHDG('REFER' 'MOD')
+     A            EORLIC    R               REFFLD(LIC#)
+     A                                      COLHDG('REFER' 'PROV. LIC#')
+     A*** End add ***** 02/18/05 **************************************
+     A*** Begin add *** 08/08/05 **************************************
+     A            EOMBUP    R               REFFLD(FLAG)
+     A                                      COLHDG('MEDICAL' 'BILL' 'UPLOAD')
+     A*                                 Field Usage:
+     A*                                     C = Pended By Concentra
+     A*                                     *blanks = Not pended
+     A*** End   add *** 08/08/05 **************************************
+     A*** Begin add *** 10/25/05 **************************************
+     A            EOCONT    R               REFFLD(DS2)
+     A                                      COLHDG('Cont' 'Type' 'Code')
+     A            EOFFEI    R     S         REFFLD(FEIN)
+     A                                      COLHDG('Facility' 'FEIN')
+     A            EOFNAM    R               REFFLD(DS35)
+     A                                      COLHDG('Facility' 'Name')
+     A            EOFZIP    R     S         REFFLD(ZIP)
+     A                                      COLHDG('Facility' 'Zip' 'Code')
+     A            EOBLIC    R               REFFLD(LIC#)
+     A                                      COLHDG('Bill Prov' 'State' 'Lic#')
+     A            EOBTYC    R               REFFLD(DS2)
+     A                                      COLHDG('Bill' 'Type' 'Code')
+     A            EORNAM    R               REFFLD(DS35)
+     A                                      COLHDG('Rend Prv' 'Lst/Grp' 'Name')
+     A            EOBLID    R               REFFLD(DS15)
+     A                                      COLHDG('Unique' 'Prov' 'Bill ID')
+     A*** End   add *** 10/25/05 **************************************
+     A*** Begin add *** 01/04/06 **************************************
+     A            EOEPMT    R               REFFLD(FLAG)
+     A                                      COLHDG('Employee' 'Payment' 'Ind')
+     A*** End   add *** 01/04/06 **************************************
+     A*** BEGIN ADD *** 11/15/06 **************************************
+     A            EONWNM    R               REFFLD(DS30)
+     A                                      COLHDG('NETWORK' 'NAME')
+     A*** END   ADD *** 11/15/06 **************************************
+     A*** BEG ADD *** 04/04/07 **************************************
+     A            EOPOST    R               REFFLD(ST)
+     A                                      COLHDG('Policy' 'State')
+     A            EOCPST    R               REFFLD(FLAG)
+     A                                      COLHDG('Capture Policy' 'St Data')
+     A*** END ADD *** 04/04/07 **************************************
+     A*** BEG ADD *** 05/16/07 **************************************
+     A            EOBNPI    R               REFFLD(DS15)
+     A                                      COLHDG('Billing Provider' +
+     A                                      'NPI#')
+     A*** END ADD *** 05/16/07 **************************************
+     A*** BEG ADD *** 10/23/07 ****************************************
+     A            EONDSC       255A         COLHDG('Network description')
+     A*** END ADD *** 10/23/07 ****************************************
+     A*** BEG ADD *** 03/11/10 ****************************************
+     A            EOREVI    R               REFFLD(FLAG)
+     A                                      COLHDG('MEIG Revision' 'indicator')
+     A*** END ADD *** 03/11/10 ****************************************
+     A*** Beg Add *** 08/12/10 ****************************************
+     A            EODSTY    R               REFFLD(DS2)
+     A                                      COLHDG('Network discount ' 'type')
+     A*** End Add *** 08/12/10 ****************************************
+     A*** Beg Add *** 09/07/10 ****************************************
+     A            EOWIND    R     S         REFFLD(A64)
+     A                                      COLHDG('Provider WI')
+     A            EOGAF     R     S         REFFLD(A64)
+     A                                      COLHDG('Geo Adjustment' 'Factor')
+     A*** End Add *** 09/07/10 ****************************************
+     A*** Beg Add *** 09/29/10 **************************************
+     A            EOTAX     R     S         REFFLD(A92)
+     A                                      COLHDG('Pharmacy Tax')
+     A*** End Add *** 09/29/10 **************************************
+     A*** Beg Add *** 07/25/11 **************************************
+     A            EONDPS    R               REFFLD(FLAG)
+     A                                      COLHDG('Non-discounted'            +
+     A                                             'provider selection')
+     A            EODPCT    R               REFFLD(FLAG)
+     A                                      COLHDG('Discounted provider'       +
+     A                                             'contract' 'not selected')
+     A*** End Add *** 07/25/11 **************************************
+     A*** Beg Add *** 01/10/12 **************************************
+     A            EOAREA         3S 0
+     A                                      COLHDG('Submitter'                 +
+     A                                      '(Billing Provider)' 'Area Code')
+     A            EOPHN          7S 0
+     A                                      COLHDG('Submitter'                 +
+     A                                      '(Billing Provider)' 'Phone Number')
+     A*** End Add *** 01/10/12 **************************************
+     A***** Beg Add *** 05/06/14 *******************************************
+     A            EORGN#    R     S         REFFLD(RGN#)
+     A                                      COLHDG('Region')
+     A***** End Add *** 05/06/14 *******************************************
+     A*** Beg Add *** 04/05/11 **************************************
+     A            EOFEE     R     S         REFFLD(A92)
+     A                                      COLHDG('Vendors Fee')
+     A*** End Add *** 04/05/11 **************************************
+     A***** Beg Add *** 08/01/14 *******************************************
+     A            EOPAUF    R               REFFLD(FLAG)
+     A                                      COLHDG('Procura Audit' +
+     A                                      'Flag')
+     A*******                               Valid Values:
+     A*******                               Blanks = unprocessed
+     A*******                               A = Audited
+     A*******                               N = Audit Procesed
+     A***** End Add *** 08/01/14 *******************************************
+     A*** Beg Add *** 09/23/14 **************************************
+     A            EONSNT    R               REFFLD(FLAG)
+     A                                      COLHDG('Network Sent Flag')
+     A*** End Add *** 09/23/14 **************************************
+     A*** Beg Add *** 01/07/15 **************************************
+     A            EOCTYMOD       6S 4       COLHDG('COUNTY CODE' +
+     A                                      'MODIFIER RATE')
+     A*** End Add *** 01/07/15 **************************************
+     A*** Beg Add *** 11/22/16 **************************************
+     A            EOBERR    R               REFFLD(FLAG)
+     A                                      COLHDG('Bill Import' 'Error Flag')
+     A*** End Add *** 11/22/16 **************************************

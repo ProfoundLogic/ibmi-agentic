@@ -1,0 +1,185 @@
+     A* (c) 2024 SAPIENS, Inc. All rights Reserved.                   *
+     A*                                                               *
+     A*****************************************************************
+     A* SCRIPTURA DATA WORK FILE FOR ESTIMATED/AUDITED BILLS          *
+     A*****************************************************************
+     A*                                                               *
+     A*  PROJECT:  SY371        PROGRAMMER:  C:65                     *
+     A*  CREATED:  01/29/16 - REVAMPED 04/22/21                       *
+     A*  DESCRIPTION:  THIS IS THE WORK FILE TO HOLD THE DATA FOR     *
+     A*                BILLS - ESTIMATED, AUDITED, QUOTE, ETC.        *
+     A*                                                               *
+     A*****************************************************************
+     A* REVISIONS:
+     A*
+     A* 01/24/24 C:291 Project: WC2670
+     A*                         Additional fields for Retrospective
+     A*                         Rating.
+     A*
+     A* 12/06/23 C:291 Project: WC2670
+     A*                         Add BLNETRTFLG and BLMINF.
+     A*
+     A* 10/05/23 C:291 Project: WC2670
+     A*                         Split BLFOOT into 3 fields.
+     A*
+     A* 08/23/23 C:291 Project: WC2670
+     A*                         Add APAP fields.
+     A*
+     A* 04/28/22 C:136 Project: WC2670
+     A*                         Add increased field limits
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PBL01                     TEXT('SCRIPTURA BILLING WORKFILE')
+     A            BLXML         60A         COLHDG('XML FILE NAME')
+     A            BLCO#     R     S         REFFLD(CO#)
+     A            BLFND     R     S         REFFLD(FND)
+     A            BLEMP#    R     S         REFFLD(EMP#)
+     A            BLDIV     R     S         REFFLD(DIV)
+     A            BLFYR     R     S         REFFLD(FYR)
+     A            BLTYPE        50A         COLHDG('TYPE OF BILL')
+     A            BLTITLE   R               REFFLD(DS40)
+     A                                      COLHDG('TITLE OF BILL')
+     A            BLPFDATE       8S 0       COLHDG('POLICY PERIOD')
+     A            BLPTDATE       8S 0       COLHDG('POLICY PERIOD')
+     A            BLREFHDG  R               REFFLD(DS20)
+     A                                      COLHDG('POL REF HEADING')
+     A            BLPOLICY# R               REFFLD(DS20)
+     A                                      COLHDG('POLICY NUMBER')
+     A            BLPRTDATE      8S 0       COLHDG('PRINT DATE')
+     A            BLANVDATE      8S 0       COLHDG('ANNIV DATE')
+     A            BLRATEST  R               REFFLD(DS10)
+     A                                      COLHDG('RATING STATE')
+     A            BLCARHDG  R               REFFLD(DS20)
+     A                                      COLHDG('CARRIER POL# HEADING')
+     A            BLCARPOL  R               REFFLD(DS25)
+     A                                      COLHDG('CARRIER POLICY#')
+     A            BLWNAME1  R               REFFLD(DS00)
+     A                                      COLHDG('WINDOW NAME #1')
+     A            BLWNAME2  R               REFFLD(DS00)
+     A                                      COLHDG('WINDOW NAME #2')
+     A            BLWNAME3  R               REFFLD(DS00)
+     A                                      COLHDG('WINDOW NAME #3')
+     A            BLWNAME4  R               REFFLD(DS00)
+     A                                      COLHDG('WINDOW NAME #4')
+     A            BLWADDR1  R               REFFLD(DS50)
+     A                                      COLHDG('WINDOW ADDR #1')
+     A            BLWADDR2  R               REFFLD(DS50)
+     A                                      COLHDG('WINDOW ADDR #2')
+     A            BLWADDR3  R               REFFLD(DS50)
+     A                                      COLHDG('WINDOW ADDR #3')
+     A            BLVALDTHD R               REFFLD(DS20)
+     A                                      COLHDG('VALID DATE HEADING')
+     A            BLVALDATE      8S 0       COLHDG('VALID UNTIL DATE')
+     A            BLPERDHD  R               REFFLD(DS25)
+     A                                      COLHDG('POL PERIOD HEADING')
+     A            BLDIVHD   R               REFFLD(DS20)
+     A                                      COLHDG('DIVISION HEADING')
+     A            BLPRTDTHD R               REFFLD(DS20)
+     A                                      COLHDG('PRINT DATE HEADING')
+     A            BLANVDTHD R               REFFLD(DS20)
+     A                                      COLHDG('ANNV DATE HEADING')
+     A            BLRTSTHD  R               REFFLD(DS20)
+     A                                      COLHDG('RATING STATE HEADING')
+     A            BLPRMWORD     12A         COLHDG('PREMIUM/CONTRI WORD')
+     A            BLMOD1         5S 4       COLHDG('FIRST MODIFIER')
+     A            BLMOD2         5S 4       COLHDG('SECOND MODIFIER')
+     A            BLMOD3         5S 4       COLHDG('THIRD MODIFIER')
+     A            BLMODDT1       8S 0       COLHDG('MOD DATE # 1')
+     A            BLMODDT2       8S 0       COLHDG('MOD DATE # 2')
+     A            BLMODDT3       8S 0       COLHDG('MOD DATE # 3')
+     A            BLEMLB    R               REFFLD(DS30)
+     A                                      COLHDG('STD E.L. DESC')
+     A            BLDEDT         5A         COLHDG('DED PLAN GR/NT')
+     A            BLDDD1        27A         COLHDG('DED DESCRIPTION')
+     A            BLAMPO         7S 0       COLHDG('AMT PER OCCUR')
+     A            BLDDVB        15A         COLHDG('CLM/OCC')
+     A            BLAMAG         9S 0       COLHDG('AMT AGGREGATE')
+     A            BLCONNAM  R               REFFLD(DS50)
+     A                                      COLHDG('SERVICED BY NAME')
+     A            BLCONADR1 R               REFFLD(DS50)
+     A                                      COLHDG('SERVICED BY ADDR #1')
+     A            BLCONADR2 R               REFFLD(DS50)
+     A                                      COLHDG('SERVICED BY ADDR #2')
+     A            BLCONADR3 R               REFFLD(DS50)
+     A                                      COLHDG('SERVICEDBY ADDR #3')
+     A            BLCONAREA R     S         REFFLD(AREA)
+     A                                      COLHDG('SERVICED BY' 'AREA' 'CODE')
+     A            BLCONPHN# R     S         REFFLD(PHN#)
+     A                                      COLHDG('SERVICED BY' 'PHONE#')
+     A            BLAGTNAM  R               REFFLD(DS50)
+     A                                      COLHDG('AGENT CONTACT NAME')
+     A            BLAGTADR1 R               REFFLD(DS50)
+     A                                      COLHDG('AGENT ADDR #1')
+     A            BLAGTADR2 R               REFFLD(DS50)
+     A                                      COLHDG('AGENT ADDR #2')
+     A            BLAGTADR3 R               REFFLD(DS50)
+     A                                      COLHDG('AGENT ADDR #3')
+     A            BLAGT#    R               REFFLD(AGT#)
+     A                                      COLHDG('AGENT NUMBER')
+     A            BLAGTAREA R     S         REFFLD(AREA)
+     A                                      COLHDG('AGENT' 'AREA' 'CODE')
+     A            BLAGTPHN# R     S         REFFLD(PHN#)
+     A                                      COLHDG('AGENT' 'PHONE#')
+      *** Beg Chg ***** 10/05/23 **********************************
+     A****        BLFOOT       240A         COLHDG('FOOTER TEXT')
+     A            BLFOOT1       80A         COLHDG('FOOTER TEXT 1')
+     A            BLFOOT2       80A         COLHDG('FOOTER TEXT 2')
+     A            BLFOOT3       80A         COLHDG('FOOTER TEXT 3')
+      *** End Chg ***** 10/05/23 **********************************
+     A            BLPAYVBG     100A         COLHDG('PAYABLE VERBIAGE')
+     A            BLCOM1    R               REFFLD(DS50)
+     A                                      COLHDG('COMMENT #1')
+     A            BLCOM2    R               REFFLD(DS50)
+     A                                      COLHDG('COMMENT #2')
+     A            BLCOM3    R               REFFLD(DS50)
+     A                                      COLHDG('COMMENT #3')
+     A            BLUSER    R               REFFLD(USER)
+     A                                      COLHDG('USER')
+     A            BLPGM     R               REFFLD(PGM)
+     A                                      COLHDG('PROGRAM')
+     A            BLTIME    R     S         REFFLD(TIME)
+     A                                      COLHDG('TIME')
+     A            BLDT      R     S         REFFLD(DT)
+     A                                      COLHDG('DATE')
+      *** beg add ***** 04/28/22 *********************************
+     A            BLLMACC        5S 0       COLHDG('Limit - Accident')
+     A            BLLMDIS        5S 0       COLHDG('Limit - Disease')
+     A            BLLMAGG        5S 0       COLHDG('Limit - Aggregate')
+     A            BLSUMM         1A         COLHDG('A/R Summary')
+      *** end add ***** 04/28/22 *********************************
+      *** beg add ***** 08/23/23 *********************************
+     A            BLARP1         5S 4       COLHDG('ARAP # 1')
+     A            BLARP2         5S 4       COLHDG('ARAP # 2')
+     A            BLARP3         5S 4       COLHDG('ARAP # 3')
+     A            BLNETP        11S 2       COLHDG('AMT DUE')
+     A            BLDUDT        18A         COLHDG('DUE DATE')
+      *** end add ***** 08/23/23 *********************************
+      *** beg add ***** 12/06/23 *********************************
+     A            BLNETRTF       1A         COLHDG('Net Rate Flag')
+     A            BLMINF         1A         COLHDG('Minimum Prem' 'Invoked')
+      *** end add ***** 12/06/23 *********************************
+      *** Beg add ***** 01/24/24 *********************************
+     A            BLMNFC         5S 4       COLHDG('Minimum Retro' 'Prem -
+     A                                      Factor')
+     A            BLMXFC         5S 4       COLHDG('Maximum Retro' 'Prem -
+     A                                      Factor')
+     A            BLLCVF         5S 4       COLHDG('Retro Loss' 'Conve-
+     A                                      rsion Factor')
+     A            BLBSFC         5S 4       COLHDG('Retro Basic' 'Prem -
+     A                                      Factor')
+     A            BLTAX          5S 4       COLHDG('Retro Tax' 'Multiplier')
+     A            BLTAXF         5S 4       COLHDG('Retro Tax' 'Multi-
+     A                                      plier F-Class')
+     A            BLELP          5S 4       COLHDG('Retro Excess Loss' 'Prem -
+     A                                      Factor')
+     A            BLELPF         5S 4       COLHDG('Retro Excess Loss' 'Prem -
+     A                                      Factor F-Class')
+     A            BLRDF1         5S 4       COLHDG('Retro Development' -
+     A                                       'Factor 1')
+     A            BLRDF2         5S 4       COLHDG('Retro Development' -
+     A                                       'Factor 2')
+     A            BLRDF3         5S 4       COLHDG('Retro Development' -
+     A                                       'Factor 3')
+     A            BLRETN        11S 2       COLHDG('Retro Loss' -
+     A                                       'Limitation')
+      *** End add ***** 01/24/24 *********************************

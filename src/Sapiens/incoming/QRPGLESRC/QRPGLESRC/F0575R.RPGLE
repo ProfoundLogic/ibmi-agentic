@@ -1,0 +1,682 @@
+     HCopyright('(c) 2020 Sapiens. All Rights Reserved.')
+     H option(*nodebugio:*srcstmt)
+     H**sy266_ovr*** dftactgrp(*no) actgrp('QILE')
+     H dftactgrp(*no) actgrp(*caller)
+     H/define CONVERT
+     H***** Beg Add *** 06/09/20 *******************************************
+     H Bnddir('STBNDDIR')
+     H***** End Add *** 06/09/20 *******************************************
+     H*****************************************************************
+     H/TITLE F0575R - CASE HISTORY (SUMMSRY)                          *
+     H*****************************************************************
+     H* INDICATOR USAGE                                               *
+     H* SCR01:                                                        *
+     H*  06    IF NO RECORDS TO SELECT, DON'T DISPLAY COLUMN SEPARATOR*
+     H*        ON SEL FLAG FIELDS                                     *
+     H*  20    INVALID CHARACTER USED TO INDICATE A SELECTED RECORD   *
+     H*  50    CHECK FOR CHANGE IN SUBFILE SCREEN (I.E. SELECTION)    *
+     H*****************************************************************
+     H*  REVISIONS:                                                   *
+     H*                                                               *
+     H*  06/09/20  C:212 Project : SY420                              *
+     H*                  Mask SSN                                     *
+     H*                                                               *
+     H*  04/08/99 C:56  SUPPORT: MC095 #17568                         *
+     H*              1. Replace use of UPCO#/UPSUB#/UPFND with the    *
+     H*                 new parms.                                    *
+     H*              2. Add CO#/SUB#/FND to call of F0574R            *
+     H*                                                               *
+     H*  04/05/99 C:56  Support: MC025  #17458                        *
+     H*                 1. Base use of amount fields on Provider Bills*
+     H*                    install flag.                              *
+     H*                                                               *
+     H*  03/25/99 C:56  PROJECT: MC152                                *
+     H*                 1. ADD CO#/SUB#/FND TO ENTRY PARMS            *
+     H*                                                               *
+     H*  12/31/98 C:56  PROJECT: MC152                                *
+     H*                 1. BASE THE LOGICAL USED TO GET FDCAP RECORDS *
+     H*                    ON PROVIDER BILLS INSTALL FLAG             *
+     H*---------------------------------------------------------------*
+     H*                                                               *
+     H*  09/07/93   C:20   REQ/PROJ: FSMNT                            *
+     H*                    1. ON PROCEDURE CODES MOVE CAPMOD INTO LAST*
+     H*                       2 BYTES OF SCCODE(11A).  CAPMOD WAS NOT *
+     H*                       BEING DISPLAYED PRIOR TO THIS FIX       *
+     H*                                                               *
+     H*  12/01/93 C:20   PROJ: FSMNT                                  *
+     H*                  1. If CACPT4 = 'FSMRA', don't display        *
+     H*                     Total Charge field                        *
+     H*                                                               *
+     H*  01/25/94 C:20   REQ/PROJ: MCMNT                              *
+     H*                  1. REVISE TO NOT RELOAD SUBFILE FROM         *
+     H*                     BEGINNING AFTER OPTION '5' WAS SELECTED.  *
+     H*                                                               *
+     H*  02/22/95 C:20   REQ/PROJ: MCMNT                              *
+     H*                  1. IF USER TRIED TO USE AN OPTION NUMBER     *
+     H*                     WHICH IS NOT VALID AND THEN TRIED TO ROLL *
+     H*                     THEY WOULD GET A PROGRAM ERROR THAT       *
+     H*                     SUBFILE WAS WRITING DUPLICATE RECORD #.   *
+     H*                     I HAVE CORRECTED THE CODE TO RELOAD THE   *
+     H*                     RRN BEFORE DOING A ROLL IF WRONG OPTION   *
+     H*                     IS USED.                                  *
+     H*                                                               *
+     H*  10/16/96 C:32  REQ/PROJ: OK005                               *
+     H*                 1. CHG CRITERIA FOR PROCESSING 'FSMRA'        *
+     H*                    FSMRA REC WAS CHGD TO HAVE A ZERO IN CATOTC*
+     H*                    AND A NEGATIVE PAID AMT IN CATOTD (DENIED) *
+     H*****************************************************************
+     FF0575F    CF   E             WORKSTN
+      /IF DEFINED (WEB)
+     F                                     HANDLER('PROFOUNDUI(HANDLER)')
+      /ENDIF
+     F                                     INFDS(FIDS01)
+     F                                     SFILE(WDW01S:RRN2)
+     F*
+     F*** BEG DEL *** 04/08/99 ****************************************
+     F*****SMUPL   IF  E           K        DISK
+     F*** END DEL *** 04/08/99 ****************************************
+     FFDCAL3    IF   E           K DISK
+     FFMCML1    IF   E           K DISK
+     FFMCDL     IF   E           K DISK
+     FFDHCL     IF   E           K DISK
+     F*** BEG ADD *** 12/31/98 ****************************************
+     FFDCALQ    IF   E           K DISK
+     F                                     RENAME(PCA01:PCA02)
+     F*** END ADD *** 12/31/98 ****************************************
+
+      ***** Beg Add *** 06/09/20 *******************************************
+      /copy sPrMask
+      ***** End Add *** 06/09/20 *******************************************
+
+     D*
+     D                 DS
+     D  DSDTTM                 1     12  0
+     D  DSTIME                 1      6  0
+     D  DSDATE                 7     12  0
+     D                 DS
+     D  XXRECF                 1     10
+     D  XXSCR#                 2      5
+     D                 DS
+     D  XXCMSV                 1     11
+     D  XXRVCD                 1      3  0
+     D  XXHCPC                 4      8
+     D  XXUNTS                 9     11  0
+     D*
+     D FIDS01        E DS                  EXTNAME(SZQ2P)
+     D  CURSOR               370    371B 0
+     D PSDS          ESDS                  EXTNAME(SZQ1P)
+
+     C*
+     C     *LIKE         DEFINE    Q2RECF        SVSCRN
+     C     *LIKE         DEFINE    CACASE        QQCASE
+     C     *LIKE         DEFINE    CACASE        Q1CASE
+     C     *LIKE         DEFINE    CADSEQ        Q1SEQ#
+     C     *LIKE         DEFINE    CAFYR         QQFYR
+     C     *LIKE         DEFINE    CAFYR         Q1FYR
+     C     *LIKE         DEFINE    CMSS#         QQSS#
+     C     *LIKE         DEFINE    CMSS#         XXSS#
+     C     *LIKE         DEFINE    CMACDT        XXACDT
+     C     *LIKE         DEFINE    CAFDAT        XXFDAT
+     C*** BEG ADD *** 03/25/99 ****************************************
+     C     *LIKE         DEFINE    CACO#         KKCO#
+     C     *LIKE         DEFINE    CASUB#        KKSUB#
+     C     *LIKE         DEFINE    CAFND         KKFND
+     C*** END ADD *** 03/25/99 ****************************************
+     C*
+     C*
+     C     CAKEY1        KLIST
+     C*** BEG CHG *** 03/25/99 ****************************************
+     C**********           KFLD           UPCO#
+     C**********           KFLD           UPSUB#
+     C**********           KFLD           UPFND
+     C                   KFLD                    KKCO#
+     C                   KFLD                    KKSUB#
+     C                   KFLD                    KKFND
+     C*** END CHG *** 03/25/99 ****************************************
+     C                   KFLD                    QQFYR
+     C                   KFLD                    QQCASE
+     C                   KFLD                    XXFDAT
+     C*
+     C     CAKEY2        KLIST
+     C*** BEG ADD *** 03/25/99 ****************************************
+     C**********           KFLD           UPCO#
+     C**********           KFLD           UPSUB#
+     C**********           KFLD           UPFND
+     C                   KFLD                    KKCO#
+     C                   KFLD                    KKSUB#
+     C                   KFLD                    KKFND
+     C*** END ADD *** 03/25/99 ****************************************
+     C                   KFLD                    QQFYR
+     C                   KFLD                    QQCASE
+     C*
+     C*  USER PARAMETER FILE
+     C*
+     C*** BEG DEL *** 04/08/99 ****************************************
+     C********** UPKEY     KLIST
+     C**********           KFLD           Q1USER
+     C*** END DEL *** 04/08/99 ****************************************
+     C*
+     C*  CLAIM MASTER FILE
+     C*
+     C     CMKEY         KLIST
+     C*** BEG CHG *** 03/25/99 ****************************************
+     C**********           KFLD           UPCO#
+     C**********           KFLD           UPSUB#
+     C**********           KFLD           UPFND
+     C                   KFLD                    KKCO#
+     C                   KFLD                    KKSUB#
+     C                   KFLD                    KKFND
+     C*** END CHG *** 03/25/99 ****************************************
+     C                   KFLD                    QQFYR
+     C                   KFLD                    SCCASE
+     C*
+     C*  CLAIMANT DEMOGRAPHICS FILE
+     C*
+     C     CDKEY         KLIST
+     C                   KFLD                    SCSS#
+     C*
+     C*  HOSPITAL DETAIL CHARGE FILE
+     C     HCKY          KLIST
+     C                   KFLD                    CACO#
+     C                   KFLD                    CASUB#
+     C                   KFLD                    CAFND
+     C                   KFLD                    CAFYR
+     C                   KFLD                    CACASE
+     C                   KFLD                    CADSEQ
+      *------------------------*
+      *   PARAMETER LIST FOR CALLED PROGRAM
+      *------------------------*
+     C*
+     C     *ENTRY        PLIST
+P1   C                   PARM                    QQPRDS           40
+P2   C                   PARM                    QQCALL            1
+P3   C                   PARM                    QQFYR
+P4   C                   PARM                    QQCASE
+P5   C                   PARM                    QQSS#
+P6   C                   PARM                    QQDATE            8 0
+P7   C                   PARM                    QQRTCD            1
+     C*** BEG ADD *** 03/25/99 ****************************************
+P8   C                   PARM                    QQCO#             3 0
+P9   C                   PARM                    QQSUB#            5 0
+P10  C                   PARM                    QQFND             3 0
+     C*** END ADD *** 03/25/99 ****************************************
+     C*
+     C     DATCHK        PLIST
+     C                   PARM                    SRDTI             8 0
+     C                   PARM      *BLANKS       SRFFMT            8
+     C                   PARM      *BLANKS       SRTFMT            8
+     C                   PARM                    SRDTO            10
+     C                   PARM                    SRERR             1
+     C*
+     C     DTCYMD        PLIST
+     C                   PARM                    SRDTI
+     C                   PARM      *BLANKS       SRFFMT
+     C                   PARM      '*CYMD'       SRTFMT
+     C                   PARM                    SRDTO
+     C                   PARM                    SRERR
+     C*
+     C     DTMDYY        PLIST
+     C                   PARM                    SRDTI
+     C                   PARM      '*CYMD'       SRFFMT
+     C                   PARM      *BLANKS       SRTFMT
+     C                   PARM                    SRDTO
+     C                   PARM                    SRERR
+     C*
+     C                   TIME                    DSDTTM
+     C                   MOVE      Q1USER        SCUSER
+     C                   MOVE      QQPRDS        SCPRDS
+     C                   MOVE      QQCASE        SCCASE
+     C                   MOVE      QQFYR         SCFYR
+      ***** Beg Chg *** 06/09/20 *******************************************
+     C***                MOVE      QQSS#         SCSS#
+      /Free
+       scSS# = MaskData('SSN':'QQSS#':QQSS#);
+      /End-free
+      ***** End Chg *** 06/09/20 *******************************************
+     C                   MOVE      QQSS#         XXSS#
+     C                   MOVE      QQDATE        SCACDT
+     C*
+     C                   Z-ADD     QQDATE        SRDTI
+     C                   CALL      'SRCVTDAT'    DTCYMD
+     C                   MOVEL     SRDTO         XXFDAT
+     C*
+     C                   Z-ADD     QQDATE        SRDTI
+     C                   CALL      'SRCVTDAT'    DTCYMD
+     C                   MOVEL     SRDTO         XXACDT
+     C*
+     C*  GET THE USER PARAMETER FILE
+     C*
+     C*** BEG DEL *** 04/08/99 ****************************************
+     C********** UPKEY     CHAINPUP01                60
+     C********** *IN60     IFEQ '1'
+     C**********           MOVE *ZERO     UPCO#
+     C**********           MOVE *ZERO     UPSUB#
+     C**********           MOVE *ZERO     UPFND
+     C**********           ELSE
+     C*** BEG DEL *** 03/25/99 ****************************************
+     C**********           Z-ADDUPSUB#    SCSUB#
+     C**********           Z-ADDUPFND     SCFND
+     C*** END DEL *** 03/25/99 ****************************************
+     C*
+     C*** BEG ADD *** 03/25/99 ****************************************
+     C*
+     C**********           Z-ADDUPCO#     KKCO#
+     C**********           Z-ADDUPSUB#    KKSUB#
+     C**********           Z-ADDUPFND     KKFND
+     C**********           Z-ADDUPSUB#    SCSUB#
+     C**********           Z-ADDUPFND     SCFND
+     C**********           ENDIF
+     C*** END DEL *** 04/08/99 ****************************************
+     C*
+     C********** Q1PRMS    IFGE 10
+     C                   Z-ADD     QQCO#         KKCO#
+     C                   Z-ADD     QQSUB#        KKSUB#
+     C                   Z-ADD     QQFND         KKFND
+     C                   Z-ADD     QQSUB#        SCSUB#
+     C                   Z-ADD     QQFND         SCFND
+     C**********           ENDIF                           Q1PRMS
+     C*
+     C*** END ADD *** 03/25/99 ****************************************
+     C*
+     C*
+     C*   GET CLAIMANT NAME
+     C*
+     C     CMKEY         CHAIN     PCM01                              60
+      ***** Beg Chg *** 06/09/20 *******************************************
+     C***                MOVE      CMSS#         SCSS#
+      /Free
+       scSS# = MaskData('SSN':'CMSS#':CMSS#);
+      /End-free
+      ***** End Chg *** 06/09/20 *******************************************
+     C*
+     C     CDKEY         CHAIN     PCD01                              60
+     C     *IN60         IFEQ      '0'
+     C                   MOVEL     CDLSN         QQLAST           56
+     C                   MOVEL     CDFSN         QQFRST           15
+     C                   MOVE      '1'           QQTERM            1
+     C                   CALL      'SRNAME'
+     C                   PARM                    QQLAST
+     C                   PARM                    QQFRST
+     C                   PARM                    QQTERM
+     C                   MOVEL     QQLAST        SCNAME
+     C                   ELSE
+     C                   MOVEL     *BLANKS       SCNAME
+     C                   END
+     C*** BEG ADD *** 12/31/98 ****************************************
+     C*
+     C* CALL API FOR SYSTEM FLAGS
+     C*
+     C                   CALL      'SA001R'
+     C                   PARM      ' '           ##WCIF            1
+     C                   PARM      ' '           ##MCIF            1
+     C                   PARM      ' '           ##WCIN            1
+     C                   PARM      ' '           ##AR              1
+     C                   PARM      ' '           ##NTWK            1
+     C                   PARM      ' '           ##UR              1
+     C                   PARM      ' '           ##MED             1
+     C                   PARM      ' '           ##EDI             1
+     C                   PARM      ' '           ##WCDK            1
+     C                   PARM      ' '           ##RHAB            1
+     C                   PARM      ' '           ##MSS             1
+     C                   PARM      ' '           ##FSCH            1
+     C                   PARM      ' '           ##PRVB            1
+     C*
+     C     ##PRVB        IFEQ      'Y'
+     C                   SETON                                        75
+     C                   ELSE
+     C                   SETOFF                                       75
+     C                   ENDIF                                                  ##PRVB = Y
+     C*
+     C*** END ADD *** 12/31/98 ****************************************
+      *===============================================================
+      * INITIALIZATION    AREA
+      *
+     C     TOP           TAG
+     C                   EXSR      INZSR
+      *
+      *===============================================================
+      *
+     C     MAINLN        TAG
+      *
+      *===============================================================
+      * SCREEN EXECUTION AREA
+      *
+     C                   EXSR      SCREXC
+      *
+      *===============================================================
+      * HANDLE F KEYS IF PRESSED
+      *
+     C     *IN11         CASEQ     '1'           FKEYS
+     C                   END                                                      END *IN11
+      *
+      *===============================================================
+     C*
+     C*   CHECK FOR USER SELECTION TO REPOSITION
+     C     SCFRDT        IFNE      *ZEROS
+     C*
+     C                   Z-ADD     SCFRDT        SRDTI
+     C                   CALL      'SRCVTDAT'    DTCYMD
+     C                   MOVEL     SRDTO         XXFDAT
+     C*
+     C                   Z-ADD     *ZEROS        SCFRDT
+     C                   GOTO      TOP
+     C                   END                                                    END SCSUBS
+     C*
+     C                   Z-ADD     RRN2          SVRRN2            5 0
+     C*
+     C                   READC     WDW01S                                 50
+     C     *IN50         IFEQ      '0'
+     C*** IF THE SUBFILE HAS CHANGED AND THE USER HAS SELECTED A RECORD, THEN
+     C*** SAVE THAT DATA TO BE PASSED BACK TO THE CALLING PROGRAM
+     C     SCSEL         IFEQ      '5'
+     C                   Z-ADD     SCFYR         Q1FYR
+     C                   Z-ADD     SCCASE        Q1CASE
+     C                   Z-ADD     SCSEQ#        Q1SEQ#
+     C*** BEG ADD *** 04/08/99 ****************************************
+     C                   Z-ADD     QQCO#         Q1CO#
+     C                   Z-ADD     QQSUB#        Q1SUB#
+     C                   Z-ADD     QQFND         Q1FND
+     C*** END ADD *** 04/08/99 ****************************************
+     C                   CALL      'F0574R'
+     C                   PARM                    QQPRDS
+     C                   PARM      '1'           QQCALL
+     C                   PARM                    Q1FYR
+     C                   PARM                    Q1CASE
+     C                   PARM                    Q1SEQ#
+     C                   PARM                    Q1RTCD            1
+     C*** BEG ADD *** 04/08/99 ****************************************
+     C                   PARM                    Q1CO#             3 0
+     C                   PARM                    Q1SUB#            5 0
+     C                   PARM                    Q1FND             3 0
+     C*** END ADD *** 04/08/99 ****************************************
+     C*
+     C                   Z-ADD     RRN2          #@$2
+     C                   Z-ADD     SVRRN2        RRN2
+     C                   MOVE      *BLANKS       SCSEL
+     C                   UPDATE    WDW01S
+     C                   MOVE      *BLANKS       Q2RECF
+     C                   MOVEL     'WDW01'       Q2RECF
+     C                   GOTO      MAINLN
+     C*
+     C                   ELSE                                                   ELSE EQ '1'
+     C*** IF THE SUBFILE HAS CHANGED BUT THE USER DID NOT USE A '5' TO INDICATE
+     C*** A SELECTED RECORD, SEND AN ERROR MESSAGE BACK TO THE SCREEN
+     C     SCSEL         IFNE      ' '
+     C                   MOVE      '1'           *IN20
+     C                   Z-ADD     RRN2          #@$2
+     C                   Z-ADD     SVRRN2        RRN2
+     C                   UPDATE    WDW01S
+     C                   MOVE      *BLANK        SCSEL
+     C                   GOTO      MAINLN
+     C                   END                                                    END NE ' '
+     C                   END                                                    END EQ '1'
+     C*** IF THE SUBFILE HAS NOT BEEN CHANGED, RETURN TO THE CALLING PROGRAM
+     C*** WITHOUT A SELECTED RECORD
+     C                   ELSE
+     C                   GOTO      MAINLN
+     C                   END                                                    END 0 *IN50
+     C*
+     C                   GOTO      TOP                                          RE-SET SUBFILE
+     C*
+     C*
+      *===============================================================
+      * TERMINATION OF PROGRAM
+      *
+     C     TERM          TAG
+     C*
+     C                   MOVE      '1'           *INLR
+     C*
+     C/EJECT
+      *====================================================================*
+      * * *   INZSR SUBROUTINE                                    I N I T ***
+      *====================================================================*
+     C     INZSR         BEGSR
+     C*
+     C*** BEG CHG *** 12/31/98 ****************************************
+     C********** CAKEY1    SETLLPCA01                60
+     C  N75CAKEY1        SETLL     PCA01                              60
+     C   75CAKEY1        SETLL     PCA02                              60
+     C*** END CHG *** 12/31/98 ****************************************
+     C*
+     C*** CLEAR SUBFILE
+     C                   MOVE      '1'           *IN04
+     C                   WRITE     WDW01C
+     C                   MOVE      '0'           *IN04
+     C*
+     C                   Z-ADD     0             RRN2
+     C*
+     C                   EXSR      LOAD                                         LOAD RCDS FROM FILE
+     C*
+     C*
+     C                   ENDSR
+      *====================================================================*
+      * * *   LOAD SUBROUTINE                                    L O A D ***
+      *====================================================================*
+     C     LOAD          BEGSR
+     C*
+     C                   MOVE      '0'           *IN20
+     C                   MOVE      '0'           *IN05
+     C                   MOVE      '0'           *IN32
+     C*
+     C*  *  *  *  LOAD THE SUBFILE SCREEN WITH UPTO 13 LINES
+     C                   DO        7             X                 5 0
+     C*
+     C*** BEG CHG *** 12/31/98 ****************************************
+     C********** CAKEY2    READEPCA01                    60
+     C  N75CAKEY2        READE     PCA01                                  60
+     C   75CAKEY2        READE     PCA02                                  60
+     C*** END CHG *** 12/31/98 ****************************************
+     C*
+     C     *IN60         IFEQ      '1'
+     C     X             ANDEQ     1
+     C                   MOVE      '1'           *IN32
+     C                   END
+     C*
+     C     *IN60         IFEQ      '0'
+     C                   ADD       1             RRN2              5 0
+     C*
+     C                   Z-ADD     CAFDAT        SRDTI
+     C                   CALL      'SRCVTDAT'    DTMDYY
+     C                   MOVEL     SRDTO         SCFDAT
+     C*
+     C                   Z-ADD     CAFEIN        SCFEIN
+     C                   Z-ADD     CAMOD         SCMOD
+     C*** BEG CHG *** 04/05/99 ****************************************
+     C**********           Z-ADDCATOTC    SCTOTC
+     C**********           Z-ADDCATOTP    SCTOTP
+     C*   LOAD SCREEN CHARGE AMOUNT AND PAID AMOUNT BASED ON PROVIDER
+     C*   BILL INTSTALL FLAG (Y = 75 ON; N = 75 OFF)
+     C*
+     C     *IN75         IFEQ      *ON
+     C                   Z-ADD     CACHRG        SCTOTC
+     C                   Z-ADD     CAPAID        SCTOTP
+     C                   ELSE
+     C                   Z-ADD     CATOTC        SCTOTC
+     C                   Z-ADD     CATOTP        SCTOTP
+     C                   ENDIF                                                  *IN75 = *ON
+     C*** END CHG *** 04/05/99 ****************************************
+     C                   Z-ADD     CADSEQ        SCSEQ#
+     C                   Z-ADD     CASVCD        XXRVCD            3 0
+     C                   MOVE      CACPT4        XXHCPC            5
+     C                   Z-ADD     *ZEROS        XXUNTS            3 0          ADD 05/31/92
+     C*
+     C                   Z-ADD     CARDAT        SRDTI
+     C                   CALL      'SRCVTDAT'    DTMDYY
+     C                   MOVEL     SRDTO         SCENTD
+     C*
+     C     CAPRTY        IFEQ      '4'
+     C                   MOVE      *BLANK        SCCODE
+     C                   MOVEL     XXCMSV        SCCODE
+     C                   ELSE
+     C     CARCFL        IFNE      'X'
+     C                   MOVE      *BLANKS       SCCODE
+     C                   MOVEL     CACPT4        SCCODE
+     C                   MOVE      CAPMOD        SCCODE                         ADD 09/07/93
+     C                   ELSE
+     C     HCKY          CHAIN     PHC01                              50
+     C     *IN50         IFEQ      '0'
+     C                   MOVE      *BLANKS       SCCODE
+     C                   MOVEL     HCNDC         SCCODE
+     C                   ELSE
+     C                   MOVE      *BLANKS       SCCODE
+     C                   END
+     C                   END
+     C                   END
+     C                   Z-ADD     CAEOB#        SCEOB#
+     C                   MOVE      '0'           *IN06
+     C                   WRITE     WDW01S
+     C                   ELSE
+     C                   MOVE      '1'           *IN05
+     C                   END
+     C                   END
+     C*
+     C* * * INZSRIALIZE SUBFILE IF NO RECORDS TO DISPLAY
+     C     RRN2          IFEQ      0
+     C     *IN60         ANDEQ     '1'
+     C                   Z-ADD     *ZEROS        SCFEIN
+     C                   Z-ADD     *ZEROS        SCMOD
+     C                   Z-ADD     *ZEROS        SCFDAT
+     C                   MOVE      *BLANKS       SCCODE
+     C                   Z-ADD     *ZEROS        SCTOTC
+     C                   Z-ADD     *ZEROS        SCTOTP
+     C                   Z-ADD     *ZEROS        SCEOB#
+     C                   Z-ADD     *ZEROS        SCENTD
+     C                   Z-ADD     1             RRN2
+     C                   MOVE      '1'           *IN06
+     C                   WRITE     WDW01S
+     C                   END
+     C*
+     C*** TO POSITION SCREEN AND CURSOR
+     C                   Z-ADD     RRN2          #@$2
+     C*
+     C                   ENDSR
+     C/EJECT
+      *===============================================================
+     C     SCREXC        BEGSR
+      *===============================================================
+      *
+      *
+     C                   MOVEL     Q2FILE        SCFILE                         SET FORMAT/FILE
+     C*
+     C     Q2RECF        IFEQ      'WDW01'
+     C     Q2RECF        OREQ      'WDW01C'
+     C     Q2RECF        OREQ      'WDW01S'
+     C                   MOVE      '1'           *IN01
+     C                   WRITE     WDW01C
+     C                   WRITE     WDW01
+     C                   EXFMT     WDW01C
+     C                   MOVE      '0'           *IN01
+     C                   END
+     C*
+     C*
+     C                   ENDSR
+      *
+     C/EJECT
+      *===============================================================
+     C     FKEYS         BEGSR
+      *===============================================================
+      *
+     C     *INKA         IFEQ      '1'
+     C                   END
+      *
+     C     *INKB         IFEQ      '1'
+     C                   END
+      *
+     C****************************************
+     C*   F3 = EXIT                          *
+     C****************************************
+     C     *INKC         IFEQ      '1'
+     C                   MOVE      '1'           *INLR
+     C                   MOVE      'A'           QQRTCD
+     C                   GOTO      TERM
+     C                   END                                                    END *INKC
+      *
+     C     *INKD         IFEQ      '1'
+     C                   END
+      *
+      *
+     C     *INKE         IFEQ      '1'
+     C                   END
+      *
+      *
+     C     *INKF         IFEQ      '1'
+     C                   END
+      *
+      *
+     C     *INKG         IFEQ      '1'
+     C                   END
+      *
+      *
+     C     *INKH         IFEQ      '1'
+     C                   END
+      *
+      *
+     C     *INKI         IFEQ      '1'
+     C                   END
+      *
+      *
+     C     *INKJ         IFEQ      '1'
+     C                   END
+      *
+     C     *INKK         IFEQ      '1'
+     C                   END
+      *
+     C****************************************
+     C*   F12 = CANCEL                       *
+     C****************************************
+     C     *INKL         IFEQ      '1'
+     C*
+     C     Q2RECF        IFEQ      'WDW01'
+     C     Q2RECF        OREQ      'WDW01S'
+     C     Q2RECF        OREQ      'WDW01C'
+     C                   MOVE      'B'           QQRTCD
+     C                   GOTO      TERM
+     C                   END
+     C*
+     C                   END                                                    END *INKL
+     C*
+     C     *INKM         IFEQ      '1'
+     C                   END
+      *
+     C     *INKN         IFEQ      '1'
+     C                   END
+      *
+     C     *INKP         IFEQ      '1'
+     C                   END
+      *
+     C     *INKQ         IFEQ      '1'
+     C                   END
+      *
+     C     *INKR         IFEQ      '1'
+     C                   END
+      *
+     C     *INKS         IFEQ      '1'
+     C                   END
+      *
+     C     *INKT         IFEQ      '1'
+     C                   END
+      *
+     C     *INKU         IFEQ      '1'
+     C                   END
+      *
+     C     *INKV         IFEQ      '1'
+     C                   END
+      *
+     C     *INKW         IFEQ      '1'
+     C                   END
+      *
+     C     *INKX         IFEQ      '1'
+     C                   END
+      *
+     C*   *IN18 -  ROLLUP REQUEST            *
+     C****************************************
+     C     *IN18         IFEQ      '1'                                          ROLLUP
+     C     *IN32         CABEQ     '1'           MAINLN                         NO ROLL IF EOF
+     C                   EXSR      LOAD
+     C                   GOTO      MAINLN
+     C                   END                                                    END 1 *IN18 ROLLUP
+     C*
+     C                   GOTO      MAINLN
+      *
+     C                   ENDSR
+     C/EJECT

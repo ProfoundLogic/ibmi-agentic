@@ -1,0 +1,48 @@
+     A*%%TS  SD  19971229  134302  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   INVOICES - DIRECT BILL STATEMENT PROMPT DISPLAY          **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C7580F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  8 23'Invoice date (MM/YY):'
+     A            SCACMY    R        B  8 46REFFLD(A60 CREFP)
+     A                                      TEXT('invoice run date month/year')
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /    ')
+     A  20                                  ERRMSGID(CCR0737 *LIBL/CMESGG)
+     A                                 23  3'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 62'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

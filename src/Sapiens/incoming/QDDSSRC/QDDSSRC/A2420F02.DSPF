@@ -1,0 +1,441 @@
+     A*%%TS  SD  19980203  090033  BELVOIRR    REL-V3R7M0  5716-PW1
+     A* COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC. 1994
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/WREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A* ===========================================================
+     A          R SCR01
+     A*%%TS  SD  19980203  090033  BELVOIRR    REL-V3R7M0  5716-PW1
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(49)
+     A  40                                  CF10
+     A                                      CF12
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A            HREC          10A  H
+     A            HFLD          10A  H
+     A            SC10A1    R     A  H      REFFLD(DS10)
+     A                                      TEXT('Sig 1 String')
+     A            SCCMD1        23A  H      TEXT('Sig 1 PCL5 cmd')
+     A            SC10A2    R     A  H      REFFLD(DS10)
+     A                                      TEXT('Sig 1 String')
+     A            SCCMD2        23A  H      TEXT('Sig 1 PCL5 cmd')
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM     R        O  2  2REFFLD(PGM)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR01'
+     A            SCMODE    R        O  3 71REFFLD(NM10)
+     A  49                                  ERRMSGID(WCR1058 *LIBL/WMESGG)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  4  2'AP/GL Company # . . . . . . . . . -
+     A                                      :'
+     A            SCFND     R        B  4 39REFFLD(FND)
+     A                                      DSPATR(HI)
+     A N55 40                               DSPATR(UL)
+     A  55
+     AON40                                  DSPATR(PR)
+     A N81N82N83
+     A N84 85 86                            DSPATR(PC)
+     A N71 72N73
+     A  74 75 76                            ERRMSGID(WC30106 *LIBL/WMESGG)
+     A N71 72 73
+     A N74N75N76                            ERRMSGID(WC30107 *LIBL/WMESGG)
+     A  20                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A  21                                  ERRMSGID(WCR0498 *LIBL/WMESGG)
+     A  23                                  ERRMSGID(WC30104 *LIBL/WMESGG)
+     A                                  5  2'Bank number . . . . . . . . . . . -
+     A                                      :'
+     A            SCAPBK    R        B  5 39REFFLD(FND)
+     A                                      DSPATR(HI)
+     A N55 40                               DSPATR(UL)
+     A  55
+     AON40                                  DSPATR(PR)
+     A N81N82N83
+     A  84 85 86                            DSPATR(PC)
+     A  24                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A  25                                  ERRMSGID(BKM0103 *LIBL/BKMES)
+     A                                  5 72'Status:'
+     A            SCSTAT    R        O  5 80REFFLD(STAT)
+     A                                      DSPATR(HI)
+     A                                  6  2'Bank account  . . . . . . . . . . -
+     A                                      :'
+     A            SCACCT    R        B  6 39REFFLD(DS20)
+     A                                      DSPATR(HI)
+     A  40                                  DSPATR(UL)
+     A N40                                  DSPATR(PR)
+     A N71 72N73
+     A  74 75 76                            ERRMSGID(WC30106 *LIBL/WMESGG)
+     A N71 72 73
+     A N74N75N76                            ERRMSGID(WC30107 *LIBL/WMESGG)
+     A N71 72N73
+     A N74 75 76                            ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A N71 72N73
+     A  74N75N76                            ERRMSGID(WCR0736 *LIBL/WMESGG)
+     A  23                                  ERRMSGID(WC30104 *LIBL/WMESGG)
+     A N71 72 73
+     A N74N75 76                            ERRMSGID(WC30116 *LIBL/WMESGG)
+     A N71 72 73
+     A N74 75N76                            ERRMSGID(WC30117 *LIBL/WMESGG)
+     A N71 72 73
+     A N74 75 76                            ERRMSGID(WC30118 *LIBL/WMESGG)
+     A N71 72 73
+     A  74N75N76                            ERRMSGID(WC30085 *LIBL/WMESGG)
+     A N81N82 83
+     A N84N85N86                            DSPATR(PC)
+     A                                  7  2'Effective date  . . . . . . . . . -
+     A                                      :'
+     A            SCEFDT    R        B  7 39REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      DSPATR(HI)
+     A  40                                  DSPATR(UL)
+     A N40                                  DSPATR(PR)
+     A N81N82N83
+     A N84N85 86                            DSPATR(PC)
+     A N71 72N73
+     A  74 75 76                            ERRMSGID(WC30106 *LIBL/WMESGG)
+     A N71 72 73
+     A N74N75N76                            ERRMSGID(WC30107 *LIBL/WMESGG)
+     A  87                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A  88                                  ERRMSGID(WCR0500 *LIBL/WMESGG)
+     A  23                                  ERRMSGID(WC30104 *LIBL/WMESGG)
+     A  71 72 73
+     A  74 75 76                            ERRMSGID(WC30102 *LIBL/WMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A                                 11  2'Trust . . . . . . . . . . . .(Y/N)-
+     A                                      :'
+     A            SCTRST    R        B 11 39REFFLD(FLAG)
+     A                                      TEXT('Trust Y/N')
+     A                                      DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N71N72N73
+     A  74N75N76                            ERRMSGID(WCR0501 *LIBL/WMESGG)
+     A                                 12  2'Print hardcopy check/voucher (Y/N)-
+     A                                      :'
+     A            SCHDCY         1A  B 12 39DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N71N72N73
+     A  74N75 76                            ERRMSGID(WCR0501 *LIBL/WMESGG)
+     A                                 13  2'  If ''Y'', formtype  . . . . . . -
+     A                                      . :'
+     A            SCFTYP        10A  B 13 39
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N71N72N73
+     A  74 75 76                            ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                 14  2'            Logo  . . . . . .(Y/N)-
+     A                                      :'
+     A            SCLOGO         1A  B 14 39
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N71N72 73
+     A N74N75N76                            ERRMSGID(WCR0501 *LIBL/WMESGG)
+     A                                 14 53'Check OUTQ  . :'
+     A            SCOUTQ        10A  B 14 70
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N81N82N83
+     A  84N85N86                            DSPATR(PC)
+     A N71N72 73
+     A N74 75N76                            ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                 15  2'            $ Limit, 2nd signature-
+     A                                      :'
+     A            SC$LMT    R     Y  B 15 39REFFLD(A90)
+     A                                      TEXT('$ Limit before 2nd signature -
+     A                                      required')
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(Z)
+     A                                 15 53'File Copy OUTQ:'
+     A            SCCPYQ        10A  B 15 70
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N81N82N83
+     A  84 85N86                            DSPATR(PC)
+     A N71N72 73
+     A N74 75 76                            ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                 16  2'            Macro ID  . . . . . . -
+     A                                      :'
+     A            SCMACR    R        B 16 39REFFLD(A40)
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N71N72 73
+     A N74N75 76                            ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                 18  2'Bank state location . . . . . . . -
+     A                                      :'
+     A            SCST      R        B 18 39REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  71N72 73
+     A N74N75 76                            ERRMSGID(WCR0504 *LIBL/WMESGG)
+     A                                 18 53'Vouchers Only :'
+     A            SCVCHR    R        O 18 70REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A                                 19  2'Bank name . . . . . . . . . . . . -
+     A                                      :'
+     A            SCBKNM    R        O 19 39REFFLD(DS40)
+     A  09                                  DSPATR(HI)
+     A                                 20  2'Bank address  . . . . . . . . . . -
+     A                                      :'
+     A            SCBKAD    R        O 20 39REFFLD(DS40)
+     A  09                                  DSPATR(HI)
+     A                                 21  2'Bank city, st. zip  . . . . . . . -
+     A                                      :'
+     A            SCBKCS    R        O 21 39REFFLD(DS40)
+     A  09                                  DSPATR(HI)
+      *
+     A  09                             23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A  40                             23  2'F3=Exit   F10=Search   F12=Cancel'
+     A                                      COLOR(BLU)
+     A N09N40                          23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+      *
+     A*
+     A* ===========================================================
+     A          R SCR02
+     A*%%TS  SD  19980203  090033  BELVOIRR    REL-V3R7M0  5716-PW1
+     A                                      CF12
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A            HREC          10A  H
+     A            HFLD          10A  H
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM     R        O  2  2REFFLD(PGM)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR02'
+     A            SCMODE    R        O  3 71REFFLD(NM10)
+     A  49                                  ERRMSGID(WCR1058 *LIBL/WMESGG)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  4  2'AP/GL Company # . . . . . . . . . -
+     A                                      :'
+     A            SCFND     R        O  4 39REFFLD(FND)
+     A                                      DSPATR(HI)
+     A                                  5  2'Bank number . . . . . . . . . . . -
+     A                                      :'
+     A            SCAPBK         3S 0O  5 39DSPATR(HI)
+     A                                  5 72'Status:'
+     A            SCSTAT    R        O  5 80REFFLD(STAT)
+     A                                      DSPATR(HI)
+     A                                  6  2'Bank account  . . . . . . . . . . -
+     A                                      : '
+     A            SCACCT    R        O  6 39REFFLD(DS20)
+     A                                      DSPATR(HI)
+     A                                  7  2'Effective date  . . . . . . . . . -
+     A                                      :'
+     A            SCEFDT    R        O  7 39REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A  42                              9  2'This bank account number will have-
+     A                                       a logo in the upper left area of t-
+     A                                      he check.'
+     A  43                             21  2'Press Enter to continue'
+     A                                      COLOR(BLU)
+     A  41                              9  2'The next four lines will print in -
+     A                                      the upper left area of the check.'
+     A  41        SC40A1    R     A  B 11 16REFFLD(DS40)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(HI)
+     A  41        SC40A2    R     A  B 13 16REFFLD(DS40)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(HI)
+     A  41        SC40A3    R     A  B 15 16REFFLD(DS40)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(HI)
+     A  41        SC40A4    R     A  B 17 16REFFLD(DS40)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(HI)
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 12'F12=Cancel'
+     A                                      COLOR(BLU)
+     A* ===========================================================
+     A          R SCR03
+     A*%%TS  SD  19980203  090033  BELVOIRR    REL-V3R7M0  5716-PW1
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(49)
+     A N09                                  CF10
+     A                                      CF12
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A            HREC          10A  H
+     A            HFLD          10A  H
+     A            SC10A1    R     A  H      REFFLD(DS10)
+     A                                      TEXT('Sig 1 String')
+     A            SCCMD1        23A  H      TEXT('Sig 1 PCL5 cmd')
+     A            SC10A2    R     A  H      REFFLD(DS10)
+     A                                      TEXT('Sig 1 String')
+     A            SCCMD2        23A  H      TEXT('Sig 1 PCL5 cmd')
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM     R        O  2  2REFFLD(PGM)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR03'
+     A            SCMODE    R        O  3 71REFFLD(NM10)
+     A  49                                  ERRMSGID(WCR1058 *LIBL/WMESGG)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  4  2'AP/GL Company # . . . . . . . . . -
+     A                                      :'
+     A            SCFND     R        O  4 39REFFLD(FND)
+     A                                      DSPATR(HI)
+     A                                  5  2'Bank number . . . . . . . . . . . -
+     A                                      :'
+     A            SCAPBK         3S 0O  5 39DSPATR(HI)
+     A                                  5 72'Status:'
+     A            SCSTAT    R        O  5 80REFFLD(STAT)
+     A                                      DSPATR(HI)
+     A                                  6  2'Bank account  . . . . . . . . . . -
+     A                                      : '
+     A            SCACCT    R        O  6 39REFFLD(DS20)
+     A                                      DSPATR(HI)
+     A                                  7  2'Effective date  . . . . . . . . . -
+     A                                      :'
+     A            SCEFDT    R        O  7 39REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A                                  9  2'The following entries pertain to S-
+     A                                      PECIFIC bank data for MICR encoding-
+     A                                       on'
+     A                                      DSPATR(HI)
+     A                                 10  2'Checks.  This information must be -
+     A                                      precise.'
+     A                                      DSPATR(HI)
+     A                                 11  2'    Routing for MICR  . . . . . . -
+     A                                       :'
+     A            SCRTE1         4A  B 11 39DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N71N72 73
+     A  74N75N76                            ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                 12  2'    Transit number  . . . . . . . -
+     A                                       :'
+     A            SCTRNS         4A  B 12 39DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N71N72 73
+     A  74N75 76                            ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                 13  2'    Check digit . . . . . . . . . -
+     A                                       :'
+     A            SCCKDG         1A  B 13 39DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N71N72 73
+     A  74 75N76                            ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                 14  2'    Auxiliary ON-US . . . . . . . -
+     A                                       :'
+     A            SCAUON        19A  B 14 39
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                 15  2'    ON-US . . . . . . . . . . . . -
+     A                                       :'
+     A            SCONUS        18A  B 15 39DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N71N72 73
+     A  74 75 76                            ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                 16  2'The following pertains to SPECIFIC-
+     A                                       bank data for fractional routing n-
+     A                                      umber.'
+     A                                      DSPATR(HI)
+     A                                 17  2'    Routing entry upper . . . . . -
+     A                                       :'
+     A            SCRTE2         7A  B 17 39DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N71 72N73
+     A N74N75N76                            ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                 18  2'    Routing entry lower . . . . . -
+     A                                       :'
+     A            SCRTE3         5A  B 18 39DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N71 72N73
+     A N74N75 76                            ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                 19  2'If signatures are to print on chec-
+     A                                      k, enter name(s) below.'
+     A                                      DSPATR(HI)
+     A                                 20  2'    First signature . . . . . . . -
+     A                                       :'
+     A            SCNAM1    R     A  B 20 39REFFLD(DS30)
+     A                                      TEXT('Signature Name 1')
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N81N82N83
+     A  84N85 86                            DSPATR(PC)
+     A                                      CHECK(LC)
+     A N71 72N73
+     A  74N75 76                            ERRMSGID(WCR0505 *LIBL/WMESGG)
+     A                                 21  2'    Second signature  . . . . . . -
+     A                                       :'
+     A            SCNAM2    R     A  B 21 39REFFLD(DS30)
+     A                                      TEXT('Signature Name 2')
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A N81N82N83
+     A  84 85 86                            DSPATR(PC)
+     A N71 72N73
+     A  74 75N76                            ERRMSGID(WCR0505 *LIBL/WMESGG)
+     A                                      CHECK(LC)
+      *
+     A  09                             23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A  40                             23  2'F3=Exit   F10=Search   F12=Cancel'
+     A                                      COLOR(BLU)
+     A N09N40                          23  2'F3=Exit   F10=Search   F12=Cancel'
+     A                                      COLOR(BLU)
+      *
+      * ===========================================================
+     A          R SCR99
+     A            SCFL01    R        O  1  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+    A                                       TEXT('DUMMY FIELD')

@@ -1,0 +1,76 @@
+     A*  (C) Copyright Progressive Data Solutions, Inc., 1997
+     A*  COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC. 1995
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/WREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      ALTHELP
+     A                                      HELP
+     A                                      VLDCMDKEY(11)
+     A                                      ROLLUP(18)
+     A                                      CF03
+     A*                                     CF06
+     A                                      CF12
+     A          R SCR01S                    SFL
+     A            SCRRN          5  0H
+     A            SCCO#     R        O 10  6REFFLD(CO#)
+     A*********** SCFND     R        O 10 11REFFLD(FND)
+     A            SCBKNM    R        O 10 16REFFLD(DS40)
+     A            SCSEL          1A  B 10  3TEXT('Selection Field')
+     A N06                                  DSPATR(CS)
+     A N06                                  DSPATR(UL)
+     A  20                                  DSPATR(RI)
+     A  20                                  DSPATR(PC)
+     A          R SCR01C                    SFLCTL(SCR01S)
+     A                                      CHGINPDFT
+     A                                      SFLSIZ(0999)
+     A                                      SFLPAG(0013)
+     A                                      OVERLAY
+     A                                      TEXT('Subfile Control - BANK INFO')
+     A                                      SETOF(20)
+     A                                      SETOF(22)
+     A  01                                  SFLDSP
+     A  01                                  SFLDSPCTL
+     A  02                                  SFLINZ
+     A  03                                  SFLDLT
+     A  04                                  SFLCLR
+     A  05                                  SFLEND
+     A  32 18                               SFLMSGID(CPF5203 *LIBL/QCPFMSG)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'A2421F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  4  2'Position to.....:'
+     A            S2CO#     R        B  4 21REFFLD(CO#)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            S2FND     R        B  4 26REFFLD(FND)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            #@$2           3S 0H      SFLRCDNBR(CURSOR)
+     A                                  7  4'1=Select'
+     A                                  9  2'Opt'
+     A                                      DSPATR(HI)
+     A                                  9  6'Co #'
+     A                                      DSPATR(HI)
+     A********************************* 9 11'Fund'
+     A************************************* DSPATR(HI)
+     A                                  9 16'Bank Name'
+     A                                      DSPATR(HI)
+     A                                  6  2'Type option, press Enter'
+     A          R SCR01
+     A                                      OVERLAY
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 14'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

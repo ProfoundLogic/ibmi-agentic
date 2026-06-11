@@ -1,0 +1,99 @@
+      *       (C) Copyright Progressive Data Solutions, Inc., 1997         *
+      *  AFTWMRHP2O: Conversion query for new WMRHP                        *
+      **********************************************************************
+      *  DESCRIPTION:                                                      *
+      *  This query produces a record count and reserve amount totals      *
+      *  on the new file.                                                  *
+      *                                                                    *
+      *  CREATED: 12/17/97         PROGRAMMER: 84         PROJECT: 60ANY   *
+      **********************************************************************
+      *  REVISIONS:                                                        *
+      *                                                                    *
+      **********************************************************************
+     A                                      REF(WMRHP)
+     A          R PRTHDR                    SKIPB(2)           SPACEA(2)
+     A            PTRDAT        10A        1
+     A            PTTITL        50A       41
+     A                                   125'Page'
+     A            PTPAGE         4S 0    129                   EDTCDE(4)
+     A            PTRTIM         8A        1SPACEB(1)          SPACEA(2)
+     A                                     1'File:'
+     A            PTQFIL        21A        7                   SPACEA(2)
+     A                                     3'Company/Fund'
+     A                                    +4'Year'
+     A                                    +7'Count'
+     A                                    +2'Rsrv Chg 1'
+     A                                    +3'Rsrv Chg 2'
+     A                                    +3'Rsrv Chg 3'
+     A                                    +3'Rsrv Chg 4'
+     A                                    +3'Rsrv Chg 5'
+     A                                    +3'Rsrv Chg 6'
+     A                                    +3'Rsrv Chg 7'
+     A                                    +3'Rsrv Chg 8'
+     A                                    +3'Rsrv Chg 9'
+     A                                    +2'Rsrv Chg 10'
+
+      * Print totals on RHFYR break
+
+     A          R PRTBK1                                       SPACEA(1)
+     A            XXCO#     R              5REFFLD(RHCO#)      EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXFND     R             +4REFFLD(RHFND)      EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXFYR     R             +5REFFLD(RHFYR)      EDTCDE(3)
+     A            XXCOUNT1       9S 0     +3                   EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXSU011   R   +1        +1REFFLD(RHSU01)     EDTCDE(L)
+     A  61                                                     UNDERLINE
+     A            XXSU021   R   +1        +1REFFLD(RHSU02)     EDTCDE(L)
+     A  61                                                     UNDERLINE
+     A            XXSU031   R   +1        +1REFFLD(RHSU03)     EDTCDE(L)
+     A  61                                                     UNDERLINE
+     A            XXSU041   R   +1        +1REFFLD(RHSU04)     EDTCDE(L)
+     A  61                                                     UNDERLINE
+     A            XXSU051   R   +1        +1REFFLD(RHSU05)     EDTCDE(L)
+     A  61                                                     UNDERLINE
+     A            XXSU061   R   +1        +1REFFLD(RHSU06)     EDTCDE(L)
+     A  61                                                     UNDERLINE
+     A            XXSU071   R   +1        +1REFFLD(RHSU07)     EDTCDE(L)
+     A  61                                                     UNDERLINE
+     A            XXSU081   R   +1        +1REFFLD(RHSU08)     EDTCDE(L)
+     A  61                                                     UNDERLINE
+     A            XXSU091   R   +1        +1REFFLD(RHSU09)     EDTCDE(L)
+     A  61                                                     UNDERLINE
+     A            XXSU101   R   +1        +1REFFLD(RHSU10)     EDTCDE(L)
+     A  61                                                     UNDERLINE
+
+      * Print totals on RHCO#/RHFND break
+
+     A          R PRTBK2                                       SPACEA(2)
+     A                                     1'*'
+     A            XXCO#     R              5REFFLD(RHCO#)      EDTCDE(3)
+     A            XXFND     R             +4REFFLD(RHFND)      EDTCDE(3)
+     A            XXCOUNT2       9S 0    +11                   EDTCDE(3)
+     A            XXSU012   R   +1        +1REFFLD(RHSU01)     EDTCDE(L)
+     A            XXSU022   R   +1        +1REFFLD(RHSU02)     EDTCDE(L)
+     A            XXSU032   R   +1        +1REFFLD(RHSU03)     EDTCDE(L)
+     A            XXSU042   R   +1        +1REFFLD(RHSU04)     EDTCDE(L)
+     A            XXSU052   R   +1        +1REFFLD(RHSU05)     EDTCDE(L)
+     A            XXSU062   R   +1        +1REFFLD(RHSU06)     EDTCDE(L)
+     A            XXSU072   R   +1        +1REFFLD(RHSU07)     EDTCDE(L)
+     A            XXSU082   R   +1        +1REFFLD(RHSU08)     EDTCDE(L)
+     A            XXSU092   R   +1        +1REFFLD(RHSU09)     EDTCDE(L)
+     A            XXSU102   R   +1        +1REFFLD(RHSU10)     EDTCDE(L)
+
+      * Print grand totals
+
+     A          R PRTTOT                                       SPACEA(1)
+     A                                     1'Grand totals:'
+     A            XXCOUNT        9S 0    +12                   EDTCDE(3)
+     A            XXSU01    R   +1        +1REFFLD(RHSU01)     EDTCDE(L)
+     A            XXSU02    R   +1        +1REFFLD(RHSU02)     EDTCDE(L)
+     A            XXSU03    R   +1        +1REFFLD(RHSU03)     EDTCDE(L)
+     A            XXSU04    R   +1        +1REFFLD(RHSU04)     EDTCDE(L)
+     A            XXSU05    R   +1        +1REFFLD(RHSU05)     EDTCDE(L)
+     A            XXSU06    R   +1        +1REFFLD(RHSU06)     EDTCDE(L)
+     A            XXSU07    R   +1        +1REFFLD(RHSU07)     EDTCDE(L)
+     A            XXSU08    R   +1        +1REFFLD(RHSU08)     EDTCDE(L)
+     A            XXSU09    R   +1        +1REFFLD(RHSU09)     EDTCDE(L)
+     A            XXSU10    R   +1        +1REFFLD(RHSU10)     EDTCDE(L)

@@ -1,0 +1,75 @@
+     A*%%TS  SD  20170803  144119  ROGULSKI    REL-V7R2M0  5770-WDS
+     A* (c) 2017 StoneRiver, Inc. All rights Reserved.                     *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*****************************************************************
+     A*TITLE CVTTOPDF - CONVERT DTM TO PDF                                 *
+     A*
+     A*****************************************************************
+     A*
+     A*  REVISIONS:
+     A*
+     A*****************************************************************
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/SREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF08
+     A          R SCR01
+     A*%%TS  SD  20170803  144119  ROGULSKI    REL-V7R2M0  5770-WDS
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 73TIME
+     A  90                              3 29'First Run of the Process'
+     A                                      COLOR(RED)
+     A                                  3 76'SCR01'
+     A                                  5  2'Type information, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  6  3'Force Job to End'
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A                                  7  4'Day of the Week  . . . . . . . . :'
+     A            SCDOW          1Y 0B  7 39
+     A  10                                  DSPATR(RI)
+     A  10                                  DSPATR(PC)
+     A  10                                  ERRMSG('Invalid Day of the week.')
+     A                                  8  5'1=Monday, 2=Tuesday, 3=Wednesday, -
+     A                                      4=Thursday, 5=Friday, 6=Saturday, 7-
+     A                                      =Sunday'
+     A                                      COLOR(WHT)
+     A                                  9  4'Time of day  . . . . . . . . . . :'
+     A            SCTMOD         6Y 0B  9 39
+     A  11                                  DSPATR(RI)
+     A  11                                  DSPATR(PC)
+     A                                      EDTWRD(' 0:  :  ')
+     A  11                                  ERRMSG('Invalid Time, Must be great-
+     A                                      er than current time.')
+     A                                 12  2'Last run date  . . . . . . . . . :'
+     A            SCLRDT         8Y 0B 12 37EDTWRD('  /  /    ')
+     A  12                                  DSPATR(RI)
+     A  12                                  DSPATR(PC)
+     A  12                                  ERRMSG('Invalid date.')
+     A                                 13  2'Last run user  . . . . . . . . . :'
+     A            SCLRUS        10A  B 13 37
+     A                                 14  2'File processed . . . . . . . . . :'
+     A            SCFILE        10A  B 14 37
+     A  13                                  DSPATR(RI)
+     A  13                                  DSPATR(PC)
+     A  13                                  ERRMSG('Invalid file name.')
+     A                                 15  2'Relative record processed  . . . :'
+     A            SCRRN          9Y 0O 15 37EDTCDE(Z)
+     A                                 16  2'Total records processed  . . . . :'
+     A            SCTOTR         9Y 0O 16 37EDTCDE(Z)
+     A                                 17  2'Status . . . . . . . . . . . . . :'
+     A            SCSTS         13A  O 17 37
+     A  30                                  ERRMSG('Invalid day of the week')
+     A*
+     A                                 23  2'F3=Exit   F8=Reset   F12=Cancel'
+     A                                      COLOR(BLU)

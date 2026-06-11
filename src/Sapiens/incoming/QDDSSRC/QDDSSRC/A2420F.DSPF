@@ -1,0 +1,211 @@
+     A*  Copyright Progressive Data Solutions, INC. 1997
+     A*************************************************************************
+     A*  A2420F - Bank Information Maint - Work With Screen Format            *
+     A*                                                                       *
+     A*  Created:  12/08/97  C:30  Project: WC500                             *
+     A*                                                                       *
+     A*************************************************************************
+     A*  REVISIONS:                                                           *
+     A*                                                                       *
+     A*                                                                       *
+     A*************************************************************************
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/WREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP
+     A                                      PAGEDOWN(01)
+     A                                      PAGEUP(02)
+     A          R SCR01S                    SFL
+     A  08                                  SFLNXTCHG
+     A            SCDBRR         9S 0H
+     A            SVCO#     R        H      REFFLD(CO#)
+     A            SVFND     R        H      REFFLD(FND)
+     A            SVAPBK    R        H      REFFLD(FND)
+     A            SVACCT    R        H      REFFLD(DS20)
+     A            SVCKTP    R        H      REFFLD(DS10)
+     A            SVEFDT    R        H      REFFLD(DT7)
+     A            SVAPPL    R        O 10 74REFFLD(CODE)
+     A            SCSEL          2A  B 10  2TEXT('Selection Field')
+     A  07                                  DSPATR(PC)
+     A  05                                  DSPATR(RI)
+     A            SCFND     R        O 10  6REFFLD(FND)
+     A                                      EDTCDE(3)
+     A            SCAPBK    R        O 10 10REFFLD(FND)
+     A                                      EDTCDE(3)
+     A            SCEFDT    R        O 10 15REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDATA        40   O 10 27
+     A            SCST      R        O 10 73REFFLD(CODE)
+     A            SCSTAT    R        O 10 79REFFLD(FLAG)
+     A*
+     A          R SCR01C                    SFLCTL(SCR01S)
+     A                                      SFLSIZ(0012)
+     A                                      SFLPAG(0011)
+     A                                      CF03
+     A                                      CF05
+     A                                      CF06
+     A                                      CF09
+     A                                      CF11
+     A                                      CF12
+     A                                      CF13
+     A                                      CF17
+     A                                      CF23
+     A                                      CF24
+     A                                      OVERLAY
+     A  04                                  SFLDSP
+     A N03                                  SFLDSPCTL
+     A  03                                  SFLCLR
+     A  95                                  SFLEND(*MORE)
+     A  93                                  SFLMSGID(CPD6A7C *LIBL/QCPFMSG)
+     A  92                                  SFLMSGID(WCR0758 *LIBL/WMESGG)
+     A                                      SFLMODE(&SFLMOD)
+     A            SFLMOD         1A  H
+     A            SCRRN1         4S 0H      SFLRCDNBR(CURSOR)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A  91                                  ERRMSGID(CPF5203 *LIBL/QCPFMSG)
+     A  94                                  ERRMSGID(CPF5204 *LIBL/QCPFMSG)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM     R        O  2  2REFFLD(DS10)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR01'
+     A                                  4  2'Position to . . .'
+     A  21                              4 21'AP/GL CO#:'
+     A  21N55     SCPST1         3M  I  4 33
+     A N06N55                               DSPATR(PC)
+     A                                      CHECK(RB)
+     A  21 55     SCPSTA         3   O  4 28
+     A  21                              4 38'Bank#:'
+     A  21N55     SCPSTB         3M  I  4 46
+     A N06N55                               DSPATR(PC)
+     A                                      CHECK(RB)
+     A  21                              4 51'Effective Date:'
+     A  21        SCPST9         8M  I  4 68
+     A N06 55                               DSPATR(PC)
+     A                                      CHECK(RB)
+     A  73                                  ERRMSGID(WCR0500 *LIBL/WMESGG)
+     A  22        SCPST2         1A  H
+     A  23        SCPST3         1A  H
+     A  24        SCPST4         1A  H
+     A  25        SCPST5         1A  H
+     A  26        SCPST6         1A  H
+     A  27        SCPST7         1A  H
+     A  28        SCPST8         1A  H
+     A                                  6  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A            SCOPL1        76A  O  7  4COLOR(BLU)
+     A            SCOPL2        76A  O  8  4COLOR(BLU)
+     A                                  9  2'Opt'
+     A                                      DSPATR(HI)
+     A            SCHDL1        75A  O  9  6DSPATR(HI)
+     A          R SCR01
+     A                                      OVERLAY
+     A            SCFKL1        78     22  2
+     A                                      COLOR(BLU)
+     A            SCFKL2        78     23  2
+     A                                      COLOR(BLU)
+     A*
+     A          R SCR02S                    SFL
+     A                                      SFLNXTCHG
+     A            SCSF1R         4S 0H
+     A            SCDBRR         9S 0H
+     A            BIEFDT    R        H      REFFLD(DT7)
+     A            SCSEL          2A  O 10  2TEXT('Selection Field')
+     A            SCEFDT    R        O 10  5REFFLD(DT8)
+     A            SCACCT    R        O 10 17REFFLD(DS20)
+     A            SCAI01        27A  O 10 40
+     A          R SCR02C                    SFLCTL(SCR02S)
+     A                                      CF12
+     A                                      OVERLAY
+     A  14                                  SFLDSP
+     A N13                                  SFLDSPCTL
+     A  13                                  SFLCLR
+     A N15                                  SFLEND(*MORE)
+     A                                      SFLSIZ(0015)
+     A                                      SFLPAG(0014)
+     A            SCRRN2         4S 0H      SFLRCDNBR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM     R        O  2  2REFFLD(DS10)
+     A            SCPRD2    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR02'
+     A                                  4  2'Press Enter to confirm your choice-
+     A                                      s for 4=Delete.'
+     A                                      COLOR(BLU)
+     A                                  5  2'Press F12 to return to change your-
+     A                                       choices.'
+     A                                      COLOR(BLU)
+     A                                  9  2'Effective Date   Bank Account#'
+     A                                      DSPATR(HI)
+     A                                  9 40'Bank Name'
+     A                                      DSPATR(HI)
+     A                                  9 61'CkTp  FND  Appl Sts'
+     A                                      DSPATR(HI)
+     A          R SCR02
+     A*                                     OVERLAY
+     A                                 23  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R SCR03
+     A                                      WINDOW(3 4 16 70)
+     A                                      CF12
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A            HREC          10A  H
+     A            HFLD          10A  H
+     A                                  1  2'A2420R'
+     A            SCPRD3    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 65'SCR03'
+     A                                  3  2'Type choices, press ENTER.'
+     A                                      COLOR(BLU)
+     A***                               5  4'Application . . . . . . . . :'
+     A***         SCSAPL    R        B  5 36REFFLD(CODE)
+     A***                                   TEXT('Application')
+     A                                  6  4'Active/Inactive (A/I) . . . :'
+     A            SCSSTA    R        B  6 36REFFLD(FLAG)
+     A                                      TEXT('SEARCH STATUS')
+     A  71                                  ERRMSGID(WCR0693 *LIBL/WMESGG)
+     A                                  7  4'Bank Name (contains)  . . . :'
+     A            SCSNAM        25A  B  7 36TEXT('SEARCH STRING')
+     A                                  8  4'Bank Account #  . . . . . . :'
+     A            SCSACT    R        B  8 36REFFLD(DS20)
+     A                                      TEXT('SEARCH ACCOUNT')
+     A                                  9  4'Effective Date  . . . . . . :'
+     A            SCSEDT    R        B  9 36REFFLD(DT8)
+     A                                      TEXT('SEARCH EFFECTIVE DATE')
+     A  72                                  ERRMSGID(WCR0500 *LIBL/WMESGG)
+     A***                              10  4'Bank Code . . . . . . . . . :'
+     A***         SCSCKT    R        B 10 36REFFLD(DS10)
+     A***                                   TEXT('SEARCH CHECK TYPE')
+     A                                 11  4'AP/GL Company # . . . . . . :'
+     A            SCSFND    R        B 11 36REFFLD(FND)
+     A                                      TEXT('SEARCH CO#')
+     A  55                                  DSPATR(PR)
+     A N55                                  DSPATR(UL)
+     A                                 12  4'Account State . . . . . . . :'
+     A            SCSST     R        B 12 36REFFLD(CODE)
+     A                                      TEXT('Account State')
+     A  73                                  ERRMSGID(WCR0504 *LIBL/WMESGG)
+     A                                 14  2'F12=Cancel'
+     A                                      COLOR(BLU)
+      *
+     A          R MSGSFL                    SFL
+     A                                      SFLMSGRCD(24)
+     A            MSGKEY                    SFLMSGKEY
+     A            Q1PGM                     SFLPGMQ
+     A          R MSGSFLC                   SFLCTL(MSGSFL)
+     A*                                     OVERLAY
+     A                                      SFLSIZ(5) SFLPAG(1)
+     A N10                                  SFLEND
+     A                                      SFLDSP
+     A                                      SFLDSPCTL
+     A                                      SFLINZ
+     A            Q1PGM                     SFLPGMQ

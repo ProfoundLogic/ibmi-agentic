@@ -1,0 +1,74 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DISPLAY FOR DAILY VEHICLE BILLING SUBMITTER              **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A*----------------------------------------------------------------
+     A          R SCR01
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7675F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  5 30'From Date:'
+     A            SCFRDT    R        B  5 42REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A  20                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A                                  7 30'To Date..:'
+     A            SCTODT    R        B  7 42REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A                                  9 20'Enter the period for which daily -
+     A                                      vehicle'
+     A                                 10 22'billing records are to be -
+     A                                      generated.'
+     A                                 12 25'A valid date entry is required.'
+     A                                 16 30'Year End Process:'
+     A            SCYEND    R        B 16 48REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                      DFT('N')
+     A                                      VALUES('Y' 'N')
+     A                                 18 12'A ''Y'' Year end process code -
+     A                                      will determine if the minimum'
+     A                                 19 12'premium has been billed and, if -
+     A                                      it hasn''''t, will bill the'
+     A                                 20 12'difference between what has been -
+     A                                      and the minimum premimum.'
+     A                                 24  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

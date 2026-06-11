@@ -1,0 +1,869 @@
+     A                                      REF(*LIBL/WREFP)
+     A                                      INDARA
+     A          R RCDTABAEL
+     A                                  1  2HTML('QPUIREC2    ROVERLAY   0     -
+     A                                      RASSUME    0     ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdTabAEL","description":"Agent-
+     A                                       Employer Listing","overlay":"true"-
+     A                                      ,"assume":"true"},"items":[{"id":"B-
+     A                                      tnExitButton","field type":"button"-
+     A                                      ,"css class":"button","value":"Exit-
+     A                                      ","left":"525px","top":"10px","widt-
+     A                                      h":"100px","cursor":"default","desc-
+     A                                      ription":"Exit Button","response":{-
+     A                                      "fieldName":"ExitNow","dataType":"i-
+     A                                      ndicator","formatting":"Indicator",-
+     A                                      "indFormat":"1 / 0"},"shortcut key"-
+     A                                      :"F3","visibility":"hidden"},{"id":-
+     A                                      "TabCBPrm","field type":"tab panel"-
+     A                                      ,"css class":"tab-panel","left":"25-
+     A                                      0px","top":"70px","width":"970px","-
+     A                                      height":{"fieldName":"TabHeight","d-
+     A                                      ataLength":"5","decPos":"0","numSep-
+     A                                      ":"false","zeroBalance":"false","ze-
+     A                                      roFill":"false","curSym":"","dataTy-
+     A                                      pe":"zoned","formatting":"Number","-
+     A                                      units":"px","negNum":"-999.00","des-
+     A                                      ignValue":"3270px"},"tab names":"Se-
+     A                                      lection Criteria","z index":"0","ta-
+     A                                      b panel style":"CompSuite Tab Panel-
+     A                                      ","value":"value text","active tab"-
+     A                                      :{"fieldName":"TabIndex","dataLengt-
+     A                                      h":"5","decPos":"0","numSep":"false-
+     A                                      ","zeroBalance":"false","zeroFill":-
+     A                                      "false","curSym":"","dataType":"zon-
+     A                                      ed","formatting":"Number","units":"-
+     A                                      ","negNum":"-999.00"},"ontabclick":-
+     A                                      "pui.click(\"BtnTabClick\")"},{"id"-
+     A                                      :"BtnTabClick","field type":"button-
+     A                                      ","css class":"button","cursor":"de-
+     A                                      fault","description":"tab click but-
+     A                                      ton","value":"Tab","response":{"fie-
+     A                                      ldName":"tabClick","dataType":"indi-
+     A                                      cator","formatting":"Indicator","in-
+     A                                      dFormat":"1 / 0"},"shortcut key":"F-
+     A                                      3","left":"485px","top":"10px","wid-
+     A                                      th":"35px","visibility":"hidden"},{-
+     A                                      "id":"btnRefresh","field type":"but-
+     A                                      ton","css class":"button","value":"-
+     A                                      Refresh","left":"640px","top":"10px-
+     A                                      ","width":"100px","cursor":"default-
+     A                                      ","response":{"fieldName":"BtnRefre-
+     A                                      sh","dataType":"indicator","formatt-
+     A                                      ing":"Indicator","indFormat":"1 / 0-
+     A                                      "},"visibility":"hidden"},{"id":"Hd-
+     A                                      gAGTEMPLST","field type":"output fi-
+     A                                      eld","css class":"heading","descrip-
+     A                                      tion":"Agent Employer Listing Repor-
+     A                                      t Heading","value":"Agent Employer -
+     A                                      Listing","left":"250px","top":"10px-
+     A                                      ","width":"215px","heading type":"P-
+     A                                      age Title"}]}')
+     A            BTNREFRESH     1A  H
+     A            EXITNOW        1A  H
+     A            TABCLICK       1A  H
+     A            TABHEIGHT      5S 0H
+     A            TABINDEX       5S 0H
+     A          R RCDAGTEMPL
+     A                                  1  2HTML('QPUIREC21   ROVERLAY   0     -
+     A                                      RASSUME    0     RROWS      2    C1-
+     A                                          1C1    1 REMSGID    5    C11   -
+     A                                      DrpPopGroupFMSFND     C6    WMESGGC-
+     A                                      5    *LIBLC0    FERFND     REMSGID -
+     A                                         5    C14   TxbPolEffFrmDtFMSPEFF-
+     A                                      FRDTC6    WMESGGC5    *LIBLC0    FE-
+     A                                      RPEFFFRDTREMSGID    5    C13   TxbP-
+     A                                      olEffToDtFMSPEFFTODTC6    WMESGGC5 -
+     A                                         *LIBLC0    FERPEFFTODTREMSGID   -
+     A                                       5    C10   TxbEmpStDTFMSEMPSTDT C6-
+     A                                          WMESGGC5    *LIBLC0    FEREMPST-
+     A                                      DT REMSGID    5    C10   TxbAgtSTDt-
+     A                                      FMSAGTSTDT C6    WMESGGC5    *LIBLC-
+     A                                      0    FERAGTSTDT REMSGID    5    C9 -
+     A                                         DrpEmpSelFMSEMPSEL  C6    WMESGG-
+     A                                      C5    *LIBLC0    FEREMPSEL  REMSGID-
+     A                                          5    C14   DrpPrimarySortFMSPRI-
+     A                                      SORT C6    WMESGGC5    *LIBLC0    F-
+     A                                      ERPRISORT REMSGID    5    C16   Drp-
+     A                                      SecondarySortFMSSECSORT C6    WMESG-
+     A                                      GC5    *LIBLC0    FERSECSORT REMSGI-
+     A                                      D    5    C10   DrpOutTypeFMSOUTTYP-
+     A                                      E C6    WMESGGC5    *LIBLC0    FERO-
+     A                                      UTTYPE REMSGID    5    C12   ChkInc-
+     A                                      CanAgtFMGCANAGT  C6    WMESGGC5    -
+     A                                      *LIBLC0    FERCANAGT  REMSGID    5 -
+     A                                         C9    TxbEmpNmRFMSEMPNMF  C6    -
+     A                                      WMESGGC5    *LIBLC0    FEREMPNMF  R-
+     A                                      EMSGID    5    C9    TxbEmpNToFMSEM-
+     A                                      PNMT  C6    WMESGGC5    *LIBLC0    -
+     A                                      FEREMPNMT  REMSGID    5    C10   Tx-
+     A                                      bEmpNumFFMSEMPNBRF C6    WMESGGC5  -
+     A                                        *LIBLC0    FEREMPNBRF REMSGID    -
+     A                                      5    C11   TxbEmpNumToFMSEMPNBRT C6-
+     A                                          WMESGGC5    *LIBLC0    FEREMPNB-
+     A                                      RT REMSGID    5    C14   TxbAgtName-
+     A                                      FromFMSAGTNMF  C6    WMESGGC5    *L-
+     A                                      IBLC0    FERAGTNMF  REMSGID    5   -
+     A                                       C12   TxbAgtNameToFMSAGTNMT  C6   -
+     A                                       WMESGGC5    *LIBLC0    FERAGTNMT  -
+     A                                      REMSGID    5    C12   txbAgtNumFrmF-
+     A                                      MSAGTNBRF C6    WMESGGC5    *LIBLC0-
+     A                                          FERAGTNBRF REMSGID    5    C11 -
+     A                                        txbAgtNumToFMSAGTNBRT C6    WMESG-
+     A                                      GC5    *LIBLC0    FERAGTNBRT ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdAgtEmpL","overlay":"true","e-
+     A                                      xternal css":"label","description":-
+     A                                      "Agent Employer Listing","assume":"-
+     A                                      true","overlay range":"1-1","design-
+     A                                       overlay formats":"RcdTabAEL","head-
+     A                                      er text align":"Left,Right","csv fi-
+     A                                      le name":"Payment Value 1 Codes","s-
+     A                                      election value":"A"},"items":[{"id"-
+     A                                      :"BtnExitButtonAll","field type":"b-
+     A                                      utton","css class":"button","value"-
+     A                                      :"Exit","left":"750px","top":"10px"-
+     A                                      ,"width":"100px","cursor":"default"-
+     A                                      ,"description":"Exit Button","respo-
+     A                                      nse":{"fieldName":"ExitNow","dataTy-
+     A                                      pe":"indicator","formatting":"Indic-
+     A                                      ator","indFormat":"1 / 0"},"shortcu-
+     A                                      t key":"F3","visibility":"hidden","-
+     A                                      height":"25px"},{"id":"FldSetCon1",-
+     A                                      "field type":"field set panel","css-
+     A                                       class":"fieldset","left":"255px","-
+     A                                      top":"95px","width":"950px","height-
+     A                                      ":"550px","z index":"8","visibility-
+     A                                      ":{"fieldName":"indCont1","dataType-
+     A                                      ":"indicator","formatting":"Indicat-
+     A                                      or","indFormat":"visible / hidden"}-
+     A                                      ,"locked in place":"true"},{"id":"L-
+     A                                      blGroup","field type":"output field-
+     A                                      ","css class":"label","value":"Grou-
+     A                                      p ","left":"265px","top":"115px","d-
+     A                                      escription":"Group Label","width":"-
+     A                                      50px"},{"id":"DrpPopGroup","field t-
+     A                                      ype":"textbox","css class":"input",-
+     A                                      "description":"Group Selection Drop-
+     A                                       Down box","value":{"fieldName":"sc-
+     A                                      Fnd","refField":"elfnd wdelp","numS-
+     A                                      ep":"false","zeroBalance":"false","-
+     A                                      numBlankFill":"false","zeroFill":"t-
+     A                                      rue","curSym":"","dataType":"refere-
+     A                                      nce","formatting":"Number","negNum"-
+     A                                      :"-999.00","units":"","designValue"-
+     A                                      :"[scFnd]"},"left":"265px","top":"1-
+     A                                      30px","width":"300px","choices data-
+     A                                      base file":{"fieldName":"grpFrom","-
+     A                                      dataLength":"200","trimLeading":"fa-
+     A                                      lse","trimTrailing":"true","blankFi-
+     A                                      ll":"false","rjZeroFill":"false","d-
+     A                                      ataType":"char","formatting":"Text"-
+     A                                      ,"textTransform":"none"},"choice op-
+     A                                      tions field":{"fieldName":"grpSelec-
+     A                                      t","dataLength":"100","trimLeading"-
+     A                                      :"false","trimTrailing":"true","bla-
+     A                                      nkFill":"false","rjZeroFill":"false-
+     A                                      ","dataType":"char","formatting":"T-
+     A                                      ext","textTransform":"none"},"choic-
+     A                                      e values field":"DIGITS(FNFND)","ch-
+     A                                      oices selection criteria":{"fieldNa-
+     A                                      me":"grpwhere","dataLength":"200","-
+     A                                      trimLeading":"false","trimTrailing"-
+     A                                      :"true","blankFill":"false","rjZero-
+     A                                      Fill":"false","dataType":"char","fo-
+     A                                      rmatting":"Text","textTransform":"n-
+     A                                      one"},"css class 2":"textbox","cont-
+     A                                      ains match":"true","error message i-
+     A                                      d":{"fieldName":"msFnd","dataLength-
+     A                                      ":"10","trimLeading":"false","trimT-
+     A                                      railing":"true","blankFill":"false"-
+     A                                      ,"rjZeroFill":"false","dataType":"c-
+     A                                      har","formatting":"Text","textTrans-
+     A                                      form":"none"},"error message file":-
+     A                                      "WMESGG","error message library":"*-
+     A                                      LIBL","error conditio')
+     A                                  1  2HTML('n":{"fieldName":"erFnd","cust-
+     A                                      omTrue":"","customFalse":"","dataTy-
+     A                                      pe":"indicator","formatting":"Indic-
+     A                                      ator","indFormat":"1 / 0"},"error e-
+     A                                      nhanced mode":"1","error messages":-
+     A                                      "1 message"},{"id":"LblPolToDt","fi-
+     A                                      eld type":"output field","css class-
+     A                                      ":"label","description":"Policy To -
+     A                                      date","value":"Policy Effective Dat-
+     A                                      e Range","left":"265px","top":"155p-
+     A                                      x","width":"165px"},{"id":"ImgPolEf-
+     A                                      f","field type":"image","css class"-
+     A                                      :"image","image source":"/profoundu-
+     A                                      i/userdata/images/asterisk_orange_s-
+     A                                      mall.png","left":"430px","top":"155-
+     A                                      px","height":"8px","width":"8px","p-
+     A                                      arent field set":"FldSetCon1"},{"id-
+     A                                      ":"LblEmpAsSt","field type":"output-
+     A                                       field","css class":"label","descri-
+     A                                      ption":"Employer Status as of","val-
+     A                                      ue":"Employer Status as of Date","l-
+     A                                      eft":"500px","top":"155px","width":-
+     A                                      "165px"},{"id":"ImgPolEff_copy","fi-
+     A                                      eld type":"image","css class":"imag-
+     A                                      e","image source":"/profoundui/user-
+     A                                      data/images/asterisk_orange_small.p-
+     A                                      ng","left":"665px","top":"155px","h-
+     A                                      eight":"8px","width":"8px","parent -
+     A                                      field set":"FldSetCon1"},{"id":"Lbl-
+     A                                      AgtStDt","field type":"output field-
+     A                                      ","css class":"label","description"-
+     A                                      :"Agent Status Date","value":"Agent-
+     A                                       Status as of Date","left":"685px",-
+     A                                      "top":"155px","width":"150px","visi-
+     A                                      bility":{"fieldName":"AgtSt","custo-
+     A                                      mTrue":"","customFalse":"","dataTyp-
+     A                                      e":"indicator","formatting":"Indica-
+     A                                      tor","indFormat":"visible / hidden"-
+     A                                      }},{"id":"TxbPolEffFrmDt","field ty-
+     A                                      pe":"date field","css class":"input-
+     A                                      ","value":{"fieldName":"scPeffFrDt"-
+     A                                      ,"dataLength":"8","decPos":"0","num-
+     A                                      Sep":"false","zeroBalance":"false",-
+     A                                      "numBlankFill":"false","zeroFill":"-
+     A                                      true","edtWrd":"''  /  /    ''","cu-
+     A                                      rSym":"","dataType":"zoned","format-
+     A                                      ting":"Number","negNum":"999.00","u-
+     A                                      nits":"","designValue":"[scPeffFrDt-
+     A                                      ]"},"text align":"right","left":"26-
+     A                                      5px","top":"170px","css class 2":"d-
+     A                                      atefield","width":"65px","error mes-
+     A                                      sages":"1 message","error message i-
+     A                                      d":{"fieldName":"msPEffFrDt","dataL-
+     A                                      ength":"10","trimLeading":"false","-
+     A                                      trimTrailing":"true","blankFill":"f-
+     A                                      alse","rjZeroFill":"false","dataTyp-
+     A                                      e":"char","formatting":"Text","text-
+     A                                      Transform":"none"},"error message f-
+     A                                      ile":"WMESGG","error message librar-
+     A                                      y":"*LIBL","error condition":{"fiel-
+     A                                      dName":"erPEffFrDt","customTrue":""-
+     A                                      ,"customFalse":"","dataType":"indic-
+     A                                      ator","formatting":"Indicator","ind-
+     A                                      Format":"1 / 0"},"error enhanced mo-
+     A                                      de":"1"},{"id":"LblHypen","field ty-
+     A                                      pe":"output field","css class":"lab-
+     A                                      el","description":"Hyphen Lable","v-
+     A                                      alue":"-","left":"370px","top":"170-
+     A                                      px","width":"10px"},{"id":"TxbPolEf-
+     A                                      fToDt","field type":"date field","c-
+     A                                      ss class":"input","value":{"fieldNa-
+     A                                      me":"scPeffToDt","dat')
+     A                                  1  2HTML('aLength":"8","decPos":"0","nu-
+     A                                      mSep":"false","zeroBalance":"false"-
+     A                                      ,"numBlankFill":"false","zeroFill":-
+     A                                      "true","edtWrd":"''  /  /    ''","c-
+     A                                      urSym":"","dataType":"zoned","forma-
+     A                                      tting":"Number","negNum":"999.00","-
+     A                                      units":"","designValue":"[scPeffToD-
+     A                                      t]"},"left":"380px","top":"170px","-
+     A                                      text align":"right","css class 2":"-
+     A                                      datefield","width":"65px","error me-
+     A                                      ssages":"1 message","error message -
+     A                                      id":{"fieldName":"msPEffToDt","data-
+     A                                      Length":"10","trimLeading":"false",-
+     A                                      "trimTrailing":"true","blankFill":"-
+     A                                      false","rjZeroFill":"false","dataTy-
+     A                                      pe":"char","formatting":"Text","tex-
+     A                                      tTransform":"none"},"error message -
+     A                                      file":"WMESGG","error message libra-
+     A                                      ry":"*LIBL","error condition":{"fie-
+     A                                      ldName":"erPEffToDt","customTrue":"-
+     A                                      ","customFalse":"","dataType":"indi-
+     A                                      cator","formatting":"Indicator","in-
+     A                                      dFormat":"1 / 0"},"error enhanced m-
+     A                                      ode":"1"},{"id":"TxbEmpStDT","field-
+     A                                       type":"date field","css class":"in-
+     A                                      put","value":{"fieldName":"scEmpStD-
+     A                                      t","dataLength":"8","decPos":"0","n-
+     A                                      umSep":"false","zeroBalance":"false-
+     A                                      ","numBlankFill":"false","zeroFill"-
+     A                                      :"true","edtWrd":"''  /  /    ''","-
+     A                                      curSym":"","dataType":"zoned","form-
+     A                                      atting":"Number","negNum":"-999.00"-
+     A                                      ,"units":"","designValue":"[scEmpSt-
+     A                                      Dt]"},"text align":"right","error m-
+     A                                      essages":"1 message","left":"500px"-
+     A                                      ,"top":"170px","width":"65px","css -
+     A                                      class 2":"datefield","error message-
+     A                                       id":{"fieldName":"msEmpStDt","data-
+     A                                      Length":"10","trimLeading":"false",-
+     A                                      "trimTrailing":"true","blankFill":"-
+     A                                      false","rjZeroFill":"false","dataTy-
+     A                                      pe":"char","formatting":"Text","tex-
+     A                                      tTransform":"none"},"error message -
+     A                                      file":"WMESGG","error message libra-
+     A                                      ry":"*LIBL","error condition":{"fie-
+     A                                      ldName":"erEmpStDt","customTrue":""-
+     A                                      ,"customFalse":"","dataType":"indic-
+     A                                      ator","formatting":"Indicator","ind-
+     A                                      Format":"1 / 0"},"error enhanced mo-
+     A                                      de":"1"},{"id":"TxbAgtSTDt","field -
+     A                                      type":"date field","css class":"inp-
+     A                                      ut","value":{"fieldName":"scAgtStDt-
+     A                                      ","dataLength":"8","decPos":"0","nu-
+     A                                      mSep":"false","zeroBalance":"false"-
+     A                                      ,"numBlankFill":"false","zeroFill":-
+     A                                      "true","edtWrd":"''  /  /    ''","c-
+     A                                      urSym":"","dataType":"zoned","forma-
+     A                                      tting":"Number","negNum":"-999.00",-
+     A                                      "units":"","designValue":"[scAgtStD-
+     A                                      t]"},"text align":"right","error me-
+     A                                      ssages":"1 message","left":"685px",-
+     A                                      "top":"170px","width":"65px","css c-
+     A                                      lass 2":"datefield","error message -
+     A                                      id":{"fieldName":"msAgtStDt","dataL-
+     A                                      ength":"10","trimLeading":"false","-
+     A                                      trimTrailing":"true","blankFill":"f-
+     A                                      alse","rjZeroFill":"false","dataTyp-
+     A                                      e":"char","formatting":"Text","text-
+     A                                      Transform":"none"},"error message f-
+     A                                      ile":"WMESGG","error message librar-
+     A                                      y":"*LIBL","error condition":{"fiel-
+     A                                      dName":"erAgtStDt","c')
+     A                                  1  2HTML('ustomTrue":"","customFalse":"-
+     A                                      ","dataType":"indicator","formattin-
+     A                                      g":"Indicator","indFormat":"1 / 0"}-
+     A                                      ,"error enhanced mode":"1","visibil-
+     A                                      ity":{"fieldName":"AgtSt","customTr-
+     A                                      ue":"","customFalse":"","dataType":-
+     A                                      "indicator","formatting":"Indicator-
+     A                                      ","indFormat":"visible / hidden"}},-
+     A                                      {"id":"LblEmpSel","field type":"out-
+     A                                      put field","css class":"label","des-
+     A                                      cription":"Employer Selection","val-
+     A                                      ue":"Employer Selection","left":"26-
+     A                                      5px","top":"195px","width":"120px"}-
+     A                                      ,{"id":"ImgAccTyp","field type":"im-
+     A                                      age","css class":"image","image sou-
+     A                                      rce":"/profoundui/userdata/images/a-
+     A                                      sterisk_orange_small.png","left":"3-
+     A                                      85px","top":"195px","height":"8px",-
+     A                                      "width":"8px","parent field set":"F-
+     A                                      ldSetCon1"},{"id":"LblPrimarySort",-
+     A                                      "field type":"output field","css cl-
+     A                                      ass":"label","description":"Primary-
+     A                                       Sort Label","value":"Primary Sort"-
+     A                                      ,"left":"500px","top":"195px","widt-
+     A                                      h":"85px"},{"id":"ImgPriSort","fiel-
+     A                                      d type":"image","css class":"image"-
+     A                                      ,"image source":"/profoundui/userda-
+     A                                      ta/images/asterisk_orange_small.png-
+     A                                      ","left":"585px","top":"195px","hei-
+     A                                      ght":"8px","width":"8px","parent fi-
+     A                                      eld set":"FldSetCon1"},{"id":"LblSe-
+     A                                      condarySort","field type":"output f-
+     A                                      ield","css class":"label","descript-
+     A                                      ion":"Secondary Sort  Label","value-
+     A                                      ":"Secondary Sort","left":"685px","-
+     A                                      top":"195px","width":"100px"},{"id"-
+     A                                      :"DrpEmpSel","field type":"select b-
+     A                                      ox","css class":"input","descriptio-
+     A                                      n":"Employer Selection Dropdown","v-
+     A                                      alue":{"fieldName":"scEmpSel","data-
+     A                                      Length":"1","trimLeading":"false","-
+     A                                      trimTrailing":"true","blankFill":"f-
+     A                                      alse","rjZeroFill":"false","dataTyp-
+     A                                      e":"char","formatting":"Text","text-
+     A                                      Transform":"none","designValue":"[s-
+     A                                      cEmpSel]"},"choices":"Active,Cancel-
+     A                                      led,Both","choice values":"A,C,B","-
+     A                                      left":"265px","top":"210px","width"-
+     A                                      :"110px","css class 2":"dropdown","-
+     A                                      blank option":"false","error messag-
+     A                                      es":"1 message","error message id":-
+     A                                      {"fieldName":"MSEmpSel","dataLength-
+     A                                      ":"10","trimLeading":"false","trimT-
+     A                                      railing":"true","blankFill":"false"-
+     A                                      ,"rjZeroFill":"false","dataType":"c-
+     A                                      har","formatting":"Text","textTrans-
+     A                                      form":"none"},"error message file":-
+     A                                      "WMESGG","error message library":"*-
+     A                                      LIBL","error condition":{"fieldName-
+     A                                      ":"erEmpSel","customTrue":"","custo-
+     A                                      mFalse":"","dataType":"indicator","-
+     A                                      formatting":"Indicator","indFormat"-
+     A                                      :"1 / 0"},"error enhanced mode":"1"-
+     A                                      },{"id":"DrpPrimarySort","field typ-
+     A                                      e":"select box","css class":"input"-
+     A                                      ,"description":"Primary sort Dropdo-
+     A                                      wn","value":{"fieldName":"scPriSort-
+     A                                      ","dataLength":"2","trimLeading":"f-
+     A                                      alse","trimTrailing":"true","blankF-
+     A                                      ill":"false","rjZeroFill":"false","-
+     A                                      dataType":"char","formatting":"Text-
+     A                                      ","textTransform":"no')
+     A                                  1  2HTML('ne","designValue":"[scPriSort-
+     A                                      ]"},"choices":"Employer alpha,Emplo-
+     A                                      yer #,Agent alpha,Agent #","choice -
+     A                                      values":"EA,EN,AA,AN","blank option-
+     A                                      ":"false","left":"500px","top":"210-
+     A                                      px","width":"105px","css class 2":"-
+     A                                      dropdown","error messages":"1 messa-
+     A                                      ge","error message id":{"fieldName"-
+     A                                      :"MSPriSort","dataLength":"10","tri-
+     A                                      mLeading":"false","trimTrailing":"t-
+     A                                      rue","blankFill":"false","rjZeroFil-
+     A                                      l":"false","dataType":"char","forma-
+     A                                      tting":"Text","textTransform":"none-
+     A                                      "},"error message file":"WMESGG","e-
+     A                                      rror message library":"*LIBL","erro-
+     A                                      r condition":{"fieldName":"erPriSor-
+     A                                      t","customTrue":"","customFalse":""-
+     A                                      ,"dataType":"indicator","formatting-
+     A                                      ":"Indicator","indFormat":"1 / 0"},-
+     A                                      "error enhanced mode":"1","onchange-
+     A                                      ":"if (get(''DrpPrimarySort'') == '-
+     A                                      'EA''){\n  applyProperty(\"DrpSecon-
+     A                                      darySort\",\"disabled\",\"true\");\-
+     A                                      n  changeElementValue(''DrpSecondar-
+     A                                      ySort'', '' '');\n}\nif (get(''DrpP-
+     A                                      rimarySort'') == ''EN''){\n  applyP-
+     A                                      roperty(\"DrpSecondarySort\",\"disa-
+     A                                      bled\",\"true\");\n  changeElementV-
+     A                                      alue(''DrpSecondarySort'', '' '');\-
+     A                                      n}\nif (get(''DrpPrimarySort'') == -
+     A                                      ''AA''){\n  applyProperty(\"DrpSeco-
+     A                                      ndarySort\",\"disabled\",\"false\")-
+     A                                      ;\n}\nif (get(''DrpPrimarySort'') =-
+     A                                      = ''AN''){\n  applyProperty(\"DrpSe-
+     A                                      condarySort\",\"disabled\",\"false\-
+     A                                      ");\n}"},{"id":"DrpSecondarySort","-
+     A                                      field type":"select box","css class-
+     A                                      ":"input","description":"Secondary -
+     A                                      sort Dropdown","value":{"fieldName"-
+     A                                      :"scSecSort","dataLength":"2","trim-
+     A                                      Leading":"false","trimTrailing":"tr-
+     A                                      ue","blankFill":"false","rjZeroFill-
+     A                                      ":"false","dataType":"char","format-
+     A                                      ting":"Text","textTransform":"none"-
+     A                                      ,"designValue":"[scSecSort]"},"erro-
+     A                                      r messages":"1 message","choices":"-
+     A                                      ,Employer alpha,Employer #","choice-
+     A                                       values":",EA,EN","blank option":"f-
+     A                                      alse","left":"685px","top":"210px",-
+     A                                      "width":"105px","css class 2":"drop-
+     A                                      down","error message id":{"fieldNam-
+     A                                      e":"MSSecSort","dataLength":"10","t-
+     A                                      rimLeading":"false","trimTrailing":-
+     A                                      "true","blankFill":"false","rjZeroF-
+     A                                      ill":"false","dataType":"char","for-
+     A                                      matting":"Text","textTransform":"no-
+     A                                      ne"},"error message file":"WMESGG",-
+     A                                      "error message library":"*LIBL","er-
+     A                                      ror condition":{"fieldName":"erSecS-
+     A                                      ort","customTrue":"","customFalse":-
+     A                                      "","dataType":"indicator","formatti-
+     A                                      ng":"Indicator","indFormat":"1 / 0"-
+     A                                      },"error enhanced mode":"1","disabl-
+     A                                      ed":"true"},{"id":"LblOutTyp","fiel-
+     A                                      d type":"output field","css class":-
+     A                                      "label","description":"Output Type -
+     A                                      Label","value":"Output Type","left"-
+     A                                      :"265px","top":"235px","width":"80p-
+     A                                      x"},{"id":"ImgAccTyp_copy","field t-
+     A                                      ype":"image","css class":"image","i-
+     A                                      mage source":"/profoundui/userdata/-
+     A                                      images/asterisk_orang')
+     A                                  1  2HTML('e_small.png","left":"350px","-
+     A                                      top":"235px","height":"8px","width"-
+     A                                      :"8px"},{"id":"DrpOutType","field t-
+     A                                      ype":"select box","css class":"inpu-
+     A                                      t","description":"Output Type Dropd-
+     A                                      own","value":{"fieldName":"scOutTyp-
+     A                                      e","dataLength":"1","trimLeading":"-
+     A                                      false","trimTrailing":"true","blank-
+     A                                      Fill":"false","rjZeroFill":"false",-
+     A                                      "dataType":"char","formatting":"Tex-
+     A                                      t","textTransform":"none","designVa-
+     A                                      lue":"[scOutType]"},"error messages-
+     A                                      ":"1 message","choices":"Printed,Fi-
+     A                                      le,Both","choice values":"P,F,B","b-
+     A                                      lank option":"false","left":"265px"-
+     A                                      ,"top":"250px","width":"110px","css-
+     A                                       class 2":"dropdown","error message-
+     A                                       id":{"fieldName":"MSOutType","data-
+     A                                      Length":"10","trimLeading":"false",-
+     A                                      "trimTrailing":"true","blankFill":"-
+     A                                      false","rjZeroFill":"false","dataTy-
+     A                                      pe":"char","formatting":"Text","tex-
+     A                                      tTransform":"none"},"error message -
+     A                                      file":"WMESGG","error message libra-
+     A                                      ry":"*LIBL","error condition":{"fie-
+     A                                      ldName":"erOutType","customTrue":""-
+     A                                      ,"customFalse":"","dataType":"indic-
+     A                                      ator","formatting":"Indicator","ind-
+     A                                      Format":"1 / 0"},"error enhanced mo-
+     A                                      de":"1"},{"id":"ChkIncCanAgt","fiel-
+     A                                      d type":"checkbox","css class":"inp-
+     A                                      ut","value":{"fieldName":"scCanAgt"-
+     A                                      ,"refField":"FLAG","trimLeading":"f-
+     A                                      alse","trimTrailing":"true","blankF-
+     A                                      ill":"false","rjZeroFill":"false","-
+     A                                      dataType":"reference","formatting":-
+     A                                      "Text","textTransform":"none","desi-
+     A                                      gnValue":"[scCanAgt]"},"checked val-
+     A                                      ue":"Y","label":"Include Cancelled -
+     A                                      Agents","error messages":"1 message-
+     A                                      ","left":"500px","top":"250px","z i-
+     A                                      ndex":"100","locked in place":"fals-
+     A                                      e","css class 2":"checkbox","unchec-
+     A                                      ked value":"N","error message id":{-
+     A                                      "fieldName":"mgCanAgt","dataLength"-
+     A                                      :"10","trimLeading":"false","trimTr-
+     A                                      ailing":"true","blankFill":"false",-
+     A                                      "rjZeroFill":"false","dataType":"ch-
+     A                                      ar","formatting":"Text","textTransf-
+     A                                      orm":"none"},"error message file":"-
+     A                                      WMESGG","error message library":"*L-
+     A                                      IBL","error condition":{"fieldName"-
+     A                                      :"erCanAgt","customTrue":"","custom-
+     A                                      False":"","dataType":"indicator","f-
+     A                                      ormatting":"Indicator","indFormat":-
+     A                                      "1 / 0"},"error enhanced mode":"1"}-
+     A                                      ,{"id":"LblEmpNamRange","field type-
+     A                                      ":"output field","css class":"label-
+     A                                      ","description":"EmpNamRange","valu-
+     A                                      e":"Employer Name Range","left":"26-
+     A                                      5px","top":"275px","width":"145px"}-
+     A                                      ,{"id":"LblEmpNumRange","field type-
+     A                                      ":"output field","css class":"label-
+     A                                      ","description":"EmpNamRange","valu-
+     A                                      e":"Employer Number Range","left":"-
+     A                                      500px","top":"275px","width":"160px-
+     A                                      "},{"id":"TxbEmpNmR","field type":"-
+     A                                      textbox","css class":"input","descr-
+     A                                      iption":"EMPLOYER NAME RANGE FROM",-
+     A                                      "value":{"fieldName":"scEmpNmF","da-
+     A                                      taLength":"2","trimLeading":"false"-
+     A                                      ,"trimTrailing":"true')
+     A                                  1  2HTML('","blankFill":"false","rjZero-
+     A                                      Fill":"false","dataType":"char","fo-
+     A                                      rmatting":"Text","textTransform":"u-
+     A                                      ppercase","designValue":"[scEmpNmF]-
+     A                                      "},"text transform":"uppercase","cu-
+     A                                      rsor row":"15","cursor column":"31"-
+     A                                      ,"error messages":"1 message","left-
+     A                                      ":"265px","top":"290px","width":"15-
+     A                                      px","css class 2":"textbox","error -
+     A                                      message id":{"fieldName":"msEmpNmF"-
+     A                                      ,"dataLength":"10","trimLeading":"f-
+     A                                      alse","trimTrailing":"true","blankF-
+     A                                      ill":"false","rjZeroFill":"false","-
+     A                                      dataType":"char","formatting":"Text-
+     A                                      ","textTransform":"none"},"error me-
+     A                                      ssage file":"WMESGG","error message-
+     A                                       library":"*LIBL","error condition"-
+     A                                      :{"fieldName":"erEmpNmF","customTru-
+     A                                      e":"","customFalse":"","dataType":"-
+     A                                      indicator","formatting":"Indicator"-
+     A                                      ,"indFormat":"1 / 0"},"error enhanc-
+     A                                      ed mode":"1"},{"id":"LblHypen1","fi-
+     A                                      eld type":"output field","css class-
+     A                                      ":"label","description":"Hyphen Lab-
+     A                                      le","value":"-","left":"300px","top-
+     A                                      ":"290px","width":"10px"},{"id":"Tx-
+     A                                      bEmpNTo","field type":"textbox","cs-
+     A                                      s class":"input","description":"EMP-
+     A                                      LOYER NAME RANGE TO","value":{"fiel-
+     A                                      dName":"scEmpNmT","dataLength":"2",-
+     A                                      "trimLeading":"false","trimTrailing-
+     A                                      ":"true","blankFill":"false","rjZer-
+     A                                      oFill":"false","dataType":"char","f-
+     A                                      ormatting":"Text","textTransform":"-
+     A                                      uppercase","designValue":"[scEmpNmT-
+     A                                      ]"},"text transform":"uppercase","c-
+     A                                      ursor row":"15","cursor column":"44-
+     A                                      ","error messages":"1 message","lef-
+     A                                      t":"320px","top":"290px","width":"1-
+     A                                      5px","css class 2":"textbox","error-
+     A                                       message id":{"fieldName":"msEmpNmT-
+     A                                      ","dataLength":"10","trimLeading":"-
+     A                                      false","trimTrailing":"true","blank-
+     A                                      Fill":"false","rjZeroFill":"false",-
+     A                                      "dataType":"char","formatting":"Tex-
+     A                                      t","textTransform":"none"},"error m-
+     A                                      essage file":"WMESGG","error messag-
+     A                                      e library":"*LIBL","error condition-
+     A                                      ":{"fieldName":"erEmpNmT","customTr-
+     A                                      ue":"","customFalse":"","dataType":-
+     A                                      "indicator","formatting":"Indicator-
+     A                                      ","indFormat":"1 / 0"},"error enhan-
+     A                                      ced mode":"1"},{"id":"TxbEmpNumF","-
+     A                                      field type":"textbox","css class":"-
+     A                                      input","description":"EMPLOYER # RA-
+     A                                      NGE FROM","value":{"fieldName":"scE-
+     A                                      mpNbrF","dataLength":"9","decPos":"-
+     A                                      0","numSep":"false","zeroBalance":"-
+     A                                      false","numBlankFill":"true","zeroF-
+     A                                      ill":"false","curSym":"","dataType"-
+     A                                      :"zoned","formatting":"Number","neg-
+     A                                      Num":"999.00","units":"","designVal-
+     A                                      ue":"[scEmpNbrF]"},"text align":"ri-
+     A                                      ght","cursor row":"16","cursor colu-
+     A                                      mn":"31","error messages":"1 messag-
+     A                                      e","left":"500px","top":"290px","wi-
+     A                                      dth":"60px","css class 2":"textbox"-
+     A                                      ,"error message id":{"fieldName":"m-
+     A                                      sEmpNbrF","dataLength":"10","trimLe-
+     A                                      ading":"false","trimTrailing":"true-
+     A                                      ","blankFill":"false","rjZeroFill":-
+     A                                      "false","dataType":"c')
+     A                                  1  2HTML('har","formatting":"Text","tex-
+     A                                      tTransform":"none"},"error message -
+     A                                      file":"WMESGG","error message libra-
+     A                                      ry":"*LIBL","error condition":{"fie-
+     A                                      ldName":"erEmpNbrF","customTrue":""-
+     A                                      ,"customFalse":"","dataType":"indic-
+     A                                      ator","formatting":"Indicator","ind-
+     A                                      Format":"1 / 0"},"error enhanced mo-
+     A                                      de":"1"},{"id":"LblHypen_copy","fie-
+     A                                      ld type":"output field","css class"-
+     A                                      :"label","description":"Hyphen Labl-
+     A                                      e","value":"-","left":"585px","top"-
+     A                                      :"290px","width":"10px"},{"id":"Txb-
+     A                                      EmpNumTo","field type":"textbox","c-
+     A                                      ss class":"input","description":"EM-
+     A                                      PLOYER # RANGE TO","value":{"fieldN-
+     A                                      ame":"scEmpNbrT","dataLength":"9","-
+     A                                      decPos":"0","numSep":"false","zeroB-
+     A                                      alance":"false","numBlankFill":"tru-
+     A                                      e","zeroFill":"false","curSym":"","-
+     A                                      dataType":"zoned","formatting":"Num-
+     A                                      ber","negNum":"999.00","units":"","-
+     A                                      designValue":"[scEmpNbrT]"},"text a-
+     A                                      lign":"right","cursor row":"16","cu-
+     A                                      rsor column":"31","error messages":-
+     A                                      "1 message","left":"610px","top":"2-
+     A                                      90px","width":"60px","css class 2":-
+     A                                      "textbox","error message id":{"fiel-
+     A                                      dName":"msEmpNbrT","dataLength":"10-
+     A                                      ","trimLeading":"false","trimTraili-
+     A                                      ng":"true","blankFill":"false","rjZ-
+     A                                      eroFill":"false","dataType":"char",-
+     A                                      "formatting":"Text","textTransform"-
+     A                                      :"none"},"error message file":"WMES-
+     A                                      GG","error message library":"*LIBL"-
+     A                                      ,"error condition":{"fieldName":"er-
+     A                                      EmpNbrT","customTrue":"","customFal-
+     A                                      se":"","dataType":"indicator","form-
+     A                                      atting":"Indicator","indFormat":"1 -
+     A                                      / 0"},"error enhanced mode":"1"},{"-
+     A                                      id":"LblAgtNamRange","field type":"-
+     A                                      output field","css class":"label","-
+     A                                      description":"AgtNamRange","value":-
+     A                                      "Agent Name Range","left":"265px","-
+     A                                      top":"315px","width":"125px"},{"id"-
+     A                                      :"LblAgtNumRange","field type":"out-
+     A                                      put field","css class":"label","des-
+     A                                      cription":"AgtNumRange","value":"Ag-
+     A                                      ent Number Range","left":"500px","t-
+     A                                      op":"315px","width":"145px"},{"id":-
+     A                                      "TxbAgtNameFrom","field type":"text-
+     A                                      box","css class":"input","descripti-
+     A                                      on":"AGENT NAME RANGE FROM","value"-
+     A                                      :{"fieldName":"scAgtNmF","dataLengt-
+     A                                      h":"2","trimLeading":"false","trimT-
+     A                                      railing":"true","blankFill":"false"-
+     A                                      ,"rjZeroFill":"false","dataType":"c-
+     A                                      har","formatting":"Text","textTrans-
+     A                                      form":"uppercase","designValue":"[s-
+     A                                      cAgtNmF]"},"text transform":"upperc-
+     A                                      ase","cursor row":"17","cursor colu-
+     A                                      mn":"31","error messages":"1 messag-
+     A                                      e","left":"265px","top":"330px","wi-
+     A                                      dth":"15px","css class 2":"textbox"-
+     A                                      ,"error message id":{"fieldName":"m-
+     A                                      sAgtNmF","dataLength":"10","trimLea-
+     A                                      ding":"false","trimTrailing":"true"-
+     A                                      ,"blankFill":"false","rjZeroFill":"-
+     A                                      false","dataType":"char","formattin-
+     A                                      g":"Text","textTransform":"none"},"-
+     A                                      error message file":"WMESGG","error-
+     A                                       message library":"*L')
+     A                                  1  2HTML('IBL","error condition":{"fiel-
+     A                                      dName":"erAgtNmF","customTrue":"","-
+     A                                      customFalse":"","dataType":"indicat-
+     A                                      or","formatting":"Indicator","indFo-
+     A                                      rmat":"1 / 0"},"error enhanced mode-
+     A                                      ":"1"},{"id":"LblHypen1_copy","fiel-
+     A                                      d type":"output field","css class":-
+     A                                      "label","description":"Hyphen Lable-
+     A                                      ","value":"-","left":"300px","top":-
+     A                                      "330px","width":"10px"},{"id":"TxbA-
+     A                                      gtNameTo","field type":"textbox","c-
+     A                                      ss class":"input","description":"AG-
+     A                                      ENT NAME RANGE TO","value":{"fieldN-
+     A                                      ame":"scAgtNmT","dataLength":"2","t-
+     A                                      rimLeading":"false","trimTrailing":-
+     A                                      "true","blankFill":"false","rjZeroF-
+     A                                      ill":"false","dataType":"char","for-
+     A                                      matting":"Text","textTransform":"up-
+     A                                      percase","designValue":"[scAgtNmT]"-
+     A                                      },"text transform":"uppercase","cur-
+     A                                      sor row":"17","cursor column":"31",-
+     A                                      "error messages":"1 message","left"-
+     A                                      :"320px","top":"330px","width":"15p-
+     A                                      x","css class 2":"textbox","error m-
+     A                                      essage id":{"fieldName":"msAgtNmT",-
+     A                                      "dataLength":"10","trimLeading":"fa-
+     A                                      lse","trimTrailing":"true","blankFi-
+     A                                      ll":"false","rjZeroFill":"false","d-
+     A                                      ataType":"char","formatting":"Text"-
+     A                                      ,"textTransform":"none"},"error mes-
+     A                                      sage file":"WMESGG","error message -
+     A                                      library":"*LIBL","error condition":-
+     A                                      {"fieldName":"erAgtNmT","customTrue-
+     A                                      ":"","customFalse":"","dataType":"i-
+     A                                      ndicator","formatting":"Indicator",-
+     A                                      "indFormat":"1 / 0"},"error enhance-
+     A                                      d mode":"1"},{"id":"txbAgtNumFrm","-
+     A                                      field type":"textbox","css class":"-
+     A                                      input","description":"AGENT # RANGE-
+     A                                       FROM","value":{"fieldName":"scAgtN-
+     A                                      brF","dataLength":"5","decPos":"0",-
+     A                                      "numSep":"false","zeroBalance":"fal-
+     A                                      se","numBlankFill":"true","zeroFill-
+     A                                      ":"false","curSym":"","dataType":"z-
+     A                                      oned","formatting":"Number","negNum-
+     A                                      ":"999.00","units":"","designValue"-
+     A                                      :"[scAgtNbrF]"},"text align":"right-
+     A                                      ","cursor row":"18","cursor column"-
+     A                                      :"31","error messages":"1 message",-
+     A                                      "left":"500px","top":"330px","width-
+     A                                      ":"40px","css class 2":"textbox","e-
+     A                                      rror message id":{"fieldName":"msAg-
+     A                                      tNbrF","dataLength":"10","trimLeadi-
+     A                                      ng":"false","trimTrailing":"true","-
+     A                                      blankFill":"false","rjZeroFill":"fa-
+     A                                      lse","dataType":"char","formatting"-
+     A                                      :"Text","textTransform":"none"},"er-
+     A                                      ror message file":"WMESGG","error m-
+     A                                      essage library":"*LIBL","error cond-
+     A                                      ition":{"fieldName":"erAgtNbrF","cu-
+     A                                      stomTrue":"","customFalse":"","data-
+     A                                      Type":"indicator","formatting":"Ind-
+     A                                      icator","indFormat":"1 / 0"},"error-
+     A                                       enhanced mode":"1"},{"id":"LblHype-
+     A                                      n1_copy2","field type":"output fiel-
+     A                                      d","css class":"label","description-
+     A                                      ":"Hyphen Lable","value":"-","left"-
+     A                                      :"555px","top":"330px","width":"10p-
+     A                                      x"},{"id":"txbAgtNumTo","field type-
+     A                                      ":"textbox","css class":"input","de-
+     A                                      scription":"AGENT # RANGE TO","valu-
+     A                                      e":{"fieldName":"scAg')
+     A                                  1  2HTML('tNbrT","dataLength":"5","decP-
+     A                                      os":"0","numSep":"false","zeroBalan-
+     A                                      ce":"false","numBlankFill":"true","-
+     A                                      zeroFill":"false","curSym":"","data-
+     A                                      Type":"zoned","formatting":"Number"-
+     A                                      ,"negNum":"999.00","units":"","desi-
+     A                                      gnValue":"[scAgtNbrT]"},"text align-
+     A                                      ":"right","cursor row":"18","cursor-
+     A                                       column":"31","error messages":"1 m-
+     A                                      essage","left":"575px","top":"330px-
+     A                                      ","width":"40px","css class 2":"tex-
+     A                                      tbox","error message id":{"fieldNam-
+     A                                      e":"msAgtNbrT","dataLength":"10","t-
+     A                                      rimLeading":"false","trimTrailing":-
+     A                                      "true","blankFill":"false","rjZeroF-
+     A                                      ill":"false","dataType":"char","for-
+     A                                      matting":"Text","textTransform":"no-
+     A                                      ne"},"error message file":"WMESGG",-
+     A                                      "error message library":"*LIBL","er-
+     A                                      ror condition":{"fieldName":"erAgtN-
+     A                                      brT","customTrue":"","customFalse":-
+     A                                      "","dataType":"indicator","formatti-
+     A                                      ng":"Indicator","indFormat":"1 / 0"-
+     A                                      },"error enhanced mode":"1"},{"id":-
+     A                                      "BtnCancel","field type":"button","-
+     A                                      css class":"button","value":"Cancel-
+     A                                      ","left":"625px","top":"380px","wid-
+     A                                      th":"90px","parent field set":"FldS-
+     A                                      etCon1","height":"25px","descriptio-
+     A                                      n":"Cancel","response":{"fieldName"-
+     A                                      :"BtnCancel","customTrue":"","custo-
+     A                                      mFalse":"","dataType":"indicator","-
+     A                                      formatting":"Indicator","indFormat"-
+     A                                      :"1 / 0"},"shortcut key":"F3","curs-
+     A                                      or":"default"},{"id":"BtnSubmit","f-
+     A                                      ield type":"button","css class":"bu-
+     A                                      tton","description":"Submit","value-
+     A                                      ":"Submit","response":{"fieldName":-
+     A                                      "BtnSubmit","customTrue":"","custom-
+     A                                      False":"","dataType":"indicator","f-
+     A                                      ormatting":"Indicator","indFormat":-
+     A                                      "1 / 0"},"shortcut key":"Enter","le-
+     A                                      ft":"750px","top":"380px","height":-
+     A                                      "25px","width":"90px","parent field-
+     A                                       set":"FldSetCon1"}]}')
+     A            AGTST          1A  H
+     A            BTNCANCEL      1A  H
+     A            BTNSUBMIT      1A  H
+     A            ERAGTNBRF      1A  H
+     A            ERAGTNBRT      1A  H
+     A            ERAGTNMF       1A  H
+     A            ERAGTNMT       1A  H
+     A            ERAGTSTDT      1A  H
+     A            ERCANAGT       1A  H
+     A            EREMPNBRF      1A  H
+     A            EREMPNBRT      1A  H
+     A            EREMPNMF       1A  H
+     A            EREMPNMT       1A  H
+     A            EREMPSEL       1A  H
+     A            EREMPSTDT      1A  H
+     A            ERFND          1A  H
+     A            EROUTTYPE      1A  H
+     A            ERPEFFFRDT     1A  H
+     A            ERPEFFTODT     1A  H
+     A            ERPRISORT      1A  H
+     A            ERSECSORT      1A  H
+     A            EXITNOW        1A  H
+     A            GRPFROM      200A  H
+     A            GRPSELECT    100A  H
+     A            GRPWHERE     200A  H
+     A            INDCONT1       1A  H
+     A            MGCANAGT      10A  H
+     A            MSAGTNBRF     10A  H
+     A            MSAGTNBRT     10A  H
+     A            MSAGTNMF      10A  H
+     A            MSAGTNMT      10A  H
+     A            MSAGTSTDT     10A  H
+     A            MSEMPNBRF     10A  H
+     A            MSEMPNBRT     10A  H
+     A            MSEMPNMF      10A  H
+     A            MSEMPNMT      10A  H
+     A            MSEMPSEL      10A  H
+     A            MSEMPSTDT     10A  H
+     A            MSFND         10A  H
+     A            MSOUTTYPE     10A  H
+     A            MSPEFFFRDT    10A  H
+     A            MSPEFFTODT    10A  H
+     A            MSPRISORT     10A  H
+     A            MSSECSORT     10A  H
+     A            SCAGTNBRF      5S 0H
+     A            SCAGTNBRT      5S 0H
+     A            SCAGTNMF       2A  H
+     A            SCAGTNMT       2A  H
+     A            SCAGTSTDT      8S 0H
+     A            SCEMPNBRF      9S 0H
+     A            SCEMPNBRT      9S 0H
+     A            SCEMPNMF       2A  H
+     A            SCEMPNMT       2A  H
+     A            SCEMPSEL       1A  H
+     A            SCEMPSTDT      8S 0H
+     A            SCOUTTYPE      1A  H
+     A            SCPEFFFRDT     8S 0H
+     A            SCPEFFTODT     8S 0H
+     A            SCPRISORT      2A  H
+     A            SCSECSORT      2A  H
+     A            SCCANAGT  R        H      REFFLD(FLAG)
+     A            SCFND     R        H      REFFLD(ELFND WDELP)

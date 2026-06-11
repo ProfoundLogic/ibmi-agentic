@@ -1,0 +1,778 @@
+/*   H*(c) 2011 StoneRiver, Inc.  All rights reserved.                    *
+/*   H*StoneRiver is a trademark of StoneRiver, Inc.                      *
+     H dftactgrp(*no)
+    H*********************************************************************
+    H/TITLE DOCVSPDF - Check for exsitence of DARTS documents
+    H*********************************************************************
+    H* Revisions:                                                        *
+    H*                                                                   *
+     H* 03/30/12  C:277 Project: SY195                                    *
+     H*                 QDLS migration to IFS                             *
+     H*                 Return Last RRN to the calling program            *
+    H*                                                                   *
+     H* 10/17/11  C:278 Project: SY195                                    *
+     H*                 QDLS migration to IFS                             *
+     H*                 Add Two Parameters with command.                  *
+     H*                                                                   *
+    H* 11/02/10  C:183 Project: SY195                                    *
+    H*                 Remove hard coding for QDLS. Call RTVDOCROOT to   *
+    H*                 get the root folder name.                         *
+    H*                                                                   *
+    H* 02/14/08  C:33  Seq#: ID135/61309                                 *
+    H*                 Print only those records not previously reported. *
+    H*                                                                   *
+    H* 02/08/08  C:33  Seq#: ID135/61309                                 *
+    H*                 Modify for existence only run.                    *
+    H*********************************************************************
+     FSDCMP     uf   e             disk    rename(PCM01:PCM0P)
+     F                                     infds(sdcmpFDS)
+     F***  Begin Add  ***  02/14/08  **************************************
+     FSXCMP     if a e           k disk
+     F***  End   Add  ***  02/14/08  **************************************
+     Fsmoll     if   e           k disk    rename(pol01:pol00)
+     Fsmdll     if   e           k disk    rename(pdl01:pdl00)
+     Fqsysprt   o    f  198        printer oflind(*inof) usropn
+
+     D*entry
+     D DocVsPDF        pr                  extPgm('DOCVSPDF')
+     D  inPrtUpdFlag                  1
+     D  inLastRRN                     9
+     D***  Begin Add  ***  02/14/08  **************************************
+     D  inList                        1
+     D***  End   Add  ***  02/14/08  **************************************
+     D DocVsPDF        pi
+     D  inPrtUpdFlag                  1
+     D  inLastRRN                     9
+     D***  Begin Add  ***  02/14/08  **************************************
+     D  inList                        1
+     D***  End   Add  ***  02/14/08  **************************************
+
+     DChkDlo           pr                  extPgm('SRCHKDLO')
+     D docName                       12    const
+     D docFlr                        32    const
+     D docType                        4    const
+     D error                          1n   const
+     D***  Begin Add  ***  10/17/11  **************************************
+     D UNCN                         255    const
+     D FSF                            1    const
+     D***  End  Add  ***  10/17/11  ***************************************
+     DChkDoc           pr                  extPgm('SRCHKDOC')
+     D docName                       12    const
+     D docPath                      256    const
+     D opticalFlag                    1    const
+     D error                          1n   const
+     DChkIFSObj        pr                  extPgm('CHKIFSOBJ')
+     D ifsObj                       256
+     D ifsObjFound                    1n
+     DRtvFldPth        pr                  extPgm('SA039R')
+     D folder                        80
+
+     DActualImgF       pr                   like(CMIMGF)
+     D inImgF                               like(CMIMGF)
+     D***  Begin Add  ***  02/14/08  **************************************
+     DcenterFld        PR         32766    opdesc
+     D fieldToCtr                 32766    options(*varsize) const
+     D size                           5  0 options(*nopass)  const
+     DCEEDOD           PR
+     D parmNum                       10I 0 const
+     D                               10I 0
+     D                               10I 0
+     D                               10I 0
+     D                               10I 0
+     D                               10I 0
+     D                               12A   options(*omit)
+     D***  End   Add  ***  02/14/08  **************************************
+     DDloExists        pr             1n
+     DIfsObjExists     pr             1n
+     DNumericSuffix    pr             1n
+     D doc                                 like(CMDCID)
+     DObjExists        pr             1n
+     DRtvPath          pr            80
+     D inFolder                            like(CMFOLD)     const
+     D inRqst                         1    options(*nopass) const
+     DValidateDoc      pr             1n
+     D docName                             like(CMDCID) const
+     D docPath                      256                 const
+
+     D sdcmpFDS        ds
+     D sdcmpRRN              397    400b 0
+
+     D***  Begin Add  ***  02/14/08  **************************************
+     D dsdttm                        12  0
+     D  dstime                        6  0 overlay(dsdttm)
+     D  dsdate                        6  0 overlay(dsdttm:7)
+     D*
+     D psds          esds                  extname(szq1p)
+     D***  End   Add  ***  02/14/08  **************************************
+
+     D actualDCID      s                   like(CMDCID)
+     D***  Begin Add  ***  02/08/08  **************************************
+     D countNotExist   s              7  0
+     D countScanned    s              7  0
+     D existOnly       s              1n
+     D***  End   Add  ***  02/08/08  **************************************
+     D ifsDCID         s             12
+     D ifsPath         s            256
+     D***  Begin Add  ***  02/14/08  **************************************
+     D key             s             79
+     D lastRRN         s              9  0
+     D list            s              1
+     D***  End   Add  ***  02/14/08  **************************************
+     D openPrt         s              1n
+     D printOnly       s              1n
+     D prtUpdFlag      s              1
+     D reasonDesc      s             30
+     D***  Begin Add  ***  02/14/08  **************************************
+     D sysDt           s               d
+     D sysDt7          s              7  0
+     D***  End   Add  ***  02/14/08  **************************************
+     D subTitle        s             60
+     D validDoc        s              1n
+     D***  Begin Add  ***  02/14/08  **************************************
+     D ##Pgm           s             10
+     D ##Key           s             79
+     D ##Name          s             79
+     D ##RtCd          s              1
+     D***  End   Add  ***  02/14/08  **************************************
+
+     D notExist        c                   'Does not exist'
+     D docNameInc      c                   'Document name incorrect'
+     D dartNameInc     c                   'DARTS name incorrect'
+     D flagInc         c                   'CMIMGF flag incorrect'
+     D title           c                   'DARTS remarks not referencing-
+     D                                      valid documents'
+
+     C                   select
+     C***  Begin Add  ***  02/08/08  **************************************
+     C                   when      %parms >= 1 and inPrtUpdFlag = 'E'
+     C                   eval      prtUpdFlag = 'P'
+     C                   eval      existOnly  = *on
+     C***  End   Add  ***  02/08/08  **************************************
+     C                   when      %parms >= 1
+     C                   eval      prtUpdFlag = inPrtUpdFlag
+     C                   other
+     C                   eval      prtUpdFlag = 'P'
+     C                   endsl
+
+     C                   eval      printOnly = prtUpdFlag = 'P'
+
+     C***  Begin Add  ***  02/14/08  **************************************
+     C                   time                    dsdttm
+     C     *mdy          move      dsdate        sysDt
+     C     *cymd         move      sysDt         sysDt7
+     C***  End   Add  ***  02/14/08  **************************************
+
+     C                   if        %parms >= 2
+     C                   move      inLastRRN     lastRRN
+     C                   endif
+
+     C***  Begin Add  ***  02/14/08  **************************************
+     C                   if        %parms >= 3
+     C                   eval      list = inList
+     C                   endif
+
+     C                   select
+     C                   when      list = 'A'
+     C                   eval      subTitle = '* * All Inclusive * *'
+     C                   when      list = 'N'
+     C                   eval      subTitle = '* * New Since Last Run * *'
+     C                   endsl
+     C                   eval      subTitle = CenterFld(subTitle)
+     C                   eval      countScanned=0
+     C***  End   Add  ***  02/14/08  **************************************
+
+     C                   select
+     C                   when      %parms < 2
+     C     *start        setll     SDCMP
+     C                   when      %parms >= 2 and lastRRN <> *zero
+     C     lastRRN       chain     SDCMP
+     C                   other
+     C     *start        setll     SDCMP
+     C                   endsl
+
+     C                   dou       %eof(SDCMP)
+     C                   read      SDCMP
+     C                   if        not %eof(SDCMP)
+     C                              and CMDCID <> *blank
+     C                              and CMDCID <> 'W0070C'
+     C                              and CMDCID <> 'WOO70C'
+     C                              and CMDCID <> 'W0050C01'
+     C                   if         CMDCID = '***IMAGE***'
+     C                   eval       CMDCID = CMIDOC
+     C                   endif
+     C                   exsr      ChkDocument
+     C                   eval      countScanned=countScanned+1
+     C                   endif
+     C                   enddo
+
+     C***  Begin Add  ***  02/14/08  **************************************
+     C                   select
+     C                   when      existOnly
+     C                   if        countNotExist = 0
+     C                   exsr      PrintHdr
+     C                   endif
+     C                   except    countE
+     C                   endsl
+     C***  End   Add  ***  02/14/08  **************************************
+     C***  Begin Add  ***  03/30/12  **************************************
+     C                   move      sdcmpRRN      inLastRRN
+     C***  End   Add  ***  03/30/12  **************************************
+
+     C                   eval      *inlr = *on
+
+     C*====================================================================
+     C     ChkDocument   begsr
+
+     C***  Begin Add  ***  02/14/08  **************************************
+     C     sdcmpRRN      chain     SXCMP                              96
+     C***  End   Add  ***  02/14/08  **************************************
+
+     C                   select
+     C***  Begin Add  ***  02/14/08  **************************************
+     C                   when      %found(SXCMP) and existOnly
+     C                   when      not *in96     and existOnly
+     C***  End   Add  ***  02/14/08  **************************************
+     C                   when      not ObjExists
+     C                   exsr      PrintInfo
+     C                   eval      reasonDesc = notExist
+     C***  Begin Add  ***  02/14/08  **************************************
+     C                   select
+     C                   when      existOnly
+     C                   eval      CMRRN  = sdcmpRRN
+     C                   eval      CMIDT  = sysDt7
+     C                   eval      CMIPGM = q1pgm
+     C                   write     pcm0x
+     C                   eval      countNotExist = countNotExist + 1
+     C                   other
+     C***  End   Add  ***  02/14/08  **************************************
+     C                   exsr      PrintReason
+     C***  Begin Add  ***  02/14/08  **************************************
+     C                   endsl
+     C***  End   Add  ***  02/14/08  **************************************
+     C***  Begin Add  ***  02/08/08  **************************************
+     C                   when      existOnly
+     C***  End   Add  ***  02/08/08  **************************************
+     C                   when         (CMIMGF = ' ' and validDoc and
+     C                                  NumericSuffix(CMDCID) and
+     C                                  not NumericSuffix(actualDCID))
+     C                             or
+     C                                (CMIMGF = 'O' and not validDoc and
+     C                                  not NumericSuffix(CMDCID) and
+     C                                  NumericSuffix(actualDCID))
+     C                   exsr      PrintInfo
+     C                   eval      reasonDesc = docNameInc
+     C                   exsr      PrintReason
+     C                   when         (CMIMGF = ' ' and validDoc and
+     C                                  not NumericSuffix(CMDCID) and
+     C                                  not NumericSuffix(actualDCID))
+     C                             or
+     C                                (CMIMGF = 'O' and not validDoc and
+     C                                  NumericSuffix(CMDCID) and
+     C                                  NumericSuffix(actualDCID))
+     C                   exsr      PrintInfo
+     C                   eval      reasonDesc = docNameInc
+     C                   exsr      PrintReason
+     C                   eval      reasonDesc = dartNameInc
+     C                   exsr      PrintReason
+     C                   when         (CMIMGF = ' ' and validDoc and
+     C                                  not NumericSuffix(CMDCID) and
+     C                                  NumericSuffix(actualDCID))
+     C                             or
+     C                                (CMIMGF = 'O' and not validDoc and
+     C                                  NumericSuffix(CMDCID) and
+     C                                  not NumericSuffix(actualDCID))
+     C                   exsr      PrintInfo
+     C                   eval      reasonDesc = dartNameInc
+     C                   exsr      PrintReason
+     C                   if        not printOnly
+     C                   eval      reasonDesc = 'DARTS record updated'
+     C                   exsr      PrintReason
+     C                   eval      CMPGM  = 'DOCVSPDF'
+     C                   eval      CMDCID = actualDCID
+     C                   update    pcm0p
+     C                   endif
+     C                   when         (CMIMGF = ' ' and not validDoc and
+     C                                  NumericSuffix(CMDCID) and
+     C                                  not NumericSuffix(actualDCID))
+     C                             or
+     C                                (CMIMGF = 'O' and validDoc and
+     C                                  not NumericSuffix(CMDCID) and
+     C                                  NumericSuffix(actualDCID))
+     C                   exsr      PrintInfo
+     C                   eval      reasonDesc = dartNameInc
+     C                   exsr      PrintReason
+     C                   eval      reasonDesc = flagInc
+     C                   exsr      PrintReason
+     C                   if        not printOnly
+     C                   eval      reasonDesc = 'DARTS record updated'
+     C                   exsr      PrintReason
+     C                   eval      CMIMGF = ActualImgF(CMIMGF)
+     C                   eval      CMDCID = actualDCID
+     C                   eval      CMPGM  = 'DOCVSPDF'
+     C                   update    pcm0p
+     C                   endif
+     C                   when         (CMIMGF = ' ' and not validDoc and
+     C                                  NumericSuffix(CMDCID) and
+     C                                  NumericSuffix(actualDCID))
+     C                             or
+     C                                (CMIMGF = 'O' and validDoc and
+     C                                  not NumericSuffix(CMDCID) and
+     C                                  not NumericSuffix(actualDCID))
+     C                   exsr      PrintInfo
+     C                   eval      reasonDesc = docNameInc
+     C                   exsr      PrintReason
+     C                   eval      reasonDesc = dartNameInc
+     C                   exsr      PrintReason
+     C                   eval      reasonDesc = flagInc
+     C                   exsr      PrintReason
+     C                   when         (CMIMGF = ' ' and not validDoc and
+     C                                  not NumericSuffix(CMDCID) and
+     C                                  not NumericSuffix(actualDCID))
+     C                             or
+     C                                (CMIMGF = 'O' and validDoc and
+     C                                  NumericSuffix(CMDCID) and
+     C                                  NumericSuffix(actualDCID))
+     C                   exsr      PrintInfo
+     C                   eval      reasonDesc = flagInc
+     C                   exsr      PrintReason
+     C                   if        not printOnly
+     C                   eval      reasonDesc = 'DARTS record updated'
+     C                   exsr      PrintReason
+     C                   eval      CMIMGF = ActualImgF(CMIMGF)
+     C                   eval      CMPGM  = 'DOCVSPDF'
+     C                   update    pcm0p
+     C                   endif
+     C                   when         (CMIMGF = ' ' and not validDoc and
+     C                                  not NumericSuffix(CMDCID) and
+     C                                  NumericSuffix(actualDCID))
+     C                             or
+     C                                (CMIMGF = 'O' and validDoc and
+     C                                  NumericSuffix(CMDCID) and
+     C                                  not NumericSuffix(actualDCID))
+     C                   exsr      PrintInfo
+     C                   eval      reasonDesc = docNameInc
+     C                   exsr      PrintReason
+     C                   eval      reasonDesc = flagInc
+     C                   exsr      PrintReason
+     C                   endsl
+
+     C                   endsr
+
+     C***  Begin Add  ***  02/14/08  **************************************
+     C*====================================================================
+     C     ExpandKey     begsr
+
+     C                   call      'SRKCVT1'
+     C                   parm      CMPNAM        ##Pgm
+     C     key           parm      CMKEY         ##Key
+     C                   parm                    ##Name
+     C                   parm                    ##RtCd
+
+     C                   if        key = *blank
+     C                   eval      key = CMKEY
+     C                   endif
+
+     C                   endsr
+
+     C*====================================================================
+     C     PrintDtl      begsr
+
+     C                   select
+     C                   when      existOnly
+     C                   exsr      ExpandKey
+     C                   except    detailE
+     C                   other
+     C                   except    detail
+     C                   endsl
+
+     C                   endsr
+     C***  End   Add  ***  02/14/08  **************************************
+
+     C*====================================================================
+     C     PrintHdr      begsr
+
+     C***  Begin Add  ***  02/14/08  **************************************
+     C                   time                    dsdttm
+     C***  End   Add  ***  02/14/08  **************************************
+
+     C                   if        not openPrt
+     C                   open      QSYSPRT
+     C                   eval      openPrt = *on
+     C                   eval      *inof = *on
+     C                   endif
+
+     C                   if        *inof
+     C***  Begin Add  ***  02/14/08  **************************************
+     C                   select
+     C                   when      existOnly
+     C                   except    headE
+     C                   other
+     C***  End   Add  ***  02/14/08  **************************************
+     C                   except    head
+     C***  Begin Add  ***  02/14/08  **************************************
+     C                   endsl
+     C***  End   Add  ***  02/14/08  **************************************
+     C                   eval      *inof = *off
+     C                   endif
+
+     C                   endsr
+
+     C*====================================================================
+     C     PrintInfo     begsr
+
+     C                   exsr      PrintHdr
+     C***  Begin Chg  ***  02/14/08  **************************************
+     C**********         except    detail
+     C                   exsr      PrintDtl
+     C***  End   Chg  ***  02/14/08  **************************************
+
+     C                   endsr
+
+     C*====================================================================
+     C     PrintReason   begsr
+
+     C                   if        *inof
+     C                   exsr      PrintHdr
+     C***  Begin Chg  ***  02/14/08  **************************************
+     C**********         except    detail
+     C                   exsr      PrintDtl
+     C***  End   Chg  ***  02/14/08  **************************************
+     C                   endif
+     C                   except    reason
+
+     C                   endsr
+
+     Oqsysprt   e            head           2 03
+     O                       title               88
+     O          e            head           2
+     O                                            4 'Key'
+     O                                           48 'Seq #'
+     O                                           55 'CMIMGF'
+     O                                           62 'CMFL05'
+     O                                           75 'DARTS Doc Nm'
+     O                                           88 'Should be Nm'
+     O                                           96 'Issue'
+     O          e            detail         0
+     O                       CMKEY               42
+     O                       CMSEQ#        X     48
+     O                       CMIMGF              52
+     O                       CMFL05              59
+     O                       CMDCID              75
+     O                       actualDCID          88
+     O                       sdcmpRRN      Z    132
+     O***  Begin Add  ***  02/14/08  **************************************
+     O          e            headE          1 03
+     O                       dsDate             + 2 '  /  /  '
+     O                       dsTime             + 3 '  :  :  '
+     O                       title               88
+     O          e            headE          2
+     O                       subTitle           +36
+     O          e            headE          2
+     O                                            4 'Key'
+     O                                           86 'Seq #'
+     O                                           99 'DARTS Doc Nm'
+     O                                          106 'CMIMGF'
+     O                                          113 'CMFL05'
+     O          e            detailE        1
+     O                       key                 80
+     O                       CMSEQ#        X     86
+     O                       CMDCID              99
+     O                       CMIMGF             103
+     O                       CMFL05             110
+     O** **                  sdcmpRRN      Z    132
+     O          e            countE      2
+     O                                          + 2 'Total missing documents:'
+     O                       countNotExist J    + 2
+     O          e            countE      2  2
+     O                                          + 2 'Total documents scanned:'
+     O                       countScanned  J    + 2
+     O***  End   Add  ***  02/14/08  **************************************
+     O          e            reason         1
+     O                       reasonDesc         121
+
+
+
+
+
+     PActualImgF       b
+     DActualImgF       pi                   like(CMIMGF)
+     D inImgF                               like(CMIMGF)
+
+     C                   select
+     C                   when      inImgF = ' '
+     C                   return    'O'
+     C                   when      inImgF = 'O'
+     C                   return    ' '
+     C                   other
+     C                   return    inImgF
+     C                   endsl
+
+     PActualImgF       e
+
+
+
+
+
+     P***  Begin Add  ***  02/14/08  **************************************
+     PcenterFld        B                   Export
+     DcenterFld        PI         32766    opdesc
+     D fieldToCtr                 32766    options(*varsize) const
+     D size                           5  0 options(*nopass)  const
+     D*
+     D* parameters passed to CEEDOD
+     D*
+     D descType        s             10I 0
+     D dataType        s             10I 0
+     D descInfo1       s             10I 0
+     D descInfo2       s             10I 0
+     D inLen           s             10I 0
+     D hexLen          s             10I 0
+     D x               s              5  0
+     D y               s              5  0
+     D z               s              5  0
+     D returnFld       s                   like(fieldToCtr)
+     C                   callp     CEEDOD(1:descType:dataType:descInfo1:
+     C                             descInfo2:inLen:*omit)
+     C                   eval      x = inLen
+     C                   if        %parms >=2 and size <> 0
+     C                   eval      x = size
+     C                   endif
+     C     ' '           checkr    fieldToCtr:x  y
+     C                   eval      z = ((x - y) / 2) + 1
+     C                   eval      %subst(returnFld:z:y) =
+     C                             %subst(fieldToCtr:1:y)
+     C
+     C                   return    returnFld
+     PcenterFld        E
+     P***  End   Add  ***  02/14/08  **************************************
+
+
+
+
+
+     PDloExists        b
+     DDloExists        pi             1n
+
+     D dloFlr          s             32
+     D error           s              1n
+     D found           s              1n
+     D ifsObj          s            256
+
+      * * *
+     C* * *              eval      ifsObj = %trim(RtvPath(CMFOLD:'Q'))
+     C* * *                               + '/' + %trim(CMDCID)
+     C* * *              callp     ChkIFSObj(ifsObj:found)
+      * * *
+     C* * *              if        not found
+     C* * *              select
+     C* * *              when      CMIMGF = 'O'
+     C* * *                         and NumericSuffix(CMDCID)
+     C* * *              eval      actualDCID = %subst(CMDCID:1:2)
+     C* * *                                   + %subst(CMDCID:6:3)
+     C* * *                                   + %subst(CMDCID:10:3)
+     C* * *                                   + '.PDF'
+     C* * *              when      CMIMGF <> 'O'
+     C* * *                         and not NumericSuffix(CMDCID)
+     C* * *              eval      actualDCID = %subst(CMDCID:1:2) + '000'
+     C* * *                                   + %subst(CMDCID:3:3) + '.'
+     C* * *                                   + %subst(CMDCID:6:3)
+     C* * *                                   + '.PDF'
+     C* * *              endsl
+     C* * *              eval      ifsObj = %trim(RtvPath(CMFOLD:'Q'))
+     C* * *                               + '/' + %trim(actualDCID)
+     C* * *              callp     ChkIFSObj(ifsObj:found)
+     C* * *              endif
+     C                   eval      dloFlr = %trim(RtvPath(CMFOLD))
+     C***  Begin Chg  ***  10/17/11  **************************************
+     C****************** callp     ChkDlo(CMDCID:dloFlr:'*DOC':error)******
+     C                   callp     ChkDlo(CMDCID:dloflr:'*DOC':error:
+     C                                       CMUNCN:CMIFSP)
+     C***  End  Chg  ***  10/17/11  ***************************************
+     C                   eval      found = not error
+
+     C                   if        not found
+     C                   select
+     C* * *              when      CMIMGF = 'O'
+     C* * *                         and NumericSuffix(CMDCID)
+     C                   when      NumericSuffix(CMDCID)
+     C                   eval      actualDCID = %subst(CMDCID:1:2)
+     C                                        + %subst(CMDCID:6:3)
+     C                                        + %subst(CMDCID:10:3)
+     C                                        + '.PDF'
+     C* * *              when      CMIMGF <> 'O'
+     C* * *                         and not NumericSuffix(CMDCID)
+     C                   when      not NumericSuffix(CMDCID)
+     C                   eval      actualDCID = %subst(CMDCID:1:2) + '000'
+     C                                        + %subst(CMDCID:3:3) + '.'
+     C                                        + %subst(CMDCID:6:3)
+     C                                        + '.PDF'
+     C                   endsl
+     C***  Begin Chg  ***  10/17/11  **************************************
+     C****************** callp     ChkDlo(actualDCID:dloFlr:'*DOC':error) *********
+     C                   callp     ChkDlo(actualDCID:dloFlr:'*DOC':error:
+     C                              CMUNCN:CMIFSP)
+     C***  End  Chg  ***  10/17/11  ***************************************
+     C                   eval      found = not error
+     C                   endif
+
+     C                   return    found
+
+     PDloExists        e
+
+
+
+
+
+     PIfsObjExists     b
+     DIfsObjExists     pi             1n
+
+     D found           s              1n   inz
+     D ifsObj          s            256
+
+     C     dartsKey      klist
+     C                   kfld                    CMKEY
+     C                   kfld                    CMSEQ#
+
+     C                   clear                   DLVOL1
+     C                   clear                   DLOFLD
+     C                   clear                   DLOSBD
+     C                   clear                   OLVOL1
+     C                   clear                   OLOFLD
+     C                   clear                   OLOSBD
+
+     C     dartsKey      chain     SMDLL
+     C     dartsKey      chain     SMOLL
+
+     C                   eval      ifsDCID = DLDCID
+     C                   eval      ifsPath = 'OPTMLB01/'
+     C                                     + %trim(DLVOL1) + '/'
+     C                                     + %trim(DLOFLD) + '/'
+     C                                     + %trim(DLOSBD)
+     C                   eval      ifsObj = '/' +
+     C* * *              eval      ifsObj =
+     C                                      %trim(RtvPath(ifsPath)) + '/' +
+     C                                      %trim(ifsDCID)
+     C                   callp(e)  ChkIFSObj(IFSObj:found)
+
+     C                   if        not found
+     C                   eval      ifsDCID = DLDCID
+     C                   eval      ifsPath = 'OPTMLB01/'
+     C                                     + %trim(OLVOL1) + '/'
+     C                                     + %trim(OLOFLD) + '/'
+     C                                     + %trim(OLOSBD)
+     C                   eval      ifsObj = '/' +
+     C* * *              eval      ifsObj =
+     C                                      %trim(RtvPath(ifsPath)) + '/' +
+     C                                      %trim(ifsDCID)
+     C                   callp(e)  ChkIFSObj(IFSObj:found)
+     C                   endif
+
+     C                   return    found
+
+     PIfsObjExists     e
+
+
+
+
+
+     PNumericSuffix    b
+     DNumericSuffix    pi             1n
+     D doc                                 like(CMDCID)
+
+     D numeric         s              1n
+     D suffix          s              3
+
+     C                   eval      suffix = %subst(doc:10:3)
+     C                   testn                   suffix               979899
+     C                   eval      numeric = *in97
+
+     C                   return    numeric
+
+     PNumericSuffix    e
+
+
+
+
+
+     PObjExists        b
+     DObjExists        pi             1n
+
+     D found           s              1n
+
+     C                   eval      actualDCID = CMDCID
+
+     C                   select
+     C                   when      CMFL05 = 'O'
+     C                   eval      found = IfsObjExists
+     C                   other
+     C                   eval      found = DloExists
+     C                   endsl
+
+     C                   if        found
+     C                   select
+     C                   when      CMFL05 = 'O'
+     C                   eval      validDoc = ValidateDoc(ifsDCID:
+     C                                            RtvPath(ifsPath))
+     C                   other
+     C                   eval      validDoc = ValidateDoc(CMDCID:
+     C                                            RtvPath(CMFOLD))
+     C                   endsl
+     C                   endif
+
+     C                   return    found
+     PObjExists        e
+
+
+
+
+
+     PRtvPath          b
+     DRtvPath          pi            80
+     D inFolder                            like(CMFOLD)     const
+     D inRqst                         1    options(*nopass) const
+
+     D request         s                   like(inRqst) inz
+     D rtnFolder       s                   like(RtvPath)
+      *** Beg add ***** 11/02/10 ***********************************************
+     D root            s             10    inz
+      *** End add ***** 11/02/10 ***********************************************
+
+     C                   if        %parms >= 2
+     C                   eval      request = inRqst
+     C                   endif
+      *** Beg add ***** 11/02/10 ***********************************************
+     C                   call      'RTVDOCROOT'
+     C                   parm                    root
+      *** End add ***** 11/02/10 ***********************************************
+
+     C                   eval      rtnFolder = inFolder
+     C                   callp     RtvFldPth(rtnFolder)
+
+     C                   select
+     C                   when      request = 'Q'
+      *** Beg chg ***** 11/02/10 ***********************************************
+     C                   return    '/' + %trim(root) + '/' + rtnfolder
+     C******             return    '/QDLS/' + rtnFolder
+      *** End chg ***** 11/02/10 ***********************************************
+     C                   other
+     C                   return    rtnFolder
+     C                   endsl
+
+     PRtvPath          e
+
+
+
+
+
+     PValidateDoc      b
+     DValidateDoc      pi             1n
+     D docName                             like(CMDCID) const
+     D docPath                      256                 const
+
+     D error           s              1n
+
+     C                   callp     ChkDoc(docName:docPath:CMFL05:error)
+
+     C                   return    not error
+
+     PValidateDoc      e

@@ -1,0 +1,651 @@
+      * (c) 2022 Sapiens. All Rights Reserved.                             *
+     A**
+     A** APPLICATION FEE SCHEDULE BASE CONTROL FILE
+     A*
+     A*****************************************************************
+     A* REVISIONS
+     A*
+     A* 02/07/18 C:180 Project: 114MJC
+     A*                Use FBAL02, Position 8 for 835 Payment Advice.
+     A*
+     A* 06/11/12 C:251 Project: 114MER
+     A*                Change FBST01 pos 1 description to claimcheck
+     A*                Change FBST02,03 to be no longer used
+     A*
+     A* 12/13/11 C:191 Project: LA025
+     A*                Mark FBST09 position 1 for LA Parish sales tax
+     A*                installed flag
+     A*
+     A* 05/18/10 C:198 Project: WC1879
+     A*                Used FBST08 to indicate whether
+     A*                Standard ICD-9 upload is installed or not.
+     A*
+     A* 02/16/09 C:198 PROJECT:MC330
+     A*                ADD DESCRIPTION OF FBST07,01
+     A*
+     A* 12/12/06 C:62 PROJECT:144MAB
+     A*               ADD DESCRIPTION OF FBAL03,02
+     A*
+     A* 07/18/05 C:79 PROJECT:MCMNT
+     A*               ADD DESCRIPTION OF FBAL04,05
+     A*
+     A* 04/15/04 C:79 PROJECT:FL046
+     A*               DEFINE - 2004 FLORIDA EDI INSTALLED
+     A*
+     A* 01/14/04 C:62 PROJECT:114MGP
+     A*               DEFINE - UCR PERCENTILE MODULE
+     A*
+     A* 04/16/03 C:62 PROJECT:MCMNT
+     A*               DEFINE - PROVIDER CHECK ISSUED IN THE BATCH FLAG
+     A*
+     A* 11/12/02 C:62 PROJECT:FS250
+     A*               DEFINE - PBILLS ENTRY CURSOR POSITION
+     A*
+     A* 11/11/02 C:79 PROJECT:FS251
+     A*               DEFINE - PROV BILL INFO: KEEP CLAIMANT INFO
+     A*               FBST04(2)
+     A*
+     A* 10/08/02 C:62 PROJECT:114MEP
+     A*               DEFINE - W/W PROV SEARCH: PRE-SUBSET VALUE
+     A*               FBST04(1)
+     A*
+     A* 07/02/02 C:62 PROJECT:FS235
+     A*               DEFINE - EOB CODE/NOTE PRINT FLAG DEFAULT
+     A*               FBST03(2)
+     A*
+     A* 04/23/02 C:62 PROJECT:114MDC
+     A*               DEFINE - CODE REVIEW INSTALLED
+     A*                        PROMATCH INSTALLED
+     A*                        MEDICARE CODE REVIEW INSTALLED
+     A*                        FREQUENCY INSTALLED
+     A*                        CODE REVIEW AUTO COMPLETE
+     A*
+     A* 01/16/02 C:62 PROJECT:114MAO
+     A*               ADD DESCRIPTION OF FBAL05
+     A*
+     A*****************************************************************
+     A                                      REF(SYREFP)
+     A*
+     A          R SFB01                     TEXT('FEE SCHED BASE CONTROL FILE')
+     A
+     A            FBKEY     R               REFFLD(APPKEY)
+     A                                      TEXT('FB KEY TO ACCESS RCD')
+     A*** HARDWARE INFORMATION ***
+     A            FBTDNM    R               REFFLD(TDNM)
+     A                                      TEXT('DEFAULT TAPE DRIVE +
+     A                                           DEVICE NAME')
+     A            FBTDEN    R               REFFLD(TDEN)
+     A                                      TEXT('DEFAULT TAPE DENSITY +
+     A                                           DEVICE NAME')
+     A            FBDDNM    R               REFFLD(DDNM)
+     A                                      TEXT('DEFAULT DISKETTE DRIVE +
+     A                                           DEVICE NAME')
+     A*** AS/400 OFFICE INFORMATION ***
+     A            FBDFLR    R               REFFLD(FLR)
+     A                                      TEXT('DEFAULT FOLDER ID')
+     A*** APPLICATION INFORMATION ***
+     A            FBSRCF    R               REFFLD(FLAG)
+     A                                      TEXT('SOURCE INSTALLED?')
+     A            FBINDT    R               REFFLD(DT)
+     A                                      TEXT('INSTALL DATE')
+     A            FBRLVL    R               REFFLD(RLVL)
+     A                                      TEXT('PRODUCT RELEASE/LVL')
+     A*** SPECIFIC APPLICATION INFORMATION ***
+     A*************************************************************************
+     A******* STATE RULES INSTALLED **********
+     A*************************************************************************
+     A*** FBST01 - FBST10 Usage - Adj States Installed
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F0019R    SCR01     no match  *IN21 = 1    Not a valid adjud state
+     A* F0029R    SCR01     no match  *IN21 = 1    Not a valid adjud state
+     A* F0070R    SCR01     no match  *IN81 = 1    Not a valid adjud state
+     A* F0075R    SCR02     no match  *IN26 = 1    Not a valid adjud state
+     A* F0086R    SCR01     match     *IN81 = 1    State has Tape
+     A*                                            Screen Tape Flag = Y
+     A*                                            License # required
+     A*                     no match  *IN81 = 0    State doesn't have Tape
+     A*                                            Screen Tape Flag = N
+     A*                                            License # not required
+     A* F2119R    SCR01     no match  *IN21 = 1    Not a valid adjud state
+     A* F2124R    SCR01     no match  *IN21 = 1    Not a valid adjud state
+     A* F2129R    SCR01     no match  *IN21 = 1    Not a valid adjud state
+     A* F7009R    SCR01     no match  *IN21 = 1    Not a valid adjud state
+     A* F7030R    SCR01     no match  *IN26 = 1    Not a valid adjud state
+     A* F7040R    SCR01     no match  *IN26 = 1    Not a valid adjud state
+     A* U0010R    SCR03     match     *IN98 = 1    Use 1st state in list for
+     A*                                            CPT4 Procedure Code Search
+     A*                                            UC open of FMPRLxx file
+     A*                               *IN98 = 0    Use FMRCP for CPT4
+     A*                                            Procedure Code Search
+     A*                                            UC open of FMRCLxx file
+     A*************************************************************************
+     A            FBST01    R               REFFLD(ST)
+     A*** Beg Chg *** 06/11/12 ************************************************
+     A********                              TEXT('CODE REVIEW/PROMATCH')
+     A********    POSITION 1: CODE REVIEW INSTALLED
+     A********    POSITION 2: PROMATCH INSTALLED
+     A                                      TEXT('CLAIM CHECK')
+     A*           POSITION 1: ClaimCheck Installed
+     A*           POSITION 2: No Longer Used
+     A*** End Chg *** 06/11/12 ************************************************
+     A*
+     A            FBST02    R               REFFLD(ST)
+     A                                      TEXT('MEDICARE/FREQUENCY')
+     A*** Beg Chg *** 06/11/12 ************************************************
+     A********    POSITION 1: MEDICARE CODE REVIEW INSTALLED
+     A********    POSITION 2: FREQUENCY INSTALLED
+     A*           POSITION 2: No Longer used
+     A*** End Chg *** 06/11/12 ************************************************
+     A*
+     A            FBST03    R               REFFLD(ST)
+     A                                      TEXT('CR Auto/EOB Print')
+     A*** Beg Chg *** 06/11/12 ************************************************
+     A********    POSITION 1: CODE REVIEW AUTO COMPLETE(Y/N)
+     A*           POSITION 1: No Longer Used
+     A*** End Chg *** 06/11/12 ************************************************
+     A*           POSITION 2: EOB Code/Note Print Flag Default
+     A*                       Valid values: *BLANKS = User must decide
+     A*                                     Y = Will print on EOMB
+     A*                                     N = Will not print on EOMB
+     A*
+     A            FBST04    R               REFFLD(ST)
+     A                                      TEXT('W/W PROV SEARCH: +
+     A                                      PRE-SUBSET VALUE')
+     A*           POSITION 1: DEFAULT VALUES FOR PAR/NON-PAR
+     A*           VALID VALUES:  P = PAR
+     A*                          N = NON-PAR
+     A*                          BLANK = ALL
+     A*           POSITION 2: PROV BILL INFO KEEP CLAIMANT INFO
+     A*           VALID VALUES:  Y = KEEP CLAIMANT INFO
+     A*                          BLANK = CLEAR CLAIMANT INFO
+     A*
+     A            FBST05    R               REFFLD(ST)
+     A*           POSITION 1: PBILLS ENTRY CURSOR POSITION
+     A*           VALID VALUES:  Y = POSITION CURSOR AT SUB#(CLM#)
+     A*                          BLANK = POSITION CURSOR AT SS#
+     A*           POSITION 2: PROVIDER CHECK ISSUED IN THE BATCH
+     A*                          BLANK = POSITION CURSOR AT SS#
+     A            FBST06    R               REFFLD(ST)
+     A*           POSITION 1: UCR PERCENTILE MODULE
+     A*           VALID VALUES:  Y = UCR PERCENTILE MODULE INSTALLED
+     A*                          BLANK = MODULE NOT INSTALLED
+     A*           POSITION 2: FL EDI 2004 INSTALLED
+     A*           VALID VALUES:  Y = INSTALLED
+     A*                          BLANK = NOT INSTALLED
+     A            FBST07    R               REFFLD(ST)
+     A                                      TEXT('STATE RULES')
+     A*           POSITION 1: NCCI DATA CALL
+     A*           VALID VALUES:  Y = INSTALLED
+     A*                          BLANK = NOT INSTALLED
+     A*** BEGIN ADD ****** 12/13/11 ************************************
+     A*           Position 2: LA Parish sales tax installed
+     A*              Values :     Y = Installed
+     A*                       Blank = Not Installed
+     A*** END   ADD ****** 12/13/11 ************************************
+     A            FBST08    R               REFFLD(ST)
+     A                                      TEXT('STATE RULES')
+     A*** Beg Add *** 05/18/10 ***********************************************
+     A*           Position 1: Standard ICD-9 upload module
+     A*           Valid Values:  Y = Installed
+     A*                          Blank = Not Installed
+     A*** End Add *** 05/18/10 ***********************************************
+     A            FBST09    R               REFFLD(ST)
+     A                                      TEXT('STATE RULES')
+     A*** BEGIN ADD ****** 12/13/11 ************************************
+     A*           Position 1: LA Parish sales tax installed
+     A*              Values :     Y = Installed
+     A*                       Blank = Not Installed
+     A*** END   ADD ****** 12/13/11 ************************************
+     A            FBST10    R               REFFLD(ST)
+     A                                      TEXT('STATE RULES')
+     A*************************************************************************
+     A******* STATE TAPE SUBMISSION INSTALLED **********
+     A*** FBTP01 - FBTP10 Usage - Tape Submission State (State ID/blank)
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F0001R    SCR02     any       *IN81 = 1    Disp FL Submitter Code
+     A*                                                 Tape Device Name
+     A*                                                 Tape Volume ID
+     A*                                                 Tape Density
+     A*                      -        *IN81 = 0    Nondisp FL Submitter Code
+     A*                                                    Tape Device Name
+     A*                                                    Tape Volume ID
+     A* F0002R    SCR02     any       *IN92 = 0    Disp Internal Audit Number
+     A*                               *IN93 = 0    Disp Servicing Agent Number
+     A*                      -        *IN92 = 1    Nondisp Internal Audit Number
+     A*                               *IN93 = 1    Nondisp Servicing Agent Numbe
+     A* F0045R    SCR02     any       *IN81 = 1    Disp FL Submitter Code
+     A*                      -        *IN81 = 0    Nondisp FL Submitter Code
+     A* F0086R    SCR01     match     *IN81 = 1    State has Tape
+     A*                                            Screen Tape Flag = Y
+     A*                                            License # required
+     A*                     no match  *IN81 = 0    State doesn't have Tape
+     A*                                            Screen Tape Flag = N
+     A*                                            License # not required
+     A* F6000C    n/a       FL        DBTP01-10=FL Process tape submission
+     A*                     -         DBTP01-10=FL No tape submission
+     A*************************************************************************
+     A            FBTP01    R               REFFLD(ST)
+     A                                      TEXT('TAPE FOR STATE')
+     A            FBTP02    R               REFFLD(ST)
+     A                                      TEXT('TAPE FOR STATE')
+     A            FBTP03    R               REFFLD(ST)
+     A                                      TEXT('TAPE FOR STATE')
+     A            FBTP04    R               REFFLD(ST)
+     A                                      TEXT('TAPE FOR STATE')
+     A            FBTP05    R               REFFLD(ST)
+     A                                      TEXT('TAPE FOR STATE')
+     A            FBTP06    R               REFFLD(ST)
+     A                                      TEXT('TAPE FOR STATE')
+     A            FBTP07    R               REFFLD(ST)
+     A                                      TEXT('TAPE FOR STATE')
+     A            FBTP08    R               REFFLD(ST)
+     A                                      TEXT('TAPE FOR STATE')
+     A            FBTP09    R               REFFLD(ST)
+     A                                      TEXT('TAPE FOR STATE')
+     A            FBTP10    R               REFFLD(ST)
+     A                                      TEXT('TAPE FOR STATE')
+     A***
+     A*************************************************************************
+     A            FBPNDF    R               REFFLD(FLAG)
+     A                                      TEXT('PEND LETTER INSTALLED?')
+     A*************************************************************************
+     A            FBINVF    R               REFFLD(FLAG)
+     A                                      TEXT('Invoicing Installed?')
+     A*** FBINVF Usage - Invoicing Installed (Y/blank)
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F0001R    SCR02      -        *IN91 = 1    Nondisp Last Inv# Used
+     A*                           AND *IN74 = 1    Nondisp Last Inv# Used
+     A*                      Y        *IN91 = 0    Disp Last Inv# Used
+     A*                           OR  *IN74 = 0    Disp Last Inv# Used
+     A*
+     A* F0002R    SCR02      -        *IN91 = 1    Nondisp Bill Rate Code
+     A*                      Y        *IN91 = 0    Disp Bill Rate Code
+     A*************************************************************************
+     A*
+     A*** LIBRARY LIST ****
+     A            FBLL01    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 01')
+     A            FBLL02    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 02')
+     A            FBLL03    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 03')
+     A            FBLL04    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 04')
+     A            FBLL05    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 05')
+     A            FBLL06    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 06')
+     A            FBLL07    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 07')
+     A            FBLL08    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 08')
+     A            FBLL09    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 09')
+     A            FBLL10    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 10')
+     A            FBLL11    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 11')
+     A            FBLL12    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 12')
+     A            FBLL13    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 13')
+     A            FBLL14    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 14')
+     A            FBLL15    R               REFFLD(LIB)
+     A                                      TEXT('LIBRARY 15')
+     A*************************************************************************
+     A*** DATE 6.0 N FUTURE USE ***
+     A*************************************************************************
+     A            FBDT01    R               REFFLD(DT)
+     A                                      TEXT('DT OF CONVERSION TO NEW EOMB')
+     A*** FBDT01 Usage - Old EOMB Desc Date
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F7200R    n/a    date lokup   If FBDT01 less than transaction date use
+     A*                                    old EOMB code file for descriptions.
+     A*                                    If FBDT01 greater than transaction
+     A*                                    date use new EOMB code for
+     A*                                    descriptions.
+     A*************************************************************************
+     A            FBDT02    R               REFFLD(DT)
+     A                                      TEXT('SECURITY LEVEL')
+     A*** FBDT02 Usage
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F0150R    SCR02     1-99        None       If WCMS interface installed
+     A*                                            and inside account and a
+     A*                                            Check/check request record
+     A*                                            exists for this EOMB the
+     A*                                            the user's security level
+     A*                                            must be greater than the
+     A*                                            minimum security level set
+     A*                                            up in FBDT02 or the user will
+     A*                                            not be able to delete EOMB.
+     A* CLT#: 40, 44
+     A* F0150R    SCR02     1-99        None       IF FBDT02 is greater than the
+     A*         NON-DISPLAY                        user's security level set up
+     A*                                            in the user parm file then
+     A*                                            the user will not be able to
+     A*                                            delete an EOMB.
+     A*************************************************************************
+     A            FBDT03    R               REFFLD(DT)
+     A*** FBDT03 Usage - PRE-CERT SAVINGS MODULE SAVINGS PER DAY
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* U0010R    SCR02     $ AMT OR 0   N/A       SAVINGS PER DAY
+     A*
+     A*************************************************************************
+     A            FBDT04    R               REFFLD(DT)
+     A*** FBDT04 Usage
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* CLT#: 68
+     A* F053 R    SCR01     1-999999    None       FBDT04 will indicate the numb
+     A*                                            er of days Closed medical Ser
+     A*                                            vices allowed to be billed fo
+     A*                                            r T/M Cahrges.
+     A*************************************************************************
+     A            FBDT05    R               REFFLD(DT)
+     A                                      TEXT('** FUTURE APPLICATION USE **')
+     A*** FBDT05 Usage
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* CLT#: 68
+     A* U0011R    SCR01                 None       IF FBDT05 is greater than the
+     A*                                            user's security level set up
+     A*                                            in the user parm file then
+     A*                                            the user will not be able to
+     A*                                            change info about discharge
+     A*************************************************************************
+     A*** FLAG 1 A FUTURE USE ***
+     A*************************************************************************
+     A            FBFL01    R               REFFLD(FLAG)
+     A                                      TEXT('WC INTERFACE FLAG')
+     A*** FBFL01 Usage - WC Interface Flag (Y/blank)
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F0001R    SCR02      Y        *IN71 = 1    Nondisp Last Case # Used
+     A*                      -        *IN71 = 0    Disp Last Case # Used
+     A* F0002R    SCR02      Y        *IN71 = 1    Disp Outside Account
+     A*                      -        *IN71 = 0    Nondisp Outside Account
+     A* F0012R    SCR02      -        *IN71 = 1    Nondisp WCMS XREF Fund#
+     A*                      Y        *IN71 = 0    Disp WCMS XREF Fund#
+     A* F0031R    SCR02      Y        *IN71 = 1    Use WCMS WMPDP file
+     A*                                            Screen fields from WMPDP are
+     A*                                            protected
+     A*                      -        *IN71 = 0    Use FS/WCMC WMPDP file
+     A* F0070R    SCR01      Y        *IN71 = 1    Nondisp F10=Add New Case
+     A*                                            Run LINKC/LINKP subr to write
+     A*                                                WCMS files to WCMC
+     A*                      -        *IN71 = 0    Disp F10=Add New Case
+     A*                                            Bypass LINKC/LINKP subr
+     A* F0075R    SCR01      Y        *IN71 = 1    Use WCMS WMCMP/WMCDP file
+     A*                                            Disp WC Fund XREF Search
+     A*                                            Screen fields from WMCMP &
+     A*                                                WMCDP are protected
+     A*                      -        *IN71 = 0    Use FS/WCMC WMCMP/WMCDP file
+     A*                                            Nondisp WC Fund XREF Search
+     A* F0150R    SCR01      Y        *IN71 = 1    Open WARPP/WDPAP to look for
+     A*                                            check processed for EOMB
+     A*                      -        *IN71 = 0    Do not look for WCMS check
+     A* F0151R    SCR01      Y        *IN71 = 1    Open WARPP/WDPAP and display
+     A*                                            payment information
+     A*                      -        *IN71 = 0    Do not open WARPP do not
+     A*                                            display payment information
+     A* F7060R    n/a        Y        FBFL01 = Y   Do not allow transfer
+     A* F0531R    SCR01      Y        *IN71 = 1    Use WCMS Provider files
+     A*                                            for search
+     A*                      -        *IN71 = 0    Use WCMC Provider files
+     A*                                            for search
+     A* F0533R    SCR01      Y        *IN71 = 1    USE WCMS Provider files
+     A*                                            for search
+     A*                      -        *IN71 = 0    Use WCMC Provider files
+     A*                                            for search
+     A* F0570R    SCR01      Y        *IN71 = 1    USE WCMS Claim files
+     A*                                            for search
+     A*                      -        *IN71 = 0    Use WCMC Claim files
+     A*                                            for search
+     A* F0571R    SCR01      Y        *IN71 = 1    USE WCMS Claim files
+     A*                                            for search
+     A*                      -        *IN71 = 0    Use WCMC Claim files
+     A*                                            for search
+     A* F0573R    SCR01      Y        *IN71 = 1    USE WCMS Claim files
+     A*                                            for search
+     A*                      -        *IN71 = 0    Use WCMC Claim Files
+     A*                                            for search
+     A* F0578R    SCR01      Y        *IN71 = 1    USE WCMS Claim Files
+     A*                                            for search
+     A*                      -        *IN71 = 0    Use WCMC Claim Files
+     A*                                            for search
+     A* F0579R    SCR01      Y        *IN71 = 1    USE WCMS Claim files
+     A*                                            for search
+     A*                      -        *IN71 = 0    Use WCMC Claim files
+     A*                                            for search
+     A* F7150R     N/A       Y        *IN71 = 1    Print check information
+     A*                                            from WCMS WARPP or WDPAP
+     A*                      -        *IN71 = 0    Do not look for check
+     A*                                            information in WCMS
+     A* CLT#: 51
+     A* N0030R    SCR01      Y        *IN81 = 1    Check to see if check
+     A*                                            request has been issued
+     A*                                            prior to allowing T/M Entry
+     A*                      -        *IN81 = 0    Do not check for check rqst
+     A* N0035R    SCR01      Y        *IN81 = 1    Check to see if check
+     A*                                            request has been issued
+     A*                                            prior to allowing T/M Entry
+     A*                      -        *IN81 = 0    Do not check for check rqst
+     A*************************************************************************
+     A            FBFL02    R               REFFLD(FLAG)
+     A                                      TEXT('Diary function installed')
+     A*** FBFL02 Usage - Diary (Y/blank)
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F2110R    SCR02      Y        *IN91 = 1    Disp Diary Function
+     A*                      -        *IN91 = 0    Nondisp Diary Function
+     A*************************************************************************
+     A*************************************************************************
+     A            FBFL03    R               REFFLD(FLAG)
+     A                                      TEXT('Allow Prov Maint from F0070R')
+     A*** FBFL03 Usage - Allow Prov Maint (Y/blank)
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F0070R    SCR01      -        *IN91 = 1    Nondisp F14=Prov Maint
+     A*                      Y        *IN91 = 0    Disp F14=Prov Maint
+     A*************************************************************************
+     A            FBFL04    R               REFFLD(FLAG)
+     A                                      TEXT('CLAIMS EDIT INSTALLED?')
+     A*************************************************************************
+     A            FBFL05    R               REFFLD(FLAG)
+     A                                      TEXT('DME INSTALLED?')
+     A*************************************************************************
+     A            FBFL06    R               REFFLD(FLAG)
+     A                                      TEXT('NETWORK/PPO INSTALLED?')
+     A*** FBFL06 Usage - NTWK/PPO & A/R Installed Flag (Y/blank)
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F0001R    SCR02      -        *IN74 = 1    Nondisp Last Prov Int# Used
+     A*                      Y        *IN74 = 0    Disp Last Prov Int# Used
+     A* F0002R    SCR02      -        *IN94 = 1    Nondisp Ouside Network
+     A*                      Y        *IN94 = 0    Disp Outside Network
+     A* F0086R    SCR01      -        *IN74 = 0    Nondisp F11=T/M ENTRY
+     A*                      Y        *IN74 = 1    Disp F11=T/M ENTRY
+     A* F7010R    SCR01      -        *IN99 = 1    Nondisp A/R & ACT. CD OPT
+     A*                      Y        *IN99 = 0    Disp A/R & ACT. CD OPT
+     A* U0010R    SCR04      -        *IN04 = 0    Nondisp T/M ENTRY
+     A*                      Y        *IN04 = 1    Disp T/M ENTRY
+     A* F0012R    SCR03      -        *IN74 = 1    Nondisp Bill RT Cd & #Bills,
+     A*                                            #Days Auto Rel
+     A*                      Y        *IN74 = 0    Disp Bill RT Cd & #Bills,
+     A*                                            #Days Auto Rel
+     A* F0031R    SCR02      -        *IN74 = 1    Nondisp PAR/Non-PAR flag
+     A*                      Y        *IN74 = 0    Disp PAR/Non-PAR flag
+     A* F0531R    SCR01      Y        *IN74 = 1    Disp Phys Address and par/non
+     A*                      -        *IN74 = 0    Nondisp phys addr and par/non
+     A* F0533R    SCR01      Y        *IN74 = 1    Disp Phys Address and par/non
+     A*                      -        *IN74 = 0    Nondisp phys addr and par/non
+     A* F0151R    SCR01      Y        *IN74 = 1    Display Invoice information
+     A*                      -        *IN74 = 0    Don't display Invoice info
+     A* F2130R    SCR01      -        *IN74 = 0    Nondisp Other Reduction
+     A*                      Y        *IN74 = 1    Desplay Other Reduction
+     A* F7011R    n/a        -        *IN99 = 1    Nondisp A/R list heading
+     A*                      Y        *IN99 = 0    Disp A/R List heading
+     A* F7200R    n/a        Y        *IN74 = 1    Print network EOMB form
+     A*                      -        *IN74 = 0    Print base EOMB form
+     A* F7071R    n/a        Y        *IN74 = 1    Print network EOMB form
+     A*                      -        *IN74 = 0    Print base EOMB form
+     A* F6000C    n/a        Y        DBFL06= Y    Process network programs
+     A*                      -        DBFL06= -    Process base programs only
+     A*************************************************************************
+     A            FBFL07    R               REFFLD(FLAG)
+     A                                      TEXT('UR INSTALLED?')
+     A*** FBFL07 Usage - UTILIZATION REVIEW INSTALLED FlAG (Y/blank)
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* N0030R    SCR01      -        *IN01 = 0    Nondisp F17=PRE-CERT# SRCH
+     A*                      Y        *IN01 = 1    Disp F17=PRE-CERT# SRCH
+     A* F0010R    SCR02      Y        *IN77 = 1    Disp LOS group
+     A*                      -        *IN77 = 0    Nondisp LOS group
+     A* F0075R    SCR02               *IN72 = 1    SCDTOB is a required field
+     A*                               *IN72 = 0    SCDTOB not a required field
+     A* F0510R    SCR01      Y        *IN77 = 1    Disp LOS group
+     A*                      -        *IN77 = 0    Nondisp LOS group
+     A* F0511R    SCR01      Y        *IN77 = 1    Disp LOS group
+     A*                      -        *IN77 = 0    Nondisp LOS group
+     A*************************************************************************
+     A            FBFL08    R               REFFLD(FLAG)
+     A                                      TEXT('DEFAULT LOS REGION')
+     A*************************************************************************
+     A            FBFL09    R               REFFLD(FLAG)
+     A                                      TEXT('EOB Interactive process flag')
+     A*                                     TEXT('Y=EOMB processed interactive')
+     A*                                     TEXT('N=EOMB processed in Batch')
+     A*** FBFL09 Usage - EOMB to be processed in batch or interactive(Y/blank)
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F0086R    SCR01      -        XXIFLG= N    Process EOMB in Batch
+     A*                      Y        XXIFLG= Y    Process EOMB interactively
+     A*************************************************************************
+     A            FBFL10    R               REFFLD(FLAG)
+     A                                      TEXT('Pharmacy Processing Y/Blank')
+     A*************************************************************************
+     A**** 10 A FUTURE USE
+     A            FBAL01    R               REFFLD(DS10)
+     A                                      TEXT('BYTE 1 - INTERQUAL INST')
+     A*** FBAL01 Usage - Misc Reasons
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* U0010R    SCR04      Y POS 1               INTERQUAL IS INSTALLED
+     A*
+     A*                      Y POS 2               SAVINGS MODULE INSTALLED
+     A*
+     A*           SCR02    L/Q POS 3               PRE-CERT SAVINGS CALC
+     A*                                            L = HCIA LOS - RECOMMENDED
+     A*                                            Q = REQUESTED - RECOMMEDNDED
+     A*           SCR02-4    Y POS 4 W/FBFL01=Y    DARTS KEY TO BE CO/FND/FYR/CS
+     A*
+     A* F0070R    SCR02/4    Y POS 4 W/FBFL01=Y    DARTS KEY TO BE CO/FND/FYR/CS
+     A*
+     A* F0075R    SCR02      Y POS 4 W/FBFL01=Y    DARTS KEY TO BE CO/FND/FYR/CS
+     A*
+     A* CLT#: 54
+     A* N9605R              XXX POS 5-7  NONE      HOLDS LAST USED NETWORK
+     A*                                            DISCOUNT CODE
+     A*
+     A* BASE:
+     A* F0031R    SCR01      Y POS 8     71        ALLOW WRITE/UPD OF WMPDP
+     A*                                            w/FBFL01 = Y
+     A*
+     A* N0215R    SCR01      Y POS 9               DISPLAY/UPD 'M' SYSTEM
+     A*
+     A* F0070R    SCR01      Y POS 10              Audit/Recon Usage
+     A* --------------------------------------------------------------------
+     A*********
+     A            FBAL02    R               REFFLD(DS10)
+     A                                      TEXT('ADJ ST - PHARMACY')
+     A*** FBAL02 Usage - Adj St Pharmacy....match to FBST01 - FBST10
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F0070R    SCR01       Y          41        Adj St Pharmacy w/ FBSTxx
+     A* --------------------------------------------------------------------
+     A* F8041R     n/a        Y POS 2              Create Provider from Upld
+     A* S8050R     n/a        Y/N POS 8            835 Payment Advice.
+     A*********
+     A            FBAL03    R               REFFLD(DS10)
+     A                                      TEXT('ADJ ST - DENTAL')
+     A*** FBAL03 Usage - Adj St DENTAL....match to FBST01 - FBST10
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F0070R    SCR01       Y          44        Adj St DENTAL w/ FBSTxx
+     A* --------------------------------------------------------------------
+     A*********
+     A            FBAL04    R               REFFLD(DS10)
+     A*
+     A*** FBAL04 Usage - Misc Reasons
+     A* PGM ID    SCRN#     Value     Indicator    Description
+     A* --------------------------------------------------------------------
+     A* F0086R    SCR01      Y POS 1               WCMC Check Issuance
+     A* F7071R1    n/a       Y POS 2               Print WCMS EOMB if pay >0
+     A*                      Y POS 3               MedView PPO Leasing Installed
+     A*                      Y POS 4               MedView Download Installed
+     A*                      Y POS 5               A/R Module installed
+     A*                      Y POS 6               EDI Module installed
+     A*                      Y POS 7               Rehab Module Installed
+     A*                      Y POS 8               Allow Future srv. dates pbill
+     A*                      Y POS 9               FSMS Module Installed
+     A*                      Y POS 10              Pbills Module Installed
+     A*In*******
+     A*** FBAL05 Usage - Misc Reasons
+     A            FBAL05    R               REFFLD(DS10)
+     A*                                            Description
+     A* --------------------------------------------------------------------
+     A*                        POS 1               Init View WW Med Cases
+     A*                                            1 = Alpha
+     A*                                            2 = SSN# DOI
+     A*                                            3 = Sub#/Grp/Fyr/Case
+     A*                                            4 = SCL#
+     A*                        POS 2               Init View WW Prov Bills
+     A*                                            1 = Alpha
+     A*                                            2 = FEIN/Mod
+     A*                                            3 = SSN# DOI
+     A*                                            4 = EOB#
+     A*                                            5 = State CNTL#
+     A*                      Y POS 3               Outcome Savings Installed
+     A*                      Y POS 4               Auto Invoice Installed
+     A*                        POS 5               Work Hist Usage when link WC
+     A*                                              = Call W4315R
+     A*                                            M = Call F0176R
+     A*                        POS 6               Init View WW Providers
+     A*                                            1 = Alpha
+     A*                                            2 = FEIN/Mod
+     A*                                            3 = DBA Name/Address
+     A*                                            4 = State id#
+     A*                        POS 7               Adjudication Poss Dup logic
+     A*                                              = Case/Srv date/Prov/Code
+     A*                                            1 = SSN#/Srv date/Prov
+     A*                                            2 = Same as ' ' except:
+     A*                                                - No dups on same bill
+     A*                                                - Hosp: Dont check HCPCS
+     A*                        POS 8               Provider Network Selection
+     A*                                              = Only Highest Matching
+     A*                                            1 = All matching
+     A*                      Y POS 9               FL Lic# Database Installed
+     A*                      Y POS 10              Correct Coding Installed
+     A*
+     A*** RECORD MAINTENANCE INFORMATION ***
+     A            FBSTAT    R               REFFLD(STAT)
+     A                                      TEXT('RECORD STATUS')
+     A            FBUSER    R               REFFLD(USER)
+     A                                      TEXT('USER LAST MAINTAINED BY')
+     A            FBPGM     R               REFFLD(PGM)
+     A                                      TEXT('PGM LAST MAINTAINED IN')
+     A            FBTIME    R               REFFLD(TIME)
+     A                                      TEXT('TIME LAST MAINTAINED')
+     A            FBDT      R               REFFLD(DT)
+     A                                      TEXT('DATE LAST MAINTAINED')
+     A            FBIUSR    R               REFFLD(USER)
+     A                                      TEXT('INITIAL USER ENTERED BY')
+     A            FBIDT     R               REFFLD(DT)
+     A                                      TEXT('INITIAL DATE ENTERED')

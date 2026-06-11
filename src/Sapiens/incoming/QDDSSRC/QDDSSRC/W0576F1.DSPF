@@ -1,0 +1,449 @@
+     A*  (C) Copyright Progressive Data Solutions, Inc., 1997
+     A*%%TS  SD  19960626  134157  JONESD      REL-V3R0M5  5763-PW1
+     A**
+     A** PAYMENT HISTORY REPORT
+     A**
+     A*****************************************************************
+     A*    PROGRAMMER: C:45                                           *
+     A*    REVISED:    01/23/96                                       *
+     A*    PROJECT#:   25WEI  PAYMENT SEARCH                          *
+     A**
+     A*    PROGRAMMER: C:46                                           *
+     A*    REVISED:    06/26/96                                       *
+     A*    PROJECT#:   25WFF  ADD CMD 11-POST/CLEAR DATE TOGGLE(SCR02)*
+     A*****************************************************************
+     A*
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/WREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF05
+     A                                      CF07
+     A                                      CF13
+     A                                      CF10
+     A                                      SETOF(18)
+     A                                      SETOF(19)
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(33)
+     A                                      SETOF(34)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(39)
+     A                                      SETOF(40)
+     A                                      SETOF(59)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'W0576F1'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  4  2'Fund:'
+     A            SCFND     R        O  4 10REFFLD(FND)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A            SCNAME    R        O  4 21REFFLD(NM60)
+     A                                      DSPATR(HI)
+     A                                      TEXT('FUND NAME')
+     A                                  7 29'Fund Year:'
+     A            SCYR      R        B  7 50REFFLD(YR)
+     A                                      DSPATR(UL)
+     A                                      CHECK(RB)
+     A  40                                  DSPATR(PC)
+     A                                      TEXT('FUND YEAR')
+     A                                      EDTCDE(4)
+     A  20                                  ERRMSGID(WCR0505 WMESGG)
+     A  23                                  ERRMSGID(WCR0517 WMESGG)
+     A                                  8 29'Case Number:'
+     A            SCCASE    R        B  8 45REFFLD(CASE)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  59                                  DSPATR(PC)
+     A  20                                  ERRMSGID(WCR0505 WMESGG)
+     A                                      TEXT('CASE NUMBER')
+     A                                      DSPATR(UL)
+     A                                  9 29'Payment Code:'
+     A            SCTRCD    R        B  9 50REFFLD(CODE)
+     A*****                                 CHGINPDFT(CS)
+     A  26                                  DSPATR(PC)
+     A                                      TEXT('PAYMENT TRANSACTION CODE')
+     A  21                                  ERRMSGID(WCR0513 WMESGG)
+     A                                 10 29'Transaction Type:'
+     A            SCTYPE    R        B 10 51REFFLD(FLAG)
+     A*****                                 CHGINPDFT(CS)
+     A  27                                  DSPATR(PC)
+     A                                      TEXT('TRANSACTION TYPE')
+     A  22                                  ERRMSGID(WCR0560 WMESGG)
+     A                                 11 29'Pmt Value 1 Code:'
+     A            SCBR2     R        B 11 50REFFLD(CODE)
+     A*****                                 CHGINPDFT(CS)
+     A  31                                  DSPATR(PC)
+     A  33                                  ERRMSGID(WCR0513 WMESGG)
+     A                                 12 29'Reserve Code:'
+     A            SCRECD    R        B 12 50REFFLD(CODE)
+     A*****                                 CHGINPDFT(CS)
+     A  37                                  DSPATR(PC)
+     A  29                                  ERRMSGID(WCR0513 WMESGG)
+     A                                 13 29'Reserve Type:'
+     A            SCRETP    R        B 13 51REFFLD(FLAG)
+     A*****                                 CHGINPDFT(CS)
+     A  28                                  DSPATR(PC)
+     A  30                                  ERRMSGID(WCR0523 WMESGG)
+     A                                 14 29'Federal ID#:'
+     A            SCFEIN    R        B 14 43REFFLD(FEIN)
+     A*****                                 CHGINPDFT(CS)
+     A                                      EDTCDE(4)
+     A  34                                  DSPATR(PC)
+     A  36                                  ERRMSGID(WCR0513 WMESGG)
+     A            SCMOD     R        B 14 54REFFLD(MOD)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      DSPATR(UL)
+     A  39                                  ERRMSGID(WCR0513 WMESGG)
+     A                                 15 29'Check #:'
+     A            SCCHK#    R        B 15 45REFFLD(CHK#)
+     A*****                                 CHGINPDFT(CS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  35                                  DSPATR(PC)
+     A  38                                  ERRMSGID(WCR0548 WMESGG)
+     A                                 23  3'F3=Exit         '
+     A                                      COLOR(BLU)
+     A                                 23 32'F12=Cancel        '
+     A                                      COLOR(BLU)
+     A                                 23 61'F5=Claim search   '
+     A                                      COLOR(BLU)
+     A                                 24  3'F7=Federal id# srch   '
+     A                                      COLOR(BLU)
+     A                                 24 32'F10=Table srch   '
+     A                                      COLOR(BLU)
+     A                                 24 61'F13=Chg usr parm   '
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A*%%TS  SD  19960626  134157  JONESD      REL-V3R0M5  5763-PW1
+     A                                      CF05
+     A*** BEGIN ADD *** 06/26/96 *********************************
+     A                                      CF11
+     A*** END ADD ***** 06/26/96 *********************************
+     A                                      CF17
+     A                                      SETOF(18)
+     A                                      SETOF(19)
+     A                                      SETOF(20)
+     A                                      SETOF(51)
+     A                                      SETOF(52)
+     A                                      SETOF(53)
+     A                                      SETOF(54)
+     A                                      SETOF(71)
+     A                                      SETOF(72)
+     A                                      SETOF(73)
+     A                                      SETOF(74)
+     A            SCUSER    R        O  1  3REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  3'W0576F1'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM DESC')
+     A                                  2 76'SCR02'
+     A                                  3  3'Fund:'
+     A            SCFND     R        O  3  9REFFLD(FND)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A            SCNAME    R        O  3 21REFFLD(NM60)
+     A                                      DSPATR(HI)
+     A                                      TEXT('FUND NAME')
+     A                                  4  3'Fnd yr:'
+     A            SCYR      R        O  4 11REFFLD(YR)
+     A                                      DSPATR(HI)
+     A                                  4 14'Case #:'
+     A            SCCASE    R        O  4 22REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      DSPATR(HI)
+     A            SCCNAM    R        O  4 30REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                      TEXT('CLAIMANT NAME')
+     A                                  5  3'Pmt Cde/Typ:'
+     A            SCTRCD    R        O  5 16REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A            SCTYPE    R        O  5 19REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                  5 21'Pmt Val 1:'
+     A            SCBR2     R        O  5 32REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A                                  5 35'Rsv Cde/Typ:'
+     A            SCRECD    R        O  5 48REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A            SCRETP    R        O  5 51REFFLD(FLAG)
+     A                                      TEXT('TYPE')
+     A                                      DSPATR(HI)
+     A                                  5 53'Fed ID#:'
+     A            SCFEIN    R        O  5 62REFFLD(FEIN)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A            SCMOD     R        O  5 72REFFLD(MOD)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(Z)
+     A                                  6  3'Totals - Weeks:'
+     A            SCWK           3Y 0O  6 19TEXT('TOTAL WEEKS')
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(1)
+     A                                  6 24'Days:'
+     A            SCDAY          1S 0O  6 30TEXT('TOTAL DAYS')
+     A                                      DSPATR(HI)
+     A                                  6 35'Paid:'
+     A            SCTOTL        11Y 2O  6 41TEXT('TOTAL PAID:')
+     A                                      EDTCDE(J)
+     A                                      DSPATR(HI)
+     A                                  6 63'Check #:'
+     A            SCCHK#    R        O  6 72REFFLD(CHK#)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                  7  3'Date:'
+     A            SCTRDT    R        B  7  9REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      DSPATR(UL)
+     A                                      TEXT('TRANSACTION DATE')
+     A                                  9  3'Payee:'
+     A                                      DSPATR(UL)
+     A                                  9 41'Description:'
+     A                                      DSPATR(UL)
+     A                                 10  3'TR/CD'
+     A                                      DSPATR(UL)
+     A                                 10  9'V1/CD'
+     A                                      DSPATR(UL)
+     A                                 10 15'WKS'
+     A                                      DSPATR(UL)
+     A                                 10 19'DYS'
+     A                                      DSPATR(UL)
+     A                                 10 23'Service Dates    '
+     A                                      DSPATR(UL)
+     A*** BEGIN CHG *** 06/26/96 *********************************
+     A N86                             10 41'Post Dt'
+     A N86                                  DSPATR(UL)
+     A  86                             10 41'Clear Dt'
+     A  86                                  DSPATR(UL)
+     A*** END CHG *** 06/26/96 ***********************************
+     A                                 10 50'Trans Dt'
+     A                                      DSPATR(UL)
+     A                                 10 59'Check #'
+     A                                      DSPATR(UL)
+     A                                 10 72'Amount'
+     A                                      DSPATR(UL)
+     A            SCFL01    R        B 11  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  20                                  ERRMSGID(WCR0600 *LIBL/WMESGG)
+     A  51                                  ERRMSGID(WCR1266 *LIBL/WMESGG)
+     A  71                                  DSPATR(PC)
+     A            SCNM01        35A  O 11  3TEXT('PAYEE NAME')
+     A  22                                  DSPATR(RI)
+     A            SCDS01        30A  O 11 41TEXT('DESCRIPTION')
+     A            SCPC01    R        O 12  3REFFLD(CODE)
+     A                                      TEXT('Payment Cd')
+     A            SCTP01    R        O 12  6REFFLD(FLAG)
+     A                                      TEXT('Record type')
+     A            SCPV01    R        O 12  9REFFLD(CODE)
+     A                                      TEXT('Pmt Val 1')
+     A            SCWK01    R        O 12 15REFFLD(WKS)
+     A                                      EDTCDE(Z)
+     A            SCDA01    R        O 12 20REFFLD(DAYS)
+     A                                      EDTCDE(Z)
+     A            SCFR01    R        O 12 23REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('From date')
+     A            SCTO01    R        O 12 32REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('To date')
+     A*** BEGIN CHG *** 06/26/96 *********************************
+     A N86        SCPO01    R        O 12 41REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Posting date')
+     A  86        SCCL01    R        O 12 41REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Clear date')
+     A*** END CHG ***** 06/26/96 *********************************
+     A            SCTR01    R        O 12 50REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Transaction date')
+     A            SCCK01    R        O 12 59REFFLD(CHK#)
+     A                                      EDTCDE(4)
+     A                                      TEXT('CHECK NUMBER')
+     A            SCAM01    R        O 12 67REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      TEXT('AMOUNT')
+     A            SCFL02    R        B 14  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  20                                  ERRMSGID(WCR0600 *LIBL/WMESGG)
+     A  52                                  ERRMSGID(WCR1266 *LIBL/WMESGG)
+     A  72                                  DSPATR(PC)
+     A            SCNM02        35A  O 14  3TEXT('PAYEE NAME')
+     A  23                                  DSPATR(RI)
+     A            SCDS02        30A  O 14 41TEXT('DESCRIPTION')
+     A            SCPC02    R        O 15  3REFFLD(CODE)
+     A                                      TEXT('Payment Cd')
+     A            SCTP02    R        O 15  6REFFLD(FLAG)
+     A                                      TEXT('Record type')
+     A            SCPV02    R        O 15  9REFFLD(CODE)
+     A                                      TEXT('Pmt Val 1')
+     A            SCWK02    R        O 15 15REFFLD(WKS)
+     A                                      EDTCDE(Z)
+     A            SCDA02    R        O 15 20REFFLD(DAYS)
+     A                                      EDTCDE(Z)
+     A            SCFR02    R        O 15 23REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('From date')
+     A            SCTO02    R        O 15 32REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('To date')
+     A*** BEGIN CHG *** 06/26/96 *********************************
+     A N86        SCPO02    R        O 15 41REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Posting date')
+     A  86        SCCL02    R        O 15 41REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Clear date')
+     A*** END CHG ***** 06/26/96 *********************************
+     A            SCTR02    R        O 15 50REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Transaction date')
+     A            SCCK02    R        O 15 59REFFLD(CHK#)
+     A                                      EDTCDE(4)
+     A                                      TEXT('CHECK NUMBER')
+     A            SCAM02    R        O 15 67REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      TEXT('AMOUNT')
+     A            SCFL03    R        B 17  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  20                                  ERRMSGID(WCR0600 *LIBL/WMESGG)
+     A  53                                  ERRMSGID(WCR1266 *LIBL/WMESGG)
+     A  73                                  DSPATR(PC)
+     A            SCNM03        35A  O 17  3TEXT('PAYEE NAME')
+     A  24                                  DSPATR(RI)
+     A            SCDS03        30A  O 17 41TEXT('DESCRIPTION')
+     A            SCPC03    R        O 18  3REFFLD(CODE)
+     A                                      TEXT('Payment Cd')
+     A            SCTP03    R        O 18  6REFFLD(FLAG)
+     A                                      TEXT('Record type')
+     A            SCPV03    R        O 18  9REFFLD(CODE)
+     A                                      TEXT('Pmt Val 1')
+     A            SCWK03    R        O 18 15REFFLD(WKS)
+     A                                      EDTCDE(Z)
+     A            SCDA03    R        O 18 20REFFLD(DAYS)
+     A                                      EDTCDE(Z)
+     A            SCFR03    R        O 18 23REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('From date')
+     A            SCTO03    R        O 18 32REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('To date')
+     A*** BEGIN CHG *** 06/26/96 *********************************
+     A N86        SCPO03    R        O 18 41REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Posting date')
+     A  86        SCCL03    R        O 18 41REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Clear date')
+     A*** END CHG ***** 06/26/96 *********************************
+     A            SCTR03    R        O 18 50REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Transaction date')
+     A            SCCK03    R        O 18 59REFFLD(CHK#)
+     A                                      EDTCDE(4)
+     A                                      TEXT('CHECK NUMBER')
+     A            SCAM03    R        O 18 67REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      TEXT('AMOUNT')
+     A            SCFL04    R        B 20  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  20                                  ERRMSGID(WCR0600 *LIBL/WMESGG)
+     A  54                                  ERRMSGID(WCR1266 *LIBL/WMESGG)
+     A  74                                  DSPATR(PC)
+     A            SCNM04        35A  O 20  3TEXT('PAYEE NAME')
+     A  25                                  DSPATR(RI)
+     A            SCDS04        30A  O 20 41TEXT('DESCRIPTION')
+     A            SCPC04    R        O 21  3REFFLD(CODE)
+     A                                      TEXT('Payment Cd')
+     A            SCTP04    R        O 21  6REFFLD(FLAG)
+     A                                      TEXT('Record type')
+     A            SCPV04    R        O 21  9REFFLD(CODE)
+     A                                      TEXT('Pmt Val 1')
+     A            SCWK04    R        O 21 15REFFLD(WKS)
+     A                                      EDTCDE(Z)
+     A            SCDA04    R        O 21 20REFFLD(DAYS)
+     A                                      EDTCDE(Z)
+     A            SCFR04    R        O 21 23REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('From date')
+     A            SCTO04    R        O 21 32REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('To date')
+     A*** BEGIN CHG *** 06/26/96 *********************************
+     A N86        SCPO04    R        O 21 41REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Posting date')
+     A  86        SCCL04    R        O 21 41REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Clear date')
+     A*** END CHG ***** 06/26/96 *********************************
+     A            SCTR04    R        O 21 50REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Transaction date')
+     A            SCCK04    R        O 21 59REFFLD(CHK#)
+     A                                      EDTCDE(4)
+     A                                      TEXT('CHECK NUMBER')
+     A            SCAM04    R        O 21 67REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      TEXT('AMOUNT')
+     A                                 23  2'F3=Exit         '
+     A                                      COLOR(BLU)
+     A                                 23 23'F12=Cancel        '
+     A                                      COLOR(BLU)
+     A*** BEGIN CHG *** 06/26/96 *********************************
+     A                                 23 44'F5=View chk   '
+     A                                      COLOR(BLU)
+     A            SCUP           9A  O 23 60
+     A            SCDOWN         9A  O 23 70
+     A                                 24  2'F11=Post dt/clear dt toggle   '
+     A                                      COLOR(BLU)
+     A                                 24 44'F17=Display/reprint eomb   '
+     A                                      COLOR(BLU)
+     A*** END CHG ***** 06/26/96 *********************************
+     A          R WDWMS1
+     A                                      SETOF(47)
+     A                                      OVERLAY
+     A                                      WINDOW(9 13 5 45)
+     A                                      WDWBORDER((*COLOR RED))
+     A                                      WDWBORDER((*DSPATR RI HI) (*CHAR ' -
+     A                                             '))
+     A                                  2  5'Enter a ''D'''
+     A                                  2 17'to Display the EOMB,'
+     A                                  3  5'or an ''R'''
+     A                                  3 15'to Reprint the EOMB:'
+     A            SCFLAG    R        B  3 39REFFLD(FLAG)
+     A                                      DSPATR(UL)
+     A  47                                  ERRMSGID(WCR1267 *LIBL/WMESGG)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

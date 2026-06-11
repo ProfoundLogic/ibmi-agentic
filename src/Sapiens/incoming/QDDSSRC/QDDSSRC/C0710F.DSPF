@@ -1,0 +1,249 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   CLAIM RESERVE DETAIL SECTION SEARCH DISPLAY              **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      PUTOVR
+     A                                      SETOF(20)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0710F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  4  2'Policy #:'
+     A            SCPOL#    R        O  4 13REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      TEXT('POLICY NUMBER')
+     A                                  4 29'Name:'
+     A            SCFIN     R        O  4 36REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                  5  2'Claim #:'
+     A            SCCLM#    R        O  5 12REFFLD(CLM#)
+     A                                      DSPATR(HI)
+     A                                  5 29'Claimant ID:'
+     A            SCCLID    R        O  5 43REFFLD(CLID)
+     A                                      DSPATR(HI)
+     A                                  5 53'Date of Loss:'
+     A            SCLSDT    R        O  5 68REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A                                  6  2'Section Code:'
+     A            SCCC      R        O  6 17REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A            SCCCNM    R        O  6 21REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                  6 63'Agent Code:'
+     A            SCAGT#    R        O  6 75REFFLD(AGT#)
+     A                                      DSPATR(HI)
+     A  33                              9  2'Vehicle Number:'
+     A            SCITM#    R        B  9 19REFFLD(ITM#)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A N33                                  DSPATR(ND)
+     A N33                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A N33                              8  2'Location:'
+     A            SCLOC#    R        B  8 13REFFLD(LOC#)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  33                                  DSPATR(ND)
+     A  33                                  DSPATR(PR)
+     A N33                              8 19'Building:'
+     A            SCPRM#    R        B  8 30REFFLD(PRM#)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  33                                  DSPATR(ND)
+     A  33                                  DSPATR(PR)
+     A                                 10 33'Remaining'
+     A                                 10 50'Remaining'
+     A                                 10 67'Remaining'
+     A            SCKEYN        26A  O 11  4OVRDTA
+     A                                 11 33'Reserves'
+     A                                 11 43'Type'
+     A                                 11 50'Reserves'
+     A                                 11 60'Type'
+     A                                 11 67'Reserves'
+     A                                 11 77'Type'
+     A            SCFL01    R        B 13  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  20                                  ERRMSGID(CCR0600 *LIBL/CMESGG)
+     A            SCFL02    R        B 15  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL03    R        B 17  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL04    R        B 19  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL05    R        B 21  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCKEY1        26A  O 13  4OVRDTA
+     A            SCKEY2        26A  O 15  4OVRDTA
+     A            SCKEY3        26A  O 17  4OVRDTA
+     A            SCKEY4        26A  O 19  4OVRDTA
+     A            SCKEY5        26A  O 21  4OVRDTA
+     A            SCR101    R        O 13 31REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR102    R        O 15 31REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR103    R        O 17 31REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR104    R        O 19 31REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR105    R        O 21 31REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCT101    R        O 13 44REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT102    R        O 15 44REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT103    R        O 17 44REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT104    R        O 19 44REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT105    R        O 21 44REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCR201    R        O 13 48REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR202    R        O 15 48REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR203    R        O 17 48REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR204    R        O 19 48REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR205    R        O 21 48REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCT201    R        O 13 61REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT202    R        O 15 61REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT203    R        O 17 61REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT204    R        O 19 61REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT205    R        O 21 61REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCR301    R        O 13 65REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR302    R        O 15 65REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR303    R        O 17 65REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR304    R        O 19 65REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR305    R        O 21 65REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCT301    R        O 13 78REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT302    R        O 15 78REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT303    R        O 17 78REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT304    R        O 19 78REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT305    R        O 21 78REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCR401    R        O 14 31REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR402    R        O 16 31REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR403    R        O 18 31REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR404    R        O 20 31REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR405    R        O 22 31REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCT401    R        O 14 44REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT402    R        O 16 44REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT403    R        O 18 44REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT404    R        O 20 44REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT405    R        O 22 44REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCR501    R        O 14 48REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR502    R        O 16 48REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR503    R        O 18 48REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR504    R        O 20 48REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCR505    R        O 22 48REFFLD(A92)
+     A                                      OVRDTA
+     A                                      EDTCDE(2)
+     A            SCT501    R        O 14 61REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT502    R        O 16 61REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT503    R        O 18 61REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT504    R        O 20 61REFFLD(CDE)
+     A                                      OVRDTA
+     A            SCT505    R        O 22 61REFFLD(CDE)
+     A                                      OVRDTA
+     A                                 24  8'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 29'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A            SCUP           9A  O 24 52OVRDTA
+     A            SCDOWN         9A  O 24 67OVRDTA
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR99
+     A            SCERR     R        O  1  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      TEXT('DUMMY FIELD')

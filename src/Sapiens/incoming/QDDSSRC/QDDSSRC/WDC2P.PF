@@ -1,0 +1,491 @@
+      * (C) Copyright Progressive Data Systems, Inc., 1997 - 2002
+      *
+      *  CLAIM DEPT LETTERS AUXILIARY WORKFILE - FOR SCREEN
+     H*****************************************************************
+     H*  REVISIONS:                                                   *
+     A*                                                                  *
+     A* 03/07/05  C:65   PROJECT: WC1202                                 *
+     A*                  Add EXTENDED EMPLOYER NAME FIELDS.              *
+     A*                                                                  *
+     A* 05/27/03  C:61   PROJECT: WC1088                                 *
+     A*                  Add Email addresses                             *
+     A*                                                                  *
+     A* 11/15/02  C:61   PROJECT: WC1088                                 *
+     A*                  Add Email addresses                             *
+     H*                                                               *
+     H*  04/03/00 C:118 PROJECT: WC854                                *
+     H*                 ADD IMPAIRMENT FLAG CLIMP (1A)                *
+     H*                                                               *
+     H*  09/17/98 C:09 PROJECT: 60ARV                                 *
+     H*                ADDED FIELD FOR USER NAME OF LETTER REQUESTOR  *
+     H*                                                               *
+      *
+      *  9/18/97   C:47  Project:  WC577
+      *
+     H*****************************************************************
+     A                                      REF(WREFP)
+     A          R PC201                     TEXT('CLAIM DEPT LETTER WORK FILE')
+      *  KEY INFORMATION
+     A            CLCO#     R               REFFLD(CO#)
+     A                                      COLHDG('COMPANY' 'NUMBER')
+     A            CLFND     R               REFFLD(FND)
+     A                                      COLHDG('FUND')
+     A            CLFYR     R               REFFLD(FYR)
+     A                                      COLHDG('FUND' 'YEAR')
+     A            CLFCLM    R               REFFLD(CASE)
+     A                                      COLHDG('FROM CLAIM' 'NUMBER')
+     A            CLREQ#    R               REFFLD(SEQ#)
+     A                                      COLHDG('REQUEST #')
+     A*
+     A*  Selected Documents
+     A*
+     A            CLDPCD    R               REFFLD(DPCD)
+     A                                      COLHDG('DEPT' 'CODE')
+     A            CLFLDR    R               REFFLD(FLDR)
+     A                                      COLHDG('FOLDER')
+     A            CLDCID    R               REFFLD(DCID)
+     A                                      COLHDG('DOCUMENT ID')
+      *
+     A            CLESUP    R               REFFLD(STAF)
+     A                                      COLHDG('EXCESS' 'ADJUSTER')
+     A            CLESUN    R               REFFLD(NAME)
+     A                                      COLHDG('EXCESS' 'ADJ NAME')
+     A            CLESUX    R               REFFLD(PHN2)
+     A                                      COLHDG('EXCESS' 'ADJ EXT')
+     A            CLSDFA    R               REFFLD(STAF)
+     A                                      COLHDG('SDF ADJUSTER')
+     A            CLSDFN    R               REFFLD(NAME)
+     A                                      COLHDG('SDF ADJ NAME')
+     A            CLSDFX    R               REFFLD(PHN2)
+     A                                      COLHDG('SDF ADJ EXT')
+     A            CLHRSD    R               REFFLD(A30)
+     A                                      COLHDG('HOURS' 'PER DAY')
+     A            CLTPAD    R               REFFLD(DT8)
+     A                                      COLHDG('TPA CONTACT DATE')
+     A            CLRECL    R               REFFLD(DS15)
+     A                                      COLHDG('REINSURER' 'CLAIM #')
+     A            CLSUPR    R               REFFLD(STAF)
+     A                                      COLHDG('SUPERVISOR')
+     A            CLSPNM    R               REFFLD(NM30)
+     A                                      COLHDG('SUPERVISOR NAME')
+     A            CLSPEX    R               REFFLD(PHN2)
+     A                                      COLHDG('SUPERVISOR EXT')
+     A*  CLAIM EXAMINER INFORMATION
+     A            CLCLEX    R               REFFLD(STAF)
+     A                                      COLHDG('CLAIMS EXAMINER')
+     A            CLCXNM    R               REFFLD(NM30)
+     A                                      COLHDG('CLMS EXM NAME')
+     A            CLCXEX    R               REFFLD(PHN2)
+     A                                      COLHDG('CLMS EXM EXT')
+     A            CLTITL    R               REFFLD(NM30)
+     A                                      COLHDG('CLAIM EXAMINER TITLE')
+     A            CLADJN    R               REFFLD(NM30)
+     A                                      COLHDG('ADJUSTOR NAME')
+     A            CLAJL#    R               REFFLD(DS15)
+     A                                      COLHDG('ADJUSTOR LICENSE #')
+     A            CLFEAD    R               REFFLD(STAF)
+     A                                      COLHDG('FIELD ADJUSTOR')
+     A            CLFDNM    R               REFFLD(NM30)
+     A                                      COLHDG('FIELD ADJ' 'NAME')
+     A            CLFDEX    R               REFFLD(PHN2)
+     A                                      COLHDG('FIELD ADJ EXT')
+     A            CLDTIC    R               REFFLD(DT8)
+     A                                      COLHDG('DATE INITIAL CONTACT')
+     A            CLRCVD    R               REFFLD(DT8)
+     A                                      COLHDG('DATE RECEIVED')
+     A            CLPLFL    R               REFFLD(FLAG)
+     A                                      COLHDG('POT LOST TIME FLAG')
+     A            CLUMAN    R               REFFLD(STAF)
+     A                                      COLHDG('UNIT MANAGER')
+     A            CLUMNA    R               REFFLD(NAME)
+     A                                      COLHDG('UNIT MGR NAME')
+     A            CLUMAX    R               REFFLD(PHN2)
+     A                                      COLHDG('UNIT MGR EXT')
+     A*  CLAIM HISTORY INFORMATION
+     A            CLOCST    R               REFFLD(FLAG)
+     A                                      COLHDG('OPEN/CLOSE STATUS')
+     A*  INTERNAL AUDIT INFORMATION
+     A            CLIAUD    R               REFFLD(AGT#)
+     A                                      COLHDG('INTERNAL AUDIT #')
+     A*  USER REQUESTING THE LETTER
+     A            CLRUSR    R               REFFLD(USER)
+     A                                      COLHDG('USER REQUESTING LTR')
+     A            CLRUEX    R               REFFLD(PHN2)
+     A                                      COLHDG('REQUESTING USER EXT')
+      *
+      *   LEGAL INFO
+      *
+     A            CLDEFA    R               REFFLD(FEIN)
+     A                                      COLHDG('DEFENSE ATTORNEY' 'FEIN')
+     A            CLDEFM    R               REFFLD(MOD)
+     A                                      COLHDG('DEFENSE ATTORNEY' 'MOD')
+     A            CLDEFN    R               REFFLD(NM30)
+     A                                      COLHDG('DEFENSE ATTORNEY' 'NAME')
+     A            CLDEFR    R               REFFLD(AREA)
+     A                                      COLHDG('DEF ATTY' 'AREA CODE')
+     A            CLDEFP    R               REFFLD(PHN#)
+     A                                      COLHDG('DEF ATTY' 'PHONE #')
+     A            CLDEDT    R               REFFLD(DT8)
+     A                                      COLHDG('DEF ATTY' 'DT ASSIGNED')
+     A            CLPLAA    R               REFFLD(FEIN)
+     A                                      COLHDG('PLAINTIFF ATTORNEY' 'FEIN')
+     A            CLPLAM    R               REFFLD(MOD)
+     A                                      COLHDG('PLAINTIFF ATTORNEY' 'MOD')
+     A            CLPLAN    R               REFFLD(NM30)
+     A                                      COLHDG('PLAINTIFF ATTORNEY' 'NAME')
+     A            CLPLAR    R               REFFLD(AREA)
+     A                                      COLHDG('PLA ATTY' 'AREA CODE')
+     A            CLPLAP    R               REFFLD(PHN#)
+     A                                      COLHDG('PLA ATTY' 'PHONE #')
+     A            CLFRAU    R               REFFLD(CODE)
+     A                                      COLHDG('FRAUDULENT CLM' 'INDICATOR')
+     A            CLFRAD    R               REFFLD(DS40)
+     A                                      COLHDG('FRAUDULENT CLM' 'INDICATOR +
+     A                                      DESC')
+     A            CLLWDT    R               REFFLD(DT8)
+     A                                      COLHDG('LAWSUIT DATE')
+     A            CLLITG    R               REFFLD(FLAG)
+     A                                      COLHDG('LITIGATION INDICATOR')
+     A            CLMTST    R               REFFLD(DS3)
+     A                                      COLHDG('METHOD OF SETTLEMENT')
+     A            CLMTSD    R               REFFLD(DS40)
+     A                                      COLHDG('METHOD OF' +
+     A                                      'SETTLEMENT DESC')
+     A            CLSTDT    R               REFFLD(DT8)
+     A                                      COLHDG('SETTLEMENT DATE')
+     A            CLSAMT    R               REFFLD(A112)
+     A                                      COLHDG('SETTLEMENT AMOUNT')
+     A            CLDTAP    R               REFFLD(DT8)
+     A                                      COLHDG('DT PLANTIFF' 'APPOINTED')
+     A*
+     A*   10 BYTE FIELDS
+     A*
+     A            CL10A1    R               REFFLD(DS10)
+     A            CL10A2    R               REFFLD(DS10)
+     A            CL10A3    R               REFFLD(DS10)
+     A            CL10A4    R               REFFLD(DS10)
+     A            CL10A5    R               REFFLD(DS10)
+     A            CL10A6    R               REFFLD(DS10)
+     A            CL10A7    R               REFFLD(DS10)
+     A            CL10A8    R               REFFLD(DS10)
+     A            CL10A9    R               REFFLD(DS10)
+     A            CL10A0    R               REFFLD(DS10)
+     A            CL10AA    R               REFFLD(DS10)
+     A            CL10AB    R               REFFLD(DS10)
+     A            CL10AC    R               REFFLD(DS10)
+     A            CL10AD    R               REFFLD(DS10)
+     A            CL10AE    R               REFFLD(DS10)
+     A            CL10AF    R               REFFLD(DS10)
+     A            CL10AG    R               REFFLD(DS10)
+     A            CL10AH    R               REFFLD(DS10)
+     A            CL10AI    R               REFFLD(DS10)
+     A            CL10AJ    R               REFFLD(DS10)
+     A*
+     A*   20 BYTE FIELDS
+     A*
+     A            CL20A1    R               REFFLD(DS20)
+     A            CL20A2    R               REFFLD(DS20)
+     A            CL20A3    R               REFFLD(DS20)
+     A            CL20A4    R               REFFLD(DS20)
+     A            CL20A5    R               REFFLD(DS20)
+     A            CL20A6    R               REFFLD(DS20)
+     A            CL20A7    R               REFFLD(DS20)
+     A            CL20A8    R               REFFLD(DS20)
+     A            CL20A9    R               REFFLD(DS20)
+     A            CL20A0    R               REFFLD(DS20)
+     A            CL20AA    R               REFFLD(DS20)
+     A            CL20AB    R               REFFLD(DS20)
+     A            CL20AC    R               REFFLD(DS20)
+     A            CL20AD    R               REFFLD(DS20)
+     A            CL20AE    R               REFFLD(DS20)
+     A            CL20AF    R               REFFLD(DS20)
+     A            CL20AG    R               REFFLD(DS20)
+     A            CL20AH    R               REFFLD(DS20)
+     A            CL20AI    R               REFFLD(DS20)
+     A            CL20AJ    R               REFFLD(DS20)
+     A*
+     A*   40 BYTE FIELDS
+     A*
+     A            CL40A1    R               REFFLD(DS40)
+     A            CL40A2    R               REFFLD(DS40)
+     A            CL40A3    R               REFFLD(DS40)
+     A            CL40A4    R               REFFLD(DS40)
+     A            CL40A5    R               REFFLD(DS40)
+     A            CL40A6    R               REFFLD(DS40)
+     A            CL40A7    R               REFFLD(DS40)
+     A            CL40A8    R               REFFLD(DS40)
+     A            CL40A9    R               REFFLD(DS40)
+     A            CL40A0    R               REFFLD(DS40)
+     A            CL40AA    R               REFFLD(DS40)
+     A            CL40AB    R               REFFLD(DS40)
+     A            CL40AC    R               REFFLD(DS40)
+     A            CL40AD    R               REFFLD(DS40)
+     A            CL40AE    R               REFFLD(DS40)
+     A            CL40AF    R               REFFLD(DS40)
+     A            CL40AG    R               REFFLD(DS40)
+     A            CL40AH    R               REFFLD(DS40)
+     A            CL40AI    R               REFFLD(DS40)
+     A            CL40AJ    R               REFFLD(DS40)
+     A*
+     A*   60 BYTE FIELDS
+     A*
+     A            CL60A1    R               REFFLD(DS60)
+     A            CL60A2    R               REFFLD(DS60)
+     A            CL60A3    R               REFFLD(DS60)
+     A            CL60A4    R               REFFLD(DS60)
+     A            CL60A5    R               REFFLD(DS60)
+     A            CL60A6    R               REFFLD(DS60)
+     A            CL60A7    R               REFFLD(DS60)
+     A            CL60A8    R               REFFLD(DS60)
+     A            CL60A9    R               REFFLD(DS60)
+     A            CL60A0    R               REFFLD(DS60)
+     A            CL60AA    R               REFFLD(DS60)
+     A            CL60AB    R               REFFLD(DS60)
+     A            CL60AC    R               REFFLD(DS60)
+     A            CL60AD    R               REFFLD(DS60)
+     A            CL60AE    R               REFFLD(DS60)
+     A            CL60AF    R               REFFLD(DS60)
+     A            CL60AG    R               REFFLD(DS60)
+     A            CL60AH    R               REFFLD(DS60)
+     A            CL60AI    R               REFFLD(DS60)
+     A            CL60AJ    R               REFFLD(DS60)
+     A*
+     A*   DATE FIELDS
+     A*
+     A            CLDT1     R               REFFLD(DT8)
+     A            CLDT2     R               REFFLD(DT8)
+     A            CLDT3     R               REFFLD(DT8)
+     A            CLDT4     R               REFFLD(DT8)
+     A            CLDT5     R               REFFLD(DT8)
+     A            CLDT6     R               REFFLD(DT8)
+     A            CLDT7     R               REFFLD(DT8)
+     A            CLDT8     R               REFFLD(DT8)
+     A            CLDT9     R               REFFLD(DT8)
+     A            CLDT10    R               REFFLD(DT8)
+     A            CLDT11    R               REFFLD(DT8)
+     A            CLDT12    R               REFFLD(DT8)
+     A            CLDT13    R               REFFLD(DT8)
+     A            CLDT14    R               REFFLD(DT8)
+     A            CLDT15    R               REFFLD(DT8)
+     A            CLDT16    R               REFFLD(DT8)
+     A            CLDT17    R               REFFLD(DT8)
+     A            CLDT18    R               REFFLD(DT8)
+     A            CLDT19    R               REFFLD(DT8)
+     A            CLDT20    R               REFFLD(DT8)
+     A*
+     A*   3.2 NUMERIC FIELDS
+     A*
+     A            CL3N1     R               REFFLD(A32)
+     A            CL3N2     R               REFFLD(A32)
+     A            CL3N3     R               REFFLD(A32)
+     A            CL3N4     R               REFFLD(A32)
+     A            CL3N5     R               REFFLD(A32)
+     A            CL3N6     R               REFFLD(A32)
+     A            CL3N7     R               REFFLD(A32)
+     A            CL3N8     R               REFFLD(A32)
+     A            CL3N9     R               REFFLD(A32)
+     A            CL3N10    R               REFFLD(A32)
+     A            CL3N11    R               REFFLD(A32)
+     A            CL3N12    R               REFFLD(A32)
+     A            CL3N13    R               REFFLD(A32)
+     A            CL3N14    R               REFFLD(A32)
+     A            CL3N15    R               REFFLD(A32)
+     A            CL3N16    R               REFFLD(A32)
+     A            CL3N17    R               REFFLD(A32)
+     A            CL3N18    R               REFFLD(A32)
+     A            CL3N19    R               REFFLD(A32)
+     A            CL3N20    R               REFFLD(A32)
+     A*
+     A*   5.2 NUMERIC FIELDS
+     A*
+     A            CL5N1     R               REFFLD(A52)
+     A            CL5N2     R               REFFLD(A52)
+     A            CL5N3     R               REFFLD(A52)
+     A            CL5N4     R               REFFLD(A52)
+     A            CL5N5     R               REFFLD(A52)
+     A            CL5N6     R               REFFLD(A52)
+     A            CL5N7     R               REFFLD(A52)
+     A            CL5N8     R               REFFLD(A52)
+     A            CL5N9     R               REFFLD(A52)
+     A            CL5N10    R               REFFLD(A52)
+     A            CL5N11    R               REFFLD(A52)
+     A            CL5N12    R               REFFLD(A52)
+     A            CL5N13    R               REFFLD(A52)
+     A            CL5N14    R               REFFLD(A52)
+     A            CL5N15    R               REFFLD(A52)
+     A            CL5N16    R               REFFLD(A52)
+     A            CL5N17    R               REFFLD(A52)
+     A            CL5N18    R               REFFLD(A52)
+     A            CL5N19    R               REFFLD(A52)
+     A            CL5N20    R               REFFLD(A52)
+     A*
+     A*   9.2 NUMERIC FIELDS
+     A*
+     A            CL9N1     R               REFFLD(A92)
+     A            CL9N2     R               REFFLD(A92)
+     A            CL9N3     R               REFFLD(A92)
+     A            CL9N4     R               REFFLD(A92)
+     A            CL9N5     R               REFFLD(A92)
+     A            CL9N6     R               REFFLD(A92)
+     A            CL9N7     R               REFFLD(A92)
+     A            CL9N8     R               REFFLD(A92)
+     A            CL9N9     R               REFFLD(A92)
+     A            CL9N10    R               REFFLD(A92)
+     A            CL9N11    R               REFFLD(A92)
+     A            CL9N12    R               REFFLD(A92)
+     A            CL9N13    R               REFFLD(A92)
+     A            CL9N14    R               REFFLD(A92)
+     A            CL9N15    R               REFFLD(A92)
+     A            CL9N16    R               REFFLD(A92)
+     A            CL9N17    R               REFFLD(A92)
+     A            CL9N18    R               REFFLD(A92)
+     A            CL9N19    R               REFFLD(A92)
+     A            CL9N20    R               REFFLD(A92)
+     A*
+     A*   11.2 NUMERIC FIELDS
+     A*
+     A            CL11N1    R               REFFLD(A112)
+     A            CL11N2    R               REFFLD(A112)
+     A            CL11N3    R               REFFLD(A112)
+     A            CL11N4    R               REFFLD(A112)
+     A            CL11N5    R               REFFLD(A112)
+     A            CL11N6    R               REFFLD(A112)
+     A            CL11N7    R               REFFLD(A112)
+     A            CL11N8    R               REFFLD(A112)
+     A            CL11N9    R               REFFLD(A112)
+     A            CL11N0    R               REFFLD(A112)
+     A            CL11NA    R               REFFLD(A112)
+     A            CL11NB    R               REFFLD(A112)
+     A            CL11NC    R               REFFLD(A112)
+     A            CL11ND    R               REFFLD(A112)
+     A            CL11NE    R               REFFLD(A112)
+     A            CL11NF    R               REFFLD(A112)
+     A            CL11NG    R               REFFLD(A112)
+     A            CL11NH    R               REFFLD(A112)
+     A            CL11NI    R               REFFLD(A112)
+     A            CL11NJ    R               REFFLD(A112)
+     A*
+     A*   1 BYTE FIELDS
+     A*
+     A            CL1A1     R               REFFLD(FLAG)
+     A            CL1A2     R               REFFLD(FLAG)
+     A            CL1A3     R               REFFLD(FLAG)
+     A            CL1A4     R               REFFLD(FLAG)
+     A            CL1A5     R               REFFLD(FLAG)
+     A            CL1A6     R               REFFLD(FLAG)
+     A            CL1A7     R               REFFLD(FLAG)
+     A            CL1A8     R               REFFLD(FLAG)
+     A            CL1A9     R               REFFLD(FLAG)
+     A            CL1A10    R               REFFLD(FLAG)
+     A            CL1A11    R               REFFLD(FLAG)
+     A            CL1A12    R               REFFLD(FLAG)
+     A            CL1A13    R               REFFLD(FLAG)
+     A            CL1A14    R               REFFLD(FLAG)
+     A            CL1A15    R               REFFLD(FLAG)
+     A            CL1A16    R               REFFLD(FLAG)
+     A            CL1A17    R               REFFLD(FLAG)
+     A            CL1A18    R               REFFLD(FLAG)
+     A            CL1A19    R               REFFLD(FLAG)
+     A            CL1A20    R               REFFLD(FLAG)
+     A*
+     A*   2 BYTE FIELDS
+     A*
+     A            CL2A1     R               REFFLD(CODE)
+     A            CL2A2     R               REFFLD(CODE)
+     A            CL2A3     R               REFFLD(CODE)
+     A            CL2A4     R               REFFLD(CODE)
+     A            CL2A5     R               REFFLD(CODE)
+     A            CL2A6     R               REFFLD(CODE)
+     A            CL2A7     R               REFFLD(CODE)
+     A            CL2A8     R               REFFLD(CODE)
+     A            CL2A9     R               REFFLD(CODE)
+     A            CL2A10    R               REFFLD(CODE)
+     A            CL2A11    R               REFFLD(CODE)
+     A            CL2A12    R               REFFLD(CODE)
+     A            CL2A13    R               REFFLD(CODE)
+     A            CL2A14    R               REFFLD(CODE)
+     A            CL2A15    R               REFFLD(CODE)
+     A            CL2A16    R               REFFLD(CODE)
+     A            CL2A17    R               REFFLD(CODE)
+     A            CL2A18    R               REFFLD(CODE)
+     A            CL2A19    R               REFFLD(CODE)
+     A            CL2A20    R               REFFLD(CODE)
+     A*
+     A*   MAINTENANCE INFORMATION
+     A*
+     A            CLSTAT    R               REFFLD(STAT)
+     A            CLUSER    R               REFFLD(USER)
+     A            CLPGM     R               REFFLD(PGM)
+     A            CLTIME    R               REFFLD(TIME)
+     A            CLDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            CLIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            CLIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL' 'PGM')
+     A            CLITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL' 'TIME')
+     A            CLIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'ENTRY' 'DATE')
+     A            CLOUTQ    R               REFFLD(OUTQ)
+     A                                      COLHDG('DOCUMENT' 'OUTPUT QUEUE')
+     A*** BEGIN ADD ***  09/17/98  ************************************
+     A            CLUSNM    R               REFFLD(NM50)
+     A                                      COLHDG('REQ USER' 'NAME')
+     A*** END ADD *****  09/17/98  ************************************
+     A***** BEGIN ADD **** 04/03/00 ***********************************
+     A            CLIMP     R               REFFLD(FLAG)
+     A                                      COLHDG('IMPAIRMENT FLAG')
+     A***** END   ADD **** 04/03/00 ***********************************
+     A******* BEG ADD **** 11/15/02 **************************************
+      *                                                                ***
+     A            CLUPEM    R               REFFLD(DS60)
+     A                                      COLHDG('USER EMAIL')
+      *                                                                ***
+     A            CLEMEM    R               REFFLD(DS60)
+     A                                      COLHDG('EMPLOYER EMAIL')
+      *                                                                ***
+     A            CLAGEM    R               REFFLD(DS60)
+     A                                      COLHDG('AGENT EMAIL')
+      *                                                                ***
+     A            CLAPEM    R               REFFLD(DS60)
+     A                                      COLHDG('PRODUCER EMAIL')
+      *                                                                ***
+     A            CLC1EM    R               REFFLD(DS60)
+     A                                      COLHDG('EMPLOYER PRIMARY' +
+     A                                      'CONTACT #1 EMAIL')
+      *                                                                ***
+     A            CLC2EM    R               REFFLD(DS60)
+     A                                      COLHDG('EMPLOYER PRIMARY' +
+     A                                      'CONTACT #2 EMAIL')
+      *                                                                ***
+     A            CLC3EM    R               REFFLD(DS60)
+     A                                      COLHDG('EMPLOYER PRIMARY' +
+     A                                      'CONTACT #3 EMAIL')
+      *                                                                ***
+     A******* END ADD **** 11/15/02 **************************************
+     A******* BEG ADD **** 05/27/03 **************************************
+      *                                                                ***
+     A            CLUWEM    R               REFFLD(DS60)
+     A                                      COLHDG('UNDERWRITER' +
+     A                                      'EMAIL')
+      *                                                                ***
+     A            CLLREM    R               REFFLD(DS60)
+     A                                      COLHDG('LOSS CONTROL' +
+     A                                      'REP EMAIL')
+      *                                                                ***
+     A            CLAMEM    R               REFFLD(DS60)
+     A                                      COLHDG('ACCOUNT MGR' +
+     A                                      'EMAIL')
+      *                                                                ***
+     A******* END ADD **** 05/27/03 **************************************
+     A*** BEGIN ADD ***  03/07/05  ***************************************
+     A            CLENM1    R               REFFLD(NM50)
+     A                                      COLHDG('EMPLR DBA NAME 1')
+     A            CLENM2    R               REFFLD(NM50)
+     A                                      COLHDG('EMPLR DBA NAME 2')
+     A            CLEFD1    R               REFFLD(NM50)
+     A                                      COLHDG('EMPLR FED NAME 1')
+     A            CLEFD2    R               REFFLD(NM50)
+     A                                      COLHDG('EMPLR FED NAME 2')
+     A*** END ADD *****  03/07/05  ***************************************

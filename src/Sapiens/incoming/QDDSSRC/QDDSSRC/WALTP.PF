@@ -1,0 +1,385 @@
+     A*  (C) Copyright Progressive Data Systems, Inc., 1988 - 1998
+     A*
+     A*  WORKERS' COMP WORK FILE FOR MULTIPLE REPORT GENERATION
+     A*
+     A*****************************************************************
+     A*  REVISIONS:                                                   *
+     A*                                                               *
+     A* 04/01/05 C:15  Project: WC1276                                *
+     A*                Added new fields:                              *
+     A*                 -Benefit adjustment code 1.                   *
+     A*                 -Benefit adjustment code 2.                   *
+     A*                 -PI rating (alpha field).                     *
+     A*                                                               *
+     A*  11/02/04 C:53  Project: 48WWD
+     A*                 Add field for DWC-25
+     A*                                                               *
+     A*                                                               *
+     A* 07/06/00  C:35   PROJECT: WC557                               *
+     A*                  ADDED FIELD FOR WKS ENTITLEMENT.             *
+     A*                                                               *
+     A*  03/23/99 C:90 PROJECT: 55WAU                                 *
+     A*                ADDED FIELDS FOR MEDICAL RECORDS LETTER -      *
+     A*                LTRZIP, LTRST, LTRNAM, LTRMRL, LTRMOD,         *
+     A*                LTRFEI, LTRCTY, LTRAD1, LTNWC4, LTPAFL.        *
+     A*                                                               *
+     A*  11/01/98 C:02 PROJECT: 48WLT                                 *
+     A*                Added the following fields: LT#BFM             *
+     A*                                                               *
+     A*  09/24/98 C:87 PROJECT: WC577                                 *
+     A*                Added the following fields:                    *
+     A*                  LTSE3, LTWLF3, LTWLT3, LTWLF4, LTWLT4,       *
+     A*                  LTWLF5, LTWLT5, LTWLF6, LTWLT6, LTWLF7,      *
+     A*                  LTWLT7, LTWLF8, LTWLT8 LTD13                 *
+     A*                                                               *
+     A*  10/04/91 TMN -CHANGED FIELDS FOR DWC-4, DWC-12 (OLD DWC-6),  *
+     A*                DWC-13 (OLD DWC-2), AND DWC-3.                 *
+     A*                                                               *
+     A*  02/22/95 C:15 PROJECT: WC294                                 *
+     A*                ADDED NEW FIELDS FOR THE DWC-4.  ALSO, CHGD    *
+     A*                LTISTT, LRTSUT, AND LTIRIT FROM 1A TO 3A.      *
+     A*                                                               *
+     A*  03/24/98 C:61 PROJECT: 51WCE                                 *
+     A*              - ADD DWC FORM 19. ADD FIELDS TO PROCESS         *
+     A*                REQUESTS OF THIS TYPE.                         *
+     A*              - ADD DWC FORM 9A. ADD FIELDS TO PROCESS         *
+     A*                REQUESTS OF THIS TYPE.                         *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PLT01                     TEXT('LETTER FILE')
+     A            LTCO#     R               REFFLD(CO#)
+     A            LTFND     R               REFFLD(FND)
+     A            LTFYR     R               REFFLD(FYR)
+     A            LTCASE    R               REFFLD(CASE)
+     A            LTREQ#    R               REFFLD(SEQ#)
+     A                                      COLHDG('REQUEST NUMBER' 'FOR CLAIM')
+     A            LTAUTO    R               REFFLD(FLAG)
+     A                                      COLHDG('DWC-2' '90 DAY FLAG')
+     A            LTDWC4    R               REFFLD(FLAG)
+     A                                      COLHDG('DWC-4 FLAG')
+     A            LTDW12    R               REFFLD(FLAG)
+     A                                      COLHDG('DWC-12')
+     A            LTDWC3    R               REFFLD(FLAG)
+     A                                      COLHDG('WAGE LOSS DWC-3')
+     A            LTDW13    R               REFFLD(FLAG)
+     A                                      COLHDG('DWC-13 FLAG')
+     A*   DWC-4 REPORT FIELDS
+     A*
+     A            LTISTD    R               REFFLD(DT)
+     A                                      COLHDG('INDEM STARTED DATE')
+     A*** BEGIN CHG *** 02/22/95 ***********************************************
+     A************LTISTT    R               REFFLD(FLAG)
+     A            LTISTT    R               REFFLD(DS3)
+     A*** END CHG ***** 02/22/95 ***********************************************
+     A                                      COLHDG('INDEM STARTED TYPE')
+     A            LTISUD    R               REFFLD(DT)
+     A                                      COLHDG('INDEM SUSPENDED DATE')
+     A*** BEGIN CHG *** 02/22/95 ***********************************************
+     A************LTISUT    R               REFFLD(FLAG)
+     A            LTISUT    R               REFFLD(DS3)
+     A*** END CHG ***** 02/22/95 ***********************************************
+     A                                      COLHDG('INDEM SUSPENDED TYPE')
+     A            LTIRID    R               REFFLD(DT)
+     A                                      COLHDG('INDEM REINSTAT. DATE')
+     A*** BEGIN CHG *** 02/22/95 ***********************************************
+     A************LTIRIT    R               REFFLD(FLAG)
+     A            LTIRIT    R               REFFLD(DS3)
+     A*** END CHG ***** 02/22/95 ***********************************************
+     A                                      COLHDG('INDEM REINSTAT. TYPE')
+     A            LTIRCD    R               REFFLD(DT)
+     A*** BEGIN CHG *** 02/22/95 ***********************************************
+     A************************************* COLHDG('INDEM RECLASS. DATE')
+     A                                      COLHDG('RLSD TO RTW DATE')
+     A*** END CHG ***** 02/22/95 ***********************************************
+     A            LTIRCT    R               REFFLD(FLAG)
+     A*** BEGIN CHG *** 02/22/95 ***********************************************
+     A************************************* COLHDG('INDEM RECLASS. TYPE')
+     A                                      COLHDG('RELEASED TO RTW' -
+     A                                      'RESTRICTION FLAG')
+     A*** END CHG ***** 02/22/95 ***********************************************
+     A            LTMMID    R               REFFLD(DT)
+     A                                      COLHDG('MMI DATE')
+     A            LTPIRT    R               REFFLD(PC52)
+     A                                      COLHDG('PI RATING %')
+     A            LTRTWD    R               REFFLD(DT)
+     A                                      COLHDG('RETURN TO WORK DATE')
+     A            LTDTHD    R               REFFLD(DT)
+     A                                      COLHDG('DATE OF DEATH')
+     A            LTREDA    R               REFFLD(FLAG)
+     A                                      COLHDG('RETROACTIVE' 'TO D/A FLAG')
+     A            LTREEF    R               REFFLD(DT)
+     A                                      COLHDG('RETRO. EFF. DATE')
+     A            LTPAWW    R               REFFLD(A92)
+     A                                      COLHDG('PREVIOUS AWW')
+     A            LTPCRT    R               REFFLD(A72)
+     A                                      COLHDG('PREVIOUS COMP RATE')
+     A            LTAAWW    R               REFFLD(A92)
+     A                                      COLHDG('AMENDED AWW')
+     A            LTACRT    R               REFFLD(A72)
+     A                                      COLHDG('AMENDED COMP RATE')
+     A            LTUNPT    R               REFFLD(A92)
+     A*** BEGIN CHG *** 02/22/95 ***********************************************
+     A************************************* COLHDG('UNDERPAYMENT')
+     A                                      COLHDG('BENEFIT ADJUSTMENT' -
+     A                                      'AMOUNT 1')
+     A*** END CHG ***** 02/22/95 ***********************************************
+     A            LTAJDT    R               REFFLD(DT)
+     A*** BEGIN CHG *** 02/22/95 ***********************************************
+     A************************************* COLHDG('ADJUSTMENT PAID' 'DATE')
+     A                                      COLHDG('FINAL INDEMNITY' -
+     A                                      'SETTLEMENT DATE')
+     A*** END CHG ***** 02/22/95 ***********************************************
+     A            LTOVPT    R               REFFLD(A92)
+     A*** BEGIN CHG *** 02/22/95 ***********************************************
+     A************************************* COLHDG('OVERPAYMENT')
+     A                                      COLHDG('BENEFIT ADJUSTMENT' -
+     A                                      'AMOUNT 2')
+     A*** END CHG ***** 02/22/95 ***********************************************
+     A            LTRCUP    R               REFFLD(A72)
+     A                                      COLHDG('RECOUPED AMT' 'PER WEEK')
+     A            LTWK#          4P 0       COLHDG('# WEEKS RECOUPED')
+     A            LTPID4    R               REFFLD(DT)
+     A                                      COLHDG('PI DATE' 'FOR DWC-4')
+     A            LTPTD4    R               REFFLD(DT)
+     A                                      COLHDG('PT A/A/ DATE' 'FOR DWC-4')
+     A            LTPTRT    R               REFFLD(A72)
+     A                                      COLHDG('PT SUPPLEMENTAL RATE')
+     A            LTPTEF    R               REFFLD(DT)
+     A                                      COLHDG('PT SUPP EFF DATE')
+     A            LTSSRC    R               REFFLD(A92)
+     A                                      COLHDG('SOC SEC REC"D AMT')
+     A            LTSSOF    R               REFFLD(A92)
+     A                                      COLHDG('SOC SEC OFFSET AMT')
+     A            LTSSEF    R               REFFLD(DT)
+     A                                      COLHDG('SS OFFSET EFF DATE')
+     A            LTCSS#    R               REFFLD(FLAG)
+     A                                      COLHDG('CORRECT SS#' 'FLAG')
+     A            LTCDA     R               REFFLD(FLAG)
+     A                                      COLHDG('CORRECT' 'D/A FLAG')
+     A            LTCNAM    R               REFFLD(FLAG)
+     A                                      COLHDG('CORRECT NAME FLAG')
+     A            LTNSS#    R               REFFLD(SS#)
+     A                                      COLHDG('CORRECT SS#')
+     A            LTNDA     R               REFFLD(DT)
+     A                                      COLHDG('CORRECT' 'D/A')
+     A            LTNNAM    R               REFFLD(NAME)
+     A                                      COLHDG('CORRECT NAME')
+     A            LTRMK1    R               REFFLD(NM60)
+     A                                      COLHDG('REMARK 1')
+     A            LTRMK2    R               REFFLD(NM60)
+     A                                      COLHDG('REMARK 2')
+     A            LTRMK3    R               REFFLD(NM60)
+     A                                      COLHDG('REMARK 3')
+     A            LTRMK4    R               REFFLD(NM60)
+     A                                      COLHDG('REMARK 4')
+     A            LTCC1     R               REFFLD(NM60)
+     A                                      COLHDG('"COPY SENT TO" 1')
+     A            LTCC2     R               REFFLD(NM60)
+     A                                      COLHDG('"COPY SENT TO" 2')
+     A            LTCC3     R               REFFLD(NM60)
+     A                                      COLHDG('"COPY SENT TO" 3')
+     A            LTCC4     R               REFFLD(NM60)
+     A                                      COLHDG('"COPY SENT TO" 4')
+     A*   DWC-12 NOTICE OF DENIAL FIELDS (OLD DWC-6)
+     A*
+     A            LTRSCD    R               REFFLD(DT)
+     A                                      COLHDG('RESCINDED DATE')
+     A            LTDEN1    R               REFFLD(NM60)
+     A                                      COLHDG('BENEFITS DENIED 1')
+     A            LTDEN2    R               REFFLD(NM60)
+     A                                      COLHDG('BENEFITS DENIED 2')
+     A            LTDEN3    R               REFFLD(NM60)
+     A                                      COLHDG('BENEFITS DENIED 3')
+     A            LTDEN4    R               REFFLD(NM60)
+     A                                      COLHDG('BENEFITS DENIED 4')
+     A            LTDEN5    R               REFFLD(NM60)
+     A                                      COLHDG('BENEFITS DENIED 5')
+     A            LTWHY0    R               REFFLD(NM60)
+     A                                      COLHDG('REASON 1')
+     A            LTWHY1    R               REFFLD(NM60)
+     A                                      COLHDG('REASON 2')
+     A            LTWHY2    R               REFFLD(NM60)
+     A                                      COLHDG('REASON 3')
+     A            LTWHY3    R               REFFLD(NM60)
+     A                                      COLHDG('REASON 4')
+     A            LTWHY4    R               REFFLD(NM60)
+     A                                      COLHDG('REASON 5')
+     A            LTWHY5    R               REFFLD(NM60)
+     A                                      COLHDG('REASON 6')
+     A            LTWHY6    R               REFFLD(NM60)
+     A                                      COLHDG('REASON 7')
+     A            LTWHY7    R               REFFLD(NM60)
+     A                                      COLHDG('REASON 8')
+     A            LTWHY8    R               REFFLD(NM60)
+     A                                      COLHDG('REASON 9')
+     A            LTWHY9    R               REFFLD(NM60)
+     A                                      COLHDG('REASON 10')
+     A            LTDCC1    R               REFFLD(NM60)
+     A                                      COLHDG('CC 1 FOR DWC-12')
+     A            LTDCC2    R               REFFLD(NM60)
+     A                                      COLHDG('CC 2 FOR DWC-12')
+     A            LTDCC3    R               REFFLD(NM60)
+     A                                      COLHDG('CC 3 FOR DWC-12')
+     A            LTDCC4    R               REFFLD(NM60)
+     A                                      COLHDG('CC 4 FOR DWC-12')
+     A*   DWC-3 REQUEST FOR BENEFITS FIELDS
+     A*
+     A            LTWLF1    R               REFFLD(DT)
+     A                                      COLHDG('WL WEEK 1 FROM DATE')
+     A            LTWLT1    R               REFFLD(DT)
+     A                                      COLHDG('WL WEEK 1 TO DATE')
+     A            LTWLF2    R               REFFLD(DT)
+     A                                      COLHDG('WL WEEK 2 FROM DATE')
+     A            LTWLT2    R               REFFLD(DT)
+     A                                      COLHDG('WL WEEK 2 TO DATE')
+     A            LTWL      R               REFFLD(FLAG)
+     A                                      COLHDG('WAGE LOSS FLAG')
+     A            LTTP      R               REFFLD(FLAG)
+     A                                      COLHDG('TEMP PARTIAL FLAG')
+     A            LTCV      R               REFFLD(FLAG)
+     A                                      COLHDG('CONTROVERTED FLAG')
+     A            LTMMI3    R               REFFLD(DT)
+     A                                      COLHDG('DWC-3 MMI DATE')
+     A            LTWLR3    R               REFFLD(PC52)
+     A                                      COLHDG('DWC-3 WL RATE %')
+     A*
+     A*   DWC-13 PROGRESS/FINAL REPORT FIELDS
+     A*
+     A            LTRPTP    R               REFFLD(FLAG)
+     A                                      COLHDG('TYPE' 'OF REPORT(I,F,A,S)')
+     A            LTMDBO    R               REFFLD(FLAG)
+     A                                      COLHDG('MEDICAL BENEFITS' 'OPEN')
+     A            LTFSAL    R               REFFLD(FLAG)
+     A                                      COLHDG('FULL SALARY FLAG')
+     A            LTFSDT    R               REFFLD(DT)
+     A                                      COLHDG('FULL SALARY' 'PAID DATE')
+     A*
+     A            LTSTAT    R               REFFLD(STAT)
+     A            LTUSER    R               REFFLD(USER)
+     A            LTPGM     R               REFFLD(PGM)
+     A            LTTIME    R               REFFLD(TIME)
+     A            LTDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            LTCLEX    R               REFFLD(STAF)
+     A                                      COLHDG('CLAIMS' 'EXAMINER')
+     A*** BEGIN ADD *** 02/22/95 ***********************************************
+     A*  FIELDS FOR DWC-4
+     A*
+     A            LTRTWF    R               REFFLD(FLAG)
+     A                                      COLHDG('RETURN TO WORK' -
+     A                                      'RESTRICTION FLAG')
+     A            LTATY1    R               REFFLD(DS3)
+     A                                      COLHDG('BENEFIT ADJUSTMENT' -
+     A                                      'TYPE 1')
+     A            LTATY2    R               REFFLD(DS3)
+     A                                      COLHDG('BENEFIT ADJUSTMENT' -
+     A                                      'TYPE 2')
+     A            LTAEF1    R               REFFLD(DT)
+     A                                      COLHDG('BENEFIT ADJUSTMENT' -
+     A                                      'EFFECTIVE DATE 1')
+     A            LTAEF2    R               REFFLD(DT)
+     A                                      COLHDG('BENEFIT ADJUSTMENT' -
+     A                                      'EFFECTIVE DATE 2')
+     A            LTACN1    R               REFFLD(DT)
+     A                                      COLHDG('BENEFIT ADJUSTMENT' -
+     A                                      'END DATE 1')
+     A            LTACN2    R               REFFLD(DT)
+     A                                      COLHDG('BENEFIT ADJUSTMENT' -
+     A                                      'END DATE 2')
+     A            LTSAGT    R               REFFLD(FLAG)
+     A                                      COLHDG('CORRECT SERVICING' -
+     A                                      'AGENT FLAG')
+     A            LTNAGT    R               REFFLD(NAME)
+     A                                      COLHDG('CORRECT SERVICING' -
+     A                                      'AGENT')
+     A*** END ADD ***** 02/22/95 ***********************************************
+      *** BEGIN ADD *** 03/24/98 **************************************
+      *
+      *   DWC-9A
+      *
+     A            LTDW9A    R               REFFLD(FLAG)
+     A                                      COLHDG('DWC-9A FLAG')
+      *
+      *   DWC-13 PROGRESS/FINAL REPORT FIELDS
+      *
+     A            LTDW19    R               REFFLD(FLAG)
+     A                                      COLHDG('DWC-19 FLAG')
+     A            LTEEFR    R               REFFLD(DT)
+     A                                      COLHDG('EMPLOYEE EARNINGS' -
+     A                                      'REPORT' 'FROM DATE')
+     A            LTEETO    R               REFFLD(DT)
+     A                                      COLHDG('EMPLOYEE EARNINGS' -
+     A                                      'REPORT' 'TO DATE')
+      *** END ADD ***** 03/24/98 **************************************
+      *** BEGIN ADD *** 09/24/98 **************************************
+     A            LTSE3     R               REFFLD(FLAG)
+     A                                      COLHDG('SPANISH/ENGLISH')
+     A            LTWLF3    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK3 FROM DT')
+     A            LTWLT3    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK3 TO DT')
+     A            LTWLF4    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK4 FROM DT')
+     A            LTWLT4    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK4 TO DT')
+     A            LTWLF5    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK5 FROM DT')
+     A            LTWLT5    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK5 TO DT')
+     A            LTWLF6    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK6 FROM DT')
+     A            LTWLT6    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK6 TO DT')
+     A            LTWLF7    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK7 FROM DT')
+     A            LTWLT7    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK7 TO DT')
+     A            LTWLF8    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK8 FROM DT')
+     A            LTWLT8    R               REFFLD(DT)
+     A                                      COLHDG('DWC3 WK8 TO DT')
+     A            LTD13     R               REFFLD(RMCD)
+     A                                      COLHDG('DWC13 DARTS RMK CODE')
+      *** END   ADD *** 09/24/98 **************************************
+      *** START ADD *** 11/01/98 **************************************
+     A            LT#BFM    R               REFFLD(A30)
+     A                                      COLHDG('# OF BLANK DWC3 FRMS')
+      *** END   ADD *** 11/01/98 **************************************
+      **** BEGIN ADD **** 03/23/99 ************************************
+      *
+      * MEDICAL RECORDS LETTER
+      *
+     A            LTRZIP    R               REFFLD(ZIP)
+     A            LTRST     R               REFFLD(ST)
+     A            LTRNAM    R               REFFLD(NM30)
+     A                                      COLHDG('NAME')
+     A            LTRMRL    R               REFFLD(FLAG)
+     A                                      COLHDG('REQUEST' 'MEDICAL RECORDS ')
+     A            LTRMOD    R               REFFLD(MOD)
+     A            LTRFEI    R               REFFLD(FEIN)
+     A            LTRCTY    R               REFFLD(CTY)
+     A                                      COLHDG('CITY')
+     A            LTRAD1    R               REFFLD(NM30)
+     A                                      COLHDG('ADDRESS')
+      *
+      * NWCC-4 FORM
+      *
+     A            LTNWC4    R               REFFLD(FLAG)
+     A            LTPAFL    R               REFFLD(FLAG)
+      **** END   ADD **** 03/23/99 ************************************
+      **** BEGIN ADD **** 07/06/00 *********************************************
+     A            LTWKEN         5  1       COLHDG('WKS ENTITLEMENT')
+      **** END   ADD **** 07/06/00 *********************************************
+      *** BEG ADD *** 11/02/04 ************************************    *********
+     A            LTDW25    R               REFFLD(FLAG)
+     A                                      COLHDG('DWC-25 FLAG')
+      *** END ADD *** 11/02/04 ************************************    *********
+     A*** Begin add *** 04/01/05 ***********************************************
+     A            LTBAJ1    R               REFFLD(DS3)
+     A                                      TEXT('Benefit adjustment code 1')
+     A            LTBAJ2    R               REFFLD(DS3)
+     A                                      TEXT('Benefit adjustment code 2')
+     A            LTPIRA         6A
+     A                                      TEXT('PI rating')
+     A*** End add ***** 04/01/05 ***********************************************

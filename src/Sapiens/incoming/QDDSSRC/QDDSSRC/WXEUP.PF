@@ -1,0 +1,155 @@
+     A*  (C) COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC., 1997-2003     *
+     A******************************************************************
+     A*  CALENDAR EARNED/UNEARNED REPORT WORKFILE                      *
+     A******************************************************************
+     A*  DESCRIPTIONS:                                                 *
+     A*  A DRIVER FILE FOR THE CALENDAR EARNED/UNEARNED REPORT PGM.    *
+     A*                                                                *
+     A*  CREATED: 12/12/97       PROJECT: CM036       PROGRAMMER: 57   *
+     A******************************************************************
+     A* REVISIONS:                                                     *
+     A*                                                                *
+     A* 01/26/06 C:136 PROJECT: WC1293                                *
+     A*                ADD FIELDS TO BREAK OUT DOMESTIC TERRORISM     *
+     A*                RISK ACT CHARGE                                *
+     A*                                                                *
+     A* 09/01/04 C:136 PROJECT: 93WEH                                 *
+     A*                Add fields for voluntary labor charge.         *
+     A*                                                               *
+     A* 07/26/04 C:136 Project: 93WEE                                 *
+     A*                Add Manual Premium fields.                     *
+     A*                                                               *
+     A* 12/01/03  C:33   Project: WC970                                *
+     A*                  Add field for TERRORISM risk amounts          *
+     A*                                                                *
+     A* 01/07/03  C:35   PROJECT: SUPPORT WA121 #34522                 *
+     A*                  ADD FIELD FOR FULL (NON-PRORATED) EXPENSE     *
+     A*                  CONSTANT.                                     *
+     A*                                                                *
+     A* 10/22/02  C:142  PROJECT: WC1094                               *
+     A*                  ADD STATE                                     *
+     A*                                                                *
+     A* 05/11/00  C:65   PROJECT: WC609                                *
+     A*                  ADD FLAG FOR AUDIT REVERSAL DESIGNATION.      *
+     A*                                                                *
+     A* 08/12/99  C:35   PROJECT: 100BI                                *
+     A*                  ADDED FIELDS FOR EXPENSE CONSTANT AND PRORATA *
+     A*                  FACTOR.                                       *
+     A*                                                                *
+     A* 08/06/98  C:35   PROJECT: CM036                                *
+     A*                  ADDED FIELD EUFAF2 TO GET FILE IN SYNCH WITH  *
+     A*                  HUMANA'S CURRENT VERSION.                     *
+     A*                                                                *
+     A******************************************************************
+     A
+     A                                      REF(WREFP)
+     A
+     A          R PEU01                     TEXT('CALENDAR EARN/UNEARN WRKF')
+     A
+     A            EUCO#     R               REFFLD(CO#)
+     A            EUFND     R               REFFLD(FND)
+     A            EUEMP#    R               REFFLD(EMP#)
+     A            EUDIV     R               REFFLD(DIV)
+     A            EUFYR     R               REFFLD(FYR)
+     A            EUPRDT    R               REFFLD(DT)
+     A                                      COLHDG('PROCESS' 'DATE')
+     A            EUSORT    R               REFFLD(FLAG)
+     A                                      COLHDG('ADDTL' 'ORDERING' 'FIELD')
+     A            EUNAME    R               REFFLD(NAME)
+     A            EUARCD    R               REFFLD(CODE)
+     A                                      COLHDG('AR TYPE CODE')
+     A            EUAMT     R               REFFLD(A92)
+     A                                      COLHDG('AR AMOUNT')
+     A            EUTRDT    R               REFFLD(DT)
+     A                                      COLHDG('TRANSACTION DATE')
+     A            EUPODT    R               REFFLD(DT)
+     A                                      COLHDG('POSTING' 'DATE')
+     A            EUFAF     R               REFFLD(FLAG)
+     A                                      COLHDG('FINAL' 'AUD' 'FLAG')
+     A            EUIAPR    R               REFFLD(A112)
+     A                                      COLHDG('INFORCE' 'ANNUAL' +
+     A                                      'PREMIUM')
+     A            EUWAPR    R               REFFLD(A112)
+     A                                      COLHDG('WRITTEN' 'ANNUAL' +
+     A                                      'PREMIUM')
+     A            EUWNMP    R               REFFLD(A112)
+     A                                      COLHDG('WRITTEN' 'NORMAL' +
+     A                                      'PREMIUM')
+     A            EUJAPR    R               REFFLD(A112)
+     A                                      COLHDG('INF CHG' 'ANNUAL' +
+     A                                      'PREMIUM')
+     A            EUXAPR    R               REFFLD(A112)
+     A                                      COLHDG('WRT CHG' 'ANNUAL' +
+     A                                      'PREMIUM')
+     A            EUXNMP    R               REFFLD(A112)
+     A                                      COLHDG('WRT CHG' 'NORMAL' +
+     A                                      'PREMIUM')
+     A            EURWDT    R               REFFLD(DT)
+     A                                      COLHDG('REWRITE' 'DATE')
+     A            EURWFL    R               REFFLD(FLAG)
+     A                                      COLHDG('REWRITE' 'FLAG')
+     A            EUIDT     R               REFFLD(DT)
+     A                                      COLHDG('ORIG REC' 'DATE MAINT')
+     A            EUITM     R               REFFLD(TIME)
+     A                                      COLHDG('ORIG REC' 'TIME MAINT')
+      **** BEGIN ADD **** 08/06/98 *********************************************
+     A            EUFAF2    R               REFFLD(FLAG)
+     A                                      COLHDG('RPT FINAL AUD. FLAG')
+      **** END   ADD **** 08/06/98 *********************************************
+      **** BEGIN ADD **** 08/12/99 *********************************************
+     A            EUPRTD    R               REFFLD(A112)
+     A                                      COLHDG('EXPENSE CONSTANT')
+     A            EUPROR    R               REFFLD(A53)
+     A                                      COLHDG('PRORATA FACTOR')
+      **** BEGIN ADD **** 08/12/99 *********************************************
+      **** BEGIN ADD **** 05/11/00 *********************************************
+     A            EUREVF    R               REFFLD(FLAG)
+     A                                      COLHDG('AUDIT REVERSAL FLAG')
+      **** END   ADD **** 05/11/00 *********************************************
+      **** BEGIN ADD **** 10/22/02 *********************************************
+     A            EUST      R               REFFLD(ST)
+      **** END   ADD **** 10/22/02 *********************************************
+      **** BEGIN ADD **** 01/07/03 *********************************************
+     A            EUPRTF    R               REFFLD(A112)
+     A                                      COLHDG('ANNUAL EXP CNST')
+      **** END   ADD **** 01/07/03 *********************************************
+      ***  Begin Add  ***  12/01/03  **************************************
+     A            EUWTER    R               REFFLD(A112)
+     A                                      COLHDG('WRTN TERRORISM RISK')
+     A            EUXTER    R               REFFLD(A112)
+     A                                      COLHDG('WRTN CHG TERROR RISK')
+     A            EUITER    R               REFFLD(A112)
+     A                                      COLHDG('INFC TERRORISM RISK')
+     A            EUJTER    R               REFFLD(A112)
+     A                                      COLHDG('INFC CHG TERROR RISK')
+      ***  Begin Add  ***  12/01/03  **************************************
+      *** Beg Add ***** 07/26/04 ******************************************
+     A            EUIMPR        11S 2
+     A                                      COLHDG('INFC MAN PREMIUM')
+     A            EUWMPR        11S 2
+     A                                      COLHDG('WRTN MAN PREMIUM')
+     A            EUJMPR        11S 2
+     A                                      COLHDG('INFC CHG MAN PREM')
+     A            EUXMPR        11S 2
+     A                                      COLHDG('WRTN CHG MAN PREM')
+      *** End Add ***** 07/26/04 ******************************************
+     A*** BEG ADD ***** 09/01/04 ******************************************
+     A            EUIVLC    R     S         REFFLD(A112)
+     A                                      COLHDG('INF VOL' 'LABOR CHG')
+     A            EUWVLC    R     S         REFFLD(A112)
+     A                                      COLHDG('WRTN VOL' 'LABOR CHG')
+     A            EUJVLC    R     S         REFFLD(A112)
+     A                                      COLHDG('INF CHG VOL' 'LABOR CHG')
+     A            EUXVLC    R     S         REFFLD(A112)
+     A                                      COLHDG('WRTN CHG VOL' 'LABOR CHG')
+     A*** END ADD ***** 09/01/04 ******************************************
+     A*** BEG ADD ***** 01/26/06 ******************************************
+     A            EUWDTR    R     S         REFFLD(A112)
+     A                                      COLHDG('WRITTEN' 'DOM TERROR')
+     A            EUXDTR    R     S         REFFLD(A112)
+     A                                      COLHDG('WRTN CHG' 'DOM TERROR')
+     A            EUIDTR    R     S         REFFLD(A112)
+     A                                      COLHDG('INFORCE' 'DOM TERROR')
+     A            EUJDTR    R     S         REFFLD(A112)
+     A                                      COLHDG('INF CHG' 'DOM TERROR')
+     A*** END ADD ***** 01/26/06 ******************************************

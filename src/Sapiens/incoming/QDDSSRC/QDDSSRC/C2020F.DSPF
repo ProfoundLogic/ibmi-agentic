@@ -1,0 +1,214 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   FORMAT DESCRIPTION:                                      **
+     A**   Billing Code Table Maintenance                           **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A*                                     CHGINPDFT(CS)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A*            09:05:15    MSHARPE     REL-R08M00  5714-UT1
+     A                                      CF05
+     A                                      SETOF(20)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C2020F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  8 27'Billing Schedule Code:'
+     A            SCCODE    R        B  8 50REFFLD(CODE)
+     A                                      TEXT('BILLING SCHEDULE CODE')
+     A  20                                  ERRMSGID(CCR0514 *LIBL/CMESGG)
+     A                                 23  2'F3=Exit         '
+     A                                      COLOR(BLU)
+     A                                 23 30'F5=Search   '
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A                                      CF12
+     A                                      CF10
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A N09N40                               CF20
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C2020F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A N09        SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  4  3'Billing Code:'
+     A            SCCODE    R        O  4 19REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A                                  4 31'Status:'
+     A            SCSTAT    R        O  4 40REFFLD(STAT)
+     A                                      DSPATR(HI)
+     A                                  5 18'Description:'
+     A            SCDESC    R        B  5 33REFFLD(DS30)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('DESCRIPTION')
+     A  20                                  ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A                                  6 18'Account Current / Direct Billing (-
+     A                                      C/D):'
+     A            SCACDB    R        B  6 62REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      TEXT('FLAG')
+     A  21                                  ERRMSGID(CCR0516 *LIBL/CMESGG)
+     A                                  7 18'Installment Fee (Y/N)?:'
+     A            SCINFE    R        B  7 44REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      TEXT('INSTALLMENT FEE')
+     A  24                                  ERRMSGID(CCR0513 *LIBL/CMESGG)
+     A                                  7 48'A/R Trans. Code:'
+     A            SCINCD    R        B  7 65REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      TEXT('A/R TRANS. CODE')
+     A                                  8 18'Installment Fee Amount:'
+     A            SCINAM    R        B  8 44REFFLD(A72)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      TEXT('INSATLLMENT FEE AMOUNT')
+     A  23                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A                                 10 29'Period 1:'
+     A            SCAB01    R        B 10 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A                                      TEXT('PERCENTAGE')
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 11 36'2:'
+     A            SCAB02    R        B 11 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 12 36'3:'
+     A            SCAB03    R        B 12 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 13 36'4:'
+     A            SCAB04    R        B 13 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 14 36'5:'
+     A            SCAB05    R        B 14 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 15 36'6:'
+     A            SCAB06    R        B 15 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 16 36'7:'
+     A            SCAB07    R        B 16 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 17 36'8:'
+     A            SCAB08    R        B 17 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 18 36'9:'
+     A            SCAB09    R        B 18 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 19 35'10:'
+     A            SCAB10    R        B 19 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 20 35'11:'
+     A            SCAB11    R        B 20 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 21 35'12:'
+     A            SCAB12    R        B 21 41REFFLD(PC43)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0517 *LIBL/CMESGG)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 21'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 41'F10=Table search'
+     A                                      COLOR(BLU)
+     A N09N40                          23 64'F20=Chg status'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND PR)

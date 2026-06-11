@@ -1,0 +1,132 @@
+     A*****************************************************************
+      * (c) 2012 StoneRiver, Inc. All rights Reserved.
+      * StoneRiver is a trademark of StoneRiver, Inc.
+     A*****************************************************************
+     A** WCMC PAYEE DEMOGRAPHICS MASTER FILE
+     A**
+     A*****************************************************************     *
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 02/07/18 C:180 Project: C114MJC                               *
+     A*                Add 835 payment advice field.                  *
+     A*                                                               *
+     A* 01/31/12 C:189 Project: WC2109                                *
+     A*                Transform: Add Clm Contacts email fields       *
+     A*                                                               *
+     A* 02/16/09 C:198 Project: MC330                                 *
+     A*                Added PDTAXO.                                  *
+     A*                                                               *
+     A* 12/10/07 C:198 Project: FL064                                 *
+     A*                Expanded license# field to 13 characters.      *
+     A*                                                               *
+     A* 03/07/04  C:15   PROJECT: WC1268                              *
+     A*                  Added out of country address fields.         *
+     A*
+     A* 02/07/01 C:62  Proj: 114MBA
+     A*                UPDATE SOURCE COMMENT OF PDVFLG.
+     A*
+     A*  07/03/97 C:31  Project: 87MCD
+     A*                 Loading BWC Provider Types
+     A*                 1. Add OH BWC Provider Type (PDBWCT)
+     A*
+     A*  03/06/97 C:31  Project: 87MBQ
+     A*                 Load BWC Providers/Anthem
+     A*                 1. Add WC Cert Date (PDWCDT)
+     A*                 2. Add BWC ID Number (PDBWC#)
+     A*                                                               *
+     A* 01/29/97 C:30 Project: 87MBB                                  *
+     A*          Add fields PDADR2, PDDBA1, PDFXAR, PDFAX#, PDWCCE,   *
+     A*          and PDAMOD.                                          *
+     A*
+     A* 02/22/93 C:05  Proj: 40MAK
+     A*                Source created for PF in FS003 to define usage of fields
+     A*
+     A***********************************************************************
+     A                                      REF(FSREFP)
+     A          R PPD01                     TEXT('PAYEE DEMOGRAPHICS MSTR FILE')
+     A            PDFEIN    R               REFFLD(FEIN)
+     A            PDMOD     R               REFFLD(MOD)
+     A            PDNAME    R               REFFLD(NAME)
+     A            PDFSN     R               REFFLD(FSN)
+     A            PDTITL    R               REFFLD(TITL)
+     A            PDADR1    R               REFFLD(ADR1)
+     A            PDCTY     R               REFFLD(CTY)
+     A            PDST      R               REFFLD(ST)
+     A            PDZIP     R               REFFLD(ZIP)
+     A            PDAREA    R               REFFLD(AREA)
+     A            PDPHN#    R               REFFLD(PHN#)
+     A            PDSHNM    R               REFFLD(NM10)
+     A                                      COLHDG('SHORT' 'NAME')
+     A            PD1099    R               REFFLD(FLAG)
+     A                                      COLHDG('1099' 'FLAG')
+     A            PDTYPE    R               REFFLD(FLAG)
+     A                                      COLHDG('PAYEE' 'TYPE')
+     A            PDSPCD    R               REFFLD(SPEC)
+     A            PDSTAT    R               REFFLD(STAT)
+     A            PDUSER    R               REFFLD(USER)
+     A            PDPGM     R               REFFLD(PGM)
+     A            PDTIME    R               REFFLD(TIME)
+     A            PDDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A*** BEGIN ADD FOR FEE SCHEDULE FL STATE TAPE SUBMISSION *************
+     A            PDFLIC    R               REFFLD(FEI2)
+     A                                      COLHDG('PHYS' 'FL LIC#')
+     A            PDVFLG    R               REFFLD(FLAG)
+     A                                      COLHDG('LIC#' 'VERIFICATION' 'FLAG')
+     A*           CLT114: Used to trigger message in F0390R, to tell
+     A*                   bill entry user that this may be a possible
+     A*                   problem provider.
+     A*
+     A*******************  Possible Problem Provider
+     A*******************         Usage:  Will be used in F0070R to prevent user
+     A*******************                 from processing bill if prblm provider
+     A***** END ADD FOR FEE SCHEDULE FL STATE TAPE SUBMISSION *************
+     A            PDPARN    R               REFFLD(FLAG)
+     A                                      COLHDG('PARTICIPATING' 'IN NETWORK')
+     A*                                     P = PARTICIPATING
+     A*                                     N = NON-PARTICIPATING
+     A*** BEGIN ADD *** 01/29/97 ****************************************
+     A            PDADR2    R               REFFLD(ADR2)
+     A                                      COLHDG('Address Line 2')
+     A            PDDBA1    R               REFFLD(FLAG)
+     A                                      COLHDG('ADDR1' 'Used as DBA' '(Y/bl-
+     A                                      ank')
+     A            PDFXAR    R               REFFLD(AREA)
+     A                                      COLHDG('FAX#' 'Area' 'Code')
+     A            PDFAX#    R               REFFLD(PHN#)
+     A                                      COLHDG('FAX#' 'Phone')
+     A            PDWCCE    R               REFFLD(FLAG)
+     A                                      COLHDG('WC' 'Certified' 'Y/N')
+     A            PDAMOD         4A
+     A                                      COLHDG('Anthem' 'Modifier')
+     A*** END   ADD *** 01/29/97 ****************************************
+     A*** BEGIN ADD ** 03/06/97 ************************************************
+     A            PDWCDT    R               REFFLD(DT)
+     A                                      COLHDG('WC' 'Cert' 'Date')
+     A            PDBWC#        11          TEXT('BWC ID Number')
+     A*** END ADD ** 03/06/97 **************************************************
+     A*** BEGIN ADD ** 07/03/97 ************************************************
+     A            PDBWCT    R               REFFLD(A30)
+     A                                      COLHDG('OH BWC' 'Prov Type')
+     A*** END ADD ** 07/03/97 **************************************************
+     A*** Begin add *** 03/07/05 **************************************
+     A            PDCTRY         3A         COLHDG('COUNTRY CODE')
+     A            PDADR3    R               REFFLD(DS40)
+     A                                      COLHDG('CITY/PROV/POSTAL CD')
+     A*** End add ***** 03/07/05 **************************************
+     A*** Begin Add *** 12/10/07 **************************************
+     A            PDLIC#        13A         COLHDG('PHYS' 'FL LIC#')
+     A*** End   Add *** 12/10/07 **************************************
+     A*** Begin Add *** 02/16/09 **************************************
+     A            PDTAXO    R               REFFLD(DS15)
+     A                                      COLHDG('Taxonomy Code')
+     A*** End   Add *** 12/10/07 **************************************
+     A*** Beg Add *** 01/31/12 **********************************************
+     A            PDEMAD    R               REFFLD(DS60)
+     A                                      COLHDG('E-mail' -
+     A                                      'Address')
+     A*** End Add *** 01/31/12 **********************************************
+     A*** Beg Add *** 02/07/18 **********************************************
+     A            PD835P    R               REFFLD(FLAG)
+     A                                      COLHDG('835 Payment Advice')
+     A*** End Add *** 02/07/18 **********************************************

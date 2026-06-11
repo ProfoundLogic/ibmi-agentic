@@ -1,0 +1,231 @@
+     A*%%TS  SD  20091215  084409  FG11RS      REL-V5R3M0  5722-WDS
+     A*****************************************************************
+     A* (c) 2009 StoneRiver, Inc. All rights Reserved.                *    *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                 *    *
+     A*****************************************************************
+     A*  Title: Work with HES Bills with Errors                       *
+     A*****************************************************************
+     A*  CREATED BY C:227  11/03/09  Project : 135MMX                 *
+     A*****************************************************************
+     A*  Revisions:                                                   *
+     A*****************************************************************
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/FSREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A          R SCR01
+     A*%%TS  SD  20091215  084409  FG11RS      REL-V5R3M0  5722-WDS
+     A                                      KEEP
+     A                                      ASSUME
+     A N09N16N26                            CF10
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A            HREC          10A  H
+     A            HFLD          10A  H
+     A            SCPRDS    R        H      REFFLD(NAME)
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDX    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR01'
+     A N16 17N09                        3 24'Press Enter to issue check request-
+     A                                      s'
+     A                                      COLOR(BLU)
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A                                  4  2'HES Bill ID . . . . . :'
+     A            SCCR#         25A  O  4 26
+     A N26                                  DSPATR(HI)
+     A N16                              6  2'Claimant  . . . . . . :'
+     A  16                              6  2'Bill deletion reason. :'
+     A N16        SCCNAM        30A  O  6 26
+     A N26                                  DSPATR(HI)
+     A N16                              7  2'Claim # . . . . . . . :'
+     A  16        SCDLRE        70A  B  7  2DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  73                                  ERRMSGID(MCR0355 *LIBL/FSMESG)
+     A                                      CHECK(LC)
+     A N16        SCFND          3Y 0B  7 26
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A N26                                  DSPATR(HI)
+     A N09N26                               DSPATR(UL)
+     A  09
+     AO 26                                  DSPATR(PR)
+     A  71                                  ERRMSGID(MCR0681 *LIBL/FSMESG)
+     A  74                                  ERRMSGID(MCR2480 *LIBL/FSMESG)
+     A N16                              7 30'-'
+     A N16        SCFYR          3Y 0B  7 32
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A N26                                  DSPATR(HI)
+     A N09N26                               DSPATR(UL)
+     A  09
+     AO 26                                  DSPATR(PR)
+     A  71                                  ERRMSGID(MCR0681 *LIBL/FSMESG)
+     A N16                              7 36'-'
+     A N16        SCCASE         7Y 0B  7 38
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A N26                                  DSPATR(HI)
+     A N09N26                               DSPATR(UL)
+     A  09
+     AO 26                                  DSPATR(PR)
+     A  71                                  ERRMSGID(MCR0681 *LIBL/FSMESG)
+     A N16                              8  2'Social Security # . . :'
+     A N16        SCSS#          9A  B  8 26
+     A N26                                  DSPATR(HI)
+     A N09N26                               DSPATR(UL)
+     A N16                              8 38'Date of Injury :'
+     A N16        SCACDT         8Y 0B  8 55EDTWRD('0  /  /    ')
+     A N26                                  DSPATR(HI)
+     A N09N26                               DSPATR(UL)
+     A N16                             10  2'Provider FEIN/mod . . :'
+     A N16        SCFEIN         9Y 0O 10 26
+     A                                      EDTCDE(4)
+     A N26                                  DSPATR(HI)
+     A  32                                  DSPATR(PC)
+     A  72                                  ERRMSGID(MCR0902 *LIBL/FSMESG)
+     A N16        SCMOD          3Y 0O 10 36
+     A***                                   EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A N16        SCPNAM        35A  O 10 42
+     A N26                                  DSPATR(HI)
+     A N16        SCPAD1        40A  O 11 26
+     A N26                                  DSPATR(HI)
+     A N16        SCPCTY        25A  O 12 26
+     A N26                                  DSPATR(HI)
+     A N16        SCPST          2A  O 12 50
+     A N26                                  DSPATR(HI)
+     A N16        SCPZIP         9Y 0O 12 53EDTCDE(4)
+     A N26                                  DSPATR(HI)
+     A N16                             14  2'Error Type'
+     A N16                             14 14'Description'
+     A N16                             14 41'Error Type'
+     A N16                             14 53'Description'
+     A N16        SCET01        10A  O 15  2COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED01        25A  O 15 14COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET02        10A  O 15 41COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED02        25A  O 15 53COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET03        10A  O 16  2COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED03        25A  O 16 14COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET04        10A  O 16 41COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED04        25A  O 16 53COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET05        10A  O 17  2COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED05        25A  O 17 14COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET06        10A  O 17 41COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED06        25A  O 17 53COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET07        10A  O 18  2COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED07        25A  O 18 14COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET08        10A  O 18 41COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED08        25A  O 18 53COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET09        10A  O 19  2COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED09        25A  O 19 14COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET10        10A  O 19 41COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED10        25A  O 19 53COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET11        10A  O 20  2COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED11        25A  O 20 14COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET12        10A  O 20 41COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED12        25A  O 20 53COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET13        10A  O 21  2COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED13        25A  O 21 14COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET14        10A  O 21 41COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED14        25A  O 21 53COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET15        10A  O 22  2COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED15        25A  O 22 14COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCET16        10A  O 22 41COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A N16        SCED16        25A  O 22 53COLOR(BLU)
+     A N26                                  DSPATR(HI)
+     A  09
+     AO 16                             23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A N09N16                          23  2'F3=Exit   F10=Search   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A*%%TS  SD  20000721  144212  WINNERW     REL-V4R4M0  5769-PW1
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR02'
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A                                 23  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A                                 11 26'Hit enter to process. . . . .'
+     A                                      DSPATR(BL)
+     A                                      DSPATR(HI)
+     A                                      COLOR(BLU)
+     A                                      DSPATR(RI)
+     A          R SCR03
+     A*%%TS  SD  19961002  163549  FREEMANT    REL-V3R6M0  5716-PW1
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10   O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR03'
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R WDW01
+     A*%%TS  SD  20031211  094908  WINNERW     REL-V4R4M0  5769-PW1
+     A                                      WINDOW(3 4 12 70)
+     A                                  1  2USER
+     A            SCPRDS    R        O  1 16REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 66'WDW01'
+     A                                 11  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A                                  5  6'This bill may issue duplicate paym-
+     A                                      ents.  If you wish to'
+     A                                      COLOR(BLU)
+     A                                  6  6'continue hit enter, else press F12-
+     A                                      =Cancel.'
+     A                                      COLOR(BLU)

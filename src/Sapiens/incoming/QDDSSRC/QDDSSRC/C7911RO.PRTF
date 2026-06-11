@@ -1,0 +1,51 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   A/R BALANCE BY POLICY REPORT                             **
+     A**                                                            **
+     A**   PROGRAMMER: C:41                                         **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      REF(*LIBL/CREFP)
+     A*  AGENT MASTER RECORD FORMAT *                                  *********
+     A          R AGMRECF
+     A*                                                                *********
+     A            AGNAME    R           6 18REFFLD(NM40)
+     A            AGMAD1    R           7 18REFFLD(ADR1 *LIBL/SREFP)
+     A            XXCSTZ    R           8 18REFFLD(ADR2 *LIBL/SREFP)
+     A*
+     A*  POLICY MASTER RECORD FORMAT *                                 *********
+     A          R PMMRECF
+     A            PMFIN     R          13 27REFFLD(NM40)
+     A            DSDATE         6  0O 13102EDTCDE(Y)
+     A            PMDBA     R          14 27REFFLD(NM40)
+     A            PMPOL#    R          15 27REFFLD(POL#)
+     A*                                                                *********
+     A*  POSITON CARRAGE RETURN *                                      *********
+     A          R POSLINE                   SKIPB(18)
+     A*                                                                *********
+     A*  A/R DETAIL RECORD FORMAT *                                    *********
+     A          R ARDRECF
+     A            ARTRDT    R             19REFFLD(DT *LIBL/SREFP)
+     A                                      EDTCDE(Y)
+     A            ARPODT    R             29REFFLD(DT *LIBL/SREFP)
+     A                                      EDTCDE(Y)
+     A            ARPYCD    R             39REFFLD(CODE)
+     A            ARDESC    R             43REFFLD(DS30)
+     A            ARCHK#    R             75REFFLD(CHK#)
+     A                                      EDTCDE(Z)
+     A            ARAMT     R             84REFFLD(A92)
+     A                                      EDTCDE(J)
+     A            TAMT      R            113REFFLD(A112)
+     A                                      EDTCDE(J)
+     A                                      SPACEA(001)
+     A*                                                                *********
+     A*  TOTAL BALANCE DUE FORMAT *                                    *********
+     A          R TBALDUE                   SPACEB(002)
+     A                                    67'BALANCE DUE:'
+     A            TBAL      R             82REFFLD(A112)
+     A                                      EDTCDE(J)

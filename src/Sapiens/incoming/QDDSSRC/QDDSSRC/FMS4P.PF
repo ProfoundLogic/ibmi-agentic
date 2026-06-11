@@ -1,0 +1,132 @@
+     A*****************************************************************
+     A** (C) COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC., 1997 - 1999
+     A*****************************************************************
+     A**   PROVIDER NETWORK CONTRACT FILE                            **
+     A**                                                             **
+     A** This file associates a network contract to a specific       **
+     A** provider.  This will replaces the use of NMPHP & NMHSP as   **
+     A** a contract file.                                            **
+     A**                                                             **
+     A**   PROGRAMMER: C:61                                          **
+     A**   CREATED:   09/18/97      PROJECT: 87MAU                   **
+     A*****************************************************************
+     A** REVISIONS:
+     A*  06/07/99 C:31  Project: 48MCW
+     A*                 Network contract pop-up window
+     A*                 1. Add network control number
+     A*
+     A*  01/15/98 C:31  Project: 60MBS
+     A*                 Anthem Network
+     A*                 1. Change NINT and CNT# field sizes.
+     A*****************************************************************
+     A**
+     A                                      REF(FSREFP)
+     A          R PS401                     TEXT('PROVIDER NETWORK CONTRACT')
+     A            S4FEIN    R               REFFLD(FEIN)
+     A                                      COLHDG('FEDERAL TAX ID')
+     A            S4MOD     R               REFFLD(MOD)
+     A                                      COLHDG('MODIFIER')
+     A            S4NWCD    R               REFFLD(DS5)
+     A                                      COLHDG('NETWORK CODE')
+     A            S4NINT    R               REFFLD(DS15)
+     A                                      COLHDG('NETWORK INTERNAL #')
+     A*** BEGIN CHG *** 01/15/98 **************************************
+     A********    S4CNT#    R               REFFLD(A50)
+     A            S4CNT#    R               REFFLD(DS15)
+     A*** END CHG *** 01/15/98 ****************************************
+     A                                      COLHDG('UNIQUE CONTRACT ID')
+     A            S4SYS     R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEM TYPE')
+      *               Valid values from FTGTP via "SYS"
+      *
+     A            S4STYP    R               REFFLD(DS3)
+     A                                      COLHDG('SYSTEM SUB-TYPE')
+      *               Valid values from FTGTP via "STYP"
+      *
+     A            S4BGDT    R               REFFLD(DT7)
+     A                                      COLHDG('CONTRACT BEGIN DATE')
+     A            S4ENDT    R               REFFLD(DT7)
+     A                                      COLHDG('CONTRACT END DATE')
+     A            S4DISC    R               REFFLD(DS3)
+     A                                      COLHDG('NETWORK' 'DISCOUNT CODE')
+     A            S4DISP         6P 2
+     A                                      COLHDG('NETWORK DISCOUNT %')
+     A            S4FEE     R               REFFLD(A92)
+     A                                      COLHDG('FEE CHARGED')
+     A            S4FSFL    R               REFFLD(FLAG)
+     A                                      COLHDG('MANUAL' 'FEE SCHEDULE FLAG')
+      *               Valid Values:
+      *                   Y = Used to specifiy that this provider should
+      *                       have his bill reduced manually, according
+      *                       to contract.  Message will appear in Bill
+      *                       Entry when this provider is entered.
+      *                       Bill Entry forces a claim status code
+      *                       300.  Bill Entry user must manually
+      *                       determine provider's payment.  Bill will
+      *                       not go through discounting.
+      *
+      *                   *BLANK = use discount code
+      *
+      *
+     A            S4ECFL    R               REFFLD(FLAG)
+     A                                      COLHDG('ELEVATED CARE FLAG')
+      *               Valid values:
+      *                    Y = Used to specify that this provider should
+      *                        have his bill reviewed on hospital
+      *                        (service) charges marked for Elevated
+      *                        Care cap, according to contract. Message
+      *                        will appear in Bill Entry when an
+      *                        elevated care service code used for
+      *                        this provider is entered.  Bill entry
+      *                        user must manually determine payment and
+      *                        should use override claim status code
+      *                        301.  These types of charges will NOT go
+      *                        through discounting.
+      *
+      *                    N = n/a
+      *
+     A            S4MDFL    R               REFFLD(FLAG)
+     A                                      COLHDG('MEDICAL DEVICES FLAG')
+      *               Valid values:
+      *                    Y = Used to specify that this provider should
+      *                        have his bill reviewed on hospital
+      *                        (service) charges marked for Medical
+      *                        Devices, according to contract.  Message
+      *                        will appear in Bill Entry when a medical
+      *                        devices service code used for this
+      *                        provider is entered.  Bill entry user
+      *                        must manually determine payment and
+      *                        should use override calim status code
+      *                        302.  These types of charges will NOT go
+      *                        thru discounting.
+      *
+      *                    N = n/a
+      *
+     A            S4RMTH    R               REFFLD(DS3)
+     A                                      COLHDG('REIMBURSEMENT'-
+     A                                       'METHOD CODE')
+      *               Valid values:
+      *                    BASED ON FTGTP VIA 'RMTH'
+      *
+     A            S4STAT    R               REFFLD(STAT)
+     A                                      COLHDG('STATUS')
+     A            S4USER    R               REFFLD(USER)
+     A                                      COLHDG('MAINT USER')
+     A            S4PGM     R               REFFLD(PGM)
+     A                                      COLHDG('MAINT PROGRAM')
+     A            S4TIME    R               REFFLD(TIME)
+     A                                      COLHDG('MAINT TIME')
+     A            S4DT      R               REFFLD(DT7)
+     A                                      COLHDG('MAINT DATE')
+     A            S4IUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            S4IPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL' 'PROGRAM')
+     A            S4ITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL' 'TIME')
+     A            S4IDT     R               REFFLD(DT7)
+     A                                      COLHDG('INITIAL' 'DATE')
+     A*** BEGIN ADD *** 06/07/99 **************************************
+     A            S4NC#     R               REFFLD(DS15)
+     A                                      COLHDG('NETWORK CONTROL #')
+     A*** END ADD *** 06/07/99 ****************************************

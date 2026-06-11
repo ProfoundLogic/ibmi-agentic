@@ -1,0 +1,1464 @@
+     A*%%TS  SD  19970723  113749  WINNERW     REL-V3R6M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   COVERAGE MAINTENANCE - GLASS ITEM DISPLAY                **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF12
+     A                                      SETOF(20)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0116F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  5  2'Policy:'
+     A            SCPOL#    R        O  5 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  5 27'Name:'
+     A            SCFIN     R        O  5 34REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  6  2'Section code:'
+     A            SCCC      R        O  6 17REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A            SCCODS    R        O  6 22REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COV CD DESCRIPTION')
+     A                                  7  2'Location number:'
+     A            SCLOC#    R        O  7 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                      TEXT('LOCATION NUMBER')
+     A                                      DSPATR(HI)
+     A                                  7 27'Building number:'
+     A            SCPRM#    R        O  7 45REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      TEXT('PREMISIS #')
+     A                                      OVRDTA
+     A                                      DSPATR(HI)
+     A                                  7 53'Coverage Code:'
+     A            SCCVBO    R        O  7 69REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                 12 12'Enter an "X" next to the desired o-
+     A                                      peration and Press ENTER.'
+     A            SCADD     R        B 14 33REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  20                                  ERRMSGID(CCR0593 *LIBL/CMESGG)
+     A                                 14 36'Add Items'
+     A            SCUPDT    R        B 16 33REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  20                                  ERRMSGID(CCR0593 *LIBL/CMESGG)
+     A                                 16 36'Update Items'
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 22'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                  3 26'ITEM MAINTENANCE ENTRY/UPDATE'
+     A                                      DSPATR(HI)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR02
+     A*%%TS  SD  19970723  113749  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      CF12
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(33)
+     A                                      SETOF(34)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(39)
+     A                                      SETOF(41)
+     A                                      SETOF(42)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0116F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A            SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  2 76'SCR02'
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 34REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  5  2'Section code:'
+     A            SCCC      R        O  5 17REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A            SCCODS    R        O  5 22REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COV CD DESCRIPTION')
+     A                                  6  2'Location number:'
+     A            SCLOC#    R        O  6 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                      TEXT('LOCATION NUMBER')
+     A                                      DSPATR(HI)
+     A                                  6 29'Building number:'
+     A            SCPRM#    R        O  6 47REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      TEXT('PREMISIS #')
+     A                                      OVRDTA
+     A                                      DSPATR(HI)
+     A                                  6 56'Coverage Code:'
+     A                                  7 70'Eff'
+     A                                  7 76'Stat'
+     A                                  8  1'Item#'
+     A                                      DSPATR(UL)
+     A                                  8  8'Plts'
+     A                                      DSPATR(UL)
+     A                                  8 14'Len'
+     A                                      DSPATR(UL)
+     A                                  8 20'Wdth'
+     A                                      DSPATR(UL)
+     A                                  8 26'Description                       -
+     A                                            '
+     A                                      DSPATR(UL)
+     A                                  8 67'   Date   '
+     A                                      DSPATR(UL)
+     A                                  8 78' '
+     A                                      DSPATR(UL)
+     A            SCIT01    R        O  9  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT02    R        O 10  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT03    R        O 11  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT04    R        O 12  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT05    R        O 13  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT06    R        O 14  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT07    R        O 15  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT08    R        O 16  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT09    R        O 17  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT10    R        O 18  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT11    R        O 19  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT12    R        O 20  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT13    R        O 21  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCIT14    R        O 22  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNP01    R        B  9  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  20 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP02    R        B 10  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  21 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP03    R        B 11  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  22 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP04    R        B 12  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  23 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP05    R        B 13  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  24 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP06    R        B 14  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  25 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP07    R        B 15  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  26 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP08    R        B 16  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  27 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP09    R        B 17  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  28 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP10    R        B 18  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  29 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP11    R        B 19  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  30 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP12    R        B 20  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  31 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP13    R        B 21  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  32 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP14    R        B 22  8REFFLD(PLTS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  33 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN01    R        B  9 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  20 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN02    R        B 10 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  21 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN03    R        B 11 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  22 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN04    R        B 12 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  23 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN05    R        B 13 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  24 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN06    R        B 14 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  25 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN07    R        B 15 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  26 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN08    R        B 16 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  27 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN09    R        B 17 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  28 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN10    R        B 18 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  29 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN11    R        B 19 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  30 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN12    R        B 20 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  31 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN13    R        B 21 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  32 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN14    R        B 22 14REFFLD(LEN)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  33 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD01    R        B  9 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  20 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD02    R        B 10 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  21 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD03    R        B 11 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  22 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD04    R        B 12 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  23 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD05    R        B 13 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  24 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD06    R        B 14 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  25 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD07    R        B 15 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  26 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD08    R        B 16 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  27 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD09    R        B 17 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  28 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD10    R        B 18 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  29 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD11    R        B 19 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  30 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD12    R        B 20 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  31 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD13    R        B 21 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  32 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCWD14    R        B 22 20REFFLD(WIDH)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  33 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('WIDTH OF PLATE')
+     A            SCDD01    R        B  9 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  20 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD02    R        B 10 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  21 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD03    R        B 11 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  22 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD04    R        B 12 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  23 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD05    R        B 13 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  24 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD06    R        B 14 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  25 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD07    R        B 15 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  26 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD08    R        B 16 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  27 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD09    R        B 17 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  28 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD10    R        B 18 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  29 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD11    R        B 19 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  30 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD12    R        B 20 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  31 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD13    R        B 21 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  32 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDD14    R        B 22 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  33 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCDT01    R        B  9 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  20 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT02    R        B 10 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  21 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT03    R        B 11 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  22 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT04    R        B 12 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  23 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT05    R        B 13 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  24 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT06    R        B 14 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  25 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT07    R        B 15 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  26 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT08    R        B 16 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  27 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT09    R        B 17 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  28 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT10    R        B 18 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  29 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT11    R        B 19 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  30 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT12    R        B 20 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  31 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT13    R        B 21 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  32 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT14    R        B 22 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  33 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCST01    R        O  9 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST02    R        O 10 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST03    R        O 11 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST04    R        O 12 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST05    R        O 13 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST06    R        O 14 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST07    R        O 15 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST08    R        O 16 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST09    R        O 17 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST10    R        O 18 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST11    R        O 19 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST12    R        O 20 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST13    R        O 21 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCST14    R        O 22 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 23'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A            SCFL99    R        O 23 75REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  41                                  ERRMSGID(CCR0595 *LIBL/CMESGG)
+     A                                      TEXT('FLAG')
+     A                                      OVRDTA
+     A            SCCVBO    R        O  6 72REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  3 24'ITEM MAINTENANCE DESCRIPTION ENTRY'
+     A                                      DSPATR(HI)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR03
+     A*%%TS  SD  19970723  113749  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      CF12
+     A N09                                  CF02
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      SETOF(15)
+     A                                      SETOF(16)
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(33)
+     A                                      SETOF(34)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(39)
+     A                                      SETOF(41)
+     A                                      SETOF(42)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0116F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A N09        SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  2 76'SCR03'
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 34REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  5  2'Section code:'
+     A            SCCC      R        O  5 17REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A            SCCODS    R        O  5 22REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COV CD DESCRIPTION')
+     A                                  6  2'Location number:'
+     A            SCLOC#    R        O  6 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                      TEXT('LOCATION NUMBER')
+     A                                      DSPATR(HI)
+     A                                  6 29'Building number:'
+     A            SCPRM#    R        O  6 47REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      TEXT('PREMISIS #')
+     A                                      OVRDTA
+     A                                      DSPATR(HI)
+     A                                  6 56'Coverage Code:'
+     A            SCFL98    R        O  7  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  15                                  ERRMSGID(CCR0600 *LIBL/CMESGG)
+     A  16                                  ERRMSGID(CCR0627 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                  7  6'Item #:'
+     A            SCITM#    R        B  7 15REFFLD(ITM#)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                  7 70'Eff'
+     A                                  7 76'Stat'
+     A                                  8  1'Item#'
+     A                                      DSPATR(UL)
+     A                                  8  8'Plts'
+     A                                      DSPATR(UL)
+     A                                  8 14'Len'
+     A                                      DSPATR(UL)
+     A                                  8 20'Wdth'
+     A                                      DSPATR(UL)
+     A                                  8 26'Description                       -
+     A                                            '
+     A                                      DSPATR(UL)
+     A                                  8 67'   Date   '
+     A                                      DSPATR(UL)
+     A                                  8 78' '
+     A                                      DSPATR(UL)
+     A            SCIT01    R        O  9  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT02    R        O 10  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT03    R        O 11  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT04    R        O 12  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT05    R        O 13  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT06    R        O 14  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT07    R        O 15  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT08    R        O 16  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT09    R        O 17  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT10    R        O 18  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT11    R        O 19  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT12    R        O 20  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT13    R        O 21  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCIT14    R        O 22  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  09                                  DSPATR(HI)
+     A            SCNP01    R        B  9  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  70
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  20 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP02    R        B 10  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  71
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  21 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP03    R        B 11  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  72
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  22 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP04    R        B 12  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  73
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  23 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP05    R        B 13  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  74
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  24 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP06    R        B 14  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  75
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  25 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP07    R        B 15  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  76
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  26 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP08    R        B 16  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  77
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  27 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP09    R        B 17  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  78
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  28 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP10    R        B 18  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  79
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  29 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP11    R        B 19  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  80
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  30 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP12    R        B 20  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  81
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  31 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP13    R        B 21  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  82
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  32 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCNP14    R        B 22  8REFFLD(PLTS)
+     A  09                                  DSPATR(HI)
+     A  83
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  33 34 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN01    R        B  9 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  70
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  20 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN02    R        B 10 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  71
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  21 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN03    R        B 11 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  72
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  22 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN04    R        B 12 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  73
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  23 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN05    R        B 13 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  74
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  24 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN06    R        B 14 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  75
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  25 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN07    R        B 15 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  76
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  26 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN08    R        B 16 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  77
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  27 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN09    R        B 17 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  78
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  28 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN10    R        B 18 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  79
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  29 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN11    R        B 19 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  80
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  30 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN12    R        B 20 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  81
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  31 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN13    R        B 21 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  82
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  32 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCLN14    R        B 22 14REFFLD(LEN)
+     A  09                                  DSPATR(HI)
+     A  83
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  33 35 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD01    R        B  9 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  70
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  20 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD02    R        B 10 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  71
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  21 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD03    R        B 11 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  72
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  22 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD04    R        B 12 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  73
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  23 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD05    R        B 13 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  74
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  24 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD06    R        B 14 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  75
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  25 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD07    R        B 15 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  76
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  26 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD08    R        B 16 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  77
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  27 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD09    R        B 17 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  78
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  28 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD10    R        B 18 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  79
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  29 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD11    R        B 19 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  80
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  30 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD12    R        B 20 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  81
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  31 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD13    R        B 21 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  82
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  32 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCWD14    R        B 22 20REFFLD(WIDH)
+     A  09                                  DSPATR(HI)
+     A  83
+     AO 09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  33 36 42                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCDD01    R        B  9 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  20 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  70
+     AO 09                                  DSPATR(PR)
+     A            SCDD02    R        B 10 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  21 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  71
+     AO 09                                  DSPATR(PR)
+     A            SCDD03    R        B 11 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  22 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  72
+     AO 09                                  DSPATR(PR)
+     A            SCDD04    R        B 12 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  23 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  73
+     AO 09                                  DSPATR(PR)
+     A            SCDD05    R        B 13 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  24 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  74
+     AO 09                                  DSPATR(PR)
+     A            SCDD06    R        B 14 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  25 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  75
+     AO 09                                  DSPATR(PR)
+     A            SCDD07    R        B 15 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  26 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  76
+     AO 09                                  DSPATR(PR)
+     A            SCDD08    R        B 16 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  27 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  77
+     AO 09                                  DSPATR(PR)
+     A            SCDD09    R        B 17 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  28 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  78
+     AO 09                                  DSPATR(PR)
+     A            SCDD10    R        B 18 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  29 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  79
+     AO 09                                  DSPATR(PR)
+     A            SCDD11    R        B 19 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  30 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  80
+     AO 09                                  DSPATR(PR)
+     A            SCDD12    R        B 20 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  31 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  81
+     AO 09                                  DSPATR(PR)
+     A            SCDD13    R        B 21 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  32 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  82
+     AO 09                                  DSPATR(PR)
+     A            SCDD14    R        B 22 26REFFLD(DS40)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  33 37 42                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A  83
+     AO 09                                  DSPATR(PR)
+     A            SCDT01    R        B  9 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  20 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  70
+     AO 09                                  DSPATR(PR)
+     A            SCDT02    R        B 10 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  21 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  71
+     AO 09                                  DSPATR(PR)
+     A            SCDT03    R        B 11 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  22 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  72
+     AO 09                                  DSPATR(PR)
+     A            SCDT04    R        B 12 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  23 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  73
+     AO 09                                  DSPATR(PR)
+     A            SCDT05    R        B 13 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  24 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  74
+     AO 09                                  DSPATR(PR)
+     A            SCDT06    R        B 14 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  25 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  75
+     AO 09                                  DSPATR(PR)
+     A            SCDT07    R        B 15 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  26 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  76
+     AO 09                                  DSPATR(PR)
+     A            SCDT08    R        B 16 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  27 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  77
+     AO 09                                  DSPATR(PR)
+     A            SCDT09    R        B 17 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  28 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  78
+     AO 09                                  DSPATR(PR)
+     A            SCDT10    R        B 18 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  29 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  79
+     AO 09                                  DSPATR(PR)
+     A            SCDT11    R        B 19 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  30 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  80
+     AO 09                                  DSPATR(PR)
+     A            SCDT12    R        B 20 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  31 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  81
+     AO 09                                  DSPATR(PR)
+     A            SCDT13    R        B 21 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  32 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  82
+     AO 09                                  DSPATR(PR)
+     A            SCDT14    R        B 22 67REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  33 38 42                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  83
+     AO 09                                  DSPATR(PR)
+     A            SCST01    R        B  9 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  70
+     AO 09                                  DSPATR(PR)
+     A  20 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST02    R        B 10 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  71
+     AO 09                                  DSPATR(PR)
+     A  21 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST03    R        B 11 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  72
+     AO 09                                  DSPATR(PR)
+     A  22 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST04    R        B 12 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  73
+     AO 09                                  DSPATR(PR)
+     A  23 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST05    R        B 13 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  74
+     AO 09                                  DSPATR(PR)
+     A  24 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST06    R        B 14 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  75
+     AO 09                                  DSPATR(PR)
+     A  25 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST07    R        B 15 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  76
+     AO 09                                  DSPATR(PR)
+     A  26 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST08    R        B 16 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  77
+     AO 09                                  DSPATR(PR)
+     A  27 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST09    R        B 17 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  78
+     AO 09                                  DSPATR(PR)
+     A  28 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST10    R        B 18 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  79
+     AO 09                                  DSPATR(PR)
+     A  29 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST11    R        B 19 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  80
+     AO 09                                  DSPATR(PR)
+     A  30 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST12    R        B 20 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  81
+     AO 09                                  DSPATR(PR)
+     A  31 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST13    R        B 21 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  82
+     AO 09                                  DSPATR(PR)
+     A  32 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A            SCST14    R        B 22 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  83
+     AO 09                                  DSPATR(PR)
+     A  33 39 42                            ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 23'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A N09                             24  2'F2=Change inactive item status '
+     A                                      COLOR(BLU)
+     A            SCUP           9A  O 23 53OVRDTA
+     A            SCDOWN         9A  O 23 67OVRDTA
+     A            SCCVBO    R        O  6 72REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  3 29'ITEM MAINTENANCE DISPLAY'
+     A                                      DSPATR(HI)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)
+     A                                      TEXT('FLAG')

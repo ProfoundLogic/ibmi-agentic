@@ -1,0 +1,146 @@
+     A*****************************************************************
+     A*  (C) Copyright Fiserv Insurance Solutions Inc., 1998-2008     *
+     A**                                                              *
+     A** WCMC EOMB Pharmacy Bill Detail Transaction File              *
+     A*****************************************************************
+     A*  Created by: C:05    Project: MC152    Date: 01/28/98         *
+     A*  NOTE:  See EXCEL spreadsheet FDDPP.XLS to review information *
+     A*         regarding conversion from old database file(s)        *
+     A*****************************************************************
+     A*  REVISIONS:
+     A*
+     A*  09/01/16 C:212  Project: FL091 Phase 2
+     A*                  Add New fields.
+     A*
+     A*  07/03/08 C:198  Project: TX046
+     A*                  1. Added Rendering Provider NPI#.
+     A*
+     A* 03/14/07 C:182  Project: FL067
+     A*                 1. Added Purchase/Rental Indicator.
+     A*                 2. Added HCPCS Code field.
+     A*                 3. Changed field Heading for DPCERT from
+     A*                    'CERTIFICATION (1,2,3,4)' to be
+     A*                    'Dispenced as Written'.
+     A*                         
+     A*   01/10/06 C:163 Project: MC270
+     A*                  Rx New field - "Medical Supplies"
+     A*
+     A*   10/25/05 C:163 Project: 136MBR
+     A*                  Managed Care/Prov Bill Interface Process
+     A*
+     A*   10/31/05 C:163 PROJECT: FL056
+     A*                  FL EDI SCREEN CHANGES
+     A*
+     A*   06/14/99 C:53 PROJECT: MC152
+     A*                 ADD FIELD(S)
+     A*
+     A*  12/11/98  C:94  PROJECT: MC152                               *
+     A*                  ADD FIELDS PER LORRI DAPPER                  *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PDP01                     TEXT('EOMB PHARMACY DETAIL FILE')
+     A            DPCO#     R               REFFLD(CO#)
+     A                                      COLHDG('COMPANY#')
+     A            DPSUB#    R               REFFLD(SUB#)
+     A                                      COLHDG('SUBSCRIBER')
+     A            DPFND     R               REFFLD(FND)
+     A                                      COLHDG('GROUP')
+     A            DPFYR     R               REFFLD(FYR)
+     A                                      COLHDG('YEAR')
+     A            DPCASE    R               REFFLD(CASE)
+     A                                      COLHDG('CASE#')
+     A            DPSS#     R               REFFLD(SS#)
+     A                                      COLHDG('SOC SEC#')
+     A            DPACDT    R               REFFLD(DT)
+     A                                      COLHDG('ACC DATE')
+     A            DPEOB#    R               REFFLD(EOB#)
+     A                                      COLHDG('EOMB#')
+     A            DPDSEQ    R               REFFLD(SEQ#)
+     A                                      COLHDG('DTL' 'SEQ#')
+     A            DPRX#     R               REFFLD(RX#)
+     A                                      COLHDG('PRESCRIPTION' 'NUMBER')
+     A            DPNDC     R               REFFLD(NDC)
+     A                                      COLHDG('NDC' 'CODE')
+     A            DPRXMQ    R               REFFLD(A94)
+     A                                      COLHDG('RX' 'METRIC' 'QTY')
+     A            DPRXMM    R               REFFLD(CODE)
+     A                                      COLHDG('RX' 'METRIC' 'MEAS')
+     A            DPRXDY    R               REFFLD(A50)
+     A                                      COLHDG('RX' 'DAYS' 'SUPPLY')
+     A            DPSTAT    R               REFFLD(STAT)
+     A                                      COLHDG('STATUS')
+     A            DPUSER    R               REFFLD(USER)
+     A                                      COLHDG('MAINT USER')
+     A            DPPGM     R               REFFLD(PGM)
+     A                                      COLHDG('MAINT PGM')
+     A            DPTIME    R               REFFLD(TIME)
+     A                                      COLHDG('MAINT TIME')
+     A            DPDT      R               REFFLD(DT)
+     A                                      COLHDG('MAINT DATE')
+     A            DPIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INIT USER')
+     A            DPIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INIT PGM')
+     A            DPITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INIT TIME')
+     A            DPIDT     R               REFFLD(DT)
+     A                                      COLHDG('INIT DATE')
+     A            DPDESC    R               REFFLD(DS25)
+     A                                      COLHDG('NDC DESC')
+     A*** BEG ADD *** 12/11/98 ***************************************
+     A            DPRXDI    R               REFFLD(CODE)
+     A                                      COLHDG('DRUG DISP INDICATOR')
+     A            DPRXGB    R               REFFLD(FLAG)
+     A                                      COLHDG('GEN/BRAND INDICATOR')
+     A            DPRXRF    R               REFFLD(A30)
+     A                                      COLHDG('NUMBER OF REFILLS')
+     A            DPRXFD    R               REFFLD(DT7)
+     A                                      COLHDG('RX FILLED DATE')
+     A*** END ADD *** 12/11/98 ***************************************
+     A            DPUNTS    R               REFFLD(A52)
+     A                                      COLHDG('UNITS')
+     A*** BEG ADD *** 06/14/99 ************************
+     A            DPBNDC    R               REFFLD(NDC)
+     A                                      COLHDG('BILLED NDC')
+     A*** END ADD *** 06/14/99 ************************
+     A*** BEG ADD *** 10/31/05 ************************
+     A            DPNWRF    R               REFFLD(FLAG)
+     A                                      COLHDG('NEW OR' 'REFILL')
+     A            DPCERT    R               REFFLD(FLAG)
+    A*** BEG CHG *** 03/14/07 ************************
+     A                                      COLHDG('DISPENSED' 'AS' 'WRITTEN')
+    A*** END CHG *** 03/14/07 ************************
+     A            DPLIC#    R               REFFLD(LIC#)
+     A                                      COLHDG('PRESCRIBERS' 'LICENSE#')
+     A*** END ADD *** 10/31/05 ************************
+     A*** BEG ADD *** 10/25/05 ************************
+     A            DPDFEE         9S 2
+     A                                      COLHDG('Disp' 'Fee')
+     A            DPBCDT    R               REFFLD(DS2)
+     A                                      COLHDG('Basis of' 'Cost' 'Deter')
+     A*** END ADD *** 10/25/05 ************************
+     A*** BEG ADD *** 01/10/06 ************************
+     A            DPRXPT    R               REFFLD(FLAG)
+     A                                      COLHDG('Rx' 'Payment' 'Type')
+     A*** END ADD *** 01/10/06 ************************
+    A*** BEG ADD *** 03/14/07 ************************
+     A            DPPRIN    R               REFFLD(FLAG)
+     A                                      COLHDG('PUR/REN' 'INDICATOR')
+     A            DPHCPC    R               REFFLD(CPT4)
+     A                                      COLHDG('HCPCS' 'CODE')
+    A*** END ADD *** 03/14/07 ************************
+     A*** BEG ADD *** 07/03/08 ************************
+     A            DPRNPI        15A
+     A                                      COLHDG('Rendering Provider' +
+     A                                              'NPI#')
+     A*** END ADD *** 07/03/08 ************************
+     A***** Beg Add *** 09/01/16 **************************************
+     A            DPNDC2    R               REFFLD(NDC)
+     A                                      COLHDG('NDC Number Secondary')
+     A*
+     A            DPDESC2   R               REFFLD(DS25)
+     A                                      COLHDG('NDC Number Secondary' +
+     A                                      'Description')
+     A*
+     A***** End Add *** 09/01/16 **************************************

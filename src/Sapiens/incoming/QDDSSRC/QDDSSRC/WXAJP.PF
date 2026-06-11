@@ -1,0 +1,77 @@
+     A*  (C) Copyright Fiserv, Inc., 1996 - 2008
+     A**
+     A** EDI/NOI A49 Transmission File - AJ Segment
+     A******************************************************************
+     A* MODIFICATIONS:                                                 *
+     A*
+     A* 03/14/09 C:53  SUPPORT: 67522
+     A*                Add flag for inclusion on specific MTC reporting
+     A*                                                                *
+     A* 10/19/07  C:191  Project: WC1584                               *
+     A*                  Added fields for Phase 2 EDI Release 3        *
+     A*                  Processing.                                   *
+     A*                                                                *
+     A******************************************************************
+     A                                      REF(WREFP)
+     A**
+     A          R PAJ01                     TEXT('EDI A49 Format - AJ')
+     A            AJCO#     R               REFFLD(CO#)
+     A            AJEXDT    R               REFFLD(DT)
+     A                                      COLHDG('EXTRACT DATE')
+     A*
+     A***    Transaction
+     A*
+     A            AJTSET    R    3A         REFFLD(CODE)
+     A                                      TEXT('TRANSACTION SET ID')
+     A            AJMTC     R               REFFLD(CODE)
+     A                                      TEXT('MAINT TYPE CODE')
+     A            AJTDT     R    8S 0       REFFLD(DT)
+     A                                      TEXT('MAINT TYPE CODE DATE')
+     A*
+     A***    Jurisdiction
+     A*
+     A            AJJRST    R               REFFLD(CODE)
+     A                                      TEXT('JURISDICTION')
+     A*
+     A*  CLAIM
+     A*
+     A            AJACLC    R   25A         REFFLD(DS20)
+     A                                      COLHDG('ADMIN' 'CLAIM' '#')
+     A*
+     A*  PAYMENT/ADJUSTMENT - OCCURS UP TO 10 TIMES
+     A*
+     A            AJPYAJ         3          TEXT('PAY/ADJ CODE')
+     A                                      COLHDG('PAY/ADJ' 'CODE')
+     A            AJPADT    R               REFFLD(A112)
+     A                                      TEXT('PAY/ADJ TO DATE')
+     A            AJAWAM    R               REFFLD(A112)
+     A                                      TEXT('WEEKLY PAYMENT AMOUNT')
+     A                                      COLHDG('WK PAY AMOUNT')
+     A            AJPSDT    R    8S 0       REFFLD(DT)
+     A                                      TEXT('PAY/ADJ START DATE')
+     A            AJPEDT    R    8S 0       REFFLD(DT)
+     A                                      TEXT('PAY/ADJ END DATE')
+     A            AJAWPD         4  0       TEXT('PAY/ADJ WEEKS PAID')
+     A                                      COLHDG('PAY/ADJ WEEKS PAID')
+     A            AJADPD         1  0       TEXT('PAY/ADJ DAYS PAID')
+     A                                      COLHDG('PAY/ADJ DAYS PAID')
+     A*
+     A            AJSTAT    R               REFFLD(STAT)
+     A            AJUSER    R               REFFLD(USER)
+     A            AJPGM     R               REFFLD(PGM)
+     A            AJTIME    R               REFFLD(TIME)
+     A            AJDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A*** Beg Add ***** 10/19/07 ***********************************************
+     A            AJGWAM        11S 2       COLHDG('Gross Weekly Amount')
+     A            AJGWEF         8S 0       COLHDG('Gross Weekly Amount'  +
+     A                                      'Effective Date')
+     A            AJNWEF         8S 0       COLHDG('Net Weekly Amount'  +
+     A                                      'Effective Date')
+     A            AJPYDT         8S 0       COLHDG('Benefit Payment' +
+     A                                      'Issue Date')
+     A*** End Add ***** 10/19/07 ***********************************************
+     A*** BEG ADD *** 03/14/09 ************************************
+     A            AJLNKM    R               REFFLD(FLAG)
+     A                                      COLHDG('LINK MTC')
+     A*** END ADD *** 03/14/09 ************************************

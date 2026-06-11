@@ -1,0 +1,780 @@
+     A                                      REF(*LIBL/WREFP)
+     A                                      INDARA
+     A          R RCDTABPAN
+     A                                  1  2HTML('QPUIREC2    ROVERLAY   0     -
+     A                                      RASSUME    0     ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdTabPan","onload":"          -
+     A                                                        ","description":"-
+     A                                      Procedure Code Maintenance Tab Pane-
+     A                                      l","overlay":"true","assume":"true"-
+     A                                      ,"window left":"10px"},"items":[{"i-
+     A                                      d":"BtnTabClick","field type":"butt-
+     A                                      on","css class":"button","cursor":"-
+     A                                      default","description":"tab click b-
+     A                                      utton","value":"Tab","response":{"f-
+     A                                      ieldName":"tabClick","dataType":"in-
+     A                                      dicator","formatting":"Indicator","-
+     A                                      indFormat":"1 / 0"},"shortcut key":-
+     A                                      "F3","left":"650px","top":"10px","w-
+     A                                      idth":"35px","visibility":"hidden"}-
+     A                                      ,{"id":"BtnExitButton","field type"-
+     A                                      :"button","css class":"button","val-
+     A                                      ue":"Exit","left":"700px","top":"10-
+     A                                      px","width":"100px","cursor":"defau-
+     A                                      lt","description":"Exit Button","re-
+     A                                      sponse":{"fieldName":"ExitNow","dat-
+     A                                      aType":"indicator","formatting":"In-
+     A                                      dicator","indFormat":"1 / 0"},"shor-
+     A                                      tcut key":"F3","visibility":"hidden-
+     A                                      "},{"id":"btnRefresh","field type":-
+     A                                      "button","css class":"button","valu-
+     A                                      e":"Refresh","left":"840px","top":"-
+     A                                      10px","width":"100px","cursor":"def-
+     A                                      ault","response":{"fieldName":"BtnR-
+     A                                      efresh","dataType":"indicator","for-
+     A                                      matting":"Indicator","indFormat":"1-
+     A                                       / 0"},"visibility":"hidden"},{"id"-
+     A                                      :"HdgProcCodeMaint","field type":"o-
+     A                                      utput field","css class":"heading",-
+     A                                      "value":"Procedure Code Maint.","le-
+     A                                      ft":"250px","top":"10px","descripti-
+     A                                      on":"Procedure Code Maintenance Scr-
+     A                                      een Heading","z index":"11","width"-
+     A                                      :"230px","heading type":"Page Title-
+     A                                      ","text align":"left"},{"id":"TabPr-
+     A                                      ocCode","field type":"tab panel","c-
+     A                                      ss class":"tab-panel","left":"250px-
+     A                                      ","top":"70px","width":"970px","hei-
+     A                                      ght":{"fieldName":"TabHeight","data-
+     A                                      Length":"5","decPos":"0","numSep":"-
+     A                                      false","zeroBalance":"false","numBl-
+     A                                      ankFill":"false","zeroFill":"false"-
+     A                                      ,"curSym":"","dataType":"zoned","fo-
+     A                                      rmatting":"Number","negNum":"-999.0-
+     A                                      0","units":"px","designValue":"570p-
+     A                                      x"},"tab names":"Procedure Code Det-
+     A                                      ails","z index":"0","tab panel styl-
+     A                                      e":"CompSuite Tab Panel","active ta-
+     A                                      b":{"fieldName":"TabIndex","dataLen-
+     A                                      gth":"5","decPos":"0","numSep":"fal-
+     A                                      se","zeroBalance":"false","numBlank-
+     A                                      Fill":"false","zeroFill":"false","c-
+     A                                      urSym":"","dataType":"zoned","forma-
+     A                                      tting":"Number","negNum":"-999.00",-
+     A                                      "units":""},"ontabclick":"pui.click-
+     A                                      (\"BtnTabClick\")"}]}')
+     A            BTNREFRESH     1A  H
+     A            EXITNOW        1A  H
+     A            TABCLICK       1A  H
+     A            TABHEIGHT      5S 0H
+     A            TABINDEX       5S 0H
+     A          R SFLPROCCD                 SFL
+     A            QPUI000001     1A  O  2  2
+     A            DSPMODE        1A  H
+     A            DSPVISB        1A  H
+     A            SCCHGSTS       1A  H
+     A            SCCOPY         1A  H
+     A            SCEDIT         1A  H
+     A            SCEFDT          L  H
+     A            SCMRA          9S 2H
+     A            SCPRCDDESC    50A  H
+     A            SCPROCCD       5A  H
+     A            SCPROF         9S 2H
+     A            SCROWSL        1A  H
+     A            SCRRN#         9S 0H
+     A            SCSTAT         1A  H
+     A          R QSFLCTL001                SFLCTL(SFLPROCCD)
+     A                                      SFLSIZ(0001)
+     A                                      SFLPAG(0001)
+     A                                      SFLDSP
+     A                                  1  2HTML('QPUISFLRCDPROCCD')
+     A          R RCDPROCCD
+     A                                  1  2HTML('QPUICTL1    SFLPROCCD 5    RS-
+     A                                      FLDSP    0    FDSPSUB    RSFLDSPCTL-
+     A                                       0    FDSPCTL    RSFLCLR    0    FC-
+     A                                      LRSUB    RSFLPAG    1    C2    10 R-
+     A                                      SFLSIZ    1    C2    11 0    4    R-
+     A                                      OVERLAY   0     RASSUME    0     RR-
+     A                                      OWS      2    C1    1C1    1 RERASE-
+     A                                           1    C7    RCDFLTR ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdProcCd","overlay":"true","ex-
+     A                                      ternal css":"label","onload":"debug-
+     A                                      ger;\ndocument.body.style.backgroun-
+     A                                      d = \"#EBF5FF\";    \nwindow.loadDe-
+     A                                      tail = function(inRow) {\n  fillDet-
+     A                                      ailBox(''sflProcCd'',inRow,''OutRRN-
+     A                                      #'');}\nloadDetail(1);","descriptio-
+     A                                      n":"Procedure Code details","assume-
+     A                                      ":"true","overlay range":"1-1","des-
+     A                                      ign overlay formats":"RcdTabPan","r-
+     A                                      eturn cursor field":{"fieldName":"H-
+     A                                      FLD","dataLength":"20","trimLeading-
+     A                                      ":"false","trimTrailing":"true","bl-
+     A                                      ankFill":"false","rjZeroFill":"fals-
+     A                                      e","dataType":"char","formatting":"-
+     A                                      Text","textTransform":"none"},"eras-
+     A                                      e format":"RCDFLTR","erase formats"-
+     A                                      :"1 format"},"items":[{"id":"BtnExi-
+     A                                      tButtonAll","field type":"button","-
+     A                                      css class":"button","value":"Exit",-
+     A                                      "left":"700px","top":"50px","width"-
+     A                                      :"100px","cursor":"default","descri-
+     A                                      ption":"Exit Button","response":{"f-
+     A                                      ieldName":"ExitNow","dataType":"ind-
+     A                                      icator","formatting":"Indicator","i-
+     A                                      ndFormat":"1 / 0"},"shortcut key":"-
+     A                                      F3","visibility":"hidden"},{"id":"O-
+     A                                      utJobNm","field type":"output field-
+     A                                      ","css class":"output-field","value-
+     A                                      ":{"fieldName":"q1job","refField":"-
+     A                                      Q1JOB SZQ1P","trimLeading":"false",-
+     A                                      "trimTrailing":"true","blankFill":"-
+     A                                      false","rjZeroFill":"false","dataTy-
+     A                                      pe":"reference","formatting":"Text"-
+     A                                      ,"textTransform":"none","designValu-
+     A                                      e":"[q1job]"},"left":"625px","top":-
+     A                                      "100px","visibility":"hidden","text-
+     A                                       align":"right"},{"id":"OutJobN","f-
+     A                                      ield type":"output field","css clas-
+     A                                      s":"output-field","value":{"fieldNa-
+     A                                      me":"q1jobn","refField":"Q1JOBN SZQ-
+     A                                      1P","trimLeading":"false","trimTrai-
+     A                                      ling":"true","blankFill":"false","r-
+     A                                      jZeroFill":"false","dataType":"refe-
+     A                                      rence","formatting":"Text","textTra-
+     A                                      nsform":"none","designValue":"[q1jo-
+     A                                      bn]"},"left":"700px","top":"100px",-
+     A                                      "visibility":"hidden","text align":-
+     A                                      "right"},{"id":"OutJobU","field typ-
+     A                                      e":"output field","css class":"outp-
+     A                                      ut-field","value":{"fieldName":"q1c-
+     A                                      usr","refField":"Q1CUSR SZQ1P","tri-
+     A                                      mLeading":"false","trimTrailing":"t-
+     A                                      rue","blankFill":"false","rjZeroFil-
+     A                                      l":"false","dataType":"reference","-
+     A                                      formatting":"Text","textTransform":-
+     A                                      "none","designValue":"[q1cusr]"},"l-
+     A                                      eft":"775px","top":"100px","visibil-
+     A                                      ity":"hidden","text align":"right"}-
+     A                                      ,{"id":"sflProcCd","field type":"gr-
+     A                                      id","css class":"subfilegrid","left-
+     A                                      ":"255px","top":"125px","number of -
+     A                                      rows":"11","number of columns":"5",-
+     A                                      "column widths":"82,281,89,48,293",-
+     A                                      "column headings":"Proc Code,Descri-
+     A                                      ption,Effective Date,Status,","head-
+     A                                      er height":"21","row height":"20","-
+     A                                      csv export":"true","export with hea-
+     A                                      dings":"true","sortable columns":"t-
+     A                                      rue","resizable columns":"true","mo-
+     A                                      vable columns":"true"')
+     A                                  1  2HTML(',"height":"221px","width":"79-
+     A                                      4px","header text align":"left,left-
+     A                                      ,right,left,","record format name":-
+     A                                      "sflProcCd","description":"Procedur-
+     A                                      e Code details","clear subfile":{"f-
+     A                                      ieldName":"clrSub","customTrue":"",-
+     A                                      "customFalse":"","dataType":"indica-
+     A                                      tor","formatting":"Indicator","indF-
+     A                                      ormat":"true / false"},"subfile rec-
+     A                                      ord number":{"fieldName":"rrnProcCd-
+     A                                      ","dataLength":"5","decPos":"0","nu-
+     A                                      mSep":"false","zeroBalance":"false"-
+     A                                      ,"numBlankFill":"false","zeroFill":-
+     A                                      "false","noExtraSpaces":"false","cu-
+     A                                      rSym":"","dataType":"zoned","format-
+     A                                      ting":"Number","negNum":"-999.00","-
+     A                                      units":""},"row selection":"single"-
+     A                                      ,"display subfile":{"fieldName":"ds-
+     A                                      pSub","customTrue":"","customFalse"-
+     A                                      :"","dataType":"indicator","formatt-
+     A                                      ing":"Indicator","indFormat":"true -
+     A                                      / false"},"display control record":-
+     A                                      {"fieldName":"dspCtl","customTrue":-
+     A                                      "","customFalse":"","dataType":"ind-
+     A                                      icator","formatting":"Indicator","i-
+     A                                      ndFormat":"true / false"},"selectio-
+     A                                      n field":{"fieldName":"scRowSl","da-
+     A                                      taLength":"1","trimLeading":"false"-
+     A                                      ,"trimTrailing":"true","blankFill":-
+     A                                      "false","rjZeroFill":"false","dataT-
+     A                                      ype":"char","formatting":"Text","te-
+     A                                      xtTransform":"none"},"selection val-
+     A                                      ue":"A","export file name":"ProcCod-
+     A                                      e_details","z index":"9","onrowclic-
+     A                                      k":"debugger;\nloadDetail(row)"},{"-
+     A                                      id":"ButtonAdd","field type":"butto-
+     A                                      n","css class":"button","value":"Ad-
+     A                                      d","left":"730px","top":"350px","wi-
+     A                                      dth":"100px","cursor":"default","re-
+     A                                      sponse":{"fieldName":"scAdd","custo-
+     A                                      mTrue":"","customFalse":"","dataTyp-
+     A                                      e":"indicator","formatting":"Indica-
+     A                                      tor","indFormat":"1 / 0"},"disabled-
+     A                                      ":{"fieldName":"dspMode","dataType"-
+     A                                      :"indicator","formatting":"Indicato-
+     A                                      r","indFormat":"true / false"},"hei-
+     A                                      ght":"20px","visibility":{"fieldNam-
+     A                                      e":"dspVisb","dataType":"indicator"-
+     A                                      ,"formatting":"Indicator","indForma-
+     A                                      t":"visible / hidden"}},{"id":"HdgP-
+     A                                      rocCode","field type":"output field-
+     A                                      ","css class":"heading","descriptio-
+     A                                      n":"Procedure Code Maintenance Grid-
+     A                                       Heading","value":"Procedure Codes"-
+     A                                      ,"text align":"left","left":"255px"-
+     A                                      ,"top":"95px","width":"115px","z in-
+     A                                      dex":"11","heading type":"Section H-
+     A                                      eader"},{"id":"BtnFilter","field ty-
+     A                                      pe":"button","css class":"button","-
+     A                                      value":"Filter","response":{"fieldN-
+     A                                      ame":"btnFilter","dataType":"indica-
+     A                                      tor","formatting":"Indicator","indF-
+     A                                      ormat":"1 / 0"},"left":"395px","top-
+     A                                      ":"100px","width":"100px","z index"-
+     A                                      :"50","cursor":"default"},{"id":"Bt-
+     A                                      nClearFilter","field type":"button"-
+     A                                      ,"css class":"button","value":"Clea-
+     A                                      r Filter","response":{"fieldName":"-
+     A                                      btnClrFltr","dataType":"indicator",-
+     A                                      "formatting":"Indicator","indFormat-
+     A                                      ":"1 / 0"},"left":"505px","top":"10-
+     A                                      0px","width":"100px",')
+     A                                  1  2HTML('"z index":"50","cursor":"defa-
+     A                                      ult","visibility":{"fieldName":"dsp-
+     A                                      ClrFltr","dataType":"indicator","fo-
+     A                                      rmatting":"Indicator","indFormat":"-
+     A                                      visible / hidden"}},{"id":"BtnCance-
+     A                                      l","field type":"button","css class-
+     A                                      ":"button","value":"Cancel","left":-
+     A                                      "625px","top":"350px","width":"100p-
+     A                                      x","height":"20px","response":{"fie-
+     A                                      ldName":"scCancel","customTrue":"",-
+     A                                      "customFalse":"","dataType":"indica-
+     A                                      tor","formatting":"Indicator","indF-
+     A                                      ormat":"1 / 0"}},{"id":"DtlOutProcC-
+     A                                      d","field type":"output field","css-
+     A                                       class":"output-field","left":"255p-
+     A                                      x","top":"395px","description":"Pro-
+     A                                      cedure Code","width":"75px","height-
+     A                                      ":"15px"},{"id":"LblProcCodeDtl","f-
+     A                                      ield type":"output field","css clas-
+     A                                      s":"label","value":"Procedure Code"-
+     A                                      ,"left":"255px","top":"380px","widt-
+     A                                      h":"150px"},{"id":"OutState","field-
+     A                                       type":"output field","css class":"-
+     A                                      output-field","value":{"fieldName":-
+     A                                      "scState","dataLength":"2","trimLea-
+     A                                      ding":"false","trimTrailing":"true"-
+     A                                      ,"blankFill":"false","rjZeroFill":"-
+     A                                      false","dataType":"char","formattin-
+     A                                      g":"Text","textTransform":"none","d-
+     A                                      esignValue":"[scState]"},"text alig-
+     A                                      n":"right","left":"250px","top":"40-
+     A                                      px"},{"id":"LblDescriptionDtl","fie-
+     A                                      ld type":"output field","css class"-
+     A                                      :"label","value":"Description","lef-
+     A                                      t":"420px","top":"380px","width":"1-
+     A                                      50px"},{"id":"DtlOutDescription1","-
+     A                                      field type":"output field","css cla-
+     A                                      ss":"output-field","description":"D-
+     A                                      escription 1","left":"420px","top":-
+     A                                      "395px","height":"15px","width":"25-
+     A                                      0px"},{"id":"DtlOutDescription2","f-
+     A                                      ield type":"output field","css clas-
+     A                                      s":"output-field","description":"De-
+     A                                      scription 2","left":"420px","top":"-
+     A                                      410px","height":"15px","width":"250-
+     A                                      px"},{"id":"LblEffectiveDateDtl","f-
+     A                                      ield type":"output field","css clas-
+     A                                      s":"label","value":"Effective Date"-
+     A                                      ,"left":"685px","top":"380px","widt-
+     A                                      h":"105px"},{"id":"DtlOutEffectiveD-
+     A                                      t","field type":"output field","css-
+     A                                       class":"output-field","description-
+     A                                      ":"Effective Date","left":"685px","-
+     A                                      top":"395px","height":"15px","width-
+     A                                      ":"105px"},{"id":"LblStatusDtl","fi-
+     A                                      eld type":"output field","css class-
+     A                                      ":"label","value":"Status","left":"-
+     A                                      805px","top":"380px","width":"105px-
+     A                                      "},{"id":"DtlOutStatus","field type-
+     A                                      ":"output field","css class":"outpu-
+     A                                      t-field","description":"Status","le-
+     A                                      ft":"805px","top":"395px","height":-
+     A                                      "15px","width":"105px"},{"id":"LblF-
+     A                                      lxMRADtl","field type":"output fiel-
+     A                                      d","css class":"label","value":{"fi-
+     A                                      eldName":"scFlxMRA","dataLength":"2-
+     A                                      0","trimLeading":"false","trimTrail-
+     A                                      ing":"true","blankFill":"false","rj-
+     A                                      ZeroFill":"false","dataType":"char"-
+     A                                      ,"formatting":"Text","textTransform-
+     A                                      ":"none","designValue":"[scFlxMRA]"-
+     A                                      },"left":"255px","top')
+     A                                  1  2HTML('":"435px","width":"150px"},{"-
+     A                                      id":"LblFlxProfDtl","field type":"o-
+     A                                      utput field","css class":"label","v-
+     A                                      alue":{"fieldName":"scFlxTech","dat-
+     A                                      aLength":"20","trimLeading":"false"-
+     A                                      ,"trimTrailing":"true","blankFill":-
+     A                                      "false","rjZeroFill":"false","dataT-
+     A                                      ype":"char","formatting":"Text","te-
+     A                                      xtTransform":"none","designValue":"-
+     A                                      [scFlxTech]"},"left":"685px","top":-
+     A                                      "435px","width":"150px"},{"id":"Dtl-
+     A                                      OutMRA","field type":"output field"-
+     A                                      ,"css class":"output-field","descri-
+     A                                      ption":"MRA","left":"255px","top":"-
+     A                                      450px","width":"115px","height":"15-
+     A                                      px"},{"id":"DtlOutTech","field type-
+     A                                      ":"output field","css class":"outpu-
+     A                                      t-field","description":"Technical C-
+     A                                      omponent","left":"685px","top":"450-
+     A                                      px","width":"115px","height":"15px"-
+     A                                      },{"id":"DtlOutProf","field type":"-
+     A                                      output field","css class":"output-f-
+     A                                      ield","description":"Professional C-
+     A                                      omponent","left":"420px","top":"450-
+     A                                      px","height":"15px","width":"120px"-
+     A                                      },{"id":"LblProcCodeDtl_copy","fiel-
+     A                                      d type":"output field","css class":-
+     A                                      "label","value":"Professional Compo-
+     A                                      nent","left":"420px","top":"435px",-
+     A                                      "width":"150px"},{"id":"OutProcCd",-
+     A                                      "field type":"output field","css cl-
+     A                                      ass":"output-field","value":{"field-
+     A                                      Name":"scProcCd","dataLength":"5","-
+     A                                      trimLeading":"false","trimTrailing"-
+     A                                      :"true","blankFill":"false","rjZero-
+     A                                      Fill":"false","dataType":"char","fo-
+     A                                      rmatting":"Text","textTransform":"n-
+     A                                      one","designValue":"[scProcCd]"},"t-
+     A                                      ext align":"left","left":"5px","top-
+     A                                      ":"5px","width":"70px","grid":"sflP-
+     A                                      rocCd","column":"0"},{"id":"OutDesc-
+     A                                      ription1","field type":"output fiel-
+     A                                      d","css class":"output-field","valu-
+     A                                      e":{"fieldName":"scPrCdDesc","dataL-
+     A                                      ength":"50","trimLeading":"false","-
+     A                                      trimTrailing":"true","blankFill":"f-
+     A                                      alse","rjZeroFill":"false","dataTyp-
+     A                                      e":"char","formatting":"Text","text-
+     A                                      Transform":"none","designValue":"[s-
+     A                                      cPrCdDesc]"},"text align":"left","l-
+     A                                      eft":"5px","top":"5px","width":"270-
+     A                                      px","grid":"sflProcCd","column":"1"-
+     A                                      },{"id":"OutEffectiveDt","field typ-
+     A                                      e":"output field","css class":"outp-
+     A                                      ut-field","value":{"fieldName":"scE-
+     A                                      fDt","dataType":"date","formatting"-
+     A                                      :"Date","dateFormat":"m/d/Y","local-
+     A                                      e":"en_US","designValue":"[scEfDt]"-
+     A                                      },"text align":"right","left":"10px-
+     A                                      ","top":"5px","width":"75px","grid"-
+     A                                      :"sflProcCd","column":"2"},{"id":"O-
+     A                                      utStatus","field type":"output fiel-
+     A                                      d","css class":"output-field","valu-
+     A                                      e":{"fieldName":"scStat","dataLengt-
+     A                                      h":"1","trimLeading":"false","trimT-
+     A                                      railing":"true","blankFill":"false"-
+     A                                      ,"rjZeroFill":"false","dataType":"c-
+     A                                      har","formatting":"Text","textTrans-
+     A                                      form":"none","designValue":"[scStat-
+     A                                      ]"},"text align":"left","left":"5px-
+     A                                      ","top":"5px","width":"40px","grid"-
+     A                                      :"sflProcCd","column"')
+     A                                  1  2HTML(':"3"},{"id":"HyperlinkEdit","-
+     A                                      field type":"hyperlink","css class"-
+     A                                      :"link","value":"Edit","left":"5px"-
+     A                                      ,"top":"5px","response":{"fieldName-
+     A                                      ":"scEdit","customTrue":"","customF-
+     A                                      alse":"","dataType":"indicator","fo-
+     A                                      rmatting":"Indicator","indFormat":"-
+     A                                      1 / 0"},"disabled":{"fieldName":"ds-
+     A                                      pMode","dataType":"indicator","form-
+     A                                      atting":"Indicator","indFormat":"tr-
+     A                                      ue / false"},"visibility":{"fieldNa-
+     A                                      me":"dspVisb","dataType":"indicator-
+     A                                      ","formatting":"Indicator","indForm-
+     A                                      at":"visible / hidden"},"grid":"sfl-
+     A                                      ProcCd","column":"4"},{"id":"Hyperl-
+     A                                      inkChgSts","field type":"hyperlink"-
+     A                                      ,"css class":"link","value":"Chg St-
+     A                                      s","response":{"fieldName":"scChgSt-
+     A                                      s","customTrue":"","customFalse":""-
+     A                                      ,"dataType":"indicator","formatting-
+     A                                      ":"Indicator","indFormat":"1 / 0"},-
+     A                                      "disabled":{"fieldName":"dspMode","-
+     A                                      dataType":"indicator","formatting":-
+     A                                      "Indicator","indFormat":"true / fal-
+     A                                      se"},"left":"60px","top":"5px","vis-
+     A                                      ibility":{"fieldName":"dspVisb","da-
+     A                                      taType":"indicator","formatting":"I-
+     A                                      ndicator","indFormat":"visible / hi-
+     A                                      dden"},"grid":"sflProcCd","column":-
+     A                                      "4"},{"id":"OutRRN#","field type":"-
+     A                                      output field","css class":"output-f-
+     A                                      ield","value":{"fieldName":"scRRN#"-
+     A                                      ,"dataLength":"9","decPos":"0","num-
+     A                                      Sep":"false","zeroBalance":"false",-
+     A                                      "numBlankFill":"false","zeroFill":"-
+     A                                      true","noExtraSpaces":"false","curS-
+     A                                      ym":"","dataType":"zoned","formatti-
+     A                                      ng":"Number","negNum":"999.00","uni-
+     A                                      ts":"","designValue":"[scRRN#]"},"l-
+     A                                      eft":"125px","top":"5px","visibilit-
+     A                                      y":"hidden","grid":"sflProcCd","col-
+     A                                      umn":"4"},{"id":"HyperlinkCopy","fi-
+     A                                      eld type":"hyperlink","css class":"-
+     A                                      link","value":"Copy","response":{"f-
+     A                                      ieldName":"scCopy","customTrue":"",-
+     A                                      "customFalse":"","dataType":"indica-
+     A                                      tor","formatting":"Indicator","indF-
+     A                                      ormat":"1 / 0"},"disabled":{"fieldN-
+     A                                      ame":"dspMode","dataType":"indicato-
+     A                                      r","formatting":"Indicator","indFor-
+     A                                      mat":"true / false"},"left":"30px",-
+     A                                      "top":"5px","visibility":{"fieldNam-
+     A                                      e":"dspVisb","dataType":"indicator"-
+     A                                      ,"formatting":"Indicator","indForma-
+     A                                      t":"visible / hidden"},"grid":"sflP-
+     A                                      rocCd","column":"4"},{"id":"OutMRA"-
+     A                                      ,"field type":"output field","css c-
+     A                                      lass":"output-field","value":{"fiel-
+     A                                      dName":"scMRA","dataLength":"9","de-
+     A                                      cPos":"2","numSep":"true","zeroBala-
+     A                                      nce":"false","numBlankFill":"false"-
+     A                                      ,"zeroFill":"false","noExtraSpaces"-
+     A                                      :"false","curSym":"","dataType":"zo-
+     A                                      ned","formatting":"Number","negNum"-
+     A                                      :"999.00","units":"","designValue":-
+     A                                      "[scMRA]"},"left":"175px","top":"5p-
+     A                                      x","visibility":"hidden","grid":"sf-
+     A                                      lProcCd","column":"4"},{"id":"OutPr-
+     A                                      of","field type":"output field","cs-
+     A                                      s class":"output-field","value":{"f-
+     A                                      ieldName":"scProf","dataLength":"9"-
+     A                                      ,"decPos":"2","numSep')
+     A                                  1  2HTML('":"false","zeroBalance":"fals-
+     A                                      e","numBlankFill":"false","zeroFill-
+     A                                      ":"true","noExtraSpaces":"false","c-
+     A                                      urSym":"","dataType":"zoned","forma-
+     A                                      tting":"Number","negNum":"999.00","-
+     A                                      units":"","designValue":"[scProf]"}-
+     A                                      ,"left":"225px","top":"5px","visibi-
+     A                                      lity":"hidden","grid":"sflProcCd","-
+     A                                      column":"4"}]}')
+     A            BTNCLRFLTR     1A  H
+     A            BTNFILTER      1A  H
+     A            CLRSUB         1A  H
+     A            DSPCLRFLTR     1A  H
+     A            DSPCTL         1A  H
+     A            DSPMODE        1A  H
+     A            DSPSUB         1A  H
+     A            DSPVISB        1A  H
+     A            EXITNOW        1A  H
+     A            HFLD          20A  H
+     A            RRNPROCCD      5S 0H
+     A            SCADD          1A  H
+     A            SCCANCEL       1A  H
+     A            SCFLXMRA      20A  H
+     A            SCFLXTECH     20A  H
+     A            SCSTATE        2A  H
+     A            Q1CUSR    R        H      REFFLD(Q1CUSR SZQ1P)
+     A            Q1JOB     R        H      REFFLD(Q1JOB SZQ1P)
+     A            Q1JOBN    R        H      REFFLD(Q1JOBN SZQ1P)
+     A          R RCDADD
+     A                                  1  2HTML('QPUIREC4    RWINDOW    0     -
+     A                                      RASSUME    0     RERRMSG    2    C1-
+     A                                      3   TxbAddAddOnCdFMSADDPRCD FERADDP-
+     A                                      RCD RERRMSG    2    C11   TxbAddEff-
+     A                                      DtFMSADDEFFDTFERADDEFFDT')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdAdd","description":"Add Proc-
+     A                                      edure Code details","assume":"true"-
+     A                                      ,"show as window":"true"},"items":[-
+     A                                      {"id":"PnlAddProcedureCode","field -
+     A                                      type":"panel","css class":"dialog",-
+     A                                      "value":"Add/Edit Procedure Code De-
+     A                                      tails","left":"290px","top":"120px"-
+     A                                      ,"width":"540px","height":"175px","-
+     A                                      panel style":"Transform Dialog","z -
+     A                                      index":"8"},{"id":"LlbAddAddOnCd","-
+     A                                      field type":"output field","css cla-
+     A                                      ss":"label","value":"Add-On Code","-
+     A                                      left":"305px","top":"160px","width"-
+     A                                      :"75px","locked in place":"false","-
+     A                                      text align":"left"},{"id":"LblAddEf-
+     A                                      fDt","field type":"output field","c-
+     A                                      ss class":"label","value":"Effectiv-
+     A                                      e Date","left":"530px","top":"160px-
+     A                                      ","width":"80px","text align":"righ-
+     A                                      t"},{"id":"TxbAddAddOnCd","field ty-
+     A                                      pe":"textbox","css class":"input","-
+     A                                      value":{"fieldName":"scAddPrCd","da-
+     A                                      taLength":"5","trimLeading":"false"-
+     A                                      ,"trimTrailing":"true","blankFill":-
+     A                                      "false","rjZeroFill":"false","dataT-
+     A                                      ype":"char","formatting":"Text","te-
+     A                                      xtTransform":"none","designValue":"-
+     A                                      [scAddPrCd]"},"left":"305px","top":-
+     A                                      "175px","css class 2":"textbox","wi-
+     A                                      dth":"55px","locked in place":"fals-
+     A                                      e","error messages":"1 message","te-
+     A                                      xt align":"left","disabled":{"field-
+     A                                      Name":"dsbAddCd","customTrue":"","c-
+     A                                      ustomFalse":"","dataType":"indicato-
+     A                                      r","formatting":"Indicator","indFor-
+     A                                      mat":"true / false"},"error message-
+     A                                      ":{"fieldName":"msAddPrCd","dataLen-
+     A                                      gth":"100","trimLeading":"false","t-
+     A                                      rimTrailing":"true","blankFill":"fa-
+     A                                      lse","rjZeroFill":"false","dataType-
+     A                                      ":"char","formatting":"Text","textT-
+     A                                      ransform":"none"},"error condition"-
+     A                                      :{"fieldName":"erAddPrCd","customTr-
+     A                                      ue":"","customFalse":"","dataType":-
+     A                                      "indicator","formatting":"Indicator-
+     A                                      ","indFormat":"1 / 0"},"error enhan-
+     A                                      ced mode":"0"},{"id":"TxbAddEffDt",-
+     A                                      "field type":"date field","css clas-
+     A                                      s":"input","value":{"fieldName":"sc-
+     A                                      AddEffDt","dataType":"date","format-
+     A                                      ting":"Date","dateFormat":"m/d/Y","-
+     A                                      locale":"en_US","designValue":"[scA-
+     A                                      ddEffDt]"},"left":"530px","top":"17-
+     A                                      5px","width":"80px","css class 2":"-
+     A                                      date input","error messages":"1 mes-
+     A                                      sage","disabled":{"fieldName":"dsbA-
+     A                                      ddEfDt","dataType":"indicator","for-
+     A                                      matting":"Indicator","indFormat":"t-
+     A                                      rue / false"},"text align":"right",-
+     A                                      "error message":{"fieldName":"msAdd-
+     A                                      EffDt","dataLength":"100","trimLead-
+     A                                      ing":"false","trimTrailing":"true",-
+     A                                      "blankFill":"false","rjZeroFill":"f-
+     A                                      alse","dataType":"char","formatting-
+     A                                      ":"Text","textTransform":"none"},"e-
+     A                                      rror condition":{"fieldName":"erAdd-
+     A                                      EffDt","dataType":"indicator","form-
+     A                                      atting":"Indicator","indFormat":"1 -
+     A                                      / 0"},"error enhanced mode":"0"},{"-
+     A                                      id":"BtnAddCancel","field type":"bu-
+     A                                      tton","css class":"bu')
+     A                                  1  2HTML('tton","value":"Cancel","left"-
+     A                                      :"585px","top":"245px","width":"100-
+     A                                      px","cursor":"default","response":{-
+     A                                      "fieldName":"BtnAddCan","customTrue-
+     A                                      ":"","customFalse":"","dataType":"i-
+     A                                      ndicator","formatting":"Indicator",-
+     A                                      "indFormat":"1 / 0"},"shortcut key"-
+     A                                      :"Escape","locked in place":"false"-
+     A                                      },{"id":"BtnAddSave","field type":"-
+     A                                      button","css class":"button","value-
+     A                                      ":"Save","left":"705px","top":"245p-
+     A                                      x","width":"100px","cursor":"defaul-
+     A                                      t","shortcut key":"Enter","response-
+     A                                      ":{"fieldName":"BtnAddSave","custom-
+     A                                      True":"","customFalse":"","dataType-
+     A                                      ":"indicator","formatting":"Indicat-
+     A                                      or","indFormat":"1 / 0"},"locked in-
+     A                                       place":"false"}]}')
+     A            BTNADDCAN      1A  H
+     A            BTNADDSAVE     1A  H
+     A            DSBADDCD       1A  H
+     A            DSBADDEFDT     1A  H
+     A            ERADDEFFDT     1A  H
+     A            ERADDPRCD      1A  H
+     A            MSADDEFFDT   100A  H
+     A            MSADDPRCD    100A  H
+     A            SCADDEFFDT      L  H
+     A            SCADDPRCD      5A  H
+     A          R RCDFLTR
+     A                                  1  2HTML('QPUIREC6    ROVERLAY   0     -
+     A                                      RWINDOW    0    FISFLTRWDW RASSUME -
+     A                                         0     RERASE     1    C9    RCDP-
+     A                                      ROCCD REMSG      2    C15   TxbFltr-
+     A                                      FromCodeFMSFLTAOCD FERFLTAOCD REMSG-
+     A                                            2    C13   TxbFltrToCodeFMSFL-
+     A                                      TAOCD FERFLTAOCD ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdFltr","description":"Procedu-
+     A                                      re Code Filter","assume":"true","sh-
+     A                                      ow as window":{"fieldName":"isFltrW-
+     A                                      dw","customTrue":"","customFalse":"-
+     A                                      ","dataType":"indicator","formattin-
+     A                                      g":"Indicator","indFormat":"true / -
+     A                                      false"},"overlay":"true","erase for-
+     A                                      mat":"RCDPROCCD","erase formats":"1-
+     A                                       format"},"items":[{"id":"PnlProcCd-
+     A                                      Filter","field type":"panel","css c-
+     A                                      lass":"dialog","panel style":"Trans-
+     A                                      form Dialog","value":"Procedure Cod-
+     A                                      e Filter","left":"265px","top":"205-
+     A                                      px","height":"195px","width":"460px-
+     A                                      ","z index":"8"},{"id":"LblAOFltrSt-
+     A                                      atus","field type":"output field","-
+     A                                      css class":"output-field","descript-
+     A                                      ion":"AddOn Code Filter for Status"-
+     A                                      ,"value":"Status","font weight":"bo-
+     A                                      ld","text align":"left","left":"285-
+     A                                      px","top":"265px","width":"40px"},{-
+     A                                      "id":"DrpProcCdFltrStatus","field t-
+     A                                      ype":"select box","css class":"inpu-
+     A                                      t","description":"Procedure Code Fi-
+     A                                      lter for Status","value":{"fieldNam-
+     A                                      e":"scFltrSts","dataLength":"10","t-
+     A                                      rimLeading":"false","trimTrailing":-
+     A                                      "true","blankFill":"false","rjZeroF-
+     A                                      ill":"false","dataType":"char","for-
+     A                                      matting":"Text","textTransform":"no-
+     A                                      ne","designValue":"[scFltrSts]"},"c-
+     A                                      hoices":" ,Active,Inactive","choice-
+     A                                       values":" ,A,I","blank option":"tr-
+     A                                      ue","left":"285px","top":"280px","h-
+     A                                      eight":"19px","width":"95px","css c-
+     A                                      lass 2":"dropdown","tab index":"1"}-
+     A                                      ,{"id":"LblFltrFromCode","field typ-
+     A                                      e":"output field","css class":"outp-
+     A                                      ut-field","description":"Procedure -
+     A                                      Code Filter for from code","value":-
+     A                                      "From Procedure Code","font weight"-
+     A                                      :"bold","text align":"left","left":-
+     A                                      "285px","top":"305px","width":"125p-
+     A                                      x"},{"id":"TxbFltrFromCode","field -
+     A                                      type":"textbox","css class":"input"-
+     A                                      ,"value":{"fieldName":"scFltrFrCd",-
+     A                                      "dataLength":"5","trimLeading":"fal-
+     A                                      se","trimTrailing":"true","blankFil-
+     A                                      l":"false","rjZeroFill":"false","da-
+     A                                      taType":"char","formatting":"Text",-
+     A                                      "textTransform":"none","designValue-
+     A                                      ":"[scFltrFrCd]"},"required":"false-
+     A                                      ","left":"285px","top":"320px","wid-
+     A                                      th":"70px","css class 2":"textbox",-
+     A                                      "error messages":"1 message","error-
+     A                                       message":{"fieldName":"msFltAOCd",-
+     A                                      "dataLength":"100","trimLeading":"f-
+     A                                      alse","trimTrailing":"true","blankF-
+     A                                      ill":"false","rjZeroFill":"false","-
+     A                                      dataType":"char","formatting":"Text-
+     A                                      ","textTransform":"none"},"error co-
+     A                                      ndition":{"fieldName":"erFltAOCd","-
+     A                                      customTrue":"","customFalse":"","da-
+     A                                      taType":"indicator","formatting":"I-
+     A                                      ndicator","indFormat":"1 / 0"},"err-
+     A                                      or enhanced mode":"1","tab index":"-
+     A                                      3"},{"id":"BtnFltrCancel","field ty-
+     A                                      pe":"button","css class":"button","-
+     A                                      value":"Cancel","response":{"fieldN-
+     A                                      ame":"BtnFltrCan","dataType":"indic-
+     A                                      ator","formatting":"I')
+     A                                  1  2HTML('ndicator","indFormat":"1 / 0"-
+     A                                      },"shortcut key":"Escape","left":"4-
+     A                                      75px","top":"365px","width":"100px"-
+     A                                      ,"cursor":"default","tab index":"4"-
+     A                                      },{"id":"BtnFltrApply","field type"-
+     A                                      :"button","css class":"button","val-
+     A                                      ue":"Apply Filter","response":{"fie-
+     A                                      ldName":"BtnFltrApp","customTrue":"-
+     A                                      ","customFalse":"","dataType":"indi-
+     A                                      cator","formatting":"Indicator","in-
+     A                                      dFormat":"1 / 0"},"shortcut key":"E-
+     A                                      nter","left":"600px","top":"365px",-
+     A                                      "width":"100px","cursor":"default",-
+     A                                      "tab index":"5"},{"id":"LblFltrToCo-
+     A                                      de","field type":"output field","cs-
+     A                                      s class":"output-field","descriptio-
+     A                                      n":"Procedure Code Filter for To Co-
+     A                                      de","value":"To Procedure Code","fo-
+     A                                      nt weight":"700","text align":"left-
+     A                                      ","left":"430px","top":"305px","wid-
+     A                                      th":"125px"},{"id":"TxbFltrToCode",-
+     A                                      "field type":"textbox","css class":-
+     A                                      "input","value":{"fieldName":"scFlt-
+     A                                      rToCd","dataLength":"5","trimLeadin-
+     A                                      g":"false","trimTrailing":"true","b-
+     A                                      lankFill":"false","rjZeroFill":"fal-
+     A                                      se","dataType":"char","formatting":-
+     A                                      "Text","textTransform":"none","desi-
+     A                                      gnValue":"[scFltrToCd]"},"required"-
+     A                                      :"false","error messages":"1 messag-
+     A                                      e","error message":{"fieldName":"ms-
+     A                                      FltAOCd","dataLength":"100","trimLe-
+     A                                      ading":"false","trimTrailing":"true-
+     A                                      ","blankFill":"false","rjZeroFill":-
+     A                                      "false","dataType":"char","formatti-
+     A                                      ng":"Text","textTransform":"none"},-
+     A                                      "error condition":{"fieldName":"erF-
+     A                                      ltAOCd","customTrue":"","customFals-
+     A                                      e":"","dataType":"indicator","forma-
+     A                                      tting":"Indicator","indFormat":"1 /-
+     A                                       0"},"error enhanced mode":"1","lef-
+     A                                      t":"430px","top":"320px","width":"7-
+     A                                      0px","css class 2":"textbox","tab i-
+     A                                      ndex":"4"},{"id":"LblFltrEffectiveD-
+     A                                      ate","field type":"output field","c-
+     A                                      ss class":"output-field","descripti-
+     A                                      on":"Effective Date Filter","value"-
+     A                                      :"Effective Date","font weight":"70-
+     A                                      0","text align":"left","left":"435p-
+     A                                      x","top":"265px","width":"85px"},{"-
+     A                                      id":"TxbFltrEffDate","field type":"-
+     A                                      date field","css class":"date-field-
+     A                                      ","value":{"fieldName":"scFltrEfDt"-
+     A                                      ,"dataLength":"8","decPos":"0","num-
+     A                                      Sep":"false","zeroBalance":"false",-
+     A                                      "numBlankFill":"false","zeroFill":"-
+     A                                      false","noExtraSpaces":"false","edt-
+     A                                      Wrd":"''  /  /    ''","curSym":"","-
+     A                                      dataType":"zoned","formatting":"Num-
+     A                                      ber","negNum":"-999.00","units":"",-
+     A                                      "designValue":"[scFltrEfDt]"},"left-
+     A                                      ":"435px","top":"280px","required":-
+     A                                      "false","tab index":"2","width":"85-
+     A                                      px"}]}')
+     A            BTNFLTRAPP     1A  H
+     A            BTNFLTRCAN     1A  H
+     A            ERFLTAOCD      1A  H
+     A            ISFLTRWDW      1A  H
+     A            MSFLTAOCD    100A  H
+     A            SCFLTREFDT     8S 0H
+     A            SCFLTRFRCD     5A  H
+     A            SCFLTRSTS     10A  H
+     A            SCFLTRTOCD     5A  H
+     A          R RCDLCKMSG
+     A                                  1  2HTML('QPUIREC2    RWINDOW    0     -
+     A                                      RASSUME    0     ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdLckMsg","description":"Windo-
+     A                                      w for Record Lock","assume":"true",-
+     A                                      "show as window":"true"},"items":[{-
+     A                                      "id":"Panel1","field type":"panel",-
+     A                                      "css class":"dialog","value":"Infor-
+     A                                      mation","left":"350px","top":"220px-
+     A                                      ","width":"340px","height":"115px",-
+     A                                      "panel style":"Transform Dialog","z-
+     A                                       index":"8"},{"id":"OutputField1","-
+     A                                      field type":"output field","css cla-
+     A                                      ss":"output-field","value":"This re-
+     A                                      cord has been updated by another us-
+     A                                      er. ","left":"385px","top":"260px",-
+     A                                      "width":"270px","text align":"cente-
+     A                                      r"},{"id":"OutputField1_copy","fiel-
+     A                                      d type":"output field","css class":-
+     A                                      "output-field","value":"Please refr-
+     A                                      esh and re-enter data.","left":"385-
+     A                                      px","top":"275px","width":"245px","-
+     A                                      text align":"center"},{"id":"Button-
+     A                                      2","field type":"button","css class-
+     A                                      ":"button","value":"Ok","left":"575-
+     A                                      px","top":"310px","width":"100px","-
+     A                                      cursor":"default","shortcut key":"E-
+     A                                      nter","response":{"fieldName":"BtnR-
+     A                                      cdLck","dataType":"indicator","form-
+     A                                      atting":"Indicator","indFormat":"1 -
+     A                                      / 0"},"tab index":"5"}]}')
+     A            BTNRCDLCK      1A  H

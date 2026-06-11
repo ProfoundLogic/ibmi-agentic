@@ -1,0 +1,65 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   ATB REPORT DIRECT BILL PROMPT DISPLAY                    **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A          R SCR01
+     A                                      CF05
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(22)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7595F2'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  9 23'PERIOD ENDING DATE:'
+     A            SCTDT     R        B  9 45REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  20                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                 13 23'Policy Number Order:'
+     A            SCBYP     R        B 13 52REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A  22                                  ERRMSGID(CCR0750 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 15 24'Agent Number Order:'
+     A            SCBYN     R        B 15 52REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A  22                                  ERRMSGID(CCR0750 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 17  7'Enter the Period Ending Date.'
+     A                                 18  7'Listing in Policy Number Order: Pl-
+     A                                      ace an "X" at Policy Number line.'
+     A                                 19  7'Listing in Agent Number Order : pl-
+     A                                      ace an "X" at Agent Number line.'
+     A                                 22  5'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 56'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

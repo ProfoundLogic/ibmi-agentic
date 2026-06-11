@@ -1,0 +1,266 @@
+      * (c) 2009 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A****************************************************************
+     A* WC WAREHOUSE POLICY FILE
+     A****************************************************************
+     A*  CREATED: 03.08.00   C:58     PROJECT: WC924
+     A****************************************************************
+     A* REVISIONS:
+      *
+      * 08/12/09  C:33  Project: CI077
+      *                 Expand name.
+      *
+      * 01/23/08  C:61  support CI132 61860
+      *                 add fields to store mailing address.
+     A*
+     A* 03/11/05  C:132 PROJECT WC1202
+     A*                - REVERSE Expand Division Name field to 100
+     A*
+     A* 03/10/05  C:132 PROJECT WC1202
+     A*                - Expand Insured Name field to 100 positions
+     A*
+     A* 05/30/02  C:132 PROJECT WC924
+     A*                - Add Insured Email & Insured Website
+     A*                - Add Underwiter First & Last Names
+     A*                - Add Underwiter Email
+     A*
+     A* 02/06/01  C:61  PROJECT WC924
+     A*                - Add InsuredCode
+     A*                - Change FEIN from 10 to 11
+     A*                - Change GroupNumber from 3 to 10
+     A*                - Add Carrier ID
+     A*                - Add PolicyStatusCode
+     A*
+     A*   C:58 5.15.00  ADD field: POAODT - Data AS OF date.
+     A*
+     A****************************************************************
+     A                                      REF(WREFP)
+     A          R PPO01                     TEXT('WH POLICY FILE')
+     A*
+     A*      ==>GRP/EMP#/YR
+     A            POPONR        25          TEXT('Policy Number')
+     A                                      COLHDG('POLICY NUMBER')
+     A*
+     A            POSEQ         25S 0       TEXT('Policy sequence')
+     A                                      COLHDG('Sequence number')
+     A***** BEG DEL ***** 02/06/01 ***********************************
+     A**WMEMP==>EMFEIN
+     A**********  POFEIN        10          TEXT('Insured FEIN')
+     A**********                            COLHDG('Insured' 'FEIN')
+     A***** END DEL ***** 02/06/01 ***********************************
+     A***** BEG ADD ***** 02/06/01 ***********************************
+      *
+      * WMEMP==>EMFEIN
+     A            POFEIN        11          TEXT('Insured FEIN')
+     A                                      COLHDG('Insured' 'FEIN')
+      *
+      * WMEMP==>EMGRP/EMEMP#
+     A            POISCD        25          TEXT('Insured Code')
+     A                                      COLHDG('Insured' 'Code')
+      *
+     A***** END ADD ***** 02/06/01 ***********************************
+     A* WMEMP==>EMNAME
+      ***** BEG CHG ***** 03/10/05 ***************************************
+      ***** BEG CHG ***** 03/11/05 ***************************************
+     A***  Begin Chg  ***  08/12/09  **************************************
+     A**********  PONAME        40          TEXT('Insured name')
+     A            PONAME       100          TEXT('Insured name')
+     A***  End   Chg  ***  08/12/09  **************************************
+     A*********   PONAME       100          TEXT('Insured name')
+      ***** END CHG ***** 03/11/05 ***************************************
+      ***** END CHG ***** 03/10/05 ***************************************
+     A                                      COLHDG('Insured Name')
+     A* WMEMP==>EMPST    ?? Phys/mail
+     A            POST           2          TEXT('Insured state')
+     A                                      COLHDG('Ins' 'ST')
+     A* WDELP==>ELPFDT
+     A            POPFDT        10          TEXT('Begin date')
+     A                                      COLHDG('Begin Date')
+     A* WDELP==>ELPTDT
+     A            POPTDT        10          TEXT('Expiration date')
+     A                                      COLHDG('Pol Exp Dt')
+     A* WDELP==>Y If prior policy year exists
+     A            POREN          1          TEXT('Renewal Y N')
+     A                                      COLHDG('REN')
+     A* WDELP==>Y if ELFAF = A
+     A            POAUD          1          TEXT('Audited Y N')
+     A                                      COLHDG('AUD')
+     A* WDELP==>ELAAPR if ELFAF = A  else ELANPR
+     A            POANPR        16S 2       TEXT('Premium')
+     A                                      COLHDG('Ann Premium')
+     A* WMEAP==>TT all P/P & P/E
+     A            POCLPR        16S 2       TEXT('Premium collected')
+     A                                      COLHDG('Prem collected')
+     A            POCLSC        16S 2       TEXT('Surcharge collected')
+     A                                      COLHDG('Surchg coll')
+     A* WMEMP==>EMPAD1
+     A            POAD1         50          TEXT('Insured address 1')
+     A                                      COLHDG('Address 1')
+     A* WMEMP==>EMPAD2
+     A            POAD2         50          TEXT('Insured address 2')
+     A                                      COLHDG('Address 2')
+     A* WMEMP==>EMPCTY
+     A            POCTY         25          TEXT('Insured city')
+     A                                      COLHDG('City')
+     A* WMEMP==>EMFAXA & FAX#
+     A            POFAX         20          TEXT('Insured FAX#')
+     A                                      COLHDG('FAX#')
+     A* WMEMP==>EMAREA & PHN#
+     A            POPHN         20          TEXT('Insured phone #')
+     A                                      COLHDG('Phone #')
+     A* WMEMP==>EMPZIP
+     A            POZIP         10          TEXT('Insured zip code')
+     A                                      COLHDG('Zip code')
+     A* WMEMP==>EMCNTY & WTCNP>CNDESC
+     A            POCNTY        30          TEXT('County description')
+     A                                      COLHDG('County')
+     A* WMEMP==>EMTPOB  & WTGTP>GTDESC @'BUSI'
+     A            POTPOB        30          TEXT('Business descriptn')
+     A                                      COLHDG('Business desc')
+     A* WMEMP==>EMNAOB
+     A            POINAO        50          TEXT('Nature of business')
+     A                                      COLHDG('Nature of Business')
+     A*      == ...
+     A            POAPNR        40          TEXT('Original app number')
+     A                                      COLHDG('Orig app number')
+     A* WMEMP==>EMCAD1
+     A            POCAD         10          TEXT('Cancel date')
+     A                                      COLHDG('Cancel Dt')
+     A*      ==>GRP/EMP#/YR -- prior fund year
+     A            POPONP        25          TEXT('Prior policy number')
+     A                                      COLHDG('PRIOR' 'POLICY NUMBER')
+     A* WMEMP==>EMNAIC
+     A            PONAIC        20          TEXT('Insured NAIC')
+     A                                      COLHDG('NAIC')
+     A* WMEMP==>EMSIC
+     A            POSIC          4          TEXT('SIC code')
+     A                                      COLHDG('SIC' 'Code')
+     A* WMEAP==>TT all Q/1 & Q/2
+     A            POPTAX        16S 2       TEXT('Premium tax')
+     A                                      COLHDG('Total Premium Tax')
+     A            POPADJ        16S 2       TEXT('Premium adjustment')
+     A*                = ...
+     A                                      COLHDG('Premium Adjustment')
+     A            PONREN        12          TEXT('Non-renewal')
+     A*                = ...
+     A                                      COLHDG('Non-renewal')
+     A* WMEMP==>EMOFF#
+     A            POOFF#         5A         TEXT('Servicing office')
+     A                                      COLHDG('Serv' 'Office')
+     A*      == ...  ??
+     A            POOFFP         5S 0       TEXT('Producing office')
+     A                                      COLHDG('Prod' 'Office')
+     A* WMFNP==>FMCARR    ???
+     A            PONCCI         5A         TEXT('NCCI Carrier')
+     A                                      COLHDG('NCCI' 'Carr')
+     A* WMEMP==>EMGRP
+     A***** BEG CHG ***** 02/06/01 ***********************************
+     A*********   POGRP          3S 0       TEXT('Group number')
+     A            POGRP         10S 0       TEXT('Group number')
+     A***** END CHG ***** 02/06/01 ***********************************
+     A                                      COLHDG('Group')
+     A            POCANR        60          TEXT('Cancel reason')
+     A                                      COLHDG('Cancel reason')
+     A* WMEMP==>EMCHAP
+     A            POCHAP         3S 0       TEXT('Chapter number')
+     A*                == EMCHAP
+     A                                      COLHDG('Chapt')
+     A* WMCPP==>CPDESC
+     A            POCDSC        30          TEXT('Chapter description')
+     A                                      COLHDG('Chapter description')
+     A* WMEMP==>EMRGN#
+     A            PORGN#         3S 0       TEXT('Region code')
+     A                                      COLHDG('Region')
+     A* WMREP==>REDESC
+     A            PORDSC        30          TEXT('Region description')
+     A                                      COLHDG('Region description')
+     A* WMRPP==>RPCAP#
+     A            POCAP#        25          TEXT('Carrier policy number')
+     A                                      COLHDG('Carrier policy nbr')
+     A* WMEMP==>EMCO#
+     A            POCO#          3S 0       TEXT('Owner code')
+     A                                      COLHDG('Owner')
+     A* WDELP==>ELDIV
+     A            PODIV          5S 0       TEXT('Division')
+     A                                      COLHDG('Division')
+     A* WDEHP==>EHTRDT
+     A            POTRDT        10A         TEXT('Initial Transaction Date')
+     A                                      COLHDG('Initial' +
+     A                                      'Transaction' 'Date')
+     A***** BEG ADD ***** 02/06/01 ***********************************
+      *
+     A*** BEG CHG ******* 05/30/02 ************************************
+      ********* WMEMP==>EMFND
+      * WMEMP==> EMCO# + EMFND
+     A*********   POCID         10S 0       TEXT('Carrier ID')
+     A            POCID         10A         TEXT('Carrier ID')
+     A*** END CHG ******* 05/30/02 ************************************
+     A                                      COLHDG('Carrier ID')
+      *
+     A            POSTCD         1A         TEXT('Status Code')
+     A                                      COLHDG('Status Code')
+      *                     'I' = Inforce
+      *                     'E' = Expired
+      *                     'C' = Cancelled
+      *
+     A***** END ADD ***** 02/06/01 ***********************************
+      *
+     A*** BEG ADD ******* 05/30/02 ************************************
+     A*      ==> *BLANKS
+     A* Insured Email Address
+     A            POEMAL        50          TEXT('Insured e-mail address')
+     A                                      COLHDG('E-mail')
+      * WMEMP==> EMIADR
+     A* Insured Web Site Address
+     A            POIADR        50          TEXT('Insured Web Site')
+     A                                      COLHDG('Website')
+      * WMEMP/EMUWTR ==>
+     A* Underwriter First Name
+     A            POUFSN        15          TEXT('Underwriter First Name')
+     A                                      COLHDG('Undrwtr' '1st Name')
+      * WMEMP/EMUWTR ==> WMUPP/UPUNM
+     A* Underwriter Last Name
+     A            POULSN        30          TEXT('Underwriter Last Name')
+     A                                      COLHDG('Undrwtr' 'Last Name')
+      * WMEMP/EMUWTR ==> WMUPP/UPMAIL
+     A* Underwriter Email Address
+     A            POUMAL        50          TEXT('Underwriter e-mail addr')
+     A                                      COLHDG('Undrwtr' 'Email')
+     A*** END ADD ******* 05/30/02 ************************************
+      ***** beg add ***** 01/23/08 ***********************************
+      * WMEMP==>POMAD1
+     A            POMAD1        50A         TEXT('Mail Addr 1')
+     A                                      COLHDG('Mail Address 1')
+      * WMEMP==>POMAD2
+     A            POMAD2        50A         TEXT('Mail Addr 2')
+     A                                      COLHDG('Mail Address 2')
+      * WMEMP==>POMCTY
+     A            POMCTY        25A         TEXT('Mail City')
+     A                                      COLHDG('Mail City')
+      * WMEMP==>POMST
+     A            POMST          2A         TEXT('Mail State')
+     A                                      COLHDG('Mail State')
+      * WMEMP==>POMZIP
+     A            POMZIP        10A         TEXT('Mail zip code')
+     A                                      COLHDG('Mail Zip code')
+      *
+     A            POMPFL         1A         TEXT('Mail/Phys Address')
+     A                                      COLHDG('Mail/Phys Address')
+      *
+      ***** end add ***** 01/23/08 ***********************************
+     A*** BEGIN ADD *** 05/15/00 **************************************
+     A*  TIME: DSDATE ==>
+     A            POAODT        10          TEXT('Data as of date')
+     A                                      COLHDG('As Of Date')
+     A*** END ADD ***** 05/15/00 **************************************
+     A* ============================================================ *
+     A*
+     A*  NOTE: ANY FIELDS ADDED TO THIS FILE NEED TO BE ADDED IN
+     A*        FRONT OF THE AS OF DATE FIELD AT END OF THE FILE -
+     A*        OR THIS COULD CAUSE RECORDS TO BE MISSED/SKIPPED
+     A*        DURING THE IMPORT PROCESS AFTER THE EXTRACT IS RUN.
+     A*
+     A* ============================================================ *
+     A*
+     A          K POPONR
+     A*

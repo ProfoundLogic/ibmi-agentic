@@ -1,0 +1,384 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   LOSS RATIO PER POLICY PRINT FILE                         **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A**   <---------------------------------------------------->   **
+     A**   <-|        THIS FILE MUST BE COMPILED WITH         |->   **
+     A**   <-|              DEVTYPE = *AFPDS                  |->   **
+     A**   <---------------------------------------------------->   **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      REF(*LIBL/CREFP)
+     A*----------------------------------------------------------------
+     A          R ROUTE                     FONT(42)
+     A*----------------------------------------------------------------
+     A                                  6  1'XXXXXXXX'
+     A                                  6 15'XXXXXX'
+     A                                  6 25'XX      XX'
+     A                                  6 36'XXXXXXXXXX'
+     A                                  6 47'XXXXXXXXXX'
+     A                                  6 58'XXX     XX'
+     A                                  6 72'XXXXXX'
+     A*
+     A                                  7  1'XXXXXXXXX'
+     A                                  7 14'XXXXXXXX'
+     A                                  7 25'XX      XX'
+     A                                  7 36'XXXXXXXXXX'
+     A                                  7 47'XXXXXXXXXX'
+     A                                  7 58'XXXX    XX'
+     A                                  7 71'XXXXXXXX'
+     A*
+     A                                  8  1'XX      XX'
+     A                                  8 13'XX      XX'
+     A                                  8 25'XX      XX'
+     A                                  8 40'XX'
+     A                                  8 51'XX'
+     A                                  8 58'XXXX    XX'
+     A                                  8 70'XX      XX'
+     A*
+     A                                  9  1'XX      XX'
+     A                                  9 13'XX      XX'
+     A                                  9 25'XX      XX'
+     A                                  9 40'XX'
+     A                                  9 51'XX'
+     A                                  9 58'XX XX   XX'
+     A                                  9 70'XX'
+     A*
+     A                                 10  1'XXXXXXXXX'
+     A                                 10 13'XX      XX'
+     A                                 10 25'XX      XX'
+     A                                 10 40'XX'
+     A                                 10 51'XX'
+     A                                 10 58'XX XX   XX'
+     A                                 10 70'XX'
+     A*
+     A                                 11  1'XXXXXXXX'
+     A                                 11 13'XX      XX'
+     A                                 11 25'XX      XX'
+     A                                 11 40'XX'
+     A                                 11 51'XX'
+     A                                 11 58'XX  XX  XX'
+     A                                 11 70'XX'
+     A*
+     A                                 12  1'XXXX'
+     A                                 12 13'XX      XX'
+     A                                 12 25'XX      XX'
+     A                                 12 40'XX'
+     A                                 12 51'XX'
+     A                                 12 58'XX  XX  XX'
+     A                                 12 70'XX    XXXX'
+     A*
+     A                                 13  1'XXXXX'
+     A                                 13 13'XX      XX'
+     A                                 13 25'XX      XX'
+     A                                 13 40'XX'
+     A                                 13 51'XX'
+     A                                 13 58'XX   XX XX'
+     A                                 13 70'XX    XXXX'
+     A*
+     A                                 14  1'XX XXX'
+     A                                 14 13'XX      XX'
+     A                                 14 25'XX      XX'
+     A                                 14 40'XX'
+     A                                 14 51'XX'
+     A                                 14 58'XX   XX XX'
+     A                                 14 70'XX      XX'
+     A*
+     A                                 15  1'XX  XXX'
+     A                                 15 13'XX      XX'
+     A                                 15 25'XX      XX'
+     A                                 15 40'XX'
+     A                                 15 51'XX'
+     A                                 15 58'XX    XXXX'
+     A                                 15 70'XX      XX'
+     A*
+     A                                 16  1'XX   XXX'
+     A                                 16 14'XXXXXXXX'
+     A                                 16 26'XXXXXXXX'
+     A                                 16 40'XX'
+     A                                 16 47'XXXXXXXXXX'
+     A                                 16 58'XX    XXXX'
+     A                                 16 71'XXXXXXXX'
+     A*
+     A                                 17  1'XX    XXX'
+     A                                 17 15'XXXXXX'
+     A                                 17 27'XXXXXX'
+     A                                 17 40'XX'
+     A                                 17 47'XXXXXXXXXX'
+     A                                 17 58'XX     XXX'
+     A                                 17 72'XXXXXX'
+     A*
+     A                                 20 11'ROUTE TO:'
+     A  08        ORDIS1    R          20 21REFFLD(DS40)
+     A  09        UPUSNM    R          20 21REFFLD(DS50)
+     A*
+     A  08        ORDIS2    R          21 21REFFLD(DS40)
+     A*
+     A  08        ORDIS3    R          22 21REFFLD(DS40)
+     A*
+     A  08        ORDIS4    R          23 21REFFLD(DS40)
+     A*
+     A                                 25  7'REPORT TITLE:'
+     A            ORTITL    R          25 21REFFLD(NM60)
+     A*
+     O                                 27  7'PROGRAM NAME:'
+     A            ORPNAM        10     27 21
+     A                                 27 32'FILE:'
+     A            ORFIL#         1     27 38
+     A                                 27 40'COPIES:'
+     A            ORCOPY         2  0  27 48
+     A                                      EDTCDE(Z)
+     A                                 27 52 'HOLD:'
+     A            ORHOLD         4     27 57
+     A*
+     A                                 29 11'POLICY #:'
+     A            QQPOL#    R          29 21REFFLD(POL#)
+     A*
+     A                                 31  7'POLICY DATES:'
+     A            XXFDT     R          31 21REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                 31 32'TO'
+     A            XXTDT     R          31 35REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A*
+     A                                 33  7 'SECTION CODE:'
+     A            QQCC      R          33 21REFFLD(CODE)
+     A*
+     A                                 35 12'AGENT #:'
+     A            QQAGT          5     35 21
+     A*
+     A                                 37  9'PRODUCER #:'
+     A            QQPRD          3     37 21
+     A*
+     O                                 39  7'OUTPUT QUEUE:'
+     A  08        OROUTQ    R          39 21REFFLD(OUTQ)
+     A  09        UPOUTQ    R          39 21REFFLD(OUTQ)
+     A                                 39 32'FORMS:'
+     A            ORFORM        10     39 38
+     A                                 39 52'SAVE:'
+     A            ORSAVE         4     39 57
+     A*
+     A                                 60 15'(C) COPYRIGHT INSURANCE INFORMA-
+     A                                       TION SYSTEMS. INC,.1996'
+     A*----------------------------------------------------------------
+     A          R HEAD1                     FONT(155)
+     A*----------------------------------------------------------------
+     A            CONAME        40A     6 31
+     A*
+     A                                  7 32'COMMERCIAL DEPARTMENT'
+     A*
+     A            COMAD1        40A     8 34
+     A*
+     A            COMAD2        40A     9 34
+     A*
+     A            COMCTY        25A    10 30
+     A            COMST          2A    10 57
+     A            COMZIP         9S 0  10 60EDTWRD('     -    ')
+     A*
+     A                                 12 39'PAGE 1'
+     A*
+     A                                 13 31'LOSS HISTORY/'
+     A                                 13 44'LOSS RATIO'
+     A*
+     A                                 15 38'SUMMARY'
+     A*
+     A                                 19  7'NAMED INSURED:'
+     A            PMFIN     R          19 23REFFLD(NM40)
+     A                                      FONT(042)
+     A                                 19 67'DATE:'
+     A            DSDAT8    R          19 72REFFLD(DT8)
+     A                                      FONT(042)
+     A                                      EDTWRD('  /  /    ')
+     A*
+     A                                 20 17'DBA:'
+     A            PMDBA     R          20 23REFFLD(NM40)
+     A                                      FONT(042)
+     A*
+     A                                 21 13'ADDRESS:'
+     A            PMADR1    R          21 23REFFLD(NM40)
+     A                                      FONT(042)
+     A*
+     A            PMADR2    R          22 23REFFLD(NM40)
+     A                                      FONT(042)
+     A*
+     A            XXCSZ     R          23 23REFFLD(NM40)
+     A                                      FONT(042)
+     A*
+     A                                 25 13'POLICY #:'
+     A            PMPOL#    R          25 23REFFLD(POL#)
+     A                                      FONT(042)
+     A*
+     A                                 26  8'POLICY PERIOD:'
+     A            XXEFDT    R          26 23REFFLD(DT8)
+     A                                      FONT(042)
+     A                                      EDTWRD('  /  /    ')
+     A                                 26 34'TO'
+     A            XXEXDT    R          26 38REFFLD(DT8)
+     A                                      FONT(042)
+     A                                      EDTWRD('  /  /    ')
+     A*
+     A                                 27  9'CANCEL DATE:'
+     A  72        XXCNDT    R          27 23REFFLD(DT8)
+     A                                      FONT(042)
+     A                                      EDTWRD('  /  /    ')
+     A N72                             27 23'N/A'
+     A                                      FONT(042)
+     A*
+     A                                 29 11'GENERAL AGENT:'
+     A            PMAGCO    R          29 27REFFLD(AGT#)
+     A                                      FONT(042)
+     A                                      EDTCDE(X)
+     A            AGNAME    R          29 34REFFLD(NM40)
+     A                                      FONT(042)
+     A*
+     A                                 30 16'PRODUCER:'
+     A  73        PMPRCO    R          30 27REFFLD(PRO#)
+     A                                      FONT(042)
+     A                                      EDTCDE(X)
+     A  73        XXPNAM    R          30 34REFFLD(NM40)
+     A                                      FONT(042)
+     A*
+     A                                 31  9'LINE OF BUSINESS:'
+     A            XXCDES    R          31 27REFFLD(DS25)
+     A                                      FONT(042)
+     A*
+     A                                 34 23'WRITTEN PREMIUM:'
+     A            XXWPM         11  2  34 41
+     A                                      FONT(042)
+     A                                      EDTCDE(1)
+     A*
+     A                                 36 23'EARNED PREMIUM:'
+     A            XXEPM         11  2  36 41
+     A                                      FONT(042)
+     A                                      EDTCDE(1)
+     A*
+     A                                 38 17'PAID LOSSES/EXPENSES:'
+     A            XXPDL         10  2  38 42
+     A                                      FONT(042)
+     A                                      EDTCDE(1)
+     A                                 38 60'/'
+     A            XXPDE         10  2  38 61
+     A                                      FONT(042)
+     A                                      EDTCDE(1)
+     A*
+     A                                 40  8'RESERVES/INCURRED FOR LOSSES:'
+     A            XXRES         10  2  40 42
+     A                                      FONT(042)
+     A                                      EDTCDE(1)
+     A                                 40 60'/'
+     A            XXINC         10  2  40 61
+     A                                      FONT(042)
+     A                                      EDTCDE(1)
+     A*
+     A                                 42 20'EARNED LOSS RATIO:'
+     A            XXRATO        10  2  42 42
+     A                                      FONT(042)
+     A                                      EDTCDE(1)
+     A                                 42 55'%'
+     A                                      FONT(042)
+     A*
+     A                                 44 21'NUMBER OF CLAIMS:'
+     A            XXCNT          7  0  44 48
+     A                                      FONT(042)
+     A                                      EDTCDE(Z)
+     A*----------------------------------------------------------------
+     A          R HEAD2                     FONT(155)
+     A*----------------------------------------------------------------
+     A            CONAME        40A     6 31
+     A*
+     A            XXCDES    R           7 32REFFLD(DS25)
+     A*
+     A            COMAD1        40A     8 34
+     A*
+     A            COMAD2        40A     9 34
+     A*
+     A            COMCTY        25A    10 30
+     A            COMST          2A    10 57
+     A            COMZIP         9S 0  10 60EDTWRD('     -    ')
+     A*
+     A                                 11 39'PAGE'
+     A            XXPAGE         3  0  11 43
+     A                                      EDTCDE(Z)
+     A*
+     A                                 13 33'LOSS HISTORY DETAIL'
+     A*
+     A                                 15  5'POLICY #:'
+     A            PMPOL#    R          15 14REFFLD(POL#)
+     A                                      FONT(042)
+     A                                 15 67'DATE:'
+     A            DSDAT8    R          15 72REFFLD(DT8)
+     A                                      FONT(042)
+     A                                      EDTWRD('  /  /    ')
+     A*
+     A                                 17  5'NAMED INSURED:'
+     A            PMFIN     R          17 20REFFLD(NM40)
+     A                                      FONT(042)
+     A*
+     A                                 18 15'DBA:'
+     A            PMDBA     R          18 20REFFLD(NM40)
+     A                                      FONT(042)
+     A*
+     A                                 20 58'CURRENT'
+     A                                      FONT(069)
+     A                                 20 70'TOTAL'
+     A                                      FONT(069)
+     A*
+     A                                 21  5'____________'
+     A                                      FONT(069)
+     A                                 21 16'_______________________-
+     A                                      _____________________'
+     A                                      FONT(069)
+     A                                 21 54'____________'
+     A                                      FONT(069)
+     A                                 21 65'____________'
+     A                                      FONT(069)
+     A                                 21 76'______'
+     A                                      FONT(069)
+     A*
+     A                                 21  5'CLAIM #/DOL'
+     A                                      FONT(069)
+     A                                 21 16'SUBLINE-DESCRIPTION/DRIVER'
+     A                                      FONT(069)
+     A                                 21 57'RESERVES'
+     A                                      FONT(069)
+     A                                 21 68'PAYMENTS'
+     A                                      FONT(069)
+     A                                 21 76'STATUS'
+     A                                      FONT(069)
+     A*----------------------------------------------------------------
+     A          R DETL2                     FONT(066)
+     A                                      SPACEB(1)
+     A*----------------------------------------------------------------
+     A            XXCLM#    R              5REFFLD(CLM#)
+     A            XXSUBT         4        16
+     A            XXSDES        40        19
+     A            XXCRS         10  2     53
+     A                                      EDTCDE(1)
+     A            XXCPY         10  2     64
+     A                                      EDTCDE(1)
+     A            XXSTAT         6        76
+     A*----------------------------------------------------------------
+     A          R DETL2A                    FONT(066)
+     A                                      SPACEB(1)
+     A*----------------------------------------------------------------
+     A          R DETL2B                    FONT(066)
+     A                                      SPACEB(1)
+     A*----------------------------------------------------------------
+     A            XXLSDT    R              8REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A            XXDNAM    R             16REFFLD(NM40)
+     A                                    55'License:'
+     A            XXLIC#    R             62REFFLD(LIC#)
+     A                                    74'/'
+     A            XXSTI     R             75REFFLD(ST)
+     A*----------------------------------------------------------------
+     A          R CNTD2                     FONT(155)
+     A                                      SPACEB(2)
+     A*----------------------------------------------------------------
+     A                                    38'CONTINUED'

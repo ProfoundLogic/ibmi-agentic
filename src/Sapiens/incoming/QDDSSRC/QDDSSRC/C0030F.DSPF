@@ -1,0 +1,1121 @@
+     A*%%TS  SD  19981223  102035  COLEMANR    REL-V4R2M0  5769-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   POLICY MASTER MAINTENANCE DISPLAY                        **
+     A**                                                            **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT(UL)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF01
+     A                                      CF24
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*
+     A          R SCR01
+     A*%%TS  SD  19981223  102035  COLEMANR    REL-V4R2M0  5769-PW1
+     A                                      CF05
+     A                                      CF07
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(56)
+     A                                      SETOF(59)
+     A                                      CF09
+     A                                      CF17
+     A                                      CF15
+     A  59                                  CSRLOC(#ROW       #COL)
+     A            #ROW           3S 0H      TEXT('CURSOR ROW POSITION')
+     A            #COL           3S 0H      TEXT('CURSOR COLUMN POSITION')
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0030F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  9 33'New Policy?:'
+     A            SCNEW     R        B  9 46REFFLD(FLAG)
+     A                                      TEXT('FLAG')
+     A  20                                  ERRMSGID(CCR0541 *LIBL/CMESGG)
+     A  21                                  ERRMSGID(CCR0637 *LIBL/CMESGG)
+     A  25                                  ERRMSGID(CCR0638 *LIBL/CMESGG)
+     A                                 11 27'Policy number:'
+     A            SCPOL#    R        B 11 43REFFLD(POL#)
+     A                                      TEXT('policy number')
+     A  23                                  ERRMSGID(CCR0624 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0535 *LIBL/CMESGG)
+     A  31                                  ERRMSGID(CCR0911 *LIBL/CMESGG)
+     A  32                                  ERRMSGID(CCR0910 *LIBL/CMESGG)
+     A  56                                  ERRMSGID(CCR0733 *LIBL/CMESGG)
+     A  29                                  ERRMSGID(CCR0908 *LIBL/CMESGG)
+     A  30                                  ERRMSGID(CCR0909 *LIBL/CMESGG)
+     A                                 14  8'For a new policy key a "Y" into th-
+     A                                      e New Policy field and key the'
+     A                                 15  8'Policy Number into the Policy Numb-
+     A                                      er field, The press enter'
+     A                                 16  8'For an existing Policy key Policy -
+     A                                      number and Press ENTER.'
+     A                                 17  8'Use F5 & F7 to search for Policy n-
+     A                                      umber by Number and Named'
+     A                                 18  8'Insured.'
+     A            SC124         78A  O 24  2TEXT('LINE 24')
+     A          R SCR02
+     A*
+     A                                      CF02
+     A                                      CF04
+     A N09                                  CF07
+     A                                      CF09
+     A                                      CF10
+     A                                      CF14
+     A                                      CF19
+     A                                      SETOF(15)
+     A                                      SETOF(16)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(54)
+     A                                      SETOF(59)
+     A  59                                  CSRLOC(#ROW #COL)
+     A            #ROW           3S 0H      TEXT('CURSOR ROW POSITION')
+     A            #COL           3S 0H      TEXT('CURSOR COLUMN POSITION')
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0030F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A N09        SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  5  2'Policy:'
+     A            SCPOL#    R        O  5 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  5 36'Annual Premium:'
+     A            SCANPR    R        O  5 53REFFLD(A80)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(K)
+     A  03                              6  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A  39        SCNRDS    R        O  6 54REFFLD(DS25)
+     A                                      DSPATR(RI)
+     A  05                              6  2'CANCELLATION PENDING'
+     A                                      DSPATR(RI)
+     A  06                              6  2'REINSTATEMENT PENDING'
+     A                                      DSPATR(RI)
+     A                                  7  2'Named Insured:'
+     A            SCFIN     R        B  7 23REFFLD(NAME)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('NAME')
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                  9  2'DBA Name:'
+     A            SCDBA     R        B  9 23REFFLD(NAME)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('NAME')
+     A                                 10  2'Address:'
+     A            SCADR1    R        B 10 23REFFLD(ADR1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('ADDRESS LINE 1')
+     A  22                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A            SCADR2    R        B 11 23REFFLD(ADR2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('ADDRESS LINE 2')
+     A                                 12  2'City/County/ST/ZIP:'
+     A            SCCTY     R        B 12 23REFFLD(CTY)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('CITY')
+     A  23                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A            SCCNTY    R        B 12 51REFFLD(CNTY)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A  15                                  DSPATR(PC)
+     A  31                                  ERRMSGID(CCR0660 *LIBL/CMESGG)
+     A  54                                  ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A            SCST      R        B 12 56REFFLD(ST)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('STATE')
+     A  16                                  DSPATR(PC)
+     A  24                                  ERRMSGID(CCR0505 *LIBL/CMESGG)
+     A            SCZIP1    R        B 12 61REFFLD(ZIP1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      TEXT('ZIP 1')
+     A  25                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A                                 12 67'-'
+     A            SCZIP2    R        B 12 69REFFLD(ZIP2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      TEXT('ZIP 2')
+     A                                 14  2'Federal Tax ID#:'
+     A            SCFEIN    R        B 14 23REFFLD(FEIN)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A  27                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 14 45'Policy Fee:'
+     A            SCPFEE    R        B 14 58REFFLD(A52)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  28                                  ERRMSGID(CCR0625 *LIBL/CMESGG)
+     A                                 15  2'Commission Rate:'
+     A            SCCMNR    R        B 15 23REFFLD(CMNR)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  29                                  ERRMSGID(CCR0597 *LIBL/CMESGG)
+     A                                      EDTCDE(4)
+     A                                 15 45'Quoted Premium:'
+     A            SCQPRM    R        B 15 62REFFLD(A80)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  32                                  ERRMSGID(CCR0597 *LIBL/CMESGG)
+     A                                      EDTCDE(4)
+     A                                 17  2'Organization type:'
+     A            SCORT     R        B 17 23REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('FLAG')
+     A  26                                  ERRMSGID(CCR0542 *LIBL/CMESGG)
+     A                                 17 28'Years in business:'
+     A            SCYIB2    R        B 17 48REFFLD(YIB)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      TEXT('YEARS IN BUSINESS')
+     A                                 18  2'Nature of business:'
+     A            SCNOB     R        B 18 23REFFLD(NAME)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('NAME')
+     A*
+     A                                 19  6'Type of Policy:'
+     A            SCTPOL    R        B 19 23REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('TYPE OF POLICY FLAG')
+     A  35                                  ERRMSGID(CCR0945 *LIBL/CMESGG)
+     A                                 19 28'Minimum Required Premium:'
+     A            SCMPRM    R        B 19 54REFFLD(A60)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('TYPE OF POLICY FLAG')
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  36                                  ERRMSGID(CCR0946 *LIBL/CMESGG)
+     A*
+     A                                 20  5'Accounting name:'
+     A            SCACN     R        B 20 23REFFLD(NM30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('NAME')
+     A                                 20 56'('
+     A            SCARAC    R        B 20 58REFFLD(AREA)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RZ)
+     A                                 20 62')'
+     A            SCPHA1    R        B 20 64REFFLD(PHN1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RZ)
+     A                                 20 68'-'
+     A            SCPHA2    R        B 20 70REFFLD(PHN2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RZ)
+     A                                 21  5'Inspection name:'
+     A            SCINM     R        B 21 23REFFLD(NM30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                 21 56'('
+     A            SCARIN    R        B 21 58REFFLD(AREA)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RZ)
+     A                                 21 62')'
+     A            SCPHI1    R        B 21 64REFFLD(PHN1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RZ)
+     A                                 21 68'-'
+     A            SCPHI2    R        B 21 70REFFLD(PHN2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RZ)
+     A            SC224         78   O 24  2TEXT('LINE 24')
+     A          R SCR02A
+     A                                      CF02
+     A                                      SETOF(59)
+     A  59                                  CSRLOC(#ROW #COL)
+     A            #ROW           3S 0H      TEXT('CURSOR ROW POSITION')
+     A            #COL           3S 0H      TEXT('CURSOR COLUMN POSITION')
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0030F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 75'SCR02A'
+     A                                  4  3'1) Haul own products exclusively?'
+     A            SCEXC     R        B  4 37REFFLD(PPA01/PAEXC *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                  4 41'If no, haul for others for hire?'
+     A            SCHIRE    R        B  4 74REFFLD(PPA01/PAHIRE *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                  5  6'a) In retail business?'
+     A            SCRETL    R        B  5 29REFFLD(PPA01/PARETL *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                  5 41'In wholesale business?'
+     A            SCWHOL    R        B  5 64REFFLD(PPA01/PAWHOL *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                  6  3'2) Haul for one concern?'
+     A            SC1CRN    R        B  6 28REFFLD(PPA01/PA1CRN *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                  6 41'Is this a trucking company?'
+     A            SCTRCO    R        B  6 69REFFLD(PPA01/PATRCO *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                  7  6'Trucking company name:'
+     A            SCNMCO    R        B  7 29REFFLD(PPA01/PANMCO *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                  8  3'3) Types of cargo:'
+     A            SCCRGO        57A  B  8 22TEXT('CARGO HAULED')
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                  9  6'a) Delivery constrained?'
+     A            SCTMC     R        B  9 31REFFLD(PPA01/PATMC *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                  9 33'If yes, explain:'
+     A            SCTMD         29A  B  9 50TEXT('DLVRY TIME EXPLAINED')
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                 10  3'4) Haul hazardous materials?'
+     A            SCHZD     R        B 10 32REFFLD(PPA01/PAHZD *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 10 34'If yes, describe:'
+     A            SCHZDD        27A  B 10 52
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                 11  3'5) Largest cities entered: Miami'
+     A            SCCTY1    R        B 11 36REFFLD(PPA01/PACTY1 *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 11 39'City #1     '
+     A            SCCTY2    R        B 11 52REFFLD(PPA01/PACTY2 *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 11 55'City #2'
+     A            SCCTY3    R        B 11 63REFFLD(PPA01/PACTY3 *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 11 65'City #3'
+     A            SCCTY4    R        B 11 77REFFLD(PPA01/PACTY4 *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 12 14'City #4'
+     A            SCCTY5    R        B 12 24REFFLD(PPA01/PACTY5 *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 12 26'City #5'
+     A            SCCTY6    R        B 12 36REFFLD(PPA01/PACTY6 *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 12 39'Other:'
+     A            SCCTYO        33A  B 12 46TEXT('OTHER CITY ENTERED')
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                 13  3'6) Operations outside State?  '
+     A            SCOUTF    R        B 13 34REFFLD(PPA01/PAOUTF *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 13 37'If yes: Regular Basis?'
+     A            SCOUTR    R        B 13 60REFFLD(PPA01/PAOUTR *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 13 64'Occasional?'
+     A            SCOUTO    R        B 13 76REFFLD(PPA01/PAOUTO *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 14  3'7) Vehicles with mechanical load o-
+     A                                      r unload device?'
+     A            SCLDEV    R        B 14 54REFFLD(PPA01/PALDEV *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 15  6'If yes, describe:'
+     A            SCVEHD        55A  B 15 24TEXT('LOAD VEHICLE NUMBER')
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                 16  3'8) Pull double and/or triple trail-
+     A                                      ers with vehicles?'
+     A            SCDTTR    R        B 16 56REFFLD(PPA01/PADTTR *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 17  3'9) If vehicle not a tractor, is tr-
+     A                                      ailer or semi-trailer ever hauled?'
+     A            SCHST     R        B 17 72REFFLD(PPA01/PAHST *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 18  2'10) Vehicle used as bus, taxi, liv-
+     A                                      ery?'
+     A            SCBTL     R        B 18 41REFFLD(PPA01/PABTL *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 18 44'Explain:'
+     A            SCBTLD    R        B 18 53REFFLD(PPA01/PABTLD *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                 19  2'11) Transport passangers?'
+     A            SCPSG     R        B 19 28REFFLD(PPA01/PAPSG *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 19 31'Explain:'
+     A            SCPSGD        39A  B 19 40TEXT('HAUL PASSANGERS DESCRIPTION')
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                 20  2'12) Haul Logs?'
+     A            SCLOG     R        B 20 17REFFLD(PPA01/PALOG *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 20 20'Explain:'
+     A            SCLOGD    R        B 20 29REFFLD(PPA01/PALOGD *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                 21  2'13) Haul Trees?'
+     A            SCHTR     R        B 21 18REFFLD(PPA01/PAHTR *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A                                 21 21'Explain:'
+     A            SCHTRD        49A  B 21 30TEXT('HAUL TREES DESCRIPTION')
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                 22  2'14) Provide copy of occupational l-
+     A                                      icense upon request?'
+     A            SCCPL     R        B 22 57REFFLD(PPA01/PACPL *LIBL/CMPAP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      VALUES('Y' 'N')
+     A            SC2A24        78A  O 24  2TEXT('LINE 24')
+     A*
+     A          R SCR03
+     A*%%TS  SD  19980321  135107  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      CF02
+     A N09                                  CF05
+     A N09                                  CF07
+     A N09                                  CF09
+     A N09                                  CF10
+     A N09                                  CF13
+     A                                      CF14
+     A N09                                  CF23
+     A                                      SETOF(15)
+     A                                      SETOF(16)
+     A                                      SETOF(17)
+     A                                      SETOF(18)
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(33)
+     A                                      SETOF(34)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(41)
+     A                                      SETOF(42)
+     A                                      SETOF(43)
+     A                                      SETOF(44)
+     A                                      SETOF(45)
+     A                                      SETOF(46)
+     A                                      SETOF(47)
+     A                                      SETOF(48)
+     A                                      SETOF(49)
+     A                                      SETOF(51)
+     A                                      SETOF(53)
+     A                                      SETOF(54)
+     A                                      SETOF(57)
+     A                                      SETOF(60)
+     A                                      SETOF(61)
+     A                                      SETOF(62)
+     A                                      SETOF(63)
+     A                                      SETOF(64)
+     A                                      SETOF(65)
+     A                                      SETOF(66)
+     A                                      SETOF(67)
+     A                                      SETOF(68)
+     A                                      SETOF(69)
+     A                                      SETOF(70)
+     A                                      SETOF(71)
+     A                                      SETOF(72)
+     A                                      SETOF(73)
+     A                                      SETOF(74)
+     A                                      SETOF(75)
+     A                                      SETOF(76)
+     A                                      SETOF(77)
+     A                                      SETOF(78)
+     A                                      SETOF(79)
+     A                                      SETOF(59)
+     A  59                                  CSRLOC(#ROW       #COL)
+     A            #ROW           3S 0H      TEXT('CURSOR ROW POSITION')
+     A            #COL           3S 0H      TEXT('CURSOR COLUMN POSITION')
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0030F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR03'
+     A N09        SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  5  2'Policy:'
+     A            SCPOL#    R        O  5 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  5 29'Name:'
+     A            SCFIN     R        O  5 36REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                      TEXT('NAME')
+     A  03                              6  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A  39        SCNRDS    R        O  6 54REFFLD(DS25)
+     A                                      DSPATR(RI)
+     A  05                              6  2'CANCELLATION PENDING'
+     A                                      DSPATR(RI)
+     A  06                              6  2'REINSTATEMENT PENDING'
+     A                                      DSPATR(RI)
+     A                                  7  4'Eff date:'
+     A            SCEFDT    R        B  7 14REFFLD(DT8)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  49                                  DSPATR(PC)
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A  20                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  57                                  ERRMSGID(CCR0934 *LIBL/CMESGG)
+     A                                  7 25'Exp date:'
+     A            SCEXDT    R        B  7 35REFFLD(DT8)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0544 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A                                  7 46'Cancel date:'
+     A            SCCNDT    R        O  7 59REFFLD(DT8)
+     A  09                                  DSPATR(HI)
+     A                                      TEXT('DATE')
+     A  23                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0545 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A                                  7 70'Code:'
+     A            SCCACD    R        O  7 76REFFLD(CODE)
+     A                                      TEXT('Cancellation Code')
+     A  09                                  DSPATR(HI)
+     A  54                                  ERRMSGID(CCR0725 *LIBL/CMESGG)
+     A  38                                  ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A                                  8  4'Agent number:'
+     A            SCAGCO         5A  B  8 19
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  41                                  DSPATR(PC)
+     A  25                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A  35                                  ERRMSGID(CCR0571 *LIBL/CMESGG)
+     A  15                                  ERRMSGID(CCR0739 *LIBL/CMESGG)
+     A                                  9  4'Sub-Producer:'
+     A            SCPRCO         3A  B  9 19
+     A  09                                  DSPATR(HI)
+     A  42                                  DSPATR(PC)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  26                                  ERRMSGID(CCR0547 *LIBL/CMESGG)
+     A  35                                  ERRMSGID(CCR0571 *LIBL/CMESGG)
+     A  16                                  ERRMSGID(CCR0942 *LIBL/CMESGG)
+     A            SCANM         47A  O  8 28TEXT('AGENT NAME')
+     A                                      COLOR(WHT)
+     A            SCPNM         47A  O  9 28TEXT('PRODUCER NAME')
+     A                                      COLOR(WHT)
+     A                                 10  4'Agent of record:'
+     A            SCAGRC         5A  B 10 22
+     A  09                                  DSPATR(HI)
+     A  43                                  DSPATR(PC)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  27                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A  36                                  ERRMSGID(CCR0571 *LIBL/CMESGG)
+     A  17                                  ERRMSGID(CCR0739 *LIBL/CMESGG)
+     A                                 10 31'Sub-Producer:'
+     A            SCPRRC         3A  B 10 46
+     A  09                                  DSPATR(HI)
+     A  44                                  DSPATR(PC)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  28                                  ERRMSGID(CCR0547 *LIBL/CMESGG)
+     A  36                                  ERRMSGID(CCR0571 *LIBL/CMESGG)
+     A  18                                  ERRMSGID(CCR0942 *LIBL/CMESGG)
+     A                                 10 52'Date:'
+     A            SCDTRC    R        B 10 59REFFLD(DT8)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      TEXT('DATE')
+     A  29                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  30                                  ERRMSGID(CCR0548 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A  45                                  DSPATR(PC)
+     A                                 11  4'Billing Cd:'
+     A            SCBLCD    R        B 11 17REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A  31                                  ERRMSGID(CCR0514 *LIBL/CMESGG)
+     A  46                                  DSPATR(PC)
+     A                                 11 28'D/E ID#:'
+     A            SCUNCD    R        B 11 38REFFLD(STAF)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A  32                                  ERRMSGID(CCR0550 *LIBL/CMESGG)
+     A  47                                  DSPATR(PC)
+     A                                 11 50'Underwriter:'
+     A            SCUNAS    R        B 11 64REFFLD(UNAS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A  48                                  DSPATR(PC)
+     A                                 12  4'Type of policy:'
+     A            SCTYPO    R        B 12 22REFFLD(TYPO)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('TYPE OF POLICY ISO')
+     A  33                                  ERRMSGID(CCR0549 *LIBL/CMESGG)
+     A                                 12 28'Accounting Month/Year:'
+     A            SCACYR         4Y 0B 12 56
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      TEXT('ACCNT MN & YR')
+     A  34                                  ERRMSGID(CCR0551 *LIBL/CMESGG)
+     A                                 12 61'Binder/Audit:'
+     A            SCAUD     R        B 12 75REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A  51                                  ERRMSGID(CCR0513 *LIBL/CMESGG)
+     A                                 14  4'Sections attached'
+     A                                      DSPATR(UL)
+     A  52                             14 22'Flag sections for review or/and en-
+     A                                      ter additional sections.'
+     A                                      DSPATR(HI)
+     A            SCFL01    R        B 15  2REFFLD(FLAG)
+     A N80                                  DSPATR(ND)
+     A N80                                  DSPATR(PR)
+     A            SCCC01    R        B 15  4REFFLD(CDE)
+     A  09
+     AO 80                                  DSPATR(HI)
+     A  09
+     AO 80                                  DSPATR(PR)
+     A                                      TEXT('CODE')
+     A  60N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  60 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N80                                  DSPATR(PC)
+     A            SCFL02    R        B 15  9REFFLD(FLAG)
+     A N81                                  DSPATR(ND)
+     A N81                                  DSPATR(PR)
+     A            SCCC02    R        B 15 11REFFLD(CDE)
+     A  09
+     AO 81                                  DSPATR(HI)
+     A  09
+     AO 81                                  DSPATR(PR)
+     A  61N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  61 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N81                                  DSPATR(PC)
+     A            SCFL03    R        B 15 16REFFLD(FLAG)
+     A N82                                  DSPATR(ND)
+     A N82                                  DSPATR(PR)
+     A            SCCC03    R        B 15 18REFFLD(CDE)
+     A  09
+     AO 82                                  DSPATR(HI)
+     A  09
+     AO 82                                  DSPATR(PR)
+     A  62N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  62 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N82                                  DSPATR(PC)
+     A            SCFL04    R        B 15 23REFFLD(FLAG)
+     A N83                                  DSPATR(ND)
+     A N83                                  DSPATR(PR)
+     A            SCCC04    R        B 15 25REFFLD(CDE)
+     A  09
+     AO 83                                  DSPATR(HI)
+     A  09
+     AO 83                                  DSPATR(PR)
+     A  63N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  63 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N83                                  DSPATR(PC)
+     A            SCFL05    R        B 15 30REFFLD(FLAG)
+     A N84                                  DSPATR(ND)
+     A N84                                  DSPATR(PR)
+     A            SCCC05    R        B 15 32REFFLD(CDE)
+     A  09
+     AO 84                                  DSPATR(HI)
+     A  09
+     AO 84                                  DSPATR(PR)
+     A  64N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  64 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N84                                  DSPATR(PC)
+     A            SCFL06    R        B 15 37REFFLD(FLAG)
+     A N85                                  DSPATR(ND)
+     A N85                                  DSPATR(PR)
+     A            SCCC06    R        B 15 39REFFLD(CDE)
+     A  09
+     AO 85                                  DSPATR(HI)
+     A  09
+     AO 85                                  DSPATR(PR)
+     A  65N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  65 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N85                                  DSPATR(PC)
+     A            SCFL07    R        B 15 44REFFLD(FLAG)
+     A N86                                  DSPATR(ND)
+     A N86                                  DSPATR(PR)
+     A            SCCC07    R        B 15 46REFFLD(CDE)
+     A  09
+     AO 86                                  DSPATR(HI)
+     A  09
+     AO 86                                  DSPATR(PR)
+     A  66N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  66 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N86                                  DSPATR(PC)
+     A            SCFL08    R        B 15 51REFFLD(FLAG)
+     A N87                                  DSPATR(ND)
+     A N87                                  DSPATR(PR)
+     A            SCCC08    R        B 15 53REFFLD(CDE)
+     A  09
+     AO 87                                  DSPATR(HI)
+     A  09
+     AO 87                                  DSPATR(PR)
+     A  67N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  67 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N87                                  DSPATR(PC)
+     A            SCFL09    R        B 15 58REFFLD(FLAG)
+     A N88                                  DSPATR(ND)
+     A N88                                  DSPATR(PR)
+     A            SCCC09    R        B 15 60REFFLD(CDE)
+     A  09
+     AO 88                                  DSPATR(HI)
+     A  09
+     AO 88                                  DSPATR(PR)
+     A  68N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  68 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N88                                  DSPATR(PC)
+     A            SCFL10    R        B 15 65REFFLD(FLAG)
+     A N89                                  DSPATR(ND)
+     A N89                                  DSPATR(PR)
+     A            SCCC10    R        B 15 67REFFLD(CDE)
+     A  09
+     AO 89                                  DSPATR(HI)
+     A  09
+     AO 89                                  DSPATR(PR)
+     A  69N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  69 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N89                                  DSPATR(PC)
+     A            SCFL11    R        B 16  2REFFLD(FLAG)
+     A N90                                  DSPATR(ND)
+     A N90                                  DSPATR(PR)
+     A            SCCC11    R        B 16  4REFFLD(CDE)
+     A  09
+     AO 90                                  DSPATR(HI)
+     A  09
+     AO 90                                  DSPATR(PR)
+     A  70N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  70 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N90                                  DSPATR(PC)
+     A            SCFL12    R        B 16  9REFFLD(FLAG)
+     A N91                                  DSPATR(ND)
+     A N91                                  DSPATR(PR)
+     A            SCCC12    R        B 16 11REFFLD(CDE)
+     A  09
+     AO 91                                  DSPATR(HI)
+     A  09
+     AO 91                                  DSPATR(PR)
+     A  71N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  71 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N91                                  DSPATR(PC)
+     A            SCFL13    R        B 16 16REFFLD(FLAG)
+     A N92                                  DSPATR(ND)
+     A N92                                  DSPATR(PR)
+     A            SCCC13    R        B 16 18REFFLD(CDE)
+     A  09
+     AO 92                                  DSPATR(HI)
+     A  09
+     AO 92                                  DSPATR(PR)
+     A  72N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  72 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N92                                  DSPATR(PC)
+     A            SCFL14    R        B 16 23REFFLD(FLAG)
+     A N93                                  DSPATR(ND)
+     A N93                                  DSPATR(PR)
+     A            SCCC14    R        B 16 25REFFLD(CDE)
+     A  09
+     AO 93                                  DSPATR(HI)
+     A  09
+     AO 93                                  DSPATR(PR)
+     A  73N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  73 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N93                                  DSPATR(PC)
+     A            SCFL15    R        B 16 30REFFLD(FLAG)
+     A N94                                  DSPATR(ND)
+     A N94                                  DSPATR(PR)
+     A            SCCC15    R        B 16 32REFFLD(CDE)
+     A  09
+     AO 94                                  DSPATR(HI)
+     A  09
+     AO 94                                  DSPATR(PR)
+     A  74N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  74 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N94                                  DSPATR(PC)
+     A            SCFL16    R        B 16 37REFFLD(FLAG)
+     A N95                                  DSPATR(ND)
+     A N95                                  DSPATR(PR)
+     A            SCCC16    R        B 16 39REFFLD(CDE)
+     A  09
+     AO 95                                  DSPATR(HI)
+     A  09
+     AO 95                                  DSPATR(PR)
+     A  75N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  75 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N95                                  DSPATR(PC)
+     A            SCFL17    R        B 16 44REFFLD(FLAG)
+     A N96                                  DSPATR(ND)
+     A N96                                  DSPATR(PR)
+     A            SCCC17    R        B 16 46REFFLD(CDE)
+     A  09
+     AO 96                                  DSPATR(HI)
+     A  09
+     AO 96                                  DSPATR(PR)
+     A  76N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  76 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N96                                  DSPATR(PC)
+     A            SCFL18    R        B 16 51REFFLD(FLAG)
+     A N97                                  DSPATR(ND)
+     A N97                                  DSPATR(PR)
+     A            SCCC18    R        B 16 53REFFLD(CDE)
+     A  09
+     AO 97                                  DSPATR(HI)
+     A  09
+     AO 97                                  DSPATR(PR)
+     A  77N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  77 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N97                                  DSPATR(PC)
+     A            SCFL19    R        B 16 58REFFLD(FLAG)
+     A N98                                  DSPATR(ND)
+     A N98                                  DSPATR(PR)
+     A            SCCC19    R        B 16 60REFFLD(CDE)
+     A  09
+     AO 98                                  DSPATR(HI)
+     A  09
+     AO 98                                  DSPATR(PR)
+     A  78N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  78 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N98                                  DSPATR(PC)
+     A            SCFL20    R        B 16 65REFFLD(FLAG)
+     A N99                                  DSPATR(ND)
+     A N99                                  DSPATR(PR)
+     A            SCCC20    R        B 16 67REFFLD(CDE)
+     A  09
+     AO 99                                  DSPATR(HI)
+     A  09
+     AO 99                                  DSPATR(PR)
+     A  79N53                               ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A  79 53                               ERRMSGID(CCR0591 *LIBL/CMESGG)
+     A N99                                  DSPATR(PC)
+     A                                 17  4'Forms Attached - All Sections'
+     A                                      DSPATR(UL)
+     A            SCFR01    R        B 18  4REFFLD(FORM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCFR02    R        B 18 18REFFLD(FORM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCFR03    R        B 18 31REFFLD(FORM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCFR04    R        B 18 44REFFLD(FORM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCFR05    R        B 18 57REFFLD(FORM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCFR06    R        B 19  4REFFLD(FORM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCFR07    R        B 19 18REFFLD(FORM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCFR08    R        B 19 31REFFLD(FORM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCFR09    R        B 19 44REFFLD(FORM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCFR10    R        B 19 57REFFLD(FORM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                 20  4'Comments'
+     A                                      DSPATR(UL)
+     A            SCCOMM    R        B 21  4REFFLD(COMM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SC324         78A  O 24  2TEXT('LINE 24')
+     A            SCACMM         2Y 0B 12 51
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      TEXT('ACCNT MN & YR')
+     A  34                                  ERRMSGID(CCR0551 *LIBL/CMESGG)
+     A                                 12 54'/'
+     A*** Begin dlt *** 08/25/01 **************************************
+     A*********** SCPRDT    R        B  4 71REFFLD(DT8)
+     A**57*******                           DSPATR(HI)
+     A***********                           DSPATR(PR)
+     A***********                           TEXT('DATE')
+     A***********                           EDTWRD('  /  /    ')
+     A***********                       4 55'Process Date..:'
+     A*** End dlt ***** 08/25/01 **************************************
+     A          R SCR04
+     A*
+     A                                      CF02
+     A                                      CF17
+     A                                      CF18
+     A                                      SETOF(21)
+     A                                      SETOF(20)
+     A                                      SETOF(59)
+     A  59                                  CSRLOC(#ROW #COL)
+     A            #ROW           3S 0H      TEXT('CURSOR ROW POSITION')
+     A            #COL           3S 0H      TEXT('CURSOR COLUMN POSITION')
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0030F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR04'
+     A                                  5  2'Policy:'
+     A            SCPOL#    R        O  5 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  5 29'Name:'
+     A            SCFIN     R        O  5 36REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                      TEXT('NAME')
+     A  03                              6  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A  39        SCNRDS    R        O  6 54REFFLD(DS25)
+     A                                      DSPATR(RI)
+     A  05                              6  2'CANCELLATION PENDING'
+     A                                      DSPATR(RI)
+     A  06                              6  2'REINSTATEMENT PENDING'
+     A                                      DSPATR(RI)
+     A                                  9 27' NEW BUSINESS PREMIUM EDIT.'
+     A                                      DSPATR(RI)
+     A                                 11 23'Press F17 to Verify Premiums En-
+     A                                      tered.'
+     A                                 12 23'Press ENTER to Continue.'
+     A            SCMSG4    R        O 16 11REFFLD(COMM)
+     A            SCQMSG        15   O 17 11
+     A            SCPRMQ    R        O 17 27REFFLD(A80)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A            SCMSGP        23   O 17 39
+     A            SCPRMP    R        O 17 63REFFLD(A80)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A  21                                  ERRMSGID(CCR0925 *LIBL/CMESGG)
+     A            SC424         78   O 24  2TEXT('LINE 24')
+     A*------------------------------------------------------------
+     A          R WDW01
+     A                                      OVERLAY
+     A                                      WINDOW(7 15 6 50)
+     A                                  2  3'This policy can not be deleted -
+     A                                      because a claim'
+     A                                  3  3'has been entered on the policy.'
+     A                                  5  3'Press Enter to continue'
+     A                                      COLOR(BLU)
+     A*------------------------------------------------------------
+     A          R WDW02
+     A                                      CF04
+     A                                      CF12
+     A                                      OVERLAY
+     A                                      WINDOW(7 10 8 60)
+     A                                  1  2'*** WARNING:  You are about to -
+     A                                      delete a policy. ***'
+     A                                      DSPATR(HI)
+     A                                  3  4'Press F4 to delete the policy, or'
+     A                                      COLOR(BLU)
+     A                                  4  4'press F12 to cancel this function.'
+     A                                      COLOR(BLU)
+     A                                  7  4'F4=Delete   F12=Cancel'
+     A                                      COLOR(BLU)
+     A*------------------------------------------------------------
+     A          R SCR99
+     A*
+     A            SCERR     R        I  3  3REFFLD(FLAG *LIBL/SREFP)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

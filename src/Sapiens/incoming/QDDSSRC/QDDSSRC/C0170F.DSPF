@@ -1,0 +1,256 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DRIVER MASTER MAINTENANCE DISPLAY                        **
+     A**                                                            **
+     A****************************************************************
+     A**  REVISIONS                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A*                                     CHGINPDFT(CS)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A*
+     A                                      CF08
+     A                                      CF09
+     A                                      CF13
+     A                                      PUTOVR
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(32)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0170F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  9 25'Policy number:'
+     A            SCPOL#    R        B  9 44REFFLD(POL#)
+     A                                      TEXT('policy number')
+     A  20                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A  21                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 11 25'Driver state:'
+     A            SCSTI     R        B 11 44REFFLD(ST)
+     A  21                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0505 *LIBL/CMESGG)
+     A  32                                  DSPATR(PC)
+     A                                      OVRDTA
+     A                                 13 25'Drivers license#:'
+     A            SCLIC#    R        B 13 44REFFLD(PREF01/LIC# *LIBL/CREFP)
+     A  21                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24  2'F8=Last name search'
+     A                                      COLOR(BLU)
+     A                                 24 28'F9=License # search'
+     A                                      COLOR(BLU)
+     A                                 24 54'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A                                  3 27'DRIVERS LICENSE NUMBER ENTRY'
+     A                                      DSPATR(HI)
+     A          R SCR02
+     A*
+     A                                      CF12
+     A N09                                  CF20
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(39)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0170F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A N09        SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 34REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  5  2'Driver State:'
+     A            SCSTI     R        O  5 16REFFLD(ST)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  5 27'License No:'
+     A            SCLIC#    R        O  5 39REFFLD(LIC#)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  5 63'Status:'
+     A            SCSTAT    R        O  5 71REFFLD(STAT)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  8  2'Drivers Last Name              '
+     A                                      DSPATR(UL)
+     A                                  8 37'First Name    '
+     A                                      DSPATR(UL)
+     A                                  8 54'Middle Initial'
+     A                                      DSPATR(UL)
+     A            SCLSN     R        B  9  2REFFLD(LSN)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('LAST NAME')
+     A            SCFSN     R        B  9 37REFFLD(FSN)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('FIRST NAME')
+     A            SCMID     R        B  9 60REFFLD(MID)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                      TEXT('MIDDLE INITIAL')
+     A                                 11  2'Date of Birth:'
+     A            SCDOB     R        B 11 18REFFLD(DT8)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A  22                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                 11 37'License Class.:'
+     A            SCCLS     R     A  B 11 53REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('License Class')
+     A  29                                  ERRMSGID(CCR0914 *LIBL/CMESGG)
+     A                                 13 37'Owner/Driver?.:'
+     A            SCOWN     R     A  B 13 53REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('Owner/driver Y/N')
+     A  27                                  ERRMSGID(CCR0513 *LIBL/CMESGG)
+     A                                 13  2'Date Hired:'
+     A            SCEMDT    R        B 13 15REFFLD(DT8)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A  23                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 15 37'Vehicle Number:'
+     A            SCITM#    R     A  B 15 53REFFLD(ITM#)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A  28                                  ERRMSGID(CCR0829 *LIBL/CMESGG)
+     A  35                                  ERRMSGID(CCR0916 *LIBL/CMESGG)
+     A                                      CHECK(RZ)
+     A                                      OVRDTA
+     A            SCITM2    R     A  B 15 60REFFLD(ITM#)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('Vehicle # 2')
+     A  36                                  ERRMSGID(CCR0916 *LIBL/CMESGG)
+     A                                      CHECK(RZ)
+     A            SCITM3    R     A  B 15 67REFFLD(ITM#)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('Vehicle # 3')
+     A  37                                  ERRMSGID(CCR0916 *LIBL/CMESGG)
+     A                                      CHECK(RZ)
+     A            SCITM4    R     A  B 16 53REFFLD(ITM#)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('Vehicle # 4')
+     A  38                                  ERRMSGID(CCR0916 *LIBL/CMESGG)
+     A                                      CHECK(RZ)
+     A            SCITM5    R     A  B 16 60REFFLD(ITM#)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('Vehicle # 5')
+     A  39                                  ERRMSGID(CCR0916 *LIBL/CMESGG)
+     A                                      CHECK(RZ)
+     A                                 15  2'Date MVR Ordered:'
+     A            SCVROD    R        B 15 21REFFLD(DT8)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A  24                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 17  2'Date MVR Received:'
+     A            SCVRRD    R        B 17 21REFFLD(DT8)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A  25                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 19  2'Comments:'
+     A            SCCOMM    R        B 19 14REFFLD(COMM)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 23'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A N09                             23 60'F20=Change status'
+     A                                      COLOR(BLU)
+     A                                  3 29'DRIVER DESCRIPTION ENTRY'
+     A                                      DSPATR(HI)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR99
+     A*
+     A            SCERR     R        I  3  3REFFLD(PREF01/FLAG *LIBL/SREFP)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)
+     A                                      TEXT('FLAG')

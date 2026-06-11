@@ -1,0 +1,71 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   A/R BALANCE BY POLICY REPORT                             **
+     A**                                                            **
+     A**   PROGRAMMER: C:41                                         **
+     A****************************************************************
+     A** REVISIONS                                                  **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      REF(*LIBL/CREFP)
+     A*  AGENT MASTER RECORD FORMAT *                                  *********
+     A          R AGMRECF
+     A*                                                                *********
+     A            AGNAME    R           6 18REFFLD(NM40)
+     A            AGMAD1    R           7 18REFFLD(ADR1 *LIBL/SREFP)
+     A            XXCSTZ    R           8 18REFFLD(ADR2 *LIBL/SREFP)
+     A*
+     A*  POLICY MASTER RECORD FORMAT *                                 *********
+     A          R PMMRECF
+     A            PMFIN     R          13 27REFFLD(NM40)
+     A            DSDAT8         8  0O 13102EDTWRD('  /  /    ')
+     A            PMDBA     R          14 27REFFLD(NM40)
+     A            PMPOL#    R          15 27REFFLD(POL#)
+     A*                                                                *********
+     A*  POSITON CARRAGE RETURN *                                      *********
+     A          R POSLINE                   SKIPB(18)
+     A*                                                                *********
+     A*  A/R DETAIL RECORD FORMAT 1                                    *********
+     A          R ARDET1
+     A            XXPODT    R             29REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A            ARPYCD    R             39REFFLD(CODE)
+     A            ARDESC    R             43REFFLD(DS30)
+     A            ARCHK#    R             75REFFLD(CHK#)
+     A                                      EDTCDE(Z)
+     A            ARGAMT    R             84REFFLD(A92)
+     A                                      EDTCDE(K)
+     A            XXAMT     R            113REFFLD(A112)
+     A                                      EDTCDE(K)
+     A                                      SPACEA(001)
+     A*                                                                *********
+     A*  A/R DETAIL RECORD FORMAT 2                                    *********
+     A          R ARDET2
+     A            XXPODT    R             29REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A            ARPYCD    R             39REFFLD(CODE)
+     A            ARDESC    R             43REFFLD(DS30)
+     A            ARCHK#    R             75REFFLD(CHK#)
+     A                                      EDTCDE(Z)
+     A            XXAMT     R            113REFFLD(A112)
+     A                                      EDTCDE(J)
+     A                                      SPACEA(001)
+     A*                                                                *********
+     A*  CONTINUED                                                     *********
+     A          R CONTINUE                  SPACEB(002)
+     A                                    68'CONTINUED'
+     A*                                                                *********
+     A*  TOTAL BALANCE DUE FORMAT *                                    *********
+     A          R TBALDUE                   SPACEB(002)
+     A                                    67'BALANCE DUE:'
+     A            XXBAL     R             82REFFLD(A112)
+     A                                      EDTCDE(J)
+     A*                                                                *********
+     A*  REQUESTOR NAME ANE DATE                                       *********
+     A          R REQNDT                    SKIPB(60)
+     A            UPSTAF         3        11
+     A            DSDAT8         8  0     15EDTWRD('  /  /    ')

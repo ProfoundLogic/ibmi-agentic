@@ -1,0 +1,64 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DISPLAY FOR DRIVERS MASTER BY LICENSE NUMBER             **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A*---------------------------------------------------------------
+     A          R SCR01
+     A                                      CF12
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0171F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  4  2'License Number:'
+     A            SCLIC#    R        O  4 18REFFLD(LIC#)
+     A*                                     DSPATR(CS)
+     A                                  6  2'Last Name                     '
+     A                                      DSPATR(UL)
+     A                                  6 34'First Name     '
+     A                                      DSPATR(UL)
+     A                                  6 51'Initial'
+     A                                      DSPATR(UL)
+     A                                  6 60'  Policy No  '
+     A                                      DSPATR(UL)
+     A                                  6 75'Status'
+     A                                      DSPATR(UL)
+     A            SCLA01        77A  O  8  2
+     A            SCLB01        69A  O  9  2
+     A            SCLA02        77A  O 11  2
+     A            SCLB02        69A  O 12  2
+     A            SCLA03        77A  O 14  2
+     A            SCLB03        69A  O 15  2
+     A            SCLA04        77A  O 17  2
+     A            SCLB04        69A  O 18  2
+     A            SCLA05        77A  O 20  2
+     A            SCLB05        69A  O 21  2
+     A                                 23  2'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A            SCROLL         8A  O 23 67
+     A*---------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND PR)

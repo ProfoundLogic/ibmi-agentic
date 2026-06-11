@@ -1,0 +1,697 @@
+     A* (c) 2015 StoneRiver, Inc. All rights Reserved.                *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                 *
+     A*                                                               *
+     A*****************************************************************
+     A* SYSTEM DOCUMENTS AND LETTERS DATA WORK FILE - Managed Care    *
+     A*****************************************************************
+     A*                                                               *
+     A*  PROJECT:  SY251        PROGRAMMER:  C:79                     *
+     A*  CREATED:  05/28/15                                           *
+     A*  DESCRIPTION:  THIS IS THE WORK FILE TO HOLD THE MANAGED CARE *
+     A*                DATA FOR THE NEW DEPARTMENT LETTERS PROCESS.   *
+     A*                                                               *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 08/04/15 C: 079 Project SY251                                 *
+     A*                 Add company and group type fields             *
+     A*                 Add staff code area code and phone number     *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(SREFP)
+     A          R PDM01                     TEXT('DOCUMENTS/LETTERS WORKFILE')
+     A*
+     A* KEY FIELDS
+     A*
+     A            DMXML         60A         COLHDG('XML FILE NAME')
+     A*
+     A            DMCO#     R     S         REFFLD(CO#)
+     A            DMSUB#    R     S         REFFLD(SUB#)
+     A            DMFND     R     S         REFFLD(FND)
+     A            DMFYR     R     S         REFFLD(FYR)
+     A            DMCASE    R     S         REFFLD(CASE)
+     A            DMEMP#    R     S         REFFLD(EMP#)
+     A            DMDIV     R     S         REFFLD(DIV)
+     A*
+     A* RECIPIENT FIELDS
+     A*
+     A            DMRCFEIN  R     S         REFFLD(FEIN)
+     A                                      COLHDG('RECIPIENT FEDERAL' 'TAX ID')
+     A            DMRCMOD   R     S         REFFLD(A30)
+     A                                      COLHDG('RECIPIENT MODIFIER')
+     A            DMRCNAME  R               REFFLD(DS00 )
+     A                                      COLHDG('RECIPIENT' 'NAME')
+     A            DMRCATTN  R               REFFLD(DS00 )
+     A                                      COLHDG('RECIPIENT' 'ATTENTION')
+     A            DMRCMADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('RECIPIENT' 'MAIL ADDRESS1')
+     A            DMRCMADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('RECIPIENT' 'MAIL ADDRESS1')
+     A            DMRCMCTY  R               REFFLD(CTY)
+     A                                      COLHDG('RECIPIENT' 'MAILING CITY')
+     A            DMRCMST   R               REFFLD(ST)
+     A                                      COLHDG('RECIPIENT' 'MAILING STATE')
+     A            DMRCMZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('RECIPIENT' 'MAILING ZIP')
+     A            DMRCPADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('RECIPIENT' 'PHYS ADDRESS1')
+     A            DMRCPADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('RECIPIENT' 'PHYS ADDRESS1')
+     A            DMRCPCTY  R               REFFLD(CTY)
+     A                                      COLHDG('RECIPIENT' 'PHYSICAL CITY')
+     A            DMRCPST   R               REFFLD(ST)
+     A                                      COLHDG('RECIPIENT' 'PHYSICAL STATE')
+     A            DMRCPZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('RECIPIENT' 'PHYSICAL ZIP')
+     A            DMRCAREA  R     S         REFFLD(AREA)
+     A                                      COLHDG('RECIPIENT' 'AREA CODE')
+     A            DMRCPHN#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('RECIPIENT' 'PHONE NUMBER')
+     A            DMRCTFRA  R     S         REFFLD(AREA)
+     A                                      COLHDG('RECIPIENT' 'TOLL FREE AREA')
+     A            DMRCTFR   R     S         REFFLD(PHN#)
+     A                                      COLHDG('RECIPIENT' 'TOLL FREE PHN')
+     A            DMRCFAXA  R     S         REFFLD(AREA)
+     A                                      COLHDG('RECIPIENT' 'FAX AREA CODE')
+     A            DMRCFAX   R     S         REFFLD(PHN#)
+     A                                      COLHDG('RECIPIENT' 'FAX PHN NUMBER')
+     A            DMRCNOB   R               REFFLD(DS40)
+     A                                      COLHDG('RECIPIENT' 'NATURE OF BUS')
+     A*
+     A* CLAIM# FIELDS
+     A*
+     A            DMCLAIM#  R               REFFLD(DS25)
+     A                                      COLHDG('CLAIM NUMBER')
+     A*
+     A* CLAIM DEMOGRAPHICS
+     A*
+     A            DMCDNAME  R               REFFLD(DS50)
+     A                                      COLHDG('CLAIMANT' 'FULL NAME')
+     A            DMCDLSN   R               REFFLD(LSN)
+     A                                      COLHDG('CLAIMANT' 'LAST NAME')
+     A            DMCDFSN   R               REFFLD(FSN)
+     A                                      COLHDG('CLAIMANT' 'FIRST NAME')
+     A            DMCDMID   R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIMANT' 'MIDDLE INT')
+     A            DMCDADR1  R               REFFLD(ADR1)
+     A                                      COLHDG('CLAIMANT' 'ADDRESS 1')
+     A            DMCDADR2  R               REFFLD(ADR2)
+     A                                      COLHDG('CLAIMANT' 'ADDRESS 2')
+     A            DMCDCTY   R               REFFLD(CTY)
+     A                                      COLHDG('CLAIMANT' 'CITY')
+     A            DMCDST    R               REFFLD(ST)
+     A                                      COLHDG('CLAIMANT' 'STATE')
+     A            DMCDZIP   R     S         REFFLD(ZIP)
+     A                                      COLHDG('CLAIMANT' 'ZIP CODE')
+     A            DMCDOADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('OUT OF CNTRY' 'ADR1')
+     A            DMCDOADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('OUT OF CNTRY' 'ADR2')
+     A            DMCDOCTY  R               REFFLD(CTY)
+     A                                      COLHDG('OUT OF CNTRY' 'CITY')
+     A            DMCDOADR3 R               REFFLD(DS40)
+     A                                      COLHDG('OUT OF CNTRY' 'PROV'+
+     A                                      'POSTAL CODE')
+     A            DMCDCTRY  R               REFFLD(DS30)
+     A                                      COLHDG('CLAIMANT' 'COUNTRY')
+     A            DMCDSS#        9A         COLHDG('CLAIMANT' 'SS#')
+     A            DMCDDTOB  R     S         REFFLD(DT)
+     A                                      COLHDG('CLAIMANT' 'DATE OF BIRTH')
+     A            DMCDAREA  R     S         REFFLD(A30)
+     A                                      COLHDG('CLAIMANT' 'AREA' 'CODE')
+     A            DMCDPHN#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('CLAIMANT' 'PHONE#')
+     A            DMCDMSTS  R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIMANT' 'MARITAL STATUS')
+     A            DMCDWARA  R     S         REFFLD(A30)
+     A                                      COLHDG('CLAIMANT' 'WORK AREA CODE')
+     A            DMCDWPH#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('CLAIMANT' 'WORK PHONE#')
+     A            DMCMDEDT  R     S         REFFLD(DT)
+     A                                      COLHDG('DATE OF DEATH')
+     A*
+     A* CLAIM FIELDS
+     A*
+     A            DMCMSTAT  R               REFFLD(DS20)
+     A                                      COLHDG('CLAIM' 'STATUS')
+     A            DMCMACDT  R     S         REFFLD(DT)
+     A                                      COLHDG('DATE OF INJURY')
+     A            DMCMDTRP  R     S         REFFLD(DT)
+     A                                      COLHDG('DATE' 'REPORTED')
+     A            DMCMACTM  R     S         REFFLD(TIME)
+     A                                      COLHDG('TIME OF INJURY')
+     A            DMCMACDS  R               REFFLD(DS60)
+     A                                      COLHDG('ACCIDENT' 'DESCRIPTION')
+     A            DMCMACD2  R               REFFLD(DS60)
+     A                                      COLHDG('ACCIDENT' 'DESCRIPTION 2')
+     A            DMCMDTLW  R     S         REFFLD(DT)
+     A                                      COLHDG('DATE' 'LAST' 'WORKED')
+     A            DMCMLTFL  R               REFFLD(FLAG)
+     A                                      COLHDG('LOST' 'TIME' 'FLAG')
+     A            DMCMMMI   R     S         REFFLD(DT)
+     A                                      COLHDG('MMI' 'DATE')
+     A            DMCMMMIP       5S 2
+     A                                      COLHDG('MMI PERCENTAGE')
+     A*
+     A* CLAIM INDICATORS
+     A*
+     A            DMCMCFLG  R               REFFLD(FLAG)
+     A                                      COLHDG('CATASTROPHIC' 'CASE')
+     A            DMCMMCA   R               REFFLD(FLAG)
+     A                                      COLHDG('MCA FLAG')
+     A            DMCMDNY   R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM DENIED' 'INDICATOR')
+     A            DMCMCVFL  R               REFFLD(FLAG)
+     A                                      COLHDG('CONTROVERT FLAG')
+     A*
+     A* MEDICAL INDICATORS
+     A*
+     A            DMCM1A3   R               REFFLD(FLAG)
+     A                                      COLHDG('REHAB')
+     A*
+     A* CLAIM # FIELDS
+     A*
+     A            DMCMCCL#  R               REFFLD(DS13)
+     A                                      COLHDG('CARRIER CLAIM' 'NUMBER')
+     A            DMCMSCL#  R               REFFLD(DS25)
+     A                                      COLHDG('STATE CLAIM' 'NUMBER')
+     A*
+     A* CLAIM STATE FIELDS
+     A*
+     A            DMCMAST   R               REFFLD(ST)
+     A                                      COLHDG('ADJUDICATION''STATE')
+     A*
+     A* CLAIM EMPLOYMENT
+     A*
+     A            DMCMOCDS  R               REFFLD(DS40)
+     A                                      COLHDG('OCCUPATION DESC')
+     A            DMCMESTS  R               REFFLD(DS40)
+     A                                      COLHDG('EMPLOYMENT STATUS')
+     A            DMCMDYWK       1S 0
+     A                                      COLHDG('DAYS PER WEEK')
+     A            DMCMHRDY  R     S         REFFLD(A30)
+     A                                      COLHDG('HOURS' 'PER DAY')
+     A            DMCMHIDT  R     S         REFFLD(DT)
+     A                                      COLHDG('DATE' 'HIRED')
+     A*
+     A* CLAIM STAFF ASSIGNMENTS
+     A*
+     A            DMCNNAME  R               REFFLD(NM50)
+     A                                      COLHDG('CASE MANAGEMENT' 'NURSE'+
+     A                                      'NAME')
+     A            DMCNEXT#  R     S         REFFLD(EXT#)
+     A                                      COLHDG('CASE MANAGEMENT' 'NURSE'+
+     A                                      'EXT#')
+     A            DMCNMAIL  R               REFFLD(DS60)
+     A                                      COLHDG('CASE MANAGEMENT' 'NURSE'+
+     A                                      'EMAIL')
+     A            DMCNTITL  R               REFFLD(TITL)
+     A                                      COLHDG('CASE MANAGEMENT' 'NURSE'+
+     A                                      'TITLE')
+     A            DMCSNAME  R               REFFLD(NM50)
+     A                                      COLHDG('CASE MANAGEMENT' 'SUPER'+
+     A                                      'NAME')
+     A            DMCSEXT#  R     S         REFFLD(EXT#)
+     A                                      COLHDG('CASE MANAGEMENT' 'SUPER'+
+     A                                      'EXT#')
+     A            DMCSMAIL  R               REFFLD(DS60)
+     A                                      COLHDG('CASE MANAGEMENT' 'SUPER'+
+     A                                      'E-MAIL')
+     A            DMCSTITL  R               REFFLD(TITL)
+     A                                      COLHDG('CASE MANAGEMENT' 'SUPER'+
+     A                                      'TITLE')
+     A            DMSUPNAME R               REFFLD(NM50)
+     A                                      COLHDG('SUPERVISOR' 'NAME')
+     A            DMSUPEXT# R     S         REFFLD(EXT#)
+     A                                      COLHDG('SUPERVISOR' 'NAME')
+     A            DMSUPMAIL R               REFFLD(DS60)
+     A                                      COLHDG('SUPERVISOR' 'MAIL')
+     A            DMSUPTITL R               REFFLD(TITL)
+     A                                      COLHDG('SUPERVISOR' 'TITLE')
+     A            DMADJNAME R               REFFLD(NM50)
+     A                                      COLHDG('ADJUSTOR' 'NAME')
+     A            DMADJEXT# R     S         REFFLD(EXT#)
+     A                                      COLHDG('ADJUSTOR' 'NAME')
+     A            DMADJMAIL R               REFFLD(DS60)
+     A                                      COLHDG('ADJUSTOR' 'MAIL')
+     A            DMADJTITL R               REFFLD(TITL)
+     A                                      COLHDG('ADJUSTOR' 'TITLE'  )
+     A            DMFADNAME R               REFFLD(NM50)
+     A                                      COLHDG('FIELD ADJUSTOR' 'NAME')
+     A            DMFADEXT# R     S         REFFLD(EXT#)
+     A                                      COLHDG('FIELD ADJUSTOR' 'NAME')
+     A            DMFADMAIL R               REFFLD(DS60)
+     A                                      COLHDG('FIELD ADJUSTOR' 'MAIL')
+     A            DMFADTITL R               REFFLD(TITL)
+     A                                      COLHDG('FIELD ADJUSTOR' 'TITLE'  )
+     A            DMST3NAME R               REFFLD(NM50)
+     A                                      COLHDG('CASE MANAGEMENT' 'STF3'+
+     A                                      'NAME')
+     A            DMST3EXT# R     S         REFFLD(EXT#)
+     A                                      COLHDG('CASE MANAGEMENT' 'STF3'+
+     A                                      'EXT#')
+     A            DMST3MAIL R               REFFLD(DS60)
+     A                                      COLHDG('CASE MANAGEMENT' 'STF3'+
+     A                                      'E-MAIL')
+     A            DMST3TITL R               REFFLD(TITL)
+     A                                      COLHDG('CASE MANAGEMENT' 'STF3'+
+     A                                      'TITLE')
+     A*
+     A* CLAIM MEDICAL
+     A*
+     A            DMCMINDT  R     S         REFFLD(DT)
+     A                                      COLHDG('INITIAL TREATMENT' 'DATE')
+     A*
+     A            DMCMTSIT  R               REFFLD(DS40)
+     A                                      COLHDG('MOST CURRENT' 'TREATMENT'+
+     A                                      'SITE')
+     A            DMCMYRLX       4S 0
+     A                                      COLHDG('YEAR LAST' 'EXPOSED')
+     A            DMCMODIS  R               REFFLD(FLAG)
+     A                                      COLHDG('OCCUPATIONAL' 'DISEASE')
+     A            DMCMDBDT  R     S         REFFLD(DT)
+     A                                      COLHDG('DATE OF' 'DISABLILITY')
+     A            DMCMPDIA  R               REFFLD(DS8)
+     A                                      COLHDG('PRIMARY''DIAGNOSIS')
+     A            DMCMPDIAD R               REFFLD(DS25)
+     A                                      COLHDG('PRIMARY DIAG' 'DESCRIPTION')
+     A            DMCMDTRE  R     S         REFFLD(DT)
+     A                                      COLHDG('DATE REHAB' 'ASSIGNED')
+     A            DMCMENTD  R     S         REFFLD(DT)
+     A                                      COLHDG('DATE ENTERED')
+     A            DMCMRCVD  R     S         REFFLD(DT)
+     A                                      COLHDG('DATE RECEIVED')
+     A            DMCMPREC  R               REFFLD(FLAG)
+     A                                      COLHDG('PRE CERTIFICATION')
+     A            DMCMPREX  R               REFFLD(FLAG)
+     A                                      COLHDG('PRE EXISTING')
+     A*
+     A* CLAIM PROVIDERS
+     A*
+     A            DMPPFEIN  R     S         REFFLD(FEIN)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'FEIN')
+     A            DMPPMOD   R     S         REFFLD(A30)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'MOD')
+     A            DMPPEMAD  R               REFFLD(DS60)
+     A                                      COLHDG('PRIMARY CARE'  'PHYSICIAN'+
+     A                                      'EMAIL')
+     A            DMPPNAME  R               REFFLD(NAME)
+     A                                      COLHDG('PRIMARY CARE'  'PHYSICIAN'+
+     A                                      'NAME')
+     A            DMPPADR1  R               REFFLD(ADR1)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'ADDRESS1')
+     A            DMPPADR2  R               REFFLD(ADR2)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'ADDRESS2')
+     A            DMPPCTY   R               REFFLD(CTY)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'CITY')
+     A            DMPPST    R               REFFLD(ST)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'STATE')
+     A            DMPPZIP   R     S         REFFLD(ZIP)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'ZIP')
+     A            DMPPOADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'ADDRESS1' 'OUT OF CNTRY')
+     A            DMPPOADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'ADDRESS2' 'OUT OF CNTRY')
+     A            DMPPOCTY  R               REFFLD(CTY)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'CITY' 'OUT OF CNTRY')
+     A            DMPPOADR3 R               REFFLD(DS40)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'PROVINCE' 'OUT OF CNTRY')
+     A            DMPPCTRY  R               REFFLD(DS30)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'COUNTRY')
+     A            DMPPAREA  R     S         REFFLD(A30)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'AREA CODE')
+     A            DMPPPHN#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'PHONE#')
+     A            DMPPFXAR  R     S         REFFLD(A30)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'FAX' 'AREA CODE')
+     A            DMPPFAX#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'FAX' 'PHONE#')
+     A            DMPPFRDT  R     S         REFFLD(DT)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'START' 'DATE')
+     A            DMPPTODT  R     S         REFFLD(DT)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'END' 'DATE')
+     A            DMPPSPEC  R               REFFLD(DS30)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'SPECIALTY')
+     A            DMPPTSIT  R               REFFLD(DS40)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'TREATEMENT' 'SITE')
+     A            DMPPN#02  R               REFFLD(DS15)
+     A                                      COLHDG('PRIMARY CARE' 'PHYSICIAN'+
+     A                                      'NPI#')
+     A*
+     A* PRE-CERT
+     A*
+     A            DMPCSTAT  R               REFFLD(FLAG)
+     A                                      COLHDG('PRE-CERT STATUS')
+     A            DMPCLIAB  R               REFFLD(FLAG)
+     A                                      COLHDG('PRE-CERT LIABILITY')
+     A            DMPCADDT  R     S         REFFLD(DT)
+     A                                      COLHDG('PRE-CERT' 'ADMIT DATE')
+     A            DMPCRVDT  R     S         REFFLD(DT)
+     A                                      COLHDG('PRE-CERT' 'REVIEW DATE')
+     A            DMPCCERT  R               REFFLD(DS15)
+     A                                      COLHDG('PRE-CERT' 'NUMBER')
+     A            DMPCEXT   R     S         REFFLD(A30)
+     A                                      COLHDG('PRE-CERT' 'NUMBER'+
+     A                                      'EXTENSION')
+     A            DMPCPDIA  R               REFFLD(DS8)
+     A                                      COLHDG('PRECERT' 'PRIMARY'+
+     A                                      'DIAGNOSIS')
+     A            DMPCPDIAD R               REFFLD(DS25)
+     A                                      COLHDG('PRECERT' 'PRIMARY'+
+     A                                      'DIAGNOSIS' 'DESCRIPTION')
+     A            DMPCINAME R               REFFLD(NM50)
+     A                                      COLHDG('PRECERT' 'INTERVIEWER'+
+     A                                      'NAME')
+     A            DMPCIEXT# R     S         REFFLD(EXT#)
+     A                                      COLHDG('PRECERT' 'INTERVIEWER'+
+     A                                      'EXT#')
+     A            DMPCMAIL  R               REFFLD(DS60)
+     A                                      COLHDG('PRECERT' 'INTERVIEWER'+
+     A                                      'EMAIL')
+     A            DMPCTITL  R               REFFLD(TITL)
+     A                                      COLHDG('PRECERT' 'INTERVIEWER'+
+     A                                      'TITLE')
+     A            DMPCREQD  R     S         REFFLD(A30)
+     A                                      COLHDG('PRECERT' 'REQUESTED DAYS')
+     A            DMPCCERD  R     S         REFFLD(A30)
+     A                                      COLHDG('PRECERT' 'CERTIFIED DAYS')
+     A            DMPCRECD  R     S         REFFLD(A30)
+     A                                      COLHDG('PRECERT' 'RECOMMENDED DAYS')
+     A            DMPCENTD  R     S         REFFLD(DT)
+     A                                      COLHDG('PRECERT' 'DATE ENTERED')
+     A            DMPCADST  R               REFFLD(FLAG)
+     A                                      COLHDG('PRECERT' 'ADMISSION STATUS')
+     A            DMPCTYAD  R               REFFLD(FLAG)
+     A                                      COLHDG('PRECERT' 'TYPE OF'+
+     A                                      'ADMISSION')
+     A            DMPCPARF  R               REFFLD(FLAG)
+     A                                      COLHDG('PRECERT' 'PA REFERRAL'+
+     A                                      'TYPE')
+     A            DMPCTPHY  R     S         REFFLD(FEIN)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'FEIN')
+     A            DMPCTPHM  R     S         REFFLD(A30)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'MOD')
+     A            DMPCTEMAD R               REFFLD(DS60)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'EMAIL')
+     A            DMPCNAME  R               REFFLD(NAME)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'NAME')
+     A            DMPCADR1  R               REFFLD(ADR1)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'ADR1')
+     A            DMPCADR2  R               REFFLD(ADR2)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'ADR2')
+     A            DMPCCTY   R               REFFLD(CTY)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'CITY')
+     A            DMPCST    R               REFFLD(ST)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'STATE')
+     A            DMPCZIP   R     S         REFFLD(ZIP)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'ZIP')
+     A            DMPCOADR3 R               REFFLD(DS40)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'PROV' 'OUT OF CNTRY')
+     A            DMPCCTRY  R               REFFLD(DS30)
+     A                                      COLHDG('PRECERT' 'TREAT PHYS'+
+     A                                      'COUNTRY')
+     A            DMPCAREA  R     S         REFFLD(A30)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'AREA' 'CODE')
+     A            DMPCPHN#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'PHONE#')
+     A            DMPCFXAR  R     S         REFFLD(A30)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'FAX' 'AREA CODE')
+     A            DMPCFAX#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'FAX' 'PHONE#')
+     A            DMPCSPEC  R               REFFLD(DS30)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'SPEC')
+     A            DMPCN#02  R               REFFLD(DS15)
+     A                                      COLHDG('PRECERT' 'TREATING PHYS'+
+     A                                      'NPI#')
+     A            DMPCDT1   R     S         REFFLD(A30)
+     A                                      COLHDG('PRECERT' 'ACTUAL DAYS')
+     A            DMPCFEIN  R     S         REFFLD(FEIN)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'FEIN')
+     A            DMPCMOD   R     S         REFFLD(A30)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'MOD')
+     A            DMPCBEMAD R               REFFLD(DS60)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'EMAIL')
+     A            DMPCBNAME R               REFFLD(NAME)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'NAME')
+     A            DMPCBADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'ADR1')
+     A            DMPCBADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'ADR2')
+     A            DMPCBCTY  R               REFFLD(CTY)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'CITY')
+     A            DMPCBST   R               REFFLD(ST)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'STATE')
+     A            DMPCBZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'ZIP')
+     A            DMPCBOAD3 R               REFFLD(DS40)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'PROV' 'OUT OF CNTRY')
+     A            DMPCBCTRY R               REFFLD(DS30)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'COUNTRY')
+     A            DMPCBAREA R     S         REFFLD(A30)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'AREA' 'CODE')
+     A            DMPCBPHN# R     S         REFFLD(PHN#)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'PHONE#')
+     A            DMPCBFXAR R     S         REFFLD(A30)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'FAX' 'AREA CODE')
+     A            DMPCBFAX# R     S         REFFLD(PHN#)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'FAX' 'PHONE#')
+     A            DMPCBSPEC R               REFFLD(DS30)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'SPEC')
+     A            DMPCBN#02 R               REFFLD(DS15)
+     A                                      COLHDG('PRECERT' 'BILLING PROV'+
+     A                                      'NPI#')
+     A            DMPCTYPA  R               REFFLD(DS3)
+     A                                      COLHDG('PRECERT' 'TYPE')
+     A            DMPCRINJ  R               REFFLD(FLAG)
+     A                                      COLHDG('PRECERT' 'RE-INJURY'+
+     A                                      'FLAG')
+     A            DMPCHMHL  R               REFFLD(FLAG)
+     A                                      COLHDG('PRECERT' 'HOME HEALTH'+
+     A                                      'FLAG')
+     A*
+     A* ENVIRONMENT FIELDS
+     A*
+     A            DMENVIRO  R               REFFLD(FLAG)
+     A                                      COLHDG('PRODUCTION/QA FLAG')
+     A*
+     A            DMTSTGRP  R               REFFLD(FLAG)
+     A                                      COLHDG('TEST GROUP FLAG')
+     A*
+     A* MAINTENANCE FIELDS
+     A*
+     A            DMUSER    R               REFFLD(USER)
+     A                                      COLHDG('USER')
+     A            DMPGM     R               REFFLD(PGM)
+     A                                      COLHDG('PROGRAM')
+     A            DMTIME    R     S         REFFLD(TIME)
+     A                                      COLHDG('TIME')
+     A            DMDT      R     S         REFFLD(DT)
+     A                                      COLHDG('DATE')
+     A*** Beg Add *** 08/04/15 *************************************
+     A*
+     A* COMPANY FIELDS
+     A*
+     A            DMCONAME  R               REFFLD(NAME)
+     A                                      COLHDG('COMPANY' 'NAME')
+     A            DMCOPADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('COMPANY' 'PHYSICAL' +
+     A                                      'ADR1')
+     A            DMCOPADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('COMPANY' 'PHYSICAL' +
+     A                                      'ADR2')
+     A            DMCOPCTY  R               REFFLD(CTY)
+     A                                      COLHDG('COMPANY' 'PHYSICAL' +
+     A                                      'CITY')
+     A            DMCOPST   R               REFFLD(ST)
+     A                                      COLHDG('COMPANY' 'PHYSICAL' +
+     A                                      'STATE')
+     A            DMCOPZIP  R     S         REFFLD(ZIP)
+     A            DMCOMADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('COMPANY' 'MAILING'  +
+     A                                      'ADR1')
+     A            DMCOMADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('COMPANY' 'MAILING'  +
+     A                                      'ADR2')
+     A            DMCOMCTY  R               REFFLD(CTY)
+     A                                      COLHDG('COMPANY' 'MAILING'  +
+     A                                      'CITY')
+     A            DMCOMST   R               REFFLD(ST)
+     A                                      COLHDG('COMPANY' 'MAILING'  +
+     A                                      'STATE')
+     A            DMCOMZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('COMPANY' 'MAILING' +
+     A                                      'ZIP')
+     A            DMCOFEIN  R     S         REFFLD(FEIN)
+     A                                      COLHDG('COMPANY FEDERAL' 'TAX ID')
+     A            DMCOAREA  R     S         REFFLD(A30)
+     A                                      COLHDG('COMPANY' 'AREA' 'CODE')
+     A            DMCOPHN#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('COMPANY' 'PHONE')
+     A            DMCOFXAR  R     S         REFFLD(A30)
+     A                                      COLHDG('COMPANY' 'FAX AREA' 'CODE')
+     A            DMCOFAX#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('COMPANY' 'FAX PHONE#')
+     A*
+     A* GROUP FIELDS
+     A*
+     A            DMGPNAME  R               REFFLD(DS60)
+     A                                      COLHDG('GROUP' 'NAME')
+     A            DMGPSNAME R               REFFLD(NAME)
+     A                                      COLHDG('GROUP' 'SHORT NAME')
+     A            DMGPANAME R               REFFLD(NM50)
+     A                                      COLHDG('GROUP' 'ALTER NAME')
+     A            DMGPNUM   R     S         REFFLD(FND)
+     A                                      COLHDG('GROUP NUMBER')
+     A            DMGPPADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('GROUP' 'PHYSICAL'   +
+     A                                      'ADR1')
+     A            DMGPPADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('GROUP' 'PHYSICAL'   +
+     A                                      'ADR2')
+     A            DMGPPCTY  R               REFFLD(CTY)
+     A                                      COLHDG('GROUP' 'PHYSICAL'   +
+     A                                      'CITY')
+     A            DMGPPST   R               REFFLD(ST)
+     A                                      COLHDG('GROUP' 'PHYSICAL'   +
+     A                                      'STATE')
+     A            DMGPPZIP  R     S         REFFLD(ZIP)
+     A            DMGPMADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('GROUP' 'MAILING'    +
+     A                                      'ADR1')
+     A            DMGPMADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('GROUP' 'MAILING'    +
+     A                                      'ADR2')
+     A            DMGPMCTY  R               REFFLD(CTY)
+     A                                      COLHDG('GROUP' 'MAILING'    +
+     A                                      'CITY')
+     A            DMGPMST   R               REFFLD(ST)
+     A                                      COLHDG('GROUP' 'MAILING'    +
+     A                                      'STATE')
+     A            DMGPMZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('GROUP' 'MAILING'   +
+     A                                      'ZIP')
+     A            DMGPAADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('GROUP' 'ALTER'      +
+     A                                      'ADR1')
+     A            DMGPAADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('GROUP' 'ALTER'      +
+     A                                      'ADR2')
+     A            DMGPACTY  R               REFFLD(CTY)
+     A                                      COLHDG('GROUP' 'ALTER'      +
+     A                                      'CITY')
+     A            DMGPAST   R               REFFLD(ST)
+     A                                      COLHDG('GROUP' 'ALTER'      +
+     A                                      'STATE')
+     A            DMGPAZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('GROUP' 'ALTER'     +
+     A                                      'ZIP')
+     A            DMGPAREA  R     S         REFFLD(A30)
+     A                                      COLHDG('GROUP PHN 1' 'AREA' +
+     A                                      'CODE')
+     A            DMGPPHN#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('GROUP INCOMING' '800' +
+     A                                      'NUMBER')
+     A            DMGPOAREA R     S         REFFLD(A30)
+     A                                      COLHDG('GROUP OTHER' 'AREA' +
+     A                                      'CODE')
+     A            DMGPOPHN# R     S         REFFLD(PHN#)
+     A                                      COLHDG('GROUP OTHER' 'PHONE'+
+     A                                      'NUMBER')
+     A            DMGPFXAR  R     S         REFFLD(A30)
+     A                                      COLHDG('GROUP' 'FAX AREA'   'CODE')
+     A            DMGPFAX#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('GROUP' 'FAX PHONE  #')
+     A            DMGPIADR  R     S         REFFLD(ADR1)
+     A                                      COLHDG('GROUP INTERNET' 'ADDRESS')
+     A*
+     A* CLAIM STAFF ASSIGNMENTS AREA CODE AND PHONE NUMBER
+     A*
+     A            DMCNAREA  R     S         REFFLD(A30)
+     A                                      COLHDG('CASE MANAGEMENT' 'NURSE'+
+     A                                      'AREA CODE')
+     A            DMCNPHN#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('CASE MANAGEMENT' 'NURSE'+
+     A                                      'PHONE NUMBER')
+     A            DMCSAREA  R     S         REFFLD(A30)
+     A                                      COLHDG('CASE MANAGEMENT' 'SUPER'+
+     A                                      'AREA CODE')
+     A            DMCSPHN#  R     S         REFFLD(PHN#)
+     A                                      COLHDG('CASE MANAGEMENT' 'SUPER'+
+     A                                      'PHONE NUMBER')
+     A            DMSUPAREA R     S         REFFLD(A30)
+     A                                      COLHDG('SUPERVISOR' 'AREA CODE')
+     A            DMSUPPHN# R     S         REFFLD(PHN#)
+     A                                      COLHDG('SUPERVISOR' 'PHONE NUMBER')
+     A            DMADJAREA R     S         REFFLD(A30)
+     A                                      COLHDG('ADJUSTOR' 'AREA CODE')
+     A            DMADJPHN# R     S         REFFLD(PHN#)
+     A                                      COLHDG('ADJUSTOR' 'PHONE NUMBER')
+     A            DMFADAREA R     S         REFFLD(A30)
+     A                                      COLHDG('FIELD ADJUSTOR' 'AREA CODE')
+     A            DMFADPHN# R     S         REFFLD(PHN#)
+     A                                      COLHDG('FIELD ADJUSTOR' 'PHONE'+
+     A                                      'NUMBER')
+     A            DMST3AREA R     S         REFFLD(A30)
+     A                                      COLHDG('CASE MANAGEMENT' 'STF3'+
+     A                                      'AREA CODE')
+     A            DMST3PHN# R     S         REFFLD(PHN#)
+     A                                      COLHDG('CASE MANAGEMENT' 'STF3'+
+     A                                      'PHONE NUMBER')
+     A            DMPCIAREA R     S         REFFLD(A30)
+     A                                      COLHDG('PRECERT' 'INTERVIEW'+
+     A                                      'AREA CODE')
+     A            DMPCIPHN# R     S         REFFLD(PHN#)
+     A                                      COLHDG('PRECERT' 'INTERVIEW'+
+     A                                      'PHONE' 'NUMBER')
+     A*** End Add *** 08/04/15 *************************************

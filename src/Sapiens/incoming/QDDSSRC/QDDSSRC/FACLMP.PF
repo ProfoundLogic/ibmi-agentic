@@ -1,0 +1,747 @@
+      * (c) 2017 StoneRiver, Inc. All rights Reserved.                *
+      * StoneRiver is a trademark of StoneRiver, Inc.                 *
+     A*                                                               *
+     A*   837 Bill Import Claim Holding File                          *
+     A*                                                               *
+     A*****************************************************************
+     A*  CREATED  10/02/17 C:180 PROJECT: 114MJB                      *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PFACLM                    TEXT('Bill Import Clm Holding File')
+      *
+      * StoneRiver upload and process fields
+      *
+     A            CLMULDT   R     S         REFFLD(DT)
+     A                                      COLHDG('Upload Date')
+     A            CLMULTM   R     S         REFFLD(TIME)
+     A                                      COLHDG('Upload Time')
+     A            CLMPRDT   R     S         REFFLD(DT)
+     A                                      COLHDG('Process Date')
+     A            CLMPRTM   R     S         REFFLD(TIME)
+     A                                      COLHDG('Process Time')
+     A            CLMPRFL   R               REFFLD(FLAG)
+     A                                      COLHDG('Process Flag')
+      *
+      * StoneRiver Key Field
+      *
+     A            CLMCO#    R     S         REFFLD(CO#)
+     A            CLMSUB#   R     S         REFFLD(SUB#)
+     A            CLMFND    R     S         REFFLD(FND)
+     A            CLMFYR    R     S         REFFLD(FYR)
+     A            CLMCASE   R     S         REFFLD(CASE)
+     A            CLMEOB#   R     S         REFFLD(EOB#)
+     A            CLMRCN    R     S         REFFLD(RCN)
+     A            CLMSS#         9A
+     A            CLMACDT   R     S         REFFLD(DT)
+     A            CLMFEIN   R     S         REFFLD(FEIN)
+     A            CLMMOD    R     S         REFFLD(MOD)
+      *
+      * Control information
+      *
+     A            CLMUNID      100A         COLHDG('Unique Id')
+     A            CLMICNTL       9A         COLHDG('Interchg' 'Ctl Number')
+     A            CLMGCTL        9A         COLHDG('Group' 'Control' 'Number')
+     A            CLMTSCNTL      9A         COLHDG('TS Ctl Nbr' 'From' 'TS Hdr')
+     A            CLMBHTTID     50A         COLHDG('Trans Id' 'From' 'BHT')
+     A            CLMPACCT      38A         COLHDG('Patient' 'Account' 'Number')
+     A            CLMCH         18A         COLHDG('Total' 'Claim' 'Charge')
+     A            CLMINSID      15A         COLHDG('Interchg' 'Sender Id')
+      *
+      * Subscriber Information
+      *
+     A            CLMSUBPRSN     1          COLHDG('Payer Resp' 'Seq Nbr Code')
+     A            CLMSUBIRC      2          COLHDG('Indiv Relationship' 'Code')
+     A            CLMSUBGPOL    50          COLHDG('Subscriber' 'Grp-Pol Nbr')
+     A            CLMSUBGPNM    60          COLHDG('Subscriber' 'Grp Name')
+     A            CLMSUBITC      3          COLHDG('Insurance' 'Type Code')
+     A            CLMSUBCLIC     2          COLHDG('Claim Filing' 'Ind Code')
+     A            CLMSUBNAM      3          COLHDG('Entity Id' 'Code')
+     A            CLMSUBETQ      1          COLHDG('Entity Type' 'Qualifier')
+     A            CLMSUBLSN     60          COLHDG('Subscriber' 'Last Name')
+     A            CLMSUBFSN     35          COLHDG('Subscriber' 'First Name')
+     A            CLMSUBMID     25          COLHDG('Subscriber' 'Middle Name')
+     A            CLMSUBSNM     10          COLHDG('Subscriber' 'Name Suffix')
+     A            CLMSUBICQ      2          COLHDG('Subscriber' 'Code Qualifer')
+     A            CLMSUBSPI     80          COLHDG('Subscriber' 'Primary Id')
+     A            CLMSUBADR1    55          COLHDG('Subscriber' 'Address Lin 1')
+     A            CLMSUBADR2    55          COLHDG('Subscriber' 'Address Lin 2')
+     A            CLMSUBCTY     30          COLHDG('Subscriber' 'City Name')
+     A            CLMSUBST       2          COLHDG('Subscriber' 'State Code')
+     A            CLMSUBZIP     15          COLHDG('Subscriber' 'Zip Code')
+     A            CLMSUBCNRY     3          COLHDG('Subscriber' 'Country Code')
+      *
+      * Payer name
+      *
+     A            CLMPAYENCD     3          COLHDG('Entity Id' 'Code')
+     A            CLMPAYENQU     1          COLHDG('Entity Type' 'Qualifier')
+     A            CLMPAYPNM     60          COLHDG('Payer Name')
+     A            CLMPAYICQ      2          COLHDG('Id Code' 'Qualifier')
+     A            CLMPAYPI      80          COLHDG('Payer Identifier')
+     A            CLMPAYADR1    55          COLHDG('Payer' 'Address' 'Line 1')
+     A            CLMPAYADR2    55          COLHDG('Payer' 'Address' 'Line 2')
+     A            CLMPAYCTY     30          COLHDG('Payer' 'City')
+     A            CLMPAYPST      2          COLHDG('Payer' 'State')
+     A            CLMPAYZIP     15          COLHDG('Payer' 'Zip')
+     A            CLMPAYCNRY     3          COLHDG('Payer' 'Country')
+      *
+      * Patient name
+      *
+     A            CLMPATENCD     3A         COLHDG('Entity Id' 'Code')
+     A            CLMPATENQU     1A         COLHDG('Entity Type' 'Qualifier')
+     A            CLMPATLSN     60A         COLHDG('Patient' 'Last Name')
+     A            CLMPATFSN     35A         COLHDG('Patient' 'First Name')
+     A            CLMPATMNM     25A         COLHDG('Patient' 'Middle Name')
+      *
+      * Patient address
+      *
+     A            CLMPATADR1    55A         COLHDG('Patient' 'Address' 'Line 1')
+     A            CLMPATADR2    55A         COLHDG('Patient' 'Address' 'Line 2')
+      *
+      * Patient Provider City/State/Zip
+      *
+     A            CLMPATCTY     30A         COLHDG('Patient' 'City')
+     A            CLMPATST       2A         COLHDG('Patient' 'State')
+     A            CLMPATPOST    15A         COLHDG('Patient' 'Zip')
+     A            CLMPATCNRY     3A         COLHDG('Patient' 'Country')
+     A            CLMPATDTFQ     3A         COLHDG('Patient' 'Date/Time' +
+     A                                             'Qualifier')
+     A            CLMPATDOB     35A         COLHDG('Patient' 'Date of Birth')
+      *
+      * Patient Property and Casualty Claim Number
+      *
+     A            CLMPATPCQU     3A         COLHDG('Reference' 'Id Qualifier')
+     A            CLMPATCLM#    50A         COLHDG('PC' 'Claim' 'Number')
+     A            CLMPIRIQ       3A         COLHDG('PC' 'Ref ID Qual')
+     A            CLMPIPCCN     50A         COLHDG('PC' 'Claim Number')
+      *
+      * Facility Information
+      *
+     A            CLMFC          2A         COLHDG('Facility Type' 'Code')
+     A            CLMFQU         2A         COLHDG('Facility Code' 'Qualifier')
+     A            CLMFCD         1A         COLHDG('Facility Frequency' 'Code')
+      *
+      * Initial Treatment Date
+      *
+     A            CLMITDTQ       3A         COLHDG('Date Time' 'Qualifier')
+     A            CLMITDTPFQ     3A         COLHDG('DT Period' 'Fmt Qualifier')
+     A            CLMITDT       35A         COLHDG('Initial' 'Treatment' 'Date')
+      *
+      * Last Seen Date
+      *
+     A            CLMLSDTQ       3A         COLHDG('Date Time' 'Qualifier')
+     A            CLMLSDTPFQ     3A         COLHDG('DT Period' 'Fmt Qualifier')
+     A            CLMLSDT       35A         COLHDG('Last Seen' 'Date')
+      *
+      * Accident Date
+      *
+     A            CLMADQU        3A         COLHDG('Date Time' 'Qualifier')
+     A            CLMADFQ        3A         COLHDG('DT Period' 'Fmt Qualifier')
+     A            CLMAD         35A         COLHDG('Accident' 'Date')
+      *
+      * Hospital Admission Date
+      *
+     A            CLMAQU         3A         COLHDG('Date Time' 'Qualifier')
+     A            CLMAFQ         3A         COLHDG('DT Period' 'Fmt Qualifier')
+     A            CLMA          35A         COLHDG('Hospital' 'Admission Date')
+      *
+      * Hospitalization Discharge Date
+      *
+     A            CLMDDQU        3A         COLHDG('Date Time' 'Qualifier')
+     A            CLMDDFQ        3A         COLHDG('DT Period' 'Fmt Qualifier')
+     A            CLMDD         35A         COLHDG('Related Hosp' 'Dischg Date')
+      *
+      * Repricer Received Date
+      *
+     A            CLMRRQU        3A         COLHDG('Date Time' 'Qualifier')
+     A            CLMRRFQ        3A         COLHDG('DT Period' 'Fmt Qualifier')
+     A            CLMRRRD       35A         COLHDG('Repricer' 'Received Date')
+      *
+      * Contract Information
+      *
+     A            CLMCTCD        2A         COLHDG('Contract' 'Type Code')
+      *
+      * HealthCare Diagnosis Code Information
+      *
+     A            CLMDG1Q        3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG1        30A         COLHDG('Diagnosis' 'Code')
+     A            CLMDG2Q        3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG2        30A         COLHDG('Diagnosis' 'Code')
+     A            CLMDG3Q        3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG3        30A         COLHDG('Diagnosis' 'Code')
+     A            CLMDG4Q        3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG4        30A         COLHDG('Diagnosis' 'Code')
+     A            CLMDG5Q        3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG5        30A         COLHDG('Diagnosis' 'Code')
+     A            CLMDG6Q        3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG6        30A         COLHDG('Diagnosis' 'Code')
+     A            CLMDG7Q        3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG7        30A         COLHDG('Diagnosis' 'Code')
+     A            CLMDG8Q        3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG8        30A         COLHDG('Diagnosis' 'Code')
+     A            CLMDG9Q        3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG9        30A         COLHDG('Diagnosis' 'Code')
+     A            CLMDG10Q       3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG10       30A         COLHDG('Diagnosis' 'Code')
+     A            CLMDG11Q       3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG11       30A         COLHDG('Diagnosis' 'Code')
+     A            CLMDG12Q       3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG12       30A         COLHDG('Diagnosis' 'Code')
+     A*
+     A* Condition Information
+     A*
+     A            CLMCCQ1        3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC1        30A         COLHDG('Condition' 'Code')
+     A            CLMCCQ2        3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC2        30A         COLHDG('Condition' 'Code')
+     A            CLMCCQ3        3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC3        30A         COLHDG('Condition' 'Code')
+     A            CLMCCQ4        3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC4        30A         COLHDG('Condition' 'Code')
+     A            CLMCCQ5        3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC5        30A         COLHDG('Condition' 'Code')
+     A            CLMCCQ6        3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC6        30A         COLHDG('Condition' 'Code')
+     A            CLMCCQ7        3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC7        30A         COLHDG('Condition' 'Code')
+     A            CLMCCQ8        3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC8        30A         COLHDG('Condition' 'Code')
+     A            CLMCCQ9        3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC9        30A         COLHDG('Condition' 'Code')
+     A            CLMCCQ10       3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC10       30A         COLHDG('Condition' 'Code')
+     A            CLMCCQ11       3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC11       30A         COLHDG('Condition' 'Code')
+     A            CLMCCQ12       3A         COLHDG('Code' 'List' 'Qualifier')
+     A            CLMCC12       30A         COLHDG('Condition' 'Code')
+     A*
+     A* Referring Provider Name
+     A*
+     A            CLMRFPIDCD     3A         COLHDG('Entity Id' 'Code')
+     A            CLMRFPENQU     1A         COLHDG('Entity Type' 'Qualifier')
+     A            CLMRFPNM      60A         COLHDG('Ref Provider' 'Last Name')
+     A            CLMRFPFNM     35A         COLHDG('Ref Provider' 'First Name')
+     A            CLMRFPMNM     25A         COLHDG('Ref Provider' 'Middle Name')
+     A            CLMRFPNMQU     2A         COLHDG('Id Code' 'Qualifier')
+     A            CLMRFPNMID    80A         COLHDG('Ref Provider' 'Id')
+     A*
+     A* Referring Provider Secondary Id
+     A*
+     A            CLMRFRUPQU     3A         COLHDG('Reference Id' 'Qualifier')
+     A            CLMRFUPID     50A         COLHDG('Ref Provider' 'Secndry Id')
+     A*
+     A* Rendering Provider Name
+     A*
+     A            CLMRNPIDCD     3A         COLHDG('Entity Id' 'Code')
+     A            CLMRNPENQU     1A         COLHDG('Entity Type' 'Qualifier')
+     A            CLMRNPNM      60A         COLHDG('Rend Provider' 'Last Name')
+     A            CLMRNPFNM     35A         COLHDG('Rend Provider' 'First Name')
+     A            CLMRNPMNM     25A         COLHDG('Rend Provider' 'Middl Name')
+     A            CLMRNPPNM     10A         COLHDG('Rend Provider' 'Name Prfx')
+     A            CLMRNPSNM     10A         COLHDG('Rend Provider' 'Name Sufx')
+     A            CLMRNPIDQU     2A         COLHDG('Id Code' 'Qualifier')
+     A            CLMRNPNMID    80A         COLHDG('Rend Provider' 'Id')
+     A*
+     A* Rendering Provider Specialty Information
+     A*
+     A            CLMRNPCODE     3A         COLHDG('Provider' 'Code')
+     A            CLMRNPSPQU     3A         COLHDG('Reference Id' 'Qualifier')
+     A            CLMRNPSPID    50A         COLHDG('Provider' 'Taxonomy Code')
+     A*
+     A* Renderring Provider Secondary Id
+     A*
+     A            CLMRNP2PQU     3A         COLHDG('Reference Id' 'Qualifier')
+     A            CLMRNP2PID    50A         COLHDG('Ref Provider' 'Secndry Id')
+      *
+      * Service Facility Location Name
+      *
+     A            CLMSFNMID      3A         COLHDG('Entity Id' 'Code')
+     A            CLMSFNMQU      1A         COLHDG('Entity Type' 'Qualifier')
+     A            CLMSFNM       60A         COLHDG('Laboratory-Facility' 'Name')
+     A            CLMSFIDQU     35A         COLHDG('Id Code' 'Qualifier')
+     A            CLMSFID       25A         COLHDG('Lab-Facility' 'Primary Id')
+      *
+      * Service Facility Location Address
+      *
+     A            CLMSFADR1     55A         COLHDG('Lab-Facility' 'Addr Line 1')
+     A            CLMSFADR2     55A         COLHDG('Lab-Facility' 'Addr Line 2')
+      *
+      * Service Facility Location City/State/Zip
+      *
+     A            CLMSFCTY      30A         COLHDG('Lab-Facility' 'City')
+     A            CLMSFST        2A         COLHDG('Lab-Facility' 'State')
+     A            CLMSFPOST     15A         COLHDG('Lab-Facility' 'Zip')
+     A            CLMSFCNTRY     3A         COLHDG('Lab-Facility' 'Country')
+      *
+      * Service Facility Location Secondary Identification
+      *
+     A            CLMSFP2NDQ     3A         COLHDG('Ref Id' 'Qualifier')
+     A            CLMSF2NDID    50A         COLHDG('Lab-Facility' 'Secondry Id')
+      *
+      * Supervising Provider Name
+      *
+     A            CLMSPNMID      3A         COLHDG('Entity Id' 'Code')
+     A            CLMSPNMQU      1A         COLHDG('Entity Type' 'Identifier')
+     A            CLMSPNM       60A         COLHDG('Superv' 'Prvdr Last Name')
+     A            CLMSPFSN      35A         COLHDG('Superv' 'Prvdr First Name')
+     A            CLMSPMNM      25A         COLHDG('Superv' 'Prvdr Middle Name')
+     A            CLMSPIDQU      2A         COLHDG('Id Code' 'Qualifier')
+     A            CLMSPID       80A         COLHDG('Superv' 'Prvdr Id')
+      *
+      * Supervising Provider Secondary Identifier.
+      *
+     A            CLMSP2NDQU     3A         COLHDG('Ref Id' 'Qualifier')
+     A            CLMSP2NDID    50A         COLHDG('Superv' 'Prvdr Secondry Id')
+      *
+      *****************************************************************
+      *  INSTITUTIONAL ONLY SECTION
+      *****************************************************************
+      *
+      *  Date Discharge Hour
+      *
+     A            CLMDHQU        3A         COLHDG('DisChg' 'DT Time Qualifier')
+     A            CLMDHDHFQ      3A         COLHDG('DisChg' 'Per Fmt Qualifier')
+     A            CLMDH         35A         COLHDG('DisChg' 'Time')
+      *
+      *  Date Statmenent Dates
+      *
+     A            CLMSCFTQU      3A         COLHDG('Statmt' 'DT Time Qualifier')
+     A            CLMSCFTFQ      3A         COLHDG('Statmt' 'Per Fmt Qualifier')
+     A            CLMSCFT       35A         COLHDG('Statmt' 'Time')
+      *
+      *  Date Admission Date-hour
+      *
+     A            CLMADHRQU      3A         COLHDG('Admisn' 'DT Time Qualifier')
+     A            CLMADHRFQ      3A         COLHDG('Admisn' 'Per Fmt Qualifier')
+     A            CLMADDTTM     35A         COLHDG('Admisn' 'Time')
+      *
+      *  Institutional Claim Code
+      *
+     A            CLMADTYP       1A         COLHDG('Prty Type of' 'Admsn Visit')
+     A            CLMADSC        1A         COLHDG('Pnt of Orign' 'Admsn Visit')
+     A            CLMPATS        2A         COLHDG('Patient' 'Status Code')
+      *
+      *  Principal Diagnosis
+      *
+     A            CLMPRDGT       3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMPRDG       30A         COLHDG('Principal' 'Diagnosis Code')
+     A            CLMPRDPOA      1A         COLHDG('Present on' 'Admsn Ind')
+      *
+      *  Admitting Diagnosis
+      *
+     A            CLMADDGT       3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMADDG       30A         COLHDG('Admitting' 'Diagnosis Code')
+      *
+      *  Patient's Reason for Visit
+      *
+     A            CLMPRVDGT      3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMPRVREA     30A         COLHDG('Patient' 'Reason For Visit')
+     A            CLMPRVDGT2     3A         COLHDG('Diagnosis 2' 'Type Code')
+     A            CLMPRVDGT3     3A         COLHDG('Diagnosis 3' 'Type Code')
+      *
+      *  External cause of Injury
+      *
+     A            CLMECDGT1      3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG1      30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA1      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMECDGT2      3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG2      30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA2      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMECDGT3      3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG3      30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA3      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMECDGT4      3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG4      30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA4      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMECDGT5      3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG5      30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA5      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMECDGT6      3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG6      30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA6      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMECDGT7      3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG7      30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA7      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMECDGT8      3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG8      30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA8      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMECDGT9      3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG9      30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA9      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMECDGT10     3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG10     30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA10     1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMECDGT11     3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG11     30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA11     1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMECDGT12     3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMECDG12     30A         COLHDG('External' 'Cause of Injury')
+     A            CLMECPOA12     1A         COLHDG('Present on' 'Admsn Ind')
+      *
+      *  Diagnosis Related Group DRG information
+      *
+     A            CLMDRGQU       3A         COLHDG('Diag Rel Grp' 'DRG Inf Qua')
+     A            CLMDRG        30A         COLHDG('DRGDI' 'Drug' 'Code')
+      *
+      *  Other Diagnosis Information
+      *
+     A            CLMDGPOA2      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGPOA3      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGPOA4      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGPOA5      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGPOA6      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGPOA7      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGPOA8      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGPOA9      1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGPOA10     1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGPOA11     1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGPOA12     1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGT13       3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG13       30A         COLHDG('Other Diagnosis')
+     A            CLMDGPOA13     1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGT14       3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG14       30A         COLHDG('Other Diagnosis')
+     A            CLMDGPOA14     1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGT15       3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG15       30A         COLHDG('Other Diagnosis')
+     A            CLMDGPOA15     1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGT16       3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG16       30A         COLHDG('Other Diagnosis')
+     A            CLMDGPOA16     1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGT17       3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG17       30A         COLHDG('Other Diagnosis')
+     A            CLMDGPOA17     1A         COLHDG('Present on' 'Admsn Ind')
+     A            CLMDGT18       3A         COLHDG('Diagnosis' 'Type Code')
+     A            CLMDG18       30A         COLHDG('Other Diagnosis')
+     A            CLMDGPOA18     1A         COLHDG('Present on' 'Admsn Ind')
+      *
+      *  Principal Procedure Information
+      *
+     A            CLMPRINPQ      3A         COLHDG('Principal Proc' 'Qualifier')
+     A            CLMPRINPC     30A         COLHDG('Principal Proc' 'Code')
+     A            CLMPRINDTQ     3A         COLHDG('Prin Proc' 'Date Time Qual')
+     A            CLMPRINDT     35A         COLHDG('Prin Proc' 'DT Period')
+     A            CLMPRINPOA     1A         COLHDG('Present on' 'Admsn Ind')
+      *
+      *  Other Procedure Information
+      *
+     A            CLMPR2Q        3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR2        30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR2DTQ      3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR2DT      35A         COLHDG('Othr Proc' 'DT Period')
+     A            CLMPR3Q        3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR3        30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR3DTQ      3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR3DT      35A         COLHDG('Othr Proc' 'DT Period')
+     A            CLMPR4Q        3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR4        30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR4DTQ      3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR4DT      35A         COLHDG('Othr Proc' 'DT Period')
+     A            CLMPR5Q        3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR5        30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR5DTQ      3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR5DT      35A         COLHDG('Othr Proc' 'DT Period')
+     A            CLMPR6Q        3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR6        30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR6DTQ      3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR6DT      35A         COLHDG('Othr Proc' 'DT Period')
+     A            CLMPR7Q        3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR7        30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR7DTQ      3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR7DT      35A         COLHDG('Othr Proc' 'DT Period')
+     A            CLMPR8Q        3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR8        30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR8DTQ      3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR8DT      35A         COLHDG('Othr Proc' 'DT Period')
+     A            CLMPR9Q        3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR9        30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR9DTQ      3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR9DT      35A         COLHDG('Othr Proc' 'DT Period')
+     A            CLMPR10Q       3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR10       30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR10DTQ     3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR10DT     35A         COLHDG('Othr Proc' 'DT Period')
+     A            CLMPR11Q       3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR11       30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR11DTQ     3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR11DT     35A         COLHDG('Othr Proc' 'DT Period')
+     A            CLMPR12Q       3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR12       30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR12DTQ     3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR12DT     35A         COLHDG('Othr Proc' 'DT Period')
+     A            CLMPR13Q       3A         COLHDG('Other Proc' 'Qualifier')
+     A            CLMPR13       30A         COLHDG('Other Proc' 'Code')
+     A            CLMPR13DTQ     3A         COLHDG('Othr Proc' 'Date Time Qual')
+     A            CLMPR13DT     35A         COLHDG('Othr Proc' 'DT Period')
+      *
+      * Occurrence Span Information                                    1-12
+      *
+     A            CLMOS1QU       3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS1CD      30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS1DTQ      3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS1DTP     35A         COLHDG('Occur Proc' 'DT Per')
+     A            CLMOS2QU       3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS2CD      30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS2DTQ      3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS2DTP     35A         COLHDG('Occur Proc' 'DT Per')
+     A            CLMOS3QU       3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS3CD      30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS3DTQ      3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS3DTP     35A         COLHDG('Occur Proc' 'DT Per')
+     A            CLMOS4QU       3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS4CD      30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS4DTQ      3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS4DTP     35A         COLHDG('Occur Proc' 'DT Per')
+     A            CLMOS5QU       3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS5CD      30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS5DTQ      3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS5DTP     35A         COLHDG('Occur Proc' 'DT Per')
+     A            CLMOS6QU       3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS6CD      30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS6DTQ      3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS6DTP     35A         COLHDG('Occur Proc' 'DT Per')
+     A            CLMOS7QU       3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS7CD      30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS7DTQ      3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS7DTP     35A         COLHDG('Occur Proc' 'DT Per')
+     A            CLMOS8QU       3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS8CD      30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS8DTQ      3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS8DTP     35A         COLHDG('Occur Proc' 'DT Per')
+     A            CLMOS9QU       3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS9CD      30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS9DTQ      3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS9DTP     35A         COLHDG('Occur Proc' 'DT Per')
+     A            CLMOS10QU      3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS10CD     30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS10DTQ     3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS10DTP    35A         COLHDG('Occur Proc' 'DT Per')
+     A            CLMOS11QU      3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS11CD     30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS11DTQ     3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS11DTP    35A         COLHDG('Occur Proc' 'DT Per')
+     A            CLMOS12QU      3A         COLHDG('Occur Span' 'Qualifier')
+     A            CLMOS12CD     30A         COLHDG('Occur Span' 'Code')
+     A            CLMOS12DTQ     3A         COLHDG('Occur Span' 'Date Time Qua')
+     A            CLMOS12DTP    35A         COLHDG('Occur Proc' 'DT Per')
+      *
+      * Occurrence Information                                         1-12
+      *
+     A            CLMOCC1QU      3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC1CD     30A         COLHDG('Occur' 'Code')
+     A            CLMOCC1DQ      3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC1DT     35A         COLHDG('Occur' 'Date Time Period')
+     A            CLMOCC2QU      3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC2CD     30A         COLHDG('Occur' 'Code')
+     A            CLMOCC2DQ      3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC2DT     35A         COLHDG('Occur' 'Date Time Period')
+     A            CLMOCC3QU      3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC3CD     30A         COLHDG('Occur' 'Code')
+     A            CLMOCC3DQ      3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC3DT     35A         COLHDG('Occur' 'Date Time Period')
+     A            CLMOCC4QU      3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC4CD     30A         COLHDG('Occur' 'Code')
+     A            CLMOCC4DQ      3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC4DT     35A         COLHDG('Occur' 'Date Time Period')
+     A            CLMOCC5QU      3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC5CD     30A         COLHDG('Occur' 'Code')
+     A            CLMOCC5DQ      3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC5DT     35A         COLHDG('Occur' 'Date Time Period')
+     A            CLMOCC6QU      3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC6CD     30A         COLHDG('Occur' 'Code')
+     A            CLMOCC6DQ      3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC6DT     35A         COLHDG('Occur' 'Date Time Period')
+     A            CLMOCC7QU      3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC7CD     30A         COLHDG('Occur' 'Code')
+     A            CLMOCC7DQ      3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC7DT     35A         COLHDG('Occur' 'Date Time Period')
+     A            CLMOCC8QU      3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC8CD     30A         COLHDG('Occur' 'Code')
+     A            CLMOCC8DQ      3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC8DT     35A         COLHDG('Occur' 'Date Time Period')
+     A            CLMOCC9QU      3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC9CD     30A         COLHDG('Occur' 'Code')
+     A            CLMOCC9DQ      3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC9DT     35A         COLHDG('Occur' 'Date Time Period')
+     A            CLMOCC10QU     3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC10CD    30A         COLHDG('Occur' 'Code')
+     A            CLMOCC10DQ     3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC10DT    35A         COLHDG('Occur' 'Date Time Period')
+     A            CLMOCC11QU     3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC11CD    30A         COLHDG('Occur' 'Code')
+     A            CLMOCC11DQ     3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC11DT    35A         COLHDG('Occur' 'Date Time Period')
+     A            CLMOCC12QU     3A         COLHDG('Occur Code List' 'Qualfr')
+     A            CLMOCC12CD    30A         COLHDG('Occur' 'Code')
+     A            CLMOCC12DQ     3A         COLHDG('Occur' 'Date Time Qualfr')
+     A            CLMOCC12DT    35A         COLHDG('Occur' 'Date Time Period')
+      *
+      * Value Information                                              1-12
+      *
+     A            CLMVC1QU       3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC1        30A         COLHDG('Value Code')
+     A            CLMVCA1       18A         COLHDG('Value Code' 'Amount')
+     A            CLMVC2QU       3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC2        30A         COLHDG('Value Code')
+     A            CLMVCA2       18A         COLHDG('Value Code' 'Amount')
+     A            CLMVC3QU       3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC3        30A         COLHDG('Value Code')
+     A            CLMVCA3       18A         COLHDG('Value Code' 'Amount')
+     A            CLMVC4QU       3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC4        30A         COLHDG('Value Code')
+     A            CLMVCA4       18A         COLHDG('Value Code' 'Amount')
+     A            CLMVC5QU       3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC5        30A         COLHDG('Value Code')
+     A            CLMVCA5       18A         COLHDG('Value Code' 'Amount')
+     A            CLMVC6QU       3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC6        30A         COLHDG('Value Code')
+     A            CLMVCA6       18A         COLHDG('Value Code' 'Amount')
+     A            CLMVC7QU       3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC7        30A         COLHDG('Value Code')
+     A            CLMVCA7       18A         COLHDG('Value Code' 'Amount')
+     A            CLMVC8QU       3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC8        30A         COLHDG('Value Code')
+     A            CLMVCA8       18A         COLHDG('Value Code' 'Amount')
+     A            CLMVC9QU       3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC9        30A         COLHDG('Value Code')
+     A            CLMVCA9       18A         COLHDG('Value Code' 'Amount')
+     A            CLMVC10QU      3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC10       30A         COLHDG('Value Code')
+     A            CLMVCA10      18A         COLHDG('Value Code' 'Amount')
+     A            CLMVC11QU      3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC11       30A         COLHDG('Value Code')
+     A            CLMVCA11      18A         COLHDG('Value Code' 'Amount')
+     A            CLMVC12QU      3A         COLHDG('Value Code' 'Qualifier')
+     A            CLMVC12       30A         COLHDG('Value Code')
+     A            CLMVCA12      18A         COLHDG('Value Code' 'Amount')
+      *
+      * Condition Information - Renamed flds to avoid duplicates       1-12
+      * E.G. CLMCC10
+      *
+     A            CLMCC1QU       3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC1CD      30A         COLHDG('Condition Code')
+     A            CLMCC2QU       3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC2CD      30A         COLHDG('Condition Code')
+     A            CLMCC3QU       3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC3CD      30A         COLHDG('Condition Code')
+     A            CLMCC4QU       3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC4CD      30A         COLHDG('Condition Code')
+     A            CLMCC5QU       3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC5CD      30A         COLHDG('Condition Code')
+     A            CLMCC6QU       3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC6CD      30A         COLHDG('Condition Code')
+     A            CLMCC7QU       3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC7CD      30A         COLHDG('Condition Code')
+     A            CLMCC8QU       3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC8CD      30A         COLHDG('Condition Code')
+     A            CLMCC9QU       3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC9CD      30A         COLHDG('Condition Code')
+     A            CLMCC10QU      3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC10CD     30A         COLHDG('Condition Code')
+     A            CLMCC11QU      3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC11CD     30A         COLHDG('Condition Code')
+     A            CLMCC12QU      3A         COLHDG('Condition Code' 'Qualifier')
+     A            CLMCC12CD     30A         COLHDG('Condition Code')
+      *
+      * Treatment Information - Renamed flds to follow same            1-12
+      * naming as previous section - Faster speed.
+      *
+     A            CLMTC1QU       3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC1CD      30A         COLHDG('Treatment Code')
+     A            CLMTC2QU       3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC2CD      30A         COLHDG('Treatment Code')
+     A            CLMTC3QU       3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC3CD      30A         COLHDG('Treatment Code')
+     A            CLMTC4QU       3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC4CD      30A         COLHDG('Treatment Code')
+     A            CLMTC5QU       3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC5CD      30A         COLHDG('Treatment Code')
+     A            CLMTC6QU       3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC6CD      30A         COLHDG('Treatment Code')
+     A            CLMTC7QU       3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC7CD      30A         COLHDG('Treatment Code')
+     A            CLMTC8QU       3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC8CD      30A         COLHDG('Treatment Code')
+     A            CLMTC9QU       3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC9CD      30A         COLHDG('Treatment Code')
+     A            CLMTC10QU      3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC10CD     30A         COLHDG('Treatment Code')
+     A            CLMTC11QU      3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC11CD     30A         COLHDG('Treatment Code')
+     A            CLMTC12QU      3A         COLHDG('Treatment Code' 'Qualifier')
+     A            CLMTC12CD     30A         COLHDG('Treatment Code')
+      *
+      * Attending Provider Name                                        1-12
+      *
+     A            CLMATPIDCD     3A         COLHDG('Attend' 'Entity ID' 'Code')
+     A            CLMATPENQU     1A         COLHDG('Attend' 'Entity Type' 'Qua')
+     A            CLMATPNM      60A         COLHDG('Attend Prov' 'Name')
+     A            CLMATPFNM     35A         COLHDG('Attend Prov' 'First' 'Name')
+     A            CLMATPMNM     25A         COLHDG('Attend Prov''Middle' 'Name')
+     A            CLMATPPNM     10A         COLHDG('Attend Prov' 'Name Prefix')
+     A            CLMATPSNM     10A         COLHDG('Attend Prov' 'Name Suffix')
+     A            CLMATPIDQU     2A         COLHDG('IC Code' 'Qualifier')
+     A            CLMATPNMID    80A         COLHDG('Identifier')
+      *
+      * Attending Provider Specialty Information                       1-12
+      * ? Changed IDQU to IDCD to match heading/consistency
+      * ? dup CMATPSPQU skipped.
+      *
+     A            CLMATPPSCD     3A         COLHDG('Provider' 'Code')
+     A            CLMATPPSQU     3A         COLHDG('Reference' 'Id Qualifier')
+     A            CLMATPTXCD    50A         COLHDG('Provider' 'Taxonomy Code')
+      *
+      * Attending Provider Secondary Identification                    1-12
+      *
+     A            CLMAT2NDQU     3A         COLHDG('Ref Id' 'Qualifier')
+     A            CLMAT2NDID    50A         COLHDG('Secondary' 'Identifier')
+      *
+      * Operating Physician Name                                       1-12
+      *
+     A            CLMOPPIDCD     3A         COLHDG('Entity Id' 'Code')
+     A            CLMOPPENQU     1A         COLHDG('Entity Type' 'Qualifier')
+     A            CLMOPPNM      60A         COLHDG('Oper Physician' 'Last Name')
+     A            CLMOPPFNM     35A         COLHDG('Oper Physician' 'Frst Name')
+     A            CLMOPPMNM     25A         COLHDG('Oper Physician' 'Midl Name')
+     A            CLMOPPPNM     10A         COLHDG('Oper Physician' 'Name Pfx')
+     A            CLMOPPSNM     10A         COLHDG('Oper Physician' 'Name Sfx')
+     A            CLMOPPIDQU     2A         COLHDG('Id Code' 'Qualifier')
+     A            CLMOPPNMID    80A         COLHDG('Identifier')
+      *
+      * Operating Physician Secondary Identification                   1-12
+      * CHANGED 2NDQA to 2ndQU for consistency
+      *
+     A            CLMOP2NDQU     3A         COLHDG('Qualifier')
+     A            CLMOP2NDID    50A         COLHDG('Secondary' 'Identifier')
+      *
+      * Other Operating Physician Name                                 1-12
+      *
+     A            CLMOOPIDCD     3A         COLHDG('Entity Id' 'Code')
+     A            CLMOOPENQU     1A         COLHDG('Entity Type' 'Qualifier')
+     A            CLMOOPNM      60A         COLHDG('Othr Physician' 'Last Name')
+     A            CLMOOPFNM     35A         COLHDG('Othr Physician' 'Frst Name')
+     A            CLMOOPMNM     25A         COLHDG('Othr Physician' 'Midl Name')
+     A            CLMOOPPNM     10A         COLHDG('Othr Physician' 'Name Pfx')
+     A            CLMOOPSNM     10A         COLHDG('Othr Physician' 'Name Sfx')
+     A            CLMOOPIDQU     2A         COLHDG('Id Code' 'Qualifier')
+     A            CLMOOPNMID    80A         COLHDG('Identifier')
+      *
+      * Other Operating Physician Secondary Identification             1-12
+      *
+     A            CLMOOP2NQU     3A         COLHDG('Qualifier')
+     A            CLMOOP2NID    50A         COLHDG('Secondary' 'Identifier')
+      *
+      * Rendering Physician Secondary Identification                   1-12
+      *
+     A            CLMRNP2NQU     3A         COLHDG('Qualifier')
+     A            CLMRNP2NID    50A         COLHDG('Secondary' 'Identifier')
+      * Other Payer Claim Control Number                               1-12
+      *
+     A            CLMOPCCNQ      3A         COLHDG('Qualifier')
+     A            CLMOPCCNBR    50A         COLHDG('Other Payer' 'CCN')
+      *
+      * Patient account suffix                                         1-12
+      *
+     A            CLMPASFX       3  0       COLHDG('Patient' 'Account' 'Suffix')

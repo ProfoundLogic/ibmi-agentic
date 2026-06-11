@@ -1,0 +1,409 @@
+     A** (C) COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC. 1992-1995, 1997
+     A**
+     A** FEE SCHEDULE - DIAG CODE/DETAIL CHARGE TEMP FILE ***
+     A** THIS FILE IS USED BEFORE DETAIL CHARGES ARE APPLIED TO AN EOMB
+     A**    OR IN EOMB DELETE, IF THE DETAIL CHARGES ARE RETAINED.
+     A** IT KEEPS INFORMATION THAT IS NEEDED BY THE EOMB RECORD BUT MAY NOT
+     A**    BE AVAILABLE IF THE DETAIL CHARGES ARE NOT IMMEDIATELY APPLIED TO
+     A**    AN EOMB WHEN THEY ARE FIRST ENTERED.
+     A**                                                                 *
+     A****************************************************************
+     A*  REVISIONS:                                                  *
+     A*                                                              *
+     A*  06/15/95  C:33  PROJECT# FL006                              *
+     A*                  ADD THE FOLLOWING NEW FIELDS:               *
+     A*                     DC7A01 - FLTP: PRINCIPLE PROCEDURE (1)   *
+     A*                     DC7A02 - FLTP: OTHER PROCEDURE (2)       *
+     A*                     DC7A03-04                                *
+     A*                     DCFL01-10                                *
+     A*                     DC10A4-10                                *
+     A*                     DCDT06-15                                *
+     A*                                                              *
+     A*  07/17/95  C:33  PROJECT# TX006                              *
+     A*                  UPDATE THE FOLLOWING FIELDS:                *
+     A*                     DC7A01 - TXTP: PRINCIPLE PROCEDURE (1)   *
+     A*                     DC7A02 - TXTP: OTHER PROCEDURE (2)       *
+     A*                     DC7A03 - TXTP: OTHER PROCEDURE (3)       *
+     A*                                                              *
+     A*  01/31/96  C:43  PROJECT# 68MBU                              *
+     A*                  ADD THE FOLLOWING NEW FIELDS:               *
+     A*                     DCSID  - SOURCE ID        5   A          *
+     A*                     DCBID# - BATCH ID         9.0            *
+     A*                     DCCID# - CLAIM ID         9.0            *
+     A*                     DCSRBI - SOURCE BILL ID  20   A          *
+     A*                     DCHCC  - COORDINATED COV  1   A          *
+     A*                     DCSBID - SOURCE BATCH ID 10   A          *
+     A*                     DCSPAY - SOURCE PAYMENT   9.2            *
+     A*                                                              *
+     A*  02/12/97  C:45  PROJECT# 87MAW                              *
+     A*                  ADD 73 NEW FIELDS FOR BILL ENTRY            *
+     A*                  REFER TO PROJECT 'BEGIN ADD' AND 'END ADD'  *
+     A*                  NOTATIONS.                                  *
+     A*                                                              *
+     A*  08/21/97  C:32  PROJECT# 87MCJ                              *
+     A*                  ADDED DCPEOB - PREVIOUS EOMB#  9.0          *
+     A*                                                              *
+     A****************************************************************
+     A                                      REF(FSREFP)
+     A          R PDC01                     TEXT('DIAG CODE FILE')
+     A            DCCO#     R               REFFLD(CO#)
+     A            DCFND     R               REFFLD(FND)
+     A            DCFYR     R               REFFLD(FYR)
+     A            DCCASE    R               REFFLD(CASE)
+     A            DCFEIN    R               REFFLD(FEIN)
+     A                                      COLHDG('PAYEE' 'FEDERAL' 'ID #')
+     A            DCMOD     R               REFFLD(MOD)
+     A            DCDCS#    R               REFFLD(SEQ#) COLHDG('DIAG CODE'+
+     A                                      'SEQ #')
+     A            DCDIA1    R               REFFLD(DIA)
+     A                                      TEXT('DIAGNOSTIC CODE 1')
+     A            DCDIA2    R               REFFLD(DIA)
+     A                                      TEXT('DIAGNOSTIC CODE 2')
+     A            DCDIA3    R               REFFLD(DIA)
+     A                                      TEXT('DIAGNOSTIC CODE 3')
+     A            DCDIA4    R               REFFLD(DIA)
+     A                                      TEXT('DIAGNOSTIC CODE 4')
+     A            DCFRDT    R               REFFLD(DT)
+     A                                      COLHDG('FROM SERV'+
+     A                                      'DATE')
+     A            DCTODT    R               REFFLD(DT)
+     A                                      COLHDG('TO SERV'+
+     A                                      'DATE')
+     A            DCSTAT    R               REFFLD(STAT)
+     A                                      TEXT('P=PENDED')
+     A            DCUSER    R               REFFLD(USER)
+     A            DCPGM     R               REFFLD(PGM)
+     A            DCTIME    R               REFFLD(TIME)
+     A            DCDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            DCIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            DCIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'ENTRY' 'DATE')
+     A*** ADD FOR MULTIPLE STATE ADJUDICATION **********************************
+     A            DCAST     R               REFFLD(ST)
+     A                                      COLHDG('ADJUDICATION' 'STATE')
+     A            DCLTR#    R               REFFLD(LTR#)
+     A                                      COLHDG('LETTER NUMBER')
+     A            DCSUB#    R               REFFLD(SUB#)
+     A                                      COLHDG('SUBSCRIBER')
+     A***********
+     A            DCZIPA    R               REFFLD(ZIPA) COLHDG('GEO ZIP')
+     A***********
+     A            DCPRTY    R               REFFLD(PRTY)
+     A                                      COLHDG('PROVIDER TYPE')
+     A            DCSYS     R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEM ID')
+     A            DCCERT    R               REFFLD(CERT)
+     A                                      COLHDG('PRE-CERT #')
+     A            DCEXT     R               REFFLD(EXT)
+     A                                      COLHDG('PRE-CERT EXTENSION')
+     A            DCBLTY    R               REFFLD(FLAG)
+     A                                      COLHDG('BILL' 'TYPE')
+     A*                                     H = HOSPITAL
+     A*                                     P = PHYSICIAN
+     A*                                     X = PHARMACY
+     A            DCFL01    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 1')
+     A*                                   Clt 68: MedView status flag  CMS?
+     A*                                     Valid Values:
+     A*                                       Blank = not sent
+     A*                                       S = Sent to MedView
+     A*                                       R = Returned from MedView
+     A            DCFL02    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 2')
+     A            DCFL03    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 3')
+     A            DCFL04    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 4')
+     A            DCFL05    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 5')
+     A            DCFL06    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 6')
+     A            DCFL07    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 7')
+     A            DCFL08    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 8')
+     A            DCFL09    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 9')
+     A            DCFL10    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 10')
+     A            DC10A1    R               REFFLD(DS10)
+     A                                      COLHDG('1 DESC 10')
+     A*                              Pos. 1-5  Network Code
+     A*                              Pos. 6-8  Bill Sub-Type
+     A*                              Pos. 9-19 FLTP: DISCHARGE HOUR
+     A            DC10A2    R               REFFLD(DS10)
+     A                                      COLHDG('2 DESC 10')
+     A*                              Pos. 1 = NM Gross Receipt Tax code:
+     A*                                       S = Itemized Separately
+     A*                                       I = Individual Chrgs incl NMGRT
+     A*                                       X = N/A for this bill
+     A*                              Pos. 2-6 NM Gross Receipt Tax Percentage
+     A*                                       which will be translated to 5.2
+     A*                              Pos. 7-9 FLTP: Type of Bill
+     A*                                       1st digit = 1-9
+     A*                                       2nd digit = 1-9
+     A*                                       3rd digit = 1-9, A,B,C,D,P,I
+     A*                              Pos. 10   FLTP: Proc Code Method
+     A            DC10A3    R               REFFLD(DS10)
+     A                                      COLHDG('3 DESC 10')
+     A*                              Pos. 7-9 Tx Hospital Type of Service:
+     A*                                  Pos. 7-8 = Type of Service
+     A*                                            IM = Acute Care Inpat Med
+     A*                                            IS = Acute Care Inpat Sur
+     A*                                            IR = Rehab Inpat
+     A*                                            IP = Psych Inpat
+     A*                                            HS = Hos Sur Outpat
+     A*                                            AS = ASC Outpat
+     A*                                            HO = Hos Outpat Other
+     A*                                            AO = AS Outpat Other
+     A*                                   Pos. 9 = I for Interim
+     A*                                            F for Final
+     A            DC10A4    R               REFFLD(DS10)
+     A                                      COLHDG('4 DESC 10')
+     A            DC10A5    R               REFFLD(DS10)
+     A                                      COLHDG('5 DESC 10')
+     A            DC7A01    R               REFFLD(DS7)
+     A************                    FLTP: PRINCIPLE PROCEDURE (1)
+     A************                    TXTP: PRINCIPLE PROCEDURE (1)
+     A            DC7A02    R               REFFLD(DS7)
+     A************                    FLTP: OTHER 'PROCEDURE' '(2)
+     A************                    TXTP: OTHER PROCEDURE (2)
+     A            DC7A03    R               REFFLD(DS7)
+     A************                    TXTP: OTHER PROCEDURE (3)
+     A            DC7A04    R               REFFLD(DS7)
+     A            DC7A05    R               REFFLD(DS7)
+     A*
+     A            DC10A6    R               REFFLD(DS10)
+     A                                      COLHDG('5 DESC 10')
+     A            DC10A7    R               REFFLD(DS10)
+     A                                      COLHDG('6 DESC 10')
+     A            DC10A8    R               REFFLD(DS10)
+     A                                      COLHDG('7 DESC 10')
+     A            DC10A9    R               REFFLD(DS10)
+     A                                      COLHDG('8 DESC 10')
+     A            DC10A0    R               REFFLD(DS10)
+     A                                      COLHDG('10 DESC 10')
+     A            DCDT06    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A************                    FLTP: HOSPITAL ADMISSION DATE
+     A            DCDT07    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A************                    FLTP: COVERAGE FROM DATE
+     A            DCDT08    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A************                    FLTP: COVERAGE TO DATE
+     A            DCDT09    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            DCDT10    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            DCDT11    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            DCDT12    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            DCDT13    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            DCDT14    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            DCDT15    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            DCSID     R               REFFLD(SID)
+     A            DCBID#    R               REFFLD(BID#)
+     A            DCCID#    R               REFFLD(CID#)
+     A            DCSRBI    R               REFFLD(DS20)
+     A                                      COLHDG('SOURCE"S BILL ID')
+     A            DCHCC     R               REFFLD(FLAG)
+     A                                      COLHDG('COORDINATED' 'COVERAGE')
+     A                                      VALUES(' ' 'Y')
+     A            DCSBID    R               REFFLD(DS10)
+     A                                      COLHDG('SOURCE"S' 'BATCH ID#')
+     A            DCSPAY    R               REFFLD(A92)
+     A                                      COLHDG('SOURCE"S' 'PAY AMT ')
+     A*** BEGIN ADD *** 02/12/97 ***********************************************
+     A            DCADSC    R               REFFLD(FLAG)
+     A                                      COLHDG('ADDMISSION' 'SOURCE')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "ADSC"
+     A            DCADTY    R               REFFLD(FLAG)
+     A                                      COLHDG('ADMISSION' 'TYPE')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "ADTY"
+     A            DCADDI    R               REFFLD(DIA)
+     A                                      COLHDG('ADMIT DIAGNOSIS' 'CODE')
+     A            DCADLT    R               REFFLD(FLAG)
+     A                                      COLHDG('ADMIT DIAG' 'LOS TYPE')
+     A            DCADHR    R               REFFLD(TIMEHM)
+     A                                      COLHDG('ADMIT' 'HOUR')
+     A            DCDYCV    R               REFFLD(A50)
+     A                                      COLHDG('DAYS' 'COVERED')
+     A            DCNOCV    R               REFFLD(A50)
+     A                                      COLHDG('DAYS' 'NON-COVERED')
+     A            DCOCD1    R               REFFLD(DS15)
+     A                                      COLHDG('OCCURANCE' 'CODE 1')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "OCCD"
+     A            DCODT1    R               REFFLD(DT)
+     A                                      COLHDG('ODDURANCE' 'DATE 1')
+     A            DCOCD2    R               REFFLD(DS15)
+     A                                      COLHDG('OCCURANCE' 'CODE 2')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "OCCD"
+     A            DCODT2    R               REFFLD(DT)
+     A                                      COLHDG('ODDURANCE' 'DATE 2')
+     A            DCOCD3    R               REFFLD(DS15)
+     A                                      COLHDG('OCCURANCE' 'CODE 3')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "OCCD"
+     A            DCODT3    R               REFFLD(DT)
+     A                                      COLHDG('ODDURANCE' 'DATE 3')
+     A            DCOCD4    R               REFFLD(DS15)
+     A                                      COLHDG('OCCURANCE' 'CODE 4')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "OCCD"
+     A            DCODT4    R               REFFLD(DT)
+     A                                      COLHDG('ODDURANCE' 'DATE 4')
+     A            DCOSCD    R               REFFLD(DS15)
+     A                                      COLHDG('OCCURANCE' 'SPAN CODE')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "OCSP"
+     A            DCOSFD    R               REFFLD(DT)
+     A                                      COLHDG('OCCUR SPAN' 'FROM DATE')
+     A            DCOSTD    R               REFFLD(DT)
+     A                                      COLHDG('OCCUR SPAN' 'TO DATE')
+     A            DCPATS    R               REFFLD(CODE)
+     A                                      COLHDG('PATIENT' 'STATUS')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "PATS"
+     A            DCVC01    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 1A')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA01    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 1A')
+     A            DCVC02    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 1B')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA02    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 1B')
+     A            DCVC03    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 1C')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA03    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 1C')
+     A            DCVC04    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 1D')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA04    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 1D')
+     A            DCVC05    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 2A')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA05    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 2A')
+     A            DCVC06    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 2B')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA06    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 2B')
+     A            DCVC07    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 2C')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA07    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 2C')
+     A            DCVC08    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 2D')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA08    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 2D')
+     A            DCVC09    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 3A')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA09    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 3A')
+     A            DCVC10    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 3B')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA10    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 3B')
+     A            DCVC11    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 3C')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA11    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 3C')
+     A            DCVC12    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 3D')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "VLCD"
+     A            DCVA12    R               REFFLD(A122)
+     A                                      COLHDG('VALUE' 'AMOUNT 3D')
+     A            DCSPCD    R               REFFLD(DS3)
+     A                                      COLHDG('BILL/PROV' 'SPEC CODE')
+     A            DCCRDT    R               REFFLD(DT)
+     A                                      COLHDG('CARRIER' 'RECV DATE')
+     A            DCIWRI    R               REFFLD(FLAG)
+     A                                      COLHDG('INJ WORKERS' 'REIMB IND')
+     A            DCACCT    R               REFFLD(DS15)
+     A                                      COLHDG('PATIENT ACCT' 'NUMBER')
+     A            DCPHTY    R               REFFLD(CODE)
+     A                                      COLHDG('PHYSICAN' 'TYPE')
+     A**********    VALID VALUES:  XREF TO FTGTP VIA "PHTY"
+     A            DCSFEI    R               REFFLD(FEIN)
+     A                                      COLHDG('SERVICING' 'PROV FEIN')
+     A            DCSMOD    R               REFFLD(MOD)
+     A                                      COLHDG('SERVICING' 'PROV MOD')
+     A            DCBFEI    R               REFFLD(FEIN)
+     A                                      COLHDG('BILLING' 'FEIN')
+     A            DCBMOD    R               REFFLD(MOD)
+     A                                      COLHDG('BILLING' 'MOD')
+     A            DCTFEI    R               REFFLD(FEIN)
+     A                                      COLHDG('ATTENDING' 'PHYS FEIN')
+     A            DCTMOD    R               REFFLD(MOD)
+     A                                      COLHDG('ATTENDING' 'PHYS MOD')
+     A            DCOFEI    R               REFFLD(FEIN)
+     A                                      COLHDG('OTHER' 'PHYS FEIN')
+     A            DCOMOD    R               REFFLD(MOD)
+     A                                      COLHDG('OTHER ' 'PHYS MOD')
+     A            DCCOC1    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 1')
+     A            DCCOC2    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 2')
+     A            DCCOC3    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 3')
+     A            DCCOC4    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 4')
+     A            DCCOC5    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 5')
+     A            DCCOC6    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 6')
+     A            DCCOC7    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 7')
+     A            DCMRC#    R               REFFLD(DS15)
+     A                                      COLHDG('MEDICAL RECORD' 'NUMBER')
+     A            DCOAMT    R               REFFLD(A112)
+     A                                      COLHDG('OTHER' 'AMOUNT')
+     A            DCDIA5    R               REFFLD(DIA)
+     A                                      COLHDG('DIAGNOSIS' 'CODE 5')
+     A            DCDIA6    R               REFFLD(DIA)
+     A                                      COLHDG('DIAGNOSIS' 'CODE 6')
+     A            DCDIA7    R               REFFLD(DIA)
+     A                                      COLHDG('DIAGNOSIS' 'CODE 7')
+     A            DCDIA8    R               REFFLD(DIA)
+     A                                      COLHDG('DIAGNOSIS' 'CODE 8')
+     A            DCDIA9    R               REFFLD(DIA)
+     A                                      COLHDG('DIAGNOSIS' 'CODE 9')
+     A            DC7A06    R               REFFLD(DS7)
+     A                                      COLHDG('OTHER' 'PROC CODE 6')
+     A            DCDT16    R               REFFLD(DT)
+     A                                      COLHDG('OTHER' 'PROC DATE 4')
+     A            DCDT17    R               REFFLD(DT)
+     A                                      COLHDG('OTHER' 'PROC DATE 5')
+     A            DCDT18    R               REFFLD(DT)
+     A                                      COLHDG('OTHER' 'PROC DATE 6')
+     A            DCPMRI    R               REFFLD(FLAG)
+     A                                      COLHDG('PAITENT MED' 'RELEASE IND')
+     A            DCTOTN    R               REFFLD(A112)
+     A                                      COLHDG('TOTAL NON-' 'COVERED CHGS')
+     A            DCEMPL    R               REFFLD(FLAG)
+     A                                      COLHDG('INJURY DUE' 'TO EMPLOYMENT')
+     A            DCDFC     R               REFFLD(DT)
+     A                                      COLHDG('DATE FIRST' 'CONSULTED')
+     A            DCLIC#    R               REFFLD(FEI2)
+     A                                      COLHDG('LICENSE /' 'MEDICARE #')
+     A            DCAMOD    R               REFFLD(DS4)
+     A                                      COLHDG('ANTHEM' 'MODIFIER')
+     A** END ADD *** 02/12/97 **************************************** *********
+     A** BEG ADD *** 08/21/97 **************************************** *********
+     A            DCPEOB    R               REFFLD(EOB#)
+     A                                      COLHDG('PREVIOUS' 'EOMB#')
+     A** END ADD *** 08/21/97 **************************************** *********

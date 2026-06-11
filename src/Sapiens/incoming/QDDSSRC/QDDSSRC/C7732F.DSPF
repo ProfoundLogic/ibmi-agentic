@@ -1,0 +1,106 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   LOSS RATIO PER POLICY PROMPT DISPLAY                     **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A*----------------------------------------------------------------
+     A          R SCR01
+     A                                      CF05
+     A                                      CF06
+     A                                      CF07
+     A                                      CF09
+     A                                      CF13
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(30)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7732F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  7 19'Effective Date From:'
+     A            SCFDT     R        B  7 40REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                  7 50'To:'
+     A            SCTDT     R        B  7 54REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  22                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A                                  9 17'Loss Ratio Percentage:'
+     A            SCPER         10Y 2B  9 40TEXT('LOSS RATIO PERCENTAGE')
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(1)
+     A  24                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A                                  9 52'%'
+     A                                 11 26'Section Code:'
+     A            SCCC      R        B 11 40REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A  25                                  ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A                                 11 50'(Default = ALL)'
+     A                                 13 16'Agent federal tax ID #:'
+     A            SCFEIN    R        B 13 40REFFLD(FEIN)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  26                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A                                 13 50'(Default = ALL)'
+     A                                 15 21'Location modifier:'
+     A            SCMOD     R        B 15 40REFFLD(MOD)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A                                 17 23'Producer Number:'
+     A            SCPROD    R     Y  B 17 40REFFLD(PRO#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  27                                  ERRMSGID(CCR0547 *LIBL/CMESGG)
+     A                                 17 50'(Default = ALL)'
+     A  30                             20 22'REQUEST HAS BEEN SUBMITTED TO BATC-
+     A                                      H'
+     A                                      COLOR(WHT)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 30'F5=Section code search'
+     A                                      COLOR(BLU)
+     A                                 23 59'F6=Fein # search'
+     A                                      COLOR(BLU)
+     A                                 24  2'F7=Agent alpha search'
+     A                                      COLOR(BLU)
+     A                                 24 30'F9=Producer search'
+     A                                      COLOR(BLU)
+     A                                 24 59'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A*----------------------------------------------------------------
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

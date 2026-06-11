@@ -1,0 +1,157 @@
+     HCopyright('(c) 2022 Sapiens. All Rights Reserved.')
+
+     H option(*nodebugio:*srcstmt)
+     H dftactgrp(*no) actgrp(*CALLER) bnddir('WTBNDDIR')
+
+     H/TITLE SR04338B - CA - Designated Employee Exclusion
+      *===============================================================*
+      * WC040338B- Designated Employee Exclusion Endorsement          *
+      *                                                               *
+      * Program Description:                                          *
+      *                                                               *
+      *   Determines if this endorsement form should be attached to   *
+      *   the policy and creates data in the Endorsement Form         *
+      *   Workfile (WXFMP) prior to a form merge.                     *
+      *                                                               *
+      * Created   : 04/28/18                                          *
+      * Programmer: C:33                                              *
+      * Project   : WC2603                                            *
+      *                                                               *
+      *===============================================================*
+      * REVISIONS:                                                    *
+      *                                                               *
+      * 10/28/22 C:333 Project: WC2834 (Recompile)                    *
+      *                Endorsement Recognition of Cancellation        *
+      *                                                               *
+      * ------------------------------------------------------------- *
+      *  NOTE: Please add comments to the top of revisions.           *
+      * ------------------------------------------------------------- *
+      *===============================================================*
+      * Notes:                                                        *
+      *                                                               *
+      *  Utilizes the endorsement copybook (SCOPYEN01F/I/C).          *
+      *                                                               *
+      *  QQMODE = 1 - Called to determine if form should be attached. *
+      *  QQMODE = 2 - Called to print endorsement.                    *
+      *  QQMODE = 3 - Called for additional input.                    *
+      *  QQMODE = 4 - Called for mid-term processing.                 *
+      *===============================================================*
+      ** Copybook F specs
+     F/COPY SCOPYEN01F
+     FWledl     if   e           k disk    Prefix(fm2:2)
+     F                                     Rename(ped01:ped00)
+      *=========================================================================
+      *  Arrays
+      *=========================================================================
+      *
+      *=========================================================================
+      *  /COPY required constants
+      *=========================================================================
+      ** Form ID
+     D qqForm          s             15a   inz('WC040338B ')
+
+      ** Additional entry program
+     D ADDPGM          C                   CONST('SR04338BI ')
+
+     D/COPY SCOPYEN01D
+
+     *=========================================================================
+     *  PLIST definitions
+     *=========================================================================
+
+      *entry parameters
+     D SR04338B        PR
+     D                                3
+     D                                3
+     D                                9
+     D                                5
+     D                                3
+     D                                1
+     D                                9  0
+     D                                1
+     D SR04338B        PI
+     D  qqCo#                         3
+     D  qqFnd                         3
+     D  qqEmp#                        9
+     D  qqDiv                         5
+     D  qqFyr                         3
+     D  qqMode                        1
+     D  qqRrn                         9  0
+     D  qqMod2                        1
+    
+     C     keyWledl      klist
+     C                   kfld                    xxCo#
+     C                   kfld                    xxFnd
+     C                   kfld                    xxEmp#
+     C                   kfld                    xxDiv
+     C                   kfld                    xxFyr
+     C                   kfld                    xxFrm1
+      *=========================================================================
+      *  KLIST definitions
+      *=========================================================================
+     C     FMKY          KLIST
+     C                   KFLD                    XXCO#
+     C                   KFLD                    XXFND
+     C                   KFLD                    XXFYR
+     C                   KFLD                    XXEMP#
+     C                   KFLD                    XXDIV
+     C                   KFLD                    XXFRM1
+      *=========================================================================
+      *  Main
+      *=========================================================================
+      ** Copybook C specs
+     C/COPY SCOPYEN01C
+      *
+      *=========================================================================
+      *  OthInf - Subroutine to load form specific information & write record
+      *=========================================================================
+     C     OthInf        Begsr
+      *
+     C                   Movel(P)  XXFORM        XXFRM1           15
+
+      /Free
+       WriteInCopybook = *Off;
+
+       Setll keyWledl ped00;
+       Reade keyWledl ped00;
+
+          Dow Not %Eof(wledl);
+          FM1F01 =  FM21F01;                   //Employee Name
+          FMFL01  = FM2FL01;                   //Check box 1
+          FMFL02  = FM2FL02;                   //Check box 2
+          FMc404 =  FM2c404;                   //Insured Name
+          FMc405 =  FM2c405;                   //Insurer
+          FMc301 =  FM2c301;                   //Policy Number
+          FMDt01 =  FM2Dt01;                   //Policy Eff date
+          FMDt02 =  FM2Dt02;                   //Policy Exp date
+
+          // Write the output record in WXFMP.
+          Exsr WriteWorkFile;
+
+          Reade keyWledl ped00;
+          EndDo;
+      /End-Free
+     C*
+      *
+     C                   Endsr
+      *=========================================================================
+      *  PGMSTR - Beginning of program processing
+      *=========================================================================
+     C     PgmStr        Begsr
+      *
+      *
+     C                   Endsr
+      *=========================================================================
+      *  PGMEND - End of program processing
+      *=========================================================================
+     C     PgmEnd        Begsr
+      *
+      *
+     C                   Endsr
+      *=========================================================================
+      *  VALID - Subroutine to attach this form to the policy
+      *=========================================================================
+     C     VALID         BEGSR
+      *
+      *
+     C                   ENDSR

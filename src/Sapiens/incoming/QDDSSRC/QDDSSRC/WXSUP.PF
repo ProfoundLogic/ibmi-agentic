@@ -1,0 +1,480 @@
+      * (c) 2018 StoneRiver, Inc. All rights Reserved.                *
+      * StoneRiver is a trademark of StoneRiver, Inc.                 *
+     A*****************************************************************
+     A*    EDI A49 Format File
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 02/14/22 C:079 Project: WC2797                                *
+     A*                Add IAIABC fields for 3.1.4                    *
+     A*                                                               *
+     A* 05/30/18 C:274 PROJECT: WC2515                                *
+     A*            079 Added new fields.                              *
+     A*                                                               *
+     A* 01/31/17 C:306 PROJECT: WC2410                                *
+     A*                Added Field SUINJS                             *
+     A*                                                               *
+     A* 02/08/14 C:180 Project: WC2234 - PRISS 27                     *
+     A*                Correct size of fiels added by WC2234          *
+     A*                                                               *
+     A* 12/12/13 C:287 PROJECT: WC2234                                *
+     A*                Add field SUPSPA, SUWWTC, SUWDSC, SUESID       *
+     A*                                                               *
+     A*  07/02/13 C:190 PROJECT 147WBF                                *
+     A*                 Add FND, FYR & CASE                           *
+     A*                                                               *
+     A*  11/17/08 C:53  Support 63706
+     A*                 Add INSURED FEIN
+     A*                                                               *
+     A* 10/30/08  C:180  SUPPORT 65671, 65757 - Add EDI R3 fields
+     A*
+     A*  10/15/08 C:180 Support 65530
+     A*                 Add Current date of disability began
+     A*
+     A*  10/19/07 C:191 Project: WC1584                               *
+     A*                 Added EDI Release 3 Phase 2 fields            *
+     A*                                                               *
+     A*  05/01/07 C:185 Project: WC1177                               *
+     A*                 Added 'EDI Release 3' Fields.                 *
+     A*                                                               *
+     A*  (C) Copyright Progressive Data Solutions, Inc., 1996         *
+     A**                                                              *
+     A** EDI - A49 Format File                                        *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A**
+     A          R PSU01                     TEXT('EDI A49 Format')
+     A            SUCO#     R               REFFLD(CO#)
+     A            SUEXDT    R               REFFLD(DT)
+     A                                      COLHDG('EXTRACT DATE')
+     A*
+     A***    Transaction
+     A*
+     A            SUTSET    R    3A         REFFLD(CODE)
+     A                                      TEXT('TRANSACTION SET ID')
+     A            SUMTC     R               REFFLD(CODE)
+     A                                      TEXT('MAINT TYPE CODE')
+     A            SUTDT     R    8S 0       REFFLD(DT)
+     A                                      TEXT('MAINT TYPE CODE DATE')
+     A*
+     A***    Jurisdiction
+     A*
+     A            SUJRST    R               REFFLD(CODE)
+     A                                      TEXT('JURISDICTION')
+     A*
+     A***    Claim Administrator
+     A*
+     A            SUCLCD    R               REFFLD(DS9)
+     A                                      TEXT('INSURER FEIN')
+     A            SUFEIN    R               REFFLD(DS9)
+     A                                      TEXT('3RD PTY FEIN')
+     A            SUAZIP    R    9A         REFFLD(ZIP)
+     A                                      TEXT('CLM ADMIN ZIP')
+     A*
+     A***    Employee
+     A*
+     A            SUSS#     R               REFFLD(SS#)
+     A                                      TEXT('SOC SEC #')
+     A            SUDEP     R    2S 0       REFFLD(A20)
+     A                                      COLHDG('#' 'OF' 'DEPENDENTS')
+     A            SUPRED    R               REFFLD(FLAG)
+     A                                      COLHDG('PREEXISTING' 'DISABILITY')
+     A            SUDBDT    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'DISABILITY' 'BEGAN')
+     A            SUMAXI    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAX MED' 'IMPROV')
+     A            SURETW    R               REFFLD(FLAG)
+     A                                      COLHDG('RETRN' 'TO WORK' 'QUAL')
+     A            SURTW     R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'RETURN' 'TO WORK')
+     A            SUEDTD    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE OF' 'EMPLOYEE' 'DEATH')
+     A*
+     A*  WAGE
+     A*
+     A            SUWAGE    R     S         REFFLD(A112)
+     A                                      COLHDG('WAGE')
+     A            SUWGPD    R               REFFLD(CODE)
+     A                                      COLHDG('WAGE' 'PERIOD')
+     A            SUDAYS    R    1S 0       REFFLD(A20)
+     A                                      COLHDG('DAYS' 'WORKED')
+     A            SUCSAL    R               REFFLD(FLAG)
+     A                                      COLHDG('CONTINUED' 'SALARY')
+     A*
+     A*  ACCIDENT
+     A*
+     A            SUACDT    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('INJURY' 'DATE')
+     A            SURPT#    R   25A         REFFLD(DS20)
+     A                                      COLHDG('INSURED' 'REPORT' 'NUMBER')
+     A            SUACLC    R   25A         REFFLD(DS20)
+     A                                      COLHDG('ADMIN' 'CLAIM' '#')
+     A            SUACL#    R   25A         REFFLD(DS20)
+     A                                      COLHDG('AGENCY' 'CLAIM' '#')
+     A*
+     A*  CLAIM STATUS
+     A*
+     A            SUCSTS    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM' 'STATUS')
+     A            SUCTYP    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM' 'TYPE')
+     A            SUACCD    R               REFFLD(FLAG)
+     A                                      COLHDG('AGREE' 'COMPENSATE' 'CODE')
+     A            SURPDT    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'OF' 'REPRESENTATION')
+     A*
+     A*  PAYMENT STATUS
+     A*
+     A            SULATC    R               REFFLD(CODE)
+     A                                      COLHDG('LATE' 'REASON' 'CODE')
+     A*
+     A*  VARIABLE SEGMENT NUMBERS
+     A*
+     A            SU#PI     R    2S 0       REFFLD(A20)
+     A                                      COLHDG('# OF PERM' 'IMPAIRMENTS')
+     A            SU#PA     R    2S 0       REFFLD(A20)
+     A                                      COLHDG('# OF' 'PAY/ADJ')
+     A            SU#BA     R    2S 0       REFFLD(A20)
+     A                                      COLHDG('# OF' 'BENEFIT ADJ')
+     A            SU#RER    R    2S 0       REFFLD(A20)
+     A                                      COLHDG('# OF PAID' 'DT, RE, RCV')
+     A            SU#DDR    R    2S 0       REFFLD(A20)
+     A                                      COLHDG('# OF DEATH' 'DEPENDENTS')
+     A*
+     A            SUSTAT    R               REFFLD(STAT)
+     A            SUUSER    R               REFFLD(USER)
+     A            SUPGM     R               REFFLD(PGM)
+     A            SUTIME    R               REFFLD(TIME)
+     A            SUDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A*** BEG ADD ****** 05/01/07 ************************************
+     A            SUMTCC         2A         COLHDG('MAINT' 'TYPE' 'CORR CODE')
+     A*
+     A            SUMTC2         8S 0       COLHDG('MAINT TYPE' 'CORR CODE' +
+     A                                      'DATE')
+     A*
+     A            SUCNLT         8S 0       COLHDG('CLAIM ADMIN' 'KNWLGE OF +
+     A                                      LOST TIME' 'DATE')
+     A*
+     A*** BEG CHG ****** 10/19/07 ************************************
+     A************SUJRBC         2A         COLHDG('JURISDICTION' +
+     A            SUJURO         2A         COLHDG('JURISDICTION' +
+     A*** END CHG ****** 10/19/07 ************************************
+     A                                      'BRANCH OFFICE' 'CODE')
+     A*
+     A*** BEG ADD ****** 10/19/07 ************************************
+     A            SUCAFE         9A         COLHDG('CLAIM ADMIN' 'FEIN')
+     A*** END ADD ****** 10/19/07 ************************************
+     A*** BEG CHG ****** 10/19/07 ************************************
+     A************SUCLNM        40A         COLHDG('CLAIM' 'ADMIN' 'NAME')
+     A            SUCNAM        40A         COLHDG('CLAIM' 'ADMIN' 'NAME')
+     A*
+     A************SUCLRM        40A         COLHDG('CLAIM ADMIN' +
+     A            SUCARP        40A         COLHDG('CLAIM ADMIN' +
+     A                                      'CLAIM REPRESENTATIVE' 'NAME')
+     A*
+     A************SUCRP#        15A         COLHDG('CLAIM ADMIN' 'CLAIM +
+     A            SUCAPH        15A         COLHDG('CLAIM ADMIN' 'CLAIM +
+     A                                      REPRESENTATIVE' 'BUSINESS PH#')
+     A*
+     A************SUCRPE        80A         COLHDG('CLAIM ADMIN' +
+     A            SUCAEM        80A         COLHDG('CLAIM ADMIN' +
+     A                                      'CLAIM REPRESENTATIVE' 'EMAIL')
+     A*
+     A************SUCRPF        10A         COLHDG('CLAIM ADMIN' +
+     A            SUCAFX        10A         COLHDG('CLAIM ADMIN' +
+     A                                      'CLAIM REPRESENTATIVE' 'FAX')
+     A*** END CHG ****** 10/19/07 ************************************
+     A*
+     A            SUEITQ         1A         COLHDG('EMPLOYEE ID' 'TYPE' +
+     A                                      'QUALIFIER')
+     A*
+     A*** BEG DEL ****** 10/19/07 ************************************
+     A************SUEID         15A         COLHDG('EMPLOYEE ID')
+     A*** END DEL ****** 10/19/07 ************************************
+     A*
+     A            SULSN         40A         COLHDG('EMPLOYEE' 'LAST' 'NAME')
+     A*
+     A            SUFSN         15A         COLHDG('EMPLOYEE' 'FIRST' 'NAME')
+     A*
+     A            SUMID         15A         COLHDG('EMPLOYEE' 'MID' 'NAME/INIT')
+     A*
+     A*** BEG DEL ****** 10/19/07 ************************************
+     A************SULSNS         4A         COLHDG('EMPLOYEE' 'LST NAME' 'SUFX')
+     A*** END DEL ****** 10/19/07 ************************************
+     A*
+     A            SUDTOB         8S 0       COLHDG('EMPLOYEE' 'DATE OF' 'BIRTH')
+     A*
+     A            SUMSTS         1A         COLHDG('EMPLOYEE' 'MARITAL +
+     A                                      STATUS' 'CODE')
+     A*
+     A*** BEG DEL ****** 10/19/07 ************************************
+     A************SUEEL          2S 0       COLHDG('EMPLOYEE' 'EDUCATION' +
+     A************                          'LEVEL')
+     A*** END DEL ****** 10/19/07 ************************************
+     A*
+     A            SUENEX         2S 0       COLHDG('EMPLOYEE' 'NO OF' +
+     A                                      'ENTITLD EXEMPTIONS')
+     A*
+     A*** BEG CHG ****** 10/19/07 ************************************
+     A************SUTFSC         1A         COLHDG('EMPLOYEE' 'TAX FILING' +
+     A            SUETFS         1A         COLHDG('EMPLOYEE' 'TAX FILING' +
+     A                                      'STATUS CODE')
+     A*
+     A************SUDRIC         1A         COLHDG('DEATH' 'RESULT OF INJURY' +
+     A            SUIDTH         1A         COLHDG('DEATH' 'RESULT OF INJURY' +
+     A                                      'CODE')
+     A*
+     A************SUINS#         9A         COLHDG('INSURED' 'FEIN')
+     A*
+     A************SUICSN         9A         COLHDG('INSOLVENT' 'INSURED' 'FEIN')
+     A            SUIIF          9A         COLHDG('INSOLVENT' 'INSURED' 'FEIN')
+     A*** END CHG ****** 10/19/07 ************************************
+     A*
+     A            SUEMP#         9A         COLHDG('EMPLOYER' 'FEIN')
+     A*
+     A            SUEZP          9A         COLHDG('EMPLOYER' 'PHYSICAL' 'ZIP')
+     A*
+     A*** BEG CHG ****** 10/19/07 ************************************
+     A************SURWSE         1A         COLHDG('RETURN TO WRK' 'WITH SAME +
+     A            SUSAME         1A         COLHDG('RETURN TO WRK' 'WITH SAME +
+     A                                      EMPLOYER' 'INDICATOR')
+     A*
+     A************SUDTRT         8S 0       COLHDG('EMP KNWLGE OF' 'DATE OF +
+     A            SUDODD         8S 0       COLHDG('EMP KNWLGE OF' 'DATE OF +
+     A                                      DISABILITY' 'DATE')
+     A*** END CHG ****** 10/19/07 ************************************
+     A*
+     A            SUNCPC         1A         COLHDG('NON CONSECUTIVE' 'PERIOD' +
+     A                                      'CODE')
+     A*
+     A*** BEG CHG ****** 10/19/07 ************************************
+     A************SUEGWA         1A         COLHDG('ESTIMATED' 'GROSS WEEKLY +
+     A            SUWMTH         1A         COLHDG('ESTIMATED' 'GROSS WEEKLY +
+     A                                      AMOUNT' 'INDICATOR')
+     A*
+     A************SUCDLD         8S 0       COLHDG('CURRENT DATE' +
+     A            SUCDLW         8S 0       COLHDG('CURRENT DATE' +
+     A                                      'LAST DAY WORKED')
+     A*
+     A************SUCDDB         8S 0       COLHDG('CURRENT DATE' +
+     A*** END CHG ****** 10/19/07 ************************************
+     A*
+     A            SUIDLD         8S 0       COLHDG('INITIAL DATE' +
+     A                                      'LAST DAY WORKED')
+     A*
+     A*** BEG CHG ****** 10/19/07 ************************************
+     A************SURWTC         1A         COLHDG('RETURN TO WORK' +
+     A            SURTWT         1A         COLHDG('RETURN TO WORK' +
+     A                                      'TYPE' 'CODE')
+     A*
+     A************SUPHRI         1A         COLHDG('PHY RESTRICTIONS' +
+     A            SUPRIN         1A         COLHDG('PHY RESTRICTIONS' +
+     A                                      'INDICATOR')
+     A*
+     A************SUSEDT         8S 0       COLHDG('SUSPENSION' 'EFFECTIVE' +
+     A            SUSUEF         8S 0       COLHDG('SUSPENSION' 'EFFECTIVE' +
+     A                                      'DATE')
+     A*
+     A************SUFDED         8S 0       COLHDG('FULL DENIAL' 'EFFECTIVE' +
+     A            SUDYEF         8S 0       COLHDG('FULL DENIAL' 'EFFECTIVE' +
+     A                                      'DATE')
+     A*
+     A************SUFDRD         8S 0       COLHDG('FULL DENIAL' 'RESCISSION' +
+     A            SUDRES         8S 0       COLHDG('FULL DENIAL' 'RESCISSION' +
+     A                                      'DATE')
+     A*
+     A************SUPRDC         1A         COLHDG('PARTIAL' 'DENIAL' 'CODE')
+     A            SUPDNY         1A         COLHDG('PARTIAL' 'DENIAL' 'CODE')
+     A*
+     A************SUCWCA        11S 2       COLHDG('CALCULATED' 'WEEKLY COMP' +
+     A            SUCAWW        11S 2       COLHDG('CALCULATED' 'WEEKLY COMP' +
+     A                                      'AMOUNT')
+     A*
+     A************SUWGED         8S 0       COLHDG('WAGE' 'EFFECTIVE' 'DATE')
+     A            SUWGEF         8S 0       COLHDG('WAGE' 'EFFECTIVE' 'DATE')
+     A*
+     A************SUDCFB        11S 2       COLHDG('DISCOUNTED' 'FRINGE' +
+     A            SUDFBE        11S 2       COLHDG('DISCOUNTED' 'FRINGE' +
+     A                                      'BENEFITS')
+     A*
+     A************SUTYLC         2A         COLHDG('TYPE' 'OF LOSS' 'CODE')
+     A            SUTOLC         2A         COLHDG('TYPE' 'OF LOSS' 'CODE')
+     A*** END CHG ****** 10/19/07 ************************************
+     A*
+     A            SUESTS         2A         COLHDG('EMPLOYMENT' 'STATUS' +
+     A                                      'CODE')
+     A*
+     A*** BEG CHG ****** 10/19/07 ************************************
+     A************SUPIMI         1A         COLHDG('PERMANENT IMPAIRMENT' 'MIN +
+     A            SUPIMP         1A         COLHDG('PERMANENT IMPAIRMENT' 'MIN +
+     A                                      PAYMENT' 'INDICATOR')
+     A*
+     A************SUIRTW         8S 0       COLHDG('INITIAL' 'RETURN TO WRK' +
+     A            SURTWD         8S 0       COLHDG('INITIAL' 'RETURN TO WRK' +
+     A                                      'DATE')
+     A*
+     A************SUWPDI         1A         COLHDG('FULL WAGES PAID' 'FOR INJ +
+     A            SUFWPI         1A         COLHDG('FULL WAGES PAID' 'FOR INJ +
+     A                                      URY DATE' 'INDICATOR')
+     A*
+     A************SULSPC         2A         COLHDG('LUMPSUM' 'PMT/SETTLEMENT' +
+     A            SULUMC         2A         COLHDG('LUMPSUM' 'PMT/SETTLEMENT' +
+     A                                      'CODE')
+     A*
+     A************SUSLCI         1A         COLHDG('SALARY PAID' 'IN LIEU OF +
+     A            SUFSAL         1A         COLHDG('SALARY PAID' 'IN LIEU OF +
+     A                                      COMP' 'INDICATOR')
+     A*** END CHG ****** 10/19/07 ************************************
+     A*
+     A            SUAWW         11S 2       COLHDG('AVERAGE' 'WAGE')
+     A*
+     A            SUIDLT         8S 0       COLHDG('INITIAL DATE' 'OF' +
+                                            'LOST TIME')
+     A*
+     A*** BEG CHG ****** 10/19/07 ************************************
+     A************SUORDT         8S 0       COLHDG('AWARD/ORDER' 'DATE')
+     A            SUSTDT         8S 0       COLHDG('AWARD/ORDER' 'DATE')
+     A*
+     A************SUCLAZ         9A         COLHDG('CLAIM ADMIN' +
+     A            SUCAZP         9A         COLHDG('CLAIM ADMIN' +
+     A                                      'ALTERNATE' 'ZIP')
+     A*** END CHG ****** 10/19/07 ************************************
+     A*
+     A***  VARIABLE SEGMENT COUNTERS
+     A*
+     A            SU#BFT         2S 0       COLHDG('NO' 'OF' 'BENEFITS')
+     A*
+     A            SU#PMT         2S 0       COLHDG('NO' 'OF' 'PAYMENTS')
+     A*
+     A            SU#OBF         2S 0       COLHDG('NO' 'OF' 'OTHER BENEFITS')
+     A*
+     A            SU#ACR         3S 0       COLHDG('NO' 'OF' 'BENEFIT ACR')
+     A*
+     A            SU#REC         2S 0       COLHDG('NO' 'OF' 'RECOVERIES')
+     A*
+     A            SU#RDE         2S 0       COLHDG('NO' 'OF' 'REDUCED EARNINGS')
+     A*
+     A            SU#CEM         2S 0       COLHDG('NO' 'OF' 'CONCURRENT +
+     A                                       EMPLOYERS')
+     A*
+     A            SU#DRC         2S 0       COLHDG('NO OF' 'FULL DENIAL REASON +
+     A                                      ' 'CODES')
+     A*
+     A            SU#DRN         2S 0       COLHDG('NO OF' 'DENIAL REASON' +
+     A                                      'NARR')
+     A*
+     A            SU#SNN         2S 0       COLHDG('NO OF' 'SUSPENSION' 'NARR')
+     A*** END ADD *** 05/01/07 **************************************
+     A*** BEGIN ADD ***** 10/15/08 ************************************
+     A            SUCDOB    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('CURR' 'DATE DISAB' 'BEGAN')
+     A*** END ADD ******* 10/15/08 ************************************
+     A*** Beg Add *** 10/30/08 **************************************  *********
+     A            SUEID         15A         COLHDG('ID other' 'than SSN')
+     A            SURBAC         1A         COLHDG('Reduced' 'Benef amt type')
+     A*** End Add *** 10/30/08 **************************************  *********
+     A*** BEG ADD *** 11/17/08 **************************************
+     A            SUIDFE    R    9A         REFFLD(EMP#)
+     A                                      COLHDG('INSURED' 'FEIN')
+     A*** END ADD *** 11/17/08 **************************************
+     A*** BEG ADD *** 07/02/13 **************************************
+     A            SUFND     R     S         REFFLD(FND)
+     A            SUYEAR    R     S         REFFLD(FYR)
+     A            SUCASE    R     S         REFFLD(CASE)
+     A*** END ADD *** 07/02/13 **************************************
+
+     A*** Begin Add *** 12/12/13 ***********************************
+     A            SUPSPA         1A         TEXT('Emplyr Paid Salry prior to -
+     A                                      acquisition')
+     A                                      COLHDG('Salry pre-acq')
+     A            SUWWTC         1A         TEXT('Work Week Type')
+     A                                      COLHDG('WW Type')
+     A*** Begin Chg *** 02/08/14 ***********************************
+     A***         SUWDSC         1A         TEXT('Work Days Scheduled')
+     A***                                   COLHDG('Wrk Days Sched')
+     A            SUWDSC         7A         TEXT('Work Days Scheduled')
+     A                                      COLHDG('Wrk Days Sched')
+     A*** End   Chg *** 02/08/14 ***********************************
+     A            SUESID        15A         TEXT('Employee Security ID')
+     A                                      COLHDG('Emp Sec ID')
+     A*** End   Add *** 12/12/13 ***********************************
+     A*** Begin Add *** 01/31/17 ***********************************
+     A            SUINJS         1A         TEXT('Injury Severity Type Code')
+     A                                      COLHDG('Inj Sev Typ Cd')
+     A*** End   Add *** 01/31/17 ***********************************
+     A*** Begin Add *** 05/30/18 ***********************************
+     A            SU#DE          2S 0       TEXT('# OF DATA ELEMENTS')
+     A                                      COLHDG('# DATA ELEMNTS')
+     A            SU#NA          2S 0       TEXT('# OF NARRATVES')
+     A                                      COLHDG('# OF NARRATVES')
+     A            SUAWLI    R               REFFLD(FLAG)
+     A                                      TEXT('Anticipated Wage Loss Ind')
+     A                                      COLHDG('Anticipated' +
+     A                                              'Wage Loss Ind')
+     A            SUIRTC    R               REFFLD(FLAG)
+     A                                      TEXT('Initial RTW Type Code')
+     A                                      COLHDG('Initial RTW' +
+     A                                             'Type Code')
+     A            SUIRPR    R               REFFLD(FLAG)
+     A                                      TEXT('Initial RTW Phys Rstr Ind')
+     A                                      COLHDG('Initial RTW Physical' +
+     A                                             'Restrictions Ind')
+     A            SUIRSE    R               REFFLD(FLAG)
+     A                                      TEXT('Initial RTW w/Same Emp Ind')
+     A                                      COLHDG('Initial RTW w/Same' +
+     A                                             'Employee Indicator')
+     A            SULRTC    R               REFFLD(FLAG)
+     A                                      TEXT('Latest RTW Type Code')
+     A                                      COLHDG('Latest RTW Type Code')
+     A            SULRPR    R               REFFLD(FLAG)
+     A                                      TEXT('Latest RTW Phys Rstr Ind')
+     A                                      COLHDG('Latest RTW Physical' +
+     A                                             'Restrictions Ind')
+     A            SULRSE    R               REFFLD(FLAG)
+     A                                      TEXT('Latest RTW w/Same Emp Ind')
+     A                                      COLHDG('Latest RTW w/Same' +
+     A                                             'Employee Indicator')
+     A            SUCDEK    R     S         REFFLD(DT8)
+     A                                      TEXT('Cur Date Emp Know Dis Date')
+     A                                      COLHDG('Cur Date Emplyr Had' +
+     A                                           'Knowl Cur Date Dis')
+     A            SUCDAK    R     S         REFFLD(DT8)
+     A                                      TEXT('Cur Date Claim Ad Dis Date')
+     A                                      COLHDG('Cur Date Claim Adm' +
+     A                                           'Knowl Cur Date Dis')
+     A            SUJRC#    R               REFFLD(DS25)
+     A                                      TEXT('Jurisdction Clm Nmbr-Related')
+     A                                      COLHDG('Jurisdiction Claim' +
+     A                                             'Number - Related')
+     A            SUALKD    R     S         REFFLD(DT8)
+     A                                      TEXT('Acqrd Clm Last Knwn Indmnty')
+     A                                      COLHDG('Acquired Claim Last' +
+     A                                           'Known Indmnty Date')
+     A            SUOPYA         9S 2       TEXT('Overpayment Amount-Current')
+     A                                      COLHDG('Overpayment' +
+     A                                           'Amount - Current')
+     A            SUSRCF    R               REFFLD(CODE)
+     A                                      TEXT('Suspension Reason Code-Full')
+     A                                      COLHDG('Suspension Reason' +
+     A                                             'Code - Full')
+     A            SUSRCP    R               REFFLD(CODE)
+     A                                      TEXT('Suspension Reason Code-Part')
+     A                                      COLHDG('Suspension Reason' +
+     A                                             'Code - Partial')
+     A            SUPDED    R     S         REFFLD(DT8)
+     A                                      TEXT('Partial Denial Eff Date')
+     A                                      COLHDG('Partial Denial' +
+     A                                             'Eff Date')
+     A*** End   Add *** 05/30/18 ***********************************
+     A*** Beg Add *** 02/14/22 **************************************
+     A            SUBCRC    R               REFFLD(FLAG)
+     A                                      COLHDG('Benefit Change' +
+     A                                             'Reason Code')
+     A            SUWHAF         9S 2       COLHDG('Withheld Attorney'   +
+     A                                             'Fees Current')
+     A            SUEDUL         2S 0       COLHDG('Employee Education'  +
+     A                                             'Level')
+     A            SUNTZ     R               REFFLD(FLAG)
+     A                                      COLHDG('Net to Zero')
+     A*** End Add *** 02/14/22 **************************************

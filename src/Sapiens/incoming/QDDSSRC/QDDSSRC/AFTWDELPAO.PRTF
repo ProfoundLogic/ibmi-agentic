@@ -1,0 +1,74 @@
+      *       (C) Copyright Progressive Data Solutions, Inc., 1997         *
+      *  AFTWDELPAO: Conversion query for new WDELP                        *
+      **********************************************************************
+      *  DESCRIPTION:                                                      *
+      *  This query produces a record count and premium totals on the      *
+      *  new file.                                                         *
+      *                                                                    *
+      *  CREATED: 12/17/97         PROGRAMMER: 84         PROJECT: 60ANY   *
+      **********************************************************************
+      *  REVISIONS:                                                        *
+      *                                                                    *
+      **********************************************************************
+     A                                      REF(WDELP)
+     A          R PRTHDR                    SKIPB(2)           SPACEA(2)
+     A            PTRDAT        10A        1
+     A            PTTITL        50A       41
+     A                                   125'Page'
+     A            PTPAGE         4S 0    129                   EDTCDE(4)
+     A            PTRTIM         8A        1SPACEB(1)          SPACEA(2)
+     A                                     1'File:'
+     A            PTQFIL        21A        7                   SPACEA(2)
+     A                                     3'Company/Fund'
+     A                                    +4'Year'
+     A                                    +7'Count'
+     A                                    +6'Aud Man Prem'
+     A                                    +7'Aud Std Prem'
+     A                                    +7'Aud Nrm Prem'
+     A                                    +7'Expense Cnst'
+     A                                    +7'Aud Anl Prem'
+
+      * Print totals on ELFYR break
+
+     A          R PRTBK1                                       SPACEA(1)
+     A            XXCO#     R              5REFFLD(ELCO#)      EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXFND     R             +4REFFLD(ELFND)      EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXFYR     R             +5REFFLD(ELFYR)      EDTCDE(3)
+     A            XXCOUNT1       9S 0     +3                   EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXAMPR1   R   +2        +1REFFLD(ELAMPR)     EDTCDE(J)
+     A  61                                                     UNDERLINE
+     A            XXASPR1   R   +2        +1REFFLD(ELASPR)     EDTCDE(J)
+     A  61                                                     UNDERLINE
+     A            XXANMP1   R   +2        +1REFFLD(ELANMP)     EDTCDE(J)
+     A  61                                                     UNDERLINE
+     A            XXPRTD1   R   +2        +1REFFLD(ELPRTD)     EDTCDE(J)
+     A  61                                                     UNDERLINE
+     A            XXAAPR1   R   +2        +1REFFLD(ELAAPR)     EDTCDE(J)
+     A  61                                                     UNDERLINE
+
+      * Print totals on ELCO#/ELFND break
+
+     A          R PRTBK2                                       SPACEA(2)
+     A                                     1'*'
+     A            XXCO#     R              5REFFLD(ELCO#)      EDTCDE(3)
+     A            XXFND     R             +4REFFLD(ELFND)      EDTCDE(3)
+     A            XXCOUNT2       9S 0    +11                   EDTCDE(3)
+     A            XXAMPR2   R   +2        +1REFFLD(ELAMPR)     EDTCDE(J)
+     A            XXASPR2   R   +2        +1REFFLD(ELASPR)     EDTCDE(J)
+     A            XXANMP2   R   +2        +1REFFLD(ELANMP)     EDTCDE(J)
+     A            XXPRTD2   R   +2        +1REFFLD(ELPRTD)     EDTCDE(J)
+     A            XXAAPR2   R   +2        +1REFFLD(ELAAPR)     EDTCDE(J)
+
+      * Print grand totals
+
+     A          R PRTTOT                                       SPACEA(1)
+     A                                     1'Grand totals:'
+     A            XXCOUNT        9S 0    +12                   EDTCDE(3)
+     A            XXAMPR    R   +2        +1REFFLD(ELAMPR)     EDTCDE(J)
+     A            XXASPR    R   +2        +1REFFLD(ELASPR)     EDTCDE(J)
+     A            XXANMP    R   +2        +1REFFLD(ELANMP)     EDTCDE(J)
+     A            XXPRTD    R   +2        +1REFFLD(ELPRTD)     EDTCDE(J)
+     A            XXAAPR    R   +2        +1REFFLD(ELAAPR)     EDTCDE(J)

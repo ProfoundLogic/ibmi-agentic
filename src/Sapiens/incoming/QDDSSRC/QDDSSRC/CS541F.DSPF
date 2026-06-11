@@ -1,0 +1,88 @@
+     A*%%TS  SD  19970218  112256  WINNERW     REL-V3R6M0  5716-PW1
+     A*****************************************************************
+     A*  (C) Copyright Progressive Data Solutions Inc., 1996
+     A*****************************************************************
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CSREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A          R SCR01S                    SFL
+     A*%%TS  SD  19970218  112256  WINNERW     REL-V3R6M0  5716-PW1
+     A            SCSEL     R        B 10  3REFFLD(FLAG)
+     A                                      TEXT('Selection Field')
+     A N06                                  DSPATR(CS)
+     A N06                                  DSPATR(UL)
+     A  20                                  DSPATR(RI)
+     A  20                                  DSPATR(PC)
+     A            SCCLT#    R        O 10  8REFFLD(CLT#)
+     A                                      TEXT('CLIENT NUMBER')
+     A                                      EDTCDE(4)
+     A            SCNAME    R        O 10 15REFFLD(NAME)
+     A                                      TEXT('CLIENT NAME')
+     A            SCSTAT    R        O 10 79REFFLD(STAT)
+     A                                      TEXT('Status')
+     A            SCMBR     R        O 10 58REFFLD(FLAG)
+     A                                      TEXT('Member (M/N flag)')
+     A            SCFND     R        O 10 62REFFLD(FND)
+     A                                      TEXT('Fund #')
+     A                                      EDTCDE(4)
+     A            SCMBR#    R        O 10 68REFFLD(EMP#)
+     A                                      TEXT('Member #')
+     A                                      EDTCDE(4)
+     A          R SCR01C                    SFLCTL(SCR01S)
+     A*%%TS  SD  19970218  112256  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      CHGINPDFT
+     A                                      SFLSIZ(0999)
+     A                                      SFLPAG(0013)
+     A                                      TEXT('Subfile Control for CUSTOM GR-
+     A                                      OUP MAINT.')
+     A                                      SETOF(20)
+     A                                      ROLLUP(18)
+     A                                      CF05
+     A                                      CF12
+     A                                      OVERLAY
+     A  01                                  SFLDSP
+     A  01                                  SFLDSPCTL
+     A  02                                  SFLINZ
+     A  03                                  SFLDLT
+     A  04                                  SFLCLR
+     A  05                                  SFLEND
+     A  20                                  SFLMSGID(CSM0507 *LIBL/CSMESG)
+     A  32 18                               SFLMSGID(CPF5203 *LIBL/QCPFMSG)
+     A            #@$2           3S 0H      SFLRCDNBR(CURSOR)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            SCFILE    R        O  2  2REFFLD(FLE)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A            SCRECF    R        O  2 71REFFLD(RECF)
+     A                                  4  2'Client Name:'
+     A            SCUNAM        40A  B  4 15DSPATR(UL)
+     A                                      DSPATR(CS)
+     A                                      TEXT('User selected Client')
+     A                                  6  2'Type option, press Enter'
+     A                                  7  4'1=Select request'
+     A                                  9  2'Opt  Client  Name                 -
+     A                                                           Mbr  Fnd   Mbr-
+     A                                      #      St'
+     A                                      DSPATR(HI)
+     A          R SCR01
+     A                                      OVERLAY
+     A                                 24  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 24 55'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A                                 24 17'F5=Wcms employer alpha search'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

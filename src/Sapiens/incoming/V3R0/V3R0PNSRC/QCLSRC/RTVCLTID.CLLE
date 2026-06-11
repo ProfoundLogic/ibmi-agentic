@@ -1,0 +1,40 @@
+/* Copyright FISERV Insurance Solutions, Inc., 2005                  */
+/*                                                                   */
+/* Retreive Client ID From Data Area                                 */
+/*********************************************************************/
+/* REVISIONS:                                                        */
+/*                                                                   */
+/* 01/01/23 C:079 Project: WC2430                                    */
+/*               Recompile only                                      */
+/*                                                                   */
+/* 03/20/06 c:132 Project: CI114 - 51322                             */
+/*               Remove Information Message in Calling program.      */
+/*                                                                   */
+/* 02/15/06 c:65 Project support                                     */
+/*               remove message printing to reduce job log spam.     */
+/*                                                                   */
+/* 06/23/05 c:61 Project 133WBS                                      */
+/*               Created.                                            */
+/*********************************************************************/
+
+             PGM        PARM(&CLT#)
+
+             DCL        VAR(&CLT#) TYPE(*CHAR) LEN(3)
+             DCL        VAR(&OUTMSG) TYPE(*CHAR) LEN(80)
+
+             RTVDTAARA  DTAARA(CLTID (1 3)) RTNVAR(&CLT#)
+             MONMSG     MSGID(CPF0000) EXEC(CHGVAR VAR(&CLT#) +
+                          VALUE('   '))
+
+/*** begin del ***  02/15/06  ***************************************/
+/**********  SNDPGMMSG  MSG('Client #: ' *CAT &CLT#)  ***************/
+/*** end del *****  02/15/06  ***************************************/
+
+/***** BEG ADD *****  03/20/06  ***************************************/
+/*  THIS IS TO REMOVE ALL THE INFO MESSAGES AT JOB END.               */
+             RMVMSG     PGMQ(*SAME (*)) CLEAR(*ALL)
+             MONMSG     MSGID(CPF0000) EXEC(RCVMSG MSGTYPE(*EXCP) RMV(*YES))
+/***** END ADD *****  03/20/06  ***************************************/
+
+             ENDPGM
+

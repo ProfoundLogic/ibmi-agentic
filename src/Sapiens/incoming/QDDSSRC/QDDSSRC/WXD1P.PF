@@ -1,0 +1,217 @@
+     A*****************************************************************
+     A*  (C) COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC., 1988 - 1998
+     A*****************************************************************
+     A*    EDI R22 Format Flat File
+     A*******************************************************************
+     A* REVISIONS:                                                      *
+     A*                                                                 *
+     A* 01/31/17 C:306 PROJECT: WC2410                                  *
+     A*                Added new field D1INJS.                          *
+     A*
+     A* 02/08/14 C:180 Project: WC2234 - PRISS 27                       *
+     A*                Correct size of fiels added by WC2234            *
+     A*                                                                 *
+     A* 12/12/13 C:287 Project: WC2234                                  *
+     A*                Derive fields D1PSPA, D1WWTC, D1WDSC, and D1ESID *
+     A*                from D1FIL2 and reduce the spaces use in D1FIL2  *
+     A*                                                                 *
+     A* 10/30/08  C:180  SUPPORT 65757 - Add EDI R3 fields
+     A*                                                               *
+     A*  (C) Copyright Progressive Data Solutions, Inc., 1996         *
+     A**                                                              *
+     A** EDI Transmission Data                                        *
+     A**                                                              *
+     A*****************************************************************
+     A          R PD101                     TEXT('EDI R22 Format')
+     A*
+     A            D1TSET         3A         COLHDG('TRANSACTION' 'SET ID')
+     A*
+     A            D1MTCC         2A         COLHDG('MAINT' 'TYPE' 'CORR CODE')
+     A*
+     A            D1MTC2         8A         COLHDG('MAINT TYPE' 'CORR CODE' +
+     A                                      'DATE')
+     A*
+     A            D1CNLT         8A         COLHDG('CLAIM ADMIN' 'KNWLGE OF +
+     A                                      LOST TIME' 'DATE')
+     A*
+     A            D1JURO         2A         COLHDG('JURST BCH' 'OFFICE' 'CODE')
+     A*
+     A            D1ACLC        25A         COLHDG('CLAIM ADMIN' 'CLM #')
+     A*
+     A            D1CAFE         9A         COLHDG('CLAIM ADMIN' 'FEIN')
+     A*
+     A            D1CANM        40A         COLHDG('CLAIM' 'ADMIN' 'NAME')
+     A*
+     A            D1CARP        40A         COLHDG('CLM ADMIN' 'CLM REP' 'NAME')
+     A*
+     A            D1CAPH        15A         COLHDG('CLM ADM' 'CLM REP' 'BUSINES+
+     A                                      S PH#')
+     A*
+     A            D1CAEM        80A         COLHDG('CLM ADM' 'CLM REP' 'EMAIL')
+     A*
+     A            D1CAFX        10A         COLHDG('CLM ADM' 'CLM REP' 'FAX')
+     A*
+     A            D1EITQ         1A         COLHDG('EMPLOYEE ID' 'TYPE' 'QUAL')
+     A*
+     A            D1SS#         15A         COLHDG('EMPLOYEE ID')
+     A*
+     A            D1LSN         40A         COLHDG('EMPLOYEE' 'LAST' 'NAME')
+     A*
+     A            D1FSN         15A         COLHDG('EMPLOYEE' 'FIRST' 'NAME')
+     A*
+     A            D1MID         15A         COLHDG('EMPLOYEE' 'MID' 'NAME/INIT')
+     A*
+     A            D1LSNS         4A         COLHDG('EMPLOYEE' 'LST NAME' 'SUFX')
+     A*
+     A            D1DTOB         8A         COLHDG('EMPLOYEE' 'DATE OF' 'BIRTH')
+     A*
+     A            D1MSTS         1A         COLHDG('EMPLOYEE' 'MARITAL STS' +
+     A                                      'CODE')
+     A*
+     A            D1EEL          2A         COLHDG('EMPLOYEE' 'EDU' 'LEVEL')
+     A*
+     A            D1ENEX         2A         COLHDG('EMPLOYEE' 'NO OF' +
+     A                                      'ENTITLD EXEMPTIONS')
+     A*
+     A******* BEGIN CHG ****** 10/30/08 *******************************
+     A****        D1FILL         2A         COLHDG('FOR FUTURE' 'USE')
+     A            D1FILL         1A         COLHDG('FOR FUTURE' 'USE')
+     A            D1RBAC         1A         COLHDG('REDUCED' 'BENEF' 'AMT CODE')
+     A******* END CHG ******** 10/30/08 *******************************
+     A*
+     A            D1ETFS         1A         COLHDG('EMPLOYEE' 'TAX FILING' +
+     A                                      'STS CODE')
+     A*
+     A            D1IDTH         1A         COLHDG('DEATH' 'RESULT OF INJURY' +
+     A                                      'CODE')
+     A*
+     A            D1INS#         9A         COLHDG('INSURED' 'FEIN')
+     A*
+     A            D1IIF          9A         COLHDG('INSOLVENT' 'INSURED' 'FEIN')
+     A*
+     A            D1EMP#         9A         COLHDG('EMPLOYER' 'FEIN')
+     A*
+     A            D1EZP          9A         COLHDG('EMPLOYER' 'PHYSICAL' 'ZIP')
+     A*
+     A            D1SAME         1A         COLHDG('RTN TO WRK' 'WITH SAME EMP +
+     A                                       ' 'IND')
+     A*
+     A            D1DODD         8A         COLHDG('EMP KNWLGE' 'OF DATE OF +
+     A                                      DISAB' 'DATE')
+     A*
+     A            D1NCPC         1A         COLHDG('NON CONSECUTIVE' 'PERIOD' +
+     A                                      'CODE')
+     A*
+     A            D1WMTH         1A         COLHDG('ESTIMATED' 'GROSS WEEKLY +
+     A                                      AMT' 'IND')
+     A*
+     A            D1CDLW         8A         COLHDG('CURR DATE' 'LAST DAY WRKD')
+     A*
+     A            D1DBDT         8A         COLHDG('CURR DATE' 'DISAB BEGAN')
+     A*
+     A            D1IDLD         8A         COLHDG('INIT DATE' 'LAST DAY WRKD')
+     A*
+     A            D1RTWT         1A         COLHDG('RTN TO WRK' 'TYPE' 'CODE')
+     A*
+     A            D1PRIN         1A         COLHDG('PHY RESTRICTIONS' 'IND')
+     A*
+     A            D1SUEF         8A         COLHDG('SUSPENSION' 'EFFECTIVE' +
+     A                                      'DATE')
+     A*
+     A            D1DYEF         8A         COLHDG('FULL DENIAL' 'EFFECTIVE' +
+     A                                      'DATE')
+     A*
+     A            D1DRES         8A         COLHDG('FULL DENIAL' 'RESCISSION' +
+     A                                      'DATE')
+     A*
+     A            D1PDNY         1A         COLHDG('PARTIAL' 'DENIAL' 'CODE')
+     A*
+     A            D1CWCA        11A         COLHDG('CALCULATED' 'WEEKLY COMP' +
+     A                                      'AMT')
+     A*
+     A            D1WGEF         8A         COLHDG('WAGE' 'EFFECTIVE' 'DATE')
+     A*
+     A            D1DFBE        11A         COLHDG('DISCOUNTED' 'FRINGE' +
+     A                                      'BENEFITS')
+     A*
+     A            D1TOLC         2A         COLHDG('TYPE' 'OF LOSS' 'CODE')
+     A*
+     A            D1ESTS         2A         COLHDG('EMPLOYMENT' 'STS' 'CODE')
+     A*
+     A            D1PIMP         1A         COLHDG('PERMANENT IMPAIRMENT' 'MIN +
+     A                                      PAYMENT' 'IND')
+     A*
+     A            D1RTWD         8A         COLHDG('INITIAL' 'RTN TO WRK' +
+     A                                      'DATE')
+     A*
+     A            D1FWPI         1A         COLHDG('FULL WAGES PAID' 'FOR INJ +
+     A                                      URY DATE' 'IND')
+     A*
+     A            D1LUMC         2A         COLHDG('LUMPSUM' 'PAYMNT/STLMNT' +
+     A                                      'CODE')
+     A*
+     A            D1FSAL         1A         COLHDG('SAL PAID' 'IN LIEU OF COMP +
+     A                                      ' 'IND')
+     A*
+     A            D1AWW         11A         COLHDG('AVG' 'WAGE')
+     A*
+     A            D1IDLT         8A         COLHDG('INIT DATE' 'OF' 'LOST TIME')
+     A*
+     A            D1STDT         8A         COLHDG('AWARD/ORDER' 'DATE')
+     A*
+     A            D1CAZP         9A         COLHDG('CLAIM ADMIN' 'ALT' 'ZIP')
+     A*
+     A*** Begin Add *** 12/12/13 ***********************************
+     A            D1PSPA         1A         TEXT('Emplyr Paid Salry prior to -
+     A                                      acquisition')
+     A                                      COLHDG('Salry pre-acq')
+     A            D1WWTC         1A         TEXT('Work Week Type')
+     A                                      COLHDG('WW Type')
+     A*** Begin CHG *** 02/08/14 ***********************************
+     A****        D1WDSC         1A         TEXT('Work Days Scheduled')
+     A****                                  COLHDG('Wrk Days Sched')
+     A            D1WDSC         7A         TEXT('Work Days Scheduled')
+     A                                      COLHDG('Wrk Days Sched')
+     A*** End   CHG *** 02/08/14 ***********************************
+     A            D1ESID        15A         TEXT('Employee Security ID')
+     A                                      COLHDG('Emp Sec ID')
+     A*
+     A*** End   Add *** 12/12/13 ***********************************
+     A*** Begin Change *** 12/12/13 ********************************
+     A*           D1FIL2        99A         COLHDG('FILLER 2')
+     A*** Begin CHG *** 02/08/14 ***********************************
+     A****        D1FIL2        81A         COLHDG('FILLER 2')
+     A*** Begin Add *** 01/31/17 ***********************************
+     A****        D1FIL2        75A         COLHDG('FILLER 2')
+     A            D1INJS         1A         TEXT('Injury Severity Type Code')
+     A                                      COLHDG('Inj Sev Type code')
+     A
+     A            D1FIL2        74A         COLHDG('FILLER 2')
+     A*** End   Add *** 01/31/17 ***********************************
+     A*** End   CHG *** 02/08/14 ***********************************
+     A*** End Change *** 12/12/13 **********************************
+     A*
+     A***  VARIABLE SEGMENT COUNTERS
+     A*
+     A            D1#BFT         2A         COLHDG('NO' 'OF' 'BENEFITS')
+     A*
+     A            D1#PMT         2A         COLHDG('NO' 'OF' 'PAYMENTS')
+     A*
+     A            D1#OBF         2A         COLHDG('NO' 'OF' 'OTHER BENEFITS')
+     A*
+     A            D1#ACR         3A         COLHDG('NO' 'OF' 'BENEFIT ACR')
+     A*
+     A            D1#REC         2A         COLHDG('NO' 'OF' 'RECOVERIES')
+     A*
+     A            D1#RDE         2A         COLHDG('NO' 'OF' 'REDUCED EARNINGS')
+     A*
+     A            D1#CEM         2A         COLHDG('NO' 'OF' 'CONCURRENT +
+     A                                       EMPLOYEES')
+     A*
+     A            D1#DRC         2A         COLHDG('NO OF' 'FULL DENIAL REASON +
+     A                                      ' 'CODES')
+     A*
+     A            D1#DRN         2A         COLHDG('NO OF' 'DENIAL REASON' +
+     A                                      'NARR')
+     A*
+     A            D1#SNN         2A         COLHDG('NO OF' 'SUSPENSION' 'NARR')

@@ -1,0 +1,1086 @@
+     A*%%TS  SD  19970723  154007  WINNERW     REL-V3R6M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   CLAIM TRANSACTION ADJUSTMENTS DISPLAY                    **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(81)
+     A                                      SETOF(83)
+     A                                      CF12
+     A                                      CF05
+     A                                      CF07
+     A                                      CF10
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0418F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  5  3' Transfer from Claim # '
+     A                                      DSPATR(UL)
+     A                                      DSPATR(RI)
+     A                                  7  4'Claim #:'
+     A            SVCLM#    R        O  7 13REFFLD(CLM#)
+     A                                      DSPATR(HI)
+     A
+     A                                  7 28'Section:'
+     A            SVCC      R        O  7 37REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A
+     A            SVCCNM    R        O  7 40REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A
+     A                                  9  4'Check #:'
+     A            SCCHK#    R        O  9 13REFFLD(CHK#)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A
+     A                                  9 22'Description:'
+     A            SCDESC    R        O  9 35REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A
+     A                                 11  4'Gross Amt:'
+     A            SCGAMT    R        O 11 15REFFLD(A92)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A
+     A                                 11 28'Net Amt:'
+     A            SCNAMT    R        O 11 37REFFLD(A92)
+     A                                      EDTCDE(4)
+     A                                      DSPATR(HI)
+     A
+     A                                 11 50'Deductible Used:'
+     A            SCDEDU    R        O 11 67REFFLD(A72)
+     A                                      EDTCDE(4)
+     A                                      DSPATR(HI)
+     A
+     A                                 13  4'Posting Date:'
+     A            SCPODT    R        O 13 18REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A                                 13 29'Transaction Date:'
+     A            SCTRDT    R        O 13 47REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A                                 17  3' Transfer to Claim # '
+     A                                      DSPATR(UL)
+     A                                      DSPATR(RI)
+     A                                 19  4'Claim #:'
+     A            SCCLM#    R     A  B 19 14REFFLD(CLM#)
+     A  21                                  ERRMSGID(CCR0675 *LIBL/CMESGG)
+     A
+     A                                 19 30'Section Code:'
+     A            SCCC      R     A  B 19 45REFFLD(CODE)
+     A  23                                  ERRMSGID(CCR0684 *LIBL/CMESGG)
+     A
+     A  81                                  DSPATR(PC)
+     A                                 19 51'Transaction Code:'
+     A            SCTRCD    R     A  B 19 70REFFLD(CODE)
+     A  24                                  ERRMSGID(CCR0806 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0753 *LIBL/CMESGG)
+     A  25                                  ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  83                                  DSPATR(PC)
+     A
+     A                                 23  3'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 30'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 58'F5=Claim # search'
+     A                                      COLOR(BLU)
+     A                                 24  7'F7=Claim section code search'
+     A                                      COLOR(BLU)
+     A                                 24 45'F10=Table search'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(29)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(39)
+     A                                      SETOF(40)
+     A                                      SETOF(82)
+     A                                      SETOF(83)
+     A                                      SETOF(85)
+     A                                      SETOF(86)
+     A                                      CF12
+     A                                      CF05
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A                                      CF11
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0418F'
+     A            SCPRDS    R     A  O  2 21REFFLD(NAME)
+     A
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A
+     A                                      DSPATR(HI)
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 35REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  5  2'Claim #:'
+     A            SCCLM#    R        O  5 11REFFLD(CLM#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                  5 27'Section:'
+     A            SCCC      R        O  5 37REFFLD(CODE)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A            SCCCNM    R        O  5 40REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  8 14'Claimant:'
+     A            SCCLID    R     A  B  8 25REFFLD(CLID)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A  35                                  ERRMSGID(CCR0642 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A            SCCNAM    R     A  O  8 32REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A
+     A                                 11  5'Location #:'
+     A            SCLOC#    R     S  B 11 17REFFLD(LOC#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A  85                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                 11 24'Building #:'
+     A            SCPRM#    R     S  B 11 36REFFLD(PRM#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                 11 43'Coverage Code:'
+     A            SCCOVF    R     A  B 11 58REFFLD(FLAG)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                 11 62'Subline:'
+     A            SCSUBL    R     A  B 11 71REFFLD(SUBL)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                 14  5'Payee ID #:'
+     A            SCFEIN    R     S  B 14 18REFFLD(FEIN)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A  82                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 14 31'Payee Modifier:'
+     A            SCMOD     R     S  B 14 47REFFLD(MOD)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 14 55'Posting Date:'
+     A            SCPODT    R        B 14 69REFFLD(DT8)
+     A  25                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A  86                                  DSPATR(PC)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A                                 17  1'Gross Amt:'
+     A            SCGAMT    R        B 17 12REFFLD(A92)
+     A  36                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A  83                                  DSPATR(PC)
+     A
+     A                                 17 30'Net Amt:'
+     A            SCNAMT    R        B 17 39REFFLD(A92)
+     A  22                                  ERRMSGID(CCR0804 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0812 *LIBL/CMESGG)
+     A  40                                  ERRMSGID(CCR0884 *LIBL/CMESGG)
+     A*                                     DSPATR(CS)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 17 55'Deductible Used:'
+     A            SCDEDU    R        B 17 72REFFLD(A72)
+     A  37                                  ERRMSGID(CCR0807 *LIBL/CMESGG)
+     A  38                                  ERRMSGID(CCR0802 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A*                                     DSPATR(CS)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 20  8'Transaction Code:'
+     A            SCTRCD    R     A  O 20 27REFFLD(CODE)
+     A
+     A                                      DSPATR(HI)
+     A            SCDESC    R     A  O 20 31REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 20'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 40'F5=Reserve search'
+     A                                      COLOR(BLU)
+     A                                 23 62'F7=Payee search'
+     A                                      COLOR(BLU)
+     A                                 24  2'F8=Alpha payee search'
+     A                                      COLOR(BLU)
+     A                                 24 32'F9=Add payee'
+     A                                      COLOR(BLU)
+     A                                 24 54'F11=Claimant id search'
+     A                                      COLOR(BLU)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR03
+     A*%%TS  SD  19970723  154007  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(29)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(39)
+     A                                      SETOF(40)
+     A                                      SETOF(82)
+     A                                      SETOF(83)
+     A                                      SETOF(85)
+     A                                      SETOF(86)
+     A                                      CF12
+     A                                      CF05
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A                                      CF11
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0418F'
+     A            SCPRDS    R     A  O  2 21REFFLD(NAME)
+     A
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR03'
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A
+     A                                      DSPATR(HI)
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 35REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  5  2'Claim #:'
+     A            SCCLM#    R        O  5 11REFFLD(CLM#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                  5 27'Section:'
+     A            SCCC      R        O  5 37REFFLD(CODE)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A            SCCCNM    R        O  5 40REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  8 14'Claimant:'
+     A            SCCLID    R     A  B  8 25REFFLD(CLID)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A  35                                  ERRMSGID(CCR0642 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A            SCCNAM    R     A  O  8 32REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A
+     A                                 11  3'Location #'
+     A            SCLOC#    R     S  B 11 14REFFLD(LOC#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A  85                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                 11 20'Building #'
+     A            SCPRM#    R     S  B 11 31REFFLD(PRM#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                 11 37'Subline:'
+     A            SCSUBL    R     A  B 11 46REFFLD(SUBL)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                 11 51'Class'
+     A            SCCLAS    R     A  B 11 57REFFLD(CLAS)
+     A                                      DSPATR(HI)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                 11 65'Coverage Code'
+     A            SCCOVF    R     A  B 11 79REFFLD(COVF)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                 14  5'Payee ID #:'
+     A            SCFEIN    R     S  B 14 18REFFLD(FEIN)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A  82                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 14 31'Payee Modifier:'
+     A            SCMOD     R     S  B 14 47REFFLD(MOD)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 14 55'Posting Date:'
+     A            SCPODT    R        B 14 69REFFLD(DT8)
+     A  25                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A  86                                  DSPATR(PC)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A                                 17  1'Gross Amt:'
+     A            SCGAMT    R        B 17 12REFFLD(A92)
+     A  36                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A  83                                  DSPATR(PC)
+     A
+     A                                 17 30'Net Amt:'
+     A            SCNAMT    R        B 17 39REFFLD(A92)
+     A  22                                  ERRMSGID(CCR0804 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0686 *LIBL/CMESGG)
+     A  40                                  ERRMSGID(CCR0884 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 17 55'Deductible Used:'
+     A            SCDEDU    R        B 17 72REFFLD(A72)
+     A  37                                  ERRMSGID(CCR0807 *LIBL/CMESGG)
+     A  38                                  ERRMSGID(CCR0802 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 20 10'Transaction Code:'
+     A            SCTRCD    R     A  O 20 28REFFLD(CODE)
+     A
+     A                                      DSPATR(HI)
+     A            SCDESC    R     A  O 20 31REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 20'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 40'F5=Reserve search'
+     A                                      COLOR(BLU)
+     A                                 23 62'F7=Payee search'
+     A                                      COLOR(BLU)
+     A                                 24  2'F8=Alpha payee search'
+     A                                      COLOR(BLU)
+     A                                 24 32'F9=Add payee'
+     A                                      COLOR(BLU)
+     A                                 24 54'F11=Claimant id search'
+     A                                      COLOR(BLU)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR04
+     A*%%TS  SD  19970723  154007  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(29)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(39)
+     A                                      SETOF(40)
+     A                                      SETOF(82)
+     A                                      SETOF(83)
+     A                                      SETOF(85)
+     A                                      SETOF(86)
+     A                                      CF12
+     A                                      CF05
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A                                      CF11
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0418F'
+     A            SCPRDS    R     A  O  2 21REFFLD(NAME)
+     A
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR04'
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A
+     A                                      DSPATR(HI)
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 35REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  5  2'Claim #:'
+     A            SCCLM#    R        O  5 11REFFLD(CLM#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                  5 27'Section:'
+     A            SCCC      R        O  5 37REFFLD(CODE)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A            SCCCNM    R        O  5 40REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  8 14'Claimant:'
+     A            SCCLID    R     A  B  8 25REFFLD(CLID)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A  35                                  ERRMSGID(CCR0642 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A
+     A            SCCNAM    R     A  O  8 32REFFLD(NM40)
+     A
+     A                                 11 13'Vehicle #:'
+     A            SCITM#    R     S  B 11 25REFFLD(ITM#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A  85                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                 11 35'Class:'
+     A            SCCLAS    R     A  B 11 43REFFLD(CLAS)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                 11 53'Coverage Line:'
+     A            SCCOVL    R     A  B 11 69REFFLD(COVF)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                 14  5'Payee ID #:'
+     A            SCFEIN    R     S  B 14 18REFFLD(FEIN)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A  82                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 14 31'Payee Modifier:'
+     A            SCMOD     R     S  B 14 47REFFLD(MOD)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 14 55'Posting Date:'
+     A            SCPODT    R        B 14 69REFFLD(DT8)
+     A  25                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A  86                                  DSPATR(PC)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A                                 17  1'Gross Amt:'
+     A            SCGAMT    R        B 17 12REFFLD(A92)
+     A  36                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A  83                                  DSPATR(PC)
+     A
+     A                                 17 30'Net Amt:'
+     A            SCNAMT    R        B 17 39REFFLD(A92)
+     A  22                                  ERRMSGID(CCR0804 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0686 *LIBL/CMESGG)
+     A  40                                  ERRMSGID(CCR0884 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 17 55'Deductible Used:'
+     A            SCDEDU    R        B 17 72REFFLD(A72)
+     A  37                                  ERRMSGID(CCR0807 *LIBL/CMESGG)
+     A  38                                  ERRMSGID(CCR0802 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 20 10'Transaction Code:'
+     A            SCTRCD    R     A  O 20 28REFFLD(CODE)
+     A
+     A                                      DSPATR(HI)
+     A            SCDESC    R     A  O 20 31REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 20'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 40'F5=Reserve search'
+     A                                      COLOR(BLU)
+     A                                 23 62'F7=Payee search'
+     A                                      COLOR(BLU)
+     A                                 24  2'F8=Alpha payee search'
+     A                                      COLOR(BLU)
+     A                                 24 32'F9=Add payee'
+     A                                      COLOR(BLU)
+     A                                 24 54'F11=Claimant id search'
+     A                                      COLOR(BLU)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR05
+     A*%%TS  SD  19970723  154007  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(29)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(39)
+     A                                      SETOF(40)
+     A                                      SETOF(82)
+     A                                      SETOF(83)
+     A                                      SETOF(85)
+     A                                      SETOF(86)
+     A                                      CF12
+     A                                      CF05
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A                                      CF11
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0418F'
+     A            SCPRDS    R     A  O  2 21REFFLD(NAME)
+     A
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR05'
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A
+     A                                      DSPATR(HI)
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 35REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  5  2'Claim #:'
+     A            SCCLM#    R        O  5 11REFFLD(CLM#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                  5 27'Section:'
+     A            SCCC      R        O  5 37REFFLD(CODE)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A            SCCCNM    R        O  5 40REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  8 14'Claimant:'
+     A            SCCLID    R     A  B  8 25REFFLD(CLID)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A  35                                  ERRMSGID(CCR0642 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A            SCCNAM    R     A  O  8 32REFFLD(NM40)
+     A
+     A                                 11  2'Location #'
+     A            SCLOC#    R     S  B 11 13REFFLD(LOC#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A  85                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                 11 20'Building #'
+     A            SCPRM#    R     S  B 11 31REFFLD(PRM#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                 11 38'Form Code'
+     A            SCFRM     R     A  B 11 48REFFLD(FRM)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                 11 52'Rate Group'
+     A            SCRTGP    R     A  B 11 63REFFLD(RTGP)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                 11 68'Class'
+     A            SCCLAS    R     A  B 11 74REFFLD(CLAS)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                 14  5'Payee ID #:'
+     A            SCFEIN    R     S  B 14 18REFFLD(FEIN)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A  82                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 14 31'Payee Modifier:'
+     A            SCMOD     R     S  B 14 47REFFLD(MOD)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 14 55'Posting Date:'
+     A            SCPODT    R        B 14 69REFFLD(DT8)
+     A  25                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A  86                                  DSPATR(PC)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A                                 17  1'Gross Amt:'
+     A            SCGAMT    R        B 17 12REFFLD(A92)
+     A  36                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A  83                                  DSPATR(PC)
+     A
+     A                                 17 30'Net Amt:'
+     A            SCNAMT    R        B 17 39REFFLD(A92)
+     A  22                                  ERRMSGID(CCR0804 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0686 *LIBL/CMESGG)
+     A  40                                  ERRMSGID(CCR0884 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 17 55'Deductible Used:'
+     A            SCDEDU    R        B 17 72REFFLD(A72)
+     A  37                                  ERRMSGID(CCR0807 *LIBL/CMESGG)
+     A  38                                  ERRMSGID(CCR0802 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 20 10'Transaction Code:'
+     A            SCTRCD    R     A  O 20 28REFFLD(CODE)
+     A
+     A                                      DSPATR(HI)
+     A            SCDESC    R     A  O 20 31REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 20'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 40'F5=Reserve search'
+     A                                      COLOR(BLU)
+     A                                 23 62'F7=Payee search'
+     A                                      COLOR(BLU)
+     A                                 24  2'F8=Alpha payee search'
+     A                                      COLOR(BLU)
+     A                                 24 32'F9=Add payee'
+     A                                      COLOR(BLU)
+     A                                 24 54'F11=Claimant id search'
+     A                                      COLOR(BLU)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR06
+     A*%%TS  SD  19970723  154007  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(29)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(39)
+     A                                      SETOF(40)
+     A                                      SETOF(82)
+     A                                      SETOF(83)
+     A                                      SETOF(85)
+     A                                      SETOF(86)
+     A                                      CF12
+     A                                      CF05
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A                                      CF11
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0418F'
+     A            SCPRDS    R     A  O  2 21REFFLD(NAME)
+     A
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR06'
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A
+     A                                      DSPATR(HI)
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 35REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  5  2'Claim #:'
+     A            SCCLM#    R        O  5 11REFFLD(CLM#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                  5 27'Section:'
+     A            SCCC      R        O  5 37REFFLD(CODE)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A            SCCCNM    R        O  5 40REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  8 14'Claimant:'
+     A            SCCLID    R     A  B  8 25REFFLD(CLID)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A  35                                  ERRMSGID(CCR0642 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A            SCCNAM    R     A  O  8 32REFFLD(NM40)
+     A
+     A                                 11 16'Location #:'
+     A            SCLOC#    R     S  B 11 28REFFLD(LOC#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A  85                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                 11 35'Building #:'
+     A            SCPRM#    R     S  B 11 47REFFLD(PRM#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                 11 54'Class:'
+     A            SCCLAS    R     A  B 11 61REFFLD(CLAS)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                 14  5'Payee ID #:'
+     A            SCFEIN    R     S  B 14 18REFFLD(FEIN)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A  82                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                 14 31'Payee Modifier:'
+     A            SCMOD     R     S  B 14 47REFFLD(MOD)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                 14 55'Posting Date:'
+     A            SCPODT    R        B 14 69REFFLD(DT8)
+     A  25                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A  86                                  DSPATR(PC)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A                                 17  1'Gross Amt:'
+     A            SCGAMT    R        B 17 12REFFLD(A92)
+     A  36                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A  83                                  DSPATR(PC)
+     A
+     A                                 17 30'Net Amt:'
+     A            SCNAMT    R        B 17 39REFFLD(A92)
+     A  22                                  ERRMSGID(CCR0804 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0686 *LIBL/CMESGG)
+     A  40                                  ERRMSGID(CCR0884 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 17 55'Deductible Used:'
+     A            SCDEDU    R        B 17 72REFFLD(A72)
+     A  37                                  ERRMSGID(CCR0807 *LIBL/CMESGG)
+     A  38                                  ERRMSGID(CCR0802 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 20 10'Transaction Code:'
+     A            SCTRCD    R     A  O 20 28REFFLD(CODE)
+     A
+     A                                      DSPATR(HI)
+     A            SCDESC    R     A  O 20 31REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 20'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 40'F5=Reserve search'
+     A                                      COLOR(BLU)
+     A                                 23 62'F7=Payee search'
+     A                                      COLOR(BLU)
+     A                                 24  2'F8=Alpha payee search'
+     A                                      COLOR(BLU)
+     A                                 24 32'F9=Add payee'
+     A                                      COLOR(BLU)
+     A                                 24 54'F11=Claimant id search'
+     A                                      COLOR(BLU)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR07
+     A*%%TS  SD  19970723  154007  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(29)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(39)
+     A                                      SETOF(40)
+     A                                      SETOF(82)
+     A                                      SETOF(83)
+     A                                      SETOF(85)
+     A                                      SETOF(86)
+     A                                      CF12
+     A                                      CF05
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A                                      CF11
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0418F'
+     A            SCPRDS    R     A  O  2 21REFFLD(NAME)
+     A
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR07'
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A
+     A                                      DSPATR(HI)
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 35REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  5  2'Claim #:'
+     A            SCCLM#    R        O  5 11REFFLD(CLM#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                  5 27'Section:'
+     A            SCCC      R        O  5 37REFFLD(CODE)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A            SCCCNM    R        O  5 40REFFLD(DS40)
+     A
+     A                                      DSPATR(HI)
+     A                                  8 14'Claimant:'
+     A            SCCLID    R     A  B  8 25REFFLD(CLID)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A  35                                  ERRMSGID(CCR0642 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A            SCCNAM    R     A  O  8 32REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A
+     A                                 11  2'Location #:'
+     A            SCLOC#    R     S  B 11 15REFFLD(LOC#)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A
+     A  85                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 11 21'Building #:'
+     A            SCPRM#    R     S  B 11 34REFFLD(PRM#)
+     A
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A                                 11 40'Coverage Code:'
+     A            SCCVBO    R        B 11 56REFFLD(CVBO)
+     A                                      DSPATR(HI)
+     A
+     A                                      CHECK(RB)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A                                 11 61'Liability Type:'
+     A            SCCOVF    R     A  B 11 78REFFLD(FLAG)
+     A
+     A                                      DSPATR(HI)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A                                 14  5'Payee ID #:'
+     A            SCFEIN    R     S  B 14 18REFFLD(FEIN)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A  82                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                 14 31'Payee Modifier:'
+     A            SCMOD     R     S  B 14 47REFFLD(MOD)
+     A  29                                  ERRMSGID(CCR0683 *LIBL/CMESGG)
+     A
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                 14 55'Posting Date:'
+     A            SCPODT    R        B 14 69REFFLD(DT8)
+     A  25                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A  86                                  DSPATR(PC)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A                                 17  1'Gross Amt:'
+     A            SCGAMT    R        B 17 12REFFLD(A92)
+     A  36                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A  83                                  DSPATR(PC)
+     A
+     A                                 17 30'Net Amt:'
+     A            SCNAMT    R        B 17 39REFFLD(A92)
+     A  22                                  ERRMSGID(CCR0804 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0686 *LIBL/CMESGG)
+     A  40                                  ERRMSGID(CCR0884 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 17 55'Deductible Used:'
+     A            SCDEDU    R        B 17 72REFFLD(A72)
+     A  37                                  ERRMSGID(CCR0807 *LIBL/CMESGG)
+     A  38                                  ERRMSGID(CCR0802 *LIBL/CMESGG)
+     A  39                                  ERRMSGID(CCR0803 *LIBL/CMESGG)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A
+     A                                 20 10'Transaction Code:'
+     A            SCDESC    R     A  O 20 31REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A
+     A            SCTRCD    R     A  O 20 28REFFLD(CODE)
+     A
+     A                                      DSPATR(HI)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 20'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 40'F5=Reserve search'
+     A                                      COLOR(BLU)
+     A                                 23 62'F7=Payee search'
+     A                                      COLOR(BLU)
+     A                                 24  2'F8=Alpha payee search'
+     A                                      COLOR(BLU)
+     A                                 24 33'F9=Add payee'
+     A                                      COLOR(BLU)
+     A                                 24 55'F11=Claimant id search'
+     A                                      COLOR(BLU)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

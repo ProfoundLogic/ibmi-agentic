@@ -1,0 +1,84 @@
+      *       (C) Copyright Progressive Data Solutions, Inc., 1997         *
+      *  AFTWMCMPO: Conversion query for new WMCMP                         *
+      **********************************************************************
+      *  DESCRIPTION:                                                      *
+      *  This query produces a record count and paid to date and           *
+      *  remaining reserve amounts totals on the new file.                 *
+      *                                                                    *
+      *  CREATED: 12/17/97         PROGRAMMER: 84         PROJECT: 60ANY   *
+      **********************************************************************
+      *  REVISIONS:                                                        *
+      *                                                                    *
+      **********************************************************************
+     A                                      REF(WMCMP)
+     A          R PRTHDR                    SKIPB(2)           SPACEA(2)
+     A            PTRDAT        10A        1
+     A            PTTITL        50A       41
+     A                                   125'Page'
+     A            PTPAGE         4S 0    129                   EDTCDE(4)
+     A            PTRTIM         8A        1SPACEB(1)          SPACEA(2)
+     A                                     1'File:'
+     A            PTQFIL        21A        7                   SPACEA(2)
+     A                                     3'Company/Fund'
+     A                                    +4'Year'
+     A                                    +4'Stat'
+     A                                    +8'Count'
+     A                                    +7'RRsv Amt'
+     A                                    +9'PTD Amt'
+     A                                    +9'Inc Amt'
+
+      * Print totals on CMSTAT break
+
+     A          R PRTBK1                                       SPACEA(1)
+     A            XXCO#     R              5REFFLD(CMCO#)      EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXFND     R             +4REFFLD(CMFND)      EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXFYR     R             +5REFFLD(CMFYR)      EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXSTAT    R             +6REFFLD(CMSTAT)
+     A            XXCOUNT1       9S 0     +5                   EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXRAM1    R   +2        +1REFFLD(CMRR01)     EDTCDE(J)
+     A  61                                                     UNDERLINE
+     A            XXPTD1    R   +2        +1REFFLD(CMAR01)     EDTCDE(J)
+     A  61                                                     UNDERLINE
+     A            XXINC1    R   +2        +1REFFLD(CMRR01)     EDTCDE(J)
+     A  61                                                     UNDERLINE
+
+      * Print totals on CMFYR break
+
+     A          R PRTBK2                                       SPACEA(1)
+     A                                     1'*'
+     A            XXCO#     R              5REFFLD(CMCO#)      EDTCDE(3)
+     A            XXFND     R             +4REFFLD(CMFND)      EDTCDE(3)
+     A            XXFYR     R             +5REFFLD(CMFYR)      EDTCDE(3)
+     A            XXCOUNT2       9S 0    +12                   EDTCDE(3)
+     A            XXRAM2    R   +2        +1REFFLD(CMRR01)     EDTCDE(J)
+     A            XXPTD2    R   +2        +1REFFLD(CMAR01)     EDTCDE(J)
+     A            XXINC2    R   +2        +1REFFLD(CMRR01)     EDTCDE(J)
+
+      * Print totals on CMCO#/CMFND break
+
+     A          R PRTBK3                                       SPACEA(1)
+     A                                     1'**'
+     A            XXCO#     R              5REFFLD(CMCO#)      EDTCDE(3)
+     A            XXFND     R             +4REFFLD(CMFND)      EDTCDE(3)
+     A            XXCOUNT3       9S 0    +20                   EDTCDE(3)
+     A            XXRAM3    R   +2        +1REFFLD(CMRR01)     EDTCDE(J)
+     A            XXPTD3    R   +2        +1REFFLD(CMAR01)     EDTCDE(J)
+     A            XXINC3    R   +2        +1REFFLD(CMRR01)     EDTCDE(J)
+
+      * Print grand totals
+
+     A          R PRTTOT                                       SPACEA(1)
+     A                                     1'Grand totals:'
+     A            XXCOUNT        9S 0    +21                   EDTCDE(3)
+     A            XXRAM     R   +2        +1REFFLD(CMRR01)     EDTCDE(J)
+     A            XXPTD     R   +2        +1REFFLD(CMAR01)     EDTCDE(J)
+     A            XXINC     R   +2        +1REFFLD(CMRR01)     EDTCDE(J)
+
+      * Print a blank line
+
+     A          R PRTBLK                                       SPACEA(1)
+     A                                     1' '

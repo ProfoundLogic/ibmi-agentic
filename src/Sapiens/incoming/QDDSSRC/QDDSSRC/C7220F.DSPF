@@ -1,0 +1,76 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   AGENT/PRODUCER LISTING PROMPT DISPLAY                    **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*---------------------------------------------------------------
+     A          R SCR01
+     A                                      CF05
+     A                                      CF07
+     A                                      CF09
+     A                                      CF13
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C7220F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 10 15'Agent federal tax ID #:'
+     A            SCFEIN    R        B 10 39REFFLD(FEIN)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A                                 10 50'(Default = ALL)'
+     A                                 12 20'Location modifier:'
+     A            SCMOD     R        B 12 39REFFLD(MOD)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                 14 22'Producer status:'
+     A            SCSTAT    R        B 14 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A  23                                  ERRMSGID(CCR0594 *LIBL/CMESGG)
+     A                                 14 50'(A=Active only I=Inactive only)'
+     A                                 15 50'(Default = ALL)'
+     A  22                             18 15'Agent/Producer Listing has been su-
+     A                                      bmitted to batch.'
+     A                                      COLOR(WHT)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 30'F5=Fein # search'
+     A                                      COLOR(BLU)
+     A                                 23 59'F7=Alpha search'
+     A                                      COLOR(BLU)
+     A                                 24  2'F9=Agent code # search'
+     A                                      COLOR(BLU)
+     A                                 24 30'F13=Change user parameters'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A*---------------------------------------------------------------
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

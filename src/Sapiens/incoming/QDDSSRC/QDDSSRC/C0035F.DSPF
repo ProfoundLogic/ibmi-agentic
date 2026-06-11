@@ -1,0 +1,280 @@
+     A*****************************************************************
+     A** (C) COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC., 1996 - 2000
+     A*****************************************************************
+     A**   UNDERWRITER REVIEW DISPLAY                               **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:
+     A**  04/07/00 *** C:31 *** V2000 ***
+     A**           1. Change field attribute
+     A**
+     A**  08/16/99 *** C:107 *** V2000 ***
+     A**           1. Add field for GUI
+     A**
+     A**  11/18/96 *** C:107 *** V2000 ***
+     A**           1. Version 2 format changes.
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF01
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF05
+     A                                      CF07
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0035F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 11 26'Policy number:'
+     A            SCPOL#    R        B 11 42REFFLD(POL#)
+     A                                      OVRDTA
+     A                                      DSPATR(UL)
+     A  20                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A                                 23  2'F1=End of job'
+     A                                 23 31'F5=Policy search'
+     A                                 23 54'F7=Named insured search'
+     A                                 24 54'F13=Change user parm'
+     A          R SCR02
+     A*%%TS  SD  19970721  153732  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      CF02
+     A                                      CF03
+     A                                      CF05
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      SETOF(20)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0035F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A  31                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A                                  5  2'Policy:'
+     A            SCPOL#    R        O  5 10REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  5 25'Effective Date:'
+     A            SCEFDT    R        O  5 41REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A            SCCNEX        18A  O  5 52OVRDTA
+     A            SCEXDT    R        O  5 71REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A                                  6  2'Agent Number:'
+     A            SCAGT#    R        O  6 16REFFLD(AGT#)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                  6 25'Agent Name:'
+     A            SCNAME    R        O  6 37REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A*** BEGIN ADD *** 08/16/99 **************************************
+     A            SCGUI     R        B  7  2REFFLD(FLAG)
+     A*** END ADD *** 08/16/99 ****************************************
+     A*** BEGIN ADD *** 04/07/00 **************************************
+     A                                      DSPATR(ND)
+     A*** END ADD *** 04/07/00 ****************************************
+     A                                  8  2'Named Insured:'
+     A            SCFIN     R        O  8 17REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A                                  9  2'DBA Name:'
+     A            SCDBA     R        O  9 17REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A                                 10  2'Address:'
+     A            SCADR1    R        O 10 17REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A            SCADR2    R        O 11 17REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A                                 12  2'City/ST/ZIP:'
+     A            SCCTY     R        O 12 17REFFLD(CTY)
+     A                                      DSPATR(HI)
+     A            SCST      R        O 12 45REFFLD(ST)
+     A                                      DSPATR(HI)
+     A            SCZIP1    R        O 12 50REFFLD(ZIP1)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                 12 56'-'
+     A                                      DSPATR(HI)
+     A            SCZIP2    R        O 12 58REFFLD(ZIP2)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                 14  2'Nature of Business:'
+     A            SCNOB     R        O 14 22REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                 15  2'Billing Code:'
+     A            SCBCDS    R        O 15 16REFFLD(DS30)
+     A                                      DSPATR(HI)
+     A                                 15 47'Prem:'
+     A            SCPREM    R        O 15 53REFFLD(A80)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(2)
+     A                                 15 64'Pol Fee:'
+     A            SCPFEE    R        O 15 73REFFLD(A52)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(2)
+     A                                 16  2'__________________________________-
+     A                                      ___________________________________-
+     A                                      _________'
+     A                                 17  2'Certificate Holders:'
+     A            SCFL01    R        B 19  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A  20                                  ERRMSGID(CCR0600 *LIBL/CMESGG)
+     A            SCNM01    R        O 19  5REFFLD(NM60)
+     A                                      OVRDTA
+     A            SCFL02    R        B 20  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCNM02    R        O 20  5REFFLD(NM60)
+     A                                      OVRDTA
+     A            SCFL03    R        B 21  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCNM03    R        O 21  5REFFLD(NM60)
+     A                                      OVRDTA
+     A            SCFL04    R        B 22  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCNM04    R        O 22  5REFFLD(NM60)
+     A                                      OVRDTA
+     A                                 24  2'F1=End of job'
+     A                                 24 21'F2=Prior screen'
+     A                                 24 45'F3=Restart'
+     A                                 24 61'F5=A/R inquiry'
+     A          R SCR03
+     A                                      CF02
+     A                                      CF03
+     A                                      CF05
+     A                                      CF07
+     A                                      SETOF(20)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0035F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR03'
+     A  31                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A                                  7  2'Policy:'
+     A            SCPOL#    R        O  7 10REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  7 25'Named Insured:'
+     A            SCFIN     R        O  7 40REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A                                 11 11'Location Number:'
+     A            SCLOC#    R        B 11 28REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A  11                                  DSPATR(PC)
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0821 *LIBL/CMESGG)
+     A                                 11 41'Building Number:'
+     A            SCPRM#    R        B 11 58REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A*                                     DSPATR(CS)
+     A  11                                  DSPATR(PC)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0822 *LIBL/CMESGG)
+     A                                 14 11'Vehicle Number:'
+     A            SCVEH#    R        B 14 28REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A*                                     DSPATR(CS)
+     A  12                                  DSPATR(PC)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  22                                  ERRMSGID(CCR0822 *LIBL/CMESGG)
+     A                                 18 12'To access a section of the policy,-
+     A                                       enter the appropriate             -
+     A                                                 number(s) in the key fie-
+     A                                      lds. Then Press ENTER.'
+     A                                 23  4'F1=End of job'
+     A                                 23 31'F2=Prior screen'
+     A                                 23 64'F3=Restart'
+     A                                 24  4'F5=Location building search'
+     A                                 24 50'F7=Vehicle number search'
+     A          R SCR04
+     A                                      CF02
+     A                                      CF03
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0035F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR04'
+     A                                  5  2'Policy Number:'
+     A            SCPOL#    R     A  O  5 18REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  5 34'Additional Interest Cd:'
+     A            S4ADI     R     A  O  5 59REFFLD(ADI)
+     A                                      DSPATR(HI)
+     A                                  5 66'Status:'
+     A            S4STAT    R        O  5 75REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  8  2'Name:'
+     A            S4NAME    R     A  O  8 19REFFLD(NM60)
+     A                                      DSPATR(HI)
+     A                                 10  2'Address Line 1:'
+     A            S4ADR1    R     A  O 10 19REFFLD(ADR1)
+     A                                      DSPATR(HI)
+     A                                 12  2'Address Line 2:'
+     A            S4ADR2    R     A  O 12 19REFFLD(ADR2)
+     A                                      DSPATR(HI)
+     A                                 14  2'City:'
+     A            S4CTY     R     A  O 14 19REFFLD(CTY)
+     A                                      DSPATR(HI)
+     A                                 14 47'State:'
+     A            S4ST      R     A  O 14 55REFFLD(ST)
+     A                                      DSPATR(HI)
+     A                                 14 60'ZIP:'
+     A            S4ZIP1    R        O 14 66REFFLD(ZIP1)
+     A                                      DSPATR(HI)
+     A            S4ZIP2    R        O 14 73REFFLD(ZIP2)
+     A                                      DSPATR(HI)
+     A                                 16  2'Additional Interest Type:'
+     A            S4IN      R     A  O 16 29REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                 17  2'Notice Required (Y/N):'
+     A            S4NOR     R     A  O 17 26REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                 18  2'Number of Days:'
+     A            S4NOD     R     S  O 18 20REFFLD(DAYS)
+     A                                      DSPATR(HI)
+     A                                 20  2'Comments'
+     A            S4COMM    R     A  O 21  2REFFLD(COMM)
+     A                                      DSPATR(HI)
+     A                                 23  2'F1=End of job'
+     A                                 23 25'F2=Prior screen'
+     A                                 23 51'F3=Restart'
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

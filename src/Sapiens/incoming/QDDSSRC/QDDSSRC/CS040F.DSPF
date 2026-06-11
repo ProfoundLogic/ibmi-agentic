@@ -1,0 +1,384 @@
+     A*%%TS  SD  19980219  143911  WINNERW     REL-V3R7M0  5716-PW1
+     A*************************************************************
+     A*  (C) Copyright Progressive Data Solutions Inc., 1997
+     A*************************************************************
+     A*  REVISIONS:
+     A*  08/09/94  C:26  PROJECT#: CS004
+     A*     1. Add division.  Change Mbr# to Emplr#
+     A*     2. Base change to tie to WCMS
+     A*     3. Add standard screen headings
+     A*
+     A***************************************************************
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CSREFP)
+     A                                      CHGINPDFT(UL)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*
+     A          R SCR01
+     A*%%TS  SD  19980219  143911  WINNERW     REL-V3R7M0  5716-PW1
+     A                                      CF05
+     A                                      CF06
+     A                                      SETOF(20)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            SCFILE    R        O  2  2REFFLD(FLE)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                      DSPATR(HI)
+     A            SCRECF    R        O  2 71REFFLD(RECF)
+     A                                  8  2'Type information, press Enter.'
+     A                                      COLOR(BLU)
+     A                                 11  4'Client Number . . . . . . . . :'
+     A            SCCLT#    R        B 11 37REFFLD(CLT#)
+     A                                      DSPATR(UL)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  20                                  ERRMSGID(CSM0504 *LIBL/CSMESG)
+     A                                      DSPATR(HI)
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 11'F5=Client# search'
+     A                                      COLOR(BLU)
+     A                                 23 30'F6=Client alpha search'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A*%%TS  SD  19980219  143911  WINNERW     REL-V3R7M0  5716-PW1
+     A                                      CF12
+     A N09N40                               CF20
+     A  64                                  CF23
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      CF10
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            SCFILE    R        O  2  2REFFLD(FLE)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                      DSPATR(HI)
+     A            SCRECF    R        O  2 71REFFLD(RECF)
+     A            SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                  5  2'Client Number:'
+     A            SCCLT#    R        O  5 17REFFLD(CLT#)
+     A                                      TEXT('Client Number')
+     A                                      EDTCDE(4)
+     A                                  5 71'Status:'
+     A            SCSTAT    R        O  5 80REFFLD(FLAG)
+     A                                      TEXT('Status')
+     A                                  9  4'Mbr/Non . . :'
+     A            SCMBR     R        B  9 19REFFLD(FLAG)
+     A                                      TEXT('Member/Non-Member Flag')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  20                                  ERRMSGID(CSM0510 *LIBL/CSMESG)
+     A  09                                  DSPATR(HI)
+     A                                  9 22'Group . . :'
+     A            SCFND     R        B  9 35REFFLD(FND)
+     A                                      TEXT('WCMS FUND #')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A                                  9 40'Emplr #:'
+     A            SCMBR#    R        B  9 50REFFLD(EMP#)
+     A                                      TEXT('WCMS Emplr#')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(HI)
+     A                                 11  4'Client name :'
+     A            SCNAME    R        B 11 19REFFLD(NAME)
+     A                                      TEXT('Client Name')
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A  21                                  ERRMSGID(CSM0503 *LIBL/CSMESG)
+     A  09                                  DSPATR(HI)
+     A                                 12  4'Address . . :'
+     A            SCADR1    R        B 12 19REFFLD(ADR1)
+     A                                      TEXT('Address 1')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  22                                  ERRMSGID(CSM0503 *LIBL/CSMESG)
+     A  09                                  DSPATR(HI)
+     A            SCADR2    R        B 13 19REFFLD(ADR2)
+     A                                      TEXT('Address 2')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 14  4'City/St/Zip :'
+     A            SCCTY     R        B 14 19REFFLD(CTY)
+     A                                      TEXT('City')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  23                                  ERRMSGID(CSM0503 *LIBL/CSMESG)
+     A  09                                  DSPATR(HI)
+     A            SCST      R        B 14 47REFFLD(ST)
+     A                                      TEXT('State')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  24                                  ERRMSGID(CSM0501 *LIBL/CSMESG)
+     A  09                                  DSPATR(HI)
+     A            SCZIP1    R        B 14 52REFFLD(ZIP1)
+     A                                      TEXT('Zip Code 1')
+     A  28                                  DSPATR(PC)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  25                                  ERRMSGID(CSM0504 *LIBL/CSMESG)
+     A  09                                  DSPATR(HI)
+     A            SCZIP2    R        B 14 60REFFLD(ZIP2)
+     A                                      TEXT('Zip Code 2')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A                                 16  4'Contact name:'
+     A            SCCONT    R        B 16 19REFFLD(NAME)
+     A                                      TEXT('Contact Name')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  26                                  ERRMSGID(CSM0503 *LIBL/CSMESG)
+     A  09                                  DSPATR(HI)
+     A                                 18  4'Telephone # :'
+     A                                 18 19'('
+     A  09                                  DSPATR(HI)
+     A            SCTARA    R        B 18 21REFFLD(ARCD)
+     A                                      TEXT('Telephone Area Code')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A                                 18 25')'
+     A  09                                  DSPATR(HI)
+     A            SCPHN#    R        B 18 27REFFLD(PHN#)
+     A                                      TEXT('Telephone #')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A  27                                  ERRMSGID(CSM0504 *LIBL/CSMESG)
+     A  09                                  DSPATR(HI)
+     A                                 18 36'Fax #:'
+     A                                 18 44'('
+     A  09                                  DSPATR(HI)
+     A            SCFARA    R        B 18 46REFFLD(ARCD)
+     A                                      TEXT('Fax Area Code')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A                                 18 50')'
+     A  09                                  DSPATR(HI)
+     A            SCFAX#    R        B 18 52REFFLD(PHN#)
+     A                                      TEXT('Fax #')
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 23'F12=Cancel'
+     A                                      COLOR(BLU)
+     A                                 23 35'F20=Change status'
+     A                                      COLOR(BLU)
+     A  09
+     AO 40                                  DSPATR(ND)
+     A            SCCMDD    R        O 23 68REFFLD(DS10)
+     A                                      TEXT('F23=DELETE')
+     A                                 23 11'F10=Search'
+     A                                      COLOR(BLU)
+     A                                 14 58'-'
+     A  09                                  DSPATR(HI)
+     A                                  7  2'Type information, press Enter.'
+     A                                      COLOR(BLU)
+     A*  90/12/14  09:02:08    LDAPPER     REL-R02M00  5728-PW1
+     A          R SCR03
+     A*%%TS  SD  19980219  133906  WINNERW     REL-V3R7M0  5716-PW1
+     A                                      CF12
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            SCFILE    R        O  2  2REFFLD(FLE)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                      DSPATR(HI)
+     A            SCRECF    R        O  3 71REFFLD(RECF)
+     A            SCMODE    R        O  2 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                  4  2'Client number:'
+     A            SCCLT#    R        O  4 18REFFLD(CLT#)
+     A                                      TEXT('Client Number')
+     A                                      EDTCDE(4)
+     A                                  5  2'Mbr/Non  . . :'
+     A            SCMBR     R        O  5 18REFFLD(FLAG)
+     A                                      TEXT('Member/Non-Member Flag')
+     A            SCFND     R        O  5 41REFFLD(FND)
+     A                                      TEXT('Fund Number')
+     A                                      EDTCDE(4)
+     A                                  5 51'Mbr#:'
+     A            SCMBR#    R        O  5 58REFFLD(EMP#)
+     A                                      TEXT('Member #')
+     A                                      EDTCDE(4)
+     A                                  5 71'Status:'
+     A            SCSTAT    R        O  5 80REFFLD(FLAG)
+     A                                      TEXT('Status')
+     A                                  7  2'Balance due  :'
+     A                                  9  2'Last Srch Dt :'
+     A            SCLSDT    R        O  9 18REFFLD(DT8)
+     A                                      TEXT('Last Search Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                  9 32'Last Bill Dt:'
+     A            SCLBDT    R        O  9 46REFFLD(DT8)
+     A                                      TEXT('Last Bill Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                  9 58'Last Pd Dt:'
+     A            SCLPDT    R        O  9 71REFFLD(DT8)
+     A                                      TEXT('Last Paid Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                 11  4'MTD         '
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A                                 11 18'# of Searches         Amount Due  -
+     A                                             Amount Paid'
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A                                 12  6'Mail . . :'
+     A            SC#MM     R        O 12 23REFFLD(A50)
+     A                                      TEXT('# Searches MTD for Mail')
+     A                                      EDTCDE(4)
+     A            SC$DMM    R        O 12 40REFFLD(A92)
+     A                                      TEXT('Amt Due MTD for Mail')
+     A                                      EDTCDE(4)
+     A            SC$PMM    R        O 12 60REFFLD(A92)
+     A                                      TEXT('Amt Pd MTD for Mail')
+     A                                      EDTCDE(4)
+     A                                 13  6'Telephone:'
+     A            SC#MT     R        O 13 23REFFLD(A50)
+     A                                      TEXT('# Search MTD for Telephone')
+     A                                      EDTCDE(4)
+     A            SC$DMT    R        O 13 40REFFLD(A92)
+     A                                      TEXT('Amt Due MTD for Telephone')
+     A                                      EDTCDE(4)
+     A            SC$PMT    R        O 13 60REFFLD(A92)
+     A                                      TEXT('Amt Pd MTD for Telephone')
+     A                                      EDTCDE(4)
+     A                                 14  6'Fax  . . :'
+     A            SC#MF     R        O 14 23REFFLD(A50)
+     A                                      TEXT('# Search MTD for Fax')
+     A                                      EDTCDE(4)
+     A            SC$DMF    R        O 14 40REFFLD(A92)
+     A                                      TEXT('Amt Due MTD for Fax')
+     A                                      EDTCDE(4)
+     A            SC$PMF    R        O 14 60REFFLD(A92)
+     A                                      TEXT('Amt Pd MTD for Fax')
+     A                                      EDTCDE(4)
+     A                                 15  4'QTD         '
+     A                                      DSPATR(UL)
+     A                                      DSPATR(HI)
+     A                                 16  6'Mail . . :'
+     A            SC#QM     R        O 16 22REFFLD(A60)
+     A                                      TEXT('# Search QTD for Mail')
+     A                                      EDTCDE(4)
+     A            SC$DQM    R        O 16 39REFFLD(A102)
+     A                                      TEXT('Amt Due QTD for Mail')
+     A                                      EDTCDE(4)
+     A            SC$PQM    R        O 16 59REFFLD(A102)
+     A                                      TEXT('Amt Pd QTD for Mail')
+     A                                      EDTCDE(4)
+     A                                 17  6'Telephone:'
+     A            SC#QT     R        O 17 22REFFLD(A60)
+     A                                      TEXT('# Search QTD for Telephone')
+     A                                      EDTCDE(4)
+     A            SC$DQT    R        O 17 39REFFLD(A102)
+     A                                      TEXT('Amt Due QTD for Telephone')
+     A                                      EDTCDE(4)
+     A            SC$PQT    R        O 17 59REFFLD(A102)
+     A                                      TEXT('Amt Pd QTD for Telephone')
+     A                                      EDTCDE(4)
+     A                                 18  6'Fax  . . :'
+     A            SC#QF     R        O 18 22REFFLD(A60)
+     A                                      TEXT('# Search QTD for Fax')
+     A                                      EDTCDE(4)
+     A            SC$DQF    R        O 18 39REFFLD(A102)
+     A                                      TEXT('Amt Due QTD for Fax')
+     A                                      EDTCDE(4)
+     A            SC$PQF    R        O 18 59REFFLD(A102)
+     A                                      TEXT('Amt Pd QTD for Fax')
+     A                                      EDTCDE(4)
+     A                                 19  4'YTD         '
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A                                 20  6'Mail . . :'
+     A            SC#YM     R        O 20 21REFFLD(A70)
+     A                                      TEXT('# Search YTD for Mail')
+     A                                      EDTCDE(4)
+     A            SC$DYM    R        O 20 38REFFLD(A112)
+     A                                      TEXT('Amt Due YTD for Mail')
+     A                                      EDTCDE(4)
+     A            SC$PYM    R        O 20 58REFFLD(A112)
+     A                                      TEXT('Amt Pd YTD for Mail')
+     A                                      EDTCDE(4)
+     A                                 21  6'Telephone:'
+     A            SC#YT     R        O 21 21REFFLD(A70)
+     A                                      TEXT('# Search YTD for Telephone')
+     A                                      EDTCDE(4)
+     A            SC$DYT    R        O 21 38REFFLD(A112)
+     A                                      TEXT('Amt Due YTD for Telephone')
+     A                                      EDTCDE(4)
+     A            SC$PYT    R        O 21 58REFFLD(A112)
+     A                                      TEXT('Amt Pd YTD for Telephone')
+     A                                      EDTCDE(4)
+     A                                 22  6'Fax  . . :'
+     A            SC#YF     R        O 22 21REFFLD(A70)
+     A                                      TEXT('# Search YTD for Fax')
+     A                                      EDTCDE(4)
+     A            SC$DYF    R        O 22 38REFFLD(A112)
+     A                                      TEXT('Amt Due YTD for Fax')
+     A                                      EDTCDE(4)
+     A            SC$PYF    R        O 22 58REFFLD(A112)
+     A                                      TEXT('Amt Pd YTD for Fax')
+     A                                      EDTCDE(4)
+     A                                 24  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 24 11'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A            SCBALD    R        O  7 18REFFLD(A112)
+     A                                      TEXT('Balance Due')
+     A                                      EDTCDE(4)
+     A                                  4 25'Client name  :'
+     A            SCNAME    R        O  4 41REFFLD(NAME)
+     A                                      TEXT('Client Name')
+     A                                  7 32'2nd notice sent?:'
+     A            SC2NOT    R        O  7 51REFFLD(FLAG)
+     A                                      TEXT('2nd Notice Flag')
+     A                                  5 25'Group  . . . :'
+     A          R SCR99
+     A*            11:14:47    TLB         REL-R08M00  5714-UT1
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

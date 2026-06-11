@@ -1,0 +1,338 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   PREMISIS LOCATION SEARCH DISPLAY                         **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      SETOF(20)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C0640F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  4  4'Policy Number:'
+     A            SCPOL#    R        O  4 19REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      TEXT('POLICY NUMBER')
+     A                                  5  4'Location Number:'
+     A            SCLOC#    R        B  5 21REFFLD(PRM#)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                  5 28'Building Number:'
+     A            SCPRM#    R        B  5 45REFFLD(PRM#)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                  6 61'Constr'
+     A                                  6 69'Protection'
+     A                                  7  3'Loc #'
+     A                                      DSPATR(UL)
+     A                                  7 11'Bldg #'
+     A                                      DSPATR(UL)
+     A                                  7 20'Occupied as Description'
+     A                                      DSPATR(UL)
+     A                                  7 53'Status'
+     A                                      DSPATR(UL)
+     A                                  7 63'ISO'
+     A                                      DSPATR(UL)
+     A                                  7 70'Class ISO'
+     A                                      DSPATR(UL)
+     A            SCFL01    R        B  8  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  20                                  ERRMSGID(CCR0600 *LIBL/CMESGG)
+     A                                      TEXT('FLAG')
+     A            SCLO01    R        O  8  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      TEXT('LOCATION NUMBER')
+     A                                      EDTCDE(4)
+     A            SCPR01    R        O  8 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS01    R        O  8 20REFFLD(DS30)
+     A                                      OVRDTA
+     A            SCST01    R     A  O  8 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO01    R     A  O  8 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL01    R        O  8 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A            SCFL02    R        B  9  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO02    R        O  9  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR02    R        O  9 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS02    R        O  9 20REFFLD(DS30)
+     A                                      OVRDTA
+     A            SCST02    R     A  O  9 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO02    R     A  O  9 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL02    R        O  9 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A            SCFL03    R        B 10  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO03    R        O 10  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR03    R        O 10 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS03    R        O 10 20REFFLD(DS30)
+     A                                      OVRDTA
+     A            SCST03    R     A  O 10 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO03    R     A  O 10 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL03    R        O 10 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A            SCFL04    R        B 11  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO04    R        O 11  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR04    R        O 11 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS04    R        O 11 20REFFLD(DS30)
+     A                                      OVRDTA
+     A            SCST04    R     A  O 11 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO04    R     A  O 11 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL04    R        O 11 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A                                      TEXT('PROTECTION CLASS ISO')
+     A            SCFL05    R        B 12  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO05    R        O 12  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR05    R        O 12 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS05    R        O 12 20REFFLD(DS30)
+     A                                      OVRDTA
+     A            SCST05    R     A  O 12 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO05    R     A  O 12 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL05    R        O 12 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A                                      TEXT('STATUS')
+     A            SCFL06    R        B 13  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO06    R        O 13  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR06    R        O 13 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS06    R        O 13 20REFFLD(DS30)
+     A                                      OVRDTA
+     A            SCST06    R     A  O 13 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO06    R     A  O 13 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL06    R        O 13 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A            SCFL07    R        B 14  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO07    R        O 14  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR07    R        O 14 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS07    R        O 14 20REFFLD(DS30)
+     A                                      OVRDTA
+     A            SCST07    R     A  O 14 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO07    R     A  O 14 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL07    R        O 14 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A            SCFL08    R        B 15  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO08    R        O 15  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR08    R        O 15 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS08    R        O 15 20REFFLD(DS30)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCST08    R     A  O 15 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO08    R     A  O 15 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL08    R        O 15 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A            SCFL09    R        B 16  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO09    R        O 16  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR09    R        O 16 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS09    R        O 16 20REFFLD(DS30)
+     A                                      OVRDTA
+     A            SCST09    R     A  O 16 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO09    R     A  O 16 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL09    R        O 16 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A            SCFL10    R        B 17  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO10    R        O 17  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR10    R        O 17 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS10    R        O 17 20REFFLD(DS30)
+     A                                      OVRDTA
+     A            SCST10    R     A  O 17 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO10    R     A  O 17 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL10    R        O 17 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A            SCFL11    R        B 18  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO11    R        O 18  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR11    R        O 18 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS11    R        O 18 20REFFLD(DS30)
+     A                                      OVRDTA
+     A            SCST11    R     A  O 18 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO11    R     A  O 18 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL11    R        O 18 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A            SCFL12    R        B 19  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO12    R        O 19  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR12    R        O 19 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS12    R        O 19 20REFFLD(DS30)
+     A                                      OVRDTA
+     A            SCST12    R     A  O 19 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO12    R     A  O 19 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL12    R        O 19 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A            SCFL13    R        B 20  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO13    R        O 20  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR13    R        O 20 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS13    R        O 20 20REFFLD(DS30)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCST13    R     A  O 20 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO13    R     A  O 20 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL13    R        O 20 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A            SCFL14    R        B 21  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO14    R        O 21  4REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR14    R        O 21 12REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCDS14    R        O 21 20REFFLD(DS30)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCST14    R     A  O 21 55REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCO14    R     A  O 21 64REFFLD(CONS)
+     A                                      TEXT('Record type')
+     A                                      OVRDTA
+     A            SCCL14    R        O 21 74REFFLD(PRTC)
+     A                                      OVRDTA
+     A                                 23 10'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 31'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A            SCUP           9A  O 23 53OVRDTA
+     A            SCDOWN         9A  O 23 67OVRDTA
+     A                                  3 28'LOCATION/BUILDING DISPLAY'
+     A                                      DSPATR(HI)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR99
+     A            SCFL01    R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

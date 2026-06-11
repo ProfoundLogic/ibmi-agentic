@@ -1,0 +1,136 @@
+     A*%%TS  SD  19970723  115247  WINNERW     REL-V3R6M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   A/R INQUIRY DETAIL DISPLAY                               **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**                                                            **
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A                                      CF04
+     A*---------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)
+     A          R SCRSFL                    SFL
+     A*%%TS  SD  19970723  115247  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      TEXT('A/R Inquiry Subfile Controll')
+     A            SCTM01         6S 0H
+     A            SCTD01    R     Y  O 11  2REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT01    R     Y  O 11 13REFFLD(DT8)
+     A                                      TEXT('Date')
+     A                                      EDTWRD('  /  /    ')
+     A            SCAR01    R        O 11 24REFFLD(CODE)
+     A                                      TEXT('Code')
+     A            SCTP01         1A  O 11 27
+     A            SCSE01    R        O 11 29REFFLD(CDE)
+     A                                      TEXT('Code')
+     A            SCCK01    R     Y  O 11 32REFFLD(CHK#)
+     A                                      TEXT('CHECK NUMBER')
+     A                                      EDTCDE(4)
+     A            SCGA01    R     Y  O 11 40REFFLD(A92)
+     A                                      TEXT('Amount')
+     A                                      EDTCDE(K)
+     A            SCCA01    R     Y  O 11 54REFFLD(A92)
+     A                                      TEXT('Amount')
+     A                                      EDTCDE(K)
+     A            SCNA01    R     Y  O 11 68REFFLD(A92)
+     A                                      TEXT('Amount')
+     A                                      EDTCDE(K)
+     A            SCDS01        30A  O 12 24
+     A          R SCRCTL                    SFLCTL(SCRSFL)
+     A*%%TS  SD  19970723  115247  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      SFLSIZ(0007)
+     A                                      SFLPAG(0006)
+     A                                      FRCDTA
+     A                                      OVERLAY
+     A                                      PUTOVR
+     A                                      OVRDTA
+     A                                      SFLDSP
+     A  80                                  SFLDSPCTL
+     A  80                                  SFLCLR
+     A N21                                  SFLEND(*MORE)
+     A                                      SFLDROP(CF04)
+     A  18 50                               SFLMSG('You are at the BOTTOM of re-
+     A                                      quested date range.')
+     A  19 88                               SFLMSG('You are at the TOP of the r-
+     A                                      equested date range.')
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A                                      TEXT('USER')
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0181F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A  05                              3  2'CANCELLATION PENDING'
+     A                                      DSPATR(RI)
+     A  06                              6  2'REINSTATEMENT PENDING'
+     A                                      DSPATR(RI)
+     A  04                              3 63'POLICY NON-RENEWED'
+     A                                      DSPATR(RI)
+     A                                  4  2'Policy number:'
+     A            SCPOL#    R        O  4 17REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  4 34'Name:'
+     A            SCFIN     R        O  4 40REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  5  2'From date:'
+     A            SCFRDT    R        O  5 14REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('DATE')
+     A                                      DSPATR(HI)
+     A                                  5 27'To date:'
+     A            SCTODT    R        O  5 37REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('DATE')
+     A                                      DSPATR(HI)
+     A                                  5 52'Agent #:'
+     A            SCAGT#    R        O  5 62REFFLD(AGT#)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                  6  2'Billing:'
+     A            SCBSDS    R        O  6 12REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                  7  2'Date:'
+     A            SCDT      R        B  7  9REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                  9  2'   Date       Date    Cd p Cd Chec-
+     A                                      k #      Amount        Amount      -
+     A                                        Amount '
+     A                                      DSPATR(UL)
+     A                                  8  4'Trans       Post       T Sec      -
+     A                                              Gross          Comm        -
+     A                                         Net'
+     A*         R SCR99
+     A          R FOOTER
+     A*%%TS  SD  19970310  140843  COLEMANR    REL-V3R1M0  5763-PW1
+     A                                      SLNO(24)
+     A                                      CLRL(*NO)
+     A                                      OVERLAY
+     A                                  1 20'F3=Exit        F12=Cancel       F4-
+     A                                      =Fold'
+     A                                      COLOR(BLU)

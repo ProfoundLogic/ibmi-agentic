@@ -1,0 +1,99 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   ACCOUNT LISTING BY POLICY/NAMED INSURED PROMPT DISPLAY   **
+     A**                                                            **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A          R SCR01
+     A                                      CF05
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(35)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7520F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  7 30'Section Code:'
+     A            SCCC      R        B  7 51REFFLD(CDE)
+     A*                                     DSPATR(CS)
+     A  35                                  ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                  7 55'(Default is all)'
+     A                                  9 29'Agent #:'
+     A            SCAGT#    R        B  9 48REFFLD(AGT#)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  25                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 11 29'From Date:'
+     A            SCFDT     R        B 11 45REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  20                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                 13 29'To Date:'
+     A            SCTDT     R        B 13 45REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                 15 29'Policy Number:'
+     A            SCBYP     R        B 15 52REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A  23                                  ERRMSGID(CCR0667 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0668 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 17 29'Named Insured:'
+     A            SCBYN     R        B 17 52REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A  23                                  ERRMSGID(CCR0667 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0668 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 19  7'Key Agent # for that Agent; Leave -
+     A                                      BLANK for all Agents on listing.'
+     A                                 20  7'Listing in Policy Number Order: Pl-
+     A                                      ace an "X" in Policy Number field.'
+     A                                 21  7'Listing in Named Insured Order: pl-
+     A                                      ace an "X" in Named Insured field.'
+     A                                 24  5'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 31'F5=Agent search'
+     A                                      COLOR(BLU)
+     A                                 24 56'F13=Change user parm'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A*            09:59:04    MSHARPE     REL-R08M00  5714-UT1
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

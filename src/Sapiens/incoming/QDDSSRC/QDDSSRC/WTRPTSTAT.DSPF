@@ -1,0 +1,779 @@
+     A                                      REF(*LIBL/WREFP)
+     A                                      INDARA
+     A          R RCDTABSTAT
+     A                                  1  2HTML('QPUIREC2    ROVERLAY   0     -
+     A                                      RASSUME    0     ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdTabStat","description":"WC S-
+     A                                      tatistical Reporting","overlay":"tr-
+     A                                      ue","assume":"true"},"items":[{"id"-
+     A                                      :"BtnExitButton","field type":"butt-
+     A                                      on","css class":"button","value":"E-
+     A                                      xit","left":"605px","top":"10px","w-
+     A                                      idth":"100px","cursor":"default","d-
+     A                                      escription":"Exit Button","response-
+     A                                      ":{"fieldName":"ExitNow","dataType"-
+     A                                      :"indicator","formatting":"Indicato-
+     A                                      r","indFormat":"1 / 0"},"shortcut k-
+     A                                      ey":"F3","visibility":"hidden"},{"i-
+     A                                      d":"TabWCSTATSubmissions","field ty-
+     A                                      pe":"tab panel","css class":"tab-pa-
+     A                                      nel","left":"250px","top":"70px","w-
+     A                                      idth":"970px","height":{"fieldName"-
+     A                                      :"TabHeight","dataLength":"5","decP-
+     A                                      os":"0","numSep":"false","zeroBalan-
+     A                                      ce":"false","zeroFill":"false","cur-
+     A                                      Sym":"","dataType":"zoned","formatt-
+     A                                      ing":"Number","units":"px","negNum"-
+     A                                      :"-999.00","designValue":"3270px"},-
+     A                                      "tab names":"Statistical Submission-
+     A                                      s","z index":"0","tab panel style":-
+     A                                      "CompSuite Tab Panel","value":"valu-
+     A                                      e text","active tab":{"fieldName":"-
+     A                                      TabIndex","dataLength":"5","decPos"-
+     A                                      :"0","numSep":"false","zeroBalance"-
+     A                                      :"false","zeroFill":"false","curSym-
+     A                                      ":"","dataType":"zoned","formatting-
+     A                                      ":"Number","units":"","negNum":"-99-
+     A                                      9.00"},"ontabclick":"pui.click(\"Bt-
+     A                                      nTabClick\")"},{"id":"BtnTabClick",-
+     A                                      "field type":"button","css class":"-
+     A                                      button","cursor":"default","descrip-
+     A                                      tion":"tab click button","value":"T-
+     A                                      ab","response":{"fieldName":"tabCli-
+     A                                      ck","dataType":"indicator","formatt-
+     A                                      ing":"Indicator","indFormat":"1 / 0-
+     A                                      "},"shortcut key":"F3","left":"565p-
+     A                                      x","top":"10px","width":"35px","vis-
+     A                                      ibility":"hidden"},{"id":"btnRefres-
+     A                                      h","field type":"button","css class-
+     A                                      ":"button","value":"Refresh","left"-
+     A                                      :"710px","top":"10px","width":"100p-
+     A                                      x","cursor":"default","response":{"-
+     A                                      fieldName":"BtnRefresh","dataType":-
+     A                                      "indicator","formatting":"Indicator-
+     A                                      ","indFormat":"1 / 0"},"visibility"-
+     A                                      :"hidden"}]}')
+     A            BTNREFRESH     1A  H
+     A            EXITNOW        1A  H
+     A            TABCLICK       1A  H
+     A            TABHEIGHT      5S 0H
+     A            TABINDEX       5S 0H
+     A          R SFLSTATSUB                SFL
+     A            QPUI000001     1A  O  2  2
+     A            ISLNKVISB      1A  H
+     A            NXCHGSTAT      1A  H
+     A            SCCARRIER      5S 0H
+     A            SCGROUP        3S 0H
+     A            SCNOOFUNIT     5S 0H
+     A            SCRPMY         5S 0H
+     A            SCRPTLVL       2S 0H
+     A            SCSELECT       1A  H
+     A            SCSTAROWSL     1A  H
+     A            SCSTATDEL      1A  H
+     A            SCSTATRRN#     9S 0H
+     A            SCSTATUNIT     1A  H
+     A            SCSUBMDATE      L  H
+     A            SCVALMONTH     6S 0H
+     A          R QSFLCTL001                SFLCTL(SFLSTATSUB)
+     A                                      SFLSIZ(0001)
+     A                                      SFLPAG(0001)
+     A                                      SFLDSP
+     A                                  1  2HTML('QPUISFLRCDWCSTAT')
+     A          R RCDWCSTAT
+     A                                  1  2HTML('QPUICTL1    SFLSTATSUB5    RS-
+     A                                      FLDSP    0    FDSPSTATSUBRSFLDSPCTL-
+     A                                       0    FDSPSTATCTLRSFLCLR    0    FC-
+     A                                      LRSTAT   RSFLPAG    1    C2    23 R-
+     A                                      SFLSIZ    1    C2    24 1    RSFLNX-
+     A                                      TCHG 0    FNXCHGSTAT 3    ROVERLAY -
+     A                                        0     RASSUME    0     RROWS     -
+     A                                       2    C1    1C1    1 ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdWCStat","overlay":"true","ex-
+     A                                      ternal css":"label","description":"-
+     A                                      WC Statistical Submissions","assume-
+     A                                      ":"true","overlay range":"1-1","des-
+     A                                      ign overlay formats":"RcdTabStat","-
+     A                                      header text align":"Left,Right","cs-
+     A                                      v file name":"Payment Value 1 Codes-
+     A                                      ","selection value":"A","onload":"/-
+     A                                      /Disable Action button and add Tool-
+     A                                      tip if NO row selected\nwindow.isSe-
+     A                                      lections = function() {\n  var tool-
+     A                                      Tip = \"Selections must be made bef-
+     A                                      ore action can be taken.\";\n  appl-
+     A                                      yProperty(\"imgSelectAction\",\"too-
+     A                                      l tip\",toolTip);\n  applyProperty(-
+     A                                      \"imgSelectAction\",\"disabled\",\"-
+     A                                      true\");\n  var myGrid = getObj(\"s-
+     A                                      flStatSubmissions\");\n    for (var-
+     A                                       r=1; r<=myGrid.grid.getRecordCount-
+     A                                      (); r++) {\n     if (!myGrid.grid.i-
+     A                                      sRowFilteredOut(r)) {\n       if (g-
+     A                                      etCellValue(r) == \"Y\") { \n      -
+     A                                          applyProperty(\"imgSelectAction-
+     A                                      \",\"tool tip\",\"Perform Action\")-
+     A                                      ;\n          applyProperty(\"imgSel-
+     A                                      ectAction\",\"disabled\",\"false\")-
+     A                                      ;\n          break;\n        }\n   -
+     A                                         }\n    }\n}\n\nwindow.getCellVal-
+     A                                      ue = function(inRow) {\n  var myGri-
+     A                                      d = getObj(\"sflStatSubmissions\");-
+     A                                      \n  var value = myGrid.grid.getData-
+     A                                      Value(inRow, \"scSelect\");\n  retu-
+     A                                      rn value;\n}\n\nwindow.updateSelect-
+     A                                      ions = function(inSelect) {\n  var -
+     A                                      myGrid = getObj(\"sflStatSubmission-
+     A                                      s\");\n  for (var r=1; r<=myGrid.gr-
+     A                                      id.getRecordCount(); r++) {\n    my-
+     A                                      Grid.grid.setDataValue(r, \"scSelec-
+     A                                      t\", \"N\");\n  }\n    if (inSelect-
+     A                                       == \"Include\") {\n      for (var -
+     A                                      r=1; r<=myGrid.grid.getRecordCount(-
+     A                                      ); r++) {\n        if (!myGrid.grid-
+     A                                      .isRowFilteredOut(r)) {\n          -
+     A                                      myGrid.grid.setDataValue(r, \"scSel-
+     A                                      ect\", \"Y\");\n        }\n      }\-
+     A                                      n    }\n  isSelections();\n}\n\nisS-
+     A                                      elections();\n\n//Remove first colu-
+     A                                      mn when inMode = ''1''\nvar inMode1-
+     A                                       = get(\"OutInMode\");\nif (inMode1-
+     A                                       == \"1\")\n{\n  getObj(\"sflStatSu-
+     A                                      bmissions\").grid.removeColumn(0);\-
+     A                                      n}\n"},"items":[{"id":"BtnExitButto-
+     A                                      nAll","field type":"button","css cl-
+     A                                      ass":"button","value":"Exit","left"-
+     A                                      :"1015px","top":"75px","width":"100-
+     A                                      px","cursor":"default","description-
+     A                                      ":"Exit Button","response":{"fieldN-
+     A                                      ame":"ExitNow","dataType":"indicato-
+     A                                      r","formatting":"Indicator","indFor-
+     A                                      mat":"1 / 0"},"shortcut key":"F3","-
+     A                                      visibility":"hidden"},{"id":"Btnsub-
+     A                                      mitResubmissions","field type":"but-
+     A                                      ton","css class":"button","value":"-
+     A                                      Submit Resubmissions","left":"795px-
+     A                                      ","top":"678px","width":"135px","cu-
+     A                                      rsor":"default","response":{"fieldN-
+     A                                      ame":"btnSubmtRe","customTrue":"","-
+     A                                      customFalse":"","dataType":"indicat-
+     A                                      or","formatting":"Indicator","indFo-
+     A                                      rmat":"1 / 0"},"visibility":{"field-
+     A                                      Name":"dspVisb","data')
+     A                                  1  2HTML('Type":"indicator","formatting-
+     A                                      ":"Indicator","indFormat":"visible -
+     A                                      / hidden"},"locked in place":"true"-
+     A                                      ,"text align":"left"},{"id":"sflSta-
+     A                                      tSubmissions","field type":"grid","-
+     A                                      css class":"subfilegrid","left":"26-
+     A                                      0px","top":"140px","number of rows"-
+     A                                      :"24","number of columns":"9","colu-
+     A                                      mn widths":"43,75,101,114,74,80,82,-
+     A                                      239,106","column headings":"Select,-
+     A                                      Group,Valuation Month,Submitted Dat-
+     A                                      e,  Carrier ,Reporting <br>     Lev-
+     A                                      els,# of Units, ,","header height":-
+     A                                      "27","row height":"22","csv export"-
+     A                                      :"true","export with headings":"tru-
+     A                                      e","sortable columns":"true","resiz-
+     A                                      able columns":"true","movable colum-
+     A                                      ns":"true","height":"533px","width"-
+     A                                      :"915px","record format name":"sflS-
+     A                                      tatSub","display subfile":{"fieldNa-
+     A                                      me":"dspStatSub","customTrue":"","c-
+     A                                      ustomFalse":"","dataType":"indicato-
+     A                                      r","formatting":"Indicator","indFor-
+     A                                      mat":"true / false"},"display contr-
+     A                                      ol record":{"fieldName":"dspStatCtl-
+     A                                      ","customTrue":"","customFalse":"",-
+     A                                      "dataType":"indicator","formatting"-
+     A                                      :"Indicator","indFormat":"true / fa-
+     A                                      lse"},"clear subfile":{"fieldName":-
+     A                                      "clrStat","customTrue":"","customFa-
+     A                                      lse":"","dataType":"indicator","for-
+     A                                      matting":"Indicator","indFormat":"t-
+     A                                      rue / false"},"subfile record numbe-
+     A                                      r":{"fieldName":"rrnStat","dataLeng-
+     A                                      th":"5","decPos":"0","numSep":"fals-
+     A                                      e","zeroBalance":"false","numBlankF-
+     A                                      ill":"false","zeroFill":"false","no-
+     A                                      ExtraSpaces":"false","curSym":"","d-
+     A                                      ataType":"zoned","formatting":"Numb-
+     A                                      er","negNum":"-999.00","units":""},-
+     A                                      "header text align":"center,left,ri-
+     A                                      ght,right,center,center,center,,","-
+     A                                      row selection":"single","selection -
+     A                                      field":{"fieldName":"scStaRowSl","d-
+     A                                      ataLength":"1","trimLeading":"false-
+     A                                      ","trimTrailing":"true","blankFill"-
+     A                                      :"false","rjZeroFill":"false","data-
+     A                                      Type":"char","formatting":"Text","t-
+     A                                      extTransform":"none"},"selection va-
+     A                                      lue":"A","description":"Statistical-
+     A                                       Submissions","export file name":"S-
+     A                                      tatistical Submissions","locked in -
+     A                                      place":"true","text align":"center,-
+     A                                      left,right,right,center,center,righ-
+     A                                      t,left,","subfile next changed":{"f-
+     A                                      ieldName":"nxchgStat","customTrue":-
+     A                                      "","customFalse":"","dataType":"ind-
+     A                                      icator","formatting":"Indicator","i-
+     A                                      ndFormat":"true / false"},"filter o-
+     A                                      ption":"true","cursor record number-
+     A                                      ":{"fieldName":"rrnStatRow","dataLe-
+     A                                      ngth":"5","decPos":"0","numSep":"fa-
+     A                                      lse","zeroBalance":"false","numBlan-
+     A                                      kFill":"false","zeroFill":"false","-
+     A                                      noExtraSpaces":"false","curSym":"",-
+     A                                      "dataType":"zoned","formatting":"Nu-
+     A                                      mber","negNum":"-999.00","units":""-
+     A                                      },"subfile return rrn":{"fieldName"-
+     A                                      :"rrnPosStat","dataLength":"5","dec-
+     A                                      Pos":"0","numSep":"false","zeroBala-
+     A                                      nce":"false","numBlankFill":"false"-
+     A                                      ,"zeroFill":"false","')
+     A                                  1  2HTML('noExtraSpaces":"false","curSy-
+     A                                      m":"","dataType":"zoned","formattin-
+     A                                      g":"Number","negNum":"-999.00","uni-
+     A                                      ts":""},"position at top":"true","f-
+     A                                      ind option":"true"},{"id":"DrpSelec-
+     A                                      tAction","field type":"select box",-
+     A                                      "css class":"input","value":{"field-
+     A                                      Name":"scSelAct","dataLength":"30",-
+     A                                      "trimLeading":"false","trimTrailing-
+     A                                      ":"true","blankFill":"false","rjZer-
+     A                                      oFill":"false","dataType":"char","f-
+     A                                      ormatting":"Text","textTransform":"-
+     A                                      none","designValue":"[scSelAct]"},"-
+     A                                      choices":{"fieldName":"choSelAct","-
+     A                                      dataLength":"200","trimLeading":"fa-
+     A                                      lse","trimTrailing":"true","blankFi-
+     A                                      ll":"false","rjZeroFill":"false","d-
+     A                                      ataType":"char","formatting":"Text"-
+     A                                      ,"textTransform":"none"},"blank opt-
+     A                                      ion":"false","left":"260px","top":"-
+     A                                      120px","width":"155px","css class 2-
+     A                                      ":"dropdown","locked in place":"tru-
+     A                                      e"},{"id":"BtnIncludeAll","field ty-
+     A                                      pe":"button","css class":"button","-
+     A                                      value":"Include All","response":{"f-
+     A                                      ieldName":"btnEndIncl","customTrue"-
+     A                                      :"","customFalse":"","dataType":"in-
+     A                                      dicator","formatting":"Indicator","-
+     A                                      indFormat":"1 / 0"},"left":"615px",-
+     A                                      "top":"678px","width":"80px","curso-
+     A                                      r":"default","visibility":{"fieldNa-
+     A                                      me":"dspVisb","dataType":"indicator-
+     A                                      ","formatting":"Indicator","indForm-
+     A                                      at":"visible / hidden"},"locked in -
+     A                                      place":"true","onclick":"updateSele-
+     A                                      ctions(\"Include\");"},{"id":"BtnEx-
+     A                                      cludeAll","field type":"button","cs-
+     A                                      s class":"button","value":"Exclude -
+     A                                      All","response":{"fieldName":"btnEn-
+     A                                      dExcl","customTrue":"","customFalse-
+     A                                      ":"","dataType":"indicator","format-
+     A                                      ting":"Indicator","indFormat":"1 / -
+     A                                      0"},"left":"705px","top":"678px","w-
+     A                                      idth":"80px","cursor":"default","vi-
+     A                                      sibility":{"fieldName":"dspVisb","d-
+     A                                      ataType":"indicator","formatting":"-
+     A                                      Indicator","indFormat":"visible / h-
+     A                                      idden"},"locked in place":"true","o-
+     A                                      nclick":"updateSelections(\"Exclude-
+     A                                      \");"},{"id":"imgSelectAction","fie-
+     A                                      ld type":"image","css class":"trans-
+     A                                      form-image","response":{"fieldName"-
+     A                                      :"btnPerAct","customTrue":"","custo-
+     A                                      mFalse":"","dataType":"indicator","-
+     A                                      formatting":"Indicator","indFormat"-
+     A                                      :"1 / 0"},"image source":"/profound-
+     A                                      ui/userdata/images/doAction.png","l-
+     A                                      eft":"420px","top":"120px","height"-
+     A                                      :"20px","width":"25px","tool tip":"-
+     A                                      Perform Action","locked in place":"-
+     A                                      true"},{"id":"BtnStatForm","field t-
+     A                                      ype":"button","css class":"button",-
+     A                                      "value":"SFL Row Click","response":-
+     A                                      {"fieldName":"BtnSfRowCl","customTr-
+     A                                      ue":"","customFalse":"","dataType":-
+     A                                      "indicator","formatting":"Indicator-
+     A                                      ","indFormat":"1 / 0"},"left":"1010-
+     A                                      px","top":"105px","width":"100px","-
+     A                                      z index":"100","locked in place":"f-
+     A                                      alse","cursor":"default","visibilit-
+     A                                      y":"hidden"},{"id":"OutInMode","fie-
+     A                                      ld type":"output fiel')
+     A                                  1  2HTML('d","css class":"output-field"-
+     A                                      ,"value":{"fieldName":"scInMode","d-
+     A                                      ataLength":"1","trimLeading":"false-
+     A                                      ","trimTrailing":"true","blankFill"-
+     A                                      :"false","rjZeroFill":"false","data-
+     A                                      Type":"char","formatting":"Text","t-
+     A                                      extTransform":"none","designValue":-
+     A                                      "[scInMode]"},"left":"1115px","top"-
+     A                                      :"105px","width":"60px","visibility-
+     A                                      ":"hidden"},{"id":"BtnSubmitCorrect-
+     A                                      ions","field type":"button","css cl-
+     A                                      ass":"button","value":"Submit Corre-
+     A                                      ctions","response":{"fieldName":"bt-
+     A                                      nSubmCor","customTrue":"","customFa-
+     A                                      lse":"","dataType":"indicator","for-
+     A                                      matting":"Indicator","indFormat":"1-
+     A                                       / 0"},"left":"940px","top":"678px"-
+     A                                      ,"width":"120px","locked in place":-
+     A                                      "true","cursor":"default","visibili-
+     A                                      ty":{"fieldName":"dspVisb","dataTyp-
+     A                                      e":"indicator","formatting":"Indica-
+     A                                      tor","indFormat":"visible / hidden"-
+     A                                      },"text align":"left"},{"id":"BtnEx-
+     A                                      tactData","field type":"button","cs-
+     A                                      s class":"button","value":"Extract -
+     A                                      Data","response":{"fieldName":"btnE-
+     A                                      xtrDta","customTrue":"","customFals-
+     A                                      e":"","dataType":"indicator","forma-
+     A                                      tting":"Indicator","indFormat":"1 /-
+     A                                       0"},"text align":"left","left":"10-
+     A                                      70px","top":"678px","width":"85px",-
+     A                                      "locked in place":"true","cursor":"-
+     A                                      default","visibility":{"fieldName":-
+     A                                      "dspVisb","dataType":"indicator","f-
+     A                                      ormatting":"Indicator","indFormat":-
+     A                                      "visible / hidden"}},{"id":"HdgStat-
+     A                                      Reporting","field type":"output fie-
+     A                                      ld","css class":"heading","value":"-
+     A                                      WC Statistical Reporting","left":"2-
+     A                                      55px","top":"35px","width":"315px",-
+     A                                      "heading type":"Page Title"},{"id":-
+     A                                      "BtnWCSRfilter","field type":"butto-
+     A                                      n","css class":"button","value":"Fi-
+     A                                      lter","response":{"fieldName":"btnF-
+     A                                      ilter","dataType":"indicator","form-
+     A                                      atting":"Indicator","indFormat":"1 -
+     A                                      / 0"},"left":"450px","top":"115px",-
+     A                                      "width":"100px","z index":"50","cur-
+     A                                      sor":"default"},{"id":"BtnWCSRClrFi-
+     A                                      lter","field type":"button","css cl-
+     A                                      ass":"button","value":"Clear Filter-
+     A                                      ","response":{"fieldName":"btnClrFl-
+     A                                      tr","customTrue":"","customFalse":"-
+     A                                      ","dataType":"indicator","formattin-
+     A                                      g":"Indicator","indFormat":"1 / 0"}-
+     A                                      ,"left":"560px","top":"115px","widt-
+     A                                      h":"100px","z index":"50","cursor":-
+     A                                      "default"},{"id":"OutEndrFrmRRN","f-
+     A                                      ield type":"output field","css clas-
+     A                                      s":"output-field","value":{"fieldNa-
+     A                                      me":"scStatRrn#","dataLength":"9","-
+     A                                      decPos":"0","numSep":"false","zeroB-
+     A                                      alance":"false","numBlankFill":"fal-
+     A                                      se","zeroFill":"true","noExtraSpace-
+     A                                      s":"false","curSym":"","dataType":"-
+     A                                      zoned","formatting":"Number","negNu-
+     A                                      m":"999.00","units":"","designValue-
+     A                                      ":"[scStatRrn#]"},"left":"5px","top-
+     A                                      ":"5px","visibility":"hidden","grid-
+     A                                      ":"sflStatSubmissions","column":"7"-
+     A                                      },{"id":"LnkStatUnits","field type"-
+     A                                      :"hyperlink","css cla')
+     A                                  1  2HTML('ss":"link","value":"Units","r-
+     A                                      esponse":{"fieldName":"scStatUnit",-
+     A                                      "customTrue":"","customFalse":"","d-
+     A                                      ataType":"indicator","formatting":"-
+     A                                      Indicator","indFormat":"1 / 0"},"le-
+     A                                      ft":"5px","top":"5px","visibility":-
+     A                                      {"fieldName":"isLnkVisb","customTru-
+     A                                      e":"","customFalse":"","dataType":"-
+     A                                      indicator","formatting":"Indicator"-
+     A                                      ,"indFormat":"visible / hidden"},"g-
+     A                                      rid":"sflStatSubmissions","column":-
+     A                                      "8"},{"id":"CbxSelectRow","field ty-
+     A                                      pe":"checkbox","css class":"input",-
+     A                                      "value":{"fieldName":"scSelect","da-
+     A                                      taLength":"1","trimLeading":"false"-
+     A                                      ,"trimTrailing":"true","blankFill":-
+     A                                      "false","rjZeroFill":"false","dataT-
+     A                                      ype":"char","formatting":"Text","te-
+     A                                      xtTransform":"none","designValue":"-
+     A                                      [scSelect]"},"checked value":"Y","u-
+     A                                      nchecked value":"N ","read only":"f-
+     A                                      alse","left":"15px","top":"5px","he-
+     A                                      ight":"15px","css class 2":"checkbo-
+     A                                      x","onchange":"isSelections();","on-
+     A                                      click":"isSelections();","grid":"sf-
+     A                                      lStatSubmissions","column":"0"},{"i-
+     A                                      d":"LnkDelete","field type":"hyperl-
+     A                                      ink","css class":"link","value":"De-
+     A                                      lete","response":{"fieldName":"scSt-
+     A                                      atDel","customTrue":"","customFalse-
+     A                                      ":"","dataType":"indicator","format-
+     A                                      ting":"Indicator","indFormat":"1 / -
+     A                                      0"},"left":"40px","top":"5px","heig-
+     A                                      ht":"15px","width":"35px","visibili-
+     A                                      ty":{"fieldName":"isLnkVisb","custo-
+     A                                      mTrue":"","customFalse":"","dataTyp-
+     A                                      e":"indicator","formatting":"Indica-
+     A                                      tor","indFormat":"visible / hidden"-
+     A                                      },"grid":"sflStatSubmissions","colu-
+     A                                      mn":"8"},{"id":"OutGroup","field ty-
+     A                                      pe":"output field","css class":"out-
+     A                                      put-field","value":{"fieldName":"Sc-
+     A                                      Group","dataLength":"3","decPos":"0-
+     A                                      ","numSep":"false","zeroBalance":"f-
+     A                                      alse","numBlankFill":"false","zeroF-
+     A                                      ill":"false","noExtraSpaces":"false-
+     A                                      ","curSym":"","dataType":"zoned","f-
+     A                                      ormatting":"Number","negNum":"-999.-
+     A                                      00","units":"","designValue":"[ScGr-
+     A                                      oup]"},"left":"10px","top":"5px","g-
+     A                                      rid":"sflStatSubmissions","column":-
+     A                                      "1"},{"id":"OutValuationMonth","fie-
+     A                                      ld type":"output field","css class"-
+     A                                      :"output-field","value":{"fieldName-
+     A                                      ":"scValMonth","dataLength":"6","de-
+     A                                      cPos":"0","numSep":"false","zeroBal-
+     A                                      ance":"false","numBlankFill":"false-
+     A                                      ","zeroFill":"false","noExtraSpaces-
+     A                                      ":"false","edtWrd":"''  /    ''","c-
+     A                                      urSym":"","dataType":"zoned","forma-
+     A                                      tting":"Number","negNum":"-999.00",-
+     A                                      "units":"","designValue":"[scValMon-
+     A                                      th]"},"text align":"right","left":"-
+     A                                      5px","top":"5px","width":"85px","gr-
+     A                                      id":"sflStatSubmissions","column":"-
+     A                                      2"},{"id":"OutSubmittedDate","field-
+     A                                       type":"output field","css class":"-
+     A                                      output-field","value":{"fieldName":-
+     A                                      "scSubmDate","dataType":"date","for-
+     A                                      matting":"Date","dateFormat":"n/j/Y-
+     A                                      ","locale":"en_US","designValue":"[-
+     A                                      scSubmDate]"},"text a')
+     A                                  1  2HTML('lign":"right","left":"10px","-
+     A                                      top":"5px","width":"95px","grid":"s-
+     A                                      flStatSubmissions","column":"3"},{"-
+     A                                      id":"OutCarrier","field type":"outp-
+     A                                      ut field","css class":"output-field-
+     A                                      ","value":{"fieldName":"scCarrier",-
+     A                                      "dataLength":"5","decPos":"0","numS-
+     A                                      ep":"false","zeroBalance":"false","-
+     A                                      numBlankFill":"false","zeroFill":"f-
+     A                                      alse","noExtraSpaces":"false","curS-
+     A                                      ym":"","dataType":"zoned","formatti-
+     A                                      ng":"Number","negNum":"-999.00","un-
+     A                                      its":"","designValue":"[scCarrier]"-
+     A                                      },"text align":"center","left":"5px-
+     A                                      ","top":"5px","width":"60px","grid"-
+     A                                      :"sflStatSubmissions","column":"4"}-
+     A                                      ,{"id":"OutReportingLevel","field t-
+     A                                      ype":"output field","css class":"ou-
+     A                                      tput-field","value":{"fieldName":"s-
+     A                                      cRptLvl","dataLength":"2","decPos":-
+     A                                      "0","numSep":"false","zeroBalance":-
+     A                                      "false","numBlankFill":"false","zer-
+     A                                      oFill":"false","noExtraSpaces":"fal-
+     A                                      se","curSym":"","dataType":"zoned",-
+     A                                      "formatting":"Number","negNum":"-99-
+     A                                      9.00","units":"","designValue":"[sc-
+     A                                      RptLvl]"},"left":"5px","top":"5px",-
+     A                                      "width":"65px","text align":"center-
+     A                                      ","grid":"sflStatSubmissions","colu-
+     A                                      mn":"5"},{"id":"OutNoOfUnit","field-
+     A                                       type":"output field","css class":"-
+     A                                      output-field","value":{"fieldName":-
+     A                                      "ScNoOfUnit","dataLength":"5","decP-
+     A                                      os":"0","numSep":"false","zeroBalan-
+     A                                      ce":"false","numBlankFill":"false",-
+     A                                      "zeroFill":"false","noExtraSpaces":-
+     A                                      "false","curSym":"","dataType":"zon-
+     A                                      ed","formatting":"Number","negNum":-
+     A                                      "-999.00","units":"","designValue":-
+     A                                      "[ScNoOfUnit]"},"left":"10px","top"-
+     A                                      :"5px","width":"55px","text align":-
+     A                                      "right","grid":"sflStatSubmissions"-
+     A                                      ,"column":"6"},{"id":"OutReportingM-
+     A                                      onth","field type":"output field","-
+     A                                      css class":"output-field","value":{-
+     A                                      "fieldName":"ScRpmy","dataLength":"-
+     A                                      5","decPos":"0","numSep":"false","z-
+     A                                      eroBalance":"false","numBlankFill":-
+     A                                      "false","zeroFill":"false","noExtra-
+     A                                      Spaces":"false","curSym":"","dataTy-
+     A                                      pe":"zoned","formatting":"Number","-
+     A                                      negNum":"-999.00","units":"","desig-
+     A                                      nValue":"[ScRpmy]"},"left":"80px","-
+     A                                      top":"5px","visibility":"hidden","g-
+     A                                      rid":"sflStatSubmissions","column":-
+     A                                      "7"}]}')
+     A            BTNCLRFLTR     1A  H
+     A            BTNENDEXCL     1A  H
+     A            BTNENDINCL     1A  H
+     A            BTNEXTRDTA     1A  H
+     A            BTNFILTER      1A  H
+     A            BTNPERACT      1A  H
+     A            BTNSFROWCL     1A  H
+     A            BTNSUBMCOR     1A  H
+     A            BTNSUBMTRE     1A  H
+     A            CHOSELACT    200A  H
+     A            CLRSTAT        1A  H
+     A            DSPSTATCTL     1A  H
+     A            DSPSTATSUB     1A  H
+     A            DSPVISB        1A  H
+     A            EXITNOW        1A  H
+     A            RRNPOSSTAT     5S 0H
+     A            RRNSTAT        5S 0H
+     A            RRNSTATROW     5S 0H
+     A            SCINMODE       1A  H
+     A            SCSELACT      30A  H
+     A          R RCDWCSRFLT
+     A                                  1  2HTML('QPUIREC9    ROVERLAY   0     -
+     A                                      RWINDOW    0     RASSUME    0     R-
+     A                                      ROWS      2    C1    1C1    1 RERRM-
+     A                                      SGID  5    C12   TxtFrmEmpGrpFMSFRM-
+     A                                      GRP  C6    WMESGGC5    *LIBLC0    F-
+     A                                      ERFRMGRP  RERRMSGID  5    C13   Val-
+     A                                      idFrmMonthFMSVALFRMMTC6    WMESGGC5-
+     A                                          *LIBLC0    FERVALFRMMTRERRMSGID-
+     A                                        5    C12   ValidToMonthFMSVALTOMT-
+     A                                       C6    WMESGGC5    *LIBLC0    FERVA-
+     A                                      LTOMT RERRMSGID  5    C10   SubFrmD-
+     A                                      ateFMSSUBFRMDTC6    WMESGGC5    *LI-
+     A                                      BLC0    FERSUBFRMDTRERRMSGID  5    -
+     A                                      C9    SubToDateFMSSUBTODT C6    WME-
+     A                                      SGGC5    *LIBLC0    FERSUBTODT ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdWCSRFlt","overlay":"true","o-
+     A                                      verlay range":"1-1","design overlay-
+     A                                       formats":"RcdWCStat","assume":"tru-
+     A                                      e","description":"WCSR Filter","sho-
+     A                                      w as window":"true"},"items":[{"id"-
+     A                                      :"PnlWCSRfilter","field type":"pane-
+     A                                      l","css class":"dialog","panel styl-
+     A                                      e":"Transform Dialog","value":"WC S-
+     A                                      tatistical Reporting Filter","left"-
+     A                                      :"290px","top":"225px","height":"25-
+     A                                      0px","width":"530px","z index":"8",-
+     A                                      "locked in place":"true"},{"id":"Lb-
+     A                                      lDisplayMsg","field type":"output f-
+     A                                      ield","css class":"output-field","v-
+     A                                      alue":"File has too many records to-
+     A                                       display. Click on Apply Filter to -
+     A                                      narrow down your search results.","-
+     A                                      left":"295px","top":"275px","height-
+     A                                      ":"20px","visibility":{"fieldName":-
+     A                                      "visWCSRFlt","customTrue":"","custo-
+     A                                      mFalse":"","dataType":"indicator","-
+     A                                      formatting":"Indicator","indFormat"-
+     A                                      :"visible / hidden"}},{"id":"Lblfil-
+     A                                      Group","field type":"output field",-
+     A                                      "css class":"output-field","descrip-
+     A                                      tion":"Group","value":"Group Range"-
+     A                                      ,"font weight":"bold","text align":-
+     A                                      "left","left":"320px","top":"320px"-
+     A                                      ,"width":"90px"},{"id":"TxtFrmEmpGr-
+     A                                      p","field type":"textbox","css clas-
+     A                                      s":"input","value":{"fieldName":"sc-
+     A                                      FrmGrp","dataLength":"3","decPos":"-
+     A                                      0","numSep":"false","zeroBalance":"-
+     A                                      false","numBlankFill":"false","zero-
+     A                                      Fill":"false","noExtraSpaces":"fals-
+     A                                      e","curSym":"","dataType":"zoned","-
+     A                                      formatting":"Number","negNum":"-999-
+     A                                      .00","units":"","designValue":"[scF-
+     A                                      rmGrp]"},"error messages":"1 messag-
+     A                                      e","left":"500px","top":"320px","wi-
+     A                                      dth":"30px","css class 2":"transfor-
+     A                                      m-textbox","tab index":"1","error m-
+     A                                      essage id":{"fieldName":"msFrmGrp",-
+     A                                      "dataLength":"10","trimLeading":"fa-
+     A                                      lse","trimTrailing":"true","blankFi-
+     A                                      ll":"false","rjZeroFill":"false","d-
+     A                                      ataType":"char","formatting":"Text"-
+     A                                      ,"textTransform":"none"},"error mes-
+     A                                      sage file":"WMESGG","error message -
+     A                                      library":"*LIBL","error condition":-
+     A                                      {"fieldName":"erFrmGrp","customTrue-
+     A                                      ":"","customFalse":"","dataType":"i-
+     A                                      ndicator","formatting":"Indicator",-
+     A                                      "indFormat":"1 / 0"},"error enhance-
+     A                                      d mode":"0"},{"id":"TxtToEmpGrp","f-
+     A                                      ield type":"textbox","css class":"i-
+     A                                      nput","value":{"fieldName":"scToGrp-
+     A                                      ","dataLength":"3","decPos":"0","nu-
+     A                                      mSep":"false","zeroBalance":"false"-
+     A                                      ,"numBlankFill":"false","zeroFill":-
+     A                                      "false","noExtraSpaces":"false","cu-
+     A                                      rSym":"","dataType":"zoned","format-
+     A                                      ting":"Number","negNum":"-999.00","-
+     A                                      units":"","designValue":"[scToGrp]"-
+     A                                      },"left":"560px","top":"320px","wid-
+     A                                      th":"30px","css class 2":"transform-
+     A                                      -textbox","tab index":"1"},{"id":"L-
+     A                                      blValidMonthRange","field type":"ou-
+     A                                      tput field","css class":"label","va-
+     A                                      lue":"Valuation Month Range","left"-
+     A                                      :"320px","top":"350px')
+     A                                  1  2HTML('","width":"145px"},{"id":"Val-
+     A                                      idFrmMonth","field type":"date fiel-
+     A                                      d","css class":"input","value":{"fi-
+     A                                      eldName":"scValFrmMt","dataLength":-
+     A                                      "8","decPos":"0","numSep":"false","-
+     A                                      zeroBalance":"false","numBlankFill"-
+     A                                      :"false","zeroFill":"false","noExtr-
+     A                                      aSpaces":"false","edtWrd":"''  /  /-
+     A                                          ''","curSym":"","dataType":"zon-
+     A                                      ed","formatting":"Number","negNum":-
+     A                                      "-999.00","units":"","designValue":-
+     A                                      "[scValFrmMt]"},"error messages":"1-
+     A                                       message","left":"500px","top":"350-
+     A                                      px","width":"70px","css class 2":"d-
+     A                                      atefield","text align":"right","tab-
+     A                                       index":"1","error message id":{"fi-
+     A                                      eldName":"msValFrmMt","dataLength":-
+     A                                      "10","trimLeading":"false","trimTra-
+     A                                      iling":"true","blankFill":"false","-
+     A                                      rjZeroFill":"false","dataType":"cha-
+     A                                      r","formatting":"Text","textTransfo-
+     A                                      rm":"none"},"error message file":"W-
+     A                                      MESGG","error message library":"*LI-
+     A                                      BL","error condition":{"fieldName":-
+     A                                      "erValFrmMt","customTrue":"","custo-
+     A                                      mFalse":"","dataType":"indicator","-
+     A                                      formatting":"Indicator","indFormat"-
+     A                                      :"1 / 0"},"error enhanced mode":"0"-
+     A                                      },{"id":"ValidToMonth","field type"-
+     A                                      :"date field","css class":"input","-
+     A                                      value":{"fieldName":"scValToMt","da-
+     A                                      taLength":"8","decPos":"0","numSep"-
+     A                                      :"false","zeroBalance":"false","num-
+     A                                      BlankFill":"false","zeroFill":"fals-
+     A                                      e","noExtraSpaces":"false","edtWrd"-
+     A                                      :"''  /  /    ''","curSym":"","data-
+     A                                      Type":"zoned","formatting":"Number"-
+     A                                      ,"negNum":"-999.00","units":"","des-
+     A                                      ignValue":"[scValToMt]"},"error mes-
+     A                                      sages":"1 message","left":"615px","-
+     A                                      top":"350px","width":"70px","css cl-
+     A                                      ass 2":"datefield","text align":"ri-
+     A                                      ght","tab index":"1","error message-
+     A                                       id":{"fieldName":"msValToMt","data-
+     A                                      Length":"10","trimLeading":"false",-
+     A                                      "trimTrailing":"true","blankFill":"-
+     A                                      false","rjZeroFill":"false","dataTy-
+     A                                      pe":"char","formatting":"Text","tex-
+     A                                      tTransform":"none"},"error message -
+     A                                      file":"WMESGG","error message libra-
+     A                                      ry":"*LIBL","error condition":{"fie-
+     A                                      ldName":"erValToMt","customTrue":""-
+     A                                      ,"customFalse":"","dataType":"indic-
+     A                                      ator","formatting":"Indicator","ind-
+     A                                      Format":"1 / 0"},"error enhanced mo-
+     A                                      de":"0"},{"id":"LblSubDateRange","f-
+     A                                      ield type":"output field","css clas-
+     A                                      s":"label","value":"Submitted Date -
+     A                                      Range","left":"320px","top":"380px"-
+     A                                      ,"width":"145px"},{"id":"SubFrmDate-
+     A                                      ","field type":"date field","css cl-
+     A                                      ass":"input","value":{"fieldName":"-
+     A                                      scSubFrmDt","dataLength":"8","decPo-
+     A                                      s":"0","numSep":"false","zeroBalanc-
+     A                                      e":"false","numBlankFill":"false","-
+     A                                      zeroFill":"false","noExtraSpaces":"-
+     A                                      false","edtWrd":"''  /  /    ''","c-
+     A                                      urSym":"","dataType":"zoned","forma-
+     A                                      tting":"Number","negNum":"-999.00",-
+     A                                      "units":"","designValue":"[scSubFrm-
+     A                                      Dt]"},"error messages":"1 message",-
+     A                                      "left":"500px","top":')
+     A                                  1  2HTML('"380px","width":"70px","css c-
+     A                                      lass 2":"datefield","text align":"r-
+     A                                      ight","tab index":"1","error messag-
+     A                                      e id":{"fieldName":"msSubFrmDt","da-
+     A                                      taLength":"10","trimLeading":"false-
+     A                                      ","trimTrailing":"true","blankFill"-
+     A                                      :"false","rjZeroFill":"false","data-
+     A                                      Type":"char","formatting":"Text","t-
+     A                                      extTransform":"none"},"error messag-
+     A                                      e file":"WMESGG","error message lib-
+     A                                      rary":"*LIBL","error condition":{"f-
+     A                                      ieldName":"erSubFrmDt","customTrue"-
+     A                                      :"","customFalse":"","dataType":"in-
+     A                                      dicator","formatting":"Indicator","-
+     A                                      indFormat":"1 / 0"},"error enhanced-
+     A                                       mode":"0"},{"id":"SubToDate","fiel-
+     A                                      d type":"date field","css class":"i-
+     A                                      nput","value":{"fieldName":"scSubTo-
+     A                                      Dt","dataLength":"8","decPos":"0","-
+     A                                      numSep":"false","zeroBalance":"fals-
+     A                                      e","numBlankFill":"false","zeroFill-
+     A                                      ":"false","noExtraSpaces":"false","-
+     A                                      edtWrd":"''  /  /    ''","curSym":"-
+     A                                      ","dataType":"zoned","formatting":"-
+     A                                      Number","negNum":"-999.00","units":-
+     A                                      "","designValue":"[scSubToDt]"},"er-
+     A                                      ror messages":"1 message","left":"6-
+     A                                      15px","top":"380px","width":"70px",-
+     A                                      "css class 2":"datefield","text ali-
+     A                                      gn":"right","tab index":"1","error -
+     A                                      message id":{"fieldName":"msSubToDt-
+     A                                      ","dataLength":"10","trimLeading":"-
+     A                                      false","trimTrailing":"true","blank-
+     A                                      Fill":"false","rjZeroFill":"false",-
+     A                                      "dataType":"char","formatting":"Tex-
+     A                                      t","textTransform":"none"},"error m-
+     A                                      essage file":"WMESGG","error messag-
+     A                                      e library":"*LIBL","error condition-
+     A                                      ":{"fieldName":"erSubToDt","customT-
+     A                                      rue":"","customFalse":"","dataType"-
+     A                                      :"indicator","formatting":"Indicato-
+     A                                      r","indFormat":"1 / 0"},"error enha-
+     A                                      nced mode":"0"},{"id":"BtnfilCancel-
+     A                                      ","field type":"button","css class"-
+     A                                      :"button","value":"Cancel","respons-
+     A                                      e":{"fieldName":"Btnfilcan","dataTy-
+     A                                      pe":"indicator","formatting":"Indic-
+     A                                      ator","indFormat":"1 / 0"},"shortcu-
+     A                                      t key":"Escape","left":"575px","top-
+     A                                      ":"430px","width":"100px","cursor":-
+     A                                      "default","tab index":"1"},{"id":"B-
+     A                                      tnfilApply","field type":"button","-
+     A                                      css class":"button","value":"Apply -
+     A                                      Filter","response":{"fieldName":"Bt-
+     A                                      nfilapp","dataType":"indicator","fo-
+     A                                      rmatting":"Indicator","indFormat":"-
+     A                                      1 / 0"},"shortcut key":"Enter","lef-
+     A                                      t":"690px","top":"430px","width":"1-
+     A                                      00px","cursor":"default","tab index-
+     A                                      ":"1"},{"id":"LblHypen","field type-
+     A                                      ":"output field","css class":"outpu-
+     A                                      t-field","value":"  -","left":"545p-
+     A                                      x","top":"320px","height":"15px","w-
+     A                                      idth":"25px"},{"id":"LblHypen_copy"-
+     A                                      ,"field type":"output field","css c-
+     A                                      lass":"output-field","value":"  -",-
+     A                                      "left":"605px","top":"350px","heigh-
+     A                                      t":"15px","width":"25px"},{"id":"Lb-
+     A                                      lHypen_copy2","field type":"output -
+     A                                      field","css class":"output-field","-
+     A                                      value":"  -","left":"605px","top":"-
+     A                                      380px","height":"15px')
+     A                                  1  2HTML('","width":"25px"}]}')
+     A            BTNFILAPP      1A  H
+     A            BTNFILCAN      1A  H
+     A            ERFRMGRP       1A  H
+     A            ERSUBFRMDT     1A  H
+     A            ERSUBTODT      1A  H
+     A            ERVALFRMMT     1A  H
+     A            ERVALTOMT      1A  H
+     A            MSFRMGRP      10A  H
+     A            MSSUBFRMDT    10A  H
+     A            MSSUBTODT     10A  H
+     A            MSVALFRMMT    10A  H
+     A            MSVALTOMT     10A  H
+     A            SCFRMGRP       3S 0H
+     A            SCSUBFRMDT     8S 0H
+     A            SCSUBTODT      8S 0H
+     A            SCTOGRP        3S 0H
+     A            SCVALFRMMT     8S 0H
+     A            SCVALTOMT      8S 0H
+     A            VISWCSRFLT     1A  H

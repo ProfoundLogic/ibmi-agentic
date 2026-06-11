@@ -1,0 +1,556 @@
+     A* (c) 2021 Sapiens. All Rights Reserved.                             *
+     A*****************************************************************
+     A* W7226O - SETTLEMENT PROCESS LETTER PRINTER FILE
+     A*****************************************************************
+     A*
+     A* PROGRAMMER: C:65          DATE CREATED: 09/26/05
+     A* PROJECT:    114WHO        CALLED FROM:  W7226R
+     A*
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 03/25/21 C:079 Project: WC2663                                *
+     A*                Invoice Cloud changes                          *
+     A*                                                               *
+     A* 11/23/10  C:255  Project: 114WVZ                              *
+     A*                  Change text Retrospective to Retention for   *
+     A*                  client 114. Indicator is used for it and it  *
+     A*                  set on in program for client 114.            *
+     A*                                                               *
+     A* 07/20/10  C:65   Project: 114WRH                              *
+     A*                  ADD OUTPUT CHANGES FOR GROUP SETTLEMENTS.    *
+     A*                                                               *
+     A* 02/16/10  C:191  Project: 25WQI PRISS #26                     *
+     A*                  SUPRESS LEADING ZEROS                        *
+     A*                                                               *
+     A* 11/19/09  C:33   Project: 25WQI                               *
+     A*                  Print Statement #.                           *
+     A*                                                               *
+     A* 05/21/09  C:220  SUPPORT:68429                                *
+     A*                  RETRO SETTLEMENT LETTER NEED CORRECTION      *
+     A*                                                               *
+     A* 08/30/07  C:193  PROJECT:114WOH                               *
+     A*                  CHANGE RETRO CALCULATION BY POLICY.          *
+     A*                                                               *
+     A*****************************************************************
+      *
+     A          R QHEAD
+     A                                      BOX(0.45 0.60 1.35 7.6 .01)
+     A                                      PAGSEG(&F2BLOG .60 5.2)
+      *
+     A            XQTITL        40          POSITION(0.4 2.36)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+      *
+      * GROUP NAME/ADDRESS
+      *
+     A            XQFNNM        60          POSITION(0.7 .80)
+     A                                      FNTCHRSET(C0H400D0 T1V10037)
+     A            XQFAD1        40          POSITION(0.9  .80)
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A            XQFAD2        40          POSITION(1.1  .80)
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A            XQFCTY        40          POSITION(1.3  .80)
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+      *
+      * POLICY INFORMATION AND NAME/ADDRESS.
+      *
+     A            XQQREF        20          POSITION(1.5 5.1)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A*** Beg Add *** 03/25/21 ****************************************
+     A            STRINV#HD     15          POSITION(1.5 .6)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            STRINV#       40          POSITION(1.5 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A*** End Add *** 03/25/21 ****************************************
+     A            XQPOL#        15          POSITION(1.5 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPERD        20          POSITION(1.65 .6)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XQPOLP        45          POSITION(1.65 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQDIVH        20          POSITION(1.65 5.61)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XQDIV          5          POSITION(1.65 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPROD        20          POSITION(1.8 5.5)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XQPRDT        20          POSITION(1.8  6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN1        50          POSITION(1.95 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     87     XQANNH        20          POSITION(1.95 5.1)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     87     XQANND        20          POSITION(1.95 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN2        50          POSITION(2.10 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQRSTH        20          POSITION(2.10 5.36)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XXST           2          POSITION(2.10 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN3        50          POSITION(2.25 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     66     XQCAPH        20          POSITION(2.25 5.37)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     66     XXCAP#        25          POSITION(2.25 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN4        50          POSITION(2.40 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     86     XQCXHD        20          POSITION(2.40 5.08)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     86     XQCXDT        20          POSITION(2.40 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN5        50          POSITION(2.55 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A***  Begin Add  ***  11/19/09  **************************************
+     A            XQSTMH        20          POSITION(2.55 &STMHV)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A*** BEGIN CHG ****** 02/16/10 ************************************
+     A**********  XQSTMD        20          POSITION(2.55 6.3)
+     A            XQSTMD        10  0       POSITION(2.55 6.3)
+     A                                      EDTCDE(3)
+     A*** END   CHG ****** 02/16/10 ************************************
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A***  End   Add  ***  11/19/09  **************************************
+     A            XXEMN6        50          POSITION(2.70 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN7        50          POSITION(2.85 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            F2BLOG         8A  P
+     A***  Begin Add  ***  11/19/09  **************************************
+     A            STMHV          5S 3P
+     A***  End   Add  ***  11/19/09  **************************************
+     A          R QPREM
+     A            XXRHD         50         5
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SKIPB(20)
+     A                                      SPACEA(1)
+     A     63                             40'Non F-Classes'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63                             60'F-Classes'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                     1'  '
+     A                                      SPACEA(1)
+     A                                     8'Policy Standard Premium:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1PRM          9  0     35EDTWRD('   ,   , $0 ')
+     A     63                             49'+'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     X1FPRM         9  0     54EDTWRD('   ,   , $0 ')
+     A     63                             68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     X1PREM         9  0     73EDTWRD('   ,   , $0 ')
+     A                                     1'  '
+     A                                      SPACEA(1)
+     A***  Beg   Chg  ***  11/23/10  **************************************
+     A*******                              8'Basic Retrospective Premium:'
+     A N71                                 8'Basic Retrospective Premium:'
+     A  71                                 8'Basic Retention Premium:'
+     A***  End   Chg  ***  11/23/10  **************************************
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X2PRM          9  0     35EDTWRD('   ,   , $0 ')
+     A                                    49'x'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            ELBSFC         5  4     54EDTCDE(3)
+     A                                    68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1BPM          9  0     73EDTWRD('   ,   , $0 ')
+     A                                      SPACEA(1)
+     A     63                             11'F-Classes'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     X2FPRM         9  0     35EDTWRD('   ,   , $0 ')
+     A     63                             49'x'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     X1BSFC         5  4     54EDTCDE(3)
+     A     63                             68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     X1FBPR         9  0     73EDTWRD('   ,   , $0 ')
+     A     63                              1'  '
+     A                                      SPACEA(2)
+     A    N63                              1'  '
+     A                                      SPACEA(1)
+     A                                     8'Open Losses:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XOLOS1         9  0     35EDTWRD('   ,   , $0 ')
+     A     63     XOFLS1         9  0     54EDTWRD('   ,   , $0 ')
+     A                                     1'  '
+     A                                      SPACEA(1)
+     A                                     8'Closed Losses:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XCLOS1         9  0     35EDTWRD('   ,   , $0 ')
+     A                                    34'_____________'
+     A     63     XCFLS1         9  0     54EDTWRD('   ,   , $0 ')
+     A     63                             53'_____________'
+     A                                     1'  '
+     A                                      SPACEA(1)
+     A                                     8'Total Losses*:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XTLOS1         9  0     35EDTWRD('   ,   , $0 ')
+     A     63     XTFLS1         9  0     54EDTWRD('   ,   , $0 ')
+     A                                     1'  '
+     A                                      SPACEA(1)
+     A                                     8'Converted Losses:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XTLOS2         9  0     35EDTWRD('   ,   , $0 ')
+     A                                    49'x'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            ELLCVF         5  4     54EDTCDE(3)
+     A                                    68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1CLOS         9  0     73EDTWRD('   ,   , $0 ')
+     A                                      SPACEA(1)
+     A     63                             11'F-Classes'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     XTFLS2         9  0     35EDTWRD('   ,   , $0 ')
+     A     63                             49'x'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     X1LCVF         5  4     54EDTCDE(3)
+     A     63                             68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     X1FCLS         9  0     73EDTWRD('   ,   , $0 ')
+     A     63                              1'  '
+     A                                      SPACEA(2)
+     A    N63                              1'  '
+     A                                      SPACEA(1)
+     A***
+     A                                     8'Excess Loss Premium:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XDELP          9  0     35EDTWRD('   ,   , $0 ')
+     A     63                             49'+'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     XDELPF         9  0     54EDTWRD('   ,   , $0 ')
+     A     63                             68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     XXELP          9  0     73EDTWRD('   ,   , $0 ')
+     A                                      SPACEA(1)
+     A    N63                              1'  '
+     A                                      SPACEA(1)
+     A***  Beg   Chg  ***  11/23/10  **************************************
+     A*******                              8'Retrospective Development Premium:'
+     A N71                                 8'Retrospective Development Premium:'
+     A  71                                 8'Retention Development Premium:'
+     A***  End   Chg  ***  11/23/10  **************************************
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XDRDP          9  0     35EDTWRD('   ,   , $0 ')
+     A     63                             49'+'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     XDRDPF         9  0     54EDTWRD('   ,   , $0 ')
+     A     63                             68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     XXRDP          9  0     73EDTWRD('   ,   , $0 ')
+     A                                      SPACEA(2)
+     A    N63                              1'  '
+     A                                      SPACEA(2)
+     A***
+     A                                     8'Total Premium:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X2CLOS         9  0     35EDTWRD('   ,   , $0 ')
+     A                                    49'+'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X2BPM          9  0     54EDTWRD('   ,   , $0 ')
+     A*****
+     A                                      SPACEA(1)
+     A            XEELP          9  0     35EDTWRD('   ,   , $0 ')
+     A                                    49'+'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XERDP          9  0     54EDTWRD('   ,   , $0 ')
+     A*****
+     A                                    68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XTTOTL         9  0     73EDTWRD('   ,   , $0 ')
+     A                                      SPACEA(1)
+     A     63                             11'F-Classes'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     X2FCLS         9  0     35EDTWRD('   ,   , $0 ')
+     A     63                             49'+'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     X2FBPR         9  0     54EDTWRD('   ,   , $0 ')
+     A********
+     A                                      SPACEA(1)
+     A     63     XEELPF         9  0     35EDTWRD('   ,   , $0 ')
+     A     63                             49'+'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     XERDPF         9  0     54EDTWRD('   ,   , $0 ')
+     A********
+     A     63                             68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     XTTOTF         9  0     73EDTWRD('   ,   , $0 ')
+     A                                      SPACEA(1)
+     A                                     8'Taxed Premium:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XUTOTL         9  0     35EDTWRD('   ,   , $0 ')
+     A                                    49'x'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            ELTAX          5  4     54EDTCDE(3)
+     A                                    68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1TOTL         9  0     73EDTWRD('   ,   , $0 ')
+     A                                      SPACEA(1)
+     A*** BEGIN ADD *** 08/30/07 **************************************
+     A    N65                              1'  '
+     A                                      SPACEA(1)
+     A*** END ADD ***** 08/30/07 **************************************
+     A     63                             11'F-Classes'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     XUTOTF         9  0     35EDTWRD('   ,   , $0 ')
+     A     63                             49'x'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     XXTAXF         5  4     54EDTCDE(3)
+     A     63                             68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     X1TOTF         9  0     73EDTWRD('   ,   , $0 ')
+     A     63                             72'_____________'
+     A                                      SPACEA(1)
+     A     63                              8'Total Taxed Premium:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     63     XSTOTL         9  0     73EDTWRD('   ,   , $0 ')
+     A                                      SPACEA(1)
+     A*** BEGIN ADD ***  07/20/10  *************************************
+     A     68                              8'Total Group Premium:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     68     XGTOTL         9  0     73EDTWRD('   ,   , $0 ')
+     A                                      SPACEA(1)
+     A*** END ADD *****  07/20/10  *************************************
+     A***  Bed   Chg  ***  11/23/10  **************************************
+     A******* 65                           8'Minimum Retrospective Premium:'
+     A N71    65                           8'Minimum Retrospective Premium:'
+     A  71    65                           8'Minimum Retention Premium:'
+     A***  End   Chg  ***  11/23/10  **************************************
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A*** BEGIN CHG *** 08/30/07 **************************************
+     A*********N64 65  X2PREM         9  0     35EDTWRD('   ,   , $0 ')
+     A    N64 65  XTPRM1         9  0     35EDTWRD('   ,   , $0 ')
+     A*** END CHG ***** 08/30/07 **************************************
+     A    N64 65                          49'x'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A    N64 65  ELMNFC         5  4     54EDTCDE(3)
+     A    N64 65                          68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A        65  X1MIN          9  0     73EDTWRD('   ,   , $0 ')
+     A                                      SPACEA(1)
+     A***  Beg   Chg  ***  11/23/10  **************************************
+     A******* 65                           8'Maximum Retrospective Premium:'
+     A N71    65                           8'Maximum Retrospective Premium:'
+     A  71    65                           8'Maximum Retention Premium:'
+     A***  End   Chg  ***  11/23/10  **************************************
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A*** BEGIN CHG *** 08/30/07 **************************************
+     A*************65  X1MAXP         9  0     35EDTWRD('   ,   , $0 ')
+     A        65  XTPRM2         9  0     35EDTWRD('   ,   , $0 ')
+     A*** END CHG ***** 08/30/07 **************************************
+     A        65                          49'x'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A        65  ELMXFC         5  4     54EDTCDE(3)
+     A        65                          68'='
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A        65  X1MAX          9  0     73EDTWRD('   ,   , $0 ')
+     A*** BEGIN ADD *** 08/30/07 **************************************
+     A                                      SPACEA(1)
+     A*** BEGIN CHG ***  07/20/10  *************************************
+     A*****65******                        8'Minimum/Maximum Adjustment:'
+     A     65N68                           8'Minimum/Maximum Adjustment:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     65 68                           8'Group Adjustment:'
+     A*** END CHG *****  07/20/10  *************************************
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A     65     XXDIFF        11  2     35EDTWRD('   ,   , $0 .  CR')
+     A     65                             34'__________________'
+     A*** END ADD ***** 08/30/07 **************************************
+     A                                      SPACEA(2)
+     A***  Beg   Chg  ***  11/23/10  **************************************
+     A*********                            8'Retrospective Premium:'
+     A N71                                 8'Retrospective Premium:'
+     A  71                                 8'Retention Premium:'
+     A***  End   Chg  ***  11/23/10  **************************************
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1AMT         11  2     35EDTWRD('   ,   , $0 .  ')
+     A                                      SPACEA(1)
+     A                                     8'Terrorism Charges/Expense Cnst:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1AMTD        11  2     35EDTWRD('   ,   , $0 .  ')
+     A                                    34'________________'
+     A                                      SPACEA(1)
+     A***  Beg   Chg  ***  11/23/10  **************************************
+     A********                             8'Total Retrospective Premium:'
+     A N71                                 8'Total Retrospective Premium:'
+     A  71                                 8'Total Retention Premium:'
+     A***  End   Chg  ***  11/23/10  **************************************
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1AMTT        11  2     35EDTWRD('   ,   , $0 .  ')
+     A                                      SPACEA(1)
+     A                                     8'Prior Billed Premium:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1ARAM        11  2     35EDTWRD('   ,   , $0 .  ')
+     A                                    34'________________'
+     A                                      SPACEA(1)
+     A                                     8'Difference:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1AR          11  2     35EDTWRD('   ,   , $0 .  CR')
+     A                                      SPACEA(2)
+     A                                     8'See attached premium notic+
+     A                                       e for account balance.'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(2)
+     A***  Beg   Chg  ***  11/23/10  **************************************
+     A****N56******                        8'This is the current calcul+
+     A*************                          ation of your retrospectiv+
+     A*************                          e premium.  As there are c+
+     A*************                          laims still open as of the +
+     A*************                          printing of this'
+     A*************                         FNTCHRSET(C0H40090 T1V10037)
+     A*************                         SPACEA(1)
+     A****N56******                        8'settlement this calculatio+
+     A*************                          n is not finalized.  Retro+
+     A*************                          spective premium will be r+
+     A*************                          calculated in twelve month+
+     A*************                          s unless an'
+     A*************                         FNTCHRSET(C0H40090 T1V10037)
+     A*************                         SPACEA(1)
+     A****N56******                        8'agreement is reached to co+
+     A*************                          nsider this the final sett+
+     A*************                          lement.'
+     A*************                         FNTCHRSET(C0H40090 T1V10037)
+     A*************                         SPACEA(2)
+     A*****56******                        8'This is the final calculat+
+     A*************                          ion of your retrospective +
+     A*************                          premium.  As there are no +
+     A*************                          claims still open as of th+
+     A*************                          e printing of'
+     A*************                         FNTCHRSET(C0H40090 T1V10037)
+     A*************                         SPACEA(1)
+     A*****56******                        8'this settlement the calcul+
+     A*************                          ation is determined to be +
+     A*************                          finalized.  No further cha+
+     A*** BEG CHG ***** 05/21/09 **************************************
+     A*************                          ges in the retrospective p+
+     A*************                          remium will'
+     A*************                          nges in the retrospective +
+     A*************                          premium will'
+     A*** END CHG ***** 05/21/09 **************************************
+     A*************                         FNTCHRSET(C0H40090 T1V10037)
+     A*************                         SPACEA(1)
+     A*****56******                        8'occur except in the case o+
+     A*************                          f clerical error, a change +
+     A*************                          of status on a closed clai+
+     A*************                          m, or a revision of standa+
+     A*************                          rd premium.'
+     A*************                         FNTCHRSET(C0H40090 T1V10037)
+     A*************                         SPACEA(2)
+     A N71N56                              8'This is the current calcul+
+     A                                       ation of your retrospectiv+
+     A                                       e premium.  As there are c+
+     A                                       laims still open as of the +
+     A                                       printing of this'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(1)
+     A N71N56                              8'settlement this calculatio+
+     A                                       n is not finalized.  Retro+
+     A                                       spective premium will be r+
+     A                                       calculated in twelve month+
+     A                                       s unless an'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(1)
+     A  71N56                              8'This is the current calcul+
+     A                                       ation of your retention +
+     A                                       premium.  As there are c+
+     A                                       laims still open as of the +
+     A                                       printing of this'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(1)
+     A  71N56                              8'settlement this calculatio+
+     A                                       n is not finalized.  Reten+
+     A                                       tion premium will be recal+
+     A                                       culated in twelve months +
+     A                                       unless an'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(1)
+     A    N56                              8'agreement is reached to co+
+     A                                       nsider this the final sett+
+     A                                       lement.'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(2)
+     A N71 56                              8'This is the final calculat+
+     A                                       ion of your retrospective +
+     A                                       premium.  As there are no +
+     A                                       claims still open as of th+
+     A                                       e printing of'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(1)
+     A N71 56                              8'this settlement the calcul+
+     A                                       ation is determined to be +
+     A                                       finalized.  No further cha+
+     A                                       nges in the retrospective +
+     A                                       premium will'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(1)
+     A  71 56                              8'This is the final calculat+
+     A                                       ion of your retention prem+
+     A                                       ium.  As there are no clai+
+     A                                       ms still open as of the +
+     A                                       printing of'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(1)
+     A  71 56                              8'this settlement the calcul+
+     A                                       ation is determined to be +
+     A                                       finalized.  No further cha+
+     A                                       nges in the retention prem+
+     A                                       ium will'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(1)
+     A     56                              8'occur except in the case o+
+     A                                       f clerical error, a change +
+     A                                       of status on a closed clai+
+     A                                       m, or a revision of standa+
+     A                                       rd premium.'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(2)
+     A***  End   Chg  ***  11/23/10  **************************************
+     A                                     8'*Incurred losses are valued as of'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XQLVDT        20        32
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A*** Beg Chg *** 03/25/21 ****************************************
+     A***************************           SPACEA(1)
+     A                                      SPACEA(2)
+     A*** End Chg *** 03/25/21 ****************************************
+     A*** Beg Add *** 03/25/21 ****************************************
+     A  76        STR3RDVRB    100         8
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SPACEA(2)
+     A*** End Add *** 03/25/21 ****************************************
+     A          R QFOOT
+     A                                     5'Serviced by:'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SKIPB(59)
+     A            XQCONM        40        17
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXAHDR        16        52
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1PRNM        45        66
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEA(1)
+     A            XQCOM1        50        17
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQAGNM        45        66
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEA(1)
+     A            XQCOM2        50        17
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            AADD1         34        66
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEA(1)
+     A            XQCOM3        50        17
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            ACSZ          34        66
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1'  '
+     A                                      SPACEA(1)
+     A            XQCOM4        50        17
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     69     XQAPHN        20        66
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1'  '
+     A                                      SPACEA(1)
+     A            XXPAGH        15        88
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+      *

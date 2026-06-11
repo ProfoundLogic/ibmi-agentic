@@ -1,0 +1,202 @@
+      *  (C) COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC. 1992 - 1997
+      *
+      *  NMPHP - Professional/Physician additional info
+      *****************************************************************
+      *                                                               *
+      *  REVISIONS:                                                   *
+      *                                                               *
+      *  09/18/97 C:61 PROJECT 87MAU                                  *
+      *                This file will now be used to only store the   *
+      *                additional information on a professional       *
+      *                provider.                                      *
+      *              - Add new fields:                                *
+      *                   PHITIM  - Initial Time                      *
+      *                   PHIPGRM - Initial Program                   *
+      *              - Following fields NOT USED.                     *
+      *                   PHDRL, PHDRF, PHDRMI, PHDRTI, PHPARN        *
+      *                   PHSPCD, PHOFCT, PHOAD1, PHOAD2, PHOCTY,     *
+      *                   PHOST, PHOZIP, PHOZSF, PHOPAR, PHOPH#,      *
+      *                   PHOFAR, PHOF#, PHBAF, PHB1A1, PHB1A2,       *
+      *                   PHB1CY, PHB1ST, PHB1ZP, PHB1ZS, PHB1AR,     *
+      *                   PHB1PH, PHNEDT, PHNXDT, PHFEEC, PHDTCD,     *
+      *                   PHFSFL, PHFL01-10, PH10A1-5, PH6N1-5,       *
+      *                   PHNWCD                                      *
+      *                                                               *
+      *  03/09/94  C:20  REQ/PROJ: 98/NW001                           *
+      *                  1. ADDED PHFL01-10, PH10A1-A5, PH6N1-5       *
+      *                     PHNWCD FOR MULTIPLE PPO PROCESSING        *
+      *                                                               *
+      *  11/01/89 LJD - PER KK/007                                    *
+      *  PROJ # I0012   ADD MANUAL FEE SCHEDULE FLAG                  *
+      *                                                               *
+      *                                                               *
+      *****************************************************************
+     A                                      REF(FSREFP)
+     A          R PPH01                     TEXT('PHYSICIANS MASTER')
+     A            PHFEIN    R               REFFLD(FEIN) COLHDG('PHYSIC FEIN #')
+     A            PHFMOD    R               REFFLD(MOD) COLHDG('PHY FE IN MOD#')
+     A            PHDRL     R               REFFLD(NM20) COLHDG('NOT USED')
+     A            PHDRF     R               REFFLD(NM20) COLHDG('NOT USED')
+     A            PHDRMI    R               REFFLD(MID)  COLHDG('NOT USED')
+     A            PHDRTI    R               REFFLD(DS25) COLHDG('NOT USED')
+     A            PHDRL#    R               REFFLD(LIC#) COLHDG('DR LICENSE #')
+     A            PHDRYL    R               REFFLD(YR)  COLHDG('DR YR LICENSED')
+     A            PHDRLE    R               REFFLD(DT)  COLHDG('DR LICENSE EXP')
+     A            PHIME     R               REFFLD(FLAG) COLHDG('IME Y/N')
+     A            PHIMC1    R               REFFLD(DS60) COLHDG('IME CMTS #1')
+     A            PHIMC2    R               REFFLD(DS60) COLHDG('IME CMTS #2')
+     A            PHPARN    R               REFFLD(FLAG) COLHDG('NOT USED')
+     A            PHPAYN    R               REFFLD(FLAG) COLHDG('P.A. Y/N')
+     A            PHPHYG    R               REFFLD(NAME) COLHDG('PHYSIC GROUP')
+     A            PHICT1    R               REFFLD(DS60) COLHDG('COMMENTS #1')
+     A            PHICT2    R               REFFLD(DS60) COLHDG('COMMENTS #2')
+     A            PHDOB     R               REFFLD(DT)   COLHDG('DATE OF BIRTH')
+     A            PHSS#     R               REFFLD(SS#)  COLHDG('SOCIAL SEC #')
+     A            PHMEDS    R               REFFLD(DS25) COLHDG('MED SCHOOL')
+     A            PHDEG     R               REFFLD(DS20) COLHDG('DEGREE')
+     A            PHYRGR    R               REFFLD(YR)  COLHDG('YEAR GRADUATED')
+     A            PHRES     R               REFFLD(DS25) COLHDG('RESIDENCY')
+     A            PHSPCD    R               REFFLD(CODE) COLHDG('NOT USED')
+     A            PHSSCD    R               REFFLD(CODE) COLHDG('SUB SPEC CODE')
+     A            PHBC1     R               REFFLD(DS40) COLHDG('BOARD CERT 1')
+     A            PHBC2     R               REFFLD(DS40) COLHDG('BOARD CERT 2')
+     A            PHELI1    R               REFFLD(DS40) COLHDG('ELIGIBILITY 1')
+     A            PHELI2    R               REFFLD(DS40) COLHDG('ELIGIBILITY 2')
+     A            PHDEA#    R               REFFLD(A10#) COLHDG('DEA NUMBER')
+     A            PHDEAE    R               REFFLD(DT)   COLHDG('DEA EXP DATE')
+     A            PHPRSG    R               REFFLD(FLAG) COLHDG('PRACT SOLO/GP')
+     A            PHGPN1    R               REFFLD(NAME) COLHDG('GROUP NAME #1')
+     A            PHOFCT    R               REFFLD(CNTY) COLHDG('NOT USED')
+     A            PHOFNM    R               REFFLD(NAME) COLHDG('OFFICE NAME')
+     A            PHOAD1    R               REFFLD(ADR1) COLHDG('NOT USED')
+     A            PHOAD2    R               REFFLD(ADR2) COLHDG('NOT USED')
+     A            PHOCTY    R               REFFLD(CTY)  COLHDG('NOT USED')
+     A            PHOST     R               REFFLD(ST)   COLHDG('NOT USED')
+     A            PHOZIP    R               REFFLD(ZIP1) COLHDG('NOT USED')
+     A            PHOZSF    R               REFFLD(ZIP2) COLHDG('NOT USED')
+     A            PHOPAR    R               REFFLD(AREA) COLHDG('NOT USED')
+     A            PHOPH#    R               REFFLD(PHN#) COLHDG('NOT USED')
+     A            PHOFAR    R               REFFLD(AREA) COLHDG('NOT USED')
+     A            PHOF#     R               REFFLD(PHN#) COLHDG('NOT USED')
+     A            PHOML     R               REFFLD(NM20) COLHDG('OFF MGR LAST')
+     A            PHOMF     R               REFFLD(NM20) COLHDG('OF MGR 1ST')
+     A            PHMONO    R               REFFLD(TIMEHM) COLHDG('MON. OPEN')
+     A            PHMONC    R               REFFLD(TIMEHM) COLHDG('MON. CLOSE')
+     A            PHTUEO    R               REFFLD(TIMEHM) COLHDG('TUES. OPEN')
+     A            PHTUEC    R               REFFLD(TIMEHM) COLHDG('TUES. CLOSE')
+     A            PHWEDO    R               REFFLD(TIMEHM) COLHDG('WED. OPEN')
+     A            PHWEDC    R               REFFLD(TIMEHM) COLHDG('WED. CLOSE')
+     A            PHTHUO    R               REFFLD(TIMEHM) COLHDG('THUR. OPEN')
+     A            PHTHUC    R               REFFLD(TIMEHM) COLHDG('THUR. CLOSE')
+     A            PHFRIO    R               REFFLD(TIMEHM) COLHDG('FRI. OPEN')
+     A            PHFRIC    R               REFFLD(TIMEHM) COLHDG('FRI. CLOSE')
+     A            PHSATO    R               REFFLD(TIMEHM) COLHDG('SAT. OPEN')
+     A            PHSATC    R               REFFLD(TIMEHM) COLHDG('SAT. CLOSE')
+     A            PHSUNO    R               REFFLD(TIMEHM) COLHDG('SUN. OPEN')
+     A            PHSUNC    R               REFFLD(TIMEHM) COLHDG('SUN. CLOSE')
+     A            PHBAF     R               REFFLD(FLAG) COLHDG('NOT USED')
+     A            PHB1A1    R               REFFLD(ADR1) COLHDG('NOT USED')
+     A            PHB1A2    R               REFFLD(ADR2) COLHDG('NOT USED')
+     A            PHB1CY    R               REFFLD(CTY)  COLHDG('NOT USED')
+     A            PHB1ST    R               REFFLD(ST)   COLHDG('NOT USED')
+     A            PHB1ZP    R               REFFLD(ZIP1) COLHDG('NOT USED')
+     A            PHB1ZS    R               REFFLD(ZIP2) COLHDG('NOT USED')
+     A            PHB1AR    R               REFFLD(AREA) COLHDG('NOT USED')
+     A            PHB1PH    R               REFFLD(PHN#) COLHDG('NOT USED')
+     A            PHGPN2    R               REFFLD(NAME) COLHDG('GROUP NAME #2')
+     A            PHHSP1    R               REFFLD(HSP) COLHDG('HP STF  PRIV 1')
+     A            PHHF#1    R               REFFLD(FEIN) COLHDG('HP FEIN # 1')
+     A            PHHFM1    R               REFFLD(MOD)  COLHDG('HP FEIN MOD 1')
+     A            PHPS1     R               REFFLD(STAT) COLHDG('PRIV STAT 1')
+     A            PHHSP2    R               REFFLD(HSP) COLHDG('HP STF  PRIV 2')
+     A            PHHF#2    R               REFFLD(FEIN) COLHDG('HP FEIN # 2')
+     A            PHHFM2    R               REFFLD(MOD)  COLHDG('HP FEIN MOD 2')
+     A            PHPS2     R               REFFLD(STAT) COLHDG('PRIV STAT 2')
+     A            PHHSP3    R               REFFLD(HSP) COLHDG('HP STF  PRIV 3')
+     A            PHHF#3    R               REFFLD(FEIN) COLHDG('HP FEIN # 3')
+     A            PHHFM3    R               REFFLD(MOD)  COLHDG('HP FEIN MOD 3')
+     A            PHPS3     R               REFFLD(STAT) COLHDG('PRIV STAT 3')
+     A            PHHSP4    R               REFFLD(HSP) COLHDG('HP STF  PRIV 4')
+     A            PHHF#4    R               REFFLD(FEIN) COLHDG('HP FEIN #4')
+     A            PHHFM4    R               REFFLD(MOD)  COLHDG('HP FEIN MOD 4')
+     A            PHPS4     R               REFFLD(STAT) COLHDG('PRIV STAT 4')
+     A            PHHSP5    R               REFFLD(HSP) COLHDG('HP STF  PRIV 5')
+     A            PHHF#5    R               REFFLD(FEIN) COLHDG('HP FEIN #5')
+     A            PHHFM5    R               REFFLD(MOD)  COLHDG('HP FEIN MOD 5')
+     A            PHPS5     R               REFFLD(STAT) COLHDG('PRIV STAT 5')
+     A            PHCOM1    R               REFFLD(DS60) COLHDG('COMMENT #1')
+     A            PHCOM2    R               REFFLD(DS60) COLHDG('COMMENT #2')
+     A            PHNEDT    R               REFFLD(DT)   COLHDG('NOT USED')
+     A            PHNXDT    R               REFFLD(DT)   COLHDG('NOT USED')
+     A            PHFEEC    R               REFFLD(A92)  COLHDG('NOT USED')
+     A            PHDTCD    R               REFFLD(SPEC) COLHDG('NOT USED')
+     A            PHPLC     R               REFFLD(NAME) COLHDG('PROFIT LIAB')
+     A            PHLIM1    R               REFFLD(A92)  COLHDG('LIMIT 1')
+     A            PHLIM2    R               REFFLD(A92)  COLHDG('LIMIT 2')
+     A            PHLIM3    R               REFFLD(A92)  COLHDG('LIMIT 3')
+     A            PHPOL#    R               REFFLD(DS20) COLHDG('POLICY #')
+     A            PHEXDT    R               REFFLD(DT)   COLHDG('EXPIRATION DT')
+     A            PHDED     R               REFFLD(A92)  COLHDG('DEDUCTABLE')
+     A            PHSTAT    R               REFFLD(STAT)
+     A            PHUSER    R               REFFLD(USER)
+     A            PHPGM     R               REFFLD(PGM)
+     A            PHTIME    R               REFFLD(TIME)
+     A            PHDT      R               REFFLD(DT)
+     A            PHIUSR    R               REFFLD(USER) COLHDG('RECORD' +
+                                            'CREATED BY')
+     A            PHIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL ENTRY DATE')
+     A*** BEGIN ADD *** 11/01/89 ******************************************
+     A            PHFSFL    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A*** END ADD ***** 11/01/89 ******************************************
+     A*** BEGIN ADD *** 03/09/94 ******************************************
+     A* FLAG FIELDS
+     A            PHFL01    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A*                                     SYSTEM TYPE FOR DISCOUNT CODE P OR H
+     A            PHFL02    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            PHFL03    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            PHFL04    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            PHFL05    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            PHFL06    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            PHFL07    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            PHFL08    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            PHFL09    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            PHFL10    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A* 10 ALPHA FIELDS
+     A            PH10A1    R               REFFLD(DS10) COLHDG('NOT USED')
+     A            PH10A2    R               REFFLD(DS10) COLHDG('NOT USED')
+     A            PH10A3    R               REFFLD(DS10) COLHDG('NOT USED')
+     A            PH10A4    R               REFFLD(DS10) COLHDG('NOT USED')
+     A            PH10A5    R               REFFLD(DS10) COLHDG('NOT USED')
+     A* 6.0 NUMERIC FIELDS
+     A            PH6N1     R               REFFLD(A60)
+     A                                      COLHDG('NOT USED')
+     A            PH6N2     R               REFFLD(A60)
+     A                                      COLHDG('NOT USED')
+     A            PH6N3     R               REFFLD(A60)
+     A                                      COLHDG('NOT USED')
+     A            PH6N4     R               REFFLD(A60)
+     A                                      COLHDG('NOT USED')
+     A            PH6N5     R               REFFLD(A60)
+     A                                      COLHDG('NOT USED')
+     A*
+     A            PHNWCD    R               REFFLD(NWCD)
+     A                                      COLHDG('NOT USED')
+     A*** END ADD *** 03/09/94 ********************************************
+      ***** BEG ADD ******* 09/18/97 **********************************
+     A            PHITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL' 'TIME')
+     A            PHIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL' 'PROGRAM')
+      ***** END ADD ******* 09/18/97 **********************************

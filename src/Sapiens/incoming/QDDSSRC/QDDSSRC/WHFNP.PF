@@ -1,0 +1,122 @@
+     A* (C) Copyright Fiserv, Inc., 2001 - 2007
+     A*
+     A* WC WAREHOUSE GROUP MASTER
+     A****************************************************************
+     A*  CREATED: 04.06.00   C:03     PROJECT: WC924
+     A****************************************************************
+     A*
+     A* REVISIONS:
+     A*
+     A* 04/30/10  C:189 PROJECT: 139DMP
+     A*                - Add NCCI  Carrier ID for CICENTER
+     A*
+     A*                                                              *
+     A* 07/20/07  C:132 PROJECT: 135DJB                              *
+     A*                - Add WMREP/RERGN#, WMREP/REDESC to output    *
+     A*                 file WHPRP before As Of Date field           *
+     A*
+     A* 05/30/02  C:132 PROJECT WC924
+     A*                - Change Carrier ID from Number to Alpha Field
+     A*
+     A* 08/07/01  C:132 PROJECT WC924
+     A*                - Add Phone Number & FAX Number Fields
+     A*
+     A* 02/06/01  C:61  PROJECT WC924
+     A*                - Change CarrierID from 3 to 10
+     A*
+     A*   C:58 5.15.00  ADD field: FNAODT - Data AS OF date.
+     A*
+     A****************************************************************
+     A                                      REF(WREFP)
+     A          R PFN01                     TEXT('CLAIM MASTER FILE')
+      *
+      *  WMFNP->FNFND
+     A****** BEG CHG ***** 02/06/01 **********************************
+     A**********  FNFND          3S 0
+     A****** BEG CHG ***** 05/30/02 **********************************
+     A********    FNFND         10S 0
+      *  WMFNP->FNCO# + FNFND
+     A            FNFND         10A
+     A****** END CHG ***** 05/30/02 **********************************
+     A****** END CHG ***** 02/06/01 **********************************
+     A                                      COLHDG('Carrier ID')
+      *  WMFNP->FNNAME
+     A            FNNAME        60A
+     A                                      COLHDG('Name')
+      *  WMFNP->FNSHNM
+     A            FNSHNM        30A
+     A                                      COLHDG('Fund' 'Short' 'Name')
+      *  WMFNP->FNMAD1
+     A            FNMAD1        50A
+     A                                      COLHDG('Mailing' 'Address 1')
+      *  WMFNP->FNMAD2
+     A            FNMAD2        50A
+     A                                      COLHDG('Mailing' 'Address 2')
+      *  WMFNP->FNMCTY
+     A            FNMCTY        25A
+     A                                      COLHDG('Mailing' 'City')
+      *  WMFNP->FNMST
+     A            FNMST          2A
+     A                                      COLHDG('Mailing' 'State')
+      *  WMFNP->FNMZIP
+     A            FNMZIP        10A
+     A                                      COLHDG('Mailing' 'Zip Code')
+      *  WMFNP->FNPAD1
+     A            FNPAD1        50A
+     A                                      COLHDG('Physical' 'Address 1')
+      *  WMFNP->FNPAD2
+     A            FNPAD2        50A
+     A                                      COLHDG('Physical' 'Address 2')
+      *  WMFNP->FNPCTY
+     A            FNPCTY        25A
+     A                                      COLHDG('Physical' 'City')
+      *  WMFNP->FNPST
+     A            FNPST          2A
+     A                                      COLHDG('Physical' 'State')
+      *  WMFNP->FNPZIP
+     A            FNPZIP        10A
+     A                                      COLHDG('Physical' 'Zip Code')
+      *  WMFNP->FNCO#
+     A            FNCO#          3S 0
+     A                                      COLHDG('Owner Code')
+     A*** BEGIN ADD *** 08/07/01 **************************************
+     A*  Phone & FAX Number - Left Aligned-Trailing Blanks
+     A* WMFNP==>FNAREA & PHN#
+     A            FNPHN         20          TEXT('Insured phone #')
+     A                                      COLHDG('Phone #')
+     A* WMFNP==>FNFAXA & FAX#
+     A            FNFAX         20          TEXT('Insured FAX#')
+     A                                      COLHDG('FAX#')
+     A*** END ADD ***** 08/07/01 **************************************
+     A*
+     A***** BEG ADD ***** 07/20/07 ************************************
+     A* WMREP/RERGN# ==> WHFNF/FNRGN#
+     A* Group Region Number
+     A            FNRGN#         3S 0       TEXT('Group Region Number')
+     A                                      COLHDG('Region' 'Number')
+     A* WMREP/REDESC ==> WHFNF/FNRGND
+     A* Group Region Description
+     A            FNRGND        30          TEXT('Group Region Description')
+     A                                      COLHDG('Grp Region' 'Descriptn')
+     A***** END ADD ***** 07/20/07 ************************************
+     A*** BEGIN ADD *** 04/30/10 **************************************
+     A*  WDF2P/ F2CAR#==>WHFNF/FNCAR#
+     A            FNCAR#    R     S         REFFLD(CLAS)
+     A                                      TEXT('NCCI Carrier ID')
+     A                                      COLHDG('NCCI Carrier ID')
+     A*** END ADD ***** 04/30/10 **************************************
+     A*
+     A*** BEGIN ADD *** 05/15/00 **************************************
+     A*  TIME: DSDATE ==>
+     A            FNAODT        10          TEXT('Data as of date')
+     A                                      COLHDG('As Of Date')
+     A*** END ADD ***** 05/15/00 **************************************
+     A* ============================================================ *
+     A*
+     A*  NOTE: ANY FIELDS ADDED TO THIS FILE NEED TO BE ADDED IN
+     A*        FRONT OF THE AS OF DATE FIELD AT END OF THE FILE -
+     A*        OR THIS COULD CAUSE RECORDS TO BE MISSED/SKIPPED
+     A*        DURING THE IMPORT PROCESS AFTER THE EXTRACT IS RUN.
+     A*
+     A* ============================================================ *
+      *

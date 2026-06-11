@@ -1,0 +1,73 @@
+     A*  (C) Copyright Progressive Data Solutions Inc., 1997
+     A*
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CSREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A          R SCR01S                    SFL
+     A            SCSEL     R        B 10  3REFFLD(FLAG)
+     A                                      TEXT('Selection Field')
+     A N06                                  DSPATR(CS)
+     A N06                                  DSPATR(UL)
+     A  20                                  DSPATR(RI)
+     A  20                                  DSPATR(PC)
+     A            SCDTYP    R        O 10 12REFFLD(DTYP)
+     A                                      TEXT('Injury Type')
+     A            SCDESC    R        O 10 23REFFLD(DS20)
+     A                                      TEXT('Description')
+     A            SCSTAT    R        O 10 61REFFLD(STAT)
+     A                                      TEXT('Status')
+     A          R SCR01C                    SFLCTL(SCR01S)
+     A*  91/03/18  08:15:02    LDAPPER     REL-R02M00  5728-PW1
+     A                                      CHGINPDFT
+     A                                      SFLSIZ(0999)
+     A                                      SFLPAG(0013)
+     A                                      TEXT('Subfile Control for CUSTOM GR-
+     A                                      OUP MAINT.')
+     A                                      SETOF(20)
+     A                                      ROLLUP(18)
+     A                                      CF12
+     A                                      OVERLAY
+     A  01                                  SFLDSP
+     A  01                                  SFLDSPCTL
+     A  02                                  SFLINZ
+     A  03                                  SFLDLT
+     A  04                                  SFLCLR
+     A  05                                  SFLEND
+     A  20                                  SFLMSGID(CSM0507 *LIBL/CSMESG)
+     A  32 18                               SFLMSGID(CPF5203 *LIBL/QCPFMSG)
+     A            #@$2           3S 0H      SFLRCDNBR(CURSOR)
+     A            SCFILE    R        O  1  3REFFLD(FLE)
+     A                                  1 30'Claim Scan System'
+     A                                      DSPATR(HI)
+     A            SCRECF    R        O  1 71REFFLD(RECF)
+     A                                  2 26'Disability Type Table Search'
+     A                                  3  2'Disability Type:'
+     A            SCUDTY    R        B  3 20REFFLD(DTYP)
+     A                                      TEXT('User Selected Injury Type')
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                  5  2'Type option, press Enter.'
+     A                                  6  4'1=Select'
+     A                                  9  2'Opt      Type        Description  -
+     A                                                             Status      -
+     A                                               '
+     A                                      DSPATR(HI)
+     A                                  8  9'Disability'
+     A                                      DSPATR(HI)
+     A          R SCR01
+     A*  91/01/08  07:50:26    MGELDERT    REL-R02M00  5728-PW1
+     A                                      OVERLAY
+     A                                 24  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 24 30'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

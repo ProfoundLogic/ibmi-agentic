@@ -1,0 +1,190 @@
+     A*%%TS  SD  19980603  092818  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   ADDITIONAL INSURED MAINTENANCE DISPLAY                   **
+     A**                                                            **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF01
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*
+     A          R SCR01
+     A*%%TS  SD  19980603  092818  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      CF02
+     A                                      CF05
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0130F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A                                  3 26'ADDITIONAL INTEREST NUMBERING'
+     A                                      DSPATR(HI)
+     A                                  9 21'Policy number:'
+     A            SCPOL#    R        O  9 38REFFLD(POL#)
+     A                                      TEXT('policy number')
+     A                                      DSPATR(HI)
+     A                                 11 21'Additional'
+     A                                 11 32'Int:'
+     A            SCADI     R        B 11 38REFFLD(ADI)
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 22  2'F1=Exit'
+     A                                      COLOR(BLU)
+     A                                 22 13'F2=Previous '
+     A                                      COLOR(BLU)
+     A                                 22 32'F5=Additional interest search'
+     A                                      COLOR(BLU)
+     A*
+     A          R SCR02
+     A*%%TS  SD  19980603  092818  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      CF02
+     A                                      CF03
+     A                                      CF05
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A N40                                  CF20
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0130F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A                                  3 23'ADDITIONAL INTEREST DESCRIPTION EN-
+     A                                      TRY'
+     A                                      DSPATR(HI)
+     A            SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  4  2'Policy number:'
+     A            SCPOL#    R     A  O  4 18REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  4 34'Additional Interest Cd:'
+     A            SCADI     R     A  O  4 58REFFLD(ADI)
+     A                                      DSPATR(HI)
+     A                                  5 63'Status:'
+     A            SCSTAT    R        O  5 72REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                  8  2'Name:'
+     A            SCNAME    R     A  B  8 19REFFLD(NM60)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('NAME')
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 10  2'Address'
+     A                                 10 10'Line'
+     A                                 10 15'1:'
+     A                                 12  2'Address'
+     A                                 12 10'Line'
+     A                                 12 15'2:'
+     A            SCADR2    R     A  B 12 19REFFLD(ADR2)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCADR1    R     A  B 10 19REFFLD(ADR1)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('ADDRESS LINE 1')
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 14  2'City:'
+     A            SCCTY     R     A  B 14 19REFFLD(CTY)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('CITY')
+     A  22                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 14 47'State:'
+     A            SCST      R     A  B 14 54REFFLD(ST)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('STATE')
+     A  23                                  ERRMSGID(CCR0505 *LIBL/CMESGG)
+     A                                 14 58'ZIP:'
+     A                                 16  2'Additional'
+     A                                 16 13'Interest'
+     A                                 16 22'Type:'
+     A            SCIN      R     A  B 16 29REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('FLAG')
+     A  25                                  ERRMSGID(CCR0590 *LIBL/CMESGG)
+     A                                 16 44'Applies to Entire Policy Y/N:'
+     A            SCAEP     R        B 16 74REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('Applies to entire policy Y/N')
+     A  27                                  ERRMSGID(CCR0513 *LIBL/CMESGG)
+     A                                 17  2'Notice Required (Y/N)'
+     A            SCNOR     R     A  B 17 25REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('FLAG')
+     A  26                                  ERRMSGID(CCR0513 *LIBL/CMESGG)
+     A                                 18  2'Number of Days:'
+     A            SCNOD     R     S  B 18 20REFFLD(DAYS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 20  2'Comments'
+     A            SCCOMM    R     A  B 21  2REFFLD(COMM)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCZIP1    R        B 14 64REFFLD(ZIP1)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A                                      TEXT('ZIP 1')
+     A  24                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A            SCZIP2    R        B 14 71REFFLD(ZIP2)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      TEXT('ZIP 2')
+     A                                 23  2'F1=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 15'F2=Previous    '
+     A                                      COLOR(BLU)
+     A                                 23 41'F3=Restart'
+     A                                      COLOR(BLU)
+     A                                 23 59'F5=Global search'
+     A                                      COLOR(BLU)
+     A N40                             24  2'F20=Change status'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A*
+     A            SCERR     R        I  3  3REFFLD(FLAG *LIBL/SREFP)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)
+     A          R SCR03
+     A          R SCR001

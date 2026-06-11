@@ -1,0 +1,193 @@
+     A** (C) COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC. 2005
+     A**
+     A** BILLING RATE/DISCOUNT MASTER FILE
+     A*****************************************************************
+     A*                                                               *
+     A* SYSTEM S1 USES THE FOLLOWING FIELDS:                          *
+     A*   BDCODE, BDEFDT, BDSTAT, BDCOM1, BDCOM2, BDPC25 = '2',       *
+     A*   BDAM01, BDTYPE, BDRCDT = 'B', BDUSER, BDPGM, BDDT, BDTIME,  *
+     A*   BDIUSR                                                      *
+     A*                                                               *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 04/08/11  C:251  PROJECT: 114MWT                              *
+     A*                  ADD COMMENT 3                                *
+     A*                                                               *
+     A* 03/21/05  C:062  PROJECT: 114MJD                              *
+     A*                  ADD MADIGAN RATE CODE                        *
+     A*                                                               *
+     A* 10/20/03  C:062  PROJECT: NW077                               *
+     A*                  ADD SKIP DENIED LINE FLAG                    *
+     A*                                                               *
+     A* 10/24/02  C:062  PROJECT: NW074                               *
+     A*                  ADD LEAVE MRA ALONE FLAG                     *
+     A*                                                               *
+     A* 07/10/02  C:062  PROJECT: NW074                               *
+     A*                  ADD DISCOUNT TO MRA OTHER OTHER2 AND NETWORK *
+     A*                  FLAGS AS WELL AS OTHER1 & 2 STATUS CODES     *
+     A*                                                               *
+     A* 08/07/00  C:062  PROJECT: 65MAL                               *
+     A*                  ADD REVISED COMMENTS FOR BDCOM2 USAGE.       *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PBD01                     TEXT('BILLING RATE/DISCOUNT MAST')
+     A            BDCODE    R               REFFLD(BRCD)
+     A                                      COLHDG('BILL RATE/DISCOUNT' 'CODE')
+     A            BDEFDT    R               REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE DATE')
+     A            BDPC01    R               REFFLD(PC43)
+     A            BDPC02    R               REFFLD(PC43)
+     A            BDPC03    R               REFFLD(PC43)
+     A            BDPC04    R               REFFLD(PC43)
+     A            BDPC05    R               REFFLD(PC43)
+     A            BDPC06    R               REFFLD(PC43)
+     A            BDPC07    R               REFFLD(PC43)
+     A            BDPC08    R               REFFLD(PC43)
+     A            BDPC09    R               REFFLD(PC43)
+     A            BDPC10    R               REFFLD(PC43)
+     A            BDPC11    R               REFFLD(PC43)
+     A            BDPC12    R               REFFLD(PC43)
+     A            BDPC13    R               REFFLD(PC43)
+     A            BDPC14    R               REFFLD(PC43)
+     A            BDPC15    R               REFFLD(PC43)
+     A            BDPC16    R               REFFLD(PC43)
+     A            BDPC17    R               REFFLD(PC43)
+     A            BDPC18    R               REFFLD(PC43)
+     A            BDPC19    R               REFFLD(PC43)
+     A            BDPC20    R               REFFLD(PC43)
+     A            BDPC21    R               REFFLD(PC43)
+     A            BDPC22    R               REFFLD(PC43)
+     A            BDPC23    R               REFFLD(PC43)
+     A            BDPC24    R               REFFLD(PC43)
+     A            BDPC25    R               REFFLD(PC43)
+     A                                      COLHDG('BILL' 'BOTH' 'SYSTEMS')
+     A            BDAM01    R               REFFLD(A92)
+     A            BDAM02    R               REFFLD(A92)
+     A            BDAM03    R               REFFLD(A92)
+     A            BDAM04    R               REFFLD(A92)
+     A            BDAM05    R               REFFLD(A92)
+     A            BDAM06    R               REFFLD(A92)
+     A            BDAM07    R               REFFLD(A92)
+     A            BDAM08    R               REFFLD(A92)
+     A            BDAM09    R               REFFLD(A92)
+     A            BDAM10    R               REFFLD(A92)
+     A            BDAM11    R               REFFLD(A92)
+     A            BDAM12    R               REFFLD(A92)
+     A            BDAM13    R               REFFLD(A92)
+     A            BDAM14    R               REFFLD(A92)
+     A            BDAM15    R               REFFLD(A92)
+     A            BDAM16    R               REFFLD(A92)
+     A            BDAM17    R               REFFLD(A92)
+     A            BDAM18    R               REFFLD(A92)
+     A            BDAM19    R               REFFLD(A92)
+     A            BDAM20    R               REFFLD(A92)
+     A            BDAM21    R               REFFLD(A92)
+     A            BDAM22    R               REFFLD(A92)
+     A            BDAM23    R               REFFLD(A92)
+     A            BDAM24    R               REFFLD(A92)
+     A            BDAM25    R               REFFLD(A92)
+     A            BDCOM1    R               REFFLD(NM60) COLHDG('COMMENTS 1')
+     A            BDCOM2    R               REFFLD(NM60) COLHDG('COMMENTS 2')
+     A**** BDCOM2 will be substringed as follows:
+     A*  Type D9:  Pos. 1-50: display/use on screen/program/file for description
+     A*            Pos. 51: Source: P = PMD
+     A*                             F = Fee Schedule
+     A*                             B = Billed Chrgs
+     A*            Pos. 52: "Lesser of" Flag: Y = take lesser of Billed Chrgs
+     A*                                           or PMD/FS
+     A*                                       blank = no comparison
+     A*            Pos. 53-60: not used at this time
+     A*  Type DB:  Pos. 1-50: display/use on screen/program/file for description
+     A*            Pos. 51: MCA discount flag: Y = Only MCA Claims discounted
+     A*                                        blank = no comparison
+     A*            Pos. 52-60: not used at this time
+     A*
+     A*  Type H1:  Pos. 1-1: Minimum Charge meaning
+     A*       Valid values:
+     A*       *blank = Bill the minimum charge if the calculated fee is
+     A*                less than the minimum.
+     A*       'X'    = Do NOT bill if the calculated fee is less than
+     A*                the minimum.
+     A*
+     A*  Type P3:  Pos. 1-1: Minimum Charge meaning
+     A*       Valid values:
+     A*       *blank = Bill the minimum charge if the calculated fee is
+     A*                less than the minimum.
+     A*       'X'    = Do NOT bill if the calculated fee is less than
+     A*                the minimum.
+     A*
+     A            BDTYPE    R               REFFLD(CODE) COLHDG('TYPE OF RATE' -
+     A                                      'OR DISCOUNT')
+     A            BDRCDT    R               REFFLD(FLAG) COLHDG('RECORD' +
+     A                                      'TYPE' 'B-BILLING,D-DISCOUNT')
+     A            BDSTAT    R               REFFLD(STAT)
+     A            BDUSER    R               REFFLD(USER)
+     A            BDPGM     R               REFFLD(PGM)
+     A            BDTIME    R               REFFLD(TIME)
+     A            BDDT      R               REFFLD(DT)
+     A            BDIUSR    R               REFFLD(USER) COLHDG('RECORD' +
+     A                                      'CREATED BY')
+     A*** BEGIN ADD *** 07/10/02 **************************************
+     A            BDMRAF    R               REFFLD(FLAG)
+     A                                      COLHDG('TO MRA FLAG')
+     A*
+     A*           Valid values: 'Y' - Direct reductions to MRA.
+     A*                         'N' - Do not Direct reductions to MRA.
+     A*
+     A            BDOT1F    R               REFFLD(FLAG)
+     A                                      COLHDG('TO OTHER 1 FLAG')
+     A*
+     A*           Valid values: 'Y' - Direct reductions to Other 1.
+     A*                         'N' - Do not Direct reductions to Other 1
+     A*
+     A            BDOT2F    R               REFFLD(FLAG)
+     A                                      COLHDG('TO OTHER 2 FLAG')
+     A*
+     A*           Valid values: 'Y' - Direct reductions to Other 2.
+     A*                         'N' - Do not Direct reductions to Other 2.
+     A*
+     A            BDNETF    R               REFFLD(FLAG)
+     A                                      COLHDG('TO NETWORK FLAG')
+     A*
+     A*           Valid values: 'Y' - Direct reductions to Network.
+     A*                         'N' - Do not Direct reductions to Network.
+     A*
+     A            BDOT1C    R               REFFLD(DS3)
+     A                                      COLHDG('TO OTHER 1 CODE')
+     A*
+     A*           Valid values: FTBSP via type "O"
+     A*
+     A            BDOT2C    R               REFFLD(DS3)
+     A                                      COLHDG('TO OTHER 2 CODE')
+     A*
+     A*           Valid values: FTBSP via type "O"
+     A*
+     A*** END   ADD *** 07/10/02 **************************************
+     A*** BEGIN ADD *** 10/24/02 **************************************
+     A            BDLMRA    R               REFFLD(FLAG)
+     A                                      COLHDG('LEAVE MRA FLAG')
+     A*
+     A*           Valid values: 'Y' - Don't touch the MRA amount.
+     A*                         'N' - Clear the MRA amount.
+     A*
+     A*** END   ADD *** 10/24/02 **************************************
+     A*** BEGIN ADD *** 10/20/03 **************************************
+     A            BDSKPD    R               REFFLD(FLAG)
+     A                                      COLHDG('SKIP IF LINE IS' +
+     A                                      'DENIED')
+     A*
+     A*           Valid values: 'Y' - Skip line if denied.
+     A*                         ' ' - Don't skip if denied.
+     A*
+     A*** END   ADD *** 10/20/03 **************************************
+     A*** BEGIN ADD *** 03/21/05 **************************************
+     A            BDMADG    R               REFFLD(DS3)
+     A                                      COLHDG('MADIGAN RATE CODE')
+     A*
+     A*           Valid values: NMBDP DK CODES
+     A*** END   ADD *** 03/21/05 **************************************
+     A*** BEGIN ADD *** 04/08/11 **************************************
+     A            BDCOM3    R               REFFLD(NM60) COLHDG('COMMENTS 3')
+     A*** END   ADD *** 04/08/11 **************************************

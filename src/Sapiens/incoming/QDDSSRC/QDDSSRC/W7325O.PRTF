@@ -1,0 +1,1077 @@
+     A* (c) 2021 Sapiens. All Rights Reserved.                             *
+     A*
+     A* * * DEDUCTIBLE INVOICES - W/OMR
+     A* * * CREATE USING
+     A*                  DEVTYPE(*AFPDS)
+     A*                  BACKOVL(*NONE)
+     A*                  FRONTOVL(*NONE)
+     A*
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 06/24/24 C:300 Project: 146WKR (Prescient)                    *
+     A*                Add Line item for Collateral Transferred       *
+     A*                Increase the Box size                          *
+     A*                                                               *
+     A* 03/25/21 C:079 Project: WC2663                                *
+     A*                Invoice Cloud changes                          *
+     A*                                                               *
+     A* 02/08/12 C:279 SUPPORT: WA132  78481                          *
+     A*                Compiled only.                                 *
+     A*                                                               *
+     A* 07/18/11 C:062 SUPPORT: WA093 77402                           *
+     A*                CORRECT ORDER OF YEAR BREAKS.                  *
+     A*                                                               *
+     H* 05/05/11 C:189 PROJECT: 25WRX Priss 40                        *
+     H*                Zero digits being printed on the screen       *
+     A*                                                               *
+     A* 04/27/11 C: 58 PROJECT: 114WYZ                                *
+     A*                1) Add Prior Balance and separators.           *
+     A*                2) Add posting date to replace text "Due upon  *
+     A*                   Receipt" if WMEXP/EXPODU flag = P.          *
+     A*                                                               *
+     A* 02/09/11 C:255 PROJECT: 25WRX                                 *
+     A*                1) Change recipient position, Only for CLT025. *
+     A*                2) Change breakout of current billed by policy *
+     A*                   yr. to be in descending order for both      *
+     A*                   CLT025 and BASE.                            *
+     A*                                                               *
+     A* 06/05/10 C:136 SUPPORT: WA139 73011                           *
+     A*                MAKE INTERNAL USE MSG CLIENT SPECIFIC FOR      *
+     A*                126 ONLY                                       *
+     A*                                                               *
+     A* 06/03/10 C:189 SUPPORT: WA025 72955                           *
+     A*          C:136 INCREASE TOTAL FIELDS FOR LARGER DED AMTS.     *
+     A*                                                               *
+     A* 05/27/10 C:220 SUPPORT: 72747                                 *
+     A*                Add policy no in the bottom info for KRMS.     *
+     A*                                                               *
+     A* 05/08/10 C:136 SUPPORT: WA025 72624                           *
+     A*                REQUESTED FORMAT CHG FOR BREAKOUT SECTION      *
+     A*                FOR TASB                                       *
+     A*                                                               *
+     A* 04/20/10 C180  FIX EDIT WORD FOR DEDUCTIBLE BALANCE DUE.      *
+     A*                                                               *
+     A* 04/05/10 C:220 PROJECT: 25WRQ                                 *
+     A*                MOVE TITLE AND LOGO BOX FOR CLIENT - TASB      *
+     A*                                                               *
+     A* 04/02/10  C:62   Project: 25WRB                               *
+     A*                 -Priss 19                                     *
+     A*                                                               *
+     A* 02/01/10  C:33   Project: 25WRB                               *
+     A*                 -New format for CTL025.                       *
+     A*                                                               *
+     A* 11/19/09  C:33   Project: 25WQI                               *
+     A*                  Print Statement #.                           *
+     H*                                                               *
+     H* 10/07/08 C:65  PROJECT: 114WRK                                *
+     H*                ADD NEW FORMAT LAYOUT FOR PREMIUM NOTICE.      *
+     A*                                                               *
+     A*  08/25/05 C:33  Project: 71WGB                                *
+     A*                 Replace the "PRIOR BILLED" and "PRIOR PAID"   *
+     A*                  line items with a "PRIOR BALANCE".           *
+     A*****************************************************************
+     A          R INVOIC1                   SKIPB(4)
+     A                                      FONT(11)
+     A                                    32'DEDUCTIBLE INVOICE'
+     A                                      SPACEA(2)
+     A*** Beg Chg *** 03/25/21 ****************************************
+     A**********  XNNAME        40         2SPACEA(1)
+     A N68        XNNAME        40         2SPACEA(1)
+     A*** End Chg *** 03/25/21 ****************************************
+     A            OFAAD1        40         2SPACEA(1)
+     A    N31     OFAAD2        40         2SPACEA(1)
+     A            XACSZ         40         2SPACEA(1)
+     A                                    59'PRINT DATE:'
+     A                                      SKIPB(14)
+     A            XXPRDT         8  0    +01EDTWRD('  /  /    ')
+     A    N28                              8'ATTN:'
+     A            XXCONT        40        15
+     A            EMNAME        40        15SPACEB(1)
+     A            XXADR1        40        15SPACEB(1)
+     A       N30  XXADR2        40        15SPACEB(1)
+     A            XXECSZ        40        15SPACEB(1)
+     A                                     3'LOSSES AS OF:'
+     A                                      SKIPB(21)
+     A            XXLSDT         8  0     20EDTWRD('  /  /    ')
+     A                                    65'DUE UPON RECEIPT'
+     A  33                                 3'CARRIER POLICY#:'
+     A                                      SKIPB(22)
+     A  33        RPCAP#        25        20
+     A  33                                 3'FILE NUMBER:'
+     A                                      SKIPB(23)
+     A N33                                 3'POLICY NUMBER:'
+     A                                      SKIPB(23)
+     A            XXFND          3  0     20
+     A            SVEMP#         9  0     23
+     A            XXBFYR         3  0     32
+     A                                     3'DIVISION:'
+     A                                      SKIPB(24)
+     A            SVDIV          5  0     20
+     A                                     2'=========================='
+     A                                      SKIPB(25)
+     A                                   +00'=========================='
+     A                                   +00'==========================='
+     A                                    29'DEDUCTIBLE'
+     A                                      SPACEB(1)
+     A                                      UNDERLINE
+     A                                    56'TAX'
+     A                                      UNDERLINE
+     A                                    74'TOTAL'
+     A                                      SPACEA(1)
+     A                                      UNDERLINE
+     A                                     3'PRIOR BALANCE:'
+     A                                      SPACEB(1)
+     A            XPRBAL        11  2     25EDTCDE(J)
+     A            XPRTAX         9  2     47EDTCDE(J)
+     A            XPRTOT        11  2     65EDTCDE(J)
+     A                                     3'CURRENT BILLED:'
+     A                                      SPACEB(1)
+     A            XXAMT         11  2     25EDTCDE(J)
+     A            XXCTAX         9  2     47EDTCDE(J)
+     A            XXCTOT        11  2     65EDTCDE(J)
+     A                                    64'================='
+     A                                      SPACEB(1)
+     C*** Begin Add ***  06/24/24  *********************************************
+     A  48                                 3'Collateral Transfer'
+     A  48                                  SPACEB(1)
+     A  48        XXCOL          9  2     27EDTCDE(J)
+     A  48        XXCOLT         9  2     67EDTCDE(J)
+     C*** End   Add ***  06/24/24  *********************************************
+     A                                     3'BALANCE DUE:'
+     A                                      SPACEB(1)
+     A            XXTOTL        11  2     65EDTCDE(J)
+     A                                     5'BREAK OUT OF CURRENT'
+     A                                      SPACEB(2)
+     A                                   +01'BILLED BY YEAR:'
+     A                                     1' '
+     A                                      SPACEB(1)
+      *
+     A  71        ARY01          3  0      6EDTCDE(4)
+     A  71        ARA01         13  2    +02EDTCDE(K)
+     A  77        ARY07          3  0     46EDTCDE(4)
+     A  77        ARA07         13  2    +02EDTCDE(K)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  72        ARY02          3  0      6EDTCDE(4)
+     A  72        ARA02         13  2    +02EDTCDE(K)
+     A  78        ARY08          3  0     46EDTCDE(4)
+     A  78        ARA08         13  2    +02EDTCDE(K)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  73        ARY03          3  0      6EDTCDE(4)
+     A  73        ARA03         13  2    +02EDTCDE(K)
+     A  79        ARY09          3  0     46EDTCDE(4)
+     A  79        ARA09         13  2    +02EDTCDE(K)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  74        ARY04          3  0      6EDTCDE(4)
+     A  74        ARA04         13  2    +02EDTCDE(K)
+     A  80        ARY10          3  0     46EDTCDE(4)
+     A  80        ARA10         13  2    +02EDTCDE(K)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  75        ARY05          3  0      6EDTCDE(4)
+     A  75        ARA05         13  2    +02EDTCDE(K)
+     A  81        ARY11          3  0     46EDTCDE(4)
+     A  81        ARA11         13  2    +02EDTCDE(K)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  76        ARY06          3  0      6EDTCDE(4)
+     A  76        ARA06         13  2    +02EDTCDE(K)
+     A  82                                44'OTHER'
+     A  82        ARA12         13  2    +02EDTCDE(K)
+     A                                    13'SEE ITEMIZATION ATTACHED'
+     A                                      SKIPB(42)
+     A                                   +01'FOR DETAIL'
+     A                                     2'=========================='
+     A                                      SPACEB(1)
+     A                                   +00'=========================='
+     A                                   +00'==========================='
+     A                                     3'MAKE CHECK PAYABLE TO:'
+     A                                      SPACEB(1)
+     A            XXCHEC        40        27
+     A                                     3'DIRECT INQUIRIES TO:'
+     A                                      SPACEB(1)
+     A                                   +01'('
+     A            OFAARA         3  0    +00
+     A                                   +00')'
+     A            XXPHN1         3  0    +00
+     A                                   +00'-'
+     A            XXPHN2         4  0    +00
+     A            XXCOM1        40         3SPACEB(2)
+     A            XXCOM2        40         3SPACEB(1)
+     A            XXCOM3        40         3SPACEB(1)
+     A            XXCOM4        40         3SPACEB(1)
+     A                                     3'INSURED:'
+     A                                      SKIPB(51)
+     A                                    43'REMIT TO:'
+     A            XXILN1        40         3SPACEB(1)
+     A            XXRLN1        40        43
+     A            XXILN2        40         3SPACEB(1)
+     A            XXRLN2        40        43
+     A            XXILN3        40         3SPACEB(1)
+     A            XXRLN3        40        43
+     A            XXILN4        40         3SPACEB(1)
+     A            XXRLN4        40        43
+     A                                     3' '
+     A                                      SKIPB(57)
+     A  33                                 3'CARRIER POLICY#:'
+     A  33        @PCAP#        25        20
+     A  33                                 3'FILE NUMBER:'
+     A                                      SPACEB(1)
+     A N33                                 3'POLICY NUMBER:'
+     A                                      SPACEB(1)
+     A            @XFND          3  0     20
+     A            @VEMP#         9  0     23
+     A            @XBFYR         3  0     32
+     A                                     3'DIVISION:'
+     A                                      SPACEB(1)
+     A            @VDIV          5  0     20
+     A                                     3'DEDUCTIBLE BALANCE DUE:'
+     A                                      SPACEB(2)
+     A                                   +01'$'
+     A            @XTOTL        11  2    +00EDTCDE(J)
+     A                                    51'AMT REMITTED: ________________'
+     A                                    29'(RETURN WITH REMITTANCE)'
+     A                                      SPACEB(2)
+     A                                      SPACEA(1)
+     A            XXOCR         47        48SKIPB(64)
+     A                                      FONT(19)
+     A*
+     A* NEW FORMAT PREMIUM NOTICE
+     A*
+     A          R QHEAD
+     A                                      SKIPB(1)
+     A          R QHEAD1
+     A                                      PAGSEG(&F2BLOG &LOGHRZ &LOGVRT)
+     A    N63     XXHDR         40          POSITION(&VRT1 &HRZ1)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A     63     X1HDR         40          POSITION(0.4 3.11)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A*** Beg Chg *** 03/25/21 ****************************************
+     A*********** XNNAME        40          POSITION(0.7 .60)
+     A***********                           FNTCHRSET(C0H400D0 T1V10037)
+     A N68        XNNAME        40          POSITION(0.7 .60)
+     A                                      FNTCHRSET(C0H400D0 T1V10037)
+     A*** Beg Chg *** 03/25/21 ****************************************
+     A            XXAAD1        40          POSITION(0.9  .60)
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A            XXAAD2        40          POSITION(1.1  .60)
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A            XOACSZ        40          POSITION(1.3  .60)
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A            F2BLOG         8A  P
+     A            LOGHRZ         5S 3P
+     A            LOGVRT         5S 3P
+     A            HRZ1           5S 3P
+     A            VRT1           5S 3P
+     A          R QH1025
+     A                                      PAGSEG(&F2BLOG &LOGVRT &LOGHRZ)
+     A    N63     XXHDR         40          POSITION(&VRT1 &HRZ1)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A     63     X1HDR         40          POSITION(0.4 3.11)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A            F2BLOG         8A  P
+     A            LOGHRZ         5S 3P
+     A            LOGVRT         5S 3P
+     A            HRZ1           5S 3P
+     A            VRT1           5S 3P
+     A          R QLINE1
+     A                                      BOX(0.45 0.40 1.35 7.8 .01)
+     A    N63                               LINE(0.20 3.3 .25 *VRT .01)
+     A    N63                               LINE(0.20 5.2 .25 *VRT .01)
+     A    N63                               LINE(0.20 3.3 1.9 *HRZ .01)
+     A     63                               LINE(0.20 3.0 .25 *VRT .01)
+     A     63                               LINE(0.20 5.5 .25 *VRT .01)
+     A     63                               LINE(0.20 3.0 2.5 *HRZ .01)
+     A                                      BOX(3.19 0.40 3.59 7.8 .02)
+     C*** Begin Chg ***  06/24/24  *********************************************
+     A*****                                 BOX(4.26 0.40 5.39 7.8 .02)
+     A    N48                               BOX(4.26 0.40 5.39 7.8 .02)
+     A     48                               BOX(4.26 0.40 5.57 7.8 .02)
+     C*** End   Chg ***  06/24/24  *********************************************
+     A                                      LINE(4.38 0.5 7.2 *HRZ .01)
+     A                                      LINE(5.09 0.5 7.2 *HRZ .01)
+     A                                      BOX(6.87 0.40 8.27 7.8 .02)
+     A                                      BOX(8.95 0.40 9.85 7.8 .02)
+     A          R QLN1OTH
+     A                                      BOX(0.45 0.40 1.35 7.8 .01)
+     A    N63                               LINE(0.20 3.3 .25 *VRT .01)
+     A    N63                               LINE(0.20 5.2 .25 *VRT .01)
+     A    N63                               LINE(0.20 3.3 1.9 *HRZ .01)
+     A     63                               LINE(0.20 3.0 .25 *VRT .01)
+     A     63                               LINE(0.20 5.5 .25 *VRT .01)
+     A     63                               LINE(0.20 3.0 2.5 *HRZ .01)
+     A          R QLN025
+     A                                      BOX(1.60 1.75 2.00 6.75 .01)
+     A                                      BOX(0.55 0.50 1.53 8.0  .01)
+     A                                      BOX(5.00 0.50 5.25 8.1  .01)
+     A                                      BOX(6.20 0.50 6.60 1.85 .01)
+     A                                      BOX(6.20 2.10 6.60 3.45 .01)
+     A                                      LINE(7.68 0.50 7.50 *HRZ .005)
+     A                                      LINE(7.71 0.50 7.50 *HRZ .005)
+     A          R QLN1025
+     A                                      BOX(1.60 1.75 2.00 6.75 .01)
+     A                                      BOX(0.55 0.50 1.53 8.0  .01)
+     A          R QHEAD2
+     A*** Beg Add *** 03/25/21 ****************************************
+     A            STRINV#       50          POSITION(1.5 .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A*** End Add *** 03/25/21 ****************************************
+     A     33     @@PLCY        15          POSITION(1.5 5.74)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A    N33     @1PLCY        15          POSITION(1.5 5.61)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXPLCY        15          POSITION(1.5 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPERD        20          POSITION(1.65 .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPOLP        45          POSITION(1.65 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     33     XQCAPH        20          POSITION(1.65 5.19)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     33     RPCAP#        25          POSITION(1.65 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT1         5          POSITION(1.80 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN1        50          POSITION(1.80 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQDIVH        20          POSITION(1.80 5.61)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            SVDIV          5  0       POSITION(1.80 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPROD        20          POSITION(1.95 5.5)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPRDT        20          POSITION(1.95  6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT2         5          POSITION(1.95 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN2        50          POSITION(1.95 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQRSTH        20          POSITION(2.10 5.36)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQST           2          POSITION(2.10 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT3         5          POSITION(2.10 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN3        50          POSITION(2.10 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT4         5          POSITION(2.25 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN4        50          POSITION(2.25 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMH        20          POSITION(2.25 &STMHV)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMD        20          POSITION(2.25 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT5         5          POSITION(2.40 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN5        50          POSITION(2.40 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT6         5          POSITION(2.55 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN6        50          POSITION(2.55 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT7         5          POSITION(2.70 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN7        50          POSITION(2.70 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT8         5          POSITION(2.85 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN8        50          POSITION(2.85 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     32     XQCNDH        20          POSITION(2.85 5.05)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     32     XXCNDT         8  0       POSITION(2.85 6.3)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQLOSH        20          POSITION(3.00 5.34)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXLSDT         8  0       POSITION(3.00 6.3)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            STMHV          5S 3P
+     A          R QHD2OTH
+     A     33     @@PLCY        15          POSITION(1.5 5.74)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A    N33     @1PLCY        15          POSITION(1.5 5.61)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXPLCY        15          POSITION(1.5 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPERD        20          POSITION(1.65 .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPOLP        45          POSITION(1.65 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     33     XQCAPH        20          POSITION(1.65 5.19)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     33     RPCAP#        25          POSITION(1.65 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT1         5          POSITION(1.80 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN1        50          POSITION(1.80 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQDIVH        20          POSITION(1.80 5.61)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            SVDIV          5  0       POSITION(1.80 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPROD        20          POSITION(1.95 5.5)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPRDT        20          POSITION(1.95  6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT2         5          POSITION(1.95 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN2        50          POSITION(1.95 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQRSTH        20          POSITION(2.10 5.36)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQST           2          POSITION(2.10 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT3         5          POSITION(2.10 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN3        50          POSITION(2.10 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT4         5          POSITION(2.25 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN4        50          POSITION(2.25 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMH        20          POSITION(2.25 &STMHV)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMD        20          POSITION(2.25 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT5         5          POSITION(2.40 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN5        50          POSITION(2.40 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT6         5          POSITION(2.55 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN6        50          POSITION(2.55 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT7         5          POSITION(2.70 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN7        50          POSITION(2.70 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT8         5          POSITION(2.85 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN8        50          POSITION(2.85 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     32     XQCNDH        20          POSITION(2.85 5.05)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     32     XXCNDT         8  0       POSITION(2.85 6.3)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQLOSH        20          POSITION(3.00 5.34)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXLSDT         8  0       POSITION(3.00 6.3)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            STMHV          5S 3P
+     A          R QHD025
+     A            XXCNDH        25          POSITION(2.10 0.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCNDS        45          POSITION(2.10 2.00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            @@PLCY        15          POSITION(2.25 0.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXPLCY        15          POSITION(2.25 2.00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1PERD        25          POSITION(2.40 0.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPOLP        45          POSITION(2.40 2.00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN1        60          POSITION(2.85 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN2        60          POSITION(3.00 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN3        60          POSITION(3.15 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN4        60          POSITION(3.30 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN5        60          POSITION(3.45 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN6        60          POSITION(3.60 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN7        60          POSITION(3.75 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN8        60          POSITION(3.90 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPROD        20          POSITION(3.25 5.50)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPRDT        20          POSITION(3.25 6.45)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMH        20          POSITION(3.40 5.50)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMD        20          POSITION(3.40 6.45)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQDUEH        20          POSITION(3.55 5.50)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQDUED        10          POSITION(3.55 6.45)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXAMDH        20          POSITION(3.70 5.50)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQTOTL        20          POSITION(3.70 6.45)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQLOSH        20          POSITION(4.75 0.6)
+     A                                      FNTCHRSET(C0H400A0 T1V10037)
+     A            XXLSDT         8  0       POSITION(4.75 2.0)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H400A0 T1V10037)
+     A            X1BXH1        15          POSITION(5.20 3.80)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1BXH2        15          POSITION(5.20 5.35)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1BXH3        15          POSITION(5.20 7.10)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X2BXH1        15          POSITION(6.35 0.80)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X3BXH1        15          POSITION(6.35 2.50)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A          R QENDPG
+     A                                      ENDPAGE
+     A          R QHD1025
+     A            XXCNDH        25          POSITION(2.10 0.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCNDS        45          POSITION(2.10 2.00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            @@PLCY        15          POSITION(2.25 0.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXPLCY        15          POSITION(2.25 2.00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1PERD        25          POSITION(2.40 0.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPOLP        45          POSITION(2.40 2.00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN1        60          POSITION(2.85 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN2        60          POSITION(3.00 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN3        60          POSITION(3.15 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN4        60          POSITION(3.30 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN5        60          POSITION(3.45 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN6        60          POSITION(3.60 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN7        60          POSITION(3.75 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            X1EMN8        60          POSITION(3.90 0.9)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPROD        20          POSITION(3.25 5.50)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPRDT        20          POSITION(3.25 6.45)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMH        20          POSITION(3.40 5.50)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMD        20          POSITION(3.40 6.45)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQDUEH        20          POSITION(3.55 5.50)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQDUED        10          POSITION(3.55 6.45)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXAMDH        20          POSITION(3.70 5.50)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQTOTL        20          POSITION(3.70 6.45)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQLOSH        20          POSITION(4.75 0.6)
+     A                                      FNTCHRSET(C0H400A0 T1V10037)
+     A            XXLSDT         8  0       POSITION(4.75 2.0)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H400A0 T1V10037)
+     A          R QHEAD3
+     A                                    31'Deductible' SKIPB(21)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                    55'Tax'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                    73'Total'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                     1'  '
+     A                                      SKIPA(23)
+     A*
+     A          R QDET
+     A                                     6'Prior Billed'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEB(1)
+     A                                    14':'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXBILL        11  2     26EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXBTAX         9  2     47EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXBTOT        11  2     65EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A                                     6'Prior Paid'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEB(1)
+     A                                    14':'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXPAID        11  2     26EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXPTAX         9  2     47EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXPTOT        11  2     65EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A                                    11'Prior Balance:'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEB(3)
+     A            XXPBAL        11  2     26EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXPBTX        11  2     45EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXPBTT        11  2     65EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A                                    11'Current Billed'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEB(2)
+     A                                    14':'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXAMT         11  2     26EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCTAX         9  2     47EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCTOT        11  2     65EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A                                    63 '______________'
+     A                                       SPACEA(1)
+     C*** Begin Add ***  06/24/24  *********************************************
+     A  48                                 6'Collateral Transfer'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A  48                                  SPACEB(1)
+     A  48        XXCOL          9  2     28EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  48        XXCOLT         9  2     67EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     C*** End   Add ***  06/24/24  *********************************************
+     A                                     6'Balance Due'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEB(1)
+     A                                    14':'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXTOTL        11  2     65EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A          R QDT025
+     A            XXPRTO        20          POSITION(5.55 0.65)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXLSDT         8  0       POSITION(5.55 1.10)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXBTOT        11  2       POSITION(5.55 3.15)
+     A                                      EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXPTOT        11  2       POSITION(5.55 4.80)
+     A                                      EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXPBAL        11  2       POSITION(5.55 6.45)
+     A                                      EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCUBL        20          POSITION(5.70 0.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCTOT        11  2       POSITION(5.70 3.15)
+     A                                      EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXBLDU        20          POSITION(5.95 0.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCBAL        11  2       POSITION(5.95 3.15)
+     A                                      EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            X1PTOT        11  2       POSITION(5.95 4.80)
+     A                                      EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXTOTL        11  2       POSITION(5.95 6.45)
+     A                                      EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            X1CTOT        11  2       POSITION(6.50 0.6)
+     A                                      EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            X1PBAL        11  2       POSITION(6.50 2.2)
+     A                                      EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A*
+     A          R QPOLBRK
+     A            XXBRK         50          POSITION(3.30 0.6)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A          R QBREAK1
+     A            XXARU          3  0       POSITION(&LIN &POS)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXARM         13  2       POSITION(&LIN &POS1)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A N67        XXARU1         3  0       POSITION(&LIN &POS2)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A N67        XXARM1        13  2       POSITION(&LIN &POS3)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            LIN            5S 3P
+     A            POS            5S 3P
+     A            POS1           5S 3P
+     A            POS2           5S 3P
+     A            POS3           5S 3P
+     A          R QBREAK
+     A            XXBRK         50         6
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(43)
+     A                                     1' '
+     A                                      SPACEB(1)
+      *
+     A  71        ARY01          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  71        ARA01         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  77        ARY07          3  0     31EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  77        ARA07         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCOM1        40        55
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  72        ARY02          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  72        ARA02         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  78        ARY08          3  0     31EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  78        ARA08         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCOM2        40        55
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  73        ARY03          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  73        ARA03         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  79        ARY09          3  0     31EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  79        ARA09         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCOM3        40        55
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  74        ARY04          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  74        ARA04         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  80        ARY10          3  0     31EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  80        ARA10         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCOM4        40        55
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  75        ARY05          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  75        ARA05         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  81        ARY11          3  0     31EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  81        ARA11         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  76        ARY06          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  76        ARA06         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  82                                29'Other'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A  82        ARA12         13  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXSEE         40        31
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(52)
+     A  93 33     @@PL93        15        35
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEB(1)
+     A  93N33     @1PL93        15        35
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEB(1)
+     A  93        XXPL93        15        40
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A*
+     A          R QBR025
+     A            XXBRK         50          POSITION(6.75 0.6)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+      *
+     A            ARY12          3  0       POSITION(6.90 0.6)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARA12         13  2       POSITION(6.90 0.9)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARY11          3  0       POSITION(6.90 2.8)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARA11         13  2       POSITION(6.90 3.1)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARY10          3  0       POSITION(7.05 0.6)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARA10         13  2       POSITION(7.05 0.9)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARY09          3  0       POSITION(7.05 2.8)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARA09         13  2       POSITION(7.05 3.1)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARY08          3  0       POSITION(7.20 0.6)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARA08         13  2       POSITION(7.20 0.9)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARY07          3  0       POSITION(7.20 2.8)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARA07         13  2       POSITION(7.20 3.1)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARY06          3  0       POSITION(7.35 0.6)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARA06         13  2       POSITION(7.35 0.9)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARY05          3  0       POSITION(7.35 2.8)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARA05         13  2       POSITION(7.35 3.1)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARY04          3  0       POSITION(7.50 0.6)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARA04         13  2       POSITION(7.50 0.9)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARY03          3  0       POSITION(7.50 2.8)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARA03         13  2       POSITION(7.50 3.1)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARY02          3  0       POSITION(7.65 0.6)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A                                      EDTCDE(4)
+     A            ARA02         13  2       POSITION(7.65 0.9)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            ARY01          3  0       POSITION(7.65 2.8)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A                                      EDTCDE(4)
+     A            ARA01         13  2       POSITION(7.65 3.1)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCOM1        40          POSITION(6.75 5.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM2        40          POSITION(6.90 5.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM3        40          POSITION(7.05 5.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM4        40          POSITION(7.20 5.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A          R QBRK025
+     A            XXBRK         50          POSITION(5.05 1.80)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A          R QBR1025
+     A            XXARU          3  0       POSITION(&LIN &POS)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXARM         13  2       POSITION(&LIN &POS1)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A N67        XXARU1         3  0       POSITION(&LIN &POS2)
+     A                                      EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A N67        XXARM1        13  2       POSITION(&LIN &POS3)
+     A                                      EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            LIN            5S 3P
+     A            POS            5S 3P
+     A            POS1           5S 3P
+     A            POS2           5S 3P
+     A            POS3           5S 3P
+     A          R QBRSPC
+     A                                     1' '
+     A                                      SPACEB(1)
+     A*
+     A          R QAGT
+     A            XXAGHD        22         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SKIPB(43)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A            AGNAME        40         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM1        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A            XXAAD1        40         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM2        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A            XXACSZ        30         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM3        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A            XXAGPH        16         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM4        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(2)
+     A            XPBATV        46         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXSEE         40        31
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(52)
+     A          R QAG025
+     A            XXAGHD        22          POSITION(4.00 1.0)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXAAD1        40          POSITION(4.10 1.0)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXACSZ        30          POSITION(4.20 1.0)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXAGPH        16          POSITION(4.30 1.0)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM1        40          POSITION(4.00 4.0)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM2        40          POSITION(4.10 4.0)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM3        40          POSITION(4.20 4.0)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM4        40          POSITION(4.30 4.0)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A*
+     A          R QINFO
+     A*** Beg Chg *** 03/25/21 ****************************************
+     A********    XXCHKH        30          POSITION(9.14 .6)
+     A********                              FNTCHRSET(C0H20090 T1V10037)
+     A********    XXCHEC        40          POSITION(9.14 2.6)
+     A********                              FNTCHRSET(C0H20090 T1V10037)
+     A N68        XXCHKH        30          POSITION(9.14 .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A N68        XXCHEC        40          POSITION(9.14 2.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A*** End Chg *** 03/25/21 ****************************************
+     A*** Beg Add *** 03/25/21 ****************************************
+     A  68        STR3RDVRB    100          POSITION(9.14 .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A*** End Add *** 03/25/21 ****************************************
+     A            XXREMH        30          POSITION(9.29  .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXOFAD       120          POSITION(9.29 2.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXSERH        30          POSITION(9.44  .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXSERN        50          POSITION(9.44 2.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXDIRH        30          POSITION(9.59  .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXDIRN        50          POSITION(9.59 2.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A*
+     A          R QBOT
+     A                                     1'  '
+     A                                      SKIPA(62)
+     A                                     6 'Deductible Balance Due: '
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A            XXTOTL        11  2     26 EDTWRD('   ,   ,  $0.  -')
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A  35                                56 'Due Upon Receipt'
+     A  35                                  FNTCHRSET(C0H200B0 T1V10037)
+     A  35                                   SPACEA(2)
+     A N35                                56 'Due date:'
+     A N35        XXPODT         8  0     68 EDTWRD('  /  /    ')
+     A N35                                  FNTCHRSET(C0H200B0 T1V10037)
+     A N35                                   SPACEA(2)
+     A                                    19 '____________________'
+     A                                       SPACEA(0)
+     A                                     6 'Amount Remitted'
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A          R QATCH
+     A            XXBRK         50         6
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(43)
+     A                                     1' '
+     A                                      SPACEB(3)
+     A                                    23 'See Attached'
+     A                                      FNTCHRSET(C0H30090 T1V10037)
+     A          R QBT025
+     A*** Beg Chg *** 03/25/21 ****************************************
+     A**********  XXCHKH        30          POSITION(7.85 0.6)
+     A**********                            FNTCHRSET(C0H40090 T1V10037)
+     A**********  XXCHEC        40          POSITION(7.85 2.15)
+     A**********                            FNTCHRSET(C0H40090 T1V10037)
+     A N68        XXCHKH        30          POSITION(7.85 0.6)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A N68        XXCHEC        40          POSITION(7.85 2.15)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A*** End Chg *** 03/25/21 ****************************************
+     A*** Beg Add *** 03/25/21 ****************************************
+     A  68        STR3RDVRB    100          POSITION(9.14 .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A*** End Add *** 03/25/21 ****************************************
+     A            XXDIRH        30          POSITION(8.00 0.6)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1DIRN        50          POSITION(8.00 2.15)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XXINSH        30          POSITION(8.30 0.6)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            XXINS1        50          POSITION(8.45 0.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXINS2        50          POSITION(8.60 0.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXINS3        50          POSITION(8.75 0.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXINS4        50          POSITION(8.90 0.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXREMH        30          POSITION(8.30 4.5)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A            X1CHEC        40          POSITION(8.45 4.5)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            LBAAD1        40          POSITION(8.60 4.5)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            LBAAD2        40          POSITION(8.75 4.5)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            LBACSZ        40          POSITION(8.90 4.5)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMH        20          POSITION(9.25 0.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMD        20          POSITION(9.25 1.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCNDH        25          POSITION(9.40 0.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCNDS        45          POSITION(9.40 1.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            @@PLCY        15          POSITION(9.55 0.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXPLCY        15          POSITION(9.55 1.60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXAMDH        20          POSITION(10.0 0.6)
+     A                                      FNTCHRSET(C0H200A0 T1V10037)
+     A            XQTOTL        20          POSITION(10.0 1.6)
+     A                                      FNTCHRSET(C0H200A0 T1V10037)
+     A            XXAMRH        20          POSITION(10.0 3.50)
+     A                                      FNTCHRSET(C0H200A0 T1V10037)
+     A            XXUNL1        25          POSITION(10.0 5.00)
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A            XXRTNW        40          POSITION(10.5 2.85)
+     A                                      FNTCHRSET(C0H30090 T1V10037)
+     A          R QATCH025
+     A            XXBRK         50          POSITION(6.75 0.6)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A            XXATCH        15          POSITION(7.00 1.2)
+     A                                      FNTCHRSET(C0H30090 T1V10037)

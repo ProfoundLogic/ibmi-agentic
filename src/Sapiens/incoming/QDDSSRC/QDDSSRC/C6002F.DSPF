@@ -1,0 +1,200 @@
+     A*%%TS  SD  19980514  103354  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DAILY BATCH PROCESS PROMPT DISPLAY                       **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(09)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A*%%TS  SD  19980514  103354  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      CF13
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C6002F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('program name')
+     A                                  2 76'SCR01'
+     A                                  5  5'Current Co#:'
+     A            SCCO#     R        O  5 19REFFLD(CO#)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A            SCCONM    R        O  5 26REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  6 21'LAST DAILY BATCH PROCEDURE WAS ABN-
+     A                                      ORMAL'
+     A                                      DSPATR(HI)
+     A                                      DSPATR(BL)
+     A N90                                  DSPATR(ND)
+     A                                  8  6'Date:'
+     A            SCDATE    R        B  8 12REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  20                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  90                                  DSPATR(HI)
+     A  90                                  DSPATR(PR)
+     A                                  8 21'Co#'
+     A N90                                  DSPATR(ND)
+     A            SCRCO     R        O  8 26REFFLD(CO#)
+     A                                      DSPATR(HI)
+     A N90                                  DSPATR(ND)
+     A                                  8 38'Submitted by:'
+     A N90                                  DSPATR(ND)
+     A            SCUSR     R        O  8 52REFFLD(USER)
+     A                                      DSPATR(HI)
+     A N90                                  DSPATR(ND)
+     A                                  8 65'Date:'
+     A N90                                  DSPATR(ND)
+     A            SCSDT     R        O  8 71REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A N90                                  DSPATR(ND)
+     A                                 10  6'Weekly :'
+     A            SCWKLY    R        B 10 15REFFLD(FLAG)
+     A                                      TEXT('FLAG')
+     A                                      OVRDTA
+     A  25                                  ERRMSGID(CCR0513 *LIBL/CMESGG)
+     A  90                                  DSPATR(HI)
+     A  90                                  DSPATR(PR)
+     A            SCFWDT    R        B 10 17REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A  23                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A  90                                  DSPATR(HI)
+     A  90                                  DSPATR(PR)
+     A                                 10 26'to'
+     A            SCTWDT    R        B 10 29REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A  24                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A  90                                  DSPATR(HI)
+     A  90                                  DSPATR(PR)
+     A                                 10 38'Submitting job:'
+     A N90                                  DSPATR(ND)
+     A            SCJOB     R        O 10 54REFFLD(JOB)
+     A                                      DSPATR(HI)
+     A N90                                  DSPATR(ND)
+     A                                 10 66'Time:'
+     A N90                                  DSPATR(ND)
+     A            SCSTM     R        O 10 72REFFLD(TIME)
+     A                                      DSPATR(HI)
+     A N90                                  DSPATR(ND)
+     A                                      EDTWRD('  :  :  ')
+     A                                 12  6'Monthly:'
+     A            SCMNTH    R        B 12 15REFFLD(FLAG)
+     A                                      TEXT('FLAG')
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0513 *LIBL/CMESGG)
+     A  90                                  DSPATR(HI)
+     A  90                                  DSPATR(PR)
+     A            SCFMDT    R        B 12 17REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A  27                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  29                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A  90                                  DSPATR(HI)
+     A  90                                  DSPATR(PR)
+     A                                 12 26'to'
+     A            SCTMDT    R        B 12 29REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A  28                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  29                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A  90                                  DSPATR(HI)
+     A  90                                  DSPATR(PR)
+     A                                 12 38'Current job step:'
+     A N90                                  DSPATR(ND)
+     A            SCTAG     R        O 12 57REFFLD(TAG)
+     A                                      DSPATR(HI)
+     A N90                                  DSPATR(ND)
+     A                                 14  6'Yearly :'
+     A            SCYEAR    R        B 14 15REFFLD(FLAG)
+     A                                      TEXT('FLAG')
+     A                                      OVRDTA
+     A  22                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A  90                                  DSPATR(HI)
+     A  90                                  DSPATR(PR)
+     A            SCFYDT    R        B 14 17REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A  30                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  32                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A  90                                  DSPATR(HI)
+     A  90                                  DSPATR(PR)
+     A                                 14 26'to'
+     A            SCTYDT    R        B 14 29REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A  31                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  32                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A  90                                  DSPATR(HI)
+     A  90                                  DSPATR(PR)
+     A                                 15  8'Press enter to re-submit the job w-
+     A                                      ith the current attributes'
+     A                                      DSPATR(HI)
+     A N90                                  DSPATR(ND)
+     A                                 17  6'Key the execution date for the dai-
+     A                                      ly batch process. Then indicate'
+     A                                 18  6'whether this is a Weekly, Monthly,-
+     A                                       or Yearly execution, and press'
+     A                                 19  6'ENTER to submit the job.'
+     A                                 23  6'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 29'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCFL01    R        O  1  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      TEXT('DUMMY FIELD')
+     A          R SCR02
+     A                                      PUTOVR
+     A                                  1  2DATE
+     A                                      EDTCDE(Y)
+     A                                  1 75'C6002F'
+     A            SCUSER    R        O  2  2REFFLD(USER)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('program name')
+     A                                  2 76'SCR01'
+     A                                  7 13'The daily batch procedure is alrea-
+     A                                      dy running, press'
+     A                                      DSPATR(HI)
+     A                                  9 21'Enter to return to your menu.'
+     A                                      DSPATR(HI)
+     A                                 23 13'F3=Exit      '
+     A                                      COLOR(BLU)

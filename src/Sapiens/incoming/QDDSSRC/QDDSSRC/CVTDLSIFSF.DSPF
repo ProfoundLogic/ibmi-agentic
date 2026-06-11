@@ -1,0 +1,74 @@
+     A*%%TS  SD  20130214  103502  CRISPENS    REL-V7R1M0  5770-WDS
+     A* (c) 2013 StoneRiver, Inc. All rights Reserved.                     *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*****************************************************************
+     A*TITLE CVTDLSIFS - CONVERT QDLS TO IFS PROMPT SCREEN                 *
+     A*
+     A*  CREATED: 10/31/12  PROGRAMMER: C:280 PROJECT: 25WSJ               *
+     A*****************************************************************
+     A*
+     A*  REVISIONS:
+     A*
+     A*****************************************************************
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/SREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF08
+     A          R SCR01
+     A*%%TS  SD  20130214  103502  CRISPENS    REL-V7R1M0  5770-WDS
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  3 76'SCR01'
+     A                                  5  2'Type information, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  7  2'Day of the Week  . . . . . . . . :'
+     A            SCDOW          1Y 0B  7 37
+     A  10                                  DSPATR(RI)
+     A  10                                  DSPATR(PC)
+     A  10                                  ERRMSG('Invalid Day of the week.')
+     A                                  8  3'1=Monday, 2=Tuesday, 3=Wednesday, -
+     A                                      4=Thursday, 5=Friday, 6=Saturday, 7-
+     A                                      =Sunday'
+     A                                      COLOR(WHT)
+     A                                  9  2'Time of day  . . . . . . . . . . :'
+     A            SCTMOD         6Y 0B  9 37
+     A  11                                  DSPATR(RI)
+     A  11                                  DSPATR(PC)
+     A                                      EDTWRD(' 0:  :  ')
+     A  11                                  ERRMSG('Invalid Time, Must be great-
+     A                                      er than current time.')
+     A                                 10  2'Last run date  . . . . . . . . . :'
+     A            SCLRDT         8Y 0B 10 37EDTWRD('  /  /    ')
+     A  12                                  DSPATR(RI)
+     A  12                                  DSPATR(PC)
+     A  12                                  ERRMSG('Invalid date.')
+     A                                 11  2'Last run user  . . . . . . . . . :'
+     A            SCLRUS        10A  B 11 37
+     A                                 12  2'File processed . . . . . . . . . :'
+     A            SCFILE        10A  B 12 37
+     A  13                                  DSPATR(RI)
+     A  13                                  DSPATR(PC)
+     A  13                                  ERRMSG('Invalid file name.')
+     A                                 13  2'Relative record processed  . . . :'
+     A            SCRRN          9Y 0O 13 37EDTCDE(Z)
+     A                                 14  2'Total records processed  . . . . :'
+     A            SCTOTR         9Y 0O 14 37EDTCDE(Z)
+     A                                 15  2'Status . . . . . . . . . . . . . :'
+     A            SCSTS          1A  O 15 37
+     A  30                                  ERRMSG('Invalid day of the week')
+     A*
+     A                                 23  2'F3=Exit   F8=Reset   +
+     A                                      F12=Cancel'
+     A                                      COLOR(BLU)
+     A  90                              3 29'First Run of the Process'
+     A                                      COLOR(RED)
+     A                                  2 73TIME

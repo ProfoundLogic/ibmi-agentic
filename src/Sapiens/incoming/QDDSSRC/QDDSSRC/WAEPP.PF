@@ -1,0 +1,153 @@
+      * (c) 2024 Sapiens. All Rights Reserved.                             *
+     A*****************************************************************
+     A** WORKERS' COMP EMPLOYER PAYROLL TRANSACTION FILE
+     A*****************************************************************
+     A* REVISIONS:                                                   *
+     A*                                                               *
+     A* 06/17/24  C:344 PROJECT: WC2952                               *
+     A*                 Expand rate field from 7.2 to 8.3 zoned.      *
+     A*                                                               *
+     A* 09/09/10  C:257 PROJECT: C93WIX                               *
+     A*                 ADD FIELDS :                                  *
+     A*                 EPAAAW - AUDITED AVERAGE ANNUAL WAGE          *
+     A*                 EPUNTW - AGE UNDER 20                         *
+     A*                 EPUNTH   AGE 21 - 30                          *
+     A*                 EPUNFA   AGE 31 - 40                          *
+     A*                 EPUNFT   AGE 41 - 50                          *
+     A*                 EPUNSI   AGE 51 - 60                          *
+     A*                 EPGTSI   AGE 61 +                             *
+     A*                                                               *
+     H*                                                               *
+     A* 04/20/09  C:190  Project: WC1473                              *
+     A*                  Compile only                                 *
+     A*                                                               *
+     H* 01/22/08  C:65  PROJECT: WC1627                               *
+     H*                 ADD FIELDS FOR NET RATE AND NET PREMIUM.      *
+     H*                                                               *
+     H* 03/22/06  C:132 PROJECT: WC71WGC & WC1377                     *
+     H*                 Add new field EPPLOP Payroll rollover option  *
+     H*                 when added fourth rollover type to selection. *
+     H*                                                               *
+     H* 08/30/01  C:90 PROJECT: WC1052                                *
+     H*                Expand premium fields from 9.2 to 11.2         *
+     H*                                                               *
+     H* 08/15/01  C:90 PROJECT: WC1035                                *
+     H*                Expand rate field from 5.2 to 7.2              *
+     H*                                                               *
+     H*  07/09/98 C:65 PROJECT: WC577                                 *
+     H*                ADD CLASS DESC EXTENSION.                      *
+     A*                                                              *
+     A* 11/21/97  C:57  PROJECT: CM027                               *
+     A*                 ADD: AIRCRAFT DESCRIPTION (EPACDS)           *
+     A*                                                              *
+     A* 10/29/97  C:33  PROJECT: WC577                               *
+     A*                 ADD: PAYROLL RENEWAL FLAG (EPRNFL)           *
+     A****************************************************************
+     A                                      REF(WREFP)
+     A          R PEP01                     TEXT('EMPLOYER PAYROLL FILE')
+     A            EPCO#     R               REFFLD(CO#)
+     A            EPFND     R               REFFLD(FND)
+     A            EPFYR     R               REFFLD(FYR)
+     A            EPEMP#    R               REFFLD(EMP#)
+     A            EPDIV     R               REFFLD(DIV)
+     A            EPCLAS    R               REFFLD(CLAS)
+     A            EPEFDT    R               REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE' 'DATE')
+     A            EPSAPR    R               REFFLD(A112)
+     A                                      COLHDG('SELF REPORTING' 'PAYROLL')
+     A            EPEAPR    R               REFFLD(A112)
+     A                                      COLHDG('EST' 'ANNUAL' 'PAYROLL')
+     A            EPSAFL    R               REFFLD(FLAG)
+     A                                      COLHDG('SELF-RPT,ANNUAL' 'FLAG')
+     A            EPAAPR    R               REFFLD(A112)
+     A                                      COLHDG('AUDITED' 'PAYROLL')
+     A            EPSC      R               REFFLD(FLAG)
+     A                                      COLHDG('SUB-CONTRACTOR' 'FLAG')
+     A            EPCADT    R               REFFLD(DT)
+     A                                      COLHDG('CANCELLATION' 'DATE')
+     A            EPADLD    R               REFFLD(A92)
+     A                                      COLHDG('ADDITIONAL' ' LOAD VALUE')
+      **** BEGIN CHG **** 08/30/01 ************************************
+     A*********** EPEMPR    R               REFFLD(A92)
+     A            EPEMPR    R               REFFLD(A112)
+      **** END   CHG **** 08/30/01 ************************************
+     A                                      COLHDG('EST MAN PREM')
+      **** BEGIN CHG **** 08/30/01 ************************************
+     A*********** EPAMPR    R               REFFLD(A92)
+     A            EPAMPR    R               REFFLD(A112)
+      **** END   CHG **** 08/30/01 ************************************
+     A                                      COLHDG('AUD MAN PREM')
+     A            EPSPEC    R               REFFLD(FLAG)
+     A                                      COLHDG('SPECIAL DES')
+      **** BEGIN CHG **** 06/17/24 ************************************
+      **** BEGIN CHG **** 08/15/01 ************************************
+     A*********** EPARAT    R               REFFLD(PC52)
+     A*********** EPARAT    R               REFFLD(A72)
+      **** END   CHG **** 08/15/01 ************************************
+     A            EPARAT         8S 3
+      **** END   CHG **** 06/17/24 ************************************
+     A                                      COLHDG('ADJUSTED RATE')
+     A            EPECNT    R               REFFLD(A70)
+     A                                      COLHDG('ESTIMATED' 'EMPLOYEE COUNT')
+     A            EPACNT    R               REFFLD(A70)
+     A                                      COLHDG('AUDITED' 'EMPLOYEE COUNT')
+     A            EPSTAT    R               REFFLD(STAT)
+     A            EPUSER    R               REFFLD(USER)
+     A            EPPGM     R               REFFLD(PGM)
+     A            EPTIME    R               REFFLD(TIME)
+     A            EPDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            EPIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            EPIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL' 'PROGRAM')
+     A            EPITM     R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL' 'TIME')
+     A            EPIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'DATE')
+     A*** BEG ADD ***** 10/29/97 ***********************************************
+     A            EPRNFL    R               REFFLD(FLAG)
+     A                                      COLHDG('PAYROLL' 'RENEWAL' 'FLAG')
+     A*** END ADD ***** 10/29/97 ***********************************************
+     A*** BEG ADD ***** 11/21/97 ***********************************************
+     A            EPACDS    R               REFFLD(DS30)
+     A                                      COLHDG('AIRCRAFT' 'DESCRIPTION')
+     A*** END ADD ***** 11/21/97 ***********************************************
+     A*** BEG ADD ***** 07/09/98 ***********************************************
+     A            EPEXT     R               REFFLD(CLA2)
+     A                                      COLHDG('CLASS DESC' 'EXTENSION')
+     A*** END ADD ***** 07/09/98 ***********************************************
+     A*
+     A***** BEG ADD ***** 03/22/06 *********************************************
+     A            EPRLOP    R               REFFLD(FLAG)
+     A                                      COLHDG('RENEW' 'ROLLOVER' 'OPTION')
+     A                                      TEXT('PYRL RENEWAL ROLLOVER OPTION')
+     A***** END ADD ***** 03/22/06 *********************************************
+     A***** BEGIN ADD *** 01/22/08 *********************************************
+     A            EPENTR         9S 4
+     A                                      COLHDG('ESTIMATED NET RATE')
+     A            EPENTP    R     S         REFFLD(A112)
+     A                                      COLHDG('ESTIMATED NET PREM')
+     A            EPANTR         9S 4
+     A                                      COLHDG('AUDITED NET RATE')
+     A            EPANTP    R     S         REFFLD(A112)
+     A                                      COLHDG('AUDITED NET PREM')
+     A***** END ADD ***** 01/22/08 *********************************************
+     A***** BEGIN ADD *** 09/09/10 *********************************************
+     A            EPAAAW    R     S         REFFLD(A112)
+     A                                      COLHDG('AUDITED AVG' 'ANNUAL WAGE')
+     A                                      TEXT('AUDITED AVERAGE ANNUAL WAGE')
+     A            EPUNTW    R     S         REFFLD(A70)
+     A                                      COLHDG('AGE UNDER' '20')
+     A
+     A            EPUNTH    R     S         REFFLD(A70)
+     A                                      COLHDG('AGE' '21 - 30')
+     A            EPUNFA    R     S         REFFLD(A70)
+     A                                      COLHDG('AGE' '31 - 40')
+     A            EPUNFT    R     S         REFFLD(A70)
+     A                                      COLHDG('AGE' '41 - 50')
+     A            EPUNSI    R     S         REFFLD(A70)
+     A                                      COLHDG('AGE' '51 - 60')
+     A            EPGTSI    R     S         REFFLD(A70)
+     A                                      COLHDG('AGE' '60 +')
+     A***** END ADD ***** 09/09/10 *********************************************

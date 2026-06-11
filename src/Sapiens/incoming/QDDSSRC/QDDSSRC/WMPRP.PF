@@ -1,0 +1,164 @@
+      * (c) 2024 Sapiens. All Rights Reserved.                             *
+     A*
+     A* WORKERS' COMP PAYROLL CLASSIFICATION FILE
+     A*****************************************************************
+     A*  MODIFICATIONS:                                               *
+     A*                                                               *
+     A*  06/17/24 C:344 PROJECT: WC2952                               *
+     A*                 Expand rate field from 7.2 to 8.3 zoned.      *
+     A*                                                               *
+     A*  08/05/20 C:65  PROJECT: WC2756                               *
+     A*                 ADD TWO FLAGS - ONE FOR EXCLUDE FROM TERROR   *
+     A*                 CALCS AND ONE FOR EXCLUDE FROM CLAIM ASSIGN.  *
+     A*                                                               **
+     A*  10/20/15 C:302 PROJECT: WC2364                               **
+     A*                 Add non-ratable class code flag               **
+     A*                                                               **
+     A*  07/20/11 C:189 PROJECT: 93WJS                                **
+     A*                 ADD NCCI INDUSTRY GROUP TO WMPRP              **
+     A*                                                               **
+     A*  03/12/10 C:235 PROJECT: 102WFC                               **
+     A*                 Additional Classes for logging                **
+     A*                                                               **
+     A*  08/10/05 C:136 PROJECT: WC1136                               **
+     A*                 ADD LCM EXP DATE                              **
+     A*                                                               **
+     A*  10/20/04 C:132 PROJECT: WC1136                               **
+     A*                 Add new field for Loss Cost Multiplier (5.4)  **
+     A*                                                               **
+     A*  04/26/04 C:136 PROJECT: WC1169                               **
+     A*                 Add new field for Occupation Disease Class    **
+     A*                                                               **
+     A*  10/13/03 C:61  PROJECT WC1017                                **
+     A*                 Add new field: PRSCCD - Seasonal class code   **
+     A*                   (do not annualize at renewal).              **
+     A*                                                               **
+     A*  03/18/03 C:61  PROJECT WC1106                                **
+     A*                 Add field for 'A' rating.  Updates can be     **
+     A*                 made to the pre-defined rate for class.       **
+     A*                                                                *
+     A*  10/01/01 C:136 PROJECT:WC577                                  *
+     A*                 Add loss constant amt field                    *
+     A*                                                                *
+     H*  08/15/01 C:90 PROJECT: WC103                                 *
+     H*                Expand rate field from 5.2 to 7.2              *
+     H*                                                               *
+     A*  10/14/99 C:65 PROJECT: WC944                                  *
+     A*                ADD 3 NEW FIELDS, EXPIRATION DATE, TRANSFER     *
+     A*                CLASS, AND GOVERNING CLASS EXCLUSION.           *
+     A*                                                                *
+     A*  07/09/98 C:87 PROJECT: WC577                                  *
+     A*                ADD 2-BYTE FIELD FOR WCSTAT:EXPOSURE ACT(PREACT)*
+     A*                ADD 2-BYTE FIELD FOR WCSTAT:RATING TIER(PRTIER) *
+     A*                                                                *
+     A*  01/09/95 C:11 PROJECT: WC213                                  *
+     A*                ADD A 3-BYTE FIELD FOR RATE SET CODE (PRRTCD).  *
+     A*
+     A*  08/22/95 C:28 PROJECT: WC446                                  *
+     A*                ADD A 5-BYTE FIELD FOR HAZARD GROUP CODE        *
+     A*                (PRHZGR)
+     A*****************************************************************
+     A**
+     A                                      REF(WREFP)
+     A          R PPR01                     TEXT('PAYROLL CLASSIFICATION FILE')
+     A            PRCO#     R               REFFLD(CO#)
+     A            PRCLAS    R               REFFLD(CLAS)
+     A            PREFDT    R               REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE' 'DATE')
+     A            PRDESC    R               REFFLD(DS30)
+      **** BEGIN CHG **** 06/17/24 ************************************
+      **** BEGIN CHG **** 08/15/01 ************************************
+     A*********** PRRT      R               REFFLD(A52)
+     A*********** PRRT      R               REFFLD(A72)
+      **** END   CHG **** 08/15/01 ************************************
+     A            PRRT           8S 3
+      **** END   CHG **** 06/17/23 ************************************
+     A                                      COLHDG('PAYROLL CLASS' 'RATE - NEW')
+     A            PRMNPR    R               REFFLD(A72)
+     A                                      COLHDG('MINIMUM' 'PREMIUM' 'NEW')
+     A            PRPCF     R               REFFLD(FLAG)
+     A                                      COLHDG('PAYROLL, PER' 'CAPITA FLAG')
+     A            PRSTAT    R               REFFLD(STAT)
+     A            PRUSER    R               REFFLD(USER)
+     A            PRPGM     R               REFFLD(PGM)
+     A            PRTIME    R               REFFLD(TIME)
+     A            PRDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            PRLHCD    R               REFFLD(FLAG)
+     A                                      COLHDG('L&H DESIGNATION')
+     A            PRCCFL    R               REFFLD(FLAG)
+     A                                      COLHDG('CONTRACTORS CLASS')
+     A            PRRTCD         3          COLHDG('RATE SET CODE')
+     A            PRHZGR    R               REFFLD(DS5)
+     A                                      COLHDG('HAZARD' 'GROUP')
+     A            PRSIC     R               REFFLD(SIC)
+     A                                      COLHDG('SIC CODE')
+     A*** BEGIN ADD *** 07/09/98 *************************************
+     A            PREACT    R               REFFLD(CODE)
+     A                                      COLHDG('EXPOSURE ACT')
+     A            PRTIER    R               REFFLD(CODE)
+     A                                      COLHDG('RATING TIER')
+     A*** END   ADD *** 07/09/98 *************************************
+     A*** BEGIN ADD *** 10/14/99 *************************************
+     A            PREXDT    R               REFFLD(DT)
+     A                                      COLHDG('EXPIRATION DATE')
+     A            PRXFER    R               REFFLD(CLAS)
+     A                                      COLHDG('TRANSFER CLASS')
+     A            PRGVEX    R               REFFLD(FLAG)
+     A                                      COLHDG('GOVERNING CLASS' +
+     A                                             'EXCLUSION')
+     A*** END   ADD *** 10/14/99 *************************************
+     A*** BEG   ADD *** 10/01/01 *************************************
+     A            PRLOSS    R               REFFLD(A72)
+     A                                      COLHDG('LOSS CONSTANT AMT')
+     A*** END   ADD *** 10/01/01 *************************************
+     A*** BEG ADD ***** 03/18/03 *************************************
+      *
+     A            PRARFL    R               REFFLD(FLAG)
+     A                                      COLHDG('Class code can be' +
+     A                                      ' A rated? (Y/ )')
+     A*** END ADD ***** 03/18/03 *************************************
+     A*** BEG ADD ***** 10/13/03 *************************************
+      *
+     A            PRSCCD    R               REFFLD(FLAG)
+     A                                      COLHDG('Seasonal Class' +
+     A                                      'Code')
+      *                     Valid value 'Y'/blank
+      *
+     A*** END ADD ***** 10/13/03 *************************************
+     A*** BEG ADD ***** 04/26/04 *************************************
+      *
+     A            PROCCD    R               REFFLD(FLAG)
+     A                                      COLHDG('Occupational' +
+     A                                      'Disease Class')
+      *                     Valid value 'Y'/blank
+      *
+     A*** END ADD ***** 04/26/04 *************************************
+     A***** BEG ADD ***** 10/20/04 *************************************
+     A            PRLCM          5S 4       TEXT('LOSS COST MULTIPLIER')
+     A                                      COLHDG('LOSS COST' 'MULTIPLIER')
+     A***** END ADD ***** 10/20/04 *************************************
+     A*** BEG ADD ***** 08/10/05 *************************************
+     A            PRLCEX    R     S         REFFLD(DT)
+     A                                      COLHDG('LCM EXP DT')
+     A*** END ADD ***** 08/10/05 *************************************
+     A*** BEG ADD ***** 03/12/10 *************************************
+     A            PRLOGF    R               REFFLD(FLAG)
+     A                                      COLHDG('Logging Flag')
+     A*** BEG ADD ***** 07/20/11 *************************************
+     A            PRNCIG    R               REFFLD(DS20)
+     A                                      COLHDG('NCCI INDUSTRY' +
+     A                                      'GROUP (093)')
+     A*** END ADD ***** 07/20/11 *************************************
+     A*** Beg Add * 10/20/15
+     A            PRNRAT    R               REFFLD(FLAG)
+     A                                      COLHDG('Non-Ratable C' +
+     A                                      'lass code ?')
+     A*** End Add * 10/20/15
+     A*** BEGIN ADD ***  08/05/20  ***********************************
+     A            PREXTER   R               REFFLD(FLAG)
+     A                                      COLHDG('EXCLUDE FROM' 'TERROR CALC')
+     A            PREXCLM   R               REFFLD(FLAG)
+     A                                      COLHDG('EXCLUDE FROM' +
+     A                                      'CLAIM ASSIGNMENT')
+     A*** END ADD *****  08/05/20  ***********************************

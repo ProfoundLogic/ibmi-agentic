@@ -1,0 +1,648 @@
+      * (c) 2024 Sapiens. All Rights Reserved.                             *
+     A*****************************************************************
+     A** WORKERS' COMP FUND DETAIL FILE                               *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 05/13/24 C:062 Project: 146WKQ                                *
+     A*                Add Bill Assessments for S/R                   *
+     A*                                                               *
+     A* 12/23/21 C:062 Project: WC2837                                *
+     A*                Add Net Rate for SR Flag                       *
+     A*                                                               *
+     A* 10/18/17 C:136 Project: 150WAQ                                *
+     A*                Add collateral A/R codes                       *
+     A*                                                               *
+     A* 09/12/17 C:65  Project: 150WAR                                *
+     A*                ADD % OF MANUAL PREMIUM GROUP DEFAULT VALUE.   *
+     A*                                                               *
+     A* 05/27/13 C:190 Project: 147WAI                                *
+     A*                Add Divident Plan A/R Codes                    *
+     A*                                                               *
+     A* 03/10/11 C:33  Project: WC1851                                *
+     A*                Add field for stop collateral date.            *
+     A*                                                               *
+     A* 01/25/10 C:232 Project: WC1851                                *
+     A*                Add F1COTA, F1CFTA, F1ACOT and F1ACFT fields.  *
+     A*                                                               *
+     A* 12/11/08 C:33  Project: WC1769                                *
+     A*                Add 6th and 7th assessment fields.             *
+     A*                                                               *
+     A*  05/18/08  C:61  PROJECT: WC1630                              *
+     A*                  Add field for "Include deductible balance".  *
+     A*                                                               *
+     A*  11/09/07  C:65  PROJECT: 129WQM                              *
+     A*                  ADD A NEW FLAG TO CONTROL THE PROCESSING OF  *
+     A*                  THE NY FLAT RATE DECREASE FOR 10/1/2007.     *
+     A*                                                               *
+     A*  10/11/07  C:183 PROJECT: 146WBC                              *
+     A*                 - Add a new flag that will be used as default *
+     A*                   regarding the Posting day of Monthly Billing*
+     A*                                                               *
+     A*  08/23/06  C:132 PROJECT: WC1196                              *
+     A*                 - Add flag for default new policy to include  *
+     A*                   premium for more than one division in AUDIT *
+     A*                   Company Auto-Assigment, "Y" to accumulate   *
+     A*                   premium across divisions.                   *
+     A*                                                               *
+     A*  08/09/06 C:136 PROJECT: 136WBG                               *
+     A*                 FLAG BILLING PROGRAMS TO CALCULATE DEPOSIT    *
+     A*                 ON A PER YEAR BASIS.                          *
+     A*                                                               *
+     A*  07/28/06  C:132 PROJECT: WC1196                              *
+     A*                 - Add flag for default Audit Co. auto-assign  *
+     A*                   by each Division or only those marked with  *
+     A*                   a "Y".                                      *
+     A*                                                               *
+     A*  04/26/06  C:168 PROJECT: 45WFB                               *
+     A*                 - Implemented projects 45WCM,45WBS,45WBZ into *
+     A*                  BASE                                         *
+     A*                 - Added 3 new fields to the end of file       *
+     A*                                                               *
+     A*  04/21/06  C:65  PROJECT: 71WGH (REIMPLEMENT 71FDN,71WFT)     *
+     A*                  ADD RETRO DEBIT CODE.                        *
+     A*                  Add Separate Audit Transfer Credit A/R code  *
+     A*                                                               *
+     A* 04/19/06 C:132 Project: 46WFL                                 *
+     A*                Add F1DSCD field to file for Self-Reporting    *
+     A*                Discount A/R Code F1DSCD                       *
+     A*                                                               *
+     A* 02/08/06 C:167 Project: 91WMX                                 *
+     A*                Add pop-up window processing control flag.     *
+     A*                                                               *
+     A* 10/27/05 C:136 PROJECT: WC1191 (XFER AUDIT CREDIT BALANCES)   *
+     A*                ADD FIELDS                                     *
+     A*                                                               *
+     A*                                                               *
+     A* 06/24/05 C:33  Project: 109WDZ                                *
+     A*                Add Midterm S/R Deposit Billed Xfer            *
+     A*                    Midterm S/R Deposit Paid Xfer              *
+     A*                    Midterm S/R Deposit to Pmt Code            *
+     A*                    Midterm S/R Deposit Tax Billed Xfer        *
+     A*                    Midterm S/R Deposit Tax Paid Xfer          *
+     A*                    Midterm S/R Deposit Tax to Pmt Code        *
+     A*                    Midterm S/R Premium Offset                 *
+     A*                    Midterm S/R Deposit Tax Premium Offset     *
+     A*                                                               *
+     A* 07/02/04 C:136 PROJECT: WC1227                                *
+     A*                Add flat canx payment transfer A/R codes       *
+     A*                fields for 4th and 5th assessment.             *
+     A*                                                               *
+     A* 12/09/03 C:136 PROJECT: 109DL                                 *
+     A*                Add new business payment transfer A/R code     *
+     A*                fields for 4th and 5th assessment.             *
+     A*                                                               *
+     A* 11/18/03  C:65   PROJECT: WC1167                              *
+     A*                  ADD FLAG AND EFF DATE FIELD FOR NET RATE.    *
+     A*                                                               *
+     A* 10/03/03 C:136 PROJECT: WC1151                                *
+     A*                ADD FIELD FOR CASH TRANSFER ON FLAT CANX.      *
+     A*                                                               *
+     A* 06/29/02 C:136   PROJECT: WC1080                              *
+     A*                  ADD 2 FIELDS FOR DEDUCTIBLE TAX BILLED AND   *
+     A*                  DEDUCTIBLE TAX PAID.                         *
+     A*                                                               *
+     A* 06/14/02  C:65   PROJECT: 114WEA                              *
+     A*                  ADD FLAG FOR ACE SPREAD DISCOUNT PROCESSING. *
+     A*                                                               *
+     A* 12/18/01  C:65   PROJECT: WC1056                              *
+     A*                  ADD A/R CODES FOR TRANSFERING FEES ON A      *
+     A*                  FLAT CANCELLATION.                           *
+     A*                                                               *
+     A* 01/02/01  C:65   PROJECT: 109CO                               *
+     A*                  ADD XFER FIELD FOR THIRD ASSESSMENT.         *
+     A*                                                               *
+     A*  09/07/00  C:65  PROJECT: WC1006                              *
+     A*                  CHANGE HEADING ON F1TXPY.  F1TXPY AND F1TXTX *
+     A*                  ARE NOW BEING USED FOR NEW BUSINESS PAYMENT  *
+     A*                  TAX TRANSFER RECORDS.                        *
+     A*                                                               *
+     A*  05/06/99  C:65  PROJECT: 90WCP                               *
+     A*                  ADD FLAG FOR USING NCCI 8810 MIN. PREM RULE  *
+     A*                                                               *
+     A*  04/12/99  C:65  PROJECT: WC875                               *
+     A*                  ADD THREE TRANSFER FIELDS FOR TAX ON DEPOSIT *
+     A*                                                               *
+     A*  07/31/98  C:65  PROJECT: 88WAJ                               *
+     A*                  ADD BILL EXP CNST TO ALL DIVS FLAG.          *
+     A*                                                               *
+     A*  04/21/98  C:33  PROJECT: WC577                               *
+     A*                  ADD F1CFFL (CASH FLOW FLAG)                  *
+     A*                                                               *
+     A* 03/09/98 C:65 PROJECT: 91WBO                                  *
+     A*               ADDED DEPOSIT ADJUSTMENT OVERRIDE FIELDS.       *
+     A*                                                               *
+     A* 12/23/97 C:65 PROJECT: WC776                                  *
+     A*               ADDED 1ST AND 2ND ASSESSMENT TRANSFER A/R CODES *
+     A*                                                               *
+     A*****************************************************************
+     A*
+     A                                      REF(WREFP)
+     A          R PF101                     TEXT('FUND DETAIL FILE')
+     A            F1CO#     R               REFFLD(CO#)
+     A            F1FND     R               REFFLD(FND)
+     A            F1FYR     R               REFFLD(FYR)
+     A            F1STPO    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'POLICY' 'STARTS')
+     A            F1ENPO    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'POLICY' 'ENDS')
+     A            F1ADP2    R               REFFLD(PC52)
+     A                                      COLHDG('DEVIATION')
+     A            F1DVPR    R               REFFLD(FLAG)
+     A                                      COLHDG('DEVIATION PREM' 'S OR N')
+     A            F1ADP3    R               REFFLD(PC52)
+     A                                      COLHDG('DISCOUNT')
+     A            F1DISC    R               REFFLD(FLAG)
+     A                                      COLHDG('DISCOUNT TYPE')
+     A            F1DPS     R               REFFLD(FLAG)
+     A                                      COLHDG('DEP STYLE' 'S,M,N')
+     A            F1RTCD         3          COLHDG('RATE SET' 'CODE')
+     A            F1UPAR    R               REFFLD(FLAG)
+     A                                      COLHDG('UPDATE A/R' 'Y/N')
+     A            F1FAUD    R               REFFLD(FLAG)
+     A                                      COLHDG('FINAL AUDIT' 'COMPLETE Y/N')
+     A            F1SPLA    R               REFFLD(FLAG)
+     A                                      COLHDG('SPLIT AUDIT' +
+     A                                       'FLAG')
+     A            F1RDPR    R               REFFLD(FLAG)
+     A                                      COLHDG('REIMB DED' +
+     A                                       'APPLIED TO M OR S')
+     A            F1EMLB    R               REFFLD(DS30)
+     A                                      COLHDG('STD EMPL' 'LIABILITY LIMIT')
+     A            F1REPC    R               REFFLD(PC52)
+     A                                      COLHDG('REIMBURSEMENT' 'PERCENTAGE')
+     A            F1PACP    R               REFFLD(A72)
+     A                                      COLHDG('MAXIMUM WKLY' 'PMT CAP')
+     A            F1PCP2    R               REFFLD(A72)
+     A                                      COLHDG('MAXIMUM WKLY' 'PMT CAP')
+     A            F1EFDT    R               REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE' 'DATE')
+     A            F1RLXC    R               REFFLD(FLAG)
+     A                                      COLHDG('RELAX CLAIMS' 'CVRG EDITS')
+     A            F1CLMS    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIMS ONLY' 'FLAG')
+     A            F1SRBB    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'S/R BACKPOSTED' 'BILL')
+     A            F1CDEB    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE,EX' 'CON BILLED')
+     A            F1CDEP    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE,EX' 'CON PAID')
+     A            F1CDET    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE,EX' 'CON TRANSFER')
+     A            F1RDBL    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'REIMB DED' 'BILLED')
+     A            F1RDPY    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'REIMB DED' 'PAID')
+     A            F1NBPT    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'NEW BUSINESS' 'PAYMENTS PAID')
+     A            F1NBTR    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'NEW BUSINESS' 'PAYMENTS TRANSFER')
+     A            F1PRTR    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'NEW BUSINESS' 'PREMIUM TRANSFER')
+     A            F1NBDT    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'NEW BUSINESS' 'DEPOSIT TRANSFER')
+     A            F1DBTR    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'DEPOSIT TO PREM' 'XFER BILLED')
+     A            F1DPTR    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'DEPOSIT TO PREM' 'XFER PAID')
+     A            F1PPTR    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'DEPOSIT TO PREM' 'XFER TRANSFER')
+     A            F1TXBL    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'STATE TAX' 'BILLED')
+     A            F1TXPY    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'STATE TAX ON DEP' 'XFER')
+     A            F1TXTX    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'STATE TAX' 'TRANSFER')
+     A            F1TAX     R               REFFLD(A72)
+     A                                      COLHDG('STATE TAX' 'PERCENT')
+     A            F1MFBL    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'MEMBERSHIP FEE' 'BILLED')
+     A            F1MFPY    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'MEMBERSHIP FEE' 'PAID')
+     A            F1MFPT    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'MEMBERSHIP FEE' 'TRANSFER')
+     A            F1MFEE    R               REFFLD(A72)
+     A                                      COLHDG('MEMBERSHIP FEE' 'AMT')
+     A            F1PMFL    R               REFFLD(FLAG)
+     A                                      COLHDG('PRORATE MEMBERSHIP' +
+     A                                       'FEE Y/N')
+     A            F1SFBL    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'SAFETY FEE' 'BILLED')
+     A            F1SFPY    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'SAFETY FEE' 'PAID')
+     A            F1SFTX    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'SAFETY FEE' 'TRANSFER')
+     A            F1SFP1    R               REFFLD(A50)
+     A                                      COLHDG('SAFETY FEE' 'PERCENT 1')
+     A            F1SFA1    R               REFFLD(A70)
+     A                                      COLHDG('SAFETY FEE' 'MIN AMT 1')
+     A            F1SFD1    R               REFFLD(DT7)
+     A                                      COLHDG('SAFETY FEE' 'EFF DT 1')
+     A            F1SFP2    R               REFFLD(A50)
+     A                                      COLHDG('SAFETY FEE' 'PERCENT 2')
+     A            F1SFA2    R               REFFLD(A70)
+     A                                      COLHDG('SAFETY FEE' 'MIN AMT 2')
+     A            F1SFD2    R               REFFLD(DT7)
+     A                                      COLHDG('SAFETY FEE' 'EFF DT 2')
+     A            F1SFP3    R               REFFLD(A50)
+     A                                      COLHDG('SAFETY FEE' 'PERCENT 3')
+     A            F1SFA3    R               REFFLD(A70)
+     A                                      COLHDG('SAFETY FEE' 'MIN AMT 3')
+     A            F1SFD3    R               REFFLD(DT7)
+     A                                      COLHDG('SAFETY FEE' 'EFF DT 3')
+     A            F1LPBL    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'LOSS PROGRAM' 'DEPOSIT BILLED')
+     A            F1LPPY    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'LOSS PROGRAM' 'DEPOSIT PAID')
+     A            F1EMRT    R               REFFLD(A112)
+     A                                      COLHDG('EMPLOYER' 'SPECIFIC RETEN')
+     A            F1CRBL    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'CLAIMS REPLENISHMENT' 'BILLED')
+     A            F1CRPY    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'CLAIMS REPLENISHMENT' 'PAID')
+     A            F1EXCO    R               REFFLD(PC52)
+     A                                      COLHDG('EXPENSE' 'CONSTANT 1')
+     A            F1MPEC    R               REFFLD(A52)
+     A                                      COLHDG('MIN PREM ON' 'EXP CONSTANT')
+     A            F1EXC2    R               REFFLD(PC52)
+     A                                      COLHDG('EXPENSE' 'CONSTANT 2')
+     A            F1XDT2    R               REFFLD(DT)
+     A                                      COLHDG('EFF DT' 'EXPENSE CONST 2')
+     A            F1STAT    R               REFFLD(STAT)
+     A            F1USER    R               REFFLD(USER)
+     A            F1PGM     R               REFFLD(PGM)
+     A            F1TIME    R               REFFLD(TIME)
+     A            F1DT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            F1IUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL USER')
+     A            F1IPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL PROGRAM')
+     A            F1ITM     R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL TIME')
+     A            F1IDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL DATE')
+     A            F1LFBL    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'LATE FEE' 'BILLED')
+     A            F1LFPY    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE' +
+     A                                       'LATE FEE' 'PAID')
+     A            F1DYAV    R               REFFLD(A30)
+     A                                      COLHDG('# DAYS ADVANCE FOR' +
+     A                                       'INSTALLMENT POST DT')
+     A            F1DYPD    R               REFFLD(A30)
+     A                                      COLHDG('# DAYS INSTALLMENT' +
+     A                                       'PAST DUE')
+     A            F1LFPC    R               REFFLD(A52)
+     A                                      COLHDG('LATE FEE %')
+     A            F1MAXC    R               REFFLD(A92)
+     A                                      COLHDG('MAXIMUM CHARGE')
+     A            F1MINB    R               REFFLD(A92)
+     A                                      COLHDG('MINIMUM BALANCE FOR' +
+     A                                       'LATE FEE')
+     A            F1DYRD    R               REFFLD(A30)
+     A                                      COLHDG('# DAYS INSTALLMENT' +
+     A                                       'PAST DUE' 'ON RETRO ACCTS')
+     A            F1INWB    R               REFFLD(FLAG)
+     A                                      COLHDG('PRINT INVOICES' +
+     A                                       'WITH BILLS Y/N')
+     A            F1CCBL    R               REFFLD(CODE)
+     A                                      COLHDG('PLP CAPITAL' +
+     A                                       'CONTR BILLING CODE')
+     A            F1CCPY    R               REFFLD(CODE)
+     A                                      COLHDG('PLP CAPITAL' +
+     A                                       'CONTR PAYMENT CODE')
+     A            F1MCBL    R               REFFLD(CODE)
+     A                                      COLHDG('PLP MONTHLY' +
+     A                                       'CLAIMS BILLING CODE')
+     A            F1MCPY    R               REFFLD(CODE)
+     A                                      COLHDG('PLP MONTHLY' +
+     A                                       'CLAIMS PAYMENT CODE')
+     A            F1SRTN    R               REFFLD(A112)
+     A                                      COLHDG('PLP SPECIFIC' +
+     A                                       'RETENTION')
+     A            F1DV2P    R               REFFLD(PC52)
+     A                                      COLHDG('2ND DEVIATION' 'PERCENTAGE')
+     A            F1DV2F    R               REFFLD(FLAG)
+     A                                      COLHDG('2ND DEVIATION' +
+     A                                      'APPLICATION' 'FLAG')
+     A            F1ACC     R               REFFLD(A50)
+     A                                      COLHDG('BODILY INJ' 'BY ACCIDENT')
+     A            F1DIS     R               REFFLD(A50)
+     A                                      COLHDG('BODILY INJ' 'BY DISEASE')
+     A            F1AGG     R               REFFLD(A50)
+     A                                      COLHDG('BODILY INJ' 'BY AGGR')
+     A            F1YRAD    R               REFFLD(FLAG)
+     A                                      COLHDG('ADJUST MEMBERSHIP'  +
+     A                                       'ON YEARLY AUDIT')
+     A            F1CXAD    R               REFFLD(FLAG)
+     A                                      COLHDG('ADJUST MEMBERSHIP'  +
+     A                                       'ON CX AUDIT')
+     A            F1APFD    R               REFFLD(FLAG)
+     A                                      COLHDG('ANNUALIZE PREM' 'FOR DISC')
+     A            F11STT    R               REFFLD(CODE)
+     A                                      COLHDG('1ST ASSESSMENT' +
+     A                                       'TRANSFER CODE')
+     A            F12NDT    R               REFFLD(CODE)
+     A                                      COLHDG('2ND ASSESSMENT' +
+     A                                       'TRANSFER CODE')
+     A*** BEGIN ADD ***  03/09/98  ************************************
+     A            F1BRFL    R               REFFLD(FLAG)
+     A                                      COLHDG('BILL ADJ ON RENEWAL')
+     A            F1BVFL    R               REFFLD(FLAG)
+     A                                      COLHDG('BILL ADJ ON REVISED')
+     A            F1DADJ    R               REFFLD(A92)
+     A                                      COLHDG('DEBIT ADJ THRESHOLD')
+     A            F1CADJ    R               REFFLD(A92)
+     A                                      COLHDG('CREDIT ADJ THRESHLD')
+     A*** END ADD *****  03/09/98  ************************************
+     A***  BEGIN ADD  ***  04/21/98  *********************************
+     A            F1CFFL    R               REFFLD(FLAG)
+     A                                      COLHDG('CASH' 'FLOW' 'FLAG')
+     A***  END   ADD  ***  04/21/98  *********************************
+     A*** BEGIN ADD *****  07/31/98  *********************************
+     A            F1EXDV    R               REFFLD(FLAG)
+     A                                      COLHDG('BILL EXP CNST' 'ALL DIVS')
+     A*** END ADD *******  07/31/98  *********************************
+     A*** BEGIN ADD *****  04/12/99  *********************************
+     A            F1TFTR    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE TAX BILLED ' +
+     A                                       'ON DEP TRANSFER')
+     A            F1TQTR    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE TAX PAID' +
+     A                                       'ON DEP TRANSFER')
+     A            F1TPTR    R               REFFLD(CODE)
+     A                                      COLHDG('A/R CDE TAX ON DEP ' +
+     A                                       'TO PREM TRANSFER')
+     A*** END ADD *******  04/12/99  *********************************
+     A*** BEGIN ADD *****  05/06/99  *********************************
+     A            F1AMIN    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG FOR USING NCCI' +
+     A                                       ' 8810 MIN PREM RULE')
+     A*** END ADD *******  05/06/99  *********************************
+     A*** BEGIN ADD *****  01/02/01  *********************************
+     A            F13RDT    R               REFFLD(CODE)
+     A                                      COLHDG('3RD ASSESSMENT TRAN' +
+     A                                       'SFER CODE')
+     A*** END ADD *******  01/02/01  *********************************
+     A*** BEGIN ADD *****  12/18/01  *********************************
+     A            F1MFTR    R               REFFLD(CODE)
+     A                                      COLHDG('MEMBERSHIP FEES XFER')
+     A            F1SATR    R               REFFLD(CODE)
+     A                                      COLHDG('SAFETY FEES XFER')
+     A            F1TXTR    R               REFFLD(CODE)
+     A                                      COLHDG('STATE TAX FEES XFER')
+     A            F11ATR    R               REFFLD(CODE)
+     A                                      COLHDG('1ST ASSMT FEES XFER')
+     A            F12ATR    R               REFFLD(CODE)
+     A                                      COLHDG('2ND ASSMT FEES XFER')
+     A            F13ATR    R               REFFLD(CODE)
+     A                                      COLHDG('3RD ASSMT FEES XFER')
+     A*** END ADD *******  12/18/01  *********************************
+     A*** BEGIN ADD *****  06/14/02  *********************************
+     A            F1ACED    R               REFFLD(FLAG)
+     A                                      COLHDG('ACE PROCESSING ON ' +
+     A                                       ' SPREAD DISCOUNT')
+     A*** END ADD *******  06/14/02  *********************************
+     A*** BEG ADD **** 06/30/02 ***********************************************
+     A            F1DTXB    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUCTIBLE TAX' +
+     A                                      'BILLED A/R CODE')
+     A            F1DTXP    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUCTIBLE TAX' +
+     A                                      'PAID A/R CODE')
+     A*** END ADD **** 06/30/02 ***********************************************
+     A*** BEG ADD **** 10/03/03 ***********************************************
+     A            F1FCTR    R               REFFLD(CODE)
+     A                                      COLHDG('FLAT CANX PREM' +
+     A                                      'XFER CODE')
+     A*** END ADD **** 10/03/03 ***********************************************
+     A*** BEGIN ADD ** 11/18/03 ***********************************************
+     A            F1NETR    R               REFFLD(FLAG)
+     A                                      COLHDG('NET RATE ON BILLS')
+     A            F1NETD         7S 0
+     A                                      COLHDG('NET RATE EFF DATE')
+     A*** END ADD **** 11/18/03 ***********************************************
+     A*** BEG ADD ***** 12/09/03 **********************************************
+     A            F14THT    R               REFFLD(CODE)
+     A                                      COLHDG('4TH ASSESSMENT' +
+     A                                      'TRANSFER CODE')
+     A            F15THT    R               REFFLD(CODE)
+     A                                      COLHDG('5TH ASSESSMENT' +
+     A                                      'TRANSFER CODE')
+     A*** END ADD ***** 12/09/03 **********************************************
+     A*** BEG ADD ***** 07/02/04 **********************************************
+     A            F14ATR    R               REFFLD(CODE)
+     A                                      COLHDG('4TH ASSMT FEES XFER')
+     A            F15ATR    R               REFFLD(CODE)
+     A                                      COLHDG('5TH ASSMT FEES XFER')
+     A*** END ADD ***** 07/02/04 **********************************************
+     A***  Begin Add  ***  06/24/05  **************************************
+     A            F1SHTR    R               REFFLD(CODE)
+     A                                      COLHDG('S/R DEP BILLED XFER')
+     A            F1SITR    R               REFFLD(CODE)
+     A                                      COLHDG('S/R DEP PAID XFER')
+     A            F1SPTR    R               REFFLD(CODE)
+     A                                      COLHDG('S/R DEP TO PAYMENT')
+     A            F1SFTR    R               REFFLD(CODE)
+     A                                      COLHDG('S/R DEP TAX BILLED' +
+     A                                             ' XFER')
+     A            F1SQTR    R               REFFLD(CODE)
+     A                                      COLHDG('S/R DEP TAX PAID' +
+     A                                             ' XFER')
+     A            F1SRTR    R               REFFLD(CODE)
+     A                                      COLHDG('S/R DEP TAX TO PAYM')
+     A            F1SPOF    R               REFFLD(CODE)
+     A                                      COLHDG('S/R PREMIUM OFFSET')
+     A            F1SRPO    R               REFFLD(CODE)
+     A                                      COLHDG('S/R DEP TAX PREMIUM' +
+     A                                             ' OFFSET')
+     A***  End   Add  ***  06/24/05  **************************************
+     A*** BEG ADD ***** 10/27/05 ******************************************
+     A            F1AXDD    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' 'DEDUCT')
+     A            F1AXEC    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' 'EX CON')
+     A            F1AXGF    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' 'GEN FEE')
+     A            F1AXLF    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' 'LATE FEE')
+     A            F1AXMF    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' 'MBR FEE')
+     A            F1AXDP    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' 'DEPOSIT')
+     A            F1AXSF    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' 'SAFETY FEE')
+     A            F1AXTX    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' 'ST TAX')
+     A            F1AXTD    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' 'DEP TAX')
+     A            F1AX1T    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' '1ST ASSMT')
+     A            F1AX2T    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' '2ND ASSMT')
+     A            F1AX3T    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' '3RD ASSMT')
+     A            F1AX4T    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' '4TH ASSMT')
+     A            F1AX5T    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' '5TH ASSMT')
+     A            F1AXPT    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' 'PREMIUM')
+     A*** END ADD ***** 10/27/05 ******************************************
+     A*** Begin add *** 02/08/06 ******************************************
+     A            F1POPF         1A         COLHDG('POP UP' 'FLAG')
+     A*** End   add *** 02/08/06 ******************************************
+     A***** BEG ADD ***** 04/19/06 ****************************************
+     A            F1DSCD    R               REFFLD(CODE)
+     A                                      COLHDG('S/R DISC' 'A/R CODE')
+     A                                      TEXT('Self-Reporting Discount A/R C-
+     A                                      ode')
+     A***** END ADD ***** 04/19/06 ****************************************
+     A***** BEGIN ADD *** 04/21/06 ****************************************
+     A            F1ORCR    R               REFFLD(FLAG)
+     A                                      COLHDG('Offer Retro Credit')
+     A            F1RCCD    R               REFFLD(CODE)
+     A                                      COLHDG('Retro Credit Code')
+     A            F1RDCD    R               REFFLD(CODE)
+     A                                      COLHDG('Retro DEBIT Code')
+     A            F1TACD    R               REFFLD(CODE)
+     A                                      COLHDG('Audit Tfr' 'Crdt Cd')
+     A                                      TEXT('Audit Transfer Credit Code A/-
+     A                                      R')
+     A***** END ADD ***** 04/21/06 ****************************************
+     A***** BEGIN ADD *** 04/26/06 ****************************************
+     A            F1NINV    R               REFFLD(A70)
+     A                                      COLHDG('NEXT AVAILABLE' +
+     A                                       'INVOICE #')
+     A            F1WFAM    R               REFFLD(A92)
+     A                                      COLHDG('WAIVER' +
+     A                                       'FEE AMT')
+     A            F1WVAR    R               REFFLD(CODE)
+     A                                      COLHDG('WAIVER' +
+     A                                       'FEE BILLED CODE')
+     A***** END ADD ***** 04/26/06 ****************************************
+     A*
+     A***** BEG ADD ***** 07/28/06 ****************************************
+     A            F1AAFL    R               REFFLD(FLAG)
+     A                                      COLHDG('Default Audit Co.' 'Auto As-
+     A                                      sign by Div')
+     A                                      TEXT('Default Audit Co. Assignment -
+     A                                      by each Division')
+      ***** END ADD ***** 07/28/06 *********************************************
+     A***** BEG ADD ***** 08/09/06 ****************************************
+     A            F1DPYM    R               REFFLD(FLAG)
+     A                                      COLHDG('DEPOSIT MODE (Y/ )')
+      ***** END ADD ***** 08/09/06 *********************************************
+     A*
+     A***** BEG ADD ***** 08/23/06 ****************************************
+     A            F1APFL    R               REFFLD(FLAG)
+     A                                      COLHDG('Accum Prem' 'Across Divns')
+     A                                      TEXT('Default Audit Co. Accumulate -
+     A                                      premium accross divisions')
+      ***** END ADD ***** 08/23/06 *********************************************
+     A***** BEG ADD ***** 10/11/07 ****************************************
+     A            F1BLFL    R               REFFLD(FLAG)
+     A                                      COLHDG('Monthly billings on' 'Polic+
+     A                                      y Effective Day' '(default)(Y/)')
+      ***** END ADD ***** 10/11/07 *********************************************
+     A***** BEG ADD ***** 11/09/07 ****************************************
+     A            F1NY07    R               REFFLD(FLAG)
+     A                                      COLHDG('DO NOT PROCESS' +
+     A                                             'OCT 07 RATE DECREASE')
+      ***** END ADD ***** 11/09/07 *********************************************
+     A***** BEG ADD ***** 05/18/08 ****************************************
+     A            F1IDBD    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE' +
+     A                                      'DEDUCTIBLE BALANCE' +
+     A                                      'ON AUDIT BILL (Y/ )')
+      ***** END ADD ***** 05/18/08 *********************************************
+     A***  Begin Add  ***  12/11/08  ******************************************
+     A            F16THT    R               REFFLD(CODE)
+     A                                      COLHDG('6TH ASSESSMENT' +
+     A                                      'TRANSFER CODE')
+     A            F16ATR    R               REFFLD(CODE)
+     A                                      COLHDG('6TH ASSMT FEES XFER')
+     A            F1AX6T    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' '6TH ASSMT')
+     A            F17THT    R               REFFLD(CODE)
+     A                                      COLHDG('7TH ASSESSMENT' +
+     A                                      'TRANSFER CODE')
+     A            F17ATR    R               REFFLD(CODE)
+     A                                      COLHDG('7TH ASSMT FEES XFER')
+     A            F1AX7T    R               REFFLD(CODE)
+     A                                      COLHDG('AUD XFER' '7TH ASSMT')
+     A*** End  n Add  ***  12/11/08  ******************************************
+     A*** BEG ADD ****** 01/25/10 *********************************************
+     A            F1COTA    R               REFFLD(CODE)
+     A                                      COLHDG('COLLATERAL FEE' +
+     A                                      'TRANSFER A/R CODE' )
+     A            F1CFTA    R               REFFLD(CODE)
+     A                                      COLHDG('CLAIMS FEE'  +
+     A                                      'TRANSFER A/R CODE' )
+     A            F1ACOT    R               REFFLD(CODE)
+     A                                      COLHDG('COLLATERAL FEE AUDIT' +
+     A                                      'TRANSFER A/R CODE' )
+     A            F1ACFT    R               REFFLD(CODE)
+     A                                      COLHDG('CLAIMS FEE AUDIT' +
+     A                                      'TRANSFER A/R CODE' )
+     A*** END ADD ****** 01/25/10 *********************************************
+     A***  Begin Add  ***  03/10/11  **************************************
+     A            F1SCDT    R     S         REFFLD(DT)
+     A                                      COLHDG('STOP COLLATERAL DATE')
+     A                                      TEXT('STOP COLLATERAL DATE')
+     A***  End   Add  ***  03/10/11  **************************************
+     A***  Begin Add  ***  05/27/13  **************************************
+     A            F1DVBL    R               REFFLD(CODE)
+     A                                      COLHDG('Div Plan Bill')
+     A            F1DVPD    R               REFFLD(CODE)
+     A                                      COLHDG('Div Plan Paid')
+     A            F1DVXR    R               REFFLD(CODE)
+     A                                      COLHDG('Div Plan XFER')
+     A***  End   Add  ***  05/27/13  **************************************
+     A*** BEGIN ADD ***  09/12/17  ****************************************
+     A            F1MANP    R     S         REFFLD(PC52)
+     A                                      COLHDG('% OF MANUAL PREMIUM' +
+     A                                      'DEFAULT')
+     A*** END ADD *****  09/12/17  ****************************************
+     A*** Beg Add ***** 10/18/17 ****************************
+     A            F1COLB    R               REFFLD(CODE)
+     A                                      COLHDG('Collateral Billed')
+     A            F1COLP    R               REFFLD(CODE)
+     A                                      COLHDG('Collateral Paid')
+     A            F1COLT    R               REFFLD(CODE)
+     A                                      COLHDG('Collateral Transfer')
+     A*** End Add ***** 10/18/17 ****************************
+     A*** Begin Add ***  12/23/21  ****************************************
+     A            F1NETSR   R               REFFLD(FLAG)
+     A                                      COLHDG('Net Rate for S/R')
+     A*** End   Add ***  12/23/21  ****************************************
+     A*** Begin Add ***  05/13/24  ****************************************
+     A            F1SRAS    R               REFFLD(FLAG)
+     A                                      COLHDG('Bill Assessments' +
+     A                                      'on S/R')
+     A*** End   Add ***  05/13/24  ****************************************

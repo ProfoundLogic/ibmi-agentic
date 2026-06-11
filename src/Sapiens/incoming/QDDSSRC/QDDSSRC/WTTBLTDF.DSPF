@@ -1,0 +1,813 @@
+     A*************************************************************************
+     A* (c) 2017 StoneRiver, Inc. All rights reserved.                        *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                         *
+     A*************************************************************************
+     A*  WTTBLTDF - Territorial Differential Factor Maintenance               *
+     A*                                                                       *
+     A*  Created on 07/23/2017 by c:62 for Project 150WAL                     *
+     A*************************************************************************
+     A* Revisions:                                                          *
+     h*
+     A*************************************************************************
+     A                                      REF(*LIBL/WREFP)
+     A                                      INDARA
+     A          R RCDTERDIF
+     A                                  1  2HTML('QPUIREC2    ROVERLAY   0     -
+     A                                      RASSUME    0     ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdTerDif","onload":"          -
+     A                                                        ","description":"-
+     A                                      Territorial Differential Factors","-
+     A                                      overlay":"true","assume":"true","de-
+     A                                      sign overlay formats":"RcdTerDif0"}-
+     A                                      ,"items":[{"id":"HdgTerritoryDiffer-
+     A                                      ential","field type":"output field"-
+     A                                      ,"css class":"heading","value":"Ter-
+     A                                      ritorial Differential Factor by Zip-
+     A                                       Code","left":"260px","top":"10px",-
+     A                                      "description":"Territorial Differen-
+     A                                      tial Factor","z index":"11","width"-
+     A                                      :"640px","heading type":"Page Title-
+     A                                      "},{"id":"BtnExitButton","field typ-
+     A                                      e":"button","css class":"button","v-
+     A                                      alue":"Exit","left":"490px","top":"-
+     A                                      10px","width":"100px","cursor":"def-
+     A                                      ault","description":"Exit Button","-
+     A                                      response":{"fieldName":"ExitNow","d-
+     A                                      ataType":"indicator","formatting":"-
+     A                                      Indicator","indFormat":"1 / 0"},"sh-
+     A                                      ortcut key":"F3","visibility":"hidd-
+     A                                      en","locked in place":"true"},{"id"-
+     A                                      :"TabTerritorialDifferential","fiel-
+     A                                      d type":"tab panel","css class":"ta-
+     A                                      b-panel","left":"250px","top":"70px-
+     A                                      ","width":"970px","height":{"fieldN-
+     A                                      ame":"TabHeight","dataLength":"5","-
+     A                                      decPos":"0","numSep":"false","zeroB-
+     A                                      alance":"false","zeroFill":"false",-
+     A                                      "curSym":"","dataType":"zoned","for-
+     A                                      matting":"Number","units":"px","neg-
+     A                                      Num":"-999.00","designValue":"3270p-
+     A                                      x"},"tab names":"Territorial Differ-
+     A                                      ential Factor","z index":"0","tab p-
+     A                                      anel style":"CompSuite Tab Panel","-
+     A                                      value":"value text","active tab":{"-
+     A                                      fieldName":"TabIndex","dataLength":-
+     A                                      "5","decPos":"0","numSep":"false","-
+     A                                      zeroBalance":"false","zeroFill":"fa-
+     A                                      lse","curSym":"","dataType":"zoned"-
+     A                                      ,"formatting":"Number","units":"","-
+     A                                      negNum":"-999.00"},"ontabclick":"pu-
+     A                                      i.click(\"BtnTabClick\")"},{"id":"B-
+     A                                      tnTabClick","field type":"button","-
+     A                                      css class":"button","cursor":"defau-
+     A                                      lt","description":"tab click button-
+     A                                      ","value":"Tab","response":{"fieldN-
+     A                                      ame":"tabClick","dataType":"indicat-
+     A                                      or","formatting":"Indicator","indFo-
+     A                                      rmat":"1 / 0"},"shortcut key":"F3",-
+     A                                      "left":"450px","top":"10px","width"-
+     A                                      :"35px","visibility":"hidden"},{"id-
+     A                                      ":"btnRefresh","field type":"button-
+     A                                      ","css class":"button","value":"Ref-
+     A                                      resh","left":"620px","top":"10px","-
+     A                                      width":"100px","cursor":"default","-
+     A                                      response":{"fieldName":"BtnRefresh"-
+     A                                      ,"dataType":"indicator","formatting-
+     A                                      ":"Indicator","indFormat":"1 / 0"},-
+     A                                      "visibility":"hidden"}]}')
+     A            BTNREFRESH     1A  H
+     A            EXITNOW        1A  H
+     A            TABCLICK       1A  H
+     A            TABHEIGHT      5S 0H
+     A            TABINDEX       5S 0H
+     A          R SFLTERDIF                 SFL
+     A            QPUI000001     1A  O  2  2
+     A            DSPMODE        1A  H
+     A            DSPVISB        1A  H
+     A            SCCARR#       15A  H
+     A            SCEFFDATE       L  H
+     A            SCEXPDATE       L  H
+     A            SCGROUP       40A  H
+     A            SCTDF          5S 4H
+     A            SCTDFDLT       1A  H
+     A            SCTDFEDT       1A  H
+     A            SCTDFRRN#      9S 0H
+     A            SCTDFSTAT     10A  H
+     A            SCZIPCD        5S 0H
+     A          R QSFLCTL001                SFLCTL(SFLTERDIF)
+     A                                      SFLSIZ(0001)
+     A                                      SFLPAG(0001)
+     A                                      SFLDSP
+     A                                  1  2HTML('QPUISFLRCDTERDIF0')
+     A          R RCDTERDIF0
+     A                                  1  2HTML('QPUICTL1    SFLTERDIF 5    RS-
+     A                                      FLDSP    0     RSFLDSPCTL 0    FDSP-
+     A                                      TDFCTL RSFLCLR    0    FCLRTDFCOD R-
+     A                                      SFLPAG    1    C1    5 RSFLSIZ    1-
+     A                                          C1    6 0    3    ROVERLAY   0 -
+     A                                          RASSUME    0     RROWS      2  -
+     A                                        C1    1C1    1 ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdTerDif0","overlay":"true","e-
+     A                                      xternal css":"label","onload":"docu-
+     A                                      ment.body.style.background = \"#EBF-
+     A                                      5FF\"; fillDetailBox(''sflTerritori-
+     A                                      alDifferential'',1,''OutTdfRRN#'', -
+     A                                      ''WTTBLTDF01'');","description":"Te-
+     A                                      rritorial Differential Factors","as-
+     A                                      sume":"true","overlay range":"1-1",-
+     A                                      "design overlay formats":"RcdTerDif-
+     A                                      ","header text align":"Left,Right",-
+     A                                      "csv file name":"Payment Value 1 Co-
+     A                                      des","selection value":"A"},"items"-
+     A                                      :[{"id":"BtnExitButtonAll","field t-
+     A                                      ype":"button","css class":"button",-
+     A                                      "value":"Exit","left":"395px","top"-
+     A                                      :"10px","width":"100px","cursor":"d-
+     A                                      efault","description":"Exit Button"-
+     A                                      ,"response":{"fieldName":"ExitNow",-
+     A                                      "dataType":"indicator","formatting"-
+     A                                      :"Indicator","indFormat":"1 / 0"},"-
+     A                                      shortcut key":"F3","visibility":"hi-
+     A                                      dden"},{"id":"HdgTerrDiffFactor","f-
+     A                                      ield type":"output field","css clas-
+     A                                      s":"heading","value":"Territorial D-
+     A                                      ifferential Factor","text align":"l-
+     A                                      eft","left":"260px","top":"100px","-
+     A                                      width":"205px","z index":"50","head-
+     A                                      ing type":"Section Header"},{"id":"-
+     A                                      sflTerritorialDifferential","field -
+     A                                      type":"grid","css class":"subfilegr-
+     A                                      id","left":"260px","top":"135px","n-
+     A                                      umber of rows":"6","number of colum-
+     A                                      ns":"8","column widths":"121,283,79-
+     A                                      ,92,96,72,97,100","column headings"-
+     A                                      :"Carrier #, Group, Zip Code, Effec-
+     A                                      tive Date, Expiration Date,Factor, -
+     A                                      Status,","header height":"21","row -
+     A                                      height":"20","csv export":"true","e-
+     A                                      xport with headings":"true","sortab-
+     A                                      le columns":"true","resizable colum-
+     A                                      ns":"true","movable columns":"true"-
+     A                                      ,"height":"121px","width":"941px","-
+     A                                      header text align":"left,left,cente-
+     A                                      r,left,left,Center,left,","record f-
+     A                                      ormat name":"sflTerDif","descriptio-
+     A                                      n":"Territorial Differential Factor-
+     A                                      s","clear subfile":{"fieldName":"cl-
+     A                                      rTdfCod","customTrue":"","customFal-
+     A                                      se":"","dataType":"indicator","form-
+     A                                      atting":"Indicator","indFormat":"tr-
+     A                                      ue / false"},"subfile record number-
+     A                                      ":{"fieldName":"rrnTdfCod","dataLen-
+     A                                      gth":"5","decPos":"0","numSep":"fal-
+     A                                      se","zeroBalance":"false","numBlank-
+     A                                      Fill":"false","zeroFill":"false","n-
+     A                                      oExtraSpaces":"false","curSym":"","-
+     A                                      dataType":"zoned","formatting":"Num-
+     A                                      ber","negNum":"-999.00","units":""}-
+     A                                      ,"row selection":"single","display -
+     A                                      control record":{"fieldName":"dspTd-
+     A                                      fCtl","customTrue":"","customFalse"-
+     A                                      :"","dataType":"indicator","formatt-
+     A                                      ing":"Indicator","indFormat":"true -
+     A                                      / false"},"selection value":"A","on-
+     A                                      rowclick":"fillDetailBox(''sflTerri-
+     A                                      torialDifferential'',row,''OutTdfRR-
+     A                                      N#'', ''WTTBLTDF01'');  ","export f-
+     A                                      ile name":"Territorial Differential-
+     A                                       Factor","filter option":"true","fi-
+     A                                      nd option":"true"},{"id":"BtnTDFAdd-
+     A                                      ","field type":"butto')
+     A                                  1  2HTML('n","css class":"button","valu-
+     A                                      e":"Add","left":"1105px","top":"260-
+     A                                      px","width":"80px","cursor":"defaul-
+     A                                      t","response":{"fieldName":"scTDFAd-
+     A                                      d","customTrue":"","customFalse":""-
+     A                                      ,"dataType":"indicator","formatting-
+     A                                      ":"Indicator","indFormat":"1 / 0"},-
+     A                                      "disabled":{"fieldName":"dspMode","-
+     A                                      dataType":"indicator","formatting":-
+     A                                      "Indicator","indFormat":"true / fal-
+     A                                      se"},"visibility":{"fieldName":"dsp-
+     A                                      Mode","customTrue":"","customFalse"-
+     A                                      :"","dataType":"indicator","formatt-
+     A                                      ing":"Indicator","indFormat":"hidde-
+     A                                      n / visible"}},{"id":"LblCArrier#",-
+     A                                      "field type":"output field","css cl-
+     A                                      ass":"label","value":"Carrier #","l-
+     A                                      eft":"265px","top":"285px","width":-
+     A                                      "130px","locked in place":"false"},-
+     A                                      {"id":"LblGroup","field type":"outp-
+     A                                      ut field","css class":"label","valu-
+     A                                      e":"Group","left":"590px","top":"28-
+     A                                      5px","width":"70px","locked in plac-
+     A                                      e":"false"},{"id":"LblTDFStatus","f-
+     A                                      ield type":"output field","css clas-
+     A                                      s":"label","value":"Status","left":-
+     A                                      "925px","top":"285px","width":"40px-
+     A                                      ","locked in place":"false"},{"id":-
+     A                                      "OutDtlCarrier#","field type":"outp-
+     A                                      ut field","css class":"output-field-
+     A                                      ","left":"265px","top":"300px","wid-
+     A                                      th":"75px","height":"12px","locked -
+     A                                      in place":"false"},{"id":"OutDtlGro-
+     A                                      up","field type":"output field","cs-
+     A                                      s class":"output-field","left":"590-
+     A                                      px","top":"300px","width":"300px","-
+     A                                      locked in place":"false","height":"-
+     A                                      12px"},{"id":"OutDtlTDFStat","field-
+     A                                       type":"output field","css class":"-
+     A                                      output-field","left":"925px","top":-
+     A                                      "300px","width":"85px","height":"12-
+     A                                      px","locked in place":"false"},{"id-
+     A                                      ":"LblZipcode","field type":"output-
+     A                                       field","css class":"label","value"-
+     A                                      :"Zip Code","left":"265px","top":"3-
+     A                                      20px","width":"120px","locked in pl-
+     A                                      ace":"false"},{"id":"LblEffDate","f-
+     A                                      ield type":"output field","css clas-
+     A                                      s":"label","value":"Effective Date"-
+     A                                      ,"left":"405px","top":"320px","widt-
+     A                                      h":"120px","locked in place":"false-
+     A                                      "},{"id":"LblTerritorialDiffeential-
+     A                                      Factor","field type":"output field"-
+     A                                      ,"css class":"label","value":"Terri-
+     A                                      torial Differential Factor","left":-
+     A                                      "925px","top":"320px","width":"180p-
+     A                                      x","locked in place":"false"},{"id"-
+     A                                      :"OutDtlZipCode","field type":"outp-
+     A                                      ut field","css class":"output-field-
+     A                                      ","left":"265px","top":"335px","hei-
+     A                                      ght":"12px","width":"120px","locked-
+     A                                       in place":"false"},{"id":"OutDtlEf-
+     A                                      fDate","field type":"output field",-
+     A                                      "css class":"output-field","left":"-
+     A                                      405px","top":"335px","height":"12px-
+     A                                      ","width":"120px","locked in place"-
+     A                                      :"false"},{"id":"OutDtlTDF","field -
+     A                                      type":"output field","css class":"o-
+     A                                      utput-field","left":"925px","top":"-
+     A                                      335px","width":"115px","height":"12-
+     A                                      px","locked in place":"false","text-
+     A                                       align":"left"},{"id"')
+     A                                  1  2HTML(':"LblExpDate","field type":"o-
+     A                                      utput field","css class":"label","v-
+     A                                      alue":"Expiration Date","left":"590-
+     A                                      px","top":"320px","width":"120px","-
+     A                                      locked in place":"false"},{"id":"Ou-
+     A                                      tDtlExpDate","field type":"output f-
+     A                                      ield","css class":"output-field","l-
+     A                                      eft":"590px","top":"335px","height"-
+     A                                      :"12px","width":"120px","locked in -
+     A                                      place":"false"},{"id":"OutCarrier#"-
+     A                                      ,"field type":"output field","css c-
+     A                                      lass":"output-field","value":{"fiel-
+     A                                      dName":"scCarr#","dataLength":"15",-
+     A                                      "trimLeading":"false","trimTrailing-
+     A                                      ":"true","blankFill":"false","rjZer-
+     A                                      oFill":"false","dataType":"char","f-
+     A                                      ormatting":"Text","textTransform":"-
+     A                                      none","designValue":"[scCarr#]"},"l-
+     A                                      eft":"5px","top":"5px","width":"110-
+     A                                      px","text align":"left","grid":"sfl-
+     A                                      TerritorialDifferential","column":"-
+     A                                      0"},{"id":"OutGroup","field type":"-
+     A                                      output field","css class":"output-f-
+     A                                      ield","value":{"fieldName":"scGroup-
+     A                                      ","dataLength":"40","trimLeading":"-
+     A                                      false","trimTrailing":"true","blank-
+     A                                      Fill":"false","rjZeroFill":"false",-
+     A                                      "dataType":"char","formatting":"Tex-
+     A                                      t","textTransform":"none","designVa-
+     A                                      lue":"[scGroup]"},"left":"5px","top-
+     A                                      ":"5px","width":"270px","text align-
+     A                                      ":"left","grid":"sflTerritorialDiff-
+     A                                      erential","column":"1"},{"id":"OutT-
+     A                                      dfRRN#","field type":"output field"-
+     A                                      ,"css class":"output-field","value"-
+     A                                      :{"fieldName":"scTdfRRN#","dataLeng-
+     A                                      th":"9","decPos":"0","numSep":"fals-
+     A                                      e","zeroBalance":"false","numBlankF-
+     A                                      ill":"false","zeroFill":"true","noE-
+     A                                      xtraSpaces":"false","curSym":"","da-
+     A                                      taType":"zoned","formatting":"Numbe-
+     A                                      r","negNum":"999.00","units":"","de-
+     A                                      signValue":"[scTdfRRN#]"},"left":"2-
+     A                                      05px","top":"5px","visibility":"hid-
+     A                                      den","grid":"sflTerritorialDifferen-
+     A                                      tial","column":"1"},{"id":"OutFromZ-
+     A                                      ip","field type":"output field","cs-
+     A                                      s class":"output-field","value":{"f-
+     A                                      ieldName":"scZipCd","dataLength":"5-
+     A                                      ","decPos":"0","numSep":"false","ze-
+     A                                      roBalance":"false","numBlankFill":"-
+     A                                      false","zeroFill":"false","noExtraS-
+     A                                      paces":"false","edtWrd":"''   0 ''"-
+     A                                      ,"curSym":"","dataType":"zoned","fo-
+     A                                      rmatting":"Number","negNum":"-999.0-
+     A                                      0","units":"","designValue":"[scZip-
+     A                                      Cd]"},"left":"5px","top":"5px","wid-
+     A                                      th":"65px","text align":"center","g-
+     A                                      rid":"sflTerritorialDifferential","-
+     A                                      column":"2"},{"id":"OutEffDate","fi-
+     A                                      eld type":"output field","css class-
+     A                                      ":"output-field","value":{"fieldNam-
+     A                                      e":"scEffDate","dataType":"date","f-
+     A                                      ormatting":"Date","dateFormat":"n/j-
+     A                                      /Y","locale":"en_US","designValue":-
+     A                                      "[scEffDate]"},"left":"5px","top":"-
+     A                                      5px","width":"70px","text align":"r-
+     A                                      ight","grid":"sflTerritorialDiffere-
+     A                                      ntial","column":"3"},{"id":"OutTDF"-
+     A                                      ,"field type":"output field","css c-
+     A                                      lass":"output-field","value":{"fiel-
+     A                                      dName":"scTDF","dataL')
+     A                                  1  2HTML('ength":"5","decPos":"4","numS-
+     A                                      ep":"false","zeroBalance":"false","-
+     A                                      numBlankFill":"false","zeroFill":"f-
+     A                                      alse","noExtraSpaces":"false","edtW-
+     A                                      rd":"''0 .    ''","curSym":"","data-
+     A                                      Type":"zoned","formatting":"Number"-
+     A                                      ,"negNum":"-999.00","units":"","des-
+     A                                      ignValue":"[scTDF]"},"left":"5px","-
+     A                                      top":"5px","width":"60px","text ali-
+     A                                      gn":"center","grid":"sflTerritorial-
+     A                                      Differential","column":"5"},{"id":"-
+     A                                      OutTDFStat","field type":"output fi-
+     A                                      eld","css class":"output-field","va-
+     A                                      lue":{"fieldName":"scTDFStat","data-
+     A                                      Length":"10","trimLeading":"false",-
+     A                                      "trimTrailing":"true","blankFill":"-
+     A                                      false","rjZeroFill":"false","dataTy-
+     A                                      pe":"char","formatting":"Text","tex-
+     A                                      tTransform":"none","designValue":"[-
+     A                                      scTDFStat]"},"left":"5px","top":"5p-
+     A                                      x","width":"85px","text align":"lef-
+     A                                      t","grid":"sflTerritorialDifferenti-
+     A                                      al","column":"6"},{"id":"LnkEdit","-
+     A                                      field type":"hyperlink","css class"-
+     A                                      :"link","value":"Edit","left":"10px-
+     A                                      ","top":"5px","response":{"fieldNam-
+     A                                      e":"scTDFEdt","customTrue":"","cust-
+     A                                      omFalse":"","dataType":"indicator",-
+     A                                      "formatting":"Indicator","indFormat-
+     A                                      ":"1 / 0"},"disabled":{"fieldName":-
+     A                                      "dspMode","dataType":"indicator","f-
+     A                                      ormatting":"Indicator","indFormat":-
+     A                                      "true / false"},"visibility":{"fiel-
+     A                                      dName":"dspVisb","dataType":"indica-
+     A                                      tor","formatting":"Indicator","indF-
+     A                                      ormat":"visible / hidden"},"grid":"-
+     A                                      sflTerritorialDifferential","column-
+     A                                      ":"7"},{"id":"LnkDelete","field typ-
+     A                                      e":"hyperlink","css class":"link","-
+     A                                      value":"Delete","response":{"fieldN-
+     A                                      ame":"scTDFDlt","customTrue":"","cu-
+     A                                      stomFalse":"","dataType":"indicator-
+     A                                      ","formatting":"Indicator","indForm-
+     A                                      at":"1 / 0"},"disabled":{"fieldName-
+     A                                      ":"dspMode","dataType":"indicator",-
+     A                                      "formatting":"Indicator","indFormat-
+     A                                      ":"true / false"},"left":"40px","to-
+     A                                      p":"5px","visibility":{"fieldName":-
+     A                                      "dspVisb","dataType":"indicator","f-
+     A                                      ormatting":"Indicator","indFormat":-
+     A                                      "visible / hidden"},"grid":"sflTerr-
+     A                                      itorialDifferential","column":"7"},-
+     A                                      {"id":"OutExpirationDate","field ty-
+     A                                      pe":"output field","css class":"out-
+     A                                      put-field","value":{"fieldName":"sc-
+     A                                      ExpDate","dataType":"date","formatt-
+     A                                      ing":"Date","dateFormat":"n/j/Y","l-
+     A                                      ocale":"en_US","designValue":"[scEx-
+     A                                      pDate]"},"text align":"right","left-
+     A                                      ":"5px","top":"5px","width":"75px",-
+     A                                      "grid":"sflTerritorialDifferential"-
+     A                                      ,"column":"4"}]}')
+     A            CLRTDFCOD      1A  H
+     A            DSPMODE        1A  H
+     A            DSPTDFCTL      1A  H
+     A            EXITNOW        1A  H
+     A            RRNTDFCOD      5S 0H
+     A            SCTDFADD       1A  H
+     A          R RCDAEDTDF
+     A                                  1  2HTML('QPUIREC9    RWINDOW    0     -
+     A                                      RASSUME    0     RSFLMSGID  4    C7-
+     A                                          WC30108C6    WMESGGC0    C0    -
+     A                                      FERDESC    RERRMSG    2    C14   Dr-
+     A                                      pCarrier#AEDFMGCAR#AED FERCAR#AED R-
+     A                                      ERRMSG    2    C11   DrpGroupAEDFMG-
+     A                                      GRPAED  FERGRPAED  REMSG      2    -
+     A                                      C13   TxbFromZipAEDFMGZIPAED  FERZI-
+     A                                      PAED  REMSG      2    C13   TxbEffD-
+     A                                      ateAEDFMGEFFDTAEDFEREFFDTAEDREMSG  -
+     A                                          2    C13   TxbExpDateAEDFMGEXPD-
+     A                                      TAEDFEREXPDTAEDREMSG      2    C12 -
+     A                                        TxbTerDifAEDFMGTDFAED  FERTDFAED -
+     A                                       ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"RcdAEDTdf","description":"Terri-
+     A                                      torial Differential Factor - Add/Ed-
+     A                                      it/Delete","assume":"true","show as-
+     A                                       window":"true","error message id":-
+     A                                      "WC30108","error message file":"WME-
+     A                                      SGG","error condition":{"fieldName"-
+     A                                      :"ErDesc","dataType":"indicator","f-
+     A                                      ormatting":"Indicator","indFormat":-
+     A                                      "1 / 0"},"error enhanced mode":"0"}-
+     A                                      ,"items":[{"id":"PanAddEdtDelete","-
+     A                                      field type":"panel","css class":"di-
+     A                                      alog","value":{"fieldName":"scTdfTi-
+     A                                      tle","dataLength":"100","trimLeadin-
+     A                                      g":"false","trimTrailing":"true","b-
+     A                                      lankFill":"false","rjZeroFill":"fal-
+     A                                      se","dataType":"char","formatting":-
+     A                                      "Text","textTransform":"none","desi-
+     A                                      gnValue":"[scTdfTitle]"},"left":"26-
+     A                                      5px","top":"90px","width":"685px","-
+     A                                      height":"180px","panel style":"Tran-
+     A                                      sform Dialog","z index":"8","locked-
+     A                                       in place":"true"},{"id":"LblCarrie-
+     A                                      r#AED","field type":"output field",-
+     A                                      "css class":"label","value":"Carrie-
+     A                                      r #","left":"280px","top":"130px","-
+     A                                      width":"60px"},{"id":"LblGroupAED",-
+     A                                      "field type":"output field","css cl-
+     A                                      ass":"label","value":"Group","left"-
+     A                                      :"400px","top":"130px","width":"40p-
+     A                                      x","locked in place":"false"},{"id"-
+     A                                      :"LblStatusAED","field type":"outpu-
+     A                                      t field","css class":"label","value-
+     A                                      ":"Status","left":"725px","top":"13-
+     A                                      0px","width":"40px","locked in plac-
+     A                                      e":"false"},{"id":"LblZipAED","fiel-
+     A                                      d type":"output field","css class":-
+     A                                      "label","value":"Zip Code","left":"-
+     A                                      280px","top":"170px","width":"65px"-
+     A                                      ,"locked in place":"false"},{"id":"-
+     A                                      LblEffDateAED","field type":"output-
+     A                                       field","css class":"label","value"-
+     A                                      :"Effective Date","left":"400px","t-
+     A                                      op":"170px","width":"85px","locked -
+     A                                      in place":"false"},{"id":"LblTerDif-
+     A                                      FactorAED","field type":"output fie-
+     A                                      ld","css class":"label","value":"Te-
+     A                                      rritorial Differential Factor","lef-
+     A                                      t":"725px","top":"170px","width":"1-
+     A                                      70px","locked in place":"false"},{"-
+     A                                      id":"Image1_copy2","field type":"im-
+     A                                      age","css class":"image","image sou-
+     A                                      rce":"/profoundui/userdata/images/a-
+     A                                      sterisk_orange_small.png","left":"3-
+     A                                      35px","top":"175px","height":"8px",-
+     A                                      "width":"8px","css class 2":"requir-
+     A                                      ed-icon","visibility":{"fieldName":-
+     A                                      "visible1","customTrue":"","customF-
+     A                                      alse":"","dataType":"indicator","fo-
+     A                                      rmatting":"Indicator","indFormat":"-
+     A                                      visible / hidden"}},{"id":"Image1_c-
+     A                                      opy3","field type":"image","css cla-
+     A                                      ss":"image","image source":"/profou-
+     A                                      ndui/userdata/images/asterisk_orang-
+     A                                      e_small.png","left":"485px","top":"-
+     A                                      175px","height":"8px","width":"8px"-
+     A                                      ,"css class 2":"required-icon","vis-
+     A                                      ibility":{"fieldName":"visible1","c-
+     A                                      ustomTrue":"","customFalse":"","dat-
+     A                                      aType":"indicator","formatting":"In-
+     A                                      dicator","indFormat":"visible / hid-
+     A                                      den"}},{"id":"DrpCarr')
+     A                                  1  2HTML('ier#AED","field type":"select-
+     A                                       box","css class":"input","descript-
+     A                                      ion":"Carrier Selection Drop down",-
+     A                                      "value":{"fieldName":"scCar#AED","d-
+     A                                      ataLength":"5","decPos":"0","numSep-
+     A                                      ":"false","zeroBalance":"false","nu-
+     A                                      mBlankFill":"false","zeroFill":"tru-
+     A                                      e","noExtraSpaces":"false","curSym"-
+     A                                      :"","dataType":"zoned","formatting"-
+     A                                      :"Number","negNum":"-999.00","units-
+     A                                      ":"","designValue":"[scCar#AED]"},"-
+     A                                      error messages":"1 message","choice-
+     A                                      s database file":{"fieldName":"carr-
+     A                                      From","dataLength":"200","trimLeadi-
+     A                                      ng":"false","trimTrailing":"true","-
+     A                                      blankFill":"false","rjZeroFill":"fa-
+     A                                      lse","dataType":"char","formatting"-
+     A                                      :"Text","textTransform":"none"},"ch-
+     A                                      oice options field":{"fieldName":"c-
+     A                                      arrSelect","dataLength":"100","trim-
+     A                                      Leading":"false","trimTrailing":"tr-
+     A                                      ue","blankFill":"false","rjZeroFill-
+     A                                      ":"false","dataType":"char","format-
+     A                                      ting":"Text","textTransform":"none"-
+     A                                      },"choice values field":"DIGITS(F2C-
+     A                                      AR#)","choices selection criteria":-
+     A                                      {"fieldName":"carrWhere","dataLengt-
+     A                                      h":"200","trimLeading":"false","tri-
+     A                                      mTrailing":"true","blankFill":"fals-
+     A                                      e","rjZeroFill":"false","dataType":-
+     A                                      "char","formatting":"Text","textTra-
+     A                                      nsform":"none"},"left":"280px","top-
+     A                                      ":"145px","width":"90px","css class-
+     A                                       2":"dropdown","tab index":"2","dis-
+     A                                      abled":{"fieldName":"disable1","cus-
+     A                                      tomTrue":"","customFalse":"","dataT-
+     A                                      ype":"indicator","formatting":"Indi-
+     A                                      cator","indFormat":"true / false"},-
+     A                                      "read only":{"fieldName":"disable1"-
+     A                                      ,"customTrue":"","customFalse":"","-
+     A                                      dataType":"indicator","formatting":-
+     A                                      "Indicator","indFormat":"true / fal-
+     A                                      se"},"error message":{"fieldName":"-
+     A                                      mgCar#AED","dataLength":"100","trim-
+     A                                      Leading":"false","trimTrailing":"tr-
+     A                                      ue","blankFill":"false","rjZeroFill-
+     A                                      ":"false","dataType":"char","format-
+     A                                      ting":"Text","textTransform":"none"-
+     A                                      },"error condition":{"fieldName":"e-
+     A                                      rCar#AED","customTrue":"","customFa-
+     A                                      lse":"","dataType":"indicator","for-
+     A                                      matting":"Indicator","indFormat":"1-
+     A                                       / 0"},"error enhanced mode":"0","b-
+     A                                      lank option":"true","blank option l-
+     A                                      abel":"*All Carriers","required":"f-
+     A                                      alse"},{"id":"DrpGroupAED","field t-
+     A                                      ype":"select box","css class":"inpu-
+     A                                      t","description":"Group Selection D-
+     A                                      rop down","value":{"fieldName":"scG-
+     A                                      rpAED","refField":"elfnd wdelp","nu-
+     A                                      mSep":"false","zeroBalance":"false"-
+     A                                      ,"numBlankFill":"false","zeroFill":-
+     A                                      "true","noExtraSpaces":"false","cur-
+     A                                      Sym":"","dataType":"reference","for-
+     A                                      matting":"Number","negNum":"-999.00-
+     A                                      ","units":"","designValue":"[scGrpA-
+     A                                      ED]"},"error messages":"1 message",-
+     A                                      "choices database file":{"fieldName-
+     A                                      ":"grpFrom","dataLength":"200","tri-
+     A                                      mLeading":"false","trimTrailing":"t-
+     A                                      rue","blankFill":"false","rjZeroFil-
+     A                                      l":"false","dataType"')
+     A                                  1  2HTML(':"char","formatting":"Text","-
+     A                                      textTransform":"none"},"choice opti-
+     A                                      ons field":{"fieldName":"grpSelect"-
+     A                                      ,"dataLength":"100","trimLeading":"-
+     A                                      false","trimTrailing":"true","blank-
+     A                                      Fill":"false","rjZeroFill":"false",-
+     A                                      "dataType":"char","formatting":"Tex-
+     A                                      t","textTransform":"none"},"choice -
+     A                                      values field":"DIGITS(FNFND)","choi-
+     A                                      ces selection criteria":{"fieldName-
+     A                                      ":"grpWhere","dataLength":"200","tr-
+     A                                      imLeading":"false","trimTrailing":"-
+     A                                      true","blankFill":"false","rjZeroFi-
+     A                                      ll":"false","dataType":"char","form-
+     A                                      atting":"Text","textTransform":"non-
+     A                                      e"},"left":"400px","top":"145px","w-
+     A                                      idth":"300px","css class 2":"dropdo-
+     A                                      wn","tab index":"2","blank option":-
+     A                                      "true","disabled":{"fieldName":"dis-
+     A                                      able1","customTrue":"","customFalse-
+     A                                      ":"","dataType":"indicator","format-
+     A                                      ting":"Indicator","indFormat":"true-
+     A                                       / false"},"read only":{"fieldName"-
+     A                                      :"disable1","customTrue":"","custom-
+     A                                      False":"","dataType":"indicator","f-
+     A                                      ormatting":"Indicator","indFormat":-
+     A                                      "true / false"},"required":"false",-
+     A                                      "error message":{"fieldName":"mgGrp-
+     A                                      AED","dataLength":"100","trimLeadin-
+     A                                      g":"false","trimTrailing":"true","b-
+     A                                      lankFill":"false","rjZeroFill":"fal-
+     A                                      se","dataType":"char","formatting":-
+     A                                      "Text","textTransform":"none"},"err-
+     A                                      or condition":{"fieldName":"erGrpAE-
+     A                                      D","customTrue":"","customFalse":""-
+     A                                      ,"dataType":"indicator","formatting-
+     A                                      ":"Indicator","indFormat":"1 / 0"},-
+     A                                      "error enhanced mode":"0","blank op-
+     A                                      tion label":"*All Groups"},{"id":"D-
+     A                                      rpStatusAED","field type":"select b-
+     A                                      ox","css class":"input","left":"725-
+     A                                      px","top":"145px","width":"135px","-
+     A                                      css class 2":"dropdown","choices":"-
+     A                                      Active,Inactive","choice values":"A-
+     A                                      ,I","value":{"fieldName":"scStatAED-
+     A                                      ","dataLength":"10","trimLeading":"-
+     A                                      false","trimTrailing":"true","blank-
+     A                                      Fill":"false","rjZeroFill":"false",-
+     A                                      "dataType":"char","formatting":"Tex-
+     A                                      t","textTransform":"none","designVa-
+     A                                      lue":"[scStatAED]"},"disabled":{"fi-
+     A                                      eldName":"disable2","customTrue":""-
+     A                                      ,"customFalse":"","dataType":"indic-
+     A                                      ator","formatting":"Indicator","ind-
+     A                                      Format":"true / false"},"read only"-
+     A                                      :{"fieldName":"disable2","customTru-
+     A                                      e":"","customFalse":"","dataType":"-
+     A                                      indicator","formatting":"Indicator"-
+     A                                      ,"indFormat":"true / false"}},{"id"-
+     A                                      :"TxbFromZipAED","field type":"text-
+     A                                      box","css class":"input","value":{"-
+     A                                      fieldName":"scZipAED","dataLength":-
+     A                                      "5","decPos":"0","numSep":"false","-
+     A                                      zeroBalance":"false","numBlankFill"-
+     A                                      :"false","zeroFill":"false","noExtr-
+     A                                      aSpaces":"false","curSym":"","dataT-
+     A                                      ype":"zoned","formatting":"Number",-
+     A                                      "negNum":"-999.00","units":"","desi-
+     A                                      gnValue":"[scZipAED]"},"required":"-
+     A                                      false","left":"280px","top":"185px"-
+     A                                      ,"width":"85px","locked in place":"-
+     A                                      false","css class 2":')
+     A                                  1  2HTML('"textbox","text transform":"u-
+     A                                      ppercase","error messages":"1 messa-
+     A                                      ge","disabled":{"fieldName":"disabl-
+     A                                      e1","customTrue":"","customFalse":"-
+     A                                      ","dataType":"indicator","formattin-
+     A                                      g":"Indicator","indFormat":"true / -
+     A                                      false"},"read only":{"fieldName":"d-
+     A                                      isable1","customTrue":"","customFal-
+     A                                      se":"","dataType":"indicator","form-
+     A                                      atting":"Indicator","indFormat":"tr-
+     A                                      ue / false"},"text align":"right","-
+     A                                      error message":{"fieldName":"mgZipA-
+     A                                      ED","dataLength":"100","trimLeading-
+     A                                      ":"false","trimTrailing":"true","bl-
+     A                                      ankFill":"false","rjZeroFill":"fals-
+     A                                      e","dataType":"char","formatting":"-
+     A                                      Text","textTransform":"none"},"erro-
+     A                                      r condition":{"fieldName":"erZipAED-
+     A                                      ","customTrue":"","customFalse":"",-
+     A                                      "dataType":"indicator","formatting"-
+     A                                      :"Indicator","indFormat":"1 / 0"},"-
+     A                                      error enhanced mode":"1"},{"id":"Tx-
+     A                                      bEffDateAED","field type":"date fie-
+     A                                      ld","css class":"input","value":{"f-
+     A                                      ieldName":"scEffDtAED","dataLength"-
+     A                                      :"8","decPos":"0","numSep":"false",-
+     A                                      "zeroBalance":"false","numBlankFill-
+     A                                      ":"false","zeroFill":"false","noExt-
+     A                                      raSpaces":"false","edtWrd":"''  /  -
+     A                                      /    ''","curSym":"","dataType":"zo-
+     A                                      ned","formatting":"Number","negNum"-
+     A                                      :"-999.00","units":"","designValue"-
+     A                                      :"[scEffDtAED]"},"required":"false"-
+     A                                      ,"left":"400px","top":"185px","widt-
+     A                                      h":"85px","css class 2":"textbox","-
+     A                                      locked in place":"false","text alig-
+     A                                      n":"right","error messages":"1 mess-
+     A                                      age","disabled":{"fieldName":"disab-
+     A                                      le1","customTrue":"","customFalse":-
+     A                                      "","dataType":"indicator","formatti-
+     A                                      ng":"Indicator","indFormat":"true /-
+     A                                       false"},"read only":{"fieldName":"-
+     A                                      disable1","customTrue":"","customFa-
+     A                                      lse":"","dataType":"indicator","for-
+     A                                      matting":"Indicator","indFormat":"t-
+     A                                      rue / false"},"error message":{"fie-
+     A                                      ldName":"mgEffDtAED","dataLength":"-
+     A                                      100","trimLeading":"false","trimTra-
+     A                                      iling":"true","blankFill":"false","-
+     A                                      rjZeroFill":"false","dataType":"cha-
+     A                                      r","formatting":"Text","textTransfo-
+     A                                      rm":"none"},"error condition":{"fie-
+     A                                      ldName":"erEffDtAED","customTrue":"-
+     A                                      ","customFalse":"","dataType":"indi-
+     A                                      cator","formatting":"Indicator","in-
+     A                                      dFormat":"1 / 0"},"error enhanced m-
+     A                                      ode":"1"},{"id":"TxbExpDateAED","fi-
+     A                                      eld type":"date field","css class":-
+     A                                      "input","value":{"fieldName":"scExp-
+     A                                      DtAED","dataLength":"8","decPos":"0-
+     A                                      ","numSep":"false","zeroBalance":"f-
+     A                                      alse","numBlankFill":"false","zeroF-
+     A                                      ill":"false","noExtraSpaces":"false-
+     A                                      ","edtWrd":"''  /  /    ''","curSym-
+     A                                      ":"","dataType":"zoned","formatting-
+     A                                      ":"Number","negNum":"-999.00","unit-
+     A                                      s":"","designValue":"[scExpDtAED]"}-
+     A                                      ,"text align":"right","disabled":{"-
+     A                                      fieldName":"disable2","customTrue":-
+     A                                      "","customFalse":"","dataType":"ind-
+     A                                      icator","formatting":"Indicator","i-
+     A                                      ndFormat":"true / fal')
+     A                                  1  2HTML('se"},"read only":{"fieldName"-
+     A                                      :"disable2","customTrue":"","custom-
+     A                                      False":"","dataType":"indicator","f-
+     A                                      ormatting":"Indicator","indFormat":-
+     A                                      "true / false"},"required":"false",-
+     A                                      "error messages":"1 message","left"-
+     A                                      :"535px","top":"185px","width":"85p-
+     A                                      x","locked in place":"false","css c-
+     A                                      lass 2":"textbox","error message":{-
+     A                                      "fieldName":"mgExpDtAED","dataLengt-
+     A                                      h":"100","trimLeading":"false","tri-
+     A                                      mTrailing":"true","blankFill":"fals-
+     A                                      e","rjZeroFill":"false","dataType":-
+     A                                      "char","formatting":"Text","textTra-
+     A                                      nsform":"none"},"error condition":{-
+     A                                      "fieldName":"erExpDtAED","customTru-
+     A                                      e":"","customFalse":"","dataType":"-
+     A                                      indicator","formatting":"Indicator"-
+     A                                      ,"indFormat":"1 / 0"},"error enhanc-
+     A                                      ed mode":"1"},{"id":"TxbTerDifAED",-
+     A                                      "field type":"textbox","css class":-
+     A                                      "input","value":{"fieldName":"scTDF-
+     A                                      AED","dataLength":"5","decPos":"4",-
+     A                                      "numSep":"false","zeroBalance":"fal-
+     A                                      se","numBlankFill":"false","zeroFil-
+     A                                      l":"false","noExtraSpaces":"false",-
+     A                                      "curSym":"","dataType":"zoned","for-
+     A                                      matting":"Number","negNum":"999.00"-
+     A                                      ,"units":"","designValue":"[scTDFAE-
+     A                                      D]"},"text align":"right","required-
+     A                                      ":"false","left":"725px","top":"185-
+     A                                      px","width":"85px","locked in place-
+     A                                      ":"false","css class 2":"textbox","-
+     A                                      error messages":"1 message","disabl-
+     A                                      ed":{"fieldName":"disable2","custom-
+     A                                      True":"","customFalse":"","dataType-
+     A                                      ":"indicator","formatting":"Indicat-
+     A                                      or","indFormat":"true / false"},"re-
+     A                                      ad only":{"fieldName":"disable2","c-
+     A                                      ustomTrue":"","customFalse":"","dat-
+     A                                      aType":"indicator","formatting":"In-
+     A                                      dicator","indFormat":"true / false"-
+     A                                      },"error message":{"fieldName":"mgT-
+     A                                      DFAED","dataLength":"100","trimLead-
+     A                                      ing":"false","trimTrailing":"true",-
+     A                                      "blankFill":"false","rjZeroFill":"f-
+     A                                      alse","dataType":"char","formatting-
+     A                                      ":"Text","textTransform":"none"},"e-
+     A                                      rror condition":{"fieldName":"erTDF-
+     A                                      AED","customTrue":"","customFalse":-
+     A                                      "","dataType":"indicator","formatti-
+     A                                      ng":"Indicator","indFormat":"1 / 0"-
+     A                                      },"error enhanced mode":"1"},{"id":-
+     A                                      "BtnCancel","field type":"button","-
+     A                                      css class":"button","value":"Cancel-
+     A                                      ","left":"725px","top":"235px","wid-
+     A                                      th":"100px","cursor":"default","res-
+     A                                      ponse":{"fieldName":"BtnCanAED","cu-
+     A                                      stomTrue":"","customFalse":"","data-
+     A                                      Type":"indicator","formatting":"Ind-
+     A                                      icator","indFormat":"1 / 0"},"short-
+     A                                      cut key":"Escape","locked in place"-
+     A                                      :"false"},{"id":"BtnSav","field typ-
+     A                                      e":"button","css class":"button","v-
+     A                                      alue":{"fieldName":"scBtnType","dat-
+     A                                      aLength":"10","trimLeading":"false"-
+     A                                      ,"trimTrailing":"true","blankFill":-
+     A                                      "false","rjZeroFill":"false","dataT-
+     A                                      ype":"char","formatting":"Text","te-
+     A                                      xtTransform":"none","designValue":"-
+     A                                      [scBtnType]"},"left":"835px","top":-
+     A                                      "235px","width":"100p')
+     A                                  1  2HTML('x","cursor":"default","shortc-
+     A                                      ut key":"Enter","response":{"fieldN-
+     A                                      ame":"BtnEntAED","customTrue":"","c-
+     A                                      ustomFalse":"","dataType":"indicato-
+     A                                      r","formatting":"Indicator","indFor-
+     A                                      mat":"1 / 0"},"locked in place":"fa-
+     A                                      lse"},{"id":"LblExpDateAED","field -
+     A                                      type":"output field","css class":"l-
+     A                                      abel","value":"Expiration Date","le-
+     A                                      ft":"535px","top":"170px","width":"-
+     A                                      95px","locked in place":"false"}]}')
+     A            BTNCANAED      1A  H
+     A            BTNENTAED      1A  H
+     A            CARRFROM     200A  H
+     A            CARRSELECT   100A  H
+     A            CARRWHERE    200A  H
+     A            DISABLE1       1A  H
+     A            DISABLE2       1A  H
+     A            ERCAR#AED      1A  H
+     A            ERDESC         1A  H
+     A            EREFFDTAED     1A  H
+     A            EREXPDTAED     1A  H
+     A            ERGRPAED       1A  H
+     A            ERTDFAED       1A  H
+     A            ERZIPAED       1A  H
+     A            GRPFROM      200A  H
+     A            GRPSELECT    100A  H
+     A            GRPWHERE     200A  H
+     A            MGCAR#AED    100A  H
+     A            MGEFFDTAED   100A  H
+     A            MGEXPDTAED   100A  H
+     A            MGGRPAED     100A  H
+     A            MGTDFAED     100A  H
+     A            MGZIPAED     100A  H
+     A            SCBTNTYPE     10A  H
+     A            SCCAR#AED      5S 0H
+     A            SCEFFDTAED     8S 0H
+     A            SCEXPDTAED     8S 0H
+     A            SCSTATAED     10A  H
+     A            SCTDFAED       5S 4H
+     A            SCTDFTITLE   100A  H
+     A            SCZIPAED       5S 0H
+     A            VISIBLE1       1A  H
+     A            SCGRPAED  R        H      REFFLD(ELFND WDELP)

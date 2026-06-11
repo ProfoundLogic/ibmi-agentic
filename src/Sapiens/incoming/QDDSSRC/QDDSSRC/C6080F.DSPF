@@ -1,0 +1,51 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DAILY CHECK EDIT PROMPT DISPLAY                          **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A*                                     CHGINPDFT(CS)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF13
+     A                                      SETOF(21)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C6080F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 10 24'Run Date:'
+     A            SCDATE    R        B 10 37REFFLD(DT8)
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                 12 24'User:'
+     A            SCUSR2    R        B 12 35REFFLD(USER)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                 23  3'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 60'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

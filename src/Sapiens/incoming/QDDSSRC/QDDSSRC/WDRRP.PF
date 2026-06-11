@@ -1,0 +1,878 @@
+      * (c) 2024 Sapiens. All Rights Reserved.                             *
+     A*****************************************************************
+     A*  STATISTICAL REPORTING/RATING FILE
+     A*  FILE:       WDRRP
+     A*  DATE:       05/20/97
+     A*  PROJECT:    WC651
+     A*  PROGRAMMER: C:65
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 04/29/24 C:340 Project: WC2965                                *
+     A*                ADD Require Email Address - RREMAIL.           *
+     A*                                                               *
+     A* 09/18/23 C:65  Project: 153WAL                                *
+     A*                ADD STAT CODE FIELD FOR SAFETY FEE.            *
+     A*                                                               *
+     A* 11/23/20 C:062 Project: 148WCA                                *
+     A*                Add Monopolistic State?                        *
+     A*                                                               *
+     A* 05/23/19 C:062 Project: 150WEA                                *
+     A*                Add Use State Reporting Division Zip code      *
+     A*                for Territory Differential.                    *
+     A*                                                               *
+     A* 04/26/19 C:136 Project: SY406                                 *
+     A*                Add Exclude State from Connect flag            *
+     A*                                                               *
+     A* 04/22/19 C:65  Project: WC2610                                *
+     A*                ADD FIELDS FOR GRADIENT CALCULATION LOGIC.     *
+     A*                                                               *
+     A* 07/11/18 C:291 PROJECT: 148WAV                                *
+     A*                ADD DEVIATION #1 AND #2 DEFAULT PERCENTAGE AND *
+     A*                ALLOW CHANGES FLAGS.                           *
+     A*                                                               *
+     A* 02/01/18 C:136 PROJECT: 148WAH                                *
+     A*                ADD POLICY FEE AMOUNT AND STAT FIELDS          *
+     A*                                                               *
+     A* 01/11/18 C:136 PROJECT: 150WCJ                                *
+     A*                ADD DEFAULT NAMED INSURED FIELD                *
+     A*                                                               *
+     A* 11/06/17 C:65  Project: WC2565                                *
+     A*                ADD TWO ADDITIONAL STAT CODE FIELDS FOR MERIT  *
+     A*                RATING ALONG WITH TWO THRESHOLD FIELDS FOR     *
+     A*                WHEN TO REPORT USING NEW STAT CODES.           *
+     A*                                                               *
+     A* 08/03/17 C:65  Project: 150WAR                                *
+     A*                ADD FLAGS TO INCLUDE/EXCLUDE STATE TAX AND     *
+     A*                ASSESSMENTS FROM % OF MANUAL PREMIUM CALC.     *
+     A*                                                               *
+     A* 07/13/17 C:136 Project: 150WAN                                *
+     A*                Add 'Default billing code'                     *
+     A*                Add 'Percenage manual premium' (client)        *
+     A*                Add 'PEO policy type' (S/M/ ) If FNPEOF = 'C'  *
+     A*                                                               *
+     A* 02/24/17 C:65  Project: WC2480                                *
+     A*                ADD FIELD TO CONTAIN ACRONYM FOR PEO NAME      *
+     A*                CONCATENATION/PRINTING.  DEFAULT TO L/C/F.     *
+     A*                                                               *
+     A* 08/17/16 C:298 Project: WC2070                                *
+     A*                Add fields for Audit Non Compliance :          *
+     A*                ANC multiplier and ANC Flag.                   *
+     A*                                                               *
+     A* 05/11/15 C:279 Project: WC2361                                *
+     A*                Add fields for each assessment to flag for     *
+     A*                exclude f-class.                               *
+     A*                                                               *
+     A* 05/26/11 C:191 Project: WC2038                                *
+     A*                Add fields for each assessment to flag for     *
+     A*                increased limits assessment basis              *
+     A*                                                               *
+     A* 03/16/11 C:190 Project: 132WPI                                *
+     A*                Add a new field to contain the optional        *
+     A*                heading for the contractor's credit.           *
+     A*                                                               *
+     A* 06/24/10 C:227 Project: WC1873                                *
+     A*                Add new fields:                                *
+     A*                   RR1ATR - RR7ATR - Include terrorism charge  *
+     A*                   flag fields for Assessments                 *
+     A*                                                               *
+     A* 06/21/10 C:255 Project: C114WVY                               *
+     A*                Added new fields for split deviations.         *
+     A*                                                               *
+     A* 04/23/10 C:61  Project: WC1880                                *
+     A*                Add new fields:                                *
+     A*                   Certificate of Insurance Overlay            *
+     A*                   Cert of Ins Signature Page Segment          *
+     A*                                                               *
+     A* 04/19/10 C:255 Project: 114WWI                                *
+     A*                Add new field "FLAG #" to control regeneration *
+     A*                of Policy page on revised bill                 *
+     A*                                                               *
+     A* 01/04/10 C:190 Project: 25WRE                                 *
+     A*                " Add new field "State employer #"             *
+     A*                                                               *
+     A* 12/02/09 C:61  Project: 132WMP                                *
+     A*                Add field to control Waiver Input Edit clt132  *
+     A*                WC990306.                                      *
+     A*                                                               *
+     A* 04/28/09 C:191 Project: WC1794                                *
+     A*                ADD NEW FIELDS FOR NCCI RISK ID # AND STATE   .*
+     A*                                                               *
+     A* 03/02/09 C:65  Project: 81WEI                                 *
+     A*                ADD OPTIONAL HEADING FIELDS FOR TERROR CHARGES.*
+     A*                                                               *
+     A* 12/11/08 C:33  Project: WC1769                                *
+     A*                Add 6th and 7th assessment fields.             *
+     A*                                                               *
+     A* 09/15/08 C:189 PROJECT: WC1644                                *
+     A*                Option to exclude terrorism from LCM           *
+     A*                                                               *
+     A* 08/21/08 C:61  PROJECT: 114WRC                                *
+     A*                Add new fields to specify maximum Debit and    *
+     A*                Credit factors.                                *
+     A*                                                               *
+     A* 08/20/08 C:191 PROJECT: 102WEP                                *
+     A*                Add new fields for SR Late Fee.                *
+     A*                                                               *
+     A* 12/17/07 C:189 PROJECT: 109WEN                                *
+     A*                Rating Deviation Calculation Renewel Credit    *
+     A*                                                               *
+     A* 11/03/07 C:61  PROJECT: WC1610                                *
+     A*                Add fields to control application of           *
+     A*                assessment to policy based upon deductible     *
+     A*                discount code.                                 *
+     A*                                                               *
+     A* 09/14/07 C:15  Project: 114WHO                                *
+     A*                Added field for the Retro Premium stat code.   *
+     A*                                                               *
+     A* 05/15/07 C:184 PROJECT: WC1568                                *
+     A*                Add new flags to determine how assessments will*
+     A*                be billed                                      *
+     A*                                                               *
+     A* 07/26/07 C:61  PROJECT: WC1570
+     A*                Add new field for "Print State Risk ID#"
+     A*
+     A* 04/19/07 C:190 PROJECT: 136WCM
+     A*                ADD A NEW FIELD 'Print Terrorism Charge on  *
+     A*                Monthly Interim.                               *
+     A*                                                               *
+     A* 04/06/07 C:65  PROJECT: WC1514                                *
+     A*                ADD FIELD FOR SHORT RATE PENALTY PREM LEVEL.  *
+     A*                                                               *
+     A* 04/04/07 C:132  PROJECT: 114WMS                               *
+     A*                 ADD Scheduled DB/CR flag RRDBCR               *
+     A*                                                               *
+     A* 11/27/06 C:65   PROJECT: SUPP#51114/114WGH                    *
+     A*                 ADD BALANCE TO INCR LIMITS MINIMUM STAT CODE. *
+     A*                                                               *
+     A* 08/21/06 C:132 PROJECT: WC1196                                *
+     A*                Added Business Category assignment: Governing  *
+     A*                Class Code, SIC Code or NAICS Code.            *
+     A*                                                               *
+     A* 06/20/06 C:168 PROJECT: 132WEW                                *
+     A*                Added Aircraft reinsurance charge code         *
+     A*                                                               *
+     A* 12/08/05 C:61  PROJECT: 139WBU                                *
+     A*                Add PEO output control flag.                   *
+     A*                                                               *
+     A* 08/10/05 C:136 PROJECT: WC1136                                *
+     A*                                                               *
+     A*                                                               *
+     A*                                                               *
+     A* 06/06/05 C:136 PROJECT: 129WKB (MA DIA ASSESSMENT BREAKOUT)   *
+     A*                ADD DEFAULT DEVIATION FIELD FOR 1ST AND 2ND    *
+     A*                DEVIATION                                      *
+     A*                                                               *
+     A* 03/31/05 C:53   PROJECT: WC1287/135WCB                        *
+     A*                 Added field for NAICS code requirements       *
+     A*                                                               *
+     A* 01/07/05 C:61   PROJECT: WC1250                               *
+     A*                 Added field for Domestic Terrorism Rate and   *
+     A*                 Domestic Terrorism Code.                      *
+     A*                                                               **
+     A*  10/20/04 C:132 PROJECT: WC1136                               **
+     A*                 Add new field for Loss Cost Multiplier (5.4)  **
+     A*                                                               *
+     A* 09/01/04 C:136 PROJECT: 93WEH                                 *
+     A*                Add new field for voluntary labor charge stat  *
+     A*                code and premium heading.                      *
+     A*                                                               *
+     A* 12/09/03 C:136 PROJECT: 109DL                                 *
+     A*                Add 4th and 5th assessment fields.             *
+     A*                                                               *
+     A* 11/04/03 C:65   PROJECT: WC1120                               *
+     A*                 ADD NEW FLAG FOR INCLUSION OF TERRORISM       *
+     A*                 CHARGE IN ASSESSMENTS.                        *
+     A*                                                               *
+     A* 05/29/03  C:35   PROJECT: WC1120                              *
+     A*                  CHANGED FIELDS TO PACKED.                    *
+     A*                                                               *
+     A* 05/22/03 C:65   PROJECT: WC1120                               *
+     A*                 ADD NEW RATE FIELD FOR NON PAYROLL CLASSES.   *
+     A*                                                               *
+     A* 03/04/03 C:132  PROJECT: WC1119                               *
+     A*                 Added field for Unemployment Number Required  *
+     A*                 flag.                                         *
+     A*                                                               *
+     A* 01/09/03 C:61   PROJECT: WC1120                               *
+     A*                 Added fields for Terrorism Risk Act rate and  *
+     A*                 code.                                         *
+     A*                                                               *
+     A* 10/24/02 C:136   PROJECT: 72WDM                               *
+     A*                  ADD A FIELD TO SPECIFY WHETHER OR NOT TO     *
+     A*                  CALCULATE TAX WITH ALL DISCOUNTS.            *
+     A*                                                               *
+     A* 06/29/02 C:136   PROJECT: WC1080                              *
+     A*                  ADD A FIELD TO SPECIFY WHETHER OR NOT TO TAX *
+     A*                  DEDUCTIBLE BILLINGS.                         *
+     A*                                                               *
+     A* 04/25/02  C:35   PROJECT: WC1026/96WET/112AU                  *
+     A*                  CHANGED STAT CODE FIELDS TO PACKED.          *
+     A*                                                               *
+     A* 01/07/02  C:65   PROJECT: 96WET                               *
+     A*                  ADD STAT CODE FIELD FOR STATE TAX.           *
+     A*                                                               *
+     A* 11/20/01  C:65   PROJECT: WC1058                              *
+     A*                  ADD FIELD FOR OPTIONAL SAFETY FEE HEADING    *
+     A*                  AND ENDORSEMENT FORM ID.                     *
+     A*                                                               *
+     A* 03/26/01  C:65   PROJECT: 112AU                               *
+     A*                  ADD STAT CODE FIELD FOR 3RD ASSESSMENT.      *
+     A*                                                               *
+     A* 02/21/01  C:65   PROJECT: WC1026                              *
+     A*                  ADD STAT CODE FIELDS FOR MERIT RATING.       *
+     A*                                                               *
+     A* 02/05/01  C:65   PROJECT: 109CQ                               *
+     A*                  ADD FIELD FOR INCLUDE EXP CNST ON DEP TAX.   *
+     A*                                                               *
+     A* 01/02/01  C:65   PROJECT: 109CO                               *
+     A*                  ADD FIELDS FOR THIRD ASSESSMENT (SIGNED).    *
+     A*                                                               *
+     A* 07/06/00  C:35   PROJECT: 95WEM/96WAY                         *
+     A*                  CHANGE 1ST AND 2ND ASSES STAT CODES TO       *
+     A*                  PACKED.  ADD STAT COADE FOR COAL MINE        *
+     A*                  DISEASE.                                     *
+     A*                                                               *
+     A* 04/07/00  C:65   PROJECT: 95WEM                               *
+     A*                  ADD STAT CODE FIELDS FOR THE ASSESSMENTS.    *
+     A*              *** (AS SIGNED NUMERICS UNTIL NEXT BASE TAPE)    *
+     A*                                                               *
+     A* 02/08/00  C:33   PROJECT: WC919                               *
+     A*                  ADD FIELD FOR DEFAULT RATE SET CODE.         *
+     A*                                                               *
+     A* 10/20/99  C:35   PROJECT: WC908                               *
+     A*                  ADD FIELDS FOR STANDARD LIABILITY LIMITS.    *
+     A*                                                               *
+     A* 10/19/99  C:65   PROJECT: WC951                               *
+     A*                  EXPAND THE TWO ASSESSMENT PERCENTAGE FIELDS  *
+     A*                                                               *
+     A* 10/07/99  C:65   PROJECT: WC937                               *
+     A*                  ADD TWO ASSSESSMENT PERCENTAGE FIELDS FOR    *
+     A*                  F-CLASS RATES.                               *
+     A*                                                               *
+     A* 09/28/99  C:65   PROJECT: WC938                               *
+     A*                  ADD FLAG FOR DISCOUNT INDEPENDENT OF STATES. *
+     A*                                                               *
+     A* 09/16/99  C:35   PROJECT: WC949                               *
+     A*                  ADD FIELDS FOR RATING FACTOR RENEWAL         *
+     A*                                                               *
+     A* 08/12/99  C:35   PROJECT: 48WQS                               *
+     A*                  ADDED FIELDS FOR TRANSITION DEBIT/CREDIT.    *
+     A*                                                               *
+     A* 05/12/99 C:113 PROJECT: CM045                                 *
+     A*                ADDED FIELD RRWVAC AS 5A FORM THE WAIVER       *
+     A*                SURCHARGE STAT CODE.                           *
+     A*                                                               *
+     A* 05/06/99  C:35   PROJECT: CM045                               *
+     A*                  ADDED FIELDS FOR AIRCRAFT SURCHARGE PREMIUM  *
+     A*                  LEVEL, WAIVER SURCHARGE STAT CODE, WAIVER    *
+     A*                  SURCHARGE PREMIUM LEVEL, WAIVER SURCHARGE    *
+     A*                  HEADING, DEFAULT WAIVER TYPE, DEFAULT WAIVER *
+     A*                  PERCENTAGE, DEFAULT WAIVER CHARGE AND        *
+     A*                  DEFAULT WAIVER MINIMUM.                      *
+     A*                                                               *
+     A* 03/04/99  C:35   PROJECT: 48WOY
+     A*                  EXPAND TAX PERCENT TO 4 DECIMALS.
+     A*
+     A*  07/09/98 C:65 PROJECT: WC577
+     A*                ADD NEW FIELD AND CHANGE THREE PERC FIELDS.
+     A*
+     A*  05/29/98 C:65 PROJECT: WC705
+     A*                ADD A FLEXIBLE STATE TAX HEADING.
+     A*
+     A*  04/30/98 C:65 PROJECT: WC705
+     A*                ADD FLAGS TO 1ST/2ND ASSESSMENT TO HANDLE CALCS.
+     A*
+     A*  02/09/98 C:65 PROJECT: WC705
+     A*                ADDED OPTIONAL HEADING FOR STOCK DISCOUNT.
+     A*
+     A*  12/18/97 C:65 PROJECT: WC776
+     A*                ADDED FIELDS FOR 1ST AND 2ND ASSESSMENT.
+     A*
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PRR01                     TEXT('STAT RPT/RATING FILE')
+     A            RRCO#     R               REFFLD(CO#)
+     A                                      COLHDG('COMPANY #')
+     A            RRFND     R               REFFLD(FND)
+     A                                      COLHDG('FUND #')
+     A            RRST      R               REFFLD(ST)
+     A                                      COLHDG('STATE')
+     A            RREFDT    R               REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE' 'DATE')
+     A            RRRDPR    R               REFFLD(FLAG)
+     A                                      COLHDG('DEDUCTIBLE' 'FLAG')
+     A            RRCCCD    R               REFFLD(CLAS)
+     A                                      COLHDG('CONTR CREDIT' 'STAT CODE')
+     A            RRDV1L    R               REFFLD(FLAG)
+     A                                      COLHDG('DEVIATION #1' 'FLAG')
+     A            RRDV1H    R               REFFLD(DS20)
+     A                                      COLHDG('DEVIATION #1' 'HEADING')
+     A            RRDV1C    R               REFFLD(CLAS)
+     A                                      COLHDG('DEVIATION #1' 'STAT CODE')
+     A            RRDV2L    R               REFFLD(FLAG)
+     A                                      COLHDG('DEVIATION #2' 'FLAG')
+     A            RRDV2H    R               REFFLD(DS20)
+     A                                      COLHDG('DEVIATION #2' 'HEADING')
+     A            RRDV2C    R               REFFLD(CLAS)
+     A                                      COLHDG('DEVIATION #2' 'STAT CODE')
+     A            RRDCCD    R               REFFLD(CLAS)
+     A                                      COLHDG('AIRCRAFT SURCHARGE' 'CODE')
+     A            RRAMAX    R               REFFLD(A112)
+     A                                      COLHDG('MAX' 'AIRCRAFT SURCHARGE')
+     A            RR1ACD    R               REFFLD(CLAS)
+     A                                      COLHDG('SUBJECT PREM CR 1A' 'CODE')
+     A            RR1AHD    R               REFFLD(DS20)
+     A                                      COLHDG('SUBJECT PR CR 1A' 'HEADING')
+     A            RR1BCD    R               REFFLD(CLAS)
+     A                                      COLHDG('SUBJECT PREM CR 1B' 'CODE')
+     A            RR1BHD    R               REFFLD(DS20)
+     A                                      COLHDG('SUBJECT PR CR 1B' 'HEADING')
+     A            RRCRCD    R               REFFLD(CLAS)
+     A                                      COLHDG('SCHEDULE CRED' 'CODE')
+     A            RRCRHD    R               REFFLD(DS20)
+     A                                      COLHDG('SCHEDULE CRED' 'HEADING')
+     A            RRDBCD    R               REFFLD(CLAS)
+     A                                      COLHDG('SCHEDULE DEBIT' 'CODE')
+     A            RRDBHD    R               REFFLD(DS20)
+     A                                      COLHDG('SCHEDULE DEBIT' 'HEADING')
+     A            RRECCD    R               REFFLD(CLAS)
+     A                                      COLHDG('EXPENSE CONST' 'CODE')
+     A            RRMPCD    R               REFFLD(CLAS)
+     A                                      COLHDG('MINIMUM PREM' 'CODE')
+     A            RRUSER    R               REFFLD(USER)
+     A                                      COLHDG('USER')
+     A            RRPGM     R               REFFLD(PGM)
+     A                                      COLHDG('PROGRAM')
+     A            RRDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE')
+     A            RRTIME    R               REFFLD(TIME)
+     A                                      COLHDG('TIME')
+     A            RRIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL USER')
+     A            RRIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL PROGRAM')
+     A            RRIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL DATE')
+     A            RRITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL TIME')
+     A            RRDISC    R               REFFLD(FLAG)
+     A                                      COLHDG('DISCOUNT DEFAULT')
+     A            RRDSPC    R               REFFLD(PC52)
+     A                                      COLHDG('DISCOUNT PERCENT')
+     A            RRDSPR    R               REFFLD(FLAG)
+     A                                      COLHDG('STOCK DISCOUNT' 'FLAG')
+     A*****       RRSFPC    R               REFFLD(PC52)
+     A            RRSFPC    R               REFFLD(PC74)
+     A                                      COLHDG('SAFETY FEE' 'PERC #1')
+     A            RRSFAM    R               REFFLD(A72)
+     A                                      COLHDG('SAFETY FEE' 'MIN AMT #1')
+     A            RRSFAP    R               REFFLD(FLAG)
+     A                                      COLHDG('SAFETY FEE' 'APPL LEVEL')
+     A            RRTXPC         6  4
+     A                                      COLHDG('STATE TAX PERC')
+     A            RRTDFL    R               REFFLD(FLAG)
+     A                                      COLHDG('STATE TAX' 'ON DEPOSIT FLG')
+     A            RRSPFL    R               REFFLD(FLAG)
+     A                                      COLHDG('SAFETY FEE' 'PRORATE FLAG')
+     A            RRYRAD    R               REFFLD(FLAG)
+     A                                      COLHDG('ADJUST S.FEE' 'ON YR AUDIT')
+     A            RRCXAD    R               REFFLD(FLAG)
+     A                                      COLHDG('ADJUST S.FEE' 'ON CX AUDIT')
+     A            RR1STP    R               REFFLD(PC96)
+     A                                      COLHDG('1ST ASSESSMENT %')
+     A            RR1STL    R               REFFLD(FLAG)
+     A                                      COLHDG('1ST ASSESSMENT LEVEL')
+     A            RR1STH    R               REFFLD(DS20)
+     A                                      COLHDG('1ST ASSESSMENT' 'HEADING')
+     A            RR2NDP    R               REFFLD(PC96)
+     A                                      COLHDG('2ND ASSESSMENT %')
+     A            RR2NDL    R               REFFLD(FLAG)
+     A                                      COLHDG('2ND ASSESSMENT LEVEL')
+     A            RR2NDH    R               REFFLD(DS20)
+     A                                      COLHDG('2ND ASSESSMENT' 'HEADING')
+     A            RRIDTP    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEVIATION' +
+     A                                             'IN TAXABLE PREMIUM')
+     A            RRDSHD    R               REFFLD(DS20)
+     A                                      COLHDG('STOCK DISCOUNT' 'HEADING')
+     A            RR1IDD    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEDUC DISC ' +
+     A                                             'IN 1ST ASSESS CALC')
+     A            RR1IDV    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEVIATION ' +
+     A                                             'IN 1ST ASSESS CALC')
+     A            RR2IDD    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEDUC DISC ' +
+     A                                             'IN 2ND ASSESS CALC')
+     A            RR2IDV    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEVIATION ' +
+     A                                             'IN 2ND ASSESS CALC')
+     A            RRTXHD    R               REFFLD(DS20)
+     A                                      COLHDG('STATE TAX' 'HEADING')
+     A            RRASWG    R               REFFLD(FLAG)
+     A                                      COLHDG('ASWG REPORTING REQ.')
+     A            RRASFL    R               REFFLD(FLAG)
+     A                                      COLHDG('AIRCRAFT SURCH' 'PREM LVL')
+     A            RRWVCD    R               REFFLD(CODE)
+     A                                      COLHDG('WAIVER SURCH' 'STAT CODE')
+     A            RRWVFL    R               REFFLD(FLAG)
+     A                                      COLHDG('WAIVER SURCH' 'PREM LVL')
+     A            RRWVHD    R               REFFLD(DS20)
+     A                                      COLHDG('WAIVER SURCHARGE' 'HEADING')
+     A            RRWDTP    R               REFFLD(FLAG)
+     A                                      COLHDG('DEFAULT' 'WAIVER TYPE')
+     A            RRWDPC    R               REFFLD(PC52)
+     A                                      COLHDG('DEFAULT' 'WAIVER PERCENTAG')
+     A            RRWDFC    R               REFFLD(A112)
+     A                                      COLHDG('DEFAULT' 'WAIVER CHARGE')
+     A            RRWDMN    R               REFFLD(A92)
+     A                                      COLHDG('DEFAULT' 'WAIVER MINIMUM')
+     A            RRWVAC         5S 0       COLHDG('WAIVER SURCH' 'STAT CODE')
+     A            RRTDCD    R               REFFLD(CLAS)
+     A                                      COLHDG('TRANSITION' 'DEBIT STAT CD')
+     A            RRTCCD    R               REFFLD(CLAS)
+     A                                      COLHDG('TRANSITION' 'CRED STAT CD')
+     A            RRTDHD    R               REFFLD(DS20)
+     A                                      COLHDG('TRANSITION' 'DEBIT HEADING')
+     A            RRTCHD    R               REFFLD(DS20)
+     A                                      COLHDG('TRANSITION' 'CRED HEADING')
+     A            RRRWCC    R               REFFLD(FLAG)
+     A                                      COLHDG('CONTRACTOR' 'CREDIT RENEW')
+     A            RRRWD1    R               REFFLD(FLAG)
+     A                                      COLHDG('DEVIATION #1' 'RENEW')
+     A            RRRWD2    R               REFFLD(FLAG)
+     A                                      COLHDG('DEVIATION #2' 'RENEW')
+     A            RRRW1A    R               REFFLD(FLAG)
+     A                                      COLHDG('SUBJECT PREM 1A' 'RENEW')
+     A            RRRW1B    R               REFFLD(FLAG)
+     A                                      COLHDG('SUBJECT PREM 1B' 'RENEW')
+     A            RRRWDC    R               REFFLD(FLAG)
+     A                                      COLHDG('DEBIT/CREDIT' 'RENEW')
+     A            RRDSIN    R               REFFLD(FLAG)
+     A                                      COLHDG('DISCOUNT INDEPENDENT' +
+     A                                             'FROM OTHER STATES')
+     A            RR1STF    R               REFFLD(PC96)
+     A                                      COLHDG('1ST ASSESSMENT %' +
+     A                                             '- F CLASS')
+     A            RR2NDF    R               REFFLD(PC96)
+     A                                      COLHDG('2ND ASSESSMENT %' +
+     A                                             '- F CLASS')
+     A            RREMLB    R               REFFLD(DS30)
+     A                                      COLHDG('STD E.L. DESCRIPTION')
+     A            RRACC     R               REFFLD(A50)
+     A                                      COLHDG('BODILY INJ' 'BY ACCIDENT')
+     A            RRDIS     R               REFFLD(A50)
+     A                                      COLHDG('BODILY INJ' 'BY DISEASE')
+     A            RRAGG     R               REFFLD(A50)
+     A                                      COLHDG('BODILY INJ' 'AGGREGATE')
+     A            RRDRAT    R               REFFLD(DS3)
+     A                                      COLHDG('DEFAULT RATE' 'SET CODE')
+     A            RR1STC    R               REFFLD(A50)
+     A                                      COLHDG('1ST ASSESSMT' 'STAT CODE')
+     A            RR2NDC    R               REFFLD(A50)
+     A                                      COLHDG('2ND ASSESSMT' 'STAT CODE')
+     A            RRCOAL    R               REFFLD(CLAS)
+     A                                      COLHDG('COAL MINE DIS' 'STAT CODE')
+     A            RR3RDP         9S 6
+     A                                      COLHDG('3RD ASSESSMENT %')
+     A            RR3RDL    R               REFFLD(FLAG)
+     A                                      COLHDG('3RD ASSESSMENT LEVEL')
+     A            RR3RDH    R               REFFLD(DS20)
+     A                                      COLHDG('3RD ASSESSMENT' 'HEADING')
+     A            RR3IDD    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEDUC DISC ' +
+     A                                             'IN 3RD ASSESS CALC')
+     A            RR3IDV    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEVIATION ' +
+     A                                             'IN 3RD ASSESS CALC')
+     A            RR3RDF         9S 6
+     A                                      COLHDG('3RD ASSESSMENT %' +
+     A                                             '- F CLASS')
+     A            RRTEFL    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE EXP CONST ' +
+     A                                             'IN TAX ON DEPOSIT')
+     A            RRMRRD    R               REFFLD(CLAS)
+     A                                      COLHDG('MERIT RATING DEBIT' +
+     A                                             ' STAT CODE')
+     A            RRMRRN    R               REFFLD(CLAS)
+     A                                      COLHDG('MERIT RATING NEUTR' +
+     A                                             'AL STAT CODE')
+     A            RRMRRC    R               REFFLD(CLAS)
+     A                                      COLHDG('MERIT RATING CREDI' +
+     A                                             'T STAT CODE')
+     A            RR3RDC    R               REFFLD(CLAS)
+     A                                      COLHDG('3RD ASSESSMENT' +
+     A                                             ' STAT CODE')
+     A            RRSFHD    R               REFFLD(DS20)
+     A                                      COLHDG('SAFETY FEE' 'HEADING')
+     A            RRENID    R               REFFLD(DS15)
+     A                                      COLHDG('ENDORSEMENT FORM ID')
+     A            RRTXCD    R               REFFLD(CLAS)
+     A                                      COLHDG('STATE TAX' +
+     A                                             ' STAT CODE')
+     A            RRRDTX    R               REFFLD(FLAG)
+     A                                      COLHDG('BILL TAX ON' +
+     A                                             'DEDUCTIBLES')
+     A            RRATAX    R               REFFLD(FLAG)
+     A                                      COLHDG('CALCULATE TAX' +
+     A                                             'WITH ALL DISCOUNTS')
+      *
+     A            RRTERR    R               REFFLD(A53)
+     A                                      COLHDG('TERROR RISK ACT' +
+     A                                             'RATE')
+      *
+     A            RRTERC    R               REFFLD(CLAS)
+     A                                      COLHDG('TERROR RISK ACT' +
+     A                                             'CODE')
+      *
+     A            RRTEDT    R               REFFLD(A70)
+     A                                      COLHDG('NOT USED')
+      *
+     A            RRURFL    R               REFFLD(FLAG)
+     A                                      COLHDG('UNEMPLOYMENT' +
+     A                                             'NUMBER REQUIRED')
+     A            RRTER2    R               REFFLD(A53)
+     A                                      COLHDG('TERROR RISK ACT' +
+     A                                             'RATE - NON PAYROLL')
+     A            RRTERA    R               REFFLD(FLAG)
+     A                                      COLHDG('INCL TERROR CHARGE' +
+     A                                             'IN ASSESSMENTS')
+     A            RR4THP         9S 6
+     A                                      COLHDG('4TH ASSESSMENT %')
+     A            RR4THL    R               REFFLD(FLAG)
+     A                                      COLHDG('4TH ASSESSMENT LEVEL')
+     A            RR4THH    R               REFFLD(DS20)
+     A                                      COLHDG('4TH ASSESSMENT' 'HEADING')
+     A            RR4IDD    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEDUC DISC ' +
+     A                                             'IN 4TH ASSESS CALC')
+     A            RR4IDV    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEVIATION ' +
+     A                                             'IN 4TH ASSESS CALC')
+     A            RR4THF         9S 6
+     A                                      COLHDG('4TH ASSESSMENT %' +
+     A                                             '- F CLASS')
+     A            RR4THC         5S 0
+     A                                      COLHDG('4TH ASSESSMENT' +
+     A                                             ' STAT CODE')
+     A            RR5THP         9S 6
+     A                                      COLHDG('5TH ASSESSMENT %')
+     A            RR5THL    R               REFFLD(FLAG)
+     A                                      COLHDG('5TH ASSESSMENT LEVEL')
+     A            RR5THH    R               REFFLD(DS20)
+     A                                      COLHDG('5TH ASSESSMENT' 'HEADING')
+     A            RR5IDD    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEDUC DISC ' +
+     A                                             'IN 5TH ASSESS CALC')
+     A            RR5IDV    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEVIATION ' +
+     A                                             'IN 5TH ASSESS CALC')
+     A            RR5THF         9S 6
+     A                                      COLHDG('5TH ASSESSMENT %' +
+     A                                             '- F CLASS')
+     A            RR5THC         5S 0
+     A                                      COLHDG('5TH ASSESSMENT' +
+     A                                             ' STAT CODE')
+     A            RRVLCC         5S 0
+     A                                      COLHDG('VOL LABOR' +
+     A                                             ' STAT CODE')
+     A            RRVLCH    R               REFFLD(DS20)
+     A                                      COLHDG('VOL LABOR' 'HEADING')
+     A            RRLCM          5S 4       TEXT('LOSS COST MULTIPLIER')
+     A                                      COLHDG('LOSS COST' 'MULTIPLIER')
+      *
+     A            RRDTRR         5S 3
+     A                                      COLHDG('Domestic Terror' +
+     A                                             'RATE')
+      *
+     A            RRDTRC         5S 0
+     A                                      COLHDG('Domestic Terror' +
+     A                                             'CODE')
+      *
+     A            RRNAIC    R               REFFLD(FLAG)
+     A                                      COLHDG('NAICS FLAG')
+     A            RRRDEV    R     S         REFFLD(PC52)
+     A                                      COLHDG('RATE DEV')
+     A            RRLCEX    R     S         REFFLD(DT)
+     A                                      COLHDG('LCM EXP DT')
+     A            RRPGFL         1A
+     A                                      COLHDG('PEO OUTPUT CONTROL')
+     A            RRARCC         5S 0
+     A                                      COLHDG('AIRCRAFT' 'REINS')
+     A            RRBAFL         1A
+     A                                      COLHDG('BUS CTGY' 'ASSIGNMENT')
+     A                                      TEXT('BUSINESS CATEGORY ASSIGNMENT')
+     A            RRILMC         5S 0
+     A                                      COLHDG('BAL TO I.L. MIN' +
+     A                                             ' STAT CODE')
+     A            RRDBCR         1A
+     A                                      COLHDG('SCHEDULED' 'DB/CR FLAG')
+     A                                      TEXT('Scheduler DB/CR Flag')
+     A            RRSRAF    R               REFFLD(FLAG)
+     A                                      COLHDG('SHORT RATE PRM LEVEL')
+     A            RRPTFL         1A
+     A                                      COLHDG('Print Terror' +
+     A                                      ' Chrg on Mont Interm')
+     A            RR1STB         1A
+     A                                      COLHDG('Bill 1st assessment' +
+     A                                      'by installment')
+     A            RR2NDB         1A
+     A                                      COLHDG('Bill 2nd assessment' +
+     A                                      'by installment')
+     A            RR3RDB         1A
+     A                                      COLHDG('Bill 3rd assessment' +
+     A                                      'by installment')
+     A            RR4THB         1A
+     A                                      COLHDG('Bill 4th assessment' +
+     A                                      'by installment')
+     A            RR5THB         1A
+     A                                      COLHDG('Bill 5th assessment' +
+     A                                      'by installment')
+     A            RRRIFL         1A
+     A                                      COLHDG('Print State' +
+     A                                      ' Risk ID#')
+     A            RRRTRC         5S 0
+     A                                      TEXT('Retro Premium stat code')
+     A            RR1ATD         1A
+     A                                      COLHDG('Calc 1st assessment' +
+     A                                      'if Deductible')
+     A            RR2ATD         1A
+     A                                      COLHDG('Calc 2nd assessment' +
+     A                                      'if deductible')
+     A            RR3ATD         1A
+     A                                      COLHDG('Calc 3rd assessment' +
+     A                                      'if deductible')
+     A            RR4ATD         1A
+     A                                      COLHDG('Calc 4th assessment' +
+     A                                      'if deductible')
+     A            RR5ATD         1A
+     A                                      COLHDG('Calc 5th assessment' +
+     A                                      'if deductible')
+     A            RRDCAP    R               REFFLD(FLAG)
+     A                                      COLHDG('Schedule DB/CR' +
+     A                                      'application')
+     A            RRLATE    R               REFFLD(FLAG)
+     A                                      COLHDG('Charge late' 'fee+
+     A                                       for S/R billing')
+     A            RRLTCD    R               REFFLD(CODE)
+     A                                      COLHDG('S/R Late fee'   +
+     A                                       'A/R Code')
+     A            RRLTAM    R     S         REFFLD(A92)
+     A                                      COLHDG('S/R Late fee'   +
+     A                                       'amount')
+     A            RRDMAX         5S 4
+     A                                      COLHDG('Maximum Schedule' +
+     A                                       'Debit Factor')
+     A            RRCMAX         5S 4
+     A                                      COLHDG('Maximum Schedule' +
+     A                                       'Credit Factor')
+     A            RRTERL         1A
+     A                                      COLHDG('Exclude Terroris' +
+     A                                       'm from LCM calculat' +
+     A                                       'ion ')
+     A
+     A            RR6THP         9S 6       COLHDG('6TH ASSESSMENT %')
+     A            RR6THL    R               REFFLD(FLAG)
+     A                                      COLHDG('6TH ASSESSMENT LEVEL')
+     A            RR6THH    R               REFFLD(DS20)
+     A                                      COLHDG('6TH ASSESSMENT' 'HEADING')
+     A            RR6IDD    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEDUC DISC ' +
+     A                                             'IN 6TH ASSESS CALC')
+     A            RR6IDV    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEVIATION ' +
+     A                                             'IN 6TH ASSESS CALC')
+     A            RR6THF         9S 6       COLHDG('6TH ASSESSMENT %' +
+     A                                             '- F CLASS')
+     A            RR6THC         5S 0       COLHDG('6TH ASSESSMENT' +
+     A                                             ' STAT CODE')
+     A            RR6THB         1A         COLHDG('Bill 6th assessment' +
+     A                                      'by installment')
+     A            RR6ATD         1A         COLHDG('Calc 6th assessment' +
+     A                                      'if deductible')
+     A            RR7THP         9S 6       COLHDG('7TH ASSESSMENT %')
+     A            RR7THL    R               REFFLD(FLAG)
+     A                                      COLHDG('7TH ASSESSMENT LEVEL')
+     A            RR7THH    R               REFFLD(DS20)
+     A                                      COLHDG('7TH ASSESSMENT' 'HEADING')
+     A            RR7IDD    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEDUC DISC ' +
+     A                                             'IN 7TH ASSESS CALC')
+     A            RR7IDV    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE DEVIATION ' +
+     A                                             'IN 7TH ASSESS CALC')
+     A            RR7THF         9S 6       COLHDG('7TH ASSESSMENT %' +
+     A                                             '- F CLASS')
+     A            RR7THC         5S 0       COLHDG('7TH ASSESSMENT' +
+     A                                             ' STAT CODE')
+     A            RR7ATD         1A         COLHDG('Calc 7th assessment' +
+     A                                      'if deductible')
+     A            RR7THB         1A         COLHDG('Bill 7th assessment' +
+     A                                      'by installment')
+     A            RRTERH    R               REFFLD(DS20)
+     A                                      COLHDG('TERRORISM' 'HEADING')
+     A            RRDTRH    R               REFFLD(DS20)
+     A                                      COLHDG('DOMESTIC' 'TERRORISM' +
+     A                                      'HEADING')
+     A            RRSRRB         1A         COLHDG('STATE RISK ID#' +
+     A                                      'REQUIRED TO BIND' )
+     A            RRSRRQ         1A         COLHDG('STATE RISK ID# REQUI' +
+     A                                      'RED ON QUOTE ENTRY')
+     A            RRNRRB         1A         COLHDG('NCCI RISK ID#'  +
+     A                                      'REQUIRED TO BIND')
+     A            RRNRRQ         1A         COLHDG('NCCI RISK ID# REQUI' +
+     A                                      'RED ON QUOTE ENTRY')
+     A            RRFLPC         1A         COLHDG('WAIVER INPUT' +
+     A                                      'FLAT RATE / PERCENT' )
+     A            RRSEMH        20A         COLHDG('STATE EMPLOYER #' +
+     A                                      'FLEXIBLE HEADING' )
+     A            RRPPFL         1A         COLHDG('AUTO RESUBMIT POLICY' +
+     A                                             'FLAG')
+      *
+     A            RRCEOV         8A         COLHDG('CERT OF INS OVERLAY')
+      *
+     A            RRSPSG         8A         COLHDG('CERT OF INS' +
+     A                                             'SIGNATURE PAGE SEG')
+     A            RR1ATR    R               REFFLD(FLAG)
+     A                                      COLHDG('INCL TERROR CHARGE' +
+     A                                             'IN 1ST ASSESSMENT')
+     A            RR2ATR    R               REFFLD(FLAG)
+     A                                      COLHDG('INCL TERROR CHARGE' +
+     A                                             'IN 2ND ASSESSMENT')
+     A            RR3ATR    R               REFFLD(FLAG)
+     A                                      COLHDG('INCL TERROR CHARGE' +
+     A                                             'IN 3RD ASSESSMENT')
+     A            RR4ATR    R               REFFLD(FLAG)
+     A                                      COLHDG('INCL TERROR CHARGE' +
+     A                                             'IN 4TH ASSESSMENT')
+     A            RR5ATR    R               REFFLD(FLAG)
+     A                                      COLHDG('INCL TERROR CHARGE' +
+     A                                             'IN 5TH ASSESSMENT')
+     A            RR6ATR    R               REFFLD(FLAG)
+     A                                      COLHDG('INCL TERROR CHARGE' +
+     A                                             'IN 6TH ASSESSMENT')
+     A            RR7ATR    R               REFFLD(FLAG)
+     A                                      COLHDG('INCL TERROR CHARGE' +
+     A                                             'IN 7TH ASSESSMENT')
+     A            RRDV1S    R               REFFLD(FLAG)
+     A            RRDV2S    R               REFFLD(FLAG)
+     A            RRCCHD        20A         COLHDG('CONTRACTOR CREDIT' +
+     A                                             'HEADING')
+     A            RR1ILF    R               REFFLD(FLAG)
+     A                                      COLHDG('1ST ASSESSMENT' +
+     A                                             'INC LIMITS BASIS')
+     A            RR2ILF    R               REFFLD(FLAG)
+     A                                      COLHDG('2ND ASSESSMENT' +
+     A                                             'INC LIMITS BASIS')
+     A            RR3ILF    R               REFFLD(FLAG)
+     A                                      COLHDG('3RD ASSESSMENT' +
+     A                                             'INC LIMITS BASIS')
+     A            RR4ILF    R               REFFLD(FLAG)
+     A                                      COLHDG('4TH ASSESSMENT' +
+     A                                             'INC LIMITS BASIS')
+     A            RR5ILF    R               REFFLD(FLAG)
+     A                                      COLHDG('5TH ASSESSMENT' +
+     A                                             'INC LIMITS BASIS')
+     A            RR6ILF    R               REFFLD(FLAG)
+     A                                      COLHDG('6TH ASSESSMENT' +
+     A                                             'INC LIMITS BASIS')
+     A            RR7ILF    R               REFFLD(FLAG)
+     A                                      COLHDG('7TH ASSESSMENT' +
+     A                                             'INC LIMITS BASIS')
+     A            RR1XFC    R               REFFLD(FLAG)
+     A                                      COLHDG('Excl F-Class ' +
+     A                                             'from 1st Asst')
+     A            RR2XFC    R               REFFLD(FLAG)
+     A                                      COLHDG('Excl F-Class ' +
+     A                                             'from 2nd Asst')
+     A            RR3XFC    R               REFFLD(FLAG)
+     A                                      COLHDG('Excl F-Class ' +
+     A                                             'from 3rd Asst')
+     A            RR4XFC    R               REFFLD(FLAG)
+     A                                      COLHDG('Excl F-Class ' +
+     A                                             'from 4th Asst')
+     A            RR5XFC    R               REFFLD(FLAG)
+     A                                      COLHDG('Excl F-Class ' +
+     A                                             'from 5th Asst')
+     A            RR6XFC    R               REFFLD(FLAG)
+     A                                      COLHDG('Excl F-Class ' +
+     A                                             'from 6th Asst')
+     A            RR7XFC    R               REFFLD(FLAG)
+     A                                      COLHDG('Excl F-Class ' +
+     A                                             'from 7th Asst')
+     A            RRANCM         5S 4
+     A                                      COLHDG('ANC Multiplier')
+     A            RRANCS         5S 0
+     A                                      COLHDG('ANC Stat Code')
+     A            RRPEOA        10A         COLHDG('PEO NAME ACRONYM')
+     A            RRBSCD         3S 0       COLHDG('Default Billing Code')
+     A            RRMANPERC      5S 2       COLHDG('% of Man Prem')
+     A            RRPEOF         1A         COLHDG('PEO Policy Type')
+     A            RRLSID         1A         COLHDG('Default Leasing ID')
+     A            RRTAXM         1A         COLHDG('STATE TAX' '% OF MANUAL')
+     A            RR1STM         1A         COLHDG('1ST ASSMNT' '% OF MANUAL')
+     A            RR2NDM         1A         COLHDG('2ND ASSMNT' '% OF MANUAL')
+     A            RR3RDM         1A         COLHDG('3RD ASSMNT' '% OF MANUAL')
+     A            RR4THM         1A         COLHDG('4TH ASSMNT' '% OF MANUAL')
+     A            RR5THM         1A         COLHDG('5TH ASSMNT' '% OF MANUAL')
+     A            RR6THM         1A         COLHDG('6TH ASSMNT' '% OF MANUAL')
+     A            RR7THM         1A         COLHDG('7TH ASSMNT' '% OF MANUAL')
+     A            RRMRRD2        5S 0       COLHDG('MERIT RATING DEBIT' +
+     A                                             ' STAT CODE 2')
+     A            RRMRRDT        5S 4       COLHDG('MERIT RATING DEBIT' +
+     A                                             ' THRESHOLD')
+     A            RRMRRC2        5S 0       COLHDG('MERIT RATING CREDIT' +
+     A                                             ' STAT CODE 2')
+     A            RRMRRCT        5S 4       COLHDG('MERIT RATING CREDIT' +
+     A                                             ' THRESHOLD')
+     A            RRNMINDFT      5S 0       COLHDG('NAMED INSURED' +
+                                                    'DEFAULT')
+     A            RRPFAM    R     S         REFFLD(A72)
+     A                                      COLHDG('POLICY FEE AMT')
+     A            RRPFCD    R     S         REFFLD(CLAS)
+     A                                      COLHDG('POLICY FEE' 'STAT CODE')
+     A            RRPFHD        20A         COLHDG('POLICY FEE' -
+     A                                      'FLEX HEADING')
+     A            RRDV1DFT       5S 2       COLHDG('DEVIATION #1' 'DEFAULT')
+     A            RRDV1DFRNWR               REFFLD(FLAG)
+     A                                      COLHDG('DEVIATION #1' +
+     A                                             'USE DEFAULT' 'AT RENEWAL')
+     A            RRDV1CHG  R               REFFLD(FLAG)
+     A                                      COLHDG('DEVIATION #1' +
+     A                                             'ALLOW CHANGES')
+     A            RRDV2DFT       5S 2       COLHDG('DEVIATION #2' 'DEFAULT')
+     A            RRDV2DFRNWR               REFFLD(FLAG)
+     A                                      COLHDG('DEVIATION #2' +
+     A                                             'USE DEFAULT' 'AT RENEWAL')
+     A            RRDV2CHG  R               REFFLD(FLAG)
+     A                                      COLHDG('DEVIATION #2' +
+     A                                             'ALLOW CHANGES')
+     A            RRDCL     R               REFFLD(FLAG)
+     A                                      COLHDG('DISCOUNT CALCULATION' +
+     A                                             'LOGIC')
+     A            RRMINFD   R     S         REFFLD(A112)
+     A                                      COLHDG('MIN PREM' 'FOR FLAT DISC')
+     A            RRMINSD   R     S         REFFLD(A112)
+     A                                      COLHDG('MIN PREM' 'FOR SCHD DEBIT')
+     A            RRMINSC   R     S         REFFLD(A112)
+     A                                      COLHDG('MIN PREM' 'FOR SCHD CREDIT')
+     A            RREXST    R               REFFLD(FLAG)
+     A                                      COLHDG('EXCLUDE STATE' -
+     A                                      'FROM CONNECT')
+     A            RRPULLSRD R               REFFLD(FLAG)
+     A                                      COLHDG('Pull Territory' +
+     A                                      'Differential from' +
+     A                                      'State Reporting Div')
+     A*** Begin Add *** 11/23/20 **************************************
+     A            RRMONO    R               REFFLD(FLAG)
+     A                                      COLHDG('Monopolistic' +
+     A                                      'State?')
+     A*** End   Add *** 11/23/20 **************************************
+     A*** BEGIN ADD ***  09/18/23  ************************************
+     A            RRSFCD    R     S         REFFLD(CLAS)
+     A                                      COLHDG('SAFETY FEE' 'STAT CODE')
+     A*** END ADD *****  09/18/23  ************************************
+     A*** Beg Add ***  04/29/24  *** WC2965 *************************
+     A            RREMAIL        1A         COLHDG('Require' 'Email')
+     A*** End Add ***  04/29/24  *** WC2965 *************************

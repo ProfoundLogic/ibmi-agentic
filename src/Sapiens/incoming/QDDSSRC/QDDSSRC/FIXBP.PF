@@ -1,0 +1,616 @@
+     A* (C) Copyright Fiserv Insurance Solutions, Inc., 2008
+     A*
+     A* FIXBP - First Health EOR Financial File Trailer
+     A*
+     A*****************************************************************
+     A* Created on 02/05/2008 by C:47 for Project 129MQN
+     A*****************************************************************
+     A* Revisions:
+     A*
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PXB01                     TEXT('First Health EOR Financial +
+     A                                            File Trailer')
+     A            XBKEY     R               REFFLD(DS17)
+     A                                      COLHDG('Trailer Key')
+     A            XBRECT    R               REFFLD(DS5)
+     A                                      COLHDG('Record' 'Type')
+     A            XBEOR     R               REFFLD(DS2)
+     A                                      COLHDG('State Form' 'Code')
+     A            XBCHRG        15S 2
+     A                                      COLHDG('Total Bill Charges')
+     A            XBFS          15S 2
+     A                                      COLHDG('Total Fee' +
+     A                                             'Schedule/UCR AMT')
+     A            XBPPO         15S 2
+     A                                      COLHDG('Total PPO')
+     A            XBRPAY        15S 2
+     A                                      COLHDG('Total Recommend' +
+     A                                             'Allow Payment')
+     A            XBPAID        15S 2
+     A                                      COLHDG('Total Paid')
+     A            XBSURC        15S 2
+     A                                      COLHDG('Total New York' 'Surcharge')
+     A            XBCAT1    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 1')
+     A            XBSAV1        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 1')
+     A            XBFEE1        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 1')
+     A            XBCAT2    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 2')
+     A            XBSAV2        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 2')
+     A            XBFEE2        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 2')
+     A            XBCAT3    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 3')
+     A            XBSAV3        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 3')
+     A            XBFEE3        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 3')
+     A            XBCAT4    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 4')
+     A            XBSAV4        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 4')
+     A            XBFEE4        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 4')
+     A            XBCAT5    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 5')
+     A            XBSAV5        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 5')
+     A            XBFEE5        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 5')
+     A            XBCAT6    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 6')
+     A            XBSAV6        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 6')
+     A            XBFEE6        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 6')
+     A            XBCAT7    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 7')
+     A            XBSAV7        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 7')
+     A            XBFEE7        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 7')
+     A            XBCAT8    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 8')
+     A            XBSAV8        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 8')
+     A            XBFEE8        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 8')
+     A            XBCAT9    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 9')
+     A            XBSAV9        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 9')
+     A            XBFEE9        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 9')
+     A            XBCA10    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 10')
+     A            XBSV10        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 10')
+     A            XBFE10        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 10')
+     A            XBCA11    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 11')
+     A            XBSV11        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 11')
+     A            XBFE11        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 11')
+     A            XBCA12    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 12')
+     A            XBSV12        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 12')
+     A            XBFE12        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 12')
+     A            XBCA13    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 13')
+     A            XBSV13        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 13')
+     A            XBFE13        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 13')
+     A            XBCA14    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 14')
+     A            XBSV14        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 14')
+     A            XBFE14        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 14')
+     A            XBCA15    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 15')
+     A            XBSV15        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 15')
+     A            XBFE15        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 15')
+     A            XBCA16    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 16')
+     A            XBSV16        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 16')
+     A            XBFE16        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 16')
+     A            XBCA17    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 17')
+     A            XBSV17        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 17')
+     A            XBFE17        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 17')
+     A            XBCA18    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 18')
+     A            XBSV18        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 18')
+     A            XBFE18        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 18')
+     A            XBCA19    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 19')
+     A            XBSV19        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 19')
+     A            XBFE19        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 19')
+     A            XBCA20    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 20')
+     A            XBSV20        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 20')
+     A            XBFE20        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 20')
+     A            XBCA21    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 21')
+     A            XBSV21        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 21')
+     A            XBFE21        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 21')
+     A            XBCA22    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 22')
+     A            XBSV22        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 22')
+     A            XBFE22        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 22')
+     A            XBCA23    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 23')
+     A            XBSV23        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 23')
+     A            XBFE23        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 23')
+     A            XBCA24    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 24')
+     A            XBSV24        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 24')
+     A            XBFE24        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 24')
+     A            XBCA25    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 25')
+     A            XBSV25        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 25')
+     A            XBFE25        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 25')
+     A            XBCA26    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 26')
+     A            XBSV26        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 26')
+     A            XBFE26        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 26')
+     A            XBCA27    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 27')
+     A            XBSV27        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 27')
+     A            XBFE27        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 27')
+     A            XBCA28    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 28')
+     A            XBSV28        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 28')
+     A            XBFE28        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 28')
+     A            XBCA29    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 29')
+     A            XBSV29        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 29')
+     A            XBFE29        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 29')
+     A            XBCA30    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 30')
+     A            XBSV30        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 30')
+     A            XBFE30        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 30')
+     A            XBCA31    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 31')
+     A            XBSV31        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 31')
+     A            XBFE31        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 31')
+     A            XBCA32    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 32')
+     A            XBSV32        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 32')
+     A            XBFE32        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 32')
+     A            XBCA33    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 33')
+     A            XBSV33        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 33')
+     A            XBFE33        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 33')
+     A            XBCA34    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 34')
+     A            XBSV34        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 34')
+     A            XBFE34        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 34')
+     A            XBCA35    R               REFFLD(FLAG)
+     A                                      COLHDG('Primary Savings' +
+     A                                             'Category Code 35')
+     A            XBSV35        15S 2
+     A                                      COLHDG('Primary Total' 'Savings 35')
+     A            XBFE35        15S 2
+     A                                      COLHDG('Primary Total' +
+     A                                             'Savings Fees 35')
+     A            XBSAV         15S 2
+     A                                      COLHDG('Total of' 'All Savings')
+     A            XBLFEE        15S 2
+     A                                      COLHDG('Total of' 'All Line Fees')
+     A            XBMLFE        15S 2
+     A                                      COLHDG('Total Line' 'Minimum Fees')
+     A            XBBCFE        15S 2
+     A                                      COLHDG('Total Bill' 'Charge Fees')
+     A            XBCNTA        15S 0
+     A                                      COLHDG('Record Count A001')
+     A            XBCNTB        15S 0
+     A                                      COLHDG('Record Count B001')
+     A            XBCNTC        15S 0
+     A                                      COLHDG('Record Count C001')
+     A            XBCNTD        15S 0
+     A                                      COLHDG('Record Count D001')
+     A            XBCNTF        15S 0
+     A                                      COLHDG('Record Count F001')
+     A            XBCNTG        15S 0
+     A                                      COLHDG('Record Count G001')
+     A            XBCNTJ        15S 0
+     A                                      COLHDG('Record Count J001')
+     A            XBCNTK        15S 0
+     A                                      COLHDG('Record Count K001')
+     A            XBCNTL        15S 0
+     A                                      COLHDG('Record Count L001')
+     A            XBCNL2        15S 0
+     A                                      COLHDG('Record Count L002')
+     A            XBCNTM        15S 0
+     A                                      COLHDG('Record Count M001')
+     A            XBCNTN        15S 0
+     A                                      COLHDG('Record Count N001')
+     A            XBCNTV        15S 0
+     A                                      COLHDG('Record Count V001')
+     A            XBRCNT        15S 0
+     A                                      COLHDG('Total Record Count')
+     A            XB2SV1    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 1')
+     A            XB2TS1        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 1')
+     A            XB2SV2    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 2')
+     A            XB2TS2        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 2')
+     A            XB2SV3    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 3')
+     A            XB2TS3        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 3')
+     A            XB2SV4    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 4')
+     A            XB2TS4        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 4')
+     A            XB2SV5    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 5')
+     A            XB2TS5        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 5')
+     A            XB2SV6    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 6')
+     A            XB2TS6        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 6')
+     A            XB2SV7    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 7')
+     A            XB2TS7        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 7')
+     A            XB2SV8    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 8')
+     A            XB2TS8        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 8')
+     A            XB2SV9    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 9')
+     A            XB2TS9        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 9')
+     A            XB2S10    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 10')
+     A            XB2T10        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 10')
+     A            XB2S11    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 11')
+     A            XB2T11        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 11')
+     A            XB2S12    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 12')
+     A            XB2T12        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 12')
+     A            XB2S13    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 13')
+     A            XB2T13        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 13')
+     A            XB2S14    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 14')
+     A            XB2T14        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 14')
+     A            XB2S15    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 15')
+     A            XB2T15        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 15')
+     A            XB2S16    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 16')
+     A            XB2T16        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 16')
+     A            XB2S17    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 17')
+     A            XB2T17        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 17')
+     A            XB2S18    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 18')
+     A            XB2T18        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 18')
+     A            XB2S19    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 29')
+     A            XB2T19        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 19')
+     A            XB2S20    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 20')
+     A            XB2T20        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 20')
+     A            XB2S21    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 21')
+     A            XB2T21        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 21')
+     A            XB2S22    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 22')
+     A            XB2T22        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 22')
+     A            XB2S23    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 23')
+     A            XB2T23        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 23')
+     A            XB2S24    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 24')
+     A            XB2T24        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 24')
+     A            XB2S25    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 25')
+     A            XB2T25        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 25')
+     A            XB2S26    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 26')
+     A            XB2T26        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 26')
+     A            XB2S27    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 27')
+     A            XB2T27        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 27')
+     A            XB2S28    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 28')
+     A            XB2T28        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 28')
+     A            XB2S29    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 29')
+     A            XB2T29        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 29')
+     A            XB2S30    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 30')
+     A            XB2T30        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 30')
+     A            XB2S31    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 31')
+     A            XB2T31        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 31')
+     A            XB2S32    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 32')
+     A            XB2T32        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 32')
+     A            XB2S33    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 33')
+     A            XB2T33        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 33')
+     A            XB2S34    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 34')
+     A            XB2T34        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 34')
+     A            XB2S35    R               REFFLD(FLAG)
+     A                                      COLHDG('Secondary Fee' +
+     A                                             'Savings Category' 'Code 35')
+     A            XB2T35        15S 2
+     A                                      COLHDG('Total Secondary' +
+     A                                             'Fee Savings' +
+     A                                             'Fees Category 35')
+     A            XB2LFE        15S 2
+     A                                      COLHDG('Total of all' +
+     A                                             'SECONDARY Line' 'Fees')
+     A            XB2LMF        15S 2
+     A                                      COLHDG('Total of all' +
+     A                                             'SECONDARY Line' +
+     A                                             'Minimum Fees')
+     A            XB2BCF        15S 2
+     A                                      COLHDG('Total of all' +
+     A                                             'SECONDARY Bill' +
+     A                                             'Charge Fees')
+     A            XBFILL       326A
+     A                                      COLHDG('Filler')
+
+     A**************************************************************************
+
+     A            XBDCID    R               REFFLD(DCID)
+     A                                      COLHDG('(Fiserv)' 'Document' 'ID')
+     A            XBMBR#    R               REFFLD(DS10)
+     A                                      COLHDG('(Fiserv)' 'Member' 'Number')
+     A            XBFIL2       478A
+     A                                      COLHDG('Filler')

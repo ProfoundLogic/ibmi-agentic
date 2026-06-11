@@ -1,0 +1,109 @@
+     A*  (C) Copyright Progressive Data Solutions, Inc., 1997
+     A*%%TS  SD  19911114  171046  WHERR       REL-V2R1M0  5738-PW1
+     A*  91/06/11  08:50:38    CAROL       REL-R03M00  5728-PW1
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/BKREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      ALTHELP
+     A                                      HELP
+     A                                      VLDCMDKEY(11)
+     A                                      ROLLUP(18)
+     A                                      CF03
+     A                                      CF06
+     A          R SCR01S                    SFL
+     A*%%TS  SD  19911114  171046  WHERR       REL-V2R1M0  5738-PW1
+     A            SCCO#     R        O 10 17REFFLD(CO#)
+     A            SCFAC#    R        O 10 22REFFLD(FAC#)
+     A            SCGLD#    R        O 10 27REFFLD(DEPT)
+     A            SCACC#    R        O 10 32REFFLD(ACCT)
+     A            SCSUB#    R        O 10 37REFFLD(SUBA)
+     A            SCSEL          1A  B 10  3TEXT('Selection Field')
+     A N06                                  DSPATR(CS)
+     A N06                                  DSPATR(UL)
+     A  20                                  DSPATR(RI)
+     A  20                                  DSPATR(PC)
+     A            SCDESC    R        O 10 42REFFLD(DS30)
+     A                                      TEXT('Description')
+     A            SCOLD          7  0O 10  8EDTCDE(Z)
+     A          R SCR01C                    SFLCTL(SCR01S)
+     A*%%TS  SD  19911114  171046  WHERR       REL-V2R1M0  5738-PW1
+     A                                      CHGINPDFT
+     A                                      SFLSIZ(0999)
+     A                                      SFLPAG(0013)
+     A                                      OVERLAY
+     A                                      TEXT('Subfile Control for Chart of -
+     A                                      Accounts .')
+     A                                      SETOF(20)
+     A  01                                  SFLDSP
+     A  01                                  SFLDSPCTL
+     A  02                                  SFLINZ
+     A  03                                  SFLDLT
+     A  04                                  SFLCLR
+     A  05                                  SFLEND
+     A                                      CF12
+     A  20                                  SFLMSGID(BKM9910 *LIBL/BKMES)
+     A  32 18                               SFLMSGID(CPF5203 *LIBL/QCPFMSG)
+     A          H                           HLPDOC('SCRN1' 'BKD010F.F' 'BK.HLP')
+     A                                      HLPARA(01 001 24 080)
+     A            SCFILE    R        O  1  2REFFLD(FLE)
+     A            SCRECF    R        O  1 70REFFLD(RECF)
+     A            SCUSER    R        O  2 70REFFLD(USER)
+     A            SCCO#     R     Y  B  5 21REFFLD(CO#)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            SCFAC#    R     Y  B  5 26REFFLD(FAC#)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            SCGLD#    R     Y  B  5 31REFFLD(DEPT)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            SCACC#    R     Y  B  5 36REFFLD(ACCT)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            SCSUB#    R     Y  B  5 41REFFLD(SUBA)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            #@$2           3S 0H      SFLRCDNBR(CURSOR)
+     A                                  7  4'1=Select request'
+     A                                  9  2'Opt'
+     A                                      DSPATR(HI)
+     A                                  6  2'Type option, press Enter'
+     A                                  1 27'Work TRANSLATION OF GL'
+     A                                      DSPATR(HI)
+     A                                  2 31'--Search--'
+     A                                      DSPATR(HI)
+     A                                  5  2'Position to Acct:'
+     A                                  9 17'General Ledger No.'
+     A                                      DSPATR(HI)
+     A                                  9 42'Description'
+     A                                      DSPATR(HI)
+     A                                  9  7'OLD#'
+     A                                      DSPATR(HI)
+     A          R SCR01
+     A                                      OVERLAY
+     A                                 23  2'F1=Help'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A                                 23 13'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A                                 23 23'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

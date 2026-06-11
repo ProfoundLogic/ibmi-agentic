@@ -1,0 +1,332 @@
+      * (c) 2024 Sapiens. All Rights Reserved.                             *
+      *
+     A*****************************************************************
+     A** WORKERS' COMP PREMIUM DETAIL FILE
+     A*****************************************************************
+     A* REVISIONS:
+     A*                                                               *
+     H* 08/14/24  C:291 PROJECT: WC2974                               *
+     H*                 ADD FIELDS FOR ACTUAL INCREASED LIMITS AND    *
+     A*                 FOR BALANCE TO INCREASED LIMITS MINIMUM.      *
+     A*                                                               *
+     H* 02/27/24  C:333 PROJECT: WC2953                               *
+     H*                 PREMIUM HISTORY BALANCE TO MINIMUM.           *
+     A*                                                               *
+     H* 11/06/23  C:65  PROJECT: WC2810                               *
+     H*                 ADD FIELD FOR BALANCE TO MIN AMOUNT.          *
+     A*                                                               *
+     H* 06/14/23  C:65  PROJECT: 150WFY                               *
+     H*                 ADD FIELDS FOR ARAP CHARGES AND LOSS CONSTANT.*
+     A*                                                               *
+     H* 07/30/20  C:65  PROJECT: PHW#90082 (SUNZ)                     *
+     H*                 ADD FIELDS FOR EXP MOD AMOUNTS, ALONG WITH    *
+     A*                 PREMIUM BEFORE/AFTER MODIFIERS.               *
+     A*                                                               *
+     A* 07/13/11 C:061 PROJECT WC2037                                 *
+     A*                  Added new field                              *
+     A*                    UNEARNED PREMIUM SURCHARGE AUDITED AMOUNT  *
+     A*                                                               *
+     A* 11/10/10  C:65   PROJECT: 139WPL                              *
+     A*                  Added new fields for HCN CREDIT.             *
+     H*                                                               *
+     H* 06/21/10  C:255 PROJECT: 114WVY                               *
+     H*                 ADD ESTIMATED AND AUDITED AMOUNT FIELDS OF 2ND*
+     A*                 PERIOD DEVIATIONS FOR SPLIT DEVIATIONS.       *
+     A*                                                               *
+     H* 01/22/08  C:65  PROJECT: WC1627                               *
+     H*                 ADD FIELDS FOR EST/AUD MANUAL AND NORMAL PREM.*
+     A*                                                               *
+     A* 06/20/06 C:168 PROJECT: 132WEW                                *
+     A*                Added the following fields                     *
+     A*                - Aircraft reinsurance charge flat amount      *
+     A*                - Aircraft reinsurance charge percentage       *
+     A*                - Aircraft reinsurance charge effective date   *
+     A*                - Aircraft reinsurance charge expiration date  *
+     A*                - Aircraft reinsurance charge estimated amount *
+     A*                - Aircraft reinsurance charge audited amount   *
+     A*
+     A* 09/01/04 C:136 PROJECT: 93WEH
+     A*                Add field for estimated and audited voluntary
+     A*                labor charge amount.
+     A*
+     A* 02/26/04  C:65   PROJECT: SUPPORT
+     A*                  ADD FIELDS FOR EXPERIENCE MOD CHANGE AMTS.    T
+     A*
+     A* 01/08/04 C:33 Project: 126WCD
+     A*               Multiple Deductiple discounts per Year.
+     A*
+     A* 04/24/02  C:35   PROJECT: WC1031
+     A*                  CHANGE FIELDS ADDED ON 03/14/02 AND 01/16/02
+     A*                  TO PACKED.
+     A*
+     A* 03/14/02  C:65   PROJECT: WC1031
+     A*                  ADDED STANDARD PREMIUM FIELD AND AUDIT DISCOUNT
+     A*                  FIELDS FOR WCSTAT.
+     A*
+     A* 01/16/02  C:65   PROJECT: WC1031
+     A*                  ADDED ADDITIONAL FIELDS FOR MINIMUM PREM INFO.
+     A*
+     A* 10/04/01  C:35   PROJECT: WC1031
+     A*                  ADDED FIELDS TO CAPTURE MINIMUM PREMIUM INFO
+     A*
+     A* 09/26/01 C:65  PROJECT: WC1045
+     A*                ADD RATING STATE TO THE FILE.
+     A*                ADD PRE-LOSS CONSTANT ANNUAL PREMIUM FIELDS.
+     A*
+     A*****************************************************************
+     A**
+     A                                      REF(WREFP)
+     A          R PMP01                     TEXT('EMPLOYER PREM DETAIL FILE')
+     A*** KEY FIELDS:
+     A            MPCO#     R               REFFLD(CO#)
+     A            MPFND     R               REFFLD(FND)
+     A            MPFYR     R               REFFLD(FYR)
+     A            MPEMP#    R               REFFLD(EMP#)
+     A            MPDIV     R               REFFLD(DIV)
+     A*** ANNUAL PREMIUM
+     A            MPANPR    R               REFFLD(A112)
+     A                                      COLHDG('EST ANNUAL PREM')
+     A            MPAAPR    R               REFFLD(A112)
+     A                                      COLHDG('AUD ANNUAL PREM')
+     A*** MAINTENANCE FIELDS:
+     A            MPSTAT    R               REFFLD(STAT)
+     A            MPUSER    R               REFFLD(USER)
+     A            MPPGM     R               REFFLD(PGM)
+     A            MPTIME    R               REFFLD(TIME)
+     A            MPDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A*** BEGIN ADD ***  09/26/01  ************************************
+     A            MPST      R               REFFLD(ST)
+     A                                      COLHDG('RATING STATE')
+     A*** ANNUAL PREMIUM - BEFORE LOSS CONSTANT.
+     A            MPANPL    R               REFFLD(A112)
+     A                                      COLHDG('EST PREM W/O LC')
+     A            MPAAPL    R               REFFLD(A112)
+     A                                      COLHDG('AUD PREM W/O LC')
+     A*** END ADD *****  09/26/01  ************************************
+      **** BEGIN ADD **** 10/04/01 *********************************************
+     A            MPEDC1    R               REFFLD(A112)
+     A                                      COLHDG('EST DISCOUNT #1')
+     A            MPEDC2    R               REFFLD(A112)
+     A                                      COLHDG('EST DISCOUNT #2')
+     A            MPEDC3    R               REFFLD(A112)
+     A                                      COLHDG('EST DISCOUNT #3')
+     A            MPEDV2    R               REFFLD(A112)
+     A                                      COLHDG('EST DEVIATION #2')
+     A            MPEDCT    R               REFFLD(A112)
+     A                                      COLHDG('EST DEDUCT AMT')
+     A            MPEDCM    R               REFFLD(A112)
+     A                                      COLHDG('EST SUBJ PREM 1A')
+     A            MPEDCS    R               REFFLD(A112)
+     A                                      COLHDG('EST SUBJ PREM 1B')
+     A            MPEDC     R               REFFLD(A112)
+     A                                      COLHDG('EST AMT OF DB/CR')
+     A            MPEWAV    R               REFFLD(A112)
+     A                                      COLHDG('EST AMT OF WAIVER')
+      **** END   ADD **** 10/04/01 *********************************************
+      **** BEGIN CHG **** 04/25/02 *********************************************
+      **** BEGIN ADD **** 01/16/02 *********************************************
+     A*********** MPETCA        11S 2
+     A***********                           COLHDG('EST AMT TRANS DB/CR')
+     A*********** MPPRTD        11S 2
+     A***********                           COLHDG('AMT OF EXP CNST')
+      **** END ADD ****** 01/16/02 *********************************************
+      **** BEGIN ADD **** 03/14/02 *********************************************
+     A*********** MPSTPR        11S 2
+     A***********                           COLHDG('EST AMT OF STD PREM')
+     A*********** MPASPR        11S 2
+     A***********                           COLHDG('AUD AMT OF STD PREM')
+     A*********** MPADC1        11S 2
+     A***********                           COLHDG('AUD DISCOUNT #1')
+     A*********** MPADC2        11S 2
+     A***********                           COLHDG('AUD DISCOUNT #2')
+     A*********** MPADC3        11S 2
+     A***********                           COLHDG('AUD DISCOUNT #3')
+     A*********** MPADV2        11S 2
+     A***********                           COLHDG('AUD DEVIATION #2')
+     A*********** MPADCT        11S 2
+     A***********                           COLHDG('AUD DEDUCT AMT')
+     A*********** MPADCM        11S 2
+     A***********                           COLHDG('AUD SUBJ PREM 1A')
+     A*********** MPADCS        11S 2
+     A***********                           COLHDG('AUD SUBJ PREM 1B')
+     A*********** MPADC         11S 2
+     A***********                           COLHDG('AUD AMT OF DB/CR')
+     A*********** MPAWAV        11S 2
+     A***********                           COLHDG('AUD AMT OF WAIVER')
+     A*********** MPATCA        11S 2
+     A***********                           COLHDG('AUD AMT TRANS DB/CR')
+      **** END ADD ****** 03/14/02 *********************************************
+     A            MPETCA    R               REFFLD(A112)
+     A                                      COLHDG('EST AMT TRANS DB/CR')
+     A            MPPRTD    R               REFFLD(A112)
+     A                                      COLHDG('AMT OF EXP CNST')
+     A            MPSTPR    R               REFFLD(A112)
+     A                                      COLHDG('EST AMT OF STD PREM')
+     A            MPASPR    R               REFFLD(A112)
+     A                                      COLHDG('AUD AMT OF STD PREM')
+     A            MPADC1    R               REFFLD(A112)
+     A                                      COLHDG('AUD DISCOUNT #1')
+     A            MPADC2    R               REFFLD(A112)
+     A                                      COLHDG('AUD DISCOUNT #2')
+     A            MPADC3    R               REFFLD(A112)
+     A                                      COLHDG('AUD DISCOUNT #3')
+     A            MPADV2    R               REFFLD(A112)
+     A                                      COLHDG('AUD DEVIATION #2')
+     A            MPADCT    R               REFFLD(A112)
+     A                                      COLHDG('AUD DEDUCT AMT')
+     A            MPADCM    R               REFFLD(A112)
+     A                                      COLHDG('AUD SUBJ PREM 1A')
+     A            MPADCS    R               REFFLD(A112)
+     A                                      COLHDG('AUD SUBJ PREM 1B')
+     A            MPADC     R               REFFLD(A112)
+     A                                      COLHDG('AUD AMT OF DB/CR')
+     A            MPAWAV    R               REFFLD(A112)
+     A                                      COLHDG('AUD AMT OF WAIVER')
+     A            MPATCA    R               REFFLD(A112)
+     A                                      COLHDG('AUD AMT TRANS DB/CR')
+      **** END   CHG **** 04/25/02 *********************************************
+     A***  Begin Add  ***  01/08/04  **************************************
+     A            MPEDD2    R     S         REFFLD(A112)
+     A                                      COLHDG('2ND EST DEDUCT AMT')
+     A            MPADD2    R     S         REFFLD(A112)
+     A                                      COLHDG('2ND AUD DEDUCT AMT')
+     A***  End   Add  ***  01/08/04  **************************************
+      **** BEGIN ADD **** 02/26/04 *********************************************
+     A            MPEXPA    R     S         REFFLD(A112)
+     A                                      COLHDG('EST CHG AMT EXP MOD')
+     A            MPAXPA    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD CHG AMT EXP MOD')
+      **** END ADD ****** 02/26/04 *********************************************
+     A*** BEG ADD ***** 09/01/04 ******************************************
+     A            MPEVLC    R     S         REFFLD(A112)
+     A                                      COLHDG('EST VOL' 'LABOR CHG AMT')
+     A            MPAVLC    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD VOL' 'LABOR CHG AMT')
+     A*** END ADD ***** 09/01/04 ******************************************
+      *** BEG ADD ***** 06/20/06 ******************************************
+     A            MPARCA        11S 2       COLHDG('AIRCRAFT REINS' +
+     A                                      'MAX/MIN')
+     A            MPARCP         5S 2       COLHDG('AIRCRAFT REINS' +
+     A                                      'PERCENTAGE')
+     A            MPAREF         7S 0       COLHDG('AIRCRAFT REINS' +
+     A                                      'EFF DATE')
+     A            MPAREX         7S 0       COLHDG('AIRCRAFT REINS' +
+     A                                      'EXP DATE')
+     A            MPEARC        11S 2       COLHDG('AIRCRAFT REINS' +
+     A                                      'EST DATE')
+     A            MPAARC        11S 2       COLHDG('AIRCRAFT REINS' +
+     A                                      'AUDIT DATE')
+      *** END ADD ***** 06/20/06 ******************************************
+     A***** BEGIN ADD *** 01/22/08 *********************************************
+     A            MPMAPR    R     S         REFFLD(A112)
+     A                                      COLHDG('EST MANUAL PREM')
+     A            MPAMPR    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD MANUAL PREM')
+     A            MPENMP    R     S         REFFLD(A112)
+     A                                      COLHDG('EST NORMAL PREM')
+     A            MPANMP    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD NORMAL PREM')
+     A***** END ADD ***** 01/22/08 *********************************************
+     A***** BEG ADD ***** 06/21/10 *********************************************
+     A            MPD1E2    R     S         REFFLD(A112)
+     A                                      COLHDG('DEV#1 SPLIT 2 EST.' +
+     A                                            'AMOUNT')
+     A
+     A            MPD1A2    R     S         REFFLD(A112)
+     A                                      COLHDG('DEV#1 SPLIT 2 AUD. ' +
+     A                                            'AMOUNT')
+     A            MPD2E2    R     S         REFFLD(A112)
+     A                                      COLHDG('DEV#2 SPLIT 2 EST. ' +
+     A                                            'AMOUNT')
+     A
+     A            MPD2A2    R     S         REFFLD(A112)
+     A                                      COLHDG('DEV#2 SPLIT 2 AUD. ' +
+     A                                            'AMOUNT')
+     A***** END ADD ***** 06/21/10 *********************************************
+     A*** BEGIN ADD **** 11/10/10 *********************************************
+     A            MPEHCN    R     S         REFFLD(A112)
+     A                                      COLHDG('HCN CREDIT' +
+     A                                            'ESTIMATED AMOUNT')
+     A            MPAHCN    R     S         REFFLD(A112)
+     A                                      COLHDG('HCN CREDIT' +
+     A                                            'AUDITED AMOUNT')
+     A*** END ADD ****** 11/10/10 *********************************************
+      ****** BEG ADD *** 07/13/11 *********************************************
+     A            MPAUSA    R     S         REFFLD(A112)
+     A                                      COLHDG('UNEARNED PREM' +
+     A                                      'SURCHARGE' 'AUDIT AMT')
+      ****** END ADD *** 07/13/11 *********************************************
+     A*** BEGIN ADD **** 07/30/20 *********************************************
+     A            MPESBJ    R     S         REFFLD(A112)
+     A                                      COLHDG('EST SUBJECT PREM')
+     A            MPASBJ    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD SUBJECT PREM')
+     A            MPEPBM    R     S         REFFLD(A112)
+     A                                      COLHDG('EST PREM BEFORE MOD')
+     A            MPAPBM    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD PREM BEFORE MOD')
+     A            MPEMPM    R     S         REFFLD(A112)
+     A                                      COLHDG('EST MODIFIED PREM')
+     A            MPAMPM    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD MODIFIED PREM')
+     A            MPEXP1    R     S         REFFLD(A112)
+     A                                      COLHDG('EST EXP MOD 1 PREM')
+     A            MPEXP2    R     S         REFFLD(A112)
+     A                                      COLHDG('EST EXP MOD 2 PREM')
+     A            MPEXP3    R     S         REFFLD(A112)
+     A                                      COLHDG('EST EXP MOD 3 PREM')
+     A            MPAXP1    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD EXP MOD 1 PREM')
+     A            MPAXP2    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD EXP MOD 2 PREM')
+     A            MPAXP3    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD EXP MOD 3 PREM')
+     A*** END ADD ****** 07/30/20 *********************************************
+     A*** BEGIN ADD ***  06/14/23  ********************************************
+     A            MPRPE1    R     S         REFFLD(A112)
+     A                                      COLHDG('EST ARAP 1 PREM')
+     A            MPRPE2    R     S         REFFLD(A112)
+     A                                      COLHDG('EST ARAP 2 PREM')
+     A            MPRPE3    R     S         REFFLD(A112)
+     A                                      COLHDG('EST ARAP 3 PREM')
+     A            MPRPA1    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD ARAP 1 PREM')
+     A            MPRPA2    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD ARAP 2 PREM')
+     A            MPRPA3    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD ARAP 3 PREM')
+     A            MPELOS    R     S         REFFLD(A112)
+     A                                      COLHDG('EST LOSS CONSTANT')
+     A            MPALOS    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD LOSS CONSTANT')
+     A*** END ADD *****  06/14/23  ********************************************
+     A*** BEGIN ADD ***  11/06/23  ********************************************
+     A            MPEBAL    R     S         REFFLD(A112)
+     A                                      COLHDG('EST BALANCE TO MIN')
+     A            MPABAL    R     S         REFFLD(A112)
+     A                                      COLHDG('AUD BALANCE TO MIN')
+     A*** END ADD *****  11/06/23  ********************************************
+     A*** BEG ADD *****  02/27/24  ********************************************
+     A            MPSRAM    R     S         REFFLD(A112)
+     A                                      COLHDG('SHORT RATE PREMI' +
+     A                                            'UM AMT')
+     A*** END ADD *****  02/27/24  ********************************************
+     A*** BEG ADD *****  08/14/24  ********************************************
+     A            MPEIN1        11S 2       COLHDG('ESTIMATED INCREASED' +
+     A                                      'LIMITS')
+     A            MPAIN1        11S 2       COLHDG('AUDITED INCREASED' +
+     A                                      'LIMITS')
+     A            MPEIN2        11S 2       COLHDG('ESTIMATED INCREASED' +
+     A                                      'LIMITS 2')
+     A            MPAIN2        11S 2       COLHDG('AUDITED INCREASED' +
+     A                                      'LIMITS 2')
+     A            MPEBIL        11S 2       COLHDG('ESTIMATED BAL TO' +
+     A                                      'I.L. MINIMUM')
+     A            MPABIL        11S 2       COLHDG('AUDITED BAL TO' +
+     A                                      'I.L. MINIMUM')
+     A            MPEBIL2       11S 2       COLHDG('ESTIMATED BAL TO' +
+     A                                      'I.L. MINIMUM 2')
+     A            MPABIL2       11S 2       COLHDG('AUDITED BAL TO' +
+     A                                      'I.L. MINIMUM 2')
+     A*** END ADD *****  08/14/24  ********************************************

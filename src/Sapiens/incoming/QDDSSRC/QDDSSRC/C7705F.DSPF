@@ -1,0 +1,61 @@
+     A*%%TS  SD  19980223  134206  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   MEMBER LOSS REPORT PROMPT DISPLAY                        **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A*%%TS  SD  19980223  134206  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      CF05
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7705F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  8 25'Federal Tax ID..:'
+     A            SCFEIN    R        B  8 43REFFLD(FEIN)
+     A                                      TEXT('FEDERAL ID NO')
+     A                                      CHECK(RB)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A  20                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A                                 10 25'Run Date........:'
+     A            SCRNDT    R        B 10 43REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                 16 20'Leave Federal Tax ID Blank For All-
+     A                                       Members'
+     A                                 22  3'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 30'F5=Policy search'
+     A                                      COLOR(BLU)
+     A                                 22 60'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

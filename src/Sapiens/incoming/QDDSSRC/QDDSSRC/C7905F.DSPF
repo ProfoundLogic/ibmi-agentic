@@ -1,0 +1,82 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DISPLAY FOR WRITTEN PREMIUM REPORT                       **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*---------------------------------------------------------------
+     A          R SCR01
+     A                                      CF03
+     A                                      CF13
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C7905F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  7 23'Evaluation Date:'
+     A            SCEDT     R        B  7 42REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      TEXT('EVALUATION DATE')
+     A                                      CHECK(RB)
+     A                                  9 29'From Date:'
+     A            SCFDT     R        B  9 42REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  22                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A                                      TEXT('FROM DATE')
+     A                                      CHECK(RB)
+     A                                 11 31'To Date:'
+     A            SCTDT     R        B 11 42REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  23                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A                                      TEXT('TO DATE')
+     A                                      CHECK(RB)
+     A                                 13 26'Section Code:'
+     A            SCCC      R        B 13 42REFFLD(CDE)
+     A*                                     DSPATR(CS)
+     A  25                                  ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A                                      TEXT('SECTION CODE')
+     A                                 13 46'(Default is all)'
+     A                                 15 27'Report Type:'
+     A            SCRPTY    R        B 15 42REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A  26                                  ERRMSGID(CCR0928 *LIBL/CMESGG)
+     A                                      TEXT('TYPE')
+     A                                 15 46'("D" = Detailed, "S" = Summarized)'
+     A                                 24  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 63'F13=Chg user parm'
+     A                                      COLOR(BLU)
+     A*---------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND PR)

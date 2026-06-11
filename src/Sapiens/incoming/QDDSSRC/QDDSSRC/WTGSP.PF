@@ -1,0 +1,88 @@
+      * (c) 2015 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*****************************************************************
+     A* GROUP PROCESS SELECT FILE
+     A*****************************************************************
+     A* REVISIONS
+     A*
+     A* 08/19/19 C:079 Project: WC2604
+     A*                Add NCCI Group Carrier Code
+     A*
+     A* 09/11/15 C:295 PROJECT:WC2362
+     A*                Add new fields:
+     A*                 GSDSPTCC   - Transaction ID Display
+     A*                 GSREQTCC   - Transaction ID Required
+     A*                 GSLIKETCC  - Require like transaction ID
+     A*
+     A* 06/23/15 C:33  35519
+     A*                Add new fiels:
+     A*                 GSLIKECAR# - Require like Carrier #'s
+     A*                 GSLIKERRE  - Require like RRE's
+     A*                 GSCXPGMVAL - Value to be returned in 'pgm' parm
+     A*
+     A* 03/11/11 C:190 PROJECT: 139WPQ
+     A*                Add a new field to enable the carrier # display.
+     A*
+     A* 07/26/10 C:136 PROJECT: WC1694
+     A*                ADD DEFAULT INC/EXC FLAG
+     A*                ADD CONDITION ON POLICY EXPORT FLAG
+     A*                ADD CONDITION ON MEDICARE RRE#
+     A*
+     A* 05/18/10 C:198 Project: WC1879
+     A*                -Added F17=Subset at 95th position so that
+     A*                 LODWTGSP can load it correctly.
+     A*
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PGS01                     TEXT('GRP PROC FILE')
+     A
+     A            GSID          10A         COLHDG('PROC ID')
+     A            GSTITL        40A         COLHDG('SCREEN TITLE')
+     A            GSPPGM        10A         COLHDG('PROC PGM')
+     A            GSPLST         3S 0       COLHDG('PARM LIST')
+     A            GSKC           1A         COLHDG('KC PARM')
+     A            GSKL           1A         COLHDG('KL PARM')
+     A            GSPRDS        25A         COLHDG('PRDS PARM')
+     A            GSCALL         1A         COLHDG('CALL PARM')
+     A            GSHDG          3S 0       COLHDG('SCRN HDG')
+     A*** Beg Add *** 05/18/10 ****************************************
+     A            GSF17          1A         COLHDG('F17=Subset')
+     A*** End Add *** 05/18/10 ****************************************
+     A            GSUSER    R               REFFLD(USER)
+     A            GSPGM     R               REFFLD(PGM)
+     A            GSDT      R     S         REFFLD(DT7)
+      *** BEG ADD ***** 07/26/10 *********************************
+     A            GSDIEF         1A         COLHDG('DEFAULT' 'INC/EXC FLG')
+     A            GSCOPE         1A         COLHDG('CONDITION' 'ON WMPEP')
+     A            GSCRRE         1A         COLHDG('CONDITION' 'ON RRE#')
+      *** END ADD ***** 07/26/10 *********************************
+      *** BEG ADD ***** 03/11/11 *********************************
+     A            GSCAR#         1A         COLHDG('Carrier #' 'Display Flag')
+      *** END ADD ***** 03/11/11 *********************************
+     A***  Begin Add  ***  06/23/15  *********************************
+     A            GSLIKECAR#     1A         COLHDG('Like' 'Carrier#')
+     A                                      TEXT('Require like Carrier #s')
+     A            GSLIKERRE      1A         COLHDG('Like' 'RRE')
+     A                                      TEXT('Require like RREs')
+     A            GSCXPGMVALR               REFFLD(PGM)
+     A                                      COLHDG('Return' 'Program' 'Value')
+     A                                      TEXT('Value to be returned in -
+     A                                      "pgm" parm')
+     A***  End   Add  ***  06/23/15  *********************************
+     A***  Beg Add  ***  09/11/15  *********************************
+     A            GSDSPTCC  R               REFFLD(FLAG)
+     A                                      COLHDG('Transaction ID' 'Display')
+     A                                      TEXT('Transaction ID Display')
+     A            GSREQTCC  R               REFFLD(FLAG)
+     A                                      COLHDG('Transaction ID' 'Required')
+     A                                      TEXT('Transaction ID Required')
+     A            GSLIKETCC R               REFFLD(FLAG)
+     A                                      COLHDG('Like' 'Transaction ID')
+     A                                      TEXT('Require like transaction ID')
+     A***  End   Add  ***  09/11/15  *********************************
+      *** Beg Add ***** 08/19/19 ************************************
+     A            GSNCARGRP R               REFFLD(FLAG)
+     A                                      COLHDG('NCCI Carrier' 'Group Code')
+      *** End Add ***** 08/19/19 ************************************
+     A*
+     A          K GSID

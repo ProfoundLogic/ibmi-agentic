@@ -1,0 +1,938 @@
+     A* (c) 2024 Sapiens. All Rights Reserved.
+     A* Admin/DARTS Control/Billing Options
+     A*==============================================================
+     A* REVISIONS:
+     A*
+     A* 08/01/24 C:053 Project: WC2975
+     A*                Inforce Premium Calc Config
+     A*
+     A* 06/24/24 C:333 Project: 146WKR
+     A*                Collateral Processing
+     A*
+     A* 01/25/24 C:344 Project: 133WTD
+     A*                Add IVC Separate 3PY Batch by group
+     A*
+     A* 07/07/23 C:062 Project: WC2916
+     A*                Add Ran IVC Sweep Flag
+     A*
+     A* 05/24/23 C:079 Support: 150/107702
+     A*                Add Delete from Quote Sec level/type
+     A*
+     A* 03/02/22 C:136 Project: WC2818
+     A*                Add Include CSV flag for Agent
+     A*                Commission Statement
+     A*
+     A* 08/02/21 C:318 Project: WC2820
+     A*                Add Vendor score and dates field.
+     A*
+     A* 03/11/21 C:062 Project: wc2663
+     A*                Add Invoice Cloud billing options.
+     A*
+     A* 05/12/20 C:136 Project: 150WEU
+     A*                Add flag to designate S/R policies excluded
+     A*                from A/R processing by est/rev bill
+     A*
+     A* 02/10/20 C:298 Project: WC2704                               *
+     A*                Add flag for CX/RE State Rpt Div only         *
+     A*                                                              *
+     A* 12/16/19 C:180 Project: 150WEH                               *
+     A*                Add SR Payroll Audit                          *
+     A*                                                              *
+     A* 10/25/19 C:33  Project: SY406                                *
+     A*                Add DARTS codes for:                          *
+     A*                -ACORD application                            *
+     A*                -Document upload                              *
+     A*                                                              *
+     A* 04/02/18 C:33  Project: 150WCF                               *
+     A*                Add flag for requiring employer link code     *
+     A*                                                              *
+     A* 08/16/17 C:65  PROJECT: 150WAO                               *
+     A*                ADD FLAG FOR PRINTING EMPLOYER LINK CODE      *
+     A*                ON POLICY PAGES' SCHEDULE OF OPERATIONS.      *
+     A*                                                              *
+     A* 09/14/15  C:65   Project WC2375                              *
+     A*                  ADD FIELDS FOR DEFER PRIOR AUDITS.          *
+     A*                                                              *
+     A* 06/20/14  C:65   Project WC2277                              *
+     A*                  Add fieldS FOR COVER LETTER DEPT CODES.     *
+     A*                                                              *
+     A* 04/10/14  C:65   Project WC2277                              *
+     A*                  Add field FOR "GENERATE POLICY NOTIFICATION"*
+     A*                  ADD DCID/FOLD FIELDS FOR NEW AND RENEWAL    *
+     A*                  COVER LETTERS.                              *
+     A*                                                              *
+     A* 03/19/14  C:295  Project 89WAX                               *
+     A*                  Add new field "Customer Id ".               *
+     A*                                                              *
+     A* 01/21/14  C:190  Project WC2201                              *
+     A*                  Add new field "EDI Contact Designation".    *
+     A*                                                              *
+     A* 11/22/13  C:190  Project 129WSB                              *
+     A*                  Field "EXSPYB" added for Suppress prior     *
+     A*                  year balance on Premium Notice.             *
+     A*                                                              *
+     A* 04/01/13  C:282  Project 147WAK                              *
+     A*                  Field "EXTRFL" added for Trnsfr Typ Flag    *
+     A*                  Field "EXQTIL" added for Change Immed  Lvl  *
+     A*                  Field "EXQTIT" added for Change Immed  Typ  *
+     A*                  Field "EXQTBL" added for Change Batch  Lvl  *
+     A*                  Field "EXQTBT" added for Change Batch  Typ  *
+     A*                                                              *
+     A* 02/08/13  C:190  Project 140WAU                              *
+     A*                  Field "EXEACD" added for Estimating deposit *
+     A*                                                              *
+     A* 02/06/12  C:255  Project 114WBD                              *
+     A*                  Field Added for Agent commission statement  *
+     A*                  remark code.                                *
+     A*                                                              *
+     A* 10/07/11  C:279  PROJECT 133WLM                              *
+     A*                  Add EXINDP: INCLUDE DEPOSIT IN PRIOR YEAR   *
+     A*                  BALANCE FOR S/R ONLINE.                     *
+     A*                                                              *
+     A* 08/17/11  C:191  PROJECT WC2048                              *
+     A*                  Add EXPYBS: PRIOR YEAR BALANCE FOR S/R ONLI *
+     A*                                                              *
+     A* 04/27/11  C: 58  PROJECT 114WYZ                              *
+     A*                  Add EXPODU: Due date Posting vs On receipt  *
+     A*                                                              *
+     A* 09/29/10  C:220  PROJECT WC1775                              *
+     A*                  ADD EXARRI FIELD FOR DELETED A/R BACK ON    *
+     A*                  REINST. CRITERIA.                          *
+     A*                                                              *
+     A* 09/07/10  C:255  PROJECT WC1929                              *
+     A*                  ADD FLAG TO FILE TO CONTROL THE DE          *
+     A*                  RATE SPLIT.                                 *
+     A*                                                              *
+     A* 05/03/10  C:220  PROJECT WC1881                              *
+     A*                  Add Ctrl flag to Final Audit Request Form   *
+     A*                                                              *
+     A* 01/25/10  C:232  PROJECT: WC1851                             *
+     A*                  ADDED FIELDS FOR ADMINISTRATIVE FEES FOR    *
+     A*                  COLLATERAL AND CLAIMS                       *
+     A*                                                              *
+     A* 01/22/10  C:246  Project: 139WNQ                             *
+     A*                  Add field for Tertiary Agent Info.          *
+     A*                                                              *
+     A* 12/30/09  C:232  PROJECT: WC1838                             *
+     A*                  ADDED FIELD EXLDAL AND EXLDAT TO HOLD THE   *
+     A*                  LARGE DEDUCTIBLE ACCOUNT.                   *
+     A*                                                              *
+     A* 11/16/09  C:198  PROJECT: 132WNC                             *
+     A*                  ADDED FIELD TO HOLD THE REQUIRED FLAGS      *
+     A*                  AND DEFAULT VALUES.                         *
+     A*                                                              *
+     A* 10/16/09  C:235  PROJECT: 139WMD                             *
+     A*                  NAME/ADD ON TOP OF QUOTES & BILLINS         *
+     A*                                                              *
+     A* 10/05/09  C:062  PROJECT: 139WMJ                             *
+     A*                  Add Flex Heading and Table                  *
+     A*                                                              *
+     A* 07/28/09  C:189  PROJECT: 93WIF                              *
+     A*                  CHANGE SSN DISPLAY ON AUDIT REQUEST         *
+     A*                                                              *
+     A* 07/08/09  C:189  PROJECT: 114WUD                             *
+     A*                  CHANGE RATES DEFAULT                        *
+     A*                                                              *
+     A* 06/06/09  C:189  PROJECT: 93WID                              *
+     A*                  ADDITIONAL FLEXIBLE FIELDS IN WDELP         *
+     A*                                                              *
+     A* 05/15/09  C:189  PROJECT: 139WLJ                             *
+     A*                  GENERATE AUTOMATIC DIARY - AUDIT            *
+     A*                                                              *
+     A* 04/28/09  C:191  PROJECT: WC1794                             *
+     A*                  THE RISK ID # EDIT FIELDS ARE NO LONGER     *
+     A*                  BEING USED                                  *
+     A*                                                              *
+     A* 01/08/09  C:189  PROJECT: 71WJU                              *
+     A*                  DEDUCTIBLE INVOICES TO RESOLVE TO DARTS     *
+     A*                                                              *
+     A* 11/05/08  C:190  PROJECT: WC1700                             *
+     A*                  ADD NEW FIELD TO STORE THE DARTS CODE FOR   *
+     A*                   'ALTERNATE EMPLOYER ENDORSEMENT'.          *
+     A*                                                              *
+     A* 10/01/08  C:197  PROJECT: WC1701                             *
+     A*                  ADD NEW FIELD STORE THE FLAG FOR THE POLICY *
+     A*                  PAGE PAYROLL PRINT CONTROL                  *
+     A*                                                              *
+     A* 07/01/08  C:191  PROJECT: 133WFE                             *
+     A*                  ADD NEW FIELD FOR ACT STS RMK CODE          *
+     A*                                                              *
+     A* 06/25/08  C:65   PROJECT: 114WRH                             *
+     A*                  ADD NEW FIELD FOR PROCESSING RETRO BY GROUP.*
+     A*                                                              *
+     A* 11/23/07  C:189  PROJECT: 132WJP                             *
+     A*                  Produce an automatic diary on a Employer    *
+     A*                  Name change                                 *
+     A*                                                              *
+     A*                                                              *
+     A* 07/27/07  C:190  PROJECT: WC1454                             *
+     A*                  ADD a new flag 'EXUPDA' to control          *
+     A*                  updates across all divisions processing     *
+     A*                                                              *
+     A* 07/16/07 C:183 Project: 45WFO                                *
+     A*               -Added a new field to designate whether or not *
+     A*                policy years are to be included in the        *
+     A*                calculation of the monthly interim prior bal. *
+     A*
+     A* 03/15/07  C:132  PROJECT: 91WOC                              *
+     A*                - ADD Field EXDPTL - Deposit Transfer         *
+     A*                  Security Level.                             *
+     A*                - ADD Field EXDPTT - Deposit Transfer         *
+     A*                  Security Type.                              *
+     A*                                                              *
+     A* 03/08/07  C:132  PROJECT: 91WNW                              *
+     A*                  ADD FIELD EXIAFL - ALLOW INACTIVATE AGENT   *
+     A*                  HISTORY W/ AR PAYMENTS.                     *
+     A*                                                              *
+     A* 03/06/07  C:61   PROJECT: 71WIF                              *
+     A*                  Add field EXAJFL - Default "Spread Revised  *
+     A*                  bill adjustment in the future".             *
+     A*                                                              *
+     A* 12/22/06  C:132  PROJECT: 129WPH                             *
+     A*                  Add field EXTBAC for Tax Billed at Audit    *
+     A*                  A/R Code.                                   *
+     A*                                                              *
+     A* 12/06/06  C:132  PROJECT: 129WOX                             *
+     A*                  Add field EXCROQ for Cx Cert Holder Letter  *
+     A*                  Output Queue.                               *
+     A*                                                              *
+     A* 10/02/06  C:53   SUPPORT: 54685                              *
+     A*                  Add field for ACH remark code.              *
+     A*                                                              *
+     A* 09/20/06 C:136 PROJECT: 71WHE (BACK TO BASE)                 *
+     A*                ADD VARIOUS FIELDS                            *
+     A*                                                              *
+     A* 07/03/06  C:168  PROJECT: 91WNG                              *
+     A*                  Add field for the revised audit-iterim days *
+     A*                ** project already installed at 91, might need*
+     A*                   to be installed at clients that might want *
+     A*                   to also get this project                   *
+     A*                                                              *
+     A* 03/29/06  C:132  PROJECT: WC1299                             *
+     A*                  Add field for group-level flag to indicate  *
+     A*                  whether or not the default agent rate in    *
+     A*                  Agent Assignment will be reassigned when    *
+     A*                  the account is transferred LIVE from Quote. *
+     A*                                                              *
+     A* 02/14/06  C:132  PROJECT: 132WDP                             *
+     A*                  Add field to store the flag on rounding of  *
+     A*                  installment amounts to whole dollar amount. *
+     A*                                                              *
+     A* 02/07/06  C:168  PROJECT: WC1418                             *
+     A*                  Add field to store the default DARTS        *
+     A*                  remarks code.                               *
+     A*                                                              *
+     A* 09/02/05  C:61   PROJECT: 129WLT WC1359                      *
+     A*                  Add fields for Cancel/Reinstatment Output   *
+     A*                  queues.                                     *
+     A*                                                              *
+     A* 08/09/05  C:65   PROJECT: 81WXR                              *
+     A*                  ADD FIELD FOR INSTALLMENT ADJUSTMENT CODE.  *
+     A*                                                              *
+     A*  08/02/05  C:33  Project: 71WGB                              *
+     A*                  Add - Lockbox Prem Pmt A/R code             *
+     A*                        Lockbox Audit Pmt A/R code            *
+     A*                        Deductible Pmt A/R code               *
+     A*                                                              *
+     A* 03/10/05  C:35   PROJECT: WC1290                             *
+     A*                  ADDED FIELDS FOR FOURTH CONTACT.            *
+     A*                                                              *
+     A* 01/03/05  C:136  PROJECT: 132WBN                             *
+     A*                  ADD FIELD TO LUMP SUM ADJUSTMENTS FOR       *
+     A*                  REVISED BILLING                             *
+     A*                                                              *
+     A* 11/30/04  C:65   PROJECT: 132WBW                             *
+     A*                  ADD FIELDS FOR ACCOUNT CURRENT INTERIM DAYS *
+     A*                                                              *
+     A* 10/06/04  C:132  PROJECT: 132WBE                             *
+     A*                  ADD Fields for State Risk ID# and NCCI      *
+     A*                  Risk# edits for quote entry or befoe the    *
+     A*                  policy can be bound.                        *
+     A*                                                              *
+     A* 09/24/04  C:53   PROJECT: 132WBD                             *
+     A*                  ADD FIELDS FOR AGENT/BROKER FLEXABILITY     *
+     A*                                                              *
+     A* 08/09/04  C:65   PROJECT: 71WFD                              *
+     A*                  ADD FIELDS FOR QUOTE BILLING ADDRESS.       *
+     A*                                                              *
+     A* 06/24/04  C:65   PROJECT: 114WHO                             *
+     A*                  ADD FIELDS FOR RETRO PROGRAM DEFAULTS.      *
+     A*                                                              *
+     A* 06/03/04  C:65   PROJECT: WC1087                             *
+     A*                  ADD FLAG FOR BILLING ASSESSMENTS TO DIV     *
+     A*                  WITH HIGHEST MINIMUM PREMIUM.               *
+     A*                                                              *
+     A* 11/18/03  C:65   PROJECT: WC1167                             *
+     A*                  ADD NEW FIELDS: NUMBER OF DAYS FOR QUOTE    *
+     A*                  VALIDATION AND DEFAULT TEXT FOR BILLS. ALSO *
+     A*                  ADD NEW FLAG FOR TYPE OF BILLING OUTPUT.    *
+     A*                                                              *
+     A* 10/21/03  C:65   PROJECT: WC1017                             *
+     A*                  ADD DARTS REMARK CODE FOR REVISED BILLS ON  *
+     A*                  RENEWALS.                                   *
+     A*                                                              *
+     A* 05/29/03  C:35   PROJECT: WC1116                             *
+     A*                  CHANGED FIELD TO PACKED.                    *
+     A*                                                              *
+     A* 04/11/03 C:136   PROJECT: WC1116                             *
+     A*                  ADD FIELD FOR ACH PROCESSING                *
+     A*                                                              *
+     A* 11/07/02  C:65   PROJECT: WC1055                             *
+     A*                  ADD FLAG FOR BILLING EXP CNST TO HIGHEST ST.*
+     A*                                                              *
+     A* 07/01/02  C:61  PROJECT 91WGS                                *
+     A*                 Add for Audit tracking deletion remark code. *
+     A*                                                              *
+     A* 04/25/02  C:35   PROJECT: WC1068                             *
+     A*                  CHANGED AGT PRODUCER STATE LICENSE SECURITY *
+     A*                  LEVEL TO PACKED.                            *
+     A*                                                              *
+     A* 02/07/02  C:65   PROJECT: WC1067                             *
+     A*                  ADD FLAG FOR BILLING EXP CNST FROM MIN PREM.*
+     A*                                                              *
+     A* 01/14/02  C:61  PROJECT WC1068                               *
+     A*                 Add security fields to enable check of valid *
+     A*                 agent producer license for employer rating   *
+     A*                 state.                                       *
+     A*                                                              *
+     A* 11/14/01  C:142  PROJECT: WC969                              *
+     A*                  ADD A/R INQUIRY SUBSET DEFAULT TO EXCLUDE   *
+     A*                  DEPOSITS.                                   *
+     A*                                                              *
+     A* 11/30/00  C:35   PROJECT: WC1019                             *
+     A*                  ADD LEVEL/TYPE AND DARTS REMARK FOR AGENT   *
+     A*                  COMMISSION PLAN CHANGE.                     *
+     A*                                                              *
+     A* 09/15/00  C:35   PROJECT: WC577                              *
+     A*                  ADDED FIELD FOR 'MONTHLY INT DEFAULT RMK'   *
+     A*                                                              *
+     A* 07/06/00  C:35   PROJECT: WC994                              *
+     A*                  ADDED FIELDS FOR POLICY DATE CHANGE         *
+     A*                  SECURITY.                                   *
+     A*                                                              *
+     A* 04/25/00  C:61   PROJECT: WC989                              *
+     A*                  Add fields for FastQuote contact x-ref.     *
+     A*                                                              *
+     A* 02/08/00  C:33   PROJECT: WC919                              *
+     A*                  ADD FIELD FOR DEFAULT REGION.               *
+     A*                                                              *
+     A*  08/11/99  C:33  PROJECT: WC897                              *
+     A*                  Add EXADLL - EMPLOYER F6 LIVE SECURITY LEVEL*
+     A*                      EXADLT - EMPLOYER F6 LIVE SECURITY TYPE *
+     A*                      EXADQL - EMPLOYER F6 QTE SECURITY LEVEL *
+     A*                      EXADQT - EMPLOYER F6 QTE SECURITY TYPE  *
+     A*                                                              *
+     A*  07/12/99  C:87  PROJECT: WC900                              *
+     A*                  Add flag EXDLAR - 'Delete future a/r during *
+     A*                  cancellation (y/ )'.                        *
+     A*                                                              *
+     A*  03/04/99  C:87  PROJECT: WC885                              *
+     A*                  Add flags: EXCMSG - Audit bill credit msg   *
+     A*                  cntrl; EXDMSG - Audit bill debit msg cntrl  *
+     A*                                                              *
+     A*  08/20/98  C:87  PROJECT:WC577                               *
+     A*                  ADDED 'QUOTE DARTS RMK DEFAULT' FIELD AND   *
+     A*                  AUDIT BILL DEFAULT A/R CODE                 *
+     A*                                                              *
+     A*  03/04/98  C:87  PROJECT:WC630                               *
+     A*                  ADDED FLAG FOR REVISED FINAL AUDIT DEFAULT  *
+     A*                  DARTS REMARK CODE                           *
+     A*                                                              *
+     A*  03/04/98  C:146 PROJECT:146WBW                              *
+     A*                  ADDED NEW FIELD FOR THIRD PARTY BILLING     *
+     A*                                                              *
+     A****************************************************************
+     A*  WORKERS' COMP  ADMIN/DARTS CONTROL DEFINITION FILE
+     A*
+     A                                      REF(WREFP)
+     A          R PEX01                     TEXT('ADMIN/DARTS CONTROL DEFINITI+
+     A                                      ON FILE')
+     A            EXCO#     R               REFFLD(CO#)
+     A            EXFND     R               REFFLD(FND)
+     A            EXDLTL    R               REFFLD(LVL)
+     A                                      COLHDG('EMPLOYER DELETION' +
+     A                                        'SECURITY LEVEL')
+     A            EXDLTT    R               REFFLD(FLAG)
+     A                                      COLHDG('EMPLOYER DELETION' +
+     A                                        'SECURITY TYPE')
+     A            EXOVRL    R               REFFLD(LVL)
+     A                                      COLHDG('OVERIDE CX DT' '< ACC DT' +
+     A                                        'SECURITY LEVEL')
+     A            EXOVRT    R               REFFLD(FLAG)
+     A                                      COLHDG('OVERIDE CX DT' '< ACC DT' +
+     A                                        'SECURITY TYPE')
+     A            EXUPDL    R               REFFLD(LVL)
+     A                                      COLHDG('UPDATE NEXT' 'AVAIL EMP #' +
+     A                                        'SECURITY LEVEL')
+     A            EXUPDT    R               REFFLD(FLAG)
+     A                                      COLHDG('UPDATE NEXT' 'AVAIL EMP #' +
+     A                                        'SECURITY TYPE')
+     A            EXSUBL    R               REFFLD(LVL)
+     A                                      COLHDG('ALLOW SUBMIS' 'MASS BILLS' +
+     A                                        'SECURITY LEVEL')
+     A            EXSUBT    R               REFFLD(FLAG)
+     A                                      COLHDG('ALLOW SUBMIS' 'MASS BILLS' +
+     A                                        'SECURITY TYPE')
+     A            EXSICR    R               REFFLD(FLAG)
+     A                                      COLHDG('EMPLOYER SIC CODES' +
+     A                                        'REQUIRED')
+     A            EXPRIN    R               REFFLD(FLAG)
+     A                                      COLHDG('PRINT INVOICES W/' +
+     A                                        'ESTIMATED BILLS')
+     A            EXDOFF    R               REFFLD(DS5)
+     A                                      COLHDG('DEFAULT OFFICE #')
+     A            EXCNT1    R               REFFLD(DS15)
+     A                                      COLHDG('CONTACT HEADING 1')
+     A            EXCNT2    R               REFFLD(DS15)
+     A                                      COLHDG('CONTACT HEADING 2')
+     A            EXCNT3    R               REFFLD(DS15)
+     A                                      COLHDG('CONTACT HEADING 3')
+     A            EXOFRM    R               REFFLD(RMCD)
+     A                                      COLHDG('OFFICE # CHANGE' +
+     A                                        'REMARK CODE')
+     A            EXORG     R               REFFLD(RMCD)
+     A                                      COLHDG('DEFAULT' 'ORIGINAL BILL' +
+     A                                        'REMARK CODE')
+     A            EXREV     R               REFFLD(RMCD)
+     A                                      COLHDG('DEFAULT' 'REVISED BILL' +
+     A                                        'REMARK CODE')
+     A            EXAUD     R               REFFLD(RMCD)
+     A                                      COLHDG('DEFAULT' 'AUDIT BILL' +
+     A                                        'REMARK CODE')
+     A            EXESCD    R               REFFLD(CODE)
+     A                                      COLHDG('ESTIMATED BILLING' 'CODE')
+     A            EXSRCD    R               REFFLD(CODE)
+     A                                      COLHDG('S/R BILLING' 'CODE')
+     A            EXDACD    R               REFFLD(CODE)
+     A                                      COLHDG('DEPOSIT ADJUSTMENT' 'CODE')
+     A            EXSTAT    R               REFFLD(STAT)
+     A            EXUSER    R               REFFLD(USER)
+     A            EXPGM     R               REFFLD(PGM)
+     A            EXTIME    R               REFFLD(TIME)
+     A            EXDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            EXIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            EXIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL' 'PROGRAM')
+     A            EXIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'DATE')
+     A            EXITM     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'TIME')
+     A            EXLNRM    R               REFFLD(RMCD)
+     A                                      COLHDG('LATE NOTICE' +
+     A                                        'REMARK CODE')
+     A            EXPNRM    R               REFFLD(RMCD)
+     A                                      COLHDG('PREMIUM NOTICE' +
+     A                                        'REMARK CODE')
+     A            EXAURQ    R               REFFLD(RMCD)
+     A                                      COLHDG('AUDIT REQUEST' +
+     A                                        'REMARK CODE')
+     A            EXCXCD    R               REFFLD(RMCD)
+     A                                      COLHDG('CANCELLATION' 'REMARK CODE')
+     A            EXRCCD    R               REFFLD(RMCD)
+     A                                      COLHDG('REVISED CANCELLATION' +
+     A                                        'REMARK CODE')
+     A            EXRECD    R               REFFLD(RMCD)
+     A                                      COLHDG('REINSTATMENT' +
+     A                                        'REMARK CODE')
+     A            EXRRCD    R               REFFLD(RMCD)
+     A                                      COLHDG('REVISED' 'REINSTATEMENT' +
+     A                                        'REMARK CODE')
+     A            EXA2FL    R               REFFLD(FLAG)
+     A                                      COLHDG('PROMPT 2ND AGT FLAG')
+     A            EXAUID    R               REFFLD(A20)
+     A                                      COLHDG('AUDIT INTERIM DAYS')
+     A            EXRVID    R               REFFLD(A20)
+     A                                      COLHDG('REVISED INTERIM DAYS')
+     A            EXFIFG    R               REFFLD(FLAG)
+     A                                      COLHDG('EMPLOYER FEDERAL ID' +
+     A                                        'REQUIRED')
+     A            EXPPCD    R               REFFLD(RMCD)
+     A                                      COLHDG('POLICY PAGE' +
+     A                                        'REMARK CODE')
+     A            EXRFAF    R               REFFLD(RMCD)
+     A                                      COLHDG('DEFAULT' 'REVISED FINAL' +
+     A                                        'AUDIT REMARK CODE')
+     A            EXQTE     R               REFFLD(RMCD)
+     A                                      COLHDG('QUOTE DARTS' 'RMK DEFAULT')
+     A            EXAUCD    R               REFFLD(CODE)
+     A                                      COLHDG('AUDIT BILL' 'DFLT A/R CODE')
+     A            EXCMSG    R               REFFLD(FLAG)
+     A                                      COLHDG('AUDIT BILL' 'CREDIT MSG')
+     A            EXDMSG    R               REFFLD(FLAG)
+     A                                      COLHDG('AUDIT BILL' 'DEBIT MSG')
+     A            EXDLAR    R               REFFLD(FLAG)
+     A                                      COLHDG('DELETE A/R' 'ON CANX')
+     A            EXADLL    R               REFFLD(LVL)
+     A                                      COLHDG('EMPLOYER F6' 'LIVE SEC LVL')
+     A            EXADLT    R               REFFLD(FLAG)
+     A                                      COLHDG('EMPLOYER F6' 'LIVE SEC TYP')
+     A            EXADQL    R               REFFLD(LVL)
+     A                                      COLHDG('EMPLOYER F6' 'QTE SEC LVL')
+     A            EXADQT    R               REFFLD(FLAG)
+     A                                      COLHDG('EMPLOYER F6' 'QTE SEC TYP')
+     A            EXDRGN    R               REFFLD(RGN#)
+     A                                      COLHDG('DEFAULT' 'REGION')
+      *
+     A            EXFQC1         2A         COLHDG('FASTQUOTE' 'CONTACT'+
+     A                                      'X-REF #1')
+      *                 Valid values WTGTP Table ID: FQCT
+      *
+     A            EXFQC2         2A         COLHDG('FASTQUOTE' 'CONTACT'+
+     A                                      'X-REF #2')
+      *                 Valid values WTGTP Table ID: FQCT
+      *
+     A            EXFQC3         2A         COLHDG('FASTQUOTE' 'CONTACT'+
+     A                                      'X-REF #3')
+      *                 Valid values WTGTP Table ID: FQCT
+      *
+     A            EXPDCL    R               REFFLD(LVL)
+     A                                      COLHDG('POLICY DATE CHANGE' +
+     A                                        'SECURITY LEVEL')
+     A            EXPDCT    R               REFFLD(FLAG)
+     A                                      COLHDG('POLICY DATE CHANGE' +
+     A                                        'SECURITY TYPE')
+     A            EXMICD    R               REFFLD(RMCD)
+     A                                      COLHDG('MONTHLY INT DEFAULT')
+     A            EXPLNL    R               REFFLD(LVL)
+     A                                      COLHDG('AGT COMM PLN' 'CHG SEC LVL')
+     A            EXPLNT    R               REFFLD(FLAG)
+     A                                      COLHDG('AGT COMM PLN' 'CHG SEC TYP')
+     A            EXPLDR    R               REFFLD(RMCD)
+     A                                      COLHDG('AGT COM PLN' 'CHG DART RMK')
+     A            EXEDFL    R               REFFLD(FLAG)
+     A                                      COLHDG('A/R INQ SUBS' 'DFT EXC DEP')
+      *
+     A            EXPRSL    R               REFFLD(A30)
+     A                                      COLHDG('Agt Producer' -
+     A                                      'state license' -
+     A                                      'security level')
+      *
+     A            EXPRST         1A         COLHDG('Agt Producer' -
+     A                                      'state license' -
+     A                                      'security type')
+      *
+     A            EXBEXP    R               REFFLD(FLAG)
+     A                                      COLHDG('BILL EXP CNST' +
+     A                                      'FROM MINIMUM PREM')
+      *
+     A            EXAUDL    R               REFFLD(RMCD)
+     A                                      COLHDG('Audit Tracking' +
+     A                                      'deletion remark code')
+     A            EXBEST    R               REFFLD(FLAG)
+     A                                      COLHDG('BILL EXP CNST' +
+     A                                      'TO HIGHEST STATE')
+     A            EXACID         2  0       COLHDG('ACH INTERIM' 'DAYS')
+     A            EXRVRN    R               REFFLD(RMCD)
+     A                                      COLHDG('REVISED BILLS ON ' +
+     A                                      'RENEWALS RMK CODE')
+     A            EX#DYS         3S 0
+     A                                      COLHDG('# OF DAYS FOR '    +
+     A                                      'QUOTE VALIDATION')
+     A            EXBTXT       240          COLHDG('BILLS FOOTER TEXT')
+     A            EXBTYP    R               REFFLD(FLAG)
+     A                                      COLHDG('TYPE OF BILLING '  +
+     A                                      'OUTPUT')
+     A            EXBASM    R               REFFLD(FLAG)
+     A                                      COLHDG('BILL ASSMNTS TO DIV ' +
+     A                                      'W/HIGHEST MIN.')
+     A            EXSRTN        11S 2       COLHDG('LOSS LIMITATION' 'DEFAULT')
+     A            EXELP          5S 4       COLHDG('EXCESS LOSS PRM' 'DEFAULT')
+     A            EXELPF         5S 4       COLHDG('E.L.P. F-CLASSES' 'DEFAULT')
+     A            EXRDF1         5S 4       COLHDG('RETRO DEV FAC#1' 'DEFAULT')
+     A            EXRDF2         5S 4       COLHDG('RETRO DEV FAC#2' 'DEFAULT')
+     A            EXRDF3         5S 4       COLHDG('RETRO DEV FAC#3' 'DEFAULT')
+     A            EXSPCD    R               REFFLD(RMCD)
+     A                                      COLHDG('SETTLEMENT PROCESS' +
+     A                                             'REMARK CODE')
+     A            EXQAD1    R               REFFLD(ADR1)
+     A                                      COLHDG('QUOTE ADDRESS 1')
+     A            EXQAD2    R               REFFLD(ADR2)
+     A                                      COLHDG('QUOTE ADDRESS 2')
+     A            EXQCTY    R               REFFLD(CTY)
+     A                                      COLHDG('QUOTE CITY')
+     A            EXQST     R               REFFLD(ST)
+     A                                      COLHDG('QUOTE STATE')
+     A            EXQZIP    R     S         REFFLD(ZIP)
+     A                                      COLHDG('QUOTE ZIP CODE')
+     A            EXAHDR    R               REFFLD(DS15)
+     A                                      COLHDG('AGENT HEADER')
+      *
+     *
+     *********THE RISK ID # EDIT FIELDS ARE NO LONGER BEING USED*************
+     *
+     A            EXSRRB    R               REFFLD(FLAG)
+     A                                      TEXT('NOT IN USE')
+     A                                      COLHDG('ST Risk ID#' 'Req bind')
+     A            EXSRRQ    R               REFFLD(FLAG)
+     A                                      TEXT('NOT IN USE')
+     A                                      COLHDG('ST Risk ID#' 'Req Quote')
+     A            EXNRRB    R               REFFLD(FLAG)
+     A                                      TEXT('NOT IN USE')
+     A                                      COLHDG('NCCI Risk ID#' 'Req bind')
+     A            EXNRRQ    R               REFFLD(FLAG)
+     A                                      TEXT('NOT IN USE')
+     A                                      COLHDG('NCCI Risk ID#' 'Req Quote')
+     A            EXAOID    R     S         REFFLD(A20)
+     A                                      COLHDG('ACCT CURR INTERIM' +
+     A                                             'DAYS ORIGINAL')
+     A            EXAAID    R     S         REFFLD(A20)
+     A                                      COLHDG('ACCT CURR INTERIM' +
+     A                                             'DAYS AUDIT')
+     A            EXLUMP    R               REFFLD(FLAG)
+     A                                      COLHDG('LUMP SUM' 'ADJUSTMENTS')
+     A            EXCNT4    R               REFFLD(DS15)
+     A                                      COLHDG('CONTACT HEADING 4')
+     A            EXFQC4         2A         COLHDG('FASTQUOTE' 'CONTACT'+
+     A                                      'X-REF #4')
+      *                 Valid values WTGTP Table ID: FQCT
+     A            EXBLAR    R               REFFLD(CODE)
+     A                                      COLHDG('Lockbox' 'Prem Pmt' +
+                                                   'A/R Code')
+     A            EXATAR    R               REFFLD(CODE)
+     A                                      COLHDG('Lockbox' 'Audit Pmt' +
+                                                   'A/R Code')
+     A            EXDDAR    R               REFFLD(CODE)
+     A                                      COLHDG('Lockbox' 'Ded Pmt' +
+                                                   'A/R Code')
+     A            EXADJC    R               REFFLD(CODE)
+     A                                      COLHDG('Installment A/R' +
+     A                                      'adjustment code')
+      *
+     A            EXMOUT        10A
+     A                                      COLHDG('Member OUTQ')
+     A            EXAOUT        10A
+     A                                      COLHDG('Agent OUTQ')
+     A            EXSOUT        10A
+     A                                      COLHDG('State OUTQ')
+      *
+     A            EXCICD         5A
+     A                                      COLHDG('Resolve COI')
+      *
+     A            EXRNDI    R               REFFLD(FLAG)
+     A                                      TEXT('Rounding of Installments to n-
+     A                                      earest $')
+     A                                      COLHDG('Rounding of' 'Installments')
+      *
+     A            EXRAFL    R               REFFLD(FLAG)
+     A                                      TEXT('Default Agent Rate re-assigne-
+     A                                      d on Tfr Live')
+     A                                      COLHDG('Agent Rate' 'Re-assignmnt')
+     A            EXBRLT    R               REFFLD(RMCD)
+     A                                      COLHDG('ACH Notice' +
+     A                                      'One Time' 'DARTS code')
+     A            EXRAID         2  0
+     A                                      TEXT('Revised Audit-Iterim # of -
+     A                                      days')
+     A                                      COLHDG('Revised' 'Audit # days')
+     A            EXOBFL    R               REFFLD(FLAG)
+     A                                      COLHDG('Prem Noti' 'w Ori Bill?')
+     A            EXRBFL    R               REFFLD(FLAG)
+     A                                      COLHDG('Prem Noti' 'w Rev Bill?')
+     A            EXABFL    R               REFFLD(FLAG)
+     A                                      COLHDG('Prem Noti' 'w Aud Bill?')
+     A            EXAHLC        18A         COLHDG('Alt Hdg Loss Cnt Rep')
+     A            EXAHWL        18A         COLHDG('Alt Hdg Watch List')
+     A            EXAHVP        18A         COLHDG('Alt Hdg VIP Member')
+     A            EXAHSA        18A         COLHDG('Alt Hdg Spec Accep')
+     A            EXCROQ        10A         TEXT('Cx Certificate Holder Letter -
+     A                                      Output Queue')
+     A                                      COLHDG('Cert Hdlr OUTQ')
+     A            EXTBAC    R               REFFLD(CODE)
+     A                                      TEXT('Tax Billed at Audit A/R Co-
+     A                                      de')
+     A                                      COLHDG('Tax Billed at' 'Audit Code')
+      *
+     A            EXAJFL         1          COLHDG('Spread Rev Bill Adj' +
+     A                                      'in the future')
+      *
+      *
+     A            EXIAFL         1          COLHDG('Allow inactv Agt' +
+     A                                      'Hsty w/AR Pymts')
+     A                                      TEXT('Allow Inactivate Agent Histor-
+     A                                      y w/AR Payments')
+      *
+     A            EXDPTL         3S 0
+     A                                      COLHDG('OVRDE DEPOST' 'TRANSFER' +
+     A                                        'SECURITY LEVEL')
+     A                                      TEXT('Allow Override on Deposit Tra-
+     A                                      sfer Security Level')
+     A            EXDPTT    R               REFFLD(FLAG)
+     A                                      COLHDG('OVRDE DEPOST' 'TRANSFER' +
+     A                                        'SECURITY TYPE')
+     A                                      TEXT('Allow Override on Deposit Tra-
+     A                                      sfer Security Type')
+     A            EXAYFL         1
+     A                                      COLHDG('Monthly Int ' +
+     A                                      ' Prior Balance all ' +
+     A                                      'years flag(Y/)')
+     A                                      TEXT('Monthly Int Prior Balance all-
+     A                                      years flag(Y/ )')
+     A            EXUPDA         1          COLHDG('Update information' +
+     A                                      'across all divisions')
+     A            EXCNDR         5A         COLHDG('Auto-diary Employe' +
+     A                                      'r Name change ' +
+     A                                      'remark code')
+     A            EXCNST         3A         COLHDG('Auto-diary Employe' +
+     A                                      'r Name change ' +
+     A                                      'staff code')
+     A            EXRETG    R               REFFLD(FLAG)
+     A                                      COLHDG('PROCESS RETRO' +
+     A                                      'ACROSS GROUP')
+     A            EXASRM         5A
+     A                                      COLHDG('ACT STS' 'RMK CD')
+     A            EXPPPC         1A         COLHDG('POLICY PAGE PAYROLL' +
+     A                                      'PRINT CONTROL ')
+     A
+     A            EXAPCD         5A
+     A                                      COLHDG('ALT EMP' 'RMK CD')
+     A            EXDDRM         5A
+     A                                      COLHDG('DED INV' 'RMK CD')
+     A            EX3RDB         1A
+     A                                      COLHDG('3RD PARTY' 'BILLING')
+     A            EXAACD         5A
+     A                                      COLHDG('AUDIT ACTIVITY NOTI' -
+     A                                      'FICATION DARTS CODE')
+     A            EXAA#M         3S 0
+     A                                      COLHDG('AUDIT ACTIVITY NOTI' -
+     A                                      'FICATION- NO. OF MON' -
+     A                                      'THS POST POLICY EXP.')
+     A            EXEHD1        18A
+     A                                      COLHDG('FLX HEADING FOR' +
+     A                                      'ADDTIONAL EMPLOYER' -
+     A                                      ' DETAIL FIELD 1')
+     A            EXTBD1         4A
+     A                                      COLHDG('GEN TABLE ID FOR' +
+     A                                      'ADDTIONAL EMPLOYER' -
+     A                                      'DETAIL FIELD 2')
+     A            EXEHD2        18A
+     A                                      COLHDG('FLX HEADING FOR' +
+     A                                      'ADDTIONAL EMPLOYER' -
+     A                                      ' DETAIL FIELD 2')
+     A            EXTBD2         4A
+     A                                      COLHDG('GEN TABLE ID FOR' +
+     A                                      'ADDTIONAL EMPLOYER' -
+     A                                      'DETAIL FIELD 2')
+     A            EXAAFL         1A
+     A                                      COLHDG('AGENT RATE ASSIG' +
+     A                                      'NMENT AT RENEWAL')
+     A            EXASSF         1A
+     A                                      COLHDG('PRINT SSN ON ' +
+     A                                      'AUDIT REQUEST (Y/N/4')
+     A            EXFLXH        18A         COLHDG('Flex Heading')
+     A            EXFLXT         4A         COLHDG('Flex Table')
+     A            EXSGRA    R               REFFLD(FLAG)
+     A                                      COLHDG('SUPRESS GROUP' +
+     A                                      'ADDRESS BILL HEADER')
+     A            EXERQ1    R               REFFLD(FLAG)
+     A                                      COLHDG('FLEXIBLE FIELD' +
+     A                                      'REQUIRED IN QUOTE 1')
+     A            EXERW1    R               REFFLD(FLAG)
+     A                                      COLHDG('FLEXIBLE FIELD' +
+     A                                      'REQUIRED IN WRITTEN' +
+     A                                      '1')
+     A            EXFDF1    R               REFFLD(KEY)
+     A                                      COLHDG('FLEXIBLE FIELD' +
+     A                                      'DEFAULT VALUE 1')
+     A            EXERQ2    R               REFFLD(FLAG)
+     A                                      COLHDG('FLEXIBLE FIELD' +
+     A                                      'REQUIRED IN QUOTE 2')
+     A            EXERW2    R               REFFLD(FLAG)
+     A                                      COLHDG('FLEXIBLE FIELD' +
+     A                                      'REQUIRED IN WRITTEN' +
+     A                                      '2')
+     A            EXFDF2    R               REFFLD(KEY)
+     A                                      COLHDG('FLEXIBLE FIELD' +
+     A                                      'DEFAULT VALUE 2')
+     A            EXLDAL    R               REFFLD(LVL)
+     A                                      COLHDG('ALLOW BILLING FOR' +
+     A                                      'LARGE DEDUCTIBLE A/C' +
+     A                                      'SECURITY LEVEL' )
+     A            EXLDAT    R               REFFLD(FLAG)
+     A                                      COLHDG('ALLOW BILLING FOR' +
+     A                                      'LARGE DEDUCTIBLE A/C' +
+     A                                      'SECURITY TYPE' )
+     A            EXDFID    R     S         REFFLD(A20)
+     A                                      COLHDG('FEE INVOICE' +
+     A                                      'INTERIM DAYS - ' +
+     A                                      'DIRECT BILLING' )
+     A            EXAFID    R     S         REFFLD(A20)
+     A                                      COLHDG('FEE INVOICE' +
+     A                                      'INTERIM DAYS - ' +
+     A                                      'ACCOUNT CURRENT' )
+     A            EXCOBA    R               REFFLD(CODE)
+     A                                      COLHDG('COLLATERAL BILLED' +
+     A                                      'A/R CODE')
+     A            EXCFBA    R               REFFLD(CODE)
+     A                                      COLHDG('CLAIMS FEE BILLED' +
+     A                                      'A/R CODE')
+     A            EXFIRM    R               REFFLD(RMCD)
+     A                                      COLHDG('FEE INVOICE' +
+     A                                      'REMARK CODE' )
+     A            EX3AGT    R               REFFLD(FLAG)
+     A                                      COLHDG('Display''Tertiary'-
+     A                                             'Agent Info in' -
+     A                                             'Agent History')
+     A            EXSRFL    R               REFFLD(FLAG)
+     A                                      COLHDG('S/R INFO' 'PRINT W' 'AUDIT')
+     A            EXDE08    R               REFFLD(FLAG)
+     A                                      COLHDG('Disable 10/01/08 DE'-
+     A                                             'Rate Split')
+     A            EXARRI    R               REFFLD(FLAG)
+     A                                      COLHDG('Deleted A/R back'-
+     A                                       'on Reinst criteria')
+     A            EXPODU    R               REFFLD(FLAG)
+     A                                      COLHDG('Due Dte P=Posting'-
+     A                                             'D= Due on Receipt')
+     A            EXPYBS    R               REFFLD(FLAG)
+     A                                      COLHDG('Prior year balance'-
+     A                                             'for S/R online')
+     A            EXINDP    R               REFFLD(FLAG)
+     A                                      COLHDG('Include deposit in'-
+     A                                             'Prior year balance'-
+     A                                             'for S/R online')
+     A            EXACSR    R               REFFLD(RMCD)
+     A                                      COLHDG('Agent commission'-
+     A                                             'statement remark'-
+     A                                             'code')
+     A            EXEACD    R               REFFLD(CODE)
+     A                                      COLHDG('Estimating'-
+     A                                            'adjustment code')
+     A            EXTRFL         1A         COLHDG('Trnsfr Typ Flag')
+     A            EXQTIL    R     S         REFFLD(LVL)
+                                            COLHDG('Qte Trnsfr Immed Lvl')
+     A            EXQTIT    R               REFFLD(FLAG)
+                                            COLHDG('Qte Trnsfr Immed Typ')
+     A            EXQTBL    R     S         REFFLD(LVL)
+                                            COLHDG('Qte Trnsfr Batch Lvl')
+     A            EXQTBT    R               REFFLD(FLAG)
+                                            COLHDG('Qte Trnsfr Batch Typ')
+     A            EXSPYB    R               REFFLD(FLAG)
+     A                                      COLHDG('Suppr Prior Yr Bal' -
+     A                                      'on Prem Notice')
+     A            EXECNT    R               REFFLD(FLAG)
+     A                                      COLHDG('EDI Contact' 'Designat-
+     A                                      ion')
+     A            EXCUST    R               REFFLD(FLAG)
+     A                                      COLHDG('Customer ID ')
+     A            EXNOTP    R               REFFLD(FLAG)
+     A                                      COLHDG('GENERATE' 'POLICY NOTI-
+     A                                      FICATION')
+     A            EXNCFD    R               REFFLD(FLDR)
+     A                                      COLHDG('NEW COVER LETTER' 'FOLDER')
+     A            EXNCDC    R               REFFLD(DCID)
+     A                                      COLHDG('NEW COVER LETTER' 'DOCUMNT')
+     A            EXRCFD    R               REFFLD(FLDR)
+     A                                      COLHDG('RNW COVER LETTER' 'FOLDER')
+     A            EXRCDC    R               REFFLD(DCID)
+     A                                      COLHDG('RNW COVER LETTER' 'DOCUMNT')
+     A            EXNCDP    R               REFFLD(DPCD)
+     A                                      COLHDG('NEW COVER LETTER' 'DEPT CD')
+     A            EXRCDP    R               REFFLD(DPCD)
+     A                                      COLHDG('RNW COVER LETTER' 'DEPT CD')
+     A            EXDPAC    R               REFFLD(FLAG)
+     A                                      COLHDG('DEFER PRIOR AUDIT' 'CREDIT')
+     A            EXDPAD    R               REFFLD(FLAG)
+     A                                      COLHDG('DEFER PRIOR AUDIT' 'DEBIT')
+     A            EXPRTL    R               REFFLD(FLAG)
+     A                                      COLHDG('PRINT EMPLR' 'LINK CODE')
+     A            EXREQLNKCDR               REFFLD(FLAG)
+     A                                      COLHDG('REQUIRE EMPLR' 'LINK CODE')
+     A            EXACORD   R               REFFLD(RMCD)
+     A                                      COLHDG('ACORD' +
+     A                                      'Application' )
+     A            EXDOCUPLODR               REFFLD(RMCD)
+     A                                      COLHDG('Documment' +
+     A                                      'Upload' )
+     A            EXAUDSR        5A         COLHDG('S/R Payroll Audit')
+     A            EXCXSTRP       1A         COLHDG('CX/RE/Confirm' +
+     A                                      'State Rpting' +
+     A                                      'Division Only')
+     A            EXEXCARBL R               REFFLD(FLAG)
+     A                                      COLHDG('Exclude A/R From' +
+     A                                      'Billing')
+     A            EXICGRP   R               REFFLD(FLAG)
+     A                                      COLHDG('Include Group for' +
+     A                                      'Invoice Cloud')
+     A            EXICQTE   R               REFFLD(FLAG)
+     A                                      COLHDG('Include Quote Bills' +
+     A                                      'for Invoice Cloud')
+     A            EXICPAYAR R               REFFLD(FLAG)
+     A                                      COLHDG('Invoice Cloud' +
+     A                                      'Payment to A/R or' +
+     A                                      'Batch')
+     A            EXICP2GAR R               REFFLD(FLAG)
+     A                                      COLHDG('Pay as You Go' +
+     A                                      'Payments to A/R or' +
+     A                                      'Batch')
+     A            EXICAMPAR R               REFFLD(FLAG)
+     A                                      COLHDG('Adhoc Make' +
+     A                                      'Payment to A/R or' +
+     A                                      'Batch')
+     A            EXICCXINV R               REFFLD(FLAG)
+     A                                      COLHDG('Invoice Cloud' +
+     A                                      'Inactive Invoices' +
+     A                                      'after CX')
+     A            EXSCRVND      25A         COLHDG('SCORING VENDOR')
+     A            EXSCRVNDEFR     S         REFFLD(DT)
+     A                                      COLHDG('SCORING VENDOR' +
+     A                                             'EFFECTIVE DATE')
+     A            EXSCRVNDEXR     S         REFFLD(DT)
+     A                                      COLHDG('SCORING VENDOR' +
+     A                                             'EXPIRATION DATE')
+      *** Beg Add ***** 03/02/22 ****************************
+     A            EXACSRCSV      1A         COLHDG('Agt Comm Stmt - ' +
+     A                                             'Include CSV')
+      *** End Add ***** 03/02/22 ****************************
+      *** Beg Add ***** 05/24/23 ****************************
+     A            EXDLTLQT  R     S         REFFLD(LVL)
+     A                                      COLHDG('Delete From Quote' +
+     A                                             'Sec Lvl')
+     A            EXDLTTQT  R               REFFLD(FLAG)
+     A                                      COLHDG('Delete From Quote' +
+     A                                             'Sec Type')
+      *** End Add ***** 05/24/23 ****************************
+      *** Begin Add *** 06/07/23 ****************************
+     A            EXSWPRAN  R               REFFLD(FLAG)
+     A                                      COLHDG('IVC Sweep Ran Flag')
+      *** End   Add *** 06/07/23 ****************************
+      *** Begin Add *** 01/25/24 ****************************
+     A            EXICPSGRP R               REFFLD(FLAG)
+     A                                      COLHDG('IVC Separate 3PY' +
+     A                                             'Batch by Group')
+      *** End   Add *** 01/25/24 ****************************
+      *** Beg Add *** 06/24/24 ******************************
+     A            EXOCOL         1A         COLHDG('Offer Collateral' +
+     A                                             'Flag')
+     A
+     A            EXCOLB         2A         COLHDG('Collateral Billed' +
+     A                                             'A/R Code')
+     A
+     A            EXCOLP         2A         COLHDG('Collateral Paid' +
+     A                                             'A/R Code')
+     A
+     A            EXCOLT         2A         COLHDG('Collateral Transfer' +
+     A                                             'A/R Code')
+     A
+     A            EXCOLO         2A         COLHDG('Collateral Billing' +
+     A                                             'Offset A/R Code')
+     A
+     A            EXCOLD         2A         COLHDG('Collateral' +
+     A                                             'Deductible Transfer' +
+     A                                             'A/R Code')
+     A
+     A            EXCOLWP        5S 2       COLHDG('Collateral Default' +
+     A                                             'Written Percentage')
+     A
+     A            EXCOLRP        5S 2       COLHDG('Collateral Default' +
+     A                                             'Reported Percentage')
+     A
+     A            EXCOLAD        1A         COLHDG('Collateral Default' +
+     A                                             'Apply to Deductible')
+      *** End Add *** 06/24/24 ******************************
+      *** Beg Add *** 08/01/24 ******************************
+     A
+     A            EXBINF         1A         COLHDG('Bypass Inforce Pre' +
+     A                                             'miun Calc')
+      *** End Add *** 08/01/24 ******************************

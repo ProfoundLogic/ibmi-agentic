@@ -1,0 +1,154 @@
+      * (c) 2024 Sapiens. All Rights Reserved.                             *
+     H* StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A**
+     A** EMP EXPERIENCE MOD WORK FILE
+     H*****************************************************************
+     H* REVISIONS:                                                    *
+     A*                                                               *
+     A* 06/17/24  C:344  PROJECT: WC2952                              *
+     A*                  Expand rate field from 7.2 to 8.3 zoned.     *
+     H*                                                               *
+     H* 07/22/10  C:246  SUPPORT:73562  REROFIT THE WC1502 GERT FTR   *
+     H*                                                               *
+     H* 09/17/06  C:03   PROJECT: WC1502                              *
+     H*                  ADDED FIELDS FOR GERT                        *
+     H*                  ADDED FIELDS AGT/PROD INFO                   *
+     H*                                                               *
+     H* 04/25/02  C:35   PROJECT: WC577                               *
+     H*                  EXPAND XMNRT FROM 5.0 TO 7.0.                *
+     H*                                                               *
+     H*  08/02/94 C:03 PROJECT WC356                                  *
+     H*             1. ADD FIELDS FOR ARAP VALUE & SURCHARGE FACTOR   *
+     H*             2. ADD FIELD FOR TOTAL EXPECTED PRIMARY LOSS
+     A*                                                               *
+     A*  11/07/94  C:30  PROJECT: WC356                               *
+     A*            ADD FIELD FOR RATE SET CODE.                       *
+     A*            ADD FIELD FOR STATE ID.                            *
+     A*                                                               *
+     H*****************************************************************
+     A*
+     A                                      REF(EREFP)
+     A          R PXX01                     TEXT('EXP MOD WORK FILE')
+     A            XCO#      R               REFFLD(CO#)
+     A            XFUND     R               REFFLD(FND)
+     A            XEMP#     R               REFFLD(EMP#)
+     A            XEFDT     R               REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE DATE')
+     A            XYEAR     R               REFFLD(AP3)
+     A                                      COLHDG('BATCH NUMBER')
+     A            XREC      R               REFFLD(FLAG)
+     A                                      COLHDG('REC TYPE')
+     A            XACDT     R               REFFLD(DT)
+     A                                      COLHDG('ACCIDENT DATE')
+     A            XCASE     R               REFFLD(CAS1)
+     A                                      COLHDG('CASE #')
+     A            XOFF      R               REFFLD(STAT)
+     A                                      COLHDG('CASE STAT' 'O=OPEN F=FINAL')
+     A            XAAMT     R               REFFLD(BUL#1)
+     A                                      COLHDG('AMT OF CLAIM')
+     A            XPRAMT    R               REFFLD(BUL#1)
+     A                                      COLHDG('PRIMARY LOSS')
+     A            XAEAMT    R               REFFLD(BUL#1)
+     A                                      COLHDG('ACTUAL LOSS')
+     A            XNCLMS    R               REFFLD(AP3)
+     A                                      COLHDG('# OF CLAIMS')
+     A            XOVR1     R               REFFLD(FLAG)
+     A                                      COLHDG('AMT > EXCESS LOSS' 'FLAG')
+     A            XOVR2     R               REFFLD(FLAG)
+     A                                      COLHDG('PRI AMT > PRI LOSS' 'FLAG')
+     A            XCLS      R               REFFLD(CLAS)
+     A                                      COLHDG('PAYROLL CLASS')
+      **** BEGIN CHG **** 06/17/24 ************************************
+      **** BEGIN CHG **** 04/25/02 *********************************************
+     A*********** XMNRT     R               REFFLD(CLAS)
+     A*********** XMNRT          7  0
+      **** END   CHG **** 04/25/02 *********************************************
+     A            XMNRT          8S 3
+      **** END   CHG **** 06/17/24 ************************************
+     A                                      COLHDG('MANUAL RATE')
+     A            XPREM     R               REFFLD(BUL#1)
+     A                                      COLHDG('PAYROLL AMT')
+      **** BEGIN CHG **** 06/17/24 ************************************
+     A*********** XELRT     R               REFFLD(CLAS)
+     A            XELRT          8S 3
+      **** END   CHG **** 06/17/24 ************************************
+     A                                      COLHDG('EXPECTED LOSS RATE')
+     A            XEXLS     R               REFFLD(BUL#1)
+     A                                      COLHDG('EXCESS LOSS AMT')
+     A            XDRATO    R               REFFLD(AP3)
+     A                                      COLHDG('DISCOUNT RATIO')
+     A            XPRIM     R               REFFLD(BUL#1)
+     A                                      COLHDG('PRIMARY LOSS')
+     A            XEXEX     R               REFFLD(BUL#1)
+     A                                      COLHDG('EXPECTED EXCESS AMT')
+     A            XMPRM     R               REFFLD(BUL#1)
+     A                                      COLHDG('MINIMUM AMT')
+     A            XTPAL         11  0       COLHDG('TTL CLM PRIMARY')
+     A            XTAAL         11  0       COLHDG('TTL ACTUAL')
+     A            XTAEL         11  0       COLHDG('TTL EXCESS')
+     A            XTEXEX        11  0       COLHDG('TTL EXPECTED EXC')
+     A            XTEXLS        11  0       COLHDG('TTL EXPECTED LOSS')
+     A            XTBALL        11  0       COLHDG('TTL BALLAST')
+     A            XTAELW        11  0       COLHDG('TTL ACTUAL EXC')
+     A            XTWVWV         3  2       COLHDG('TTL WEIGHING VAL')
+     A            XTEXEW        11  0       COLHDG('TTL WEIGH EXC')
+     A            XTDENM        11  0       COLHDG('TTL DENOMINATOR')
+     A            XTNUM         11  0       COLHDG('TTL NUMERATOR')
+     A            XTMOD          5  4       COLHDG('TTL MOD < 1')
+     A            XTERTO         7  4       COLHDG('TTL ADJ')
+     A            XTMODA         5  4       COLHDG('TTL MOD > 1')
+     A            XTM2YR        11  0       COLHDG('TTL MIN 2 YR')
+     A            XTMALY        11  0       COLHDG('TTL MANUAL PREM')
+     A            XTM2RT        11  4       COLHDG('TTL 2 YR RATE')
+     A            XTMALR        11  4       COLHDG('TTL MANUAL RATE')
+     A            XTOVR3    R               REFFLD(STAT)
+     A                                      COLHDG('FLAG')
+     A            XUSER     R               REFFLD(USER)
+     A            XPGM      R               REFFLD(PGM)
+     A            XTIME     R               REFFLD(TIME)
+     A            XDT       R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            XIUSR     R               REFFLD(USER)
+     A                                      COLHDG('INITIAL USER')
+     A            XIDT      R               REFFLD(DT)
+     A                                      COLHDG('INITIAL ENTRY DATE')
+     A*****
+     A*** ADDED FOR BSI5 & BSI 17 CHANGES   9-19-91
+     A            XRDAT     R               REFFLD(DT)
+     A                                      COLHDG('MANUAL RATE EFF DATE')
+     A            XFRDT     R               REFFLD(DT)
+     A                                      COLHDG('POLICY FROM DATE')
+     A            XTODT     R               REFFLD(DT)
+     A                                      COLHDG('POLICY TO DATE')
+     A*
+     A**** BGN ADD  08/01/94 *****************************************
+     A            XTRVAL    R               REFFLD(A52)
+     A                                      COLHDG('R VALUE')
+     A            XTSURF    R               REFFLD(A52)
+     A                                      COLHDG('SURCHARGE FACTOR')
+     A            XTEPLS    R               REFFLD(BUL#1)
+     A                                      COLHDG('EXPTD PRIMARY LOSS')
+     A**** END ADD  08/01/94 *****************************************
+     A*** BEGIN ADD *** 11/07/94 ***
+     A            XTDRSC    R               REFFLD(SPEC)
+     A                                      TEXT('RATE SET CODE')
+     A                                      COLHDG('RATE SET' 'CODE')
+     A            XTST      R               REFFLD(ST)
+     A                                      COLHDG('STATE ID')
+     A*** END   ADD *** 11/07/94 ***
+     A*
+     A*
+     A*** BEGIN ADD *** 09/17/06***
+     A            XTGERT         7S 4
+     A                                      COLHDG('GERT FACTOR')
+     A            XTGMOD         7S 4
+     A                                      COLHDG('GERT MOD')
+     A            XTAGT#    R               REFFLD(AGT#)
+     A                                      COLHDG('AGT# ')
+     A            XTAGNM    R               REFFLD(NAME)
+     A                                      COLHDG('AGT NAME')
+     A            XTPROD    R               REFFLD(AGT#)
+     A                                      COLHDG('PRODUCER')
+     A            XTPRNM    R               REFFLD(NAME)
+     A                                      COLHDG('PRODUCER NAME')
+     A*** END   ADD *** 09/17/06 ***

@@ -1,0 +1,84 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   NON-RENEWAL REPORT PROMPT DISPLAY                        **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A          R SCR01
+     A                                      CF05
+     A                                      CF06
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7571F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  7 33'Agent #:'
+     A            SCAGT#    R        B  7 43REFFLD(AGT#)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  25                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                  7 56'(Default = ALL)'
+     A                                  9 31'From Date:'
+     A            SCFDT     R        B  9 43REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A  20                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A                                 11 33'To Date:'
+     A            SCTDT     R        B 11 43REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                 13 28'Section Code:'
+     A            SCCC      R        B 13 43REFFLD(CDE)
+     A*                                     DSPATR(CS)
+     A  26                                  ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 13 56'(Default = ALL)'
+     A                                 23  3'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 19'F5=Agent search'
+     A                                      COLOR(BLU)
+     A                                 23 37'F6=Section search'
+     A                                      COLOR(BLU)
+     A                                 23 57'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

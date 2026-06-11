@@ -1,0 +1,117 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   CHECK SCHEDULE FILE MAINTENANCE DISPLAY                  **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A*                                     CHGINPDFT(CS)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF05
+     A                                      CF13
+     A                                      PUTOVR
+     A                                      SETOF(21)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C6010F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 10 24'Process Date:'
+     A            SCPRDT    R        B 10 41REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      TEXT('DATE')
+     A                                      OVRDTA
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 30'F5=Search'
+     A                                      COLOR(BLU)
+     A                                 23 60'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A                                      CF12
+     A                                      PUTOVR
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C6010F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A N09        SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  7  2'Process Date:'
+     A            SCPRDT    R        O  7 18REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A                                 11  8'Starting check# (or first damaged -
+     A                                      check# for restart):'
+     A            SCCHK#    R        B 11 63REFFLD(CHK#)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('CHECK NUMBER')
+     A  20                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 13  8'Next available check number (resta-
+     A                                      rt only):'
+     A            SCRSTR    R        B 13 63REFFLD(CHK#)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                 15  8'Waste checks (restart only):'
+     A            SCWAST    R        B 15 63REFFLD(FLAG)
+     A  22                                  ERRMSGID(CCR0541 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                 17  8'Check print flag:'
+     A            SCSTA0    R        B 17 63REFFLD(FLAG)
+     A  21                                  ERRMSGID(CCR0541 *LIBL/CMESGG)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('FLAG')
+     A                                      OVRDTA
+     A                                 19  8'Check process flag:'
+     A            SCSTA1    R        O 19 63REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                      TEXT('FLAG')
+     A                                      OVRDTA
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 35'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

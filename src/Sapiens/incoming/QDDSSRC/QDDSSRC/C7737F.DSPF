@@ -1,0 +1,119 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   TYPE OF RISK EXPERIENCE ANALYSIS PROMPT DISPLAY          **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A*----------------------------------------------------------------
+     A          R SCR01
+     A                                      CF05
+     A                                      CF06
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A                                      CF13
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7737F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  5 16'Policy Effective Dates:'
+     A            SCFDT     R        B  5 40REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                  5 50'To:'
+     A            SCTDT     R        B  5 54REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  22                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A                                  7 28'As of Date:'
+     A            SCASOF    R        B  7 40REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  24                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                  9 26'Section Code:'
+     A            SCCC      R        B  9 40REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A  25                                  ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A                                  9 50'(Default = ALL)'
+     A                                 11 16'Agent federal tax ID #:'
+     A            SCFEIN    R        B 11 40REFFLD(FEIN)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  26                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A                                 11 50'(Default = ALL)'
+     A                                 13 21'Location modifier:'
+     A            SCMOD     R        B 13 40REFFLD(MOD)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A                                 15 23'Producer Number:'
+     A            SCPROD    R     Y  B 15 40REFFLD(PRO#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  27                                  ERRMSGID(CCR0547 *LIBL/CMESGG)
+     A                                 15 50'(Default = ALL)'
+     A                                 17 10'Report in Territory Sequence:'
+     A            SCTORD    R        B 17 40REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A  28                                  ERRMSGID(CCR0518 *LIBL/CMESGG)
+     A                                 17 50'(Y if yes, else blank)'
+     A                                 18 29'Territory:'
+     A            SCTERA    R        B 18 40REFFLD(TERA)
+     A*                                     DSPATR(CS)
+     A  29                                  ERRMSGID(CCR0547 *LIBL/CMESGG)
+     A  30                             20 22'REQUEST HAS BEEN SUBMITTED TO BATC-
+     A                                      H'
+     A                                      COLOR(WHT)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 17'F5=Section code search'
+     A                                      COLOR(BLU)
+     A                                 23 41'F6=Fein # search'
+     A                                      COLOR(BLU)
+     A                                 23 59'F7=Agent alpha search'
+     A                                      COLOR(BLU)
+     A                                 24  2'F8=Territory search'
+     A                                      COLOR(BLU)
+     A                                 24 31'F9=Producer search'
+     A                                      COLOR(BLU)
+     A                                 24 59'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A*----------------------------------------------------------------
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

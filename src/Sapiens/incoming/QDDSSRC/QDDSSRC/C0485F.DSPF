@@ -1,0 +1,114 @@
+     A*%%TS  SD  19970731  194513  WINNERW     REL-V3R6M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   NON-RENEWAL/RESCISSION CODE PROCESS                      **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*---------------------------------------------------------------
+     A          R SCR01
+     A*%%TS  SD  19970731  194513  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      CF05
+     A                                      CF07
+     A                                      CF09
+     A                                      CF10
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0485F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  9 23'Policy number   :'
+     A            SCPOL#    R        B  9 42REFFLD(POL#)
+     A                                      OVRDTA
+     A  30                                  DSPATR(PC)
+     A  20                                  ERRMSGID(CCR0535 *LIBL/CMESGG)
+     A                                 11 23'Transaction Type:'
+     A            SCTYPE    R        B 11 42REFFLD(FLAG)
+     A                                      OVRDTA
+     A  29                                  DSPATR(PC)
+     A  21                                  ERRMSGID(CCR0918 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0920 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0923 *LIBL/CMESGG)
+     A            SCDESC    R        O  9 56REFFLD(DS25)
+     A                                      COLOR(WHT)
+     A                                 13 23'Reason Code . . :'
+     A            SCRNCD    R        B 13 42REFFLD(CDE)
+     A                                      OVRDTA
+     A  31                                  DSPATR(PC)
+     A  24                                  ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  25                                  ERRMSGID(CCR0919 *LIBL/CMESGG)
+     A            SCMSG     R        O 15 18REFFLD(DS50)
+     A                                      COLOR(WHT)
+     A                                 22  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 29'F5=Policy search'
+     A                                      COLOR(BLU)
+     A                                 22 54'F7=Named insured search   '
+     A                                      COLOR(BLU)
+     A                                 23  2'F9=Dba name search'
+     A                                      COLOR(BLU)
+     A                                 23 29'F10=Table search'
+     A                                      COLOR(BLU)
+     A                                 23 54'F13=Change user parm'
+     A                                      COLOR(BLU)
+     A*---------------------------------------------------------------
+     A          R SCR02
+     A*%%TS  SD  19970731  194513  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      SETOF(40)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0485F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A                                  9 23'Policy number   :'
+     A            SCPOL#    R        O  9 42REFFLD(POL#)
+     A            SCDESC    R        O  9 56REFFLD(DS25)
+     A                                      COLOR(WHT)
+     A                                 11 23'Transaction Type:'
+     A            SCTYPE    R        O 11 42REFFLD(FLAG)
+     A                                 13 23'Reason Code . . :'
+     A            SCRNCD    R        O 13 42REFFLD(CDE)
+     A                                 15 21'PRESS ENTER TO COMPLETE CHANGE'
+     A                                      COLOR(WHT)
+     A                                 22  2'F12=Cancel        '
+     A                                      COLOR(BLU)
+     A*---------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

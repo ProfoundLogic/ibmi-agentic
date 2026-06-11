@@ -1,0 +1,383 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   INLAND MARINE ITEM SEARCH DISPLAY                        **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A          R SCR01
+     A                                      SETOF(15)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0575F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 34REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  5  2'Section code:'
+     A            SCCC      R        O  5 17REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A            SCCODS    R        O  5 22REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COV CD DESCRIPTION')
+     A                                  6  2'Location #:'
+     A            SCLOC#    R        O  6 14REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                      TEXT('LOCATION NUMBER')
+     A                                      DSPATR(HI)
+     A                                  6 20'Building #:'
+     A            SCPRM#    R        O  6 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      TEXT('PREMISIS #')
+     A                                      OVRDTA
+     A                                      DSPATR(HI)
+     A                                  6 38'Class code:'
+     A            SCCLAS    R        O  6 50REFFLD(CLSI)
+     A                                      OVRDTA
+     A                                      TEXT('CLASS. CDE INLAND MARINE')
+     A                                      DSPATR(HI)
+     A                                  7  6'Item #:'
+     A            SCITM#    R        B  7 15REFFLD(ITM#)
+     A*                                     DSPATR(CS)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                  7 71'Eff'
+     A                                  7 76'Stat'
+     A                                  8  1'Item#'
+     A                                      DSPATR(UL)
+     A                                  8  7'Description                       -
+     A                                       '
+     A                                      DSPATR(UL)
+     A                                  8 44'ID/Serial #    '
+     A                                      DSPATR(UL)
+     A                                  8 61'   Value'
+     A                                      DSPATR(UL)
+     A                                  8 70' Date   '
+     A                                      DSPATR(UL)
+     A                                  8 79' '
+     A                                      DSPATR(UL)
+     A            SCIT01    R        O  9  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD01    R        O  9  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID01    R        O  9 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A            SCVL01    R        O  9 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                      TEXT('AMOUNT')
+     A            SCDT01    R        O  9 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  20 37 39                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCST01    R        O  9 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT02    R        O 10  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD02    R        O 10  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID02    R        O 10 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A            SCVL02    R        O 10 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDT02    R        O 10 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST02    R        O 10 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT03    R        O 11  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD03    R        O 11  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID03    R        O 11 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A  22 35 39                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A            SCVL03    R        O 11 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDT03    R        O 11 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST03    R        O 11 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT04    R        O 12  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD04    R        O 12  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID04    R        O 12 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A            SCVL04    R        O 12 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  23 36 39                            ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A            SCDT04    R        O 12 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST04    R        O 12 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT05    R        O 13  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD05    R        O 13  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID05    R        O 13 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A            SCVL05    R        O 13 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDT05    R        O 13 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  24 37 39                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCST05    R        O 13 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT06    R        O 14  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD06    R        O 14  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  25 34 39                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCID06    R        O 14 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A            SCVL06    R        O 14 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDT06    R        O 14 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST06    R        O 14 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT07    R        O 15  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD07    R        O 15  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID07    R        O 15 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A            SCVL07    R        O 15 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDT07    R        O 15 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST07    R        O 15 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT08    R        O 16  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD08    R        O 16  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID08    R        O 16 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A  27 35 39                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A            SCVL08    R        O 16 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDT08    R        O 16 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST08    R        O 16 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT09    R        O 17  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD09    R        O 17  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID09    R        O 17 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A            SCVL09    R        O 17 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  28 36 39                            ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A            SCDT09    R        O 17 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST09    R        O 17 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT10    R        O 18  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD10    R        O 18  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID10    R        O 18 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A            SCVL10    R        O 18 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDT10    R        O 18 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST10    R        O 18 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT11    R        O 19  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD11    R        O 19  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A  30 34 39                            ERRMSGID(CCR0515 *LIBL/CMESGG)
+     A            SCID11    R        O 19 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A            SCVL11    R        O 19 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDT11    R        O 19 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST11    R        O 19 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT12    R        O 20  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD12    R        O 20  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID12    R        O 20 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A            SCVL12    R        O 20 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDT12    R        O 20 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST12    R        O 20 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT13    R        O 21  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD13    R        O 21  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID13    R        O 21 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A  32 35 39                            ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A            SCVL13    R        O 21 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDT13    R        O 21 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST13    R        O 21 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A            SCIT14    R        O 22  1REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDD14    R        O 22  7REFFLD(DS35)
+     A                                      OVRDTA
+     A                                      TEXT('DESCRIPTION')
+     A            SCID14    R        O 22 44REFFLD(ID#)
+     A                                      OVRDTA
+     A                                      TEXT('SERIAL/ID #')
+     A            SCVL14    R        O 22 61REFFLD(A80)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDT14    R        O 22 70REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      EDTWRD('  /  /    ')
+     A            SCST14    R        O 22 79REFFLD(FLAG)
+     A                                      OVRDTA
+     A                                      TEXT('FLAG')
+     A                                 24  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 23'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A            SCUP      R        O 24 48REFFLD(NM10)
+     A                                      OVRDTA
+     A            SCDOWN    R        O 24 62REFFLD(NM10)
+     A                                      OVRDTA
+     A            SCFL99    R        O 24 75REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  15                                  ERRMSGID(CCR0600 *LIBL/CMESGG)
+     A                                      TEXT('FLAG')
+     A                                      OVRDTA
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)
+     A                                      TEXT('FLAG')

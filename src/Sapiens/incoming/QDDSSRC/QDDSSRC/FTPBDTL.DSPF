@@ -1,0 +1,372 @@
+     A*************************************************************************
+     A* (c) 2019 StoneRiver, Inc. All rights reserved.                        *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                         *
+     A*************************************************************************
+     A*  FTPBDTL - Provider Bills Detail Screen                               *
+     A*                                                                       *
+     A*  Created on 05/22/2019 by c:212    Project : MC430                    *
+     A*************************************************************************
+     A* Revisions:                                                          *
+     A*                                                                       *
+     A*************************************************************************
+     A                                      REF(*LIBL/WREFP)
+     A                                      INDARA
+     A          R RCDPBDTL
+     A                                  1  2HTML('QPUIREC2    ROVERLAY   0     -
+     A                                      RASSUME    0     ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"rcdPBDtl","onload":"document.bo-
+     A                                      dy.style.background = \"#EBF5FF\"; -
+     A                                      ","column widths":"119,108,108,108,-
+     A                                      108","font size":"11px","design ove-
+     A                                      rlay formats":"rcdPBSts","overlay":-
+     A                                      "true","assume":"true"},"items":[{"-
+     A                                      id":"SCPRDS","field type":"output f-
+     A                                      ield","css class":"outputField","de-
+     A                                      scription":"PROGRAM NAME","value":{-
+     A                                      "fieldName":"SCPRDS","refField":"NA-
+     A                                      ME","trimLeading":"true","trimTrail-
+     A                                      ing":"true","dataType":"reference",-
+     A                                      "formatting":"Text","textTransform"-
+     A                                      :"none","designValue":"[SCPRDS]"},"-
+     A                                      font family":"Trebuchet MS","font s-
+     A                                      ize":"10px","cursor row":"2","curso-
+     A                                      r column":"21","left":"575px","top"-
+     A                                      :"-15px","width":"60px","css class -
+     A                                      2":"HI","visibility":"hidden"},{"id-
+     A                                      ":"btnPnlSave","field type":"button-
+     A                                      ","css class":"button","cursor":"de-
+     A                                      fault","value":"Save","response":{"-
+     A                                      fieldName":"BtnSave","customTrue":"-
+     A                                      ","customFalse":"","dataType":"indi-
+     A                                      cator","formatting":"Indicator","in-
+     A                                      dFormat":"1 / 0"},"left":"1095px","-
+     A                                      top":"20px","width":"100px","visibi-
+     A                                      lity":"hidden","shortcut key":"Ente-
+     A                                      r"},{"id":"btnPnlRefresh","field ty-
+     A                                      pe":"button","css class":"button","-
+     A                                      cursor":"default","value":"Refresh"-
+     A                                      ,"response":{"fieldName":"BtnRefres-
+     A                                      h","customTrue":"","customFalse":""-
+     A                                      ,"dataType":"indicator","formatting-
+     A                                      ":"Indicator","indFormat":"1 / 0"},-
+     A                                      "left":"985px","top":"20px","width"-
+     A                                      :"100px","visibility":"hidden","sho-
+     A                                      rtcut key":"F5"},{"id":"TabPBInfo",-
+     A                                      "field type":"tab panel","css class-
+     A                                      ":"tab-panel","left":"250px","top":-
+     A                                      "70px","height":{"fieldName":"tabHe-
+     A                                      ight","dataLength":"5","decPos":"0"-
+     A                                      ,"numSep":"false","zeroBalance":"fa-
+     A                                      lse","zeroFill":"false","curSym":""-
+     A                                      ,"dataType":"zoned","formatting":"N-
+     A                                      umber","units":"px","negNum":"-999.-
+     A                                      00","designValue":"1385px"},"width"-
+     A                                      :"970px","tab panel style":"Transfo-
+     A                                      rm Tab Panel","tab names":{"fieldNa-
+     A                                      me":"tabHeader","dataLength":"100",-
+     A                                      "trimLeading":"false","trimTrailing-
+     A                                      ":"true","blankFill":"false","rjZer-
+     A                                      oFill":"false","dataType":"char","f-
+     A                                      ormatting":"Text","textTransform":"-
+     A                                      none"},"active tab":{"fieldName":"t-
+     A                                      abIndex","dataLength":"5","decPos":-
+     A                                      "0","numSep":"false","zeroBalance":-
+     A                                      "false","zeroFill":"false","curSym"-
+     A                                      :"","dataType":"zoned","formatting"-
+     A                                      :"Number","units":"","negNum":"-999-
+     A                                      .00"},"ontabclick":"pui.click(\"Btn-
+     A                                      TabClick\")"},{"id":"HdgPBDtl","fie-
+     A                                      ld type":"output field","css class"-
+     A                                      :"heading","value":"Provider Bills -
+     A                                      Detail","left":"250px","top":"10px"-
+     A                                      ,"heading type":"Page Title"},{"id"-
+     A                                      :"BtnPnlExit","field type":"button"-
+     A                                      ,"css class":"button","description"-
+     A                                      :"Exit Button","value":"Exit","resp-
+     A                                      onse":{"fieldName":"ExitNow","custo-
+     A                                      mTrue":"","customFals')
+     A                                  1  2HTML('e":"","dataType":"indicator",-
+     A                                      "formatting":"Indicator","indFormat-
+     A                                      ":"1 / 0"},"shortcut key":"F3","lef-
+     A                                      t":"550px","top":"20px","width":"10-
+     A                                      0px","cursor":"default","visibility-
+     A                                      ":"hidden"}]}')
+     A            BTNREFRESH     1A  H
+     A            BTNSAVE        1A  H
+     A            EXITNOW        1A  H
+     A            TABHEADER    100A  H
+     A            TABHEIGHT      5S 0H
+     A            TABINDEX       5S 0H
+     A            SCPRDS    R        H      REFFLD(NAME)
+     A          R SFLSTSHIST                SFL
+     A            QPUI000001     1A  O  2  2
+     A            SCSHDATE        L  H
+     A            SCSHLTR        1A  H
+     A            SCSHRCN        3S 0H
+     A            SCSHREASON    40A  H
+     A            SCSHRRN#       9S 0H
+     A            SCSHSTAT       1A  H
+     A            SCSHTIME       6S 0H
+     A            SCSHTYPE       3A  H
+     A            SCSHUSER      10A  H
+     A          R QSFLCTL001                SFLCTL(SFLSTSHIST)
+     A                                      SFLSIZ(0001)
+     A                                      SFLPAG(0001)
+     A                                      SFLDSP
+     A                                  1  2HTML('QPUISFLRCDPBSTS')
+     A          R RCDPBSTS
+     A                                  1  2HTML('QPUICTL1    SFLSTSHIST5    RS-
+     A                                      FLDSP    0    FDSPSTSHSUBRSFLDSPCTL-
+     A                                       0    FDSPSTSHCTLRSFLCLR    0    FC-
+     A                                      LRSTSHSUBRSFLPAG    1    C1    8 RS-
+     A                                      FLSIZ    1    C1    9 0    3    ROV-
+     A                                      ERLAY   0     RASSUME    0     RROW-
+     A                                      S      2    C1    1C1    1 ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"rcdPBSts","description":"Provid-
+     A                                      er Bill Status History","overlay":"-
+     A                                      true","overlay range":"1-1","design-
+     A                                       overlay formats":"rcdPBDtl","assum-
+     A                                      e":"true"},"items":[{"id":"sflPBSta-
+     A                                      tusHistory","field type":"grid","cs-
+     A                                      s class":"subfilegrid","left":"260p-
+     A                                      x","top":"150px","number of rows":"-
+     A                                      9","number of columns":"8","column -
+     A                                      widths":"84,66,54,57,241,80,51,75",-
+     A                                      "column headings":"Date,Time,Status-
+     A                                      ,Type,Reason,User,Rcn,Letter","head-
+     A                                      er height":"21","row height":"20","-
+     A                                      csv export":"true","export with hea-
+     A                                      dings":"true","sortable columns":"t-
+     A                                      rue","resizable columns":"true","mo-
+     A                                      vable columns":"true","height":"181-
+     A                                      px","width":"709px","record format -
+     A                                      name":"sflStsHist","description":"B-
+     A                                      ill Status History Grid","display s-
+     A                                      ubfile":{"fieldName":"dspStsHSub","-
+     A                                      customTrue":"","customFalse":"","da-
+     A                                      taType":"indicator","formatting":"I-
+     A                                      ndicator","indFormat":"true / false-
+     A                                      "},"display control record":{"field-
+     A                                      Name":"dspStsHCtl","customTrue":"",-
+     A                                      "customFalse":"","dataType":"indica-
+     A                                      tor","formatting":"Indicator","indF-
+     A                                      ormat":"true / false"},"clear subfi-
+     A                                      le":{"fieldName":"clrStsHSub","cust-
+     A                                      omTrue":"","customFalse":"","dataTy-
+     A                                      pe":"indicator","formatting":"Indic-
+     A                                      ator","indFormat":"true / false"},"-
+     A                                      subfile record number":{"fieldName"-
+     A                                      :"rrnStsHist","dataLength":"5","dec-
+     A                                      Pos":"0","numSep":"false","zeroBala-
+     A                                      nce":"false","numBlankFill":"false"-
+     A                                      ,"zeroFill":"false","noExtraSpaces"-
+     A                                      :"false","curSym":"","dataType":"zo-
+     A                                      ned","formatting":"Number","negNum"-
+     A                                      :"-999.00","units":""},"export file-
+     A                                       name":"Prov. Bills Status History_-
+     A                                      details","header text align":"left"-
+     A                                      },{"id":"BtnExit","field type":"but-
+     A                                      ton","css class":"button","descript-
+     A                                      ion":"Exit Button","value":"Exit","-
+     A                                      response":{"fieldName":"ExitNow","c-
+     A                                      ustomTrue":"","customFalse":"","dat-
+     A                                      aType":"indicator","formatting":"In-
+     A                                      dicator","indFormat":"1 / 0"},"shor-
+     A                                      tcut key":"F3","left":"825px","top"-
+     A                                      :"60px","width":"100px","cursor":"d-
+     A                                      efault","visibility":"hidden"},{"id-
+     A                                      ":"BtnTabClick","field type":"butto-
+     A                                      n","css class":"button","descriptio-
+     A                                      n":"tab click button","value":"Tab"-
+     A                                      ,"response":{"fieldName":"tabClick"-
+     A                                      ,"dataType":"indicator","formatting-
+     A                                      ":"Indicator","indFormat":"1 / 0"},-
+     A                                      "left":"695px","top":"20px","width"-
+     A                                      :"35px","cursor":"default","visibil-
+     A                                      ity":"hidden"},{"id":"OutJobNm","fi-
+     A                                      eld type":"output field","css class-
+     A                                      ":"output-field","value":{"fieldNam-
+     A                                      e":"q1job","refField":"Q1JOB SZQ1P"-
+     A                                      ,"trimLeading":"false","trimTrailin-
+     A                                      g":"true","blankFill":"false","rjZe-
+     A                                      roFill":"false","dataType":"referen-
+     A                                      ce","formatting":"Text","textTransf-
+     A                                      orm":"none","designValue":"[q1job]"-
+     A                                      },"text align":"right')
+     A                                  1  2HTML('","left":"480px","top":"110px-
+     A                                      ","visibility":"hidden"},{"id":"Out-
+     A                                      JobN","field type":"output field","-
+     A                                      css class":"output-field","value":{-
+     A                                      "fieldName":"q1jobn","refField":"Q1-
+     A                                      JOBN SZQ1P","trimLeading":"false","-
+     A                                      trimTrailing":"true","blankFill":"f-
+     A                                      alse","rjZeroFill":"false","dataTyp-
+     A                                      e":"reference","formatting":"Text",-
+     A                                      "textTransform":"none","designValue-
+     A                                      ":"[q1jobn]"},"text align":"right",-
+     A                                      "left":"540px","top":"110px","visib-
+     A                                      ility":"hidden"},{"id":"OutJobU","f-
+     A                                      ield type":"output field","css clas-
+     A                                      s":"output-field","value":{"fieldNa-
+     A                                      me":"q1cusr","refField":"Q1CUSR SZQ-
+     A                                      1P","trimLeading":"false","trimTrai-
+     A                                      ling":"true","blankFill":"false","r-
+     A                                      jZeroFill":"false","dataType":"refe-
+     A                                      rence","formatting":"Text","textTra-
+     A                                      nsform":"none","designValue":"[q1cu-
+     A                                      sr]"},"text align":"right","left":"-
+     A                                      610px","top":"110px","visibility":"-
+     A                                      hidden"},{"id":"HdgPBStsHist","fiel-
+     A                                      d type":"output field","css class":-
+     A                                      "heading","value":"Status History",-
+     A                                      "left":"260px","top":"110px","headi-
+     A                                      ng type":"Section Header"},{"id":"B-
+     A                                      tnCancel","field type":"button","cs-
+     A                                      s class":"button","description":"Ca-
+     A                                      ncel Button","value":"Cancel","resp-
+     A                                      onse":{"fieldName":"CancelNow","cus-
+     A                                      tomTrue":"","customFalse":"","dataT-
+     A                                      ype":"indicator","formatting":"Indi-
+     A                                      cator","indFormat":"1 / 0"},"shortc-
+     A                                      ut key":"F12","left":"870px","top":-
+     A                                      "370px","width":"100px","cursor":"d-
+     A                                      efault","visibility":"visible"},{"i-
+     A                                      d":"btnRefresh","field type":"butto-
+     A                                      n","css class":"button","value":"Re-
+     A                                      fresh","response":{"fieldName":"Btn-
+     A                                      Refresh","customTrue":"","customFal-
+     A                                      se":"","dataType":"indicator","form-
+     A                                      atting":"Indicator","indFormat":"1 -
+     A                                      / 0"},"shortcut key":"F5","left":"9-
+     A                                      30px","top":"60px","width":"100px",-
+     A                                      "cursor":"default","visibility":"hi-
+     A                                      dden"},{"id":"btnSave","field type"-
+     A                                      :"button","css class":"button","val-
+     A                                      ue":"Save","response":{"fieldName":-
+     A                                      "BtnSave","customTrue":"","customFa-
+     A                                      lse":"","dataType":"indicator","for-
+     A                                      matting":"Indicator","indFormat":"1-
+     A                                       / 0"},"shortcut key":"Enter","left-
+     A                                      ":"1035px","top":"60px","width":"10-
+     A                                      0px","cursor":"default","visibility-
+     A                                      ":"hidden"},{"id":"OutSHDate","fiel-
+     A                                      d type":"output field","css class":-
+     A                                      "output-field","value":{"fieldName"-
+     A                                      :"scSHDate","dataType":"date","form-
+     A                                      atting":"Date","dateFormat":"m/d/Y"-
+     A                                      ,"locale":"en_US","designValue":"[s-
+     A                                      cSHDate]"},"left":"5px","top":"5px"-
+     A                                      ,"text align":"left","grid":"sflPBS-
+     A                                      tatusHistory","column":"0"},{"id":"-
+     A                                      OutSHTime","field type":"output fie-
+     A                                      ld","css class":"output-field","val-
+     A                                      ue":{"fieldName":"scSHTime","dataLe-
+     A                                      ngth":"6","decPos":"0","numSep":"fa-
+     A                                      lse","zeroBalance":"true","numBlank-
+     A                                      Fill":"false","zeroFill":"true","no-
+     A                                      ExtraSpaces":"false",')
+     A                                  1  2HTML('"edtWrd":"''  :  :  ''","curS-
+     A                                      ym":"","dataType":"zoned","formatti-
+     A                                      ng":"Number","negNum":"-999.00","un-
+     A                                      its":"","designValue":"[scSHTime]"}-
+     A                                      ,"left":"5px","top":"5px","text ali-
+     A                                      gn":"left","width":"55px","grid":"s-
+     A                                      flPBStatusHistory","column":"1"},{"-
+     A                                      id":"OutSHStatus","field type":"out-
+     A                                      put field","css class":"output-fiel-
+     A                                      d","value":{"fieldName":"scSHStat",-
+     A                                      "dataLength":"1","trimLeading":"fal-
+     A                                      se","trimTrailing":"true","blankFil-
+     A                                      l":"false","rjZeroFill":"false","da-
+     A                                      taType":"char","formatting":"Text",-
+     A                                      "textTransform":"none","designValue-
+     A                                      ":"[scSHStat]"},"text align":"left"-
+     A                                      ,"left":"5px","top":"5px","width":"-
+     A                                      50px","grid":"sflPBStatusHistory","-
+     A                                      column":"2"},{"id":"OutSHType","fie-
+     A                                      ld type":"output field","css class"-
+     A                                      :"output-field","value":{"fieldName-
+     A                                      ":"scSHType","dataLength":"3","trim-
+     A                                      Leading":"false","trimTrailing":"tr-
+     A                                      ue","blankFill":"false","rjZeroFill-
+     A                                      ":"false","dataType":"char","format-
+     A                                      ting":"Text","textTransform":"none"-
+     A                                      ,"designValue":"[scSHType]"},"text -
+     A                                      align":"left","left":"5px","top":"5-
+     A                                      px","width":"55px","grid":"sflPBSta-
+     A                                      tusHistory","column":"3"},{"id":"Ou-
+     A                                      tSHReason","field type":"output fie-
+     A                                      ld","css class":"output-field","val-
+     A                                      ue":{"fieldName":"scSHReason","data-
+     A                                      Length":"40","trimLeading":"false",-
+     A                                      "trimTrailing":"true","blankFill":"-
+     A                                      false","rjZeroFill":"false","dataTy-
+     A                                      pe":"char","formatting":"Text","tex-
+     A                                      tTransform":"none","designValue":"[-
+     A                                      scSHReason]"},"text align":"left","-
+     A                                      left":"5px","top":"5px","width":"65-
+     A                                      px","grid":"sflPBStatusHistory","co-
+     A                                      lumn":"4"},{"id":"OutSHUser","field-
+     A                                       type":"output field","css class":"-
+     A                                      output-field","value":{"fieldName":-
+     A                                      "scSHUser","dataLength":"10","trimL-
+     A                                      eading":"false","trimTrailing":"tru-
+     A                                      e","blankFill":"false","rjZeroFill"-
+     A                                      :"false","dataType":"char","formatt-
+     A                                      ing":"Text","textTransform":"none",-
+     A                                      "designValue":"[scSHUser]"},"text a-
+     A                                      lign":"left","left":"5px","top":"5p-
+     A                                      x","grid":"sflPBStatusHistory","col-
+     A                                      umn":"5"},{"id":"OutSHRcn","field t-
+     A                                      ype":"output field","css class":"ou-
+     A                                      tput-field","value":{"fieldName":"s-
+     A                                      cSHRcn","dataLength":"3","decPos":"-
+     A                                      0","numSep":"false","zeroBalance":"-
+     A                                      true","numBlankFill":"false","zeroF-
+     A                                      ill":"true","noExtraSpaces":"false"-
+     A                                      ,"edtWrd":"'' 0 ''","curSym":"","da-
+     A                                      taType":"zoned","formatting":"Numbe-
+     A                                      r","negNum":"-999.00","units":"","d-
+     A                                      esignValue":"[scSHRcn]"},"text alig-
+     A                                      n":"left","left":"5px","top":"5px",-
+     A                                      "width":"55px","grid":"sflPBStatusH-
+     A                                      istory","column":"6"},{"id":"OutSHL-
+     A                                      etter","field type":"output field",-
+     A                                      "css class":"output-field","value":-
+     A                                      {"fieldName":"scSHLtr","dataLength"-
+     A                                      :"1","trimLeading":"false","trimTra-
+     A                                      iling":"true","blankFill":"false","-
+     A                                      rjZeroFill":"false","')
+     A                                  1  2HTML('dataType":"char","formatting"-
+     A                                      :"Text","textTransform":"none","des-
+     A                                      ignValue":"[scSHLtr]"},"text align"-
+     A                                      :"left","left":"5px","top":"5px","g-
+     A                                      rid":"sflPBStatusHistory","column":-
+     A                                      "7"},{"id":"OutSHRRN#","field type"-
+     A                                      :"output field","css class":"output-
+     A                                      -field","value":{"fieldName":"scSHR-
+     A                                      RN#","dataLength":"9","decPos":"0",-
+     A                                      "numSep":"false","zeroBalance":"fal-
+     A                                      se","numBlankFill":"false","zeroFil-
+     A                                      l":"true","noExtraSpaces":"false","-
+     A                                      curSym":"","dataType":"zoned","form-
+     A                                      atting":"Number","negNum":"-999.00"-
+     A                                      ,"units":"","designValue":"[scSHRRN-
+     A                                      #]"},"text align":"left","left":"90-
+     A                                      px","top":"5px","visibility":"hidde-
+     A                                      n","grid":"sflPBStatusHistory","col-
+     A                                      umn":"4"}]}')
+     A            BTNREFRESH     1A  H
+     A            BTNSAVE        1A  H
+     A            CANCELNOW      1A  H
+     A            CLRSTSHSUB     1A  H
+     A            DSPSTSHCTL     1A  H
+     A            DSPSTSHSUB     1A  H
+     A            EXITNOW        1A  H
+     A            RRNSTSHIST     5S 0H
+     A            TABCLICK       1A  H
+     A            Q1CUSR    R        H      REFFLD(Q1CUSR SZQ1P)
+     A            Q1JOB     R        H      REFFLD(Q1JOB SZQ1P)
+     A            Q1JOBN    R        H      REFFLD(Q1JOBN SZQ1P)

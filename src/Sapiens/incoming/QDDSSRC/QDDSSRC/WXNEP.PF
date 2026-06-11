@@ -1,0 +1,161 @@
+     A* (C) Copyright Fiserv Insurance Solutions, Inc., 2004-2007
+     A*****************************************************************
+     A*  NCCI REPORTING - ENDORSEMENT TRANSACTION
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 12/13/07  C:183  PROJECT: 139WCI                              *
+     A*                  ALT EMPLOYER NAME PROCESSING: ADDITIONAL     *
+     A*                  OUTPUT                                       *
+     A*                                                               *
+     A* 04/25/06  C:65   PROJECT: 132WAY                              *
+     A*                  ADDED PERSONAL NAME FLAGS FOR NAME FIELDS.   *
+     A*                                                               *
+     A* 08/17/05  C:33  Project: 114WGH                               *
+     A*                 Add 'Exposure Link Code' field.               *
+     A*                                                               *
+     A* 09/10/04  C:33  Support: WA126/43795                          *
+     A*                 Add 'Name Link Counter Identifier' field.     *
+     A*                                                               *
+     A* 05/14/04  C:65   PROJECT: WC1202                              *
+     A*                  ADD FIELDS FOR EXTENDED EMPLOYER NAMES.      *
+     A*                                                               *
+     A* 04/25/02  C:35   PROJECT: WC577/WC878                         *
+     A*                  EXPANDED NEMOD T0 5.4, CHANGED NEEMPY TO     *
+     A*                  PACKED.                                      *
+     A*                                                               *
+     A* 06/01/01  C:35   PROJECT: WC878                               *
+     A*                  ADD FIELDS FOR REVISED NUMBER OF EMPLOYEES   *
+     A*                  AND REVISED SIC CODE.                        *
+     A*                                                               *
+     A* 09/18/00 C:90 PROJECT: 95WFA                                  *
+     A*               ADD STATE UNEMPLOYMENT NUMBER (NEUE#).          *
+     A*                                                               *
+     A* 07/28/94 C:09 PROJECT 03AZK                                   *
+     A*               NEW TRANSACTION FILE FOR NCCI REPORTING.        *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PNE01                     TEXT('ENDORSEMENT TRANS FILE')
+     A            NECO#     R               REFFLD(CO#)
+     A            NEFND     R               REFFLD(FND)
+     A            NEEMP#    R               REFFLD(EMP#)
+     A            NEFYR     R               REFFLD(FYR)
+     A            NEUNID    R               REFFLD(A120)
+     A                                      COLHDG('UNIQUE' 'IDENTIFIER')
+     A            NEST      R               REFFLD(ST)
+     A                                      COLHDG('STATE')
+     A            NEENCD    R               REFFLD(A30)
+     A                                      COLHDG('ENTITY' 'CODE')
+     A            NENAME    R               REFFLD(NAME)
+     A                                      COLHDG('ENTITY' 'NAME')
+     A            NEPFDT    R               REFFLD(DT)
+     A                                      COLHDG('POLICY' 'EFF DT')
+     A            NETRDT    R               REFFLD(DT)
+     A                                      COLHDG('TRANS' 'DATE')
+     A            NETYPE    R               REFFLD(CODE)
+     A                                      COLHDG('RECORD' 'TYPE')
+     A            NEEND#    R               REFFLD(FLE)
+     A                                      COLHDG('ENDORSEMENT #')
+     A            NEEEDT    R               REFFLD(DT)
+     A                                      COLHDG('ENDORSEMENT' 'EFF DT')
+      **** BEGIN CHG **** 04/25/02 *********************************************
+     A*********** NEMOD     R               REFFLD(PC32)
+     A            NEMOD     R               REFFLD(PC54)
+      **** END   CHG **** 04/25/02 *********************************************
+     A                                      COLHDG('REVISED' 'MOD')
+     A            NEMEDT    R               REFFLD(DT)
+     A                                      COLHDG('MODIFIER' 'EFF DT')
+     A            NERNAM    R               REFFLD(NAME)
+     A                                      COLHDG('REVISED' 'ENT NAME')
+     A            NEFEID    R               REFFLD(FEIN)
+     A                                      COLHDG('REVISED' 'FED ID#')
+     A            NEELID    R               REFFLD(CTGY)
+     A                                      COLHDG('ENTITY/LOC ID#')
+     A            NEADTP    R               REFFLD(FLAG)
+     A                                      COLHDG('ADDRESS TYPE')
+     A            NEMA12    R               REFFLD(ADR1)
+     A                                      COLHDG('REV MAIL' 'ADDR 1')
+     A            NEMA22    R               REFFLD(ADR2)
+     A                                      COLHDG('REV MAIL' 'ADDR 2')
+     A            NEMCT2    R               REFFLD(CTY)
+     A                                      COLHDG('REV MAIL' 'CITY')
+     A            NEMST2    R               REFFLD(ST)
+     A                                      COLHDG('REV MAIL' 'STATE')
+     A            NEMZP2    R               REFFLD(ZIP)
+     A                                      COLHDG('REV MAIL' 'ZIP CODE')
+     A            NEAREA    R               REFFLD(AREA)
+     A                                      COLHDG('REVISED' 'AREA CODE')
+     A            NEPHN#    R               REFFLD(PHN#)
+     A                                      COLHDG('REVISED' 'PHONE #')
+     A            NEPFD2    R               REFFLD(DT)
+     A                                      COLHDG('REVISED' 'EFF DT')
+     A            NEPTD2    R               REFFLD(DT)
+     A                                      COLHDG('REVISED' 'EXP DT')
+     A            NECAR1    R               REFFLD(CLAS)
+     A                                      COLHDG('ORIG' 'CARRIER #')
+     A            NECAR2    R               REFFLD(CLAS)
+     A                                      COLHDG('REVISED' 'CARR #')
+     A            NEPLC1    R               REFFLD(FND)
+     A                                      COLHDG('POLICY #' 'FUND')
+     A            NEPLC2    R               REFFLD(EMP#)
+     A                                      COLHDG('POLICY #' 'EMP #')
+     A            NEPLC3    R               REFFLD(FYR)
+     A                                      COLHDG('POLICY #' 'FYR')
+     A            NELGST    R               REFFLD(FLAG)
+     A                                      COLHDG('REV LEGAL' 'STATUS')
+     A            NEAGT#    R               REFFLD(AGT#)
+     A                                      COLHDG('REVISED' 'AGT #')
+     A            NEAGNM    R               REFFLD(NAME)
+     A                                      COLHDG('REVISED' 'PR/AG NM')
+     A            NERSK#    R               REFFLD(A90)
+     A                                      COLHDG('REVISED' 'RSK ID #')
+     A            NESEQ#    R               REFFLD(SEQ#)
+     A                                      COLHDG('ENDORSEMENT' 'SEQ #')
+     A            NEREQ#    R               REFFLD(SEQ#)
+     A                                      COLHDG('ENDORSEMENT' 'REQ #')
+     A            NEDESC    R               REFFLD(DS30)
+     A                                      COLHDG('ENDORSEMENT' 'DESC')
+     A            NESTAT    R               REFFLD(STAT)
+     A            NEUSER    R               REFFLD(USER)
+     A            NEPGM     R               REFFLD(PGM)
+     A            NETIME    R               REFFLD(TIME)
+     A            NEDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            NEIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            NEIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'ENTRY' 'DATE')
+     A**** BEGIN ADD **** 09/18/00 ************************************
+     A            NEUE#     R               REFFLD(DS15)
+     A                                      COLHDG('STATE' 'UNEMPLOYMENT #')
+     A**** END   ADD **** 09/18/00 ************************************
+      **** BEGIN ADD **** 06/01/01 ************************************
+      **** BEGIN CHG **** 04/25/02 *********************************************
+     A*********** NEEMPY         7S 0       COLHDG('REVISED NBR' 'OF EMPLOYEES')
+     A            NEEMPY    R               REFFLD(A70)
+     A                                      COLHDG('REVISED NBR' 'OF EMPLOYEES')
+      **** END   CHG **** 04/25/02 *********************************************
+     A            NESIC     R               REFFLD(SIC)
+     A                                      COLHDG('REVISED SIC CODE')
+      **** BEGIN ADD **** 05/14/04 *********************************************
+     A            NENAM2    R               REFFLD(NM60)
+     A                                      COLHDG('EMPLR NAME EXTENSION')
+     A            NERNM2    R               REFFLD(NM60)
+     A                                      COLHDG('REV EMPLR NAME EXT')
+      **** END ADD ****** 05/14/04 *********************************************
+     A***  Begin Add  ***  09/10/04  **************************************
+     A            NENLKC    R     S         REFFLD(A20)
+     A                                      COLHDG('NAME LINK' 'COUNTER')
+     A***  End   Add  ***  09/10/04  **************************************
+     A***  Begin Add  ***  08/17/05  **************************************
+     A            NEELCD         5S 0       COLHDG('EXPOSURE' 'LINK')
+     A***  End   Add  ***  08/17/05  **************************************
+      ***** BEG ADD ***** 04/25/06 *********************************************
+     A            NERNMP    R               REFFLD(FLAG)
+     A                                      COLHDG('PERS REVISED' 'NAME FLAG')
+      ***** END ADD ***** 04/25/06 *********************************************
+     A***** BEG ADD ***** 12/13/07 *********************************************
+     A            NERNM4       360A         COLHDG('Revised extended' +
+     A                                      'employer name field')
+     A***** END ADD ***** 12/13/07 *********************************************

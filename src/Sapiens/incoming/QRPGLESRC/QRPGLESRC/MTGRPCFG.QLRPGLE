@@ -1,0 +1,2056 @@
+     hcopyright('(c) 2024 Sapiens, Inc. All rights reserved.')
+     h/title MTGRPCFG- Group Configuration(Profound)
+     h dftname(MTGRPCFG)
+     h option(*nodebugio: *srcstmt)
+     h dftactgrp(*no) actgrp(*caller)
+     h ALWNULL(*UsrCtl)
+     h/define   profoundUI
+     h bnddir('STBNDDIR')
+     h bnddir('STAPPCFG')
+      //*********************************************************************
+      //==============================================================*
+      //  Created   : 06/10/24                                         *
+      //  Programmer: C:342                                            *
+      //  Project   : MC447 - Redesign of Work with Groups             *
+      //===============================================================*
+      //  Revisions:                                                   *
+      //                                                               *
+      //                                                               *
+      // ------------------------------------------------------------- *
+      //  NOTE: Please add comments to the top of Revisions.           *
+      // ------------------------------------------------------------- *
+      //===============================================================*
+
+     fMTGRPCFG  cf   e             workstn
+     f                                     handler('PROFOUNDUI(HANDLER)')
+     f                                     Sfile(sflGrpCfg:scSflRRN)
+     f                                     Sfile(sflModInfo:scSflRRN2)
+     f                                     Sfile(sflNetInfo:scSflRRN3)
+     fstactpnl  cf   e             workstn
+     f                                     handler('PROFOUNDUI(HANDLER)')
+      * Company file
+     fsmcol     if   e           k disk    rename(pco01:pco00)
+      * Fund Master file
+     ffmfnp     if a e             disk    rename(pfn01:pfn0p)
+     ffmfnl     if   e           k disk    rename(pfn01:pfn00)
+     f                                     infds(dbfds)
+     ffmfnl1    if   e           k disk    rename(pfn01:pfn01)
+      * Fund Auxiliary File
+     ffmf1p     if a e             disk    rename(pf101:pf10p)
+     ffmf1l     if   e           k disk    rename(pf101:pf100)
+      * WCMC Control File
+     ffmcxp     if a e             disk    rename(pcx01:pcx0p)
+      * Group State Information File
+     ffdf2p     if a e             disk    rename(pf201:pf20p)
+      * Network (All systems) Billing Rate/Discount Master
+     fnmbdl     if   e           k disk    rename(pbd01:pbd00)
+      * User Parameter File
+     fsmupl     if   e           k disk    rename(pup01:pup00)
+
+     d psds          esds                  extname(szq1p)
+     d dbfds           ds
+     d  dbrrn                397    400b 0
+     d dbfds2          ds
+     d  dbrrn2               397    400b 0
+
+      // work variables
+     d i               s              3  0
+     d j               s              3  0
+     d clientID        s              3    inz('000')
+     d intCo#          s              3  0
+     d indexTab        s              5  0
+     d chgMod          s               n   inz(*off)
+     d dspMode         s               n   inz(*off)
+     d process         s               n   inz(*off)
+     d strDartsKey     s             40
+     d strUrlRRN       s              9    inz
+     d strUrlTabName   s             50    inz
+     d UsrDftFnd       s                   like(UPfnd) inz
+     d UsrDftSub       s                   like(UPsub#) inz
+     d UsrDftFyr       s                   like(UPfyr) inz
+     d xxDate1         s              8  0
+     d beginDate       s              7  0 inz(0)
+     d endDate         s              7  0 inz(0)
+     d isWcif          s               n   inz
+     d isAR            s               n   inz
+     d isNtwk          s               n   inz
+     d isCrvw          s               n   inz
+     d isWcin          s               n   inz
+     d isNpwc          s               n   inz
+     d RedHeight       s              4  0 inz
+
+     d                 ds
+     d dsIsError               1     10    dim(10)
+     d  isError01              1      1
+     d  isError02              2      2
+     d  isError03              3      3
+     d  isError04              4      4
+     d  isError05              5      5
+     d  isError06              6      6
+     d  isError07              7      7
+     d  isError08              8      8
+     d  isError09              9      9
+     d  isError10             10     10
+
+     d* Screen System Code
+     d                 ds
+     d dsSysCd                 1     10    dim(10)
+     d  SysCd01                1      1
+     d  SysCd02                2      2
+     d  SysCd03                3      3
+     d  SysCd04                4      4
+     d  SysCd05                5      5
+     d  SysCd06                6      6
+     d  SysCd07                7      7
+     d  SysCd08                8      8
+     d  SysCd09                9      9
+     d  SysCd10               10     10
+
+     d* AR Rate Code
+     d                 ds
+     d dsArCd                  1     30    dim(10)
+     d  ArCd01                 1      3
+     d  ArCd02                 4      6
+     d  ArCd03                 7      9
+     d  ArCd04                10     12
+     d  ArCd05                13     15
+     d  ArCd06                16     18
+     d  ArCd07                19     21
+     d  ArCd08                22     24
+     d  ArCd09                25     27
+     d  ArCd10                28     30
+
+     d* Group Network Information
+     d* Network code
+     d                 ds
+     d dsNwCd                  1     50    dim(10)
+     d  NwCd01                 1      5
+     d  NwCd02                 6     10
+     d  NwCd03                11     15
+     d  NwCd04                16     20
+     d  NwCd05                21     25
+     d  NwCd06                26     30
+     d  NwCd07                31     35
+     d  NwCd08                36     40
+     d  NwCd09                41     45
+     d  NwCd10                46     50
+
+     d* Network Type screen fields
+     d                 ds
+     d dsNwTyp                 1     10    dim(10)
+     d  NwTyp01                1      1
+     d  NwTyp02                2      2
+     d  NwTyp03                3      3
+     d  NwTyp04                4      4
+     d  NwTyp05                5      5
+     d  NwTyp06                6      6
+     d  NwTyp07                7      7
+     d  NwTyp08                8      8
+     d  NwTyp09                9      9
+     d  NwTyp10               10     10
+
+     d* Network Fee Type screen fields
+     d                 ds
+     d dsNwFTyp                1     10    dim(10)
+     d  NwFTyp01               1      1
+     d  NwFTyp02               2      2
+     d  NwFTyp03               3      3
+     d  NwFTyp04               4      4
+     d  NwFTyp05               5      5
+     d  NwFTyp06               6      6
+     d  NwFTyp07               7      7
+     d  NwFTyp08               8      8
+     d  NwFTyp09               9      9
+     d  NwFTyp10              10     10
+
+     d* Network Fee Rate screen fields
+     d                 ds
+     d dsNtFRt                 1     90  2 dim(10)
+     d  NtFRt01                1      9  2
+     d  NtFRt02               10     18  2
+     d  NtFRt03               19     27  2
+     d  NtFRt04               28     36  2
+     d  NtFRt05               37     45  2
+     d  NtFRt06               46     54  2
+     d  NtFRt07               55     63  2
+     d  NtFRt08               64     72  2
+     d  NtFRt09               73     81  2
+     d  NtFRt10               82     90  2
+
+     d* FEIN/Mod screen fields
+     d                 ds
+     d dsNtFEIN                1    120    dim(10)
+     d  NtFEIN01               1     12
+     d  NtFEIN02              13     24
+     d  NtFEIN03              25     36
+     d  NtFEIN04              37     48
+     d  NtFEIN05              49     60
+     d  NtFEIN06              61     72
+     d  NtFEIN07              73     84
+     d  NtFEIN08              85     96
+     d  NtFEIN09              97    108
+     d  NtFEIN10             109    120
+
+     d* WCMC Group Module Information
+     d* Data base field for System Code
+     d                 ds
+     d dsFnSys                 1     10    dim(10)
+     d  FNsy01                 1      1
+     d  FNsy02                 2      2
+     d  FNsy03                 3      3
+     d  FNsy04                 4      4
+     d  FNsy05                 5      5
+     d  FNsy06                 6      6
+     d  FNsy07                 7      7
+     d  FNsy08                 8      8
+     d  FNsy09                 9      9
+     d  FNsy10                10     10
+
+     d* Data base field for AR Rate Type
+     d                 ds
+     d dsFnAR                  1     30    dim(10)
+     d  FNbr01                 1      3
+     d  FNbr02                 4      6
+     d  FNbr03                 7      9
+     d  FNbr04                10     12
+     d  FNbr05                13     15
+     d  FNbr06                16     18
+     d  FNbr07                19     21
+     d  FNbr08                22     24
+     d  FNbr09                25     27
+     d  FNbr10                28     30
+
+     d* WCMC Group Network Information
+     d* Data base field for Network Code
+     d                 ds
+     d dsF1nwcd                1     50    dim(10)
+     d  F1nw01                 1      5
+     d  F1nw02                 6     10
+     d  F1nw03                11     15
+     d  F1nw04                16     20
+     d  F1nw05                21     25
+     d  F1nw06                26     30
+     d  F1nw07                31     35
+     d  F1nw08                36     40
+     d  F1nw09                41     45
+     d  F1nw10                46     50
+
+     d* Data base field for Network Type
+     d                 ds
+     d dsF1NwTyp               1     10    dim(10)
+     d  F1nf01                 1      1
+     d  F1nf02                 2      2
+     d  F1nf03                 3      3
+     d  F1nf04                 4      4
+     d  F1nf05                 5      5
+     d  F1nf06                 6      6
+     d  F1nf07                 7      7
+     d  F1nf08                 8      8
+     d  F1nf09                 9      9
+     d  F1nf10                10     10
+
+     d* Data base field for Network Fee Type
+     d                 ds
+     d dsF1NwFTyp              1     10    dim(10)
+     d  F1nt01                 1      1
+     d  F1nt02                 2      2
+     d  F1nt03                 3      3
+     d  F1nt04                 4      4
+     d  F1nt05                 5      5
+     d  F1nt06                 6      6
+     d  F1nt07                 7      7
+     d  F1nt08                 8      8
+     d  F1nt09                 9      9
+     d  F1nt10                10     10
+
+     d* Data base field for Network Fee Rate
+     d                 ds
+     d dsF1NtFRt               1     90  2 dim(10)
+     d  F1n$01                 1      9  2
+     d  F1n$02                10     18  2
+     d  F1n$03                19     27  2
+     d  F1n$04                28     36  2
+     d  F1n$05                37     45  2
+     d  F1n$06                46     54  2
+     d  F1n$07                55     63  2
+     d  F1n$08                64     72  2
+     d  F1n$09                73     81  2
+     d  F1n$10                82     90  2
+
+     d* Data base field for FEIN
+     d                 ds
+     d dsF1NtFEIN              1     90  0 dim(10)
+     d  F1ni01                 1      9  0
+     d  F1ni02                10     18  0
+     d  F1ni03                19     27  0
+     d  F1ni04                28     36  0
+     d  F1ni05                37     45  0
+     d  F1ni06                46     54  0
+     d  F1ni07                55     63  0
+     d  F1ni08                64     72  0
+     d  F1ni09                73     81  0
+     d  F1ni10                82     90  0
+
+     d* Data base field for Mod
+     d                 ds
+     d dsF1NtMOD               1     30  0 dim(10)
+     d  F1nm01                 1      3  0
+     d  F1nm02                 4      6  0
+     d  F1nm03                 7      9  0
+     d  F1nm04                10     12  0
+     d  F1nm05                13     15  0
+     d  F1nm06                16     18  0
+     d  F1nm07                19     21  0
+     d  F1nm08                22     24  0
+     d  F1nm09                25     27  0
+     d  F1nm10                28     30  0
+
+      * Variable for WA038R
+     d  ##co#          s              3  0
+     d  ##fnd          s              3  0
+     d  ##rtcd         s              1
+     d
+      * Variable for GroupType
+     d  outRtCD        s              1
+     d  outCo          s              3
+     d  outSub#        s              5
+     d  outFnd         s              3
+     d  outSts         s              1
+     d svnewfnd        s              3  0 inz
+     d svnewrrn        s              5  0 inz
+     d svdftrrn        s              5  0 inz
+
+     d $$co#           s              3  0
+     d $$usr           s             10
+     d $$appl          s              1
+     d $$rtcd          s              1
+     d $$auth          s              1
+     d $$fnd           s              3  0
+     d MultiGrpRst     s              1n   inz(*off)
+
+      * Check Group Restriction
+     d CheckGrpRst     pr                  extpgm('SA008R')
+     d $$co#                          3  0
+     d $$usr                         10
+     d $$appl                         1    Const
+     d $$rtcd                         1
+     d $$auth                         1    options(*nopass)
+     d $$fnd                          3  0 options(*nopass)
+
+      * Get client ID
+     d GetClientID     pr                  extpgm('RTVCLTID')
+     d   outCltID                     3
+
+     d GetCoFnd        pr                  extpgm('WA038R')
+     d ##co#                          3  0
+     d ##fnd                          3  0
+     d ##rtcd                         1
+
+     d GroupType       pr                  extpgm('FA701R')
+     d                                1
+     d                                3
+     d                                5
+     d                                3
+     d                                1
+
+      * Initialize the Screen fields for Add Group
+     d InzGrpInfScVal  pr
+
+      * Load Group Grid info
+     d LoadGroupGrid   pr
+
+      * Load System Code grid
+     d LoadModInfo     pr
+
+      * Load Network Info grid
+     d LoadNetInfo     pr
+
+      * Main Processing
+     d Main            pr
+
+      * Process Group Addition
+     d ProcessAdd      pr
+
+      * Program Start
+     d ProgramStart    pr
+     d processMe                       n
+
+      * Validate Group Addition info. procedure.
+     d ValidateGroup   pr              n
+
+     d/copy sprUsrPrms
+     d/copy sPrDate
+     d/copy sprCompany
+     d/copy sPrAtrium
+     d/copy sPrModule
+
+      // Entry of Program.
+
+     c     *entry        plist
+     c                   parm                    @@rrn             9            rrn
+     c                   parm                    @@mode            1            Mode
+     c                   parm                    @@next           10            next pgm
+     c                   parm                    @@TabInd          5            tab index
+
+     c     keyFmfnl      klist
+     c                   kfld                    intco#
+     c                   kfld                    UsrDftSub
+
+      /free
+       Exec Sql Set Option Commit = *None;
+
+       GetClientID(clientID);
+
+       ProgramStart(process);
+
+       If process;
+
+          Main();
+
+       Endif;
+
+       *InLr = *On;
+      /end-free
+
+       //===================================================================
+       // InzGrpInfScVal - Initialize the Screen fields and indicators
+       //===================================================================
+     p InzGrpInfScVal  b
+     d InzGrpInfScVal  pi
+
+      /Free
+       scCo# = intCo#;
+
+       visMstCont  =  *on;
+       visARCont   =  *on;
+       visNetCont  =  *on;
+       visStCont   =  *on;
+       visMedCont  =  *on;
+       visBilCont  =  *on;
+       visGrpCfg   =  *on;
+       visGrpHdg   =  *off;
+       TopMst      = 120;
+       TopAR       = 370;
+       TopNet      = 625;
+       TopState    = 835;
+       TopMed      = 1025;
+       TopBill     = 1290;
+       TopSaveCan  = 1600;
+       PnlHeight   = 1600;
+       AddPnlHt    = 1550;
+
+       // If Network is not installed then do not show Network Information
+       If isNtwk <> *on;
+          RedHeight = 220;
+          visNetCont = *off;
+          TopState -=  RedHeight;
+          TopMed   -=  RedHeight;
+          TopBill  -=  RedHeight;
+          TopSaveCan -= RedHeight;
+          PnlHeight -= RedHeight;
+          AddPnlHt  -= RedHeight;
+       Endif;
+
+       // display and process procura audit flag, Payment limit,Outbound EOB Code
+       // Non-Workers Comp group only for client 114 CSI
+       visCSI = *off;
+       if clientID = '114';
+         visCSI  = *on;
+       endif;
+
+       // Non-Workers Comp group only for client 114 CSI
+       visWCGrp = *off;
+       If iswcif = *on;
+          visWCGrp = *on;
+       Endif;
+
+       // Set visibility for AR Rate code, #days, #bills for auto release
+       visAR = *off;
+       scRmvAR = 'Y';
+       If isar   = *on;
+          visAR = *on;
+          scRmvAR = *blanks;
+       Endif;
+
+       // Set visibility for ALLOW MC Case Closure
+
+       // Set visibility for Network Reduction Heading
+       visNtRedHd = *off;
+       If isNtwk = *on;
+          visNtRedHd = *on;
+       Endif;
+
+       // Set visibility for Process Through Claim Check
+       visClmChk = *off;
+       If isCrvw = *on;
+          visClmChk = *on;
+       Endif;
+
+       // Set visibility for CVT Claim Number
+       Select;
+       When @@mode = 'A' and outSTS ='N';
+          VisCVT# = *off;
+          DisCVT# = *on;
+       When outSTS = 'N';
+          VisCVT# = *on;
+          DisCVT# = *on;
+       Other;
+          VisCVT# = *on;
+          DisCVT# = *off;
+       Endsl;
+
+       // Group master information
+       // Outbound EOB Code
+       selEOBcd = 'GTco# = ' + %EditC(intCo#:'X') + ' and ' +
+          'GTstat<>' + '''I''' + 'and GTtbid=' + '''OEOB''';
+
+       // WCMS Group Module Information
+       // System Type Selection Criteria
+       selSys  = 'GTco# = ' + %EditC(intCo#:'X') + ' and ' +
+          'GTstat<>' + '''I''' + 'and GTtbid=' + '''SYS''';
+
+       // WCMC Group Network Information
+       // Network Code Selection Criteria
+       SelNwCd  = 'NWco# = ' + %EditC(intCo#:'X') + ' and ' +
+          'NWstat<>' + '''I''';
+
+       // Network Type Selection Criteria
+       SelNwTyp = 'GTco# = ' + %EditC(intCo#:'X') + ' and ' +
+          'GTstat<>' + '''I''' + 'and GTtbid=' + '''NWNT''';
+
+       // Network Fee Type Selection Criteria
+       SelNwFTyp = 'GTco# = ' + %EditC(intCo#:'X') + ' and ' +
+          'GTstat<>' + '''I''' + 'and GTtbid=' + '''NWFT''';
+
+       // Network FEIN Selection Criteria
+       SelNwFEIN ='PDFEIN || '' '' || PDMOD || ''-'' || ' +
+        'CASE WHEN PDDBA1=''Y'' THEN TRIM(PDADR1) || ''-'' || ' +
+        'TRIM(PDADR2) ELSE ' +
+        'TRIM(PDNAME) || ''-'' || TRIM(PDADR1) || '' '' || ' +
+        'TRIM(PDADR2) END ' +
+        ' || ''- '' || TRIM(PDCTY) || '', '' || ' +
+        'PDST || '' '' || SUBSTR(DIGITS(PDZIP),1,5)';
+
+       // Medical Case Control Information
+       // Security Types Selection Criteria
+       SelSecTyp = 'GTco# = ' + %EditC(intCo#:'X') + ' and ' +
+          'GTstat<>' + '''I''' + 'and GTtbid=' + '''SECT''';
+
+       // Provider Bill Control Information
+       // Medical Examiner User
+       SelMEUsr = 'GTco# = ' + %EditC(intCo#:'X') + ' and ' +
+          'GTstat<>' + '''I''' + 'and GTtbid=' + '''DIUS''';
+
+       // Default Pend Code
+       SelPndCode = 'BSco# = ' + %EditC(intCo#:'X') + ' and ' +
+          'BSstat<>' + '''I''' + 'and BStype=' + '''P''';
+
+      /End-Free
+     p InzGrpInfScVal  e
+
+       //===================================================================
+       // Load Group Grid info
+       //===================================================================
+     p LoadGroupGrid   b
+     d LoadGroupGrid   pi
+
+      /free
+         // Clear the subfile
+         scSflRRN = 0;
+         scSflDsp = *off;
+         scSflClr = *on;
+         Write rcdGrpCfg;
+         scSflClr = *off;
+         scSflDsp = *on;
+         scRowSel = 1;
+
+         // Populate the subfile
+         Setll keyFmfnl fmfnl;
+         Reade keyFmfnl fmfnl;
+         Dow not %eof(fmfnl);
+            // Check for Group Restriction
+            If UPxfnd = 'Y';
+               If MultiGrpRst = *off and UPfnd <> FNfnd;
+                  Reade keyFmfnl fmfnl;
+                  Iter;
+               Endif;
+
+               If MultiGrpRst = *on;
+                  // Check for list of Restricted Groups
+                  $$co#  = intCo#;
+                  $$usr  = q1user;
+                  $$appl = 'W';
+                  $$rtcd = *off;
+                  $$auth = 'A';
+                  $$fnd  = FNfnd;
+                  CheckGrpRst($$co#:$$usr:$$appl:$$rtcd:$$auth:$$fnd);
+
+                  If $$rtcd = *on;
+                     Reade keyFmfnl fmfnl;
+                     Iter;
+                  Endif;
+               Endif;
+            Endif;
+
+            scSflRRN += 1;
+            scSflSel = *off;
+           // User Default Group at the top of the Grid
+            If UsrDftFnd = 0;
+               If scSflRRN = 1;
+                  scSflSel = *on;
+               Endif;
+            Else;
+               If UsrDftFnd = FNfnd;
+                  scSflSel = *on;
+                  svdftrrn = scSflRRN;
+               Endif;
+            Endif;
+           // Select newly added Group at the top of the Grid
+            If svnewfnd <> 0 and svnewfnd = FNfnd;
+               svnewfnd = 0;
+               svnewrrn = scSflRRN;
+               scSflSel = *on;
+            Endif;
+            scGrp   = Fnfnd;
+            scGrpNm = FNname;
+            scShNm  = FNshnm;
+            scWCGrp = FNwcf#;
+            scEfdt  = CvtToDate(FNefdt);
+            scExdt  = CvtToDate(FNexdt);
+            scRRN   = dbrrn;
+
+           // Get Standalone flag from fmf1p file
+            Chain(n) (FNCo#:FNsub#:FNFnd) pf100;
+            If %found(fmf1l);
+               scStdAln = F1outa;
+            Endif;
+
+            // Populate Edit Group Link
+            Clear scEdtURL;
+            strUrlRRN = %Editc(scRRN:'X');
+            strUrlTabName = FNname;
+            scEdtURL = CreateURL('STDRVPGM':strUrlTabName:strUrlRRN:'C':
+             'MTGRPPRI');
+
+            // Populate Inquiry Group Link
+            Clear scInqryURL;
+            strUrlRRN = %Editc(scRRN:'X');
+            strUrlTabName = FNname;
+            scInqryURL = CreateURL('STDRVPGM':strUrlTabName:strUrlRRN:'D':
+             'MTGRPPRI');
+
+            // Populate iDARTS link
+            Clear scDartURL;
+            strUrlTabName = 'iDARTS';
+            strDartsKey = %editc(FNCo#:'X') + %editc(FNFnd:'X');
+            scDartURL  = strUrlTabName +
+             CreateGenUrl('/iDartsWeb/profound.do':
+             'user=' + %Trim(q1User):
+             '&keyProgram=W0010R':
+             '&key=' + %trim(strDartsKey):
+             '&action=listing':
+             '&mode=remarks');
+
+            Write sflGrpCfg;
+            Reade keyFmfnl fmfnl;
+         Enddo;
+
+         scSflRRN = 1;
+        // User Default Group at the top of the Grid
+         If svdftrrn <> 0;
+            scSflRRN = svdftrrn;
+            scRowSel = svdftrrn;
+            svdftrrn = 0;
+         Endif;
+        // Select newly added Group at the top of the Grid
+         If svnewrrn <> 0;
+            scSflRRN = svnewrrn;
+            scRowSel = svnewrrn;
+            svnewrrn = 0;
+         Endif;
+
+      /end-free
+     p LoadGroupGrid   e
+
+       //===================================================================
+       // Load System code / AR Rate Code information
+       //===================================================================
+     p LoadModInfo     b
+     d LoadModInfo     pi
+      /free
+
+       // Clear the subfile
+       scSflRRN2 = 0;
+       scSflDsp2 = *off;
+       scSflDsp3 = *off;
+       scSflClr2 = *on;
+       Write rcdGrpAdd;
+       scSflClr2 = *off;
+       scSflDsp2 = *on;
+       scSflDsp3 = *on;
+       i=1;
+       Dow i<=10;
+          clear scSysCd;
+          clear erSysCd;
+          clear msSysCd;
+          clear scArCd;
+          clear erArCd;
+          clear msArCd;
+          scsflrrn2 += 1;
+          Write sflModInfo;
+          i= i+1;
+       Enddo;
+       scSflRRN2 = 1;
+
+       /end-free
+     p LoadModInfo     e
+
+       //===================================================================
+       // Load Group Network Information
+       //===================================================================
+     p LoadNetInfo     b
+     d LoadNetInfo     pi
+
+      /free
+
+       // Clear the subfile
+       scSflRRN3 = 0;
+       scSflDsp2 = *off;
+       scSflDsp3 = *off;
+       scSflClr3 = *on;
+       Write rcdGrpAdd;
+       scSflDsp2 = *on;
+       scSflDsp3 = *on;
+       scSflClr3 = *off;
+       i=1;
+       Dow i<=10;
+          clear scNwCd;
+          clear erNwCd;
+          clear msNwCd;
+          clear scNwTyp;
+          clear erNwTyp;
+          clear msNwTyp;
+          clear scNwFTyp;
+          clear erNwFTyp;
+          clear msNwFTyp;
+          clear scNtFRt;
+          clear erNtFRt;
+          clear msNtFRt;
+          clear scNtFein;
+          clear erNtFein;
+          clear msNtFein;
+          scsflrrn3 += 1;
+          Write sflNetInfo;
+          i= i+1;
+       Enddo;
+       scSflRRN3 = 1;
+
+       /end-free
+     p LoadNetInfo     e
+
+       //===================================================================
+       // Main - Main processing
+       //===================================================================
+     p Main            b
+     d Main            pi
+      /free
+
+       // Process until exit button is pressed.
+       DoU BtnCancel = *On;
+
+          // Load Group Grid Info
+          LoadGroupGrid();
+
+          // display screen
+          Exsr ExfmtScreens;
+
+          // Perform actions on screen.
+          Select;
+
+          // Refresh
+          When btnRefresh = *On;
+             btnRefresh =*Off;
+
+          // Add Group
+          When BtnUsrAdd = *On;
+             BtnUsrAdd =*Off;
+             ProcessAdd();
+
+          Other;
+
+          Endsl;
+       Enddo;
+
+       //===================================================================
+       // Write Screen Formats;
+       //===================================================================
+       BegSr ExfmtScreens;
+
+        indexTab = TabIndex + 1;
+        Select;
+        When indexTab = 1;
+           pnlHeight = 500;
+           APnlHeight = pnlHeight + 60;
+
+           Write rcdSysTbl;
+           Write rcdPanel;
+           Exfmt rcdGrpCfg;
+           Read rcdSysTbl;
+           Read rcdPanel;
+        EndSl;
+
+       Endsr;
+
+      /end-free
+     p Main            e
+
+       //===================================================================
+       // processAdd - process addition of Group
+       //===================================================================
+     P ProcessAdd      B
+     D ProcessAdd      PI
+     d  isexit         s               n   Inz(*off)
+      /free
+
+       Clear RcdGrpAdd;
+       scFocus1 = *on;
+       isexit = *off;
+       BtnCanGrp = *off;
+       pnlHeight = 1700;
+       APnlHeight = pnlHeight + 60;
+
+       scStsE = 'A';
+       // Set Indicator for screen fields
+       isGrpAdd = *on;
+       InzGrpInfScVal();
+       LoadModInfo();
+       LoadNetInfo();
+
+       Dow BtnCanGrp = *off and isexit = *off;
+
+          scSflRRN2 = 1;
+          scSflRRN3 = 1;
+          Exfmt RcdGrpAdd;
+
+          Select;
+          // Save Button
+          When BtnSavGrp = *on;
+             BtnSavGrp = *off;
+             If ValidateGroup();
+                Exsr WrtGroup;
+                isexit = *on;
+             EndIf;
+
+          // Cancel Button
+          When BtnCanGrp = *on;
+               BtnCanGrp = *off;
+               isexit = *on;
+
+          Other;
+
+          EndSl;
+       Enddo;
+
+       // Subrotine to move Screen fields into database fields.
+       BegSr MoveScDb;
+        FNco#   = intco#;                // Company Number
+        FNsub#  = UsrDftSub;             // Subcriber
+        FNfnd   = scFnd;                 // Group Number
+        FNname  = scName;                // Name
+        FNshnm  = scShnm;                // Short Name
+        FNast   = scAdjcSt;              // Adjudication State
+        FNmad1  = scMad1;                // Mailing Addres 1
+        FNmad2  = scMad2;                // Mailing Addres 2
+        FNmcty  = scMcty;                // Mailing City
+        FNmst   = scMst;                 // Mailing State
+        FNmzip  = scMzip;                // Mailing Zipcode
+        FNpad1  = scPad1;                // Physical Addres 1
+        FNpad2  = scPad2;                // Physical Addres 2
+        FNpcty  = scPcty;                // Physical City
+        FNpst   = scPst;                 // Physical State
+        FNpzip  = scPzip;                // Physical Zipcode
+
+        If scPhone1 > *zeros;
+           FNara1  = %dec(%subst(%editc(scPhone1:'X'):1:3):3:0); // Phone 1 Area Code
+           FNph1   = %dec(%subst(%editc(scPhone1:'X'):4):7:0);   // Phone 1 Number
+        EndIf;
+        If scPhone1 = *zeros;
+           FNara1  = *zeros;
+           FNph1   = *zeros;
+        EndIf;
+
+        If scPhone2 > *zeros;
+           FNarea  = %dec(%subst(%editc(scPhone2:'X'):1:3):3:0); // Phone 2 Area Code
+           FNph2   = %dec(%subst(%editc(scPhone2:'X'):4):7:0);   // Phone 2 Number
+        EndIf;
+        If scPhone2 = *zeros;
+           FNarea  = *zeros;
+           FNph2   = *zeros;
+        EndIf;
+
+        If scFax > *zeros;
+           FNfara  = %dec(%subst(%editc(scFax:'X'):1:3):3:0); // Fax Area Code
+           FNfax   = %dec(%subst(%editc(scFax:'X'):4):7:0);   // Fax Number
+        EndIf;
+        If scFax = *zeros;
+           FNfara  = *zeros;
+           FNfax   = *zeros;
+        EndIf;
+
+        FNefdt  = dtCYMD(scEfDta);       // Effective date
+        FNexdt  = dtCYMD(scExDta);       // Effective date
+
+        FNwcf#  = scWCGrpE;              // WCMS Group Number
+        FNtest  = scTestGrp;             // Test Group Flag
+        FNnwcg  = scNonWCGrp;            // Non-WCMS Group
+        FNmpln  = scPymtLmt;             // Medical Payment Limit
+        FNclelig= scExGrpClm;            // Exclude From Base Claims El
+        FNoEob  = scEOBCd;               // Outbound EOB Code
+
+        // Move data to fmf1p file
+        F1co#   = intco#;                // Compnay Number
+        F1sub#  = UsrDftSub;             // Subcriber
+        F1fnd   = scFnd;                 // fund
+        F1flg1  = scAltFlg;              // Alternate Addres flag
+        F1anme  = scAnam;                // Alternate Company Name
+        F1aad1  = scAad1;                // Alternate Addres 1
+        F1aad2  = scAad2;                // Alternate Addres 2
+        F1acty  = scActy;                // Alternate City
+        F1ast   = scAst;                 // Alternate State
+        F1azip  = scAzip;                // Alternate Zipcode
+        If scAltPhone > *zeros;
+           F1aara  = %dec(%subst(%editc(scAltPhone:'X'):1:3):3:0); // Phone Area Code
+           F1aphn  = %dec(%subst(%editc(scAltPhone:'X'):4):7:0);   // Phone Number
+        EndIf;
+        If scAltPhone = *zeros;
+           F1aara  = *zeros;
+           F1aphn  = *zeros;
+        EndIf;
+        F1afei  = scAFedID;              // Alternate Fed ID
+        F1outa  = scStdAlone;            // StandAlone
+        F1fl04  = scChkIss;              // WCMC Check Issuance
+
+        //Write WCMC Group Module Information   // update Fmfnp file
+        For i = 1 to 10;
+           dsFNSys(i) = dsSysCd(i);
+        Endfor;
+        For i = 1 to 10;
+           dsFNAR(i) = dsArCd(i);
+        Endfor;
+        FN#day = scDays#;
+        FN#bll = scBills#;
+
+        //Write WCMC Group Network Information  // update Fmfnp/Fmf1p file
+        If isNtwk = *on;
+           For i = 1 to 10;
+              dsF1Nwcd(i)   =  dsNwcd(i);
+              dsF1NwTyp(i)  =  dsNwTyp(i);
+              dsF1NwFTyp(i) =  dsNwFTyp(i);
+              dsF1NtFRt(i)  =  dsNtFRt(i);
+
+              Monitor;
+                 dsF1NtFEIN(i) = %Dec(%Subst(dsNtFein(i):1:9):9:0);
+              On-Error 105;
+                 dsF1NtFEIN(i) = 0;
+              EndMon;
+
+              Monitor;
+                 dsF1NtMOD(i) = %Dec(%Subst(dsNtFein(i):10:3):3:0);
+              On-Error 105;
+                 dsF1NtMOD(i) = 0;
+              EndMon;
+           Endfor;
+        Endif;
+
+        //End of moving screen field to fmfnp and fmf1p file
+        FNstat  = scStsE;                // Status
+        FNuser  = q1user;                // User
+        FNpgm   = q1pgm;                 // Program
+        FNtime  = Timeto6(SystemTime()); // Time
+        FNdt    = Dateto7(SystemDate()); // Date Mintained
+        FNiusr  = q1user;                // Initial User
+        FNipgm  = q1pgm;                 // Initial Program
+        FNitim  = Timeto6(SystemTime()); // Initial Time
+        FNidt   = Dateto7(SystemDate()); // Initial Date
+
+        F1stat  = 'A';                   // Status
+        F1user  = q1user;                // User
+        F1pgm   = q1pgm;                 // Program
+        F1time  = Timeto6(SystemTime()); // Time
+        F1dt    = Dateto7(SystemDate()); // Date Mintained
+        F1iusr  = q1user;                // Initial User
+        F1ipgm  = q1pgm;                 // Initial Program
+        F1itim  = Timeto6(SystemTime()); // Initial Time
+        F1idt   = Dateto7(SystemDate()); // Initial Date
+
+        //Write WCMC Group State Information    // update 4 state info STSTP/FDF2P
+        //Write FL state Information
+        If scInsCdNum <> *zeros;
+           clear pf20p;
+           F2st    =  'FL';
+           F25n01  = scInsCdNum;
+           F25n02  = scTPACdNum;
+           F29n01  = scInsFedID;
+           F29n03  = scTPAFedID;
+           F29n02  = scInszip;
+           F29n04  = scTPAzip;
+           Exsr WrtFdf2p;
+        Endif;
+
+        //Write CA state Information
+        If scCAFein <> *zeros;
+           clear pf20p;
+           F2st    =  'CA';
+           F29n01  =  scCAFein;
+           Exsr WrtFdf2p;
+        Endif;
+
+        //Write KY state Information
+        If scKYFein <> *zeros;
+           clear pf20p;
+           F2st    =  'KY';
+           F29n01  =  scKYFein;
+           Exsr WrtFdf2p;
+        Endif;
+
+        //Write TX state Information
+        If scMstBzID<> *zeros;
+           clear pf20p;
+           F2st    =  'TX';
+           F29n01  =  scMstBzID;
+           Exsr WrtFdf2p;
+        Endif;
+
+        //Write Medical Case Control Information   // update/write Fmcxp file
+        CXco#   =  intco#;
+        CXsub#  =  UsrDftSub;
+        CXfnd   =  scfnd;
+        CXhdnu  =  scNurseHdg;
+        CXhdsu  =  scSupHdg;
+        CXhds3  =  scStf3Hdg;
+        CXhdcs  =  scClmSHdg;
+        CXhdca  =  scClmAdHdg;
+        CXhdfa  =  scFldAdHdg;
+        CXcldl  =  scCaseDel;
+        CXcldt  =  scSecTyp01;
+        CXcltl  =  scCaseTrf;
+        CXcltt  =  scSecTyp02;
+        CXdnsl  =  scCaseDen;
+        CXdnst  =  scSecTyp03;
+        CXrvdt  =  scRmkCd;
+
+        //Write Provider Bill Control Information  // update Fmcxp file
+        CXhex   =  scMedExHdg;
+        CXflex  =  scMEUsr;
+        CXhmra  =  scMRedHdg;
+        CXhot1  =  scORed1Hdg;
+        CXhot2  =  scORed2Hdg;
+        CXhnet  =  scNtRedHdg;
+        CXckdl  =  scChkDel;
+        CXckdt  =  scSecTyp04;
+        CXrcal  =  scROMBRec;
+        CXrcsl  =  scRecSecLv;
+        CXrcst  =  scSecTyp05;
+        CXrmeb  =  scRmkCdEob;
+        CXcpdf  =  scCmpPnd;
+        CXcppn  =  scPendCode;
+        CXcrus  =  scPrClmChk;
+        If visCSI = *on;
+          if scAudFlg = 'Y';
+            CXpauf = 'Y';
+          else;
+            CXpauf = *blanks;
+          endif;
+        Endif;
+        CXcvt# = scCVTClm#;
+
+        CXstat  =  'A';
+        CXuser  =  q1user;                // User
+        CXpgm   =  q1pgm;                 // Program
+        CXtime  =  Timeto6(SystemTime()); // Time
+        CXdt    =  Dateto7(SystemDate()); // Date Mintained
+        CXiusr  =  q1user;                // Initial User
+        CXipgm  =  q1pgm;                 // Initial Program
+        CXitim  =  Timeto6(SystemTime()); // Initial Time
+        CXidt   =  Dateto7(SystemDate()); // Initial Date
+       EndSr;
+
+       // Writing new Group subroutine
+       BegSr WrtGroup;
+        Clear pfn0p;
+        Clear pf10p;
+        Clear pcx0p;
+        Exsr MoveScDb;
+        Write pfn0p;
+        Write pf10p;
+        Write pcx0p;
+        // Select newly added Group at the top of the Grid
+        svnewfnd = scfnd;
+       EndSr;
+
+       Begsr WrtFdf2p;
+        F2co#   =  intco#;
+        F2sub#  =  UsrDftSub;
+        F2fnd   =  scfnd;
+        F2stat  =  'A';
+        F2user  =  q1user;                // User
+        F2pgm   =  q1pgm;                 // Program
+        F2time  =  Timeto6(SystemTime()); // Time
+        F2date  =  Dateto7(SystemDate()); // Date Mintained
+        F2iusr  =  q1user;                // Initial User
+        F2ipgm  =  q1pgm;                 // Initial Program
+        F2itim  =  Timeto6(SystemTime()); // Initial Time
+        F2idt   =  Dateto7(SystemDate()); // Initial Date
+        Write pf20p;
+       Endsr;
+
+      /end-free
+     P ProcessAdd      E
+
+       //===================================================================
+       // ProgramStart - Initial Program tasks
+       //===================================================================
+     p ProgramStart    b
+     d ProgramStart    pi
+     d processMe                       n
+      /free
+
+       // Program Mode.
+       If q1prms >= 2;
+          Select;
+          When @@mode = 'D';
+             dspMode = *on;
+          When @@mode = 'C';
+             chgMod  = *on;
+          Endsl;
+       Endif;
+
+       // Set Screen Heading
+       scHeading = 'WCMC Group Configuration';
+       // Set Tab Names
+       TbNmRcdPnl = 'WCMC Group Configuration';
+       aMenHeight = 120;
+       apFootHght = aMenHeight + 125;
+
+       // Tab Index
+       tabIndex = 0;
+       If q1prms >= 4;
+          If @@TabInd <> ' ';
+             tabIndex = %int(@@TabInd);
+             If tabIndex < 0 or tabIndex > 2;
+                TabIndex = 0;
+             Endif;
+          Endif;
+          @@TabInd = '00000';
+       Endif;
+
+       intCo# = GetUserInfo(q1user);
+       Chain intCo# pco00;
+       If COname <> ' ';
+          scCompName = COname;
+       Endif;
+       scCo# = intCo#;
+
+       // Get User Default Group
+       UsrDftFnd = 0;
+       Chain q1user pup00;
+       If %found(smupl);
+          UsrDftFnd = UPfnd;
+          UsrDftSub = UPsub#;
+          UsrDftFyr = UPfyr;
+       EndIf;
+
+       // Check for Multi Group Restriction
+       $$co#  = intCo#;
+       $$usr  = q1user;
+       $$appl = 'W';
+       $$rtcd = *off;
+       CheckGrpRst($$co#:$$usr:$$appl:$$rtcd);
+       MultiGrpRst = $$rtcd;
+
+       // Retrieve System Values
+       isWcif   = *off;
+       isWcif   = IsModEnabled('WorkComp');
+
+       isAR     = *off;
+       isAR     = IsModEnabled('Managed Care AR');
+
+       isWcin   = *off;
+       isWcin   = IsModEnabled('Work Comp Interface');
+
+       isNpwc   = *off;
+       isNpwc   = IsModEnabled('NonPDSWC');
+
+       isNtwk   = *off;
+       isNtwk   = IsModEnabled('Managed Care Network');
+
+       isCrvw   = *off;
+       isCrvw   = IsModEnabled('Claim Check Install');
+
+       outRTCD = *blanks;
+       outSTS  = *blanks;
+       outCO   = %editc(intco#:'X');
+       outSUB# = %editc(UsrDftSub:'X');
+       outFND  = %editc(scfnd:'X');
+       GroupType(outRTCD:outCO:outSUB#:outFND:outSTS);
+
+       visCSI = *off;
+       if clientID = '114';
+         visCSI  = *on;
+       endif;
+
+       processMe = *on;
+       Return;
+
+      /end-free
+     p ProgramStart    e
+
+      //===================================================================
+      // Validate the Group addition information.
+      // Returns *on  ----> No errors
+      // Returns *off ----> Any errors
+      //===================================================================
+     p ValidateGroup   b
+     d ValidateGroup   pi              n
+     d isError         s               n   inz
+      /Free
+
+       isError = *off;
+      // Initialize all the messageId and error indicators.
+       erFnd  = *off;
+       msFnd  = *blanks;
+       erName = *off;
+       msName = *blanks;
+       erShnm = *off;
+       msShnm = *blanks;
+       erMad1 = *off;
+       msMad1 = *blanks;
+       erMcty = *off;
+       msMcty = *blanks;
+       erMst  = *off;
+       msMst  = *blanks;
+       erMzip = *off;
+       msMzip = *blanks;
+       erPad1 = *off;
+       msPad1 = *blanks;
+       erPcty = *off;
+       msPcty = *blanks;
+       erPst  = *off;
+       msPst  = *blanks;
+       erPzip = *off;
+       msPzip = *blanks;
+       erEfDta = *off;
+       msEfDta = *blanks;
+       erExDta = *off;
+       msExDta = *blanks;
+       erAdjcSt = *off;
+       msAdjcSt = *blanks;
+       erAnam = *off;
+       msAnam = *blanks;
+       erAad1 = *off;
+       msAad1 = *blanks;
+       erActy = *off;
+       msActy = *blanks;
+       erAst  = *off;
+       msAst  = *blanks;
+       erAzip = *off;
+       msAzip = *blanks;
+       erAltPhone = *off;
+       msAltPhone = *blanks;
+       erAWCGrp   = *off;
+       msAWCGrp   = *blanks;
+
+       // Error indicator and message ID for Group Module Information
+       Readc sflModInfo;
+       Dow not %eof;
+          erSysCd = *off;
+          msSysCd = *blanks;
+          erArCd  = *off;
+          msArCd  = *blanks;
+          update sflModInfo;
+          Readc sflModInfo;
+       Enddo;
+       scsflRRN2 =1;
+
+       If isNtwk = *on;
+          clear dsIsError;
+          Readc sflNetInfo;
+          Dow not %eof;
+             erNwCd    = *off;
+             msNwCd    = *blanks;
+             erNwTyp   = *off;
+             msNwTyp   = *blanks;
+             erNwFTyp  = *off;
+             msNwFTyp  = *blanks;
+             erNtFRt   = *off;
+             msNtFRt   = *blanks;
+             erNtFEIN  = *off;
+             msNtFEIN  = *blanks;
+             update sflNetInfo;
+             Readc sflNetInfo;
+          Enddo;
+          scsflRRN3 =1;
+       Endif;
+
+       // Error indicator and message ID for Group State Information
+       erInsCdNum = *off;
+       msInsCdNum = *blanks;
+       erInsFedID = *off;
+       msInsFedID = *blanks;
+       erInszip   = *off;
+       msInszip   = *blanks;
+       erTPACdNum = *off;
+       msTPACdNum = *blanks;
+       erTPAFedID = *off;
+       msTPAFedID = *blanks;
+       erTPAzip   = *off;
+       msTPAzip   = *blanks;
+
+       erKYFEIN   = *off;
+       msKYFEIN   = *blanks;
+
+       erMstBzID  = *off;
+       msMstBzID  = *blanks;
+
+       erCAFEIN   = *off;
+       msCAFEIN   = *blanks;
+
+       // Error indicator and message ID for Group Module Information
+       erNurseHdg = *off;
+       msNurseHdg = *blanks;
+       erCaseDel  = *off;
+       msCaseDel  = *blanks;
+       erCaseTrf  = *off;
+       msCaseTrf  = *blanks;
+       erCaseDen  = *off;
+       msCaseDen  = *blanks;
+       erSecTyp01 = *off;
+       msSecTyp01 = *blanks;
+       erSecTyp02 = *off;
+       msSecTyp02 = *blanks;
+       erSecTyp03 = *off;
+       msSecTyp03 = *blanks;
+       erRmkCd    = *off;
+       msRmkCd    = *blanks;
+
+       // Provider Bill Control Information
+       erMedExHdg = *off;
+       msMedExHdg = *blanks;
+       erMEUsr    = *off;
+       msMEUsr    = *blanks;
+       erMRedHdg  = *off;
+       msMRedHdg  = *blanks;
+       erORed1Hdg = *off;
+       msORed1Hdg = *blanks;
+       erORed2Hdg = *off;
+       msORed2Hdg = *blanks;
+       erNtRedHdg = *off;
+       msNtRedHdg = *blanks;
+       erChkDel   = *off;
+       msChkDel   = *blanks;
+       erSecTyp04 = *off;
+       msSecTyp04 = *blanks;
+       erRecSecLv = *off;
+       msRecSecLv = *blanks;
+       erSecTyp05 = *off;
+       msSecTyp05 = *blanks;
+       erRmkCdEob = *off;
+       msRmkCdEob = *blanks;
+       erCmpPnd   = *off;
+       msCmpPnd   = *blanks;
+
+      // Group number is invalid.
+       If scFnd <= *zero;
+          erFnd = *on;
+          msFnd = 'MCR0556';
+          isError = *on;
+       Endif;
+
+      // Duplicate Group Number
+       If scFnd <> *zero;
+          chain (scCo#:UsrDftSub:scFnd) pfn00;
+          chain (scCo#:UsrDftSub:ScFnd) pf100;
+          If %found(fmfnl) or %found(fmf1l);
+             erFnd = *on;
+             msFnd = 'MC40042';
+             isError = *on;
+          Endif;
+       Endif;
+
+      // Group name cannot be blank.
+       If scName = *blanks;
+          erName = *on;
+          msName = 'MCR0503';
+          isError = *on;
+       Endif;
+
+      // Short name cannot be blank.
+       If scShnm = *blanks;
+          erShnm = *on;
+          msShnm = 'MCR0503';
+          isError = *on;
+       Endif;
+
+      // Enter complete info for Mailing address as this is mandatory
+       If scMad1 = *Blanks;
+          erMad1 = *on;
+          msMad1 = 'MCR0503';
+          isError = *on;
+       Endif;
+       If scMcty = *blanks;
+          erMcty = *on;
+          msMcty = 'MCR0503';
+          isError = *on;
+       Endif;
+       If scMst  = *blanks;
+          erMst  = *on;
+          msMst  = 'MCR0503';
+          isError = *on;
+       Endif;
+       If scMzip = *zeros;
+          erMzip = *on;
+          msMzip = 'MCR0556';
+          isError = *on;
+       Endif;
+
+      // Enter complete info for Physical address, if any of the field is entered
+       If scPad1 <> *blanks or scPad2 <> *blanks or
+        scPcty <> *blanks or scPst <> *blanks or scPzip <> 0;
+          If scPad1 = *Blanks;
+             erPad1 = *on;
+             msPad1 = 'MCR0503';
+             isError = *on;
+          Endif;
+          If scPcty = *blanks;
+             erPcty = *on;
+             msPcty = 'MCR0503';
+             isError = *on;
+          Endif;
+          If scPst  = *blanks;
+             erPst  = *on;
+             msPst  = 'MCR0503';
+             isError = *on;
+          Endif;
+          If scPzip = *zeros;
+             erPzip = *on;
+             msPzip = 'MCR0556';
+             isError = *on;
+          Endif;
+       Endif;
+
+       xxDate1 = dtCheck(scEfDta);
+       If xxDate1 = 0;
+          isError = *on;
+          erEfDta = *on;
+          msEfDta = 'MCR0500';
+       Endif;
+
+      // Validation Check for Expiration Date
+       If scExDta <> 0;
+          xxDate1 = dtCheck(scExDta);
+          If xxDate1 = 0;
+             isError = *on;
+             erExDta = *on;
+             msExDta = 'MCR0500';
+          Endif;
+       Endif;
+
+      // Dates must be in Ascending order
+       If scEfDta <> 0 and scExDta <> 0;
+          If erExDta = *off and erEfDta = *off;
+             beginDate =  DtCYMD(scEfDta);
+             endDate   =  DtCYMD(scExDta);
+             If endDate < beginDate;
+                erEfDta = *on;
+                msEfDta = 'MCR0529';
+                erExDta = *on;
+                msExDta = 'MCR0529';
+             Endif;
+          Endif;
+       Endif;
+
+      // Adjudication State must be entered
+       If scAdjcSt = *blanks;
+          erAdjcst  = *on;
+          msAdjcst  = 'MCR0503';
+          isError = *on;
+       Endif;
+
+      // if Alternate Address flag is Y then name and address must be entered
+      // Enter complete info for Alternate Name and address,
+      // if any of the field is entered
+       If scAnam <> *blanks or scAad1 <> *blanks or scAad2 <> *blanks or
+        scActy <> *blanks or scAst <> *blanks or scAzip <> 0 or scAltFlg = 'Y';
+          If scAnam = *Blanks;
+             erAnam = *on;
+             msAnam = 'MCR0503';
+             isError = *on;
+          Endif;
+          If scAad1 = *Blanks;
+             erAad1 = *on;
+             msAad1 = 'MCR0503';
+             isError = *on;
+          Endif;
+          If scActy = *blanks;
+             erActy = *on;
+             msActy = 'MCR0503';
+             isError = *on;
+          Endif;
+          If scAst  = *blanks;
+             erAst  = *on;
+             msAst  = 'MCR0503';
+             isError = *on;
+          Endif;
+          If scAzip = *zeros;
+             erAzip = *on;
+             msAzip = 'MCR0556';
+             isError = *on;
+          Endif;
+          If scAltFlg = 'Y';
+             If scAltPhone = *zeros;
+                erAltPhone = *on;
+                msAltPhone = 'MCR0556';
+                isError = *on;
+             Endif;
+          Endif;
+       Endif;
+
+      // If Not Standalone then WCMS Group Number must be validate
+       If scStdAlone <> 'Y' and visWCGrp = *on;
+          If scWCGrpE = *zeros and isNpwc <> *on;
+             erAWCGrp = *on;
+             msAWCGrp = 'MCR0556';
+             isError = *on;
+          Endif;
+          If scWCGrpE <> *zeros;
+             If iswcif = *on and isWcin = *on and isNpwc <> *on;
+                ##co# = intco#;
+                ##fnd = scWCGrpE;
+                ##rtcd= '0';
+                GetCoFnd(##co#:scWCGrpE:##rtcd);
+                If ##rtcd = '1';
+                   erAWCGrp = *on;
+                   msAWCGrp = 'MCR0508';  //Invalid Group Number entered.
+                   isError = *on;
+                Endif;
+             Endif;
+          Endif;
+          If scWCGrpE <> *zeros;
+             Chain (intco#:scWCGrpE) pfn01;
+             If %found(fmfnl1) and Fnfnd <> scFnd;
+                erAWCGrp = *on;
+                msAWCGrp = 'MCR0320';  //X-REF group number must be unique.
+                isError = *on;
+             Endif;
+          Endif;
+       Else;
+          If scWCGrpE <> *zeros and isNpwc <> *on and visWCGrp = *on;
+             erAWCGrp = *on;
+             msAWCGrp = 'MCR0801';     // field must be left blank
+             isError = *on;
+          Endif;
+       Endif;
+
+       Clear dsSysCd;
+       Clear dsArCd;
+       i = 1;
+       Readc sflModInfo;
+       Dow not %eof and i <=10;
+          dsSysCd(i) = scSysCd;
+          dsArCd(i) = scARCd;
+          update sflModInfo;
+          Readc sflModInfo;
+          i = i + 1;
+       Enddo;
+
+      // Validate error for System Code and AR Code entered on Group Module Info
+       // Validate System Code fields
+       // First System Code Can't be Blank
+       If SysCd01 = *Blanks;
+          // Since we are re-arranging System Code before Save
+          // so this error is required when all 10 System Code are Blank
+          If SysCd02 = *Blanks and SysCd03 = *Blanks and SysCd04 = *Blanks and
+           SysCd05 = *Blanks and SysCd06 = *Blanks and SysCd07 = *Blanks and
+           SysCd08 = *Blanks and SysCd09 = *Blanks and SysCd10 = *Blanks;
+             scsflRRN2 = 1;
+             chain scSflRRN2 sflModInfo;
+             erSysCd = *on;
+             msSysCd = 'MCR0503';
+             update sflModInfo;
+             isError = *on;
+          Endif;
+       Endif;
+
+       // First AR Rate code can't be Blank
+       If ArCd01 = *Blanks and visAR = *on;
+          // Since we are re-arranging AR Rate Code before Save
+          // so this error is required when all 10 AR Rate Code are Blank
+          If ArCd02 = *Blanks and ArCd03 = *Blanks and ArCd04 = *Blanks and
+           ArCd05 = *Blanks and ArCd06 = *Blanks and ArCd07 = *Blanks and
+           ArCd08 = *Blanks and ArCd09 = *Blanks and ArCd10 = *Blanks;
+             scsflRRN2 = 1;
+             chain scSflRRN2 sflModInfo;
+             erArCd = *on;
+             msArCd = 'MCR0503';
+             update sflModInfo;
+             isError = *on;
+          Endif;
+       Endif;
+
+       // Check for Duplicate System Codes
+       For i = 1 to 9;
+          For j = 2 to 10;
+             If i<>j and dsSysCd(i) <> *blanks and dsSysCd(i) = dsSysCd(j);
+                isError = *on;
+                scsflRRN2 = i;
+                chain scSflRRN2 sflModInfo;
+                erSysCd = *on;
+                msSysCd = 'M400077';
+                update sflModInfo;
+                scsflRRN2 = j;
+                chain scSflRRN2 sflModInfo;
+                erSysCd = *on;
+                msSysCd = 'M400077';
+                update sflModInfo;
+             Endif;
+          Endfor;
+       Endfor;
+
+       // If System Code entered then A/R rate code must be entered.
+       If visAR = *on;
+          For i = 2 to 10;
+             If dsSysCd(i) <> *blanks and dsArCd(i) = *blanks;
+                scsflRRN2 = i;
+                chain scSflRRN2 sflModInfo;
+                erArCd = *on;
+                msArCd  = 'MCR0503';     //This field can not be blank.
+                update sflModInfo;
+                isError = *on;
+             Endif;
+          Endfor;
+
+          // If System Code blank then A/R rate code must be blank
+          For i = 2 to 10;
+             If dsSysCd(i) = *blanks and dsArCd(i) <> *blanks;
+                scsflRRN2 = i;
+                chain scSflRRN2 sflModInfo;
+                erArCd = *on;
+                msArCd  = 'MC40403';         //This field must be blank.
+                update sflModInfo;
+                isError = *on;
+             Endif;
+          Endfor;
+
+          // If A/R rate code entered then A/R rate code must match system code
+          For i = 1 to 10;
+             If dsSysCd(i) <> *blanks and dsArCd(i) <> *blanks;
+                chain dsArCd(i) pbd00;
+                If %found(Nmbdl);
+                   If %subst(BDtype:1:1) <> dsSysCd(i);
+                      scsflRRN2 = i;
+                      chain scSflRRN2 sflModInfo;
+                      erArCd = *on;
+                      msArCd  = 'MCR0619';   //Invalid A/R code entered for associated System code
+                      update sflModInfo;
+                      isError = *on;
+                   Endif;
+                Endif;
+             Endif;
+          Endfor;
+       Endif;
+
+       // If No Error, for saving in the database file
+       // Re-arrange System Codes to Eliminate Blank codes
+       If isError = *off;
+          For i = 1 to 9;
+             For j = i+1 to 10;
+                If dsSysCd(i) = *blanks and dsSysCd(j) <> *blanks;
+                   dsSysCd(i) = dsSysCd(j);
+                   dsSysCd(j) = *blanks;
+                Endif;
+             Endfor;
+          Endfor;
+       Endif;
+
+       // If No Error, for saving in the database file
+       // Re-arrange AR Rate Codes to Eliminate Blank codes
+       If isError = *off and visAR = *on;
+          For i = 1 to 9;
+             For j = i+1 to 10;
+                If dsArCd(i) = *blanks and dsArCd(j) <> *blanks;
+                   dsArCd(i) = dsArCd(j);
+                   dsArCd(j) = *blanks;
+                Endif;
+             Endfor;
+          Endfor;
+       Endif;
+
+       //*** WCMC Group Network Information ***//
+       If isNtwk = *on;
+          Clear dsNwCd;
+          Clear dsNwTyp;
+          Clear dsNwFTyp;
+          Clear dsNtFRt;
+          Clear dsNtFein;
+          i = 1;
+          Readc sflNetInfo;
+          Dow not %eof and i <=10;
+             dsNwCd(i)   =  scNwCd;
+             dsNwTyp(i)  =  scNwTyp;
+             dsNwFTyp(i) =  scNwFTyp;
+             dsNtFRt(i)  =  scNtFRt;
+             dsNtFein(i) =  scNtFein;
+             update sflNetInfo;
+             Readc sflNetInfo;
+             i = i + 1;
+          Enddo;
+
+          //Network code must be entered
+          For i = 1 to 10;
+             If dsNwCd(i) = *blanks and (dsNwTyp(i) <> *blanks or
+             dsNwFTyp(i) <> *blanks or dsNtFRt(i) <> *zeros
+             or dsNtFein(i) <> *blanks);
+                scsflRRN3 = i;
+                chain scsflRRN3 sflNetInfo;
+                erNwCd   = *on;
+                msNwCd   = 'MCR0544'; //The indicated information is mutually inclusive.
+                erNwTyp  = *on;
+                msNwTyp  = 'MCR0544';
+                erNwFTyp = *on;
+                msNwFTyp = 'MCR0544';
+                erNtFRt  = *on;
+                msNtFRt  = 'MCR0544';
+                erNtFein = *on;
+                msNtFein = 'MCR0544';
+                update sflNetInfo;
+                isError = *on;
+                dsIsError(i) = *on;
+             Endif;
+          Endfor;
+
+          //Fee Rate must be zero if Network flag not equal to 'N' OR 'Y'
+          For i = 1 to 10;
+             If ( dsNwTyp(i) <> 'N' and dsNwTyp(i) <> 'Y') and
+              dsNtFRt(i) <> *zeros and dsIsError(i) = ' ';
+                scsflRRN3 = i;
+                chain scsflRRN3 sflNetInfo;
+                erNtFRt  = *on;
+                msNtFRt  = 'MC40011'; //Value must equal zero.
+                update sflNetInfo;
+                dsIsError(i) = *on;
+                isError = *on;
+             Endif;
+          Endfor;
+
+          //Network Fee Type is required if Network type = 'N' OR 'Y'
+          For i = 1 to 10;
+             If ( dsNwTyp(i) = 'N' or dsNwTyp(i) = 'Y') and
+              dsNwFTyp(i) = *blanks and dsIsError(i) = ' ';
+                scsflRRN3 = i;
+                chain scsflRRN3 sflNetInfo;
+                erNwFTyp  = *on;
+                msNwFTyp  = 'MCR0503';   //This field cannot be blank.
+                update sflNetInfo;
+                dsIsError(i) = *on;
+                isError = *on;
+             Endif;
+          Endfor;
+
+          //Network Fein is required if Network type = 'N' OR 'Y'
+          For i = 1 to 10;
+             If (dsNwTyp(i) = 'N' or dsNwTyp(i) = 'Y') and
+               dsNwFTyp(i) <> 'N' and dsNtFEIN(i) = *blanks
+               and dsIsError(i) = ' ';
+                scsflRRN3 = i;
+                chain scsflRRN3 sflNetInfo;
+                erNtFEIN  = *on;
+                msNtFEIN  = 'MCR0556'; //Value cannot be zero.
+                update sflNetInfo;
+                dsIsError(i) = *on;
+                isError = *on;
+             Endif;
+          Endfor;
+
+          //four errors
+          //If Network Fee Type = 'B' or 'S' then flag = 'N' fee > *ZEROS
+          For i = 1 to 10;
+             If (dsNwFTyp(i) = 'B' or dsNwFTyp(i) = 'S') and
+              (dsNwTyp(i) <>'N' or dsNtFRt(i) <= *zeros) and dsIsError(i) = ' ';
+                scsflRRN3 = i;
+                chain scsflRRN3 sflNetInfo;
+                If dsNwTyp(i) <> 'N';
+                   erNwTyp  = *on;
+                   msNwTyp  = 'MC40008'; // Invalid type.
+                Endif;
+                If dsNtFRt(i) <= *zeros;
+                   erNtFRt  = *on;
+                   msNtFRt  = 'MC40008'; // Invalid type.
+                Endif;
+                update sflNetInfo;
+                dsIsError(i) = *on;      //error text desc
+                isError = *on;           //Network type must = 'N' and Fee rate must be > *zeros.
+             Endif;
+          Endfor;
+
+          //If Network Fee Type = 'N' then Net Type = 'N' fee = *ZEROS
+          For i = 1 to 10;
+             If dsNwFTyp(i) = 'N' and (dsNwTyp(i)<>'N' or
+              dsNtFRt(i) <> *zeros) and dsIsError(i) = ' ';
+                scsflRRN3 = i;
+                chain scsflRRN3 sflNetInfo;
+                If dsNwTyp(i) <> 'N';
+                   erNwTyp  = *on;
+                   msNwTyp  = 'MC40009';       //Invalid type.
+                Endif;
+                If dsNtFRt(i) <> *zeros;
+                   erNtFRt  = *on;
+                   msNtFRt  = 'MC40009';       //Invalid type.
+                Endif;
+                update sflNetInfo;
+                dsIsError(i) = *on;
+                isError = *on;             //Network type must = 'N' and Fee rate must = *zeros
+             Endif;
+          Endfor;
+
+          //If Network Fee Type = 'R' then Net Type = 'Y' fee = *zeros
+          For i = 1 to 10;
+             If dsNwFTyp(i) = 'R' and (dsNwTyp(i)<>'Y' or
+              dsNtFRt(i) <> *zeros) and dsIsError(i) = ' ';
+                scsflRRN3 = i;
+                chain scsflRRN3 sflNetInfo;
+                If dsNwTyp(i) <> 'Y';
+                   erNwTyp  = *on;
+                   msNwTyp  = 'MC40010';     //Invalid type
+                Endif;
+                If dsNtFRt(i) <> *zeros;
+                   erNtFRt  = *on;
+                   msNtFRt  = 'MC40010';     //Invalid type
+                Endif;
+                update sflNetInfo;
+                dsIsError(i) = *on;
+                isError = *on;             //Network type must = 'Y' and Fee rate must = *zeros.
+             Endif;
+          Endfor;
+
+          // If No Error, for saving in the database file
+          // Re-arrange Network Info to Eliminate Blank codes
+          If isError = *off;
+             For i = 1 to 9;
+                For j = i+1 to 10;
+                   If dsNwCd(i) = *blanks and dsNwCd(j) <> *blanks;
+                      dsNwCd(i) = dsNwCd(j);
+                      dsNwCd(j) = *blanks;
+                      dsNwTyp(i) = dsNwTyp(j);
+                      dsNwTyp(j) = *blanks;
+                      dsNwFTyp(i) = dsNwFTyp(j);
+                      dsNwFTyp(j) = *blanks;
+                      dsNtFRt(i) = dsNtFRt(j);
+                      dsNtFRt(j) = *zeros;
+                      dsNtFein(i) = dsNtFein(j);
+                      dsNtFein(j) = *blanks;
+                   Endif;
+                Endfor;
+             Endfor;
+          Endif;
+       Endif;
+
+
+       //WCMC Group State Information
+       //FL state Information
+       If scInsCdNum <> *zeros or scInsFedID <> *zeros or
+          scInszip <> *zeros  or scTPACdNum <> *zeros or
+          scTPAFedID<> *zeros  or scTPAZip <> *zeros;
+          //Insurer code number
+          If scInsCdNum = *zeros;
+             erInsCdNum = *on;
+             msInsCdNum = 'MCR0556';
+             isError = *on;
+          Endif;
+
+          //Insurer Federal Tax ID
+          If scInsFedID = *zeros;
+             erInsFedID = *on;
+             msInsFedID = 'MCR0556';
+             isError = *on;
+          Endif;
+
+          //Insurer Location Zip
+          If scInszip  = *zeros;
+             erInszip  = *on;
+             msInszip  = 'MCR0556';
+             isError = *on;
+          Endif;
+
+          //Service co/TPA code#
+          If scTPACdNum = *zeros;
+             erTPACdNum = *on;
+             msTPACdNum = 'MCR0556';
+             isError = *on;
+          Endif;
+
+          //Service co/TPA fed Tax ID
+          If scTPAFedID = *zeros;
+             erTPAFedID = *on;
+             msTPAFedID = 'MCR0556';
+             isError = *on;
+          Endif;
+
+          //Service co/TPA Loc zip
+          If scTPAzip  = *zeros;
+             erTPAzip  = *on;
+             msTPAzip  = 'MCR0556';
+             isError = *on;
+          Endif;
+       Endif;
+
+       // Medical Case Control Information
+       //CM Nurse Heading
+       If scNurseHdg = *blanks;
+          erNurseHdg = *on;
+          msNurseHdg = 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Case Deletion
+       If scCaseDel  = *zeros;
+          erCaseDel  = *on;
+          msCaseDel  = 'MCR0556';
+          isError = *on;
+       Endif;
+
+       //Case Transfer
+       If scCaseTrf  = *zeros;
+          erCaseTrf  = *on;
+          msCaseTrf  = 'MCR0556';
+          isError = *on;
+       Endif;
+
+       //Override Case Denied
+       If scCaseDen  = *zeros;
+          erCaseDen  = *on;
+          msCaseDen  = 'MCR0556';
+          isError = *on;
+       Endif;
+
+       //Security Type 1
+       If scSecTyp01 = *blanks;
+          erSecTyp01 = *on;
+          msSecTyp01 = 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Security Type 2
+       If scSecTyp02 = *blanks;
+          erSecTyp02 = *on;
+          msSecTyp02 = 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Security Type 3
+       If scSecTyp03 = *blanks;
+          erSecTyp03 = *on;
+          msSecTyp03 = 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Remark Code for Review Date Diary
+       If scRmkCd  = *blanks;
+          erRmkCd  = *on;
+          msRmkCd  = 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Provider Bill Control Information
+       //Medical examiner heading
+       If scMedExHdg = *blanks;
+          erMedExHdg = *on;
+          msMedExHdg = 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Medical Examiner User
+       If scMEUsr = *blanks;
+          erMEUsr = *on;
+          msMEUsr = 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //MRA Reductions Heading
+       If scMRedHdg = *blanks;
+          erMRedHdg = *on;
+          msMRedHdg = 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Other Reductions 1 Heading
+       If scORed1Hdg= *blanks;
+          erORed1Hdg= *on;
+          msORed1Hdg= 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Other Reductions 2 Heading
+       If scORed2Hdg= *blanks;
+          erORed2Hdg= *on;
+          msORed2Hdg= 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Network Reductions Heading
+       If scNtRedHdg= *blanks;
+          erNtRedHdg= *on;
+          msNtRedHdg= 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Delete EOMB with Check
+       If scChkDel  = *zeros;
+          erChkDel  = *on;
+          msChkDel  = 'MCR0556';
+          isError = *on;
+       Endif;
+
+       //Secuirty Level 04
+       If scSecTyp04 = *blanks;
+          erSecTyp04 = *on;
+          msSecTyp04 = 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //EOMB Recon Security
+       If scRecSecLv = *zeros;
+          erRecSecLv = *on;
+          msRecSecLv = 'MCR0556';
+          isError = *on;
+       Endif;
+
+       //Secuirty Level 05
+       If scSecTyp05 = *blanks;
+          erSecTyp05 = *on;
+          msSecTyp05 = 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Remark Code for EOBs
+       If scRmkCdEob = *blanks;
+          erRmkCdEob = *on;
+          msRmkCdEob = 'MCR0503';
+          isError = *on;
+       Endif;
+
+       //Complete or Pend
+       If scCmpPnd  = *blanks;
+          erCmpPnd  = *on;
+          msCmpPnd  = 'MCR0503';
+          isError = *on;
+       Endif;
+
+      // Return *on indicator when No error exists.
+       If isError = *on;
+          return *off;
+       Else;
+          return *on;
+       Endif;
+
+      /End-Free
+     p ValidateGroup   e

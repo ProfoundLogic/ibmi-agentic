@@ -1,0 +1,152 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   1099 MANUAL ENTRY MAINTENANCE DISPLAY                    **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A*                                     CHGINPDFT(CS)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF05
+     A                                      CF07
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C1098F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                  2 76'SCR01'
+     A                                  8 22'Reporting year:'
+     A            SCYR      R     Y  B  8 40REFFLD(YR)
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A                                      TEXT('YEAR')
+     A                                      EDTCDE(4)
+     A                                 10 22'Federal Id#'
+     A            SCFEIN    R     Y  B 10 40REFFLD(FEIN)
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      DSPATR(PC)
+     A                                      CHECK(RB)
+     A                                      TEXT('FEDERAL TAX ID')
+     A                                      EDTCDE(4)
+     A                                 22  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 28'F5=Fed id search'
+     A                                      COLOR(BLU)
+     A                                 22 58'F7=Alpha search'
+     A                                      COLOR(BLU)
+     A                                 23 58'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A                                      CF12
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(27)
+     A                                      SETOF(29)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCPRDS    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C1098F'
+     A                                  2 76'SCR02'
+     A            SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A  09                                  DSPATR(ND)
+     A                                  5  3'Year:'
+     A            SCYR      R        O  5 10REFFLD(YR)
+     A                                      TEXT('YEAR')
+     A                                      DSPATR(HI)
+     A                                  5 16'Federal id#'
+     A                                      DSPATR(HI)
+     A            SCFEIN    R        O  5 29REFFLD(FEIN)
+     A                                      DSPATR(HI)
+     A                                      TEXT('FEDERAL TAX ID')
+     A                                  8  3'Name:'
+     A            SCNAME    R        B  8 24REFFLD(NAME)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 10  3'Address:'
+     A            SCADR     R        B 10 24REFFLD(ADR1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 12  3'City, State, Zip:'
+     A            SCCTY         29A  B 12 24
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  22                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A            SCST      R        B 12 55REFFLD(ST)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  23                                  ERRMSGID(CCR0505 *LIBL/CMESGG)
+     A            SCZP1     R     Y  B 12 59REFFLD(ZIP1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  24                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A                                 12 65'-'
+     A            SCZP2     R     Y  B 12 67REFFLD(ZIP2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 14  3'Amount 3 (prizes & awards):'
+     A            SCAMT3        10S 2B 14 32OVRDTA
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  27                                  ERRMSGID(CCR0724 *LIBL/CMESGG)
+     A                                 16  3'Amount 7 (nonemployee comp):'
+     A            SCAMT7        10S 2B 16 32OVRDTA
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  29                                  ERRMSGID(CCR0724 *LIBL/CMESGG)
+     A                                 22  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 33'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCFL01    R        O  1  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      TEXT('DUMMY FIELD')

@@ -1,0 +1,850 @@
+     A* ** ======================================================= **
+     A* (c) 2025 Sapiens. All Rights Reserved.                       *
+     A*                                                              *
+     A*     MEDICARE 2ND PAY DATA EXTRACT LOG FILE                   *
+     A*                                                              *
+     A*     DESC:  THIS FILE CONTAINS LOG RECORDS OF EACH MEDICARE   *
+     A*            2ND PAY DATA EXTRACT PROCESSED.  EACH CLAIM THAT  *
+     A*            IS EXTRACTED WILL CREATE A LOG RECORD EACH TIME   *
+     A*            IT SUBMITS DATA IN THE EXPORT.                    *
+     A*                                                              *
+     A*    06/12/09  C:65   PROJECT: WC1819                          *
+     A*                                                              *
+     A*     NOTE: SUBMITTED DATA ELEMENTS HAVE STANDARD FIELD NAME   *
+     A*           STARTING WITH D1, BUT THE APPLIED DATA ELEMENTS    *
+     A*           BEGIN WITH D2 INSTEAD.                             *
+     A*                                                              *
+     A** ========================================================= **
+     A* REVISIONS:                                                   *
+     A*                                                              *
+     A* 03/06/25 C:333 Project: WC2998                               *
+     A*                Changes to CMS Settlement Reporting.          *
+     A*
+     A* 10/11/21 C:298 Project: WC2822
+     A*                CMS Response File Format Change
+     A*
+     A* 04/27/15 C:53  Project: WC2261
+     A*                Update file for ICD-10 codes.
+     A*
+     A* 04/12/11 C: 58 Project: WC1975                               *
+     A*                -Add 1 field D1CLEX adjuster staff code  3A
+     A*                                                              *
+     A* 02/02/11 C:235 Project: 114WXO                               *
+     A*                -Added 1 fields D1RSPD(Response Descp.)len 40 *
+     A*                                                              *
+     A* 05/18/10 C:198 Project: WC1879                               *
+     A*                -Added 2 fields DCN1 and DCN2 each of len 30  *
+     A*                -Added a Re-submit flag.                      *
+     A*                                                              *
+     A****************************************************************
+     A*  MEDICARE 2ND PAY DATA EXTRACT LOG FILE
+     A*
+     A                                      REF(WREFP)
+     A          R PD101                     TEXT('MEDICARE EXTRACT LOG FILE')
+     A            D1CO#     R     S         REFFLD(CO#)
+     A                                      COLHDG('CO#')
+     A            D1FND     R     S         REFFLD(FND)
+     A                                      COLHDG('GROUP')
+     A            D1FYR     R     S         REFFLD(FYR)
+     A                                      COLHDG('POLICY YEAR')
+     A            D1CASE    R     S         REFFLD(CASE)
+     A            D1DCN#        15A         COLHDG('DOCUMENT CONTROL #')
+     A            D1EXDT    R     S         REFFLD(DT)
+     A                                      COLHDG('EXTRACT DATE')
+     A            D1RSDT    R     S         REFFLD(DT)
+     A                                      COLHDG('RESPONSE DATE')
+     A            D1CODE    R               REFFLD(CODE)
+     A                                      COLHDG('DISPOSITION CODE')
+     A            D1TYPE    R               REFFLD(FLAG)
+     A                                      COLHDG('ACTION TYPE')
+     A*
+     A* SUBMITTED DATA ELEMENTS
+     A*
+     A            D1HIC#        12A
+     A                                      COLHDG('MEDICARE HICN#')
+     A            D1SS#          9A
+     A                                      COLHDG('SOCIAL SECURITY #')
+     A            D1LSN         40A
+     A                                      COLHDG('INJURED PARTY' 'LAST NAME')
+     A            D1FSN         30A
+     A                                      COLHDG('INJURED PARTY' 'FIRST NAME')
+     A            D1MID          1A
+     A                                      COLHDG('INJURE PARTY' 'MID INITIAL')
+     A            D1SEX          1A
+     A                                      COLHDG('INJURED PARTY' 'GENDER')
+     A            D1DTOB    R     S         REFFLD(DT)
+     A                                      COLHDG('INJURED' 'DATE OF BIRTH')
+     A            D1CMDI    R     S         REFFLD(DT)
+     A                                      COLHDG('CMS DATE OF INCIDENT')
+     A            D1ACDT    R     S         REFFLD(DT)
+     A                                      COLHDG('INDUSTRY DATE OF' -
+     A                                         'INCIDENT')
+     A            D1AINJ         5A
+     A                                      COLHDG('ALLEGED' 'CAUSE OF INJURY')
+     A            D1JRST         2A
+     A                                      COLHDG('STATE OF VENUE')
+     A            D1I901         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 01')
+     A            D1I902         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 02')
+     A            D1I903         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 03')
+     A            D1I904         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 04')
+     A            D1I905         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 05')
+     A            D1I906         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 06')
+     A            D1I907         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 07')
+     A            D1I908         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 08')
+     A            D1I909         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 09')
+     A            D1I910         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 10')
+     A            D1I911         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 11')
+     A            D1I912         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 12')
+     A            D1I913         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 13')
+     A            D1I914         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 14')
+     A            D1I915         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 15')
+     A            D1I916         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 16')
+     A            D1I917         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 17')
+     A            D1I918         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 18')
+     A            D1I919         5A
+     A                                      COLHDG('ICD9 DIAGNOSIS' 'CODE 19')
+     A            D1DINJ        50A
+     A                                      COLHDG('DESCRIPTION OF' 'INJURY')
+     A            D1PRLI         1A
+     A                                      COLHDG('PRODUCT LIABILITY' 'INDC')
+     A            D1PRNM        40A
+     A                                      COLHDG('PRODUCT GENERIC' 'NAME')
+     A            D1PRBN        40A
+     A                                      COLHDG('PRODUCT BRAND' 'NAME')
+     A            D1PRMN        40A
+     A                                      COLHDG('PRODUCT MANUFACTURER')
+     A            D1PAHM       200A
+     A                                      COLHDG('PRODUCT ALLEGED HARM')
+     A            D1SLFI         1A
+     A                                      COLHDG('SELF INSURED' 'INDICATPR')
+     A            D1SLFT         1A
+     A                                      COLHDG('SELF INSURED' 'TYPE')
+     A            D1PLNM        40A
+     A                                      COLHDG('POLICY HOLDER' 'LAST NAME')
+     A            D1PFNM        30A
+     A                                      COLHDG('POLICY HOLDER' 'FIRST NAME')
+     A            D1NAME        70A
+     A                                      COLHDG('DBA NAME')
+     A            D1FDNM        70A
+     A                                      COLHDG('LEGAL (FEDERAL) NAME')
+     A            D1PITY         1A
+     A                                      COLHDG('PLAN INSURANCE' 'TYPE')
+     A            D1FEIN         9S 0
+     A                                      COLHDG('FEDERAL TAX ID')
+     A            D1OFF#         9A
+     A                                      COLHDG('OFFICE CODE/SITE ID')
+     A            D1CAP#        30A
+     A                                      COLHDG('CARRIER POLICY #')
+     A            D1CLM#        30A
+     A                                      COLHDG('CLAIM #')
+     A            D1PCDN        70A
+     A                                      COLHDG('PLAN CONTACT' 'DEPT NAME')
+     A            D1PCLN        40A
+     A                                      COLHDG('PLAN CONTACT' 'LAST NAME')
+     A            D1PCFN        30A
+     A                                      COLHDG('PLAN CONTACT' 'FIRST NAME')
+     A            D1PCPH        10S 0
+     A                                      COLHDG('PLAN CONTACT' 'PHONE NUM')
+     A            D1PCPE         5A
+     A                                      COLHDG('PLAN CONTACT' 'PHONE EXT')
+     A            D1NFIL        11A
+     A                                      COLHDG('NO FAULT' 'INSURANCE LIMIT')
+     A            D1NFED         7S 0
+     A                                      COLHDG('NO FAULT' 'EXHAUST DATE')
+     A            D1CLRI         1A
+     A                                      COLHDG('INJURED PARTY' 'REP INDIC')
+     A            D1RPLN        40A
+     A                                      COLHDG('REPRESENTATIVE' 'LAST NAME')
+     A            D1RPFN        30A
+     A                                      COLHDG('REP' 'FIRST NAME')
+     A            D1RFNM        70A
+     A                                      COLHDG('REPRESENTATIVE' 'FIRM NAME')
+     A            D1PLAA         9S 0
+     A                                      COLHDG('REPRESENTATIVE' 'TIN')
+     A            D1RMA1        50A
+     A                                      COLHDG('REP' 'MAILING ADDR 1')
+     A            D1RMA2        50A
+     A                                      COLHDG('REP' 'MAILING ADDR 2')
+     A            D1RCTY        30A
+     A                                      COLHDG('REP' 'MAILING CITY')
+     A            D1RST          2A
+     A                                      COLHDG('REP' 'MAILING STATE')
+     A            D1RZIP         5S 0
+     A                                      COLHDG('REP' 'MAILING ZIP CODE')
+     A            D1RZP4         4S 0
+     A                                      COLHDG('REP' 'MAILING ZIP PLUS 4')
+     A            D1RPH#        10S 0
+     A                                      COLHDG('REP' 'PHONE NUMBER')
+     A            D1RPEC         5A
+     A                                      COLHDG('REP' 'PHONE EXTENSION')
+     A            D1ORMI         1A
+     A                                      COLHDG('ORM' 'INDICATOR')
+     A            D1ORMD         7S 0
+     A                                      COLHDG('ORM' 'TERM DATE')
+     A            D1T1SD         7S 0
+     A                                      COLHDG('TPOC 1' 'START DATE')
+     A            D1T1AM        11S 2
+     A                                      COLHDG('TPOC 1' 'AMOUNT')
+     A            D1T1FD         7S 0
+     A                                      COLHDG('TPOC 1' 'FUNDING DELAY DT')
+     A            D1C1RL         1A
+     A                                      COLHDG('CLAIMANT 1' 'RELATIONSHIP')
+     A            D1C1SS         9S 0
+     A                                      COLHDG('CLAIMANT 1' 'TIN')
+     A            D1C1LN        40A
+     A                                      COLHDG('CLAIMANT 1' 'LAST NAME')
+     A            D1C1FN        30A
+     A                                      COLHDG('CLAIMANT 1' 'FIRST NAME')
+     A            D1C1MI         1A
+     A                                      COLHDG('CLAIMANT 1' 'MIDDLE INT')
+     A            D1C1A1        50A
+     A                                      COLHDG('CLAIMANT 1' 'ADDRESS #1')
+     A            D1C1A2        50A
+     A                                      COLHDG('CLAIMANT 1' 'ADDRESS #2')
+     A            D1C1CY        30A
+     A                                      COLHDG('CLAIMANT 1' 'MAILING CITY')
+     A            D1C1ST         2A
+     A                                      COLHDG('CLAIMANT 1' 'MAILING STATE')
+     A            D1C1ZP         5S 0
+     A                                      COLHDG('CLAIMANT 1' 'ZIP CODE')
+     A            D1C1Z4         4S 0
+     A                                      COLHDG('CLAIMANT 1' 'ZIP PLUS 4')
+     A            D1C1PH        10S 0
+     A                                      COLHDG('CLAIMANT 1' 'PHONE NUM')
+     A            D1C1PE         5A
+     A                                      COLHDG('CLAIMANT 1' 'PHONE EXT')
+     A            D1C1RI         1A
+     A                                      COLHDG('CLAIM 1 REP' 'INDICATOR')
+     A            D1C1RN        40A
+     A                                      COLHDG('CLAIM 1 REP' 'LAST NAME')
+     A            D1C1RF        30A
+     A                                      COLHDG('CLAIM 1 REP' 'FIRST NAME')
+     A            D1C1RM        70A
+     A                                      COLHDG('CLAIM 1 REP' 'FIRM NAME')
+     A            D1C1RT         9S 0
+     A                                      COLHDG('CLAIM 1 REP' 'TIN')
+     A            D1C1R1        50A
+     A                                      COLHDG('CLAIM 1 REP' 'MAIL ADDR 1')
+     A            D1C1R2        50A
+     A                                      COLHDG('CLAIM 1 REP' 'MAIL ADDR 2')
+     A            D1C1RC        30A
+     A                                      COLHDG('CLAIM 1 REP' 'MAIL CITY')
+     A            D1C1RS         2A
+     A                                      COLHDG('CLAIM 1 REP' 'MAIL STATE')
+     A            D1C1RZ         5S 0
+     A                                      COLHDG('CLAIM 1 REP' 'ZIP CODE')
+     A            D1C1R4         4S 0
+     A                                      COLHDG('CLAIM 1 REP' 'ZIP PLUS 4')
+     A            D1C1RP        10S 0
+     A                                      COLHDG('CLAIM 1 REP' 'PHONE NUM')
+     A            D1C1RE         5A
+     A                                      COLHDG('CLAIM 1 REP' 'PHONE EXT')
+     A            D1C2RL         1A
+     A                                      COLHDG('CLAIMANT 2' 'RELATIONSHIP')
+     A            D1C2SS         9S 0
+     A                                      COLHDG('CLAIMANT 2' 'TIN')
+     A            D1C2LN        40A
+     A                                      COLHDG('CLAIMANT 2' 'LAST NAME')
+     A            D1C2FN        30A
+     A                                      COLHDG('CLAIMANT 2' 'FIRST NAME')
+     A            D1C2MI         1A
+     A                                      COLHDG('CLAIMANT 2' 'MIDDLE INT')
+     A            D1C2A1        50A
+     A                                      COLHDG('CLAIMANT 2' 'ADDRESS #1')
+     A            D1C2A2        50A
+     A                                      COLHDG('CLAIMANT 2' 'ADDRESS #2')
+     A            D1C2CY        30A
+     A                                      COLHDG('CLAIMANT 2' 'MAILING CITY')
+     A            D1C2ST         2A
+     A                                      COLHDG('CLAIMANT 2' 'MAILING STATE')
+     A            D1C2ZP         5S 0
+     A                                      COLHDG('CLAIMANT 2' 'ZIP CODE')
+     A            D1C2Z4         4S 0
+     A                                      COLHDG('CLAIMANT 2' 'ZIP PLUS 4')
+     A            D1C2PH        10S 0
+     A                                      COLHDG('CLAIMANT 2' 'PHONE NUM')
+     A            D1C2PE         5A
+     A                                      COLHDG('CLAIMANT 2' 'PHONE EXT')
+     A            D1C2RI         1A
+     A                                      COLHDG('CLAIM 2 REP' 'INDICATOR')
+     A            D1C2RN        40A
+     A                                      COLHDG('CLAIM 2 REP' 'LAST NAME')
+     A            D1C2RF        30A
+     A                                      COLHDG('CLAIM 2 REP' 'FIRST NAME')
+     A            D1C2RM        70A
+     A                                      COLHDG('CLAIM 2 REP' 'FIRM NAME')
+     A            D1C2RT         9S 0
+     A                                      COLHDG('CLAIM 2 REP' 'TIN')
+     A            D1C2R1        50A
+     A                                      COLHDG('CLAIM 2 REP' 'MAIL ADDR 1')
+     A            D1C2R2        50A
+     A                                      COLHDG('CLAIM 2 REP' 'MAIL ADDR 2')
+     A            D1C2RC        30A
+     A                                      COLHDG('CLAIM 2 REP' 'MAIL CITY')
+     A            D1C2RS         2A
+     A                                      COLHDG('CLAIM 2 REP' 'MAIL STATE')
+     A            D1C2RZ         5S 0
+     A                                      COLHDG('CLAIM 2 REP' 'ZIP CODE')
+     A            D1C2R4         4S 0
+     A                                      COLHDG('CLAIM 2 REP' 'ZIP PLUS 4')
+     A            D1C2RP        10S 0
+     A                                      COLHDG('CLAIM 2 REP' 'PHONE NUM')
+     A            D1C2RE         5A
+     A                                      COLHDG('CLAIM 2 REP' 'PHONE EXT')
+     A            D1C3RL         1A
+     A                                      COLHDG('CLAIMANT 3' 'RELATIONSHIP')
+     A            D1C3SS         9S 0
+     A                                      COLHDG('CLAIMANT 3' 'TIN')
+     A            D1C3LN        40A
+     A                                      COLHDG('CLAIMANT 3' 'LAST NAME')
+     A            D1C3FN        30A
+     A                                      COLHDG('CLAIMANT 3' 'FIRST NAME')
+     A            D1C3MI         1A
+     A                                      COLHDG('CLAIMANT 3' 'MIDDLE INT')
+     A            D1C3A1        50A
+     A                                      COLHDG('CLAIMANT 3' 'ADDRESS #1')
+     A            D1C3A2        50A
+     A                                      COLHDG('CLAIMANT 3' 'ADDRESS #2')
+     A            D1C3CY        30A
+     A                                      COLHDG('CLAIMANT 3' 'MAILING CITY')
+     A            D1C3ST         2A
+     A                                      COLHDG('CLAIMANT 3' 'MAILING STATE')
+     A            D1C3ZP         5S 0
+     A                                      COLHDG('CLAIMANT 3' 'ZIP CODE')
+     A            D1C3Z4         4S 0
+     A                                      COLHDG('CLAIMANT 3' 'ZIP PLUS 4')
+     A            D1C3PH        10S 0
+     A                                      COLHDG('CLAIMANT 3' 'PHONE NUM')
+     A            D1C3PE         5A
+     A                                      COLHDG('CLAIMANT 3' 'PHONE EXT')
+     A            D1C3RI         1A
+     A                                      COLHDG('CLAIM 3 REP' 'INDICATOR')
+     A            D1C3RN        40A
+     A                                      COLHDG('CLAIM 3 REP' 'LAST NAME')
+     A            D1C3RF        30A
+     A                                      COLHDG('CLAIM 3 REP' 'FIRST NAME')
+     A            D1C3RM        70A
+     A                                      COLHDG('CLAIM 3 REP' 'FIRM NAME')
+     A            D1C3RT         9S 0
+     A                                      COLHDG('CLAIM 3 REP' 'TIN')
+     A            D1C3R1        50A
+     A                                      COLHDG('CLAIM 3 REP' 'MAIL ADDR 1')
+     A            D1C3R2        50A
+     A                                      COLHDG('CLAIM 3 REP' 'MAIL ADDR 2')
+     A            D1C3RC        30A
+     A                                      COLHDG('CLAIM 3 REP' 'MAIL CITY')
+     A            D1C3RS         2A
+     A                                      COLHDG('CLAIM 3 REP' 'MAIL STATE')
+     A            D1C3RZ         5S 0
+     A                                      COLHDG('CLAIM 3 REP' 'ZIP CODE')
+     A            D1C3R4         4S 0
+     A                                      COLHDG('CLAIM 3 REP' 'ZIP PLUS 4')
+     A            D1C3RP        10S 0
+     A                                      COLHDG('CLAIM 3 REP' 'PHONE NUM')
+     A            D1C3RE         5A
+     A                                      COLHDG('CLAIM 3 REP' 'PHONE EXT')
+     A            D1C4RL         1A
+     A                                      COLHDG('CLAIMANT 4' 'RELATIONSHIP')
+     A            D1C4SS         9S 0
+     A                                      COLHDG('CLAIMANT 4' 'TIN')
+     A            D1C4LN        40A
+     A                                      COLHDG('CLAIMANT 4' 'LAST NAME')
+     A            D1C4FN        30A
+     A                                      COLHDG('CLAIMANT 4' 'FIRST NAME')
+     A            D1C4MI         1A
+     A                                      COLHDG('CLAIMANT 4' 'MIDDLE INT')
+     A            D1C4A1        50A
+     A                                      COLHDG('CLAIMANT 4' 'ADDRESS #1')
+     A            D1C4A2        50A
+     A                                      COLHDG('CLAIMANT 4' 'ADDRESS #2')
+     A            D1C4CY        30A
+     A                                      COLHDG('CLAIMANT 4' 'MAILING CITY')
+     A            D1C4ST         2A
+     A                                      COLHDG('CLAIMANT 4' 'MAILING STATE')
+     A            D1C4ZP         5S 0
+     A                                      COLHDG('CLAIMANT 4' 'ZIP CODE')
+     A            D1C4Z4         4S 0
+     A                                      COLHDG('CLAIMANT 4' 'ZIP PLUS 4')
+     A            D1C4PH        10S 0
+     A                                      COLHDG('CLAIMANT 4' 'PHONE NUM')
+     A            D1C4PE         5A
+     A                                      COLHDG('CLAIMANT 4' 'PHONE EXT')
+     A            D1C4RI         1A
+     A                                      COLHDG('CLAIM 4 REP' 'INDICATOR')
+     A            D1C4RN        40A
+     A                                      COLHDG('CLAIM 4 REP' 'LAST NAME')
+     A            D1C4RF        30A
+     A                                      COLHDG('CLAIM 4 REP' 'FIRST NAME')
+     A            D1C4RM        70A
+     A                                      COLHDG('CLAIM 4 REP' 'FIRM NAME')
+     A            D1C4RT         9S 0
+     A                                      COLHDG('CLAIM 4 REP' 'TIN')
+     A            D1C4R1        50A
+     A                                      COLHDG('CLAIM 4 REP' 'MAIL ADDR 1')
+     A            D1C4R2        50A
+     A                                      COLHDG('CLAIM 4 REP' 'MAIL ADDR 2')
+     A            D1C4RC        30A
+     A                                      COLHDG('CLAIM 4 REP' 'MAIL CITY')
+     A            D1C4RS         2A
+     A                                      COLHDG('CLAIM 4 REP' 'MAIL STATE')
+     A            D1C4RZ         5S 0
+     A                                      COLHDG('CLAIM 4 REP' 'ZIP CODE')
+     A            D1C4R4         4S 0
+     A                                      COLHDG('CLAIM 4 REP' 'ZIP PLUS 4')
+     A            D1C4RP        10S 0
+     A                                      COLHDG('CLAIM 4 REP' 'PHONE NUM')
+     A            D1C4RE         5A
+     A                                      COLHDG('CLAIM 4 REP' 'PHONE EXT')
+     A            D1T2SD         7S 0
+     A                                      COLHDG('TPOC 2' 'START DATE')
+     A            D1T2AM        11S 2
+     A                                      COLHDG('TPOC 2' 'AMOUNT')
+     A            D1T2FD         7S 0
+     A                                      COLHDG('TPOC 2' 'FUNDING DELAY DT')
+     A            D1T3SD         7S 0
+     A                                      COLHDG('TPOC 3' 'START DATE')
+     A            D1T3AM        11S 2
+     A                                      COLHDG('TPOC 3' 'AMOUNT')
+     A            D1T3FD         7S 0
+     A                                      COLHDG('TPOC 3' 'FUNDING DELAY DT')
+     A            D1T4SD         7S 0
+     A                                      COLHDG('TPOC 4' 'START DATE')
+     A            D1T4AM        11S 2
+     A                                      COLHDG('TPOC 4' 'AMOUNT')
+     A            D1T4FD         7S 0
+     A                                      COLHDG('TPOC 4' 'FUNDING DELAY DT')
+     A            D1T5SD         7S 0
+     A                                      COLHDG('TPOC 5' 'START DATE')
+     A            D1T5AM        11S 2
+     A                                      COLHDG('TPOC 5' 'AMOUNT')
+     A            D1T5FD         7S 0
+     A                                      COLHDG('TPOC 5' 'FUNDING DELAY DT')
+     A*
+     A* APPLIED DATA ELEMENTS
+     A*
+     A            D2HIC#        12A
+     A                                      COLHDG('APPLIED' 'MEDICARE HICN#')
+     A            D2SS#          9A
+     A                                      COLHDG('RESERVED FOR' 'FUTURE USE')
+     A            D2LSN         40A
+     A                                      COLHDG('APPLIED' 'INJURED PARTY' -
+     A                                         'LAST NAME')
+     A            D2FSN         30A
+     A                                      COLHDG('APPLIED' 'INJURED PARTY' -
+     A                                         'FIRST NAME')
+     A            D2MID          1A
+     A                                      COLHDG('APPLIED' 'INJURE PARTY' -
+     A                                        'MID INITIAL')
+     A            D2SEX          1A
+     A                                      COLHDG('APPLIED' 'INJURED PARTY' -
+     A                                        'GENDER')
+     A            D2DTOB    R     S         REFFLD(DT)
+     A                                      COLHDG('APPLIED' 'INJURED' -
+     A                                         'DATE OF BIRTH')
+     A            D2MEFD    R     S         REFFLD(DT)
+     A                                      COLHDG('APPLIED' -
+     A                                         'MSP EFFECTIVE DATE')
+     A            D2MEXD    R     S         REFFLD(DT)
+     A                                      COLHDG('APPLIED' -
+     A                                         'MSP EXPIRATION DATE')
+     A            D2PITY         1A
+     A                                      COLHDG('APPLIED' 'PLAN INSURANCE' -
+     A                                         'TYPE')
+     A*
+     A* MAINTENANCE INFORMATION
+     A*
+     A            D1USER    R               REFFLD(USER)
+     A            D1PGM     R               REFFLD(PGM)
+     A            D1TIME    R     S         REFFLD(TIME)
+     A            D1DT      R     S         REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            D1IUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            D1IPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL' 'PROGRAM')
+     A            D1ITIM    R     S         REFFLD(TIME)
+     A                                      COLHDG('INITIAL' 'TIME')
+     A            D1IDT     R     S         REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'DATE')
+     A*** Beg Add *** 05/18/10 ***************************************
+     A            D1DCN1        30A
+     A                                      COLHDG('Primary Identifier')
+     A            D2DCN2        30A
+     A                                      COLHDG('Secondary Identifier')
+     A            D1RSBM    R               REFFLD(FLAG)
+     A                                      COLHDG('Re-submission flag')
+     A*** End Add *** 05/18/10 ***************************************
+     A*** Beg Add *** 02/02/11 ***************************************
+     A            D1RSPD    R               REFFLD(DS40)
+     A                                      COLHDG('Response Description')
+     A*** End Add *** 02/02/11 ***************************************
+     A*** Beg Add *** 04/12/11 ***************************************
+     A            D1CLEX    R               REFFLD(STAF)
+     A                                      TEXT('Adjuster staff code')
+     A                                      COLHDG('Adj' 'Cde')
+     A*** End Add *** 04/12/11 ***************************************
+     A*** End Add *** 04/27/15 ***************************************
+     A            D1I101         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 01')
+     A            D1I102         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 02')
+     A            D1I103         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 03')
+     A            D1I104         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 04')
+     A            D1I105         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 05')
+     A            D1I106         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 06')
+     A            D1I107         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 07')
+     A            D1I108         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 08')
+     A            D1I109         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 09')
+     A            D1I110         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 10')
+     A            D1I111         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 11')
+     A            D1I112         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 12')
+     A            D1I113         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 13')
+     A            D1I114         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 14')
+     A            D1I115         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 15')
+     A            D1I116         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 16')
+     A            D1I117         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 17')
+     A            D1I118         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 18')
+     A            D1I119         7A
+     A                                      COLHDG('ICD10 DIAGNOSIS' 'CODE 19')
+     A            D1AIN1         7A
+     A                                      COLHDG('ALLEGED' 'CAUSE OF INJ 10')
+     A*** End Add *** 04/27/15 ***************************************
+      ***** Beg Add ***** 10/11/21 ***********************************
+     A            D1MRPAEFD      8S 0       COLHDG('MRMP Part A Eff Dt')
+     A            D1MRPATRD      8S 0       COLHDG('MRMP Part A Term Dt')
+     A            D1MRPBEFD      8S 0       COLHDG('MRMP Part B Eff Dt')
+     A            D1MRPBTRD      8S 0       COLHDG('MRMP Part B Term Dt')
+     A            D1MRPCPC#      5A         COLHDG('MRMP Part C plan' -
+     A                                      'contract #')
+     A            D1MRPCPED      8S 0       COLHDG('MRMP Part C Enr Dt')
+     A            D1MRPCPTD      8S 0       COLHDG('MRMP Part C Term Dt')
+     A            D1MRPCPCN     50A         COLHDG('MRMP Part C plan' -
+     A                                      'contract name')
+     A            D1MRPCBP#      3A         COLHDG('MRMP Part C PBP#')
+     A            D1MRPCAD1     55A         COLHDG('MRMP Part C add 1')
+     A            D1MRPCAD2     55A         COLHDG('MRMP Part C add 2')
+     A            D1MRPCCTY     30A         COLHDG('MRMP Part C city')
+     A            D1MRPCST       2A         COLHDG('MRMP Part C state')
+     A            D1MRPCZIP      9A         COLHDG('MRMP Part C zip')
+     A            D1PPCPC#       5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            D1PPCPED       8S 0       COLHDG('PMP Part C Enr Dt')
+     A            D1PPCPTD       8S 0       COLHDG('PMP Part C Term Dt')
+     A            D1PPCPCN      50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            D1PPCBP#       3A         COLHDG('PMP Part C PBP#')
+     A            D1PPCAD1      55A         COLHDG('PMP Part C add 1')
+     A            D1PPCAD2      55A         COLHDG('PMP Part C add 2')
+     A            D1PPCCTY      30A         COLHDG('PMP Part C city')
+     A            D1PPCST        2A         COLHDG('PMP Part C state')
+     A            D1PPCZIP       9A         COLHDG('PMP Part C zip')
+     A            D1PPCPC#1      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            D1PPCPED1      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            D1PPCPTD1      8S 0       COLHDG('PMP Part C Term Dt')
+     A            D1PPCPCN1     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            D1PPCBP#1      3A         COLHDG('PMP Part C PBP#')
+     A            D1PPCAD11     55A         COLHDG('PMP Part C add 1')
+     A            D1PPCAD21     55A         COLHDG('PMP Part C add 2')
+     A            D1PPCCTY1     30A         COLHDG('PMP Part C city')
+     A            D1PPCST1       2A         COLHDG('PMP Part C state')
+     A            D1PPCZIP1      9A         COLHDG('PMP Part C zip')
+     A            D1PPCPC#2      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            D1PPCPED2      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            D1PPCPTD2      8S 0       COLHDG('PMP Part C Term Dt')
+     A            D1PPCPCN2     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            D1PPCBP#2      3A         COLHDG('PMP Part C PBP#')
+     A            D1PPCAD12     55A         COLHDG('PMP Part C add 1')
+     A            D1PPCAD22     55A         COLHDG('PMP Part C add 2')
+     A            D1PPCCTY2     30A         COLHDG('PMP Part C city')
+     A            D1PPCST2       2A         COLHDG('PMP Part C state')
+     A            D1PPCZIP2      9A         COLHDG('PMP Part C zip')
+     A            D1PPCPC#3      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            D1PPCPED3      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            D1PPCPTD3      8S 0       COLHDG('PMP Part C Term Dt')
+     A            D1PPCPCN3     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            D1PPCBP#3      3A         COLHDG('PMP Part C PBP#')
+     A            D1PPCAD13     55A         COLHDG('PMP Part C add 1')
+     A            D1PPCAD23     55A         COLHDG('PMP Part C add 2')
+     A            D1PPCCTY3     30A         COLHDG('PMP Part C city')
+     A            D1PPCST3       2A         COLHDG('PMP Part C state')
+     A            D1PPCZIP3      9A         COLHDG('PMP Part C zip')
+     A            D1PPCPC#4      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            D1PPCPED4      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            D1PPCPTD4      8S 0       COLHDG('PMP Part C Term Dt')
+     A            D1PPCPCN4     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            D1PPCBP#4      3A         COLHDG('PMP Part C PBP#')
+     A            D1PPCAD14     55A         COLHDG('PMP Part C add 1')
+     A            D1PPCAD24     55A         COLHDG('PMP Part C add 2')
+     A            D1PPCCTY4     30A         COLHDG('PMP Part C city')
+     A            D1PPCST4       2A         COLHDG('PMP Part C state')
+     A            D1PPCZIP4      9A         COLHDG('PMP Part C zip')
+     A            D1PPCPC#5      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            D1PPCPED5      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            D1PPCPTD5      8S 0       COLHDG('PMP Part C Term Dt')
+     A            D1PPCPCN5     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            D1PPCBP#5      3A         COLHDG('PMP Part C PBP#')
+     A            D1PPCAD15     55A         COLHDG('PMP Part C add 1')
+     A            D1PPCAD25     55A         COLHDG('PMP Part C add 2')
+     A            D1PPCCTY5     30A         COLHDG('PMP Part C city')
+     A            D1PPCST5       2A         COLHDG('PMP Part C state')
+     A            D1PPCZIP5      9A         COLHDG('PMP Part C zip')
+     A            D1PPCPC#6      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            D1PPCPED6      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            D1PPCPTD6      8S 0       COLHDG('PMP Part C Term Dt')
+     A            D1PPCPCN6     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            D1PPCBP#6      3A         COLHDG('PMP Part C PBP#')
+     A            D1PPCAD16     55A         COLHDG('PMP Part C add 1')
+     A            D1PPCAD26     55A         COLHDG('PMP Part C add 2')
+     A            D1PPCCTY6     30A         COLHDG('PMP Part C city')
+     A            D1PPCST6       2A         COLHDG('PMP Part C state')
+     A            D1PPCZIP6      9A         COLHDG('PMP Part C zip')
+     A            D1PPCPC#7      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            D1PPCPED7      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            D1PPCPTD7      8S 0       COLHDG('PMP Part C Term Dt')
+     A            D1PPCPCN7     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            D1PPCBP#7      3A         COLHDG('PMP Part C PBP#')
+     A            D1PPCAD17     55A         COLHDG('PMP Part C add 1')
+     A            D1PPCAD27     55A         COLHDG('PMP Part C add 2')
+     A            D1PPCCTY7     30A         COLHDG('PMP Part C city')
+     A            D1PPCST7       2A         COLHDG('PMP Part C state')
+     A            D1PPCZIP7      9A         COLHDG('PMP Part C zip')
+     A            D1PPCPC#8      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            D1PPCPED8      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            D1PPCPTD8      8S 0       COLHDG('PMP Part C Term Dt')
+     A            D1PPCPCN8     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            D1PPCBP#8      3A         COLHDG('PMP Part C PBP#')
+     A            D1PPCAD18     55A         COLHDG('PMP Part C add 1')
+     A            D1PPCAD28     55A         COLHDG('PMP Part C add 2')
+     A            D1PPCCTY8     30A         COLHDG('PMP Part C city')
+     A            D1PPCST8       2A         COLHDG('PMP Part C state')
+     A            D1PPCZIP8      9A         COLHDG('PMP Part C zip')
+     A            D1PPCPC#9      5A         COLHDG('MRMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPCPED9      8S 0       COLHDG('PMP PART C ENR DT')
+     A            D1PPCPTD9      8S 0       COLHDG('PMP PART C TERM DT')
+     A            D1PPCPCN9     50A         COLHDG('PMP PART C PLAN' -
+     A                                      'CONTRACT NAME')
+     A            D1PPCBP#9      3A         COLHDG('PMP PART C PBP#')
+     A            D1PPCAD19     55A         COLHDG('PMP PART C ADD 1')
+     A            D1PPCAD29     55A         COLHDG('PMP PART C ADD 2')
+     A            D1PPCCTY9     30A         COLHDG('PMP PART C CITY')
+     A            D1PPCST99      2A         COLHDG('PMP PART C STATE')
+     A            D1PPCZIP9      9A         COLHDG('PMP PART C ZIP')
+     A            D1MRPDPC#      5A         COLHDG('MRMP PART D PLAN' -
+     A                                      'CONTRACT #')
+     A            D1MRPDPED      8S 0       COLHDG('MRMP Part D Enr Dt')
+     A            D1MRPDPTD      8S 0       COLHDG('MRMP Part D Term Dt')
+     A            D1MRPDPCN     50A         COLHDG('MRMP Part D plan' -
+     A                                      'contract name')
+     A            D1MRPDBP#      3A         COLHDG('MRMP Part D PBP#')
+     A            D1MRPDAD1     55A         COLHDG('MRMP Part D add 1')
+     A            D1MRPDAD2     55A         COLHDG('MRMP Part D add 2')
+     A            D1MRPDCTY     30A         COLHDG('MRMP Part D city')
+     A            D1MRPDST       2A         COLHDG('MRMP Part D state')
+     A            D1MRPDZIP      9A         COLHDG('MRMP Part D zip')
+     A            D1PPDPC#1      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPED1      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTD1      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCN1     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#1      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD11     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD21     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTY1     30A         COLHDG('PMP Part D city')
+     A            D1PPDST1       2A         COLHDG('PMP Part D state')
+     A            D1PPDZIP1      9A         COLHDG('PMP Part D zip')
+     A            D1PPDPC#2      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPED2      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTD2      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCN2     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#2      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD12     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD22     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTY2     30A         COLHDG('PMP Part D city')
+     A            D1PPDST2       2A         COLHDG('PMP Part D state')
+     A            D1PPDZIP2      9A         COLHDG('PMP Part D zip')
+     A            D1PPDPC#3      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPED3      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTD3      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCN3     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#3      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD13     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD23     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTY3     30A         COLHDG('PMP Part D city')
+     A            D1PPDST3       2A         COLHDG('PMP Part D state')
+     A            D1PPDZIP3      9A         COLHDG('PMP Part D zip')
+     A            D1PPDPC#4      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPED4      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTD4      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCN4     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#4      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD14     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD24     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTY4     30A         COLHDG('PMP Part D city')
+     A            D1PPDST4       2A         COLHDG('PMP Part D state')
+     A            D1PPDZIP4      9A         COLHDG('PMP Part D zip')
+     A            D1PPDPC#5      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPED5      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTD5      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCN5     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#5      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD15     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD25     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTY5     30A         COLHDG('PMP Part D city')
+     A            D1PPDST55      2A         COLHDG('PMP Part D state')
+     A            D1PPDZIP5      9A         COLHDG('PMP Part D zip')
+     A            D1PPDPC#6      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPED6      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTD6      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCN6     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#6      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD16     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD26     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTY6     30A         COLHDG('PMP Part D city')
+     A            D1PPDST6       2A         COLHDG('PMP Part D state')
+     A            D1PPDZIP6      9A         COLHDG('PMP Part D zip')
+     A            D1PPDPC#7      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPED7      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTD7      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCN7     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#7      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD17     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD27     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTY7     30A         COLHDG('PMP Part D city')
+     A            D1PPDST7       2A         COLHDG('PMP Part D state')
+     A            D1PPDZIP7      9A         COLHDG('PMP Part D zip')
+     A            D1PPDPC#8      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPED8      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTD8      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCN8     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#8      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD18     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD28     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTY8     30A         COLHDG('PMP Part D city')
+     A            D1PPDST8       2A         COLHDG('PMP Part D state')
+     A            D1PPDZIP8      9A         COLHDG('PMP Part D zip')
+     A            D1PPDPC#9      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPED9      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTD9      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCN9     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#9      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD19     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD29     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTY9     30A         COLHDG('PMP Part D city')
+     A            D1PPDST9       2A         COLHDG('PMP Part D state')
+     A            D1PPDZIP9      9A         COLHDG('PMP Part D zip')
+     A            D1PPDPC#A      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPEDA      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTDA      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCNA     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#A      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD1A     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD2A     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTYA     30A         COLHDG('PMP Part D city')
+     A            D1PPDSTA       2A         COLHDG('PMP Part D state')
+     A            D1PPDZIPA      9A         COLHDG('PMP Part D zip')
+     A            D1PPDPC#B      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPEDB      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTDB      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCNB     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#B      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD1B     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD2B     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTYB     30A         COLHDG('PMP Part D city')
+     A            D1PPDSTB       2A         COLHDG('PMP Part D state')
+     A            D1PPDZIPB      9A         COLHDG('PMP Part D zip')
+      ***** End Add ***** 10/11/21 ***********************************
+     A            D1PPDPC#C      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            D1PPDPEDC      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            D1PPDPTDC      8S 0       COLHDG('PMP Part D Term Dt')
+     A            D1PPDPCNC     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            D1PPDBP#C      3A         COLHDG('PMP Part D PBP#')
+     A            D1PPDAD1C     55A         COLHDG('PMP Part D add 1')
+     A            D1PPDAD2C     55A         COLHDG('PMP Part D add 2')
+     A            D1PPDCTYC     30A         COLHDG('PMP Part D city')
+     A            D1PPDSTC       2A         COLHDG('PMP Part D state')
+     A            D1PPDZIPC      9A         COLHDG('PMP Part D zip')
+     A*** Beg Add ***** 03/06/25 ****************************************
+     A            D1MSAAMT      11S 2       COLHDG('MSA Amount')
+     A            D1MSAPRD       2S 0       COLHDG('MSA Period')
+     A            D1LUMSTR       1A         COLHDG('Lump Sum or' 'Structured')
+     A            D1INDEPAMT    11S 2       COLHDG('Initial Deposit' 'Amount')
+     A            D1ADEPAMT     11S 2       COLHDG('Annual Deposit' 'Amount')
+     A            D1CASECNT     15A         COLHDG('Case Control' 'Number')
+     A            D1PRADEIN      9S 0       COLHDG('Professional' -
+     A                                       'Administrator FEIN')
+     A*** End Add ***** 03/06/25 ****************************************
+     A

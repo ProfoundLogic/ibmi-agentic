@@ -1,0 +1,619 @@
+     A*****************************************************************
+      * (c) 2013 StoneRiver, Inc. All rights Reserved.                     *
+     A* StoneRiver is a trademark of StoneRiver, Inc.
+     A*****************************************************************
+     A**   CLAIM FILE LOGICAL                                        **
+     A**                                                             **
+     A*****************************************************************
+     A** REVISIONS:                                                   *
+     A*
+     A*  02/04/13 C:280 Project: 114MBB
+     A*                 CHANGE COPYRIGHT
+     A*                                                               *
+     A* 12/14/11 C:251 Proj: 114MBB                                   *
+     A*                Add Lifetime Payment for Auto-Cat-CMLFPY       *
+     A*                                                               *
+     A* 09/18/07 C:180 Proj: 139MHK - Copied from WW/C062 version     *
+     A*                Add Catastrophic claim flag, Case manager      *
+     A*                assigned, Case manager close date.             *
+     A*                                                               *
+     A* 05/08/07 C:188 Proj: FL061                                    *
+     A*                Add Policy State CMPOST                        *
+     A*                                                               *
+     A* 04/07/03 C:62  Proj: 129MBF                                   *
+     A*                Change source comment for CM10A4               *
+     A*                                                               *
+     A* 10/03/01 C:79  Proj: MCMNT                                    *
+     A*                Change source comment for CMWKPT               *
+     A*                                                               *
+     A* 03/02/01 C:62  Proj: 114MAD                                   *
+     A*                EXPAND CMTSIT TO 40A.                          *
+     A*                                                               *
+     A* 02/07/01 C:62  Proj: 114MBA                                   *
+     A*                UPDATE SOURCE COMMENT OF CMPEND.               *
+     A*                                                               *
+     A* 11/30/00  C:079  PROJECT: 114MAD                              *
+     A*                  Add CMTSIT                                   *
+     A*                                                               *
+     A* 04/03/00  C:118  PROJECT: WC854                               *
+     A*                  Add Impairment field CMIMP (1A).             *
+     A*                                                               *
+     A* 02/24/00  C: 53  Project: MCMNT - CLT087                      *
+     A*                  Add comments to field CM40A1-3 (no field chgs)
+     A*                                                               *
+     A* 01/24/00  C:112  Project: 87MIT                               *
+     A*                  Add an extended accident description field   *
+     A*                  CMACD3 Extended Acc Desc 144A                **
+     A*                                                               **
+     A*  02/12/99  C:62 - 87MHT                                       *
+     A*                   ADDED JOB TITLE.                            *
+     A*                                                               *
+     A*  09/24/98  C:94 - 87MFX                                       *
+     A*                   ADD TEXT DESCRIPTION TO FIELDS              *
+     A*                                                               *
+     A*  02/10/97  C:53 - 87MAZ                                       *
+     A*                   ADD FIELDS FOR OHIO C/M COMPLIANCE          *
+     A*                                                               *
+     A*  03/20/97  C:53 - 87MAZ                                       *
+     A*                   ADD REFUSAL OF TREATMENT FIELD              *
+     A*                   NOTATE CMESDT/CMECDT NOT USED AT THIS TIME  *
+     A*                                                               *
+     A*  04/16/97  C:53 - 87MAZ                                       *
+     A*                   NOTATE CMCLIN NOT USED AT THIS TIME         *
+     A*                                                               *
+     A*  06/30/97  C:56 PROJECT: 87MAX                                *
+     A*                 Add additional fields: CMRPDT,                *
+     A*                 CMREHB, CMSRC AND CMMED                       *
+     A*                                                               *
+     A*  08/22/97 C:31  Project: 87MAZ  CO# 48                        *
+     A*                 Add comments that following fields are no     *
+     A*                 longer used by client.                        *
+     A*                  . Refusal of treatment                       *
+     A*                  . Hosp/Treatment Prov                        *
+     A*                  . Clmnt Rep Prov                             *
+     A*                  . Emplr Rep Prov                             *
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PCM01                     TEXT('CLAIM FILE')
+     A            CMCO#     R               REFFLD(CO#)
+     A            CMSUB#    R               REFFLD(SUB#)
+     A                                      COLHDG('SUBSCRIBER')
+     A            CMFND     R               REFFLD(FND)
+     A            CMFYR     R               REFFLD(FYR)
+     A            CMEMP#    R               REFFLD(EMP#)
+     A            CMDIV     R               REFFLD(DIV)
+     A            CMCASE    R               REFFLD(CASE)
+     A            CMSS#     R               REFFLD(SS#)
+     A            CMACDT    R               REFFLD(DT)
+     A                                      COLHDG('ACCIDENT' 'DATE')
+     A            CMACTM    R               REFFLD(TIME)
+     A                                      COLHDG('ACCIDENT' 'TIME')
+     A            CMDTRP    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'REPORTED')
+     A            CMDTLW    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'LAST' 'WORKED')
+     A*******************  Clt 59: Date of Review
+     A            CMACDS    R               REFFLD(NM60)
+     A                                      COLHDG('ACCIDENT' 'DESCRIPTION')
+     A            CMMCON    R               REFFLD(FLAG)
+     A                                      COLHDG('METHOD OF' 'CONTACT')
+     A            CMRT01    R               REFFLD(CODE)
+     A                                      COLHDG('NOT USED')
+     A* CMRT01 IS USED IN FSMS STANDALONE/UR REPORT
+     A            CMAR01    R               REFFLD(A92)
+     A                                      COLHDG('NOT USED')
+     A* CMRT01 IS USED IN FSMS STANDALONE/UR REPORT
+     A            CMDTRE    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'REHAB' 'ASSIGNED')
+     A            CMSTAT    R               REFFLD(STAT)
+     A            CMUSER    R               REFFLD(USER)
+     A            CMPGM     R               REFFLD(PGM)
+     A            CMTIME    R               REFFLD(TIME)
+     A            CMDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            CMENTD    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'ENTERED')
+     A*******************  Clt 59: First Contact Date
+     A            CMRCVD    R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'RECEIVED')
+     A            CMCCL#    R               REFFLD(LIC#)
+     A                                      COLHDG('CARRIER' 'CLAIM #')
+     A*                    CLT 57: CORP SYSTEMS CLAIM #
+     A*                            USAGE: INCLUDED IN FILE CREATED IN
+     A*                                   WCMC DAILY BATCH PROCESS OF EOMBS
+     A*                                   THESE EOMBS ARE RETRIEVED BY CORPORATE
+     A*                                   SYSTEMS TO CREATE PAYMENTS
+     A*******************  Clt 59: Case Manager
+     A            CMPREC    R               REFFLD(FLAG)
+     A                                      COLHDG('PRE-CERT? Y/N')
+     A*******************  Clt 47: Charge for Setup?
+     A            CMPREX    R               REFFLD(FLAG)
+     A                                      COLHDG('PRE-EXISTING' 'COND? Y/N')
+     A*******************  Clt 40: Pended Case File (Y/N)
+     A*******************         Usage:  Will be used in F0070R to prevent user
+     A*******************                 from processing bill if pended claim
+     A            CMPRV1    R               REFFLD(FEIN)
+     A                                      COLHDG('NOT USED')
+     A*******************  Clt 40: Pending Provider 1
+     A*******************         Usage:  Will be used in F0070R to prevent user
+     A*******************                 from processing bill if pended prov
+     A            CMPRM1    R               REFFLD(MOD)
+     A                                      COLHDG('NOT USED')
+     A*******************  Clt 40: Pending Provider Modifier 1
+     A            CMEFD1    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A            CMPRV2    R               REFFLD(FEIN)
+     A                                      COLHDG('NOT USED')
+     A*******************  Clt 40: Pending Provider 2
+     A            CMPRM2    R               REFFLD(MOD)
+     A                                      COLHDG('NOT USED')
+     A*******************  Clt 40: Pending Provider Modifier 2
+     A            CMEFD2    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A            CMPRV3    R               REFFLD(FEIN)
+     A                                      COLHDG('NOT USED')
+     A*******************  Clt 40: Pending Provider 3
+     A            CMPRM3    R               REFFLD(MOD)
+     A                                      COLHDG('NOT USED')
+     A*******************  Clt 40: Pending Provider Modifier 3
+     A            CMEFD3    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A            CMPRV4    R               REFFLD(FEIN)
+     A                                      COLHDG('NOT USED')
+     A*******************  Clt 40: Pending Provider 4
+     A            CMPRM4    R               REFFLD(MOD)
+     A                                      COLHDG('NOT USED')
+     A*******************  Clt 40: Pending Provider Modifier 4
+     A            CMEFD4    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A            CMPHY1    R               REFFLD(FEIN)
+     A                                      COLHDG('NOT USED')
+     A            CMPHM1    R               REFFLD(MOD)
+     A                                      COLHDG('NOT USED')
+     A            CMEFD5    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A            CMPHY2    R               REFFLD(FEIN)
+     A                                      COLHDG('NOT USED')
+     A            CMPHM2    R               REFFLD(MOD)
+     A                                      COLHDG('NOT USED')
+     A            CMEFD6    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A            CMPHY3    R               REFFLD(FEIN)
+     A                                      COLHDG('NOT USED')
+     A            CMPHM3    R               REFFLD(MOD)
+     A                                      COLHDG('NOT USED')
+     A            CMEFD7    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A            CMCTYP    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A*                                            1=NET, 2=HBA,
+     A*                                            3=PBR, 4=COMBO,5=OTHER,
+     A*                                            6=UR, 7=DME
+     A            CMCLTP    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CMRSRC    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CMMGMT    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A*******************                          Clt 47: Setup billed
+     A            CMRPRV    R               REFFLD(NAME)
+     A                                      COLHDG('NOT USED')
+     A*******************  Clt 40: QURS Number
+     A*******************         Usage:  Will be used internally by QURS
+     A*******************  Clt 53: Adjuster
+     A*******************  Clt 59: Claimant Phone#
+     A            CMRGN     R               REFFLD(CODE)
+     A                                      COLHDG('NOT USED')
+     A            CMPRFL    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CMPRDT    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A            CMAST     R               REFFLD(ST)
+     A                                      COLHDG('ADJUDICATION STATE')
+     A            CMMMI     R               REFFLD(DT)
+     A                                      COLHDG('MMI' 'DATE')
+     A            CMIUSR    R               REFFLD(DS10)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            CMIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'DATE')
+     A            CM1A1     R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A****                                  Clt 25: Claim Denial Flag
+     A****                                          Valid Values: Y = No Process
+     A****                                                        N = Ok to Proc
+     A            CM1A2     R               REFFLD(FLAG)
+     A                                      COLHDG('Catastrophy Case flg')
+     A*                     USED AS CATASTROPHIC CASE
+     A*                     VALID VALUES: Y OR N
+     A            CM1A3     R               REFFLD(FLAG)
+     A                                      COLHDG('Rehab (Y/N)')
+     A            CM1A4     R               REFFLD(FLAG)
+     A                                      COLHDG('ADR (Y/N)')
+     A            CM1A5     R               REFFLD(FLAG)
+     A                                      COLHDG('$1000 Med Only flag')
+     A            CM1A6     R               REFFLD(FLAG)
+     A                                      COLHDG('Owner Partner member')
+     A            CM1A7     R               REFFLD(FLAG)
+     A                                      COLHDG('ACTIVE/INACTIVE')
+     A            CM1A8     R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CM1A9     R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CM1A10    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CM6N1     R               REFFLD(DT)
+     A                                      COLHDG('MCO Trans Date')
+     A            CM6N2     R               REFFLD(DT)
+     A                                      COLHDG('Settle Date')
+     A            CM6N3     R               REFFLD(DT)
+     A                                      COLHDG('$1000 Limit reached')
+     A            CM6N4     R               REFFLD(DT) COLHDG('FILING DATE')
+     A            CM6N5     R               REFFLD(DT) COLHDG('CHANGEOVER DATE')
+     A            CM6N6     R               REFFLD(DT)
+     A                                      COLHDG('STATUTE OF LIMITATNS')
+     A            CM6N7     R               REFFLD(DT) COLHDG('NOT USED')
+     A            CM6N8     R               REFFLD(DT) COLHDG('NOT USED')
+     A            CM6N9     R               REFFLD(DT) COLHDG('NOT USED')
+     A            CM6N10    R               REFFLD(DT) COLHDG('NOT USED')
+     A            CM10A1    R               REFFLD(DS10) COLHDG('NOT USED')
+     A            CM10A2    R               REFFLD(DS10)
+     A                                      COLHDG('NA/PA/CA codes')
+     A            CM10A3    R               REFFLD(DS10)
+     A                                      COLHDG('Most curr. BWC sts')
+     A            CM10A4    R               REFFLD(DS10) COLHDG('Telephonic' -
+     A                                      'Bill Tracking')
+     A*  Used to track status of Telephonic Case Mgmt billing
+     A*  (Associated w/ "M2" algorithm)
+     A*
+     A*  Valid values: 'F' = 1st number of days have been processed
+     A*                'S' = 1st and 2nd number of days have been processed
+     A*                'Txxxxx'
+     A*                  'T' = 1st and 2nd number of days have been processed
+     A*                  'xxxxx' = Third number of days iterated
+     A*
+     A            CM10A5    R               REFFLD(DS10) COLHDG('NOT USED')
+     A*** BEG CHG *** 02/24/00 ****************************
+     A*** CLT087: CM40A1-3 Will be concatenated together to form a 120
+     A***                  alpha screen field "Nature of Injury"
+     A*
+     A            CM40A1    R               REFFLD(DS40)
+     A                                      COLHDG('Nature of injury 1')
+     A            CM40A2    R               REFFLD(DS40)
+     A                                      COLHDG('Nature of injury 2')
+     A            CM40A3    R               REFFLD(DS40)
+     A                                      COLHDG('Nature of injury 3')
+     A*** BEG CHG *** 02/24/00 ****************************
+     A            CM40A4    R               REFFLD(DS40) COLHDG('NOT USED')
+     A            CM40A5    R               REFFLD(DS40) COLHDG('NOT USED')
+     A            CM92N1    R               REFFLD(A92)
+     A                                      COLHDG('NOT USED')
+     A            CM92N2    R               REFFLD(A92)
+     A                                      COLHDG('NOT USED')
+     A            CM92N3    R               REFFLD(A92)
+     A                                      COLHDG('NOT USED')
+     A            CM92N4    R               REFFLD(A92)
+     A                                      COLHDG('NOT USED')
+     A            CM92N5    R               REFFLD(A92)
+     A                                      COLHDG('NOT USED')
+     A            CMMCA     R               REFFLD(FLAG)
+     A                                      COLHDG('MCA' 'FLAG')
+     A            CMITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL TIME')
+     A            CMLTFL    R               REFFLD(FLAG)
+     A                                      COLHDG('LOST TIME' 'FLAG')
+     A            CMTCV1    R               REFFLD(CODE)
+     A                                      COLHDG('NOT USED')
+     A            CMTCV2    R               REFFLD(CODE)
+     A                                      COLHDG('NOT USED')
+     A            CMTCV3    R               REFFLD(CODE)
+     A                                      COLHDG('NOT USED')
+     A            CMCMNU    R               REFFLD(STAF)
+     A                                      COLHDG('CASE MGMT' 'NURSE')
+     A            CMCMSU    R               REFFLD(STAF)
+     A                                      COLHDG('CASE MGMT' 'SUPV')
+     A            CMCLSU    R               REFFLD(STAF)
+     A                                      COLHDG('CLAIM' 'SUPV')
+     A            CMCLAD    R               REFFLD(STAF)
+     A                                      COLHDG('CLAIMS' 'ADJ')
+     A            CMDIA1    R               REFFLD(DIA)
+     A                                      COLHDG('OCCUPATION CODE')
+     A            CMLOS1    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CMDIA2    R               REFFLD(DIA)
+     A                                      COLHDG('NOT USED')
+     A            CMLOS2    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CMDIA3    R               REFFLD(DIA)
+     A                                      COLHDG('NOT USED')
+     A            CMLOS3    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CMDIA4    R               REFFLD(DIA)
+     A                                      COLHDG('NOT USED')
+     A            CMLOS4    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CMDIA5    R               REFFLD(DIA)
+     A                                      COLHDG('NOT USED')
+     A            CMLOS5    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CMSETU    R               REFFLD(FLAG)
+     A                                      COLHDG('SETUP BILLING' 'DONE')
+     A            CMOCC     R               REFFLD(CLAS)
+     A                                      COLHDG('NOT USED')
+     A            CMCNTY    R               REFFLD(DS4)
+     A                                      COLHDG('not used')
+     A*** BEGIN ADD *** 02/10/97 **************************
+     A            CMSCL#    R               REFFLD(SCL#)
+     A                                      COLHDG('STATE CLIAM #')
+     A            CMRNDT    R               REFFLD(DT)
+     A                                      COLHDG('REF DATE R/N')
+     A            CMACD2    R               REFFLD(NM60)
+     A                                      COLHDG('ACC DESC 2')
+     A            CMINAC    R               REFFLD(FLAG)
+     A                                      COLHDG('INDUSTRIAL ACCIDENT')
+     A***                       VALID VALUES (Y/N)
+     A            CMOEPR    R               REFFLD(FLAG)
+     A                                      COLHDG('ON EMPLOYER PREMISES')
+     A***                       VALID VALUES (Y/N)
+     A            CM#DEP    R               REFFLD(A30)
+     A                                      COLHDG('NOT USED')
+     A            CMAPDT    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A***   CMAPDT NOT USED AT THIS TIME
+     A            CMRLSN    R               REFFLD(LSN)
+     A                                      COLHDG('NOT USED')
+     A            CMRFSN    R               REFFLD(FSN)
+     A                                      COLHDG('NOT USED')
+     A            CMRMID    R               REFFLD(MID)
+     A                                      COLHDG('NOT USED')
+     A            CMRTIL    R               REFFLD(NAME)
+     A                                      COLHDG('NOT USED')
+     A            CMRDAT    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A            CMRTYP    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A***                       VALID VALUES (Y/N/U)
+     A***                                 Y =
+     A***                                 N =
+     A***                                 U = UNKNOWN
+     A***
+     A            CMRDSC    R               REFFLD(DS60)
+     A                                      COLHDG('NOT USED')
+     A**
+     A            CMMCTM    R               REFFLD(TIMEHM)
+     A                                      COLHDG('NOT USED')
+     A            CMMC24    R               REFFLD(FLAG)
+     A                                      COLHDG('MCO NOTIFIED W/IN 24')
+     A***                       VALID VALUES (Y/N)
+     A            CMESDT    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A*** CMESDT NO LONGER USED
+     A            CMECDT    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A*** CMECDT NO LONGER USED
+     A            CMINDT    R               REFFLD(DT)
+     A                                      COLHDG('DT OF INIT TREATMENT')
+     A            CMRINA    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A***                       VALID VALUES (Y/N)
+     A            CMIFEI    R               REFFLD(FEIN)
+     A                                      COLHDG('NOT USED')
+     A            CMIMOD    R               REFFLD(MOD)
+     A                                      COLHDG('NOT USED')
+     A            CMIBWC    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A***                       EST FROM FMPDP/PDWCCE AT ADD OF RECORD
+     A            CMINWC    R               REFFLD(NWCD)
+     A                                      COLHDG('NOT USED')
+     A***                       EST FROM XREF FMEMP/EMNWCD VS. PAR
+     A***                       CONTRACTS AT ADD OF RECORD
+     A            CMHFEI    R               REFFLD(FEIN)
+     A*           >>> Field no longer used by client <<<
+     A                                      COLHDG('NOT USED')
+     A            CMHMOD    R               REFFLD(MOD)
+     A*           >>> Field no longer used by client <<<
+     A                                      COLHDG('NOT USED')
+     A            CMHBWC    R               REFFLD(FLAG)
+     A*           >>> Field no longer used by client <<<
+     A                                      COLHDG('NOT USED')
+     A***                       EST FROM FMPDP/PDWCCE AT ADD OF RECORD
+     A            CMHNWC    R               REFFLD(NWCD)
+     A*           >>> Field no longer used by client <<<
+     A                                      COLHDG('NOT USED')
+     A***                       EST FROM XREF FMEMP/EMNWCD VS. PAR
+     A***                       CONTRACTS AT ADD OF RECORD
+     A            CMCLR#         8S 0
+     A*           >>> Field no longer used by client <<<
+     A                                      COLHDG('NOT USED')
+     A            CMCLRN    R               REFFLD(NAME)
+     A*           >>> Field no longer used by client <<<
+     A                                      COLHDG('NOT USED')
+     A            CMEMR#         8S 0
+     A*           >>> Field no longer used by client <<<
+     A                                      COLHDG('NOT USED')
+     A            CMEMRN    R               REFFLD(NAME)
+     A*           >>> Field no longer used by client <<<
+     A                                      COLHDG('NOT USED')
+     A            CMTER     R               REFFLD(A50)
+     A                                      COLHDG('NOT USED')
+     A            CMTSPC    R               REFFLD(A50)
+     A                                      COLHDG('NOT USED')
+     A            CMTOCC    R               REFFLD(A50)
+     A                                      COLHDG('NOT USED')
+     A**
+     A            CMPLAC    R               REFFLD(DS40)
+     A                                      COLHDG('PLACE OF ACCIDENT')
+     A            CMPLA1    R               REFFLD(ADR1)
+     A                                      COLHDG('PLACE OF ACC ADDR 1')
+     A            CMPLA2    R               REFFLD(ADR2)
+     A                                      COLHDG('PLACE OF ACC ADDR 2')
+     A            CMPLCY    R               REFFLD(CTY)
+     A                                      COLHDG('PLACE OF ACC CITY')
+     A            CMPLST    R               REFFLD(ST)
+     A                                      COLHDG('PLACE OF ACC STATE')
+     A            CMPLZP    R               REFFLD(ZIP)
+     A                                      COLHDG('PLACE OF ACC ZIP')
+     A            CMCLIN    R               REFFLD(CODE)
+     A                                      COLHDG('NOT USED')
+     A*** CMCLIN NOT USED AT THIS TIME
+     A***                       VALID VALUES:  WB = FROI
+     A***                                      WD = SUBSEQUENT REPORT
+     A            CMSUBR    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A***                       VALID VALUES (Y/N)
+     A            CMHIST    R               REFFLD(ST)
+     A                                      COLHDG('STATE HIRED')
+     A            CMHIDT    R               REFFLD(DT)
+     A                                      COLHDG('DATE HIRED')
+     A            CMPRPO    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A***                       VALID VALUES (Y/N)
+     A            CMDEEM    R               REFFLD(CODE)
+     A                                      COLHDG('NOT USED')
+     A***                       VALID VALUES:  *BLANK/'DI'
+     A            CMDEDT    R               REFFLD(DT)
+     A                                      COLHDG('DEATH DATE')
+     A            CMSTWK    R               REFFLD(CODE)
+     A                                      COLHDG('TYPE OF ACCIDENT')
+     A***                       VALID VALUES:  17 = OCCUPATIONAL DISEASE
+     A***                       VALID VALUES:  18 = ACCIDENT ONLY
+     A            CMSEFL    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A***                       VALID VALUES (Y/N)
+     A            CMWGAE    R               REFFLD(A72)
+     A                                      COLHDG('WAGE AMT EARNED')
+     A            CMWGTY    R               REFFLD(CODE)
+     A                                      COLHDG('WAGE TYPE CODE')
+     A***                       XREF TO FTGTP USING 'WGTY'
+     A            CMWGFQ    R               REFFLD(FLAG)
+     A                                      COLHDG('FREQUENCY')
+     A***                       XREF TO FTGTP VIA WKPT
+     A            CMWKPT    R               REFFLD(CODE)
+     A                                      COLHDG('WORK PATTERN')
+     A            CMHRRT    R               REFFLD(HRRT)
+     A                                      COLHDG('NOT USED')
+     A            CMHRWK    R               REFFLD(A20)
+     A                                      COLHDG('NOT USED')
+     A            CMWKDY    R               REFFLD(CODE)
+     A                                      COLHDG('REGULAR WORK DAYS')
+     A***                       XREF TO FTGTP USING 'WKDY'
+     A            CMSTTM    R               REFFLD(TIMEHM)
+     A                                      COLHDG('START TIME')
+     A            CMENTM    R               REFFLD(TIMEHM)
+     A                                      COLHDG('END TIME')
+     A            CMWGDT    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A*** END   ADD *** 02/10/97 **************************
+     A*** BEGIN ADD *** 03/20/97 **************************
+,,,  A            CMRFTX    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CMCASG    R               REFFLD(DS30)
+     A                                      COLHDG('NOT USED')
+     A*** END   ADD *** 03/20/97 **************************
+     A*** BEGIN ADD *** 06/30/97 **************************************
+     A            CMRPDT    R               REFFLD(DT)
+     A                                      COLHDG('NOT USED')
+     A            CMREHB    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            CMSRC     R               REFFLD(DS20)
+     A                                      COLHDG('NOT USED')
+     A            CMMED     R               REFFLD(DS20)
+     A                                      COLHDG('NOT USED')
+     A*** END ADD *** 06/30/97 ****************************************
+     A            CMLSN     R               REFFLD(LSN)
+     A                                      COLHDG('LAST NAME')
+     A            CMFSN     R               REFFLD(FSN)
+     A                                      COLHDG('FIRST NAME')
+     A            CMMID     R               REFFLD(MID)
+     A                                      COLHDG('MID INITIAL')
+     A            CMMMIP    R               REFFLD(PC52)
+     A                                      COLHDG('MMI PERCENTAGE')
+     A            CMCVFL    R               REFFLD(FLAG)
+     A                                      COLHDG('CONTROVERT FLAG')
+     A*
+     A* FOR CLT 10:"CONTROVERT FLAG", VALID VALUES- 'Y' OR *BLANKS;
+     A* PROGRAM(S) WILL HAVE TO BE CHANGED TO REFERENCE NEW FIELD.
+     A*
+     A            CMNTWK    R               REFFLD(DS10)
+     A                                      COLHDG('CLAIMS NETWORK')
+     A*
+     A* FOR CLT 10:"CLAIM'S NETWORK PROGRAM"; PROGRAM(S) WILL HAVE
+     A* TO BE CHANGED TO REFERENCE NEW FIELD.
+     A*
+     A            CMDNY     R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM DENIAL FLAG')
+     A*
+     A* FOR CLT 25:"CLAIM DENIAL FLAG", VALID VALUES ARE 'Y'=NO PROCESS
+     A* , 'N'=OKAY TO PROCESS; PROGRAMS WILL HAVE TO BE CHANGED TO
+     A* REFERENCE NEW FIELD.
+     A*
+     A            CMPEND    R               REFFLD(FLAG)
+     A                                      COLHDG('PEND ENTIRE' 'CASE (Y/N)')
+     A*           CLT114: Used to trigger message in F0350R01, to tell
+     A*                   the bill entry user to check DARTS notes on
+     A*                   this case file.
+     A*
+     A*
+     A* CVT FROM OLD FMCMP/CMPREX.
+     A*
+     A            CMCLFA    R               REFFLD(STAF)
+     A                                      COLHDG('WC FIELD ADJUSTER')
+     A            CMOCDS    R               REFFLD(DS40)
+     A                                      COLHDG('OCCUPATION' ' DESCRIPTION')
+     A            CMODIS    R               REFFLD(FLAG)
+     A                                      COLHDG('OCCUPATIONAL' 'DISEASE' +
+     A                                             'FLAG')
+     A            CMYRLX    R               REFFLD(TIMEHM)
+     A                                      COLHDG('OCC DISEASE:' 'YR LAST' +
+     A                                             'EXPOSED')
+     A            CMDYWK    R               REFFLD(DAYS)
+     A                                      COLHDG('DAYS/WEEK')
+     A            CMHRDY    R               REFFLD(A30)
+     A                                      COLHDG('HOURS/DAY')
+     A            CMESTS    R               REFFLD(CODE)
+     A                                      COLHDG('EMPLOYMENT STATUS')
+     A            CMOSCL    R               REFFLD(SCL#)
+     A                                      COLHDG('OLD STATE' 'CLAIM NUMBER')
+     A            CMDBDT    R               REFFLD(DT7)
+     A                                      COLHDG('DATE OF DISABILITY')
+     A            CMSTF3    R               REFFLD(STAF)
+     A                                      COLHDG('MC STAFF CODE #3')
+     A*** BEGIN ADD *** 02/12/99 **************************************
+     A            CMJOB     R               REFFLD(DS70)
+     A                                      COLHDG('JOB TITLE')
+     A*** END   ADD *** 02/12/99 **************************************
+     A**** BEGIN ADD *** 01/24/00 ************************************ *********
+     A            CMACD3       144A         COLHDG('ACC DESC 3')
+     A**** END ADD ***** 01/24/00 ************************************ *********
+     A***** BEGIN ADD **** 04/03/00 ***********************************
+     A            CMIMP     R               REFFLD(FLAG)
+     A                                      COLHDG('IMPAIRMENT')
+     A***** END   ADD **** 04/03/00 ***********************************
+     A*** BEG ADD *** 11/30/00 ****************************************
+     A*** VALID VALUES: FTGTP via 'TSIT'
+     A*** BEG CHG *** 03/02/01 ****************************************
+     A**********  CMTSIT    R               REFFLD(DS10)
+     A**********                            COLHDG('MOST CURRENT' 'TRMT SITE')
+     A            CMTSIT    R               REFFLD(DS40)
+     A                                      COLHDG('MOST CURRENT' 'TRMT SITE')
+     A*** END CHG *** 03/02/01 ****************************************
+     A*** END ADD *** 11/30/00 ****************************************
+     A*** BEG ADD *** 05/08/07 ****************************************
+     A            CMPOST    R               REFFLD(ST)
+     A                                      COLHDG('POLICY' 'STATE')
+     A*** END ADD *** 05/08/07 ****************************************
+     A*** BEGIN ADD *** 09/18/07 **************************************
+     A            CMCFLG    R               REFFLD(FLAG)
+     A                                      COLHDG('Catastrophic Claim' +
+     A                                      'Flag')
+     A            CMCMAD    R               REFFLD(DT)
+     A                                      COLHDG('Case Management' +
+     A                                      'Assign Date')
+     A            CMCMCD    R               REFFLD(DT)
+     A                                      COLHDG('Case Management' +
+     A                                      'Close Date')
+     A*** END   ADD *** 09/18/07 **************************************
+     A*** Beg Add *** 12/14/11 ****************************************
+     A            CMLFPY    R     S         REFFLD(A92)
+     A                                      COLHDG('Lifetime Payments' +
+     A                                      'for Auto-Cat')
+     A*** End Add *** 12/14/11 ****************************************

@@ -1,0 +1,194 @@
+     A****************************************************************
+     A** (C) COPYRIGHT FISERV, INC., 1996 - 2007                    **
+     A****************************************************************
+     A**   BANK INFORMATION FILE MAINTENANCE                        **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**                                                            **
+     A**  04/24/07 C:191 63WBN                                      **
+     A**           REQUIRE TWO SIGNATURES ON CHECKS OVER $ AMOUNT   **
+     A**                                                            **
+     A**  03/12/01 C:53 PC082 #26701                                **
+     A**           ALLOW LOWER CASE IN SIGNATURE LINES              **
+     A**                                                            **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      CF05
+     A                                      CF13
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C2420F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  6 28'Company number:'
+     A            SCCO#     R        B  6 45REFFLD(CO#)
+     A                                      DSPATR(UL)
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A                                  8 28'Check Type    :'
+     A            SCCTYP         2A  B  8 45DSPATR(UL)
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 14'F5=Search bank records'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A                                      CF12
+     A                                      CF20
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C2420F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A                                  3  2'Co#:'
+     A            SCCO#     R        O  3  7REFFLD(CO#)
+     A                                      DSPATR(HI)
+     A            SCCTYP         2A  O  3 19DSPATR(HI)
+     A                                 14  2'Bank Acct#:'
+     A            SCACCT        20A  B 14 22DSPATR(UL)
+     A                                  3 59'Status:'
+     A            SCSTAT    R        O  3 67REFFLD(STAT)
+     A                                      DSPATR(HI)
+     A N09        SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  4  2'CK Header/Logo1:'
+     A            SCCKH1    R        B  4 22REFFLD(PBI01/BICKH1 *LIBL/CMBIP)
+     A                                      CHECK(LC)
+     A            SCCKH2    R        B  5 22REFFLD(PBI01/BIHDR1 *LIBL/CMBIP)
+     A                                      CHECK(LC)
+     A            SCCKH3    R        B  6 22REFFLD(PBI01/BICKH1 *LIBL/CMBIP)
+     A                                      CHECK(LC)
+     A            SCCKH4    R        B  7 22REFFLD(PBI01/BIHDR1 *LIBL/CMBIP)
+     A                                      CHECK(LC)
+     A                                  8  2'Bank Name:'
+     A            SCBKNM    R        B  8 22REFFLD(DS40)
+     A                                      CHECK(LC)
+     A                                      DSPATR(UL)
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                  9  2'Bank Address:'
+     A            SCBKAD    R        B  9 22REFFLD(DS40)
+     A                                      CHECK(LC)
+     A                                      DSPATR(UL)
+     A                                 10  2'Bank City, St. Zip:'
+     A            SCBKCS    R        B 10 22REFFLD(DS40)
+     A                                      CHECK(LC)
+     A                                      DSPATR(UL)
+     A                                 11  2'Auxiliary ON-US:'
+     A            SCAUON        21A  B 11 22DSPATR(UL)
+     A                                 12  2'Routing for MICR:'
+     A            SCRTE1         4A  B 12 22DSPATR(UL)
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 12 29'Transit number:'
+     A            SCTRNS         4A  B 12 45DSPATR(UL)
+     A  22                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 12 51'Check Digit:'
+     A            SCCKDG         1A  B 12 64DSPATR(UL)
+     A  23                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 13  2'ON-US:'
+     A            SCONUS        19A  B 13 22DSPATR(UL)
+     A  24                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A            SCRTE2         7A  B 13 58DSPATR(UL)
+     A  25                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A            SCRTE3         7A  B 13 73DSPATR(UL)
+     A  26                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A            SC10A1        10A  B 16 63TEXT('Font STRING for signature 1')
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A            SC10A2        10A  B 17 63TEXT('Font STRING for signature 2')
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A*** BEG ADD ****** 04/24/2007 ********************************************
+     A            SC$LMT         9  0B 18 27TEXT('$ Limit for 2nd signature')
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A*** END ADD ****** 04/24/2007 ********************************************
+     A                                 13 42'Routing Upper:'
+     A                                 13 66'Lower:'
+     A                                 24  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 24 14'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A N09                             24 31'F20=Change status'
+     A                                      COLOR(BLU)
+     A                                  3 12'Ctyp:'
+     A                                  5  2'CK Header/Logo2:'
+     A                                  6  2'CK Header/Logo3:'
+     A                                  7  2'CK Header/Logo4:'
+     A                                 16  2'Signature-Font Select 1:'
+     A            SCSIG2    R        B 17 27REFFLD(PBI01/BISIG2 *LIBL/CMBIP)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A            SCSIG1    R        B 16 27REFFLD(PBI01/BISIG1 *LIBL/CMBIP)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                 16 55'String:'
+     A                                 17 55'String:'
+     A                                 17  2'Signature-Font Select 2:'
+     A*** BEG ADD ****** 04/24/2007 ********************************************
+     A                                 18  2'$ Limit, 2nd signature :'
+     A*** END ADD ****** 04/24/2007 ********************************************
+     A                                 19  2'Overlay-Macro ID:'
+     A            SCOVL     R        B 19 20REFFLD(PBI01/BIOVL *LIBL/CMBIP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                 19 32'Program Name for check Output:'
+     A            SCCPGM    R        B 19 63REFFLD(PBI01/BICPGM *LIBL/CMBIP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                 14 47'LOGO Y/N:'
+     A            SCLOGO    R        B 14 58REFFLD(PBI01/BILOGO *LIBL/CMBIP)
+     A          R SCR99
+     A            SCFL01    R        O  1  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      TEXT('DUMMY FIELD')

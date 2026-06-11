@@ -1,0 +1,492 @@
+     A* (c) 2010 StoneRiver, Inc. All rights Reserved.                *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                 *
+     A*****************************************************************
+     A*                                                               *
+     A* * * FEE INVOICES - W/OMR                                      *
+     A* * * CREATE USING                                              *
+     A*                  DEVTYPE(*AFPDS)                              *
+     A*                  BACKOVL(*NONE)                               *
+     A*                  FRONTOVL(*NONE)                              *
+     A*****************************************************************
+     A*  PROJECT:  WC1851            PROGRAMMER:  C:189               *
+     A*  CREATED:  01/25/10                                           *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 08/13/10 C:61 PROJECT WC1851 PRISS 65
+     A*               Correct print of text of form.
+     A*                                                               *
+     A*****************************************************************
+     A          R INVOIC1                   SKIPB(4)
+     A                                      FONT(11)
+     A                                    35'FEE INVOICE'
+     A                                      SPACEA(2)
+     A            XNNAME        40         2SPACEA(1)
+     A            OFAAD1        40         2SPACEA(1)
+     A    N31     OFAAD2        40         2SPACEA(1)
+     A            XACSZ         40         2SPACEA(1)
+     A                                    59'PRINT DATE:'
+     A                                      SKIPB(14)
+     A            XXPRDT         8  0    +01EDTWRD('  /  /    ')
+     A    N28                              8'ATTN:'
+     A            XXCONT        40        15
+     A            EMNAME        40        15SPACEB(1)
+     A            XXADR1        40        15SPACEB(1)
+     A       N30  XXADR2        40        15SPACEB(1)
+     A            XXECSZ        40        15SPACEB(1)
+     A                                     3'LOSSES AS OF:'
+     A                                      SKIPB(21)
+     A            XXLSDT         8  0     20EDTWRD('  /  /    ')
+     A                                    65'DUE UPON RECEIPT'
+     A  33                                 3'CARRIER POLICY#:'
+     A                                      SKIPB(22)
+     A  33        RPCAP#        25        20
+     A  33                                 3'FILE NUMBER:'
+     A                                      SKIPB(23)
+     A N33                                 3'POLICY NUMBER:'
+     A                                      SKIPB(23)
+     A            XXFND          3  0     20
+     A            SVEMP#         9  0     23
+     A            XXBFYR         3  0     32
+     A                                     3'DIVISION:'
+     A                                      SKIPB(24)
+     A            SVDIV          5  0     20
+     A                                     2'=========================='
+     A                                      SKIPB(25)
+     A                                   +00'=========================='
+     A                                   +00'==========================='
+     A                                    36'FEE'
+     A                                      SPACEB(1)
+     A                                      UNDERLINE
+     A                                    56'   '
+     A                                    74'TOTAL'
+     A                                      SPACEA(1)
+     A                                      UNDERLINE
+     A                                     3'PRIOR CLAIM FEE BALANCE:'
+     A                                      SPACEB(1)
+     A            XPRBAL         9  2     27EDTCDE(J)
+     A            XPRTOT         9  2     67EDTCDE(J)
+     A                                     3'CURRENT BILLED:'
+     A                                      SPACEB(1)
+     A            XXAMT          9  2     27EDTCDE(J)
+     A            XXCTOT         9  2     67EDTCDE(J)
+     A                                     3'PRIOR COL FEE BALANCE:'
+     A                                      SPACEB(2)
+     A            XPRBAL1        9  2     27EDTCDE(J)
+     A            XPRTOT1        9  2     67EDTCDE(J)
+     A                                     3'CURRENT BILLED:'
+     A                                      SPACEB(1)
+     A            XXAMT11        9  2     27EDTCDE(J)
+     A            XXCTOT1        9  2     67EDTCDE(J)
+     A                                    64'================='
+     A                                      SPACEB(1)
+     A                                     3'BALANCE DUE:'
+     A                                      SPACEB(1)
+     A            XXTOTL         9  2     67EDTCDE(J)
+     A  71        ARY01          3  0      6EDTCDE(4)
+     A  71        ARA01         11  2    +02EDTCDE(K)
+     A  77        ARY07          3  0     46EDTCDE(4)
+     A  77        ARA07         11  2    +02EDTCDE(K)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  72        ARY02          3  0      6EDTCDE(4)
+     A  72        ARA02         11  2    +02EDTCDE(K)
+     A  78        ARY08          3  0     46EDTCDE(4)
+     A  78        ARA08         11  2    +02EDTCDE(K)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  73        ARY03          3  0      6EDTCDE(4)
+     A  73        ARA03         11  2    +02EDTCDE(K)
+     A  79        ARY09          3  0     46EDTCDE(4)
+     A  79        ARA09         11  2    +02EDTCDE(K)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  74        ARY04          3  0      6EDTCDE(4)
+     A  74        ARA04         11  2    +02EDTCDE(K)
+     A  80        ARY10          3  0     46EDTCDE(4)
+     A  80        ARA10         11  2    +02EDTCDE(K)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  75        ARY05          3  0      6EDTCDE(4)
+     A  75        ARA05         11  2    +02EDTCDE(K)
+     A  81        ARY11          3  0     46EDTCDE(4)
+     A  81        ARA11         11  2    +02EDTCDE(K)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  76        ARY06          3  0      6EDTCDE(4)
+     A  76        ARA06         11  2    +02EDTCDE(K)
+     A  82                                44'OTHER'
+     A  82        ARA12         11  2    +02EDTCDE(K)
+     A                                    13'SEE ITEMIZATION ATTACHED'
+     A                                      SKIPB(42)
+     A                                   +01'FOR DETAIL'
+     A                                     2'=========================='
+     A                                      SPACEB(1)
+     A                                   +00'=========================='
+     A                                   +00'==========================='
+     A                                     3'MAKE CHECK PAYABLE TO:'
+     A                                      SPACEB(1)
+     A            XXCHEC        40        27
+     A                                     3'DIRECT INQUIRIES TO:'
+     A                                      SPACEB(1)
+     A                                   +01'('
+     A            OFAARA         3  0    +00
+     A                                   +00')'
+     A            XXPHN1         3  0    +00
+     A                                   +00'-'
+     A            XXPHN2         4  0    +00
+     A            XXCOM1        40         3SPACEB(2)
+     A            XXCOM2        40         3SPACEB(1)
+     A            XXCOM3        40         3SPACEB(1)
+     A            XXCOM4        40         3SPACEB(1)
+     A                                     3'INSURED:'
+     A                                      SKIPB(51)
+     A                                    43'REMIT TO:'
+     A            XXILN1        40         3SPACEB(1)
+     A            XXRLN1        40        43
+     A            XXILN2        40         3SPACEB(1)
+     A            XXRLN2        40        43
+     A            XXILN3        40         3SPACEB(1)
+     A            XXRLN3        40        43
+     A            XXILN4        40         3SPACEB(1)
+     A            XXRLN4        40        43
+     A                                     3' '
+     A                                      SKIPB(57)
+     A  33                                 3'CARRIER POLICY#:'
+     A  33        @PCAP#        25        20
+     A  33                                 3'FILE NUMBER:'
+     A                                      SPACEB(1)
+     A N33                                 3'POLICY NUMBER:'
+     A                                      SPACEB(1)
+     A            @XFND          3  0     20
+     A            @VEMP#         9  0     23
+     A            @XBFYR         3  0     32
+     A                                     3'DIVISION:'
+     A                                      SPACEB(1)
+     A            @VDIV          5  0     20
+      ********* beg chg **** 08/13/10 *********************************
+     A******                               3'DEDUCTIBLE BALANCE DUE:'
+     A******                                SPACEB(2)
+     A                                     3'FEE INVOICE BALANCE DUE:'
+     A                                      SPACEB(2)
+      ********* chg chg **** 08/13/10 *********************************
+     A                                   +01'$'
+     A            @XTOTL         9  2    +00EDTCDE(J)
+     A                                    51'AMT REMITTED: ________________'
+     A                                    29'(RETURN WITH REMITTANCE)'
+     A                                      SPACEB(2)
+     A                                      SPACEA(1)
+     A            XXOCR         47        48SKIPB(64)
+     A                                      FONT(19)
+     A*
+     A* NEW FORMAT PREMIUM NOTICE
+     A*
+     A          R QHEAD
+     A                                      SKIPB(1)
+     A          R QHEAD1
+     A                                      PAGSEG(&F2BLOG &LOGHRZ &LOGVRT)
+     A    N63     XXHDR         40          POSITION(0.4 3.49)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A     63     X1HDR         40          POSITION(0.4 3.11)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A            XNNAME        40          POSITION(0.7 .60)
+     A                                      FNTCHRSET(C0H400D0 T1V10037)
+     A            XXAAD1        40          POSITION(0.9  .60)
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A            XXAAD2        40          POSITION(1.1  .60)
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A            XOACSZ        40          POSITION(1.3  .60)
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A            F2BLOG         8A  P
+     A            LOGHRZ         5S 3P
+     A            LOGVRT         5S 3P
+     A          R QLINE1
+     A                                      BOX(0.45 0.40 1.35 7.8 .01)
+     A    N63                               LINE(0.20 3.3 .25 *VRT .01)
+     A    N63                               LINE(0.20 5.2 .25 *VRT .01)
+     A    N63                               LINE(0.20 3.3 1.9 *HRZ .01)
+     A     63                               LINE(0.20 3.0 .25 *VRT .01)
+     A     63                               LINE(0.20 5.5 .25 *VRT .01)
+     A     63                               LINE(0.20 3.0 2.5 *HRZ .01)
+     A                                      BOX(3.19 0.40 3.59 7.8 .02)
+     A                                      BOX(6.87 0.40 8.27 7.8 .02)
+     A                                      BOX(8.95 0.40 9.85 7.8 .02)
+     A          R QHEAD2
+     A     33     @@PLCY        15          POSITION(1.5 5.74)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A    N33     @1PLCY        15          POSITION(1.5 5.61)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXPLCY        15          POSITION(1.5 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPERD        20          POSITION(1.65 .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPOLP        45          POSITION(1.65 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     33     XQCAPH        20          POSITION(1.65 5.19)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     33     RPCAP#        25          POSITION(1.65 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT1         5          POSITION(1.80 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN1        50          POSITION(1.80 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQDIVH        20          POSITION(1.80 5.61)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            SVDIV          5  0       POSITION(1.80 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPROD        20          POSITION(1.95 5.5)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQPRDT        20          POSITION(1.95  6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT2         5          POSITION(1.95 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN2        50          POSITION(1.95 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQRSTH        20          POSITION(2.10 5.36)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQST           2          POSITION(2.10 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT3         5          POSITION(2.10 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN3        50          POSITION(2.10 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT4         5          POSITION(2.25 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN4        50          POSITION(2.25 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMH        20          POSITION(2.25 &STMHV)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQSTMD        20          POSITION(2.25 6.3)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT5         5          POSITION(2.40 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN5        50          POSITION(2.40 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT6         5          POSITION(2.55 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN6        50          POSITION(2.55 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT7         5          POSITION(2.70 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN7        50          POSITION(2.70 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXATT8         5          POSITION(2.85 0.95)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXEMN8        50          POSITION(2.85 1.4)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     32     XQCNDH        20          POSITION(2.85 5.05)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A     32     XXCNDT         8  0       POSITION(2.85 6.3)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XQLOSH        20          POSITION(3.00 5.34)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXLSDT         8  0       POSITION(3.00 6.3)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            STMHV          5S 3P
+     A          R QHEAD3
+     A                                    31'Deductible' SKIPB(21)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                    55'Tax'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                    73'Total'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                     1'  '
+     A                                      SKIPA(23)
+     A*
+     A          R QDET
+     A                                     6'Prior Billed'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEB(1)
+     A                                    14':'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXBILL         9  2     27EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXBTAX         9  2     47EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXBTOT         9  2     66EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A                                     6'Prior Paid'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEB(1)
+     A                                    14':'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXPAID         9  2     27EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXPTAX         9  2     47EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXPTOT         9  2     66EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A                                     6'Current Billed'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEB(1)
+     A                                    14':'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXAMT          9  2     27EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCTOT         9  2     66EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A                                    63 '______________'
+     A                                       SPACEA(1)
+     A                                     6'Balance Due'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SPACEB(1)
+     A                                    14':'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXTOTL         9  2     66EDTCDE(J)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A*
+     A          R QBREAK
+     A            XXBRK         50         6
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(43)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  71        ARY01          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  71        ARA01         11  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  77        ARY07          3  0     31EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  77        ARA07         11  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCOM1        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  72        ARY02          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  72        ARA02         11  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  78        ARY08          3  0     31EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  78        ARA08         11  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCOM2        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  73        ARY03          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  73        ARA03         11  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  79        ARY09          3  0     31EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  79        ARA09         11  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCOM3        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  74        ARY04          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  74        ARA04         11  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  80        ARY10          3  0     31EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  80        ARA10         11  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXCOM4        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  75        ARY05          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  75        ARA05         11  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  81        ARY11          3  0     31EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  81        ARA11         11  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A  76        ARY06          3  0      6EDTCDE(4)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  76        ARA06         11  2    +02EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A  82                                31'Other'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A  82        ARA12         11  2    +00EDTCDE(K)
+     A                                      FNTCHRSET(C0420000 T1V10037)
+     A            XXSEE         40        31
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(52)
+     A*
+     A          R QAGT
+     A            XXAGHD        22         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SKIPB(43)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A            AGNAME        40         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM1        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A            XXAAD1        40         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM2        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A            XXACSZ        30         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM3        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(1)
+     A            XXAGPH        16         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCOM4        40        53
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                     1' '
+     A                                      SPACEB(2)
+     A            XPBATH        40         6
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XPBAT#         9  0     28
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXSEE         40        31
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(52)
+     A*
+     A          R QINFO
+     A            XXCHKH        30          POSITION(9.14 .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXCHEC        40          POSITION(9.14 2.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXREMH        30          POSITION(9.29  .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXOFAD       120          POSITION(9.29 2.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXSERH        30          POSITION(9.44  .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXSERN        50          POSITION(9.44 2.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXDIRH        30          POSITION(9.59  .6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A            XXDIRN        50          POSITION(9.59 2.6)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A*
+     A          R QBOT
+     A                                     1'  '
+     A                                      SKIPA(62)
+      ********* beg chg **** 08/13/10 *********************************
+     A******                               6 'Deductible Balance Due: '
+     A******                                FNTCHRSET(C0H200B0 T1V10037)
+     A******      XXTOTL         9  2     26 EDTWRD(' ,   ,  $0.  ')
+     A******                                FNTCHRSET(C0H200B0 T1V10037)
+     A                                     6 'Fee Invoice Balance Due: '
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A            XXTOTL         9  2     27 EDTWRD(' ,   ,  $0.  ')
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+      ********* end chg **** 08/13/10 *********************************
+     A                                    56 'Due Upon Receipt'
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A                                       SPACEA(2)
+     A                                    19 '____________________'
+     A                                       SPACEA(0)
+     A                                     6 'Amount Remitted'
+     A                                      FNTCHRSET(C0H200B0 T1V10037)
+     A                                       SPACEA(1)

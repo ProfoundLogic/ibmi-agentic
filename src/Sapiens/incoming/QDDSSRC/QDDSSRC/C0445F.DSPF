@@ -1,0 +1,489 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   AGENT COMMISSION POSTING DISPLAY                         **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF12
+     A                                      CF05
+     A                                      CF07
+     A                                      CF09
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0445F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 10 26'Agent Number:'
+     A            SCAGT#    R        B 10 42REFFLD(AGT#)
+     A*                                     DSPATR(CS)
+     A  30                                  DSPATR(PC)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A  20                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A  21                                  ERRMSGID(CCR0739 *LIBL/CMESGG)
+     A                                 12 26'Policy Number:'
+     A            SCPOL#    R        B 12 42REFFLD(POL#)
+     A*                                     DSPATR(CS)
+     A  31                                  DSPATR(PC)
+     A                                      OVRDTA
+     A                                      TEXT('POLICY NUMBER')
+     A  22                                  ERRMSGID(CCR0740 *LIBL/CMESGG)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 29'F5=Agent # search'
+     A                                      COLOR(BLU)
+     A                                 23 59'F7=Policy # search'
+     A                                      COLOR(BLU)
+     A                                 24 24'F9=Agent commission inquiry'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A                                      CF12
+     A                                      CF01
+     A                                      CF10
+     A                                      SETOF(15)
+     A                                      SETOF(16)
+     A                                      SETOF(17)
+     A                                      SETOF(18)
+     A                                      SETOF(19)
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(33)
+     A                                      SETOF(34)
+     A                                      SETOF(35)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0445F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                  2 76'SCR02'
+     A                                  4  2'Agent Number:'
+     A            SCAGT#    R        O  4 17REFFLD(AGT#)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCNAME    R        O  4 25REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  5  2'Policy:'
+     A            SCPOL#    R        O  5 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  5 28'Transaction Date:'
+     A            SCTRDT    R        O  5 47REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A                                  7  4'Agent'
+     A                                  8  2'Commission'
+     A                                  8 15'Posting'
+     A                                  9  5'Code'
+     A                                      DSPATR(UL)
+     A                                  9 14'  Date  '
+     A                                      DSPATR(UL)
+     A                                  9 25'Description                   '
+     A                                      DSPATR(UL)
+     A                                  9 58'Check #'
+     A                                      DSPATR(UL)
+     A                                  9 68'   Amount'
+     A                                      DSPATR(UL)
+     A            SCTC01    R     A  B 11  6REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  20 30 18                            DSPATR(PC)
+     A  20 30 17                            ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  20 30 15                            ERRMSGID(CCR0745 *LIBL/CMESGG)
+     A            SCTC02    R     A  B 12  6REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  21 30 18                            DSPATR(PC)
+     A  21 30 17                            ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  21 30 15                            ERRMSGID(CCR0745 *LIBL/CMESGG)
+     A            SCTC03    R     A  B 13  6REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  22 30 18                            DSPATR(PC)
+     A  22 30 17                            ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  22 30 15                            ERRMSGID(CCR0745 *LIBL/CMESGG)
+     A            SCTC04    R     A  B 14  6REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  23 30 18                            DSPATR(PC)
+     A  23 30 17                            ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  23 30 15                            ERRMSGID(CCR0745 *LIBL/CMESGG)
+     A            SCTC05    R     A  B 15  6REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  24 30 18                            DSPATR(PC)
+     A  24 30 17                            ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  24 30 15                            ERRMSGID(CCR0745 *LIBL/CMESGG)
+     A            SCTC06    R     A  B 16  6REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  25 30 18                            DSPATR(PC)
+     A  25 30 17                            ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  25 30 15                            ERRMSGID(CCR0745 *LIBL/CMESGG)
+     A            SCTC07    R     A  B 17  6REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  26 30 18                            DSPATR(PC)
+     A  26 30 17                            ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  26 30 15                            ERRMSGID(CCR0745 *LIBL/CMESGG)
+     A            SCTC08    R     A  B 18  6REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  27 30 18                            DSPATR(PC)
+     A  27 30 17                            ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  27 30 15                            ERRMSGID(CCR0745 *LIBL/CMESGG)
+     A            SCTC09    R     A  B 19  6REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  28 30 18                            DSPATR(PC)
+     A  28 30 17                            ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  28 30 15                            ERRMSGID(CCR0745 *LIBL/CMESGG)
+     A            SCTC10    R     A  B 20  6REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  29 30 18                            DSPATR(PC)
+     A  29 30 17                            ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  29 30 15                            ERRMSGID(CCR0745 *LIBL/CMESGG)
+     A            SCPD01    R        B 11 14REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  20 31 18                            DSPATR(PC)
+     A  20 31 19                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A            SCPD02    R        B 12 14REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  21 31 18                            DSPATR(PC)
+     A  21 31 19                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A            SCPD03    R        B 13 14REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  22 31 18                            DSPATR(PC)
+     A  22 31 19                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A            SCPD04    R        B 14 14REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  23 31 18                            DSPATR(PC)
+     A  23 31 19                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A            SCPD05    R        B 15 14REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  24 31 18                            DSPATR(PC)
+     A  24 31 19                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A            SCPD06    R        B 16 14REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  25 31 18                            DSPATR(PC)
+     A  25 31 19                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A            SCPD07    R        B 17 14REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  26 31 18                            DSPATR(PC)
+     A  26 31 19                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A            SCPD08    R        B 18 14REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  27 31 18                            DSPATR(PC)
+     A  27 31 19                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A            SCPD09    R        B 19 14REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  28 31 18                            DSPATR(PC)
+     A  28 31 19                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A            SCPD10    R        B 20 14REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  29 31 18                            DSPATR(PC)
+     A  29 31 19                            ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A            SCDC01    R     A  B 11 25REFFLD(DS30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCDC02    R     A  B 12 25REFFLD(DS30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCDC03    R     A  B 13 25REFFLD(DS30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCDC04    R     A  B 14 25REFFLD(DS30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCDC05    R     A  B 15 25REFFLD(DS30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCDC06    R     A  B 16 25REFFLD(DS30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCDC07    R     A  B 17 25REFFLD(DS30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCDC08    R     A  B 18 25REFFLD(DS30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCDC09    R     A  B 19 25REFFLD(DS30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCDC10    R     A  B 20 25REFFLD(DS30)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCCK01    R        B 11 58REFFLD(CHK#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A            SCCK02    R        B 12 58REFFLD(CHK#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A            SCCK03    R        B 13 58REFFLD(CHK#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A            SCCK04    R        B 14 58REFFLD(CHK#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A            SCCK05    R        B 15 58REFFLD(CHK#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A            SCCK06    R        B 16 58REFFLD(CHK#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A            SCCK07    R        B 17 58REFFLD(CHK#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A            SCCK08    R        B 18 58REFFLD(CHK#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A            SCCK09    R        B 19 58REFFLD(CHK#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A            SCCK10    R        B 20 58REFFLD(CHK#)
+     A*                                     DSPATR(CS)
+     A                                      EDTCDE(4)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A            SCAM01    R        B 11 68REFFLD(A92)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCAM02    R        B 12 68REFFLD(A92)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCAM03    R        B 13 68REFFLD(A92)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCAM04    R        B 14 68REFFLD(A92)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCAM05    R        B 15 68REFFLD(A92)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCAM06    R        B 16 68REFFLD(A92)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCAM07    R        B 17 68REFFLD(A92)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCAM08    R        B 18 68REFFLD(A92)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCAM09    R        B 19 68REFFLD(A92)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A            SCAM10    R        B 20 68REFFLD(A92)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                 23  3'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 23'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 44'F1=Restart'
+     A                                      COLOR(BLU)
+     A                                 23 60'F10=Table search'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)
+     A                                      TEXT('FLAG')

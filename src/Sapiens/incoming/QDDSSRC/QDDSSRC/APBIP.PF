@@ -1,0 +1,143 @@
+     A*  (C) Copyright Progressive Data Systems, Inc., 1997
+     A**
+     A*********************************************************************
+     A** WORKERS' COMP BANK INFORMATION FILE (MICR CHECKS)                *
+     A*                                                                   *
+     A*  REVISIONS:                                                       *
+     A*                                                                   *
+     A*  12/04/97 C:30 Project: WC500                                     *
+     A*           Add 15 fields BIEFDT (Effective Date), BIAPPL (Applica- *
+     A*           tion), BIFTYP (Formtype), BIOUTQ (OUTQ), BICPYQ (File   *
+     A*           Copy OUTQ), BIANTH (Anthem Flag), BINAM1 (Signature     *
+     A*           Name 1), BICMD1 (PCL5 string 1), BINAM2 (Signature Name *
+     A*           2), BICMD2 (PCL5 string 2), BIMACR (Printer MACRO #),   *
+     A*           BIHDCY (Hardcopy Produced?), BIACCT (Bank Acct),        *
+     A*           BICKTP (Check Type), and BIAPBK (Bank #).               *
+     A*********************************************************************
+     A                                      REF(BKREFP)
+     A          R PBI01                     TEXT('BANK INFO FILE')
+     A            BICO#     R               REFFLD(CO#)
+     A                                      COLHDG('WCMS' 'CO#')
+     A            BIFND     R               REFFLD(FND)
+     A                                      COLHDG('AP/GL' 'CO#')
+     A            BICKH1    R               REFFLD(DS40)
+     A                                      COLHDG('CHECK HEADING' 'ONE')
+     A            BICKH2    R               REFFLD(DS40)
+     A                                      COLHDG('CHECK HEADING' 'TWO')
+     A            BIAI01    R               REFFLD(DS40)
+     A                                      COLHDG('ACCOUNT INFO' 'TOP +
+     A                                      LEFT' 'ONE')
+     A            BIAI02    R               REFFLD(DS40)
+     A                                      COLHDG('ACCOUNT INFO' 'TOP +
+     A                                      LEFT' 'TWO')
+     A            BIAI03    R               REFFLD(DS40)
+     A                                      COLHDG('ACCOUNT INFO' 'TOP +
+     A                                      LEFT' 'THREE')
+     A            BIAI04    R               REFFLD(DS40)
+     A                                      COLHDG('ACCOUNT INFO' 'TOP +
+     A                                      LEFT' 'FOUR')
+     **
+     *****  ON-US 19A USUALLY = ACCOUNT NUMBER *** MAY NOT PRINT ENTIRE
+     **                          19 CHARACTERS
+     **
+     A            BIONUS        19
+     A                                      COLHDG('ON-US FLD' 'UP TO 19A')
+     **
+     *****  TRANSIT # CONSISTING OF (TRANSIT SYMBOL + CK DIGIT + BANK# +
+     **                              ROUTING# + TRANSIT SYMBOL) (11 A)
+     **
+     A            BICKDG    R    1          REFFLD(FLAG)
+     A                                      COLHDG('TRANSIT' 'CHECK DIGIT')
+     A            BIBNK#    R    4          REFFLD(DS10)
+     A                                      COLHDG('TRANSIT' 'BANK #')
+     A            BITRNS    R    4          REFFLD(DS10)
+     A                                      COLHDG('TRANSIT' 'ROUTING #')
+     **
+     *****  AUXILLARY ON-US (DEFINED BY BANK) UPTO 21 A *** CHECK # ***
+     **
+     A            BIAXOU    R   21          REFFLD(ADR2)
+     A                                      COLHDG( 'AUX' 'ON-US FLD' +
+     A                                      'UPTO 21A(CHK#)')
+     A            BISTAT    R               REFFLD(STAT)
+     A            BIUSER    R               REFFLD(USER)
+     A            BIPGM     R               REFFLD(PGM)
+     A            BITIME    R               REFFLD(TIME)
+     A            BIDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            BI#CF          2  0       COLHDG('# OF FILE COPIES')
+     A            BIRTUP         7          COLHDG('ROUTING ENTRY UPPER')
+     A            BIRTLW         7          COLHDG('ROUTING ENRTY LOWER')
+     A            BITRST    R               REFFLD(FLAG)
+     A                                      COLHDG('TRUST?' 'Y/N')
+     A            BILOGO    R               REFFLD(FLAG)
+     A                                      COLHDG('LOGO?' 'Y/N')
+     A            BI$LMT    R               REFFLD(A90)
+     A                                      COLHDG('$LIMIT' 'W/O SIGN')
+     A*
+     A*** ADDITIONAL FIELDS *** MAY BE USED FOR FUTURE PROCESSING
+     A******* 1 ALPHA FIELDS
+     A            BI1A1     R               REFFLD(FLAG)
+     A            BI1A2     R               REFFLD(FLAG)
+     A            BI1A3     R               REFFLD(FLAG)
+     A            BI1A4     R               REFFLD(FLAG)
+     A            BI1A5     R               REFFLD(FLAG)
+     A******* 10 ALPHA FIELDS
+     A            BI10A1    R               REFFLD(DS10)
+     A                                      COLHDG('SIG 1 STRING')
+     A            BI10A2    R               REFFLD(DS10)
+     A                                      COLHDG('SIG 2 STRING')
+     A            BI10A3    R               REFFLD(DS10)
+     A******* 5.0 NUMERIC FIELDS
+     A            BI50N1    R               REFFLD(A50)
+     A                                      COLHDG('SIG 1 SUBSCRIPT')
+     A            BI50N2    R               REFFLD(A50)
+     A                                      COLHDG('SIG 2 SUBSCRIPT')
+     A            BI50N3    R               REFFLD(A50)
+     A******* 9.2 NUMERIC FIELDS
+     A            BI92N1    R               REFFLD(A92)
+     A            BI92N2    R               REFFLD(A92)
+     A            BI92N3    R               REFFLD(A92)
+     A            BI92N4    R               REFFLD(A92)
+     A            BI92N5    R               REFFLD(A92)
+      *** BEGIN ADD *** 12/04/97 ******************************************
+     A            BIEFDT    R               REFFLD(DT)
+     A                                      COLHDG('Effective Date')
+     A            BIAPPL    R               REFFLD(CODE)
+     A                                      COLHDG('Application' 'Code')
+     A            BIFTYP    R               REFFLD(DS10)
+     A                                      COLHDG('Form Type')
+     A            BINAM1    R               REFFLD(DS30)
+     A                                      COLHDG('Signature 1' 'Full Name')
+     A            BICMD1        23A
+     A                                      COLHDG('Sig 1' 'PCL5 CMD')
+     A            BINAM2    R               REFFLD(DS30)
+     A                                      COLHDG('Signature 2' 'Full Name')
+     A            BICMD2        23A
+     A                                      COLHDG('Sig 2' 'PCL5 CMD')
+     A            BIMACR         4S 0
+     A                                      COLHDG('Macro ID')
+     A            BIHDCY    R               REFFLD(FLAG)
+     A                                      COLHDG('Hardcopy' 'Produced?' 'Y/N')
+     A            BIOUTQ    R               REFFLD(DS10)
+     A                                      COLHDG('Check OUTQ')
+     A            BICPYQ    R               REFFLD(DS10)
+     A                                      COLHDG('File Copy' 'OUTQ')
+     A            BIANTH    R               REFFLD(FLAG)
+     A                                      COLHDG('Anthem' 'Y/N')
+     A            BIACCT    R               REFFLD(DS20)
+     A                                      COLHDG('Bank Account #')
+     A            BICKTP    R               REFFLD(DS10)
+     A                                      COLHDG('Check' 'Type')
+     A            BIST      R               REFFLD(CODE)
+     A                                      COLHDG('Acct' 'State')
+     A            BIAPBK    R               REFFLD(FND)
+     A                                      COLHDG('AP/GL' 'Bank#')
+      *** END   ADD *** 04/15/97 ******************************************
+     A            BI40A1    R               REFFLD(DS40)
+     A                                      COLHDG('DESC 40A 1')
+     A            BI40A2    R               REFFLD(DS40)
+     A                                      COLHDG('DESC 40A 2')
+     A            BI40A3    R               REFFLD(DS40)
+     A                                      COLHDG('DESC 40A 3')
+     A            BI40A4    R               REFFLD(DS40)
+     A                                      COLHDG('DESC 40A 4')

@@ -1,0 +1,81 @@
+     A*%%TS  SD  19980223  114916  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   SALVAGE RECOVERY REPORT - PROMPT DISPLAY                 **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A          R SCR01
+     A*%%TS  SD  19980223  114916  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      CF05
+     A                                      CF10
+     A                                      CF13
+     A                                      SETOF(42)
+     A                                      SETOF(43)
+     A                                      SETOF(44)
+     A                                      SETOF(45)
+     A                                      SETOF(46)
+     A                                      SETOF(47)
+     A                                      SETOF(48)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7665F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  7 28'Adjustor:'
+     A            SCADJR         3A  B  7 49DSPATR(HI)
+     A  42                                  ERRMSGID(CCR0641 *LIBL/CMESGG)
+     A                                  9 28'Section Code:'
+     A            SCCC           2A  B  9 50DSPATR(HI)
+     A  43                                  ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A                                 11 28'From Date:'
+     A            SCFRDT    R        B 11 42REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A  44                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A  45                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  46                                  ERRMSGID(CCR0847 *LIBL/CMESGG)
+     A                                 13 28'To Date:'
+     A            SCTODT    R        B 13 42REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A  47                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A  48                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      CHECK(RB)
+     A                                 17  5'Enter a specific Adjustor and/or S-
+     A                                      ection Code or leave blank to run a-
+     A                                      ll.'
+     A                                 19 25'A valid date entry is required.'
+     A                                 22  4'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 21'F5=Adjustor search'
+     A                                      COLOR(BLU)
+     A                                 22 43'F10=Table search'
+     A                                      COLOR(BLU)
+     A                                 22 63'F13=Chg usr parm'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

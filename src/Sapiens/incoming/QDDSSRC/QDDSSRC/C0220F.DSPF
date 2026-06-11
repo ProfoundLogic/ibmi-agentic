@@ -1,0 +1,453 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DISPLAY FOR AGENT MASTER MAINTENANCE                     **
+     A**                                                            **
+     A****************************************************************
+     A**  REVISIONS:                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A*
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A*                                     CHGINPDFT(CS)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*----------------------------------------------------------------
+     A          R SCR01
+     A                                      CF05
+     A                                      CF07
+     A                                      CF09
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0220F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 10 25'Agent federal tax ID #:'
+     A            SCFEIN    R        B 10 49REFFLD(FEIN)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 12 25'Location modifier:'
+     A            SCMOD     R        B 12 49REFFLD(MOD)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                 23  5'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 30'F5=Agent # search'
+     A                                      COLOR(BLU)
+     A                                 23 59'F7=Alpha search'
+     A                                      COLOR(BLU)
+     A                                 24 11'F9=Agent code # search'
+     A                                      COLOR(BLU)
+     A                                 24 45'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A          R SCR02
+     A                                      CF12
+     A                                      CF01
+     A                                      CF10
+     A                                      CF20
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0220F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A            SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A N09                                  DSPATR(HI)
+     A  09                                  DSPATR(ND)
+     A                                  5  2'Agent:'
+     A            SCFEIN    R        O  5  9REFFLD(FEIN)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                  5 23'Location:'
+     A            SCMOD     R        O  5 33REFFLD(MOD)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                  5 50'Status:'
+     A            SCSTAT    R        O  5 59REFFLD(STAT)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  7  2'Agent name:'
+     A            SCNAME    R        B  7 21REFFLD(NAME)
+     A                                      TEXT('AGENT NAME')
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                  8  2'Mailing address:'
+     A            SCMAD1    R        B  8 21REFFLD(ADR1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      TEXT('MAILING ADDRESS LINE 1')
+     A                                  9  2'City, State, Zip:'
+     A            SCMCTY    R        B  9 21REFFLD(CTY)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  22                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      TEXT('MAILING CITY')
+     A            SCMST     R        B  9 48REFFLD(ST)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  23                                  ERRMSGID(CCR0505 *LIBL/CMESGG)
+     A                                      TEXT('MAILING STATE')
+     A            SCMZP1    R        B  9 52REFFLD(ZIP1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  24                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A                                      TEXT('MAILING ZIP 1')
+     A                                  9 58'-'
+     A            SCMZP2    R        B  9 60REFFLD(ZIP2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                      TEXT('MAILING ZIP 2')
+     A                                 10  2'Physical address:'
+     A            SCPAD1    R        B 10 21REFFLD(ADR1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                      TEXT('PHYSICAL ADDRESS LINE 1')
+     A                                 11  2'City, State, Zip:'
+     A            SCPCTY    R        B 11 21REFFLD(CTY)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  25                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      TEXT('PHYSICAL CITY')
+     A            SCPST     R        B 11 48REFFLD(ST)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  26                                  ERRMSGID(CCR0505 *LIBL/CMESGG)
+     A                                      TEXT('PHYSICAL STATE')
+     A            SCPZP1    R        B 11 52REFFLD(ZIP1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  27                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A                                      TEXT('PHYSICAL ZIP 1')
+     A                                 11 58'-'
+     A            SCPZP2    R        B 11 60REFFLD(ZIP2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                      TEXT('PHYSICAL ZIP 2')
+     A                                 12  2'Area code, Phone:'
+     A                                 12 21'('
+     A            SCARE1    R        B 12 23REFFLD(AREA)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                 12 27')'
+     A            SCPH11    R        B 12 29REFFLD(PHN1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                 12 33'-'
+     A            SCPH12    R        B 12 35REFFLD(PHN2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                 13  2'Area code, Phone:'
+     A                                 13 21'('
+     A            SCARE2    R        B 13 23REFFLD(AREA)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                 13 27')'
+     A            SCPH21    R        B 13 29REFFLD(PHN1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                 13 33'-'
+     A            SCPH22    R        B 13 35REFFLD(PHN2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                 15  2'Marketing contact:'
+     A            SCCONT    R        B 15 21REFFLD(NAME)
+     A                                      TEXT('MARKETING CONTACT')
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                 16  2'Comments:'
+     A            SCCOMM    R        B 16 21REFFLD(NM60)
+     A                                      TEXT('COMMENTS')
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                 18  2'Agent type code:'
+     A            SCTPCD    R        B 18 21REFFLD(CODE)
+     A                                      TEXT('AGENT TYPE CODE')
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A  30                                  DSPATR(PC)
+     A                                      OVRDTA
+     A  29                                  ERRMSGID(CCR0534 *LIBL/CMESGG)
+     A                                 19  2'Agent Code number:'
+     A            SCACC#    R        B 19 21REFFLD(PREF01/AGT# *LIBL/CREFP)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  31                                  ERRMSGID(CCR0533 *LIBL/CMESGG)
+     A  32                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 22'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 44'F1=Restart'
+     A                                      COLOR(BLU)
+     A N09                             23 60'F10=Table search'
+     A                                      COLOR(BLU)
+     A N09                             24 60'F20=Change status'
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A          R SCR03
+     A*            14:59:22    MSHARPE     REL-R08M00  5714-UT1
+     A                                      CF12
+     A                                      CF05
+     A                                      CF01
+     A                                      CF07
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0220F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR03'
+     A                                  5  2'Agent Code Number:'
+     A            SCACC#    R        O  5 22REFFLD(AGT#)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                  6  2'Federal Tax ID:'
+     A            SCFEIN    R        O  6 19REFFLD(FEIN)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                      TEXT('FEDERAL TAX ID')
+     A                                      OVRDTA
+     A                                  6 31'Location:'
+     A            SCMOD     R        O  6 42REFFLD(MOD)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A            SCSHNM    R        O  6 49REFFLD(NM30)
+     A                                      TEXT('agent name')
+     A                                      DSPATR(HI)
+     A                                 12 30'Producer number:'
+     A            SCPROD    R        B 12 48REFFLD(PRO#)
+     A                                      TEXT('AGENT PRODUCER NUMBER')
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                 14 24'Next available number:'
+     A            SCNPN     R        O 14 48REFFLD(PRO#)
+     A                                      TEXT('AGENT PRODUCER NUMBER')
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 22'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 44'F1=Restart'
+     A                                      COLOR(BLU)
+     A                                 23 61'F5=Prod # search'
+     A                                      COLOR(BLU)
+     A                                 24  2'F7=Prod alpha search'
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A          R SCR04
+     A                                      CF12
+     A                                      CF01
+     A                                      CF20
+     A                                      SETOF(20)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0220F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR04'
+     A                                  5  2'Agent Code Number:'
+     A            SCACC#    R        O  5 22REFFLD(AGT#)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                  6  2'Federal Tax ID:'
+     A            SCFEIN    R        O  6 19REFFLD(FEIN)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                  6 31'Location:'
+     A            SCMOD     R        O  6 42REFFLD(MOD)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A            SCSHNM    R        O  6 49REFFLD(NM30)
+     A                                      TEXT('agent name')
+     A                                      DSPATR(HI)
+     A                                  7  2'Producer:'
+     A            SCPROD    R        O  7 13REFFLD(PRO#)
+     A                                      TEXT('PRODUCER NUMBER')
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                  7 57'Status:'
+     A            SCSTAT    R        O  7 66REFFLD(STAT)
+     A N09                                  DSPATR(HI)
+     A                                      OVRDTA
+     A                                      TEXT('STATUS')
+     A                                 10  9'Last name:'
+     A            SCLSN     R        B 10 21REFFLD(LSN)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 12  9'First name:'
+     A            SCFSN     R        B 12 21REFFLD(FSN)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                 14  2'Business name...:'
+     A            SC4DBA    R        B 14 21REFFLD(NAME)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                 15  2'Mailing address.:'
+     A            SC4AD1    R        B 15 21REFFLD(ADR1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                      TEXT('MAILING ADDRESS LINE 1')
+     A                                 16  2'City, State, Zip:'
+     A            SC4CTY    R        B 16 21REFFLD(CTY)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  22                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      TEXT('MAILING CITY')
+     A            SC4ST     R        B 16 48REFFLD(ST)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  23                                  ERRMSGID(CCR0505 *LIBL/CMESGG)
+     A                                      TEXT('MAILING STATE')
+     A            SC4ZP1    R        B 16 52REFFLD(ZIP1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  24                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A                                      TEXT('MAILING ZIP 1')
+     A                                 16 58'-'
+     A            SC4ZP2    R        B 16 60REFFLD(ZIP2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                      TEXT('MAILING ZIP 2')
+     A                                 18 11'Comment:'
+     A            SCCOM1    R        B 18 21REFFLD(NM60)
+     A                                      TEXT('comments')
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 22'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 44'F1=Restart'
+     A                                      COLOR(BLU)
+     A                                 23 60'F20=Change status'
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A          R SCR99
+     A            SCFL01    R        O  1  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      TEXT('DUMMY FIELD')

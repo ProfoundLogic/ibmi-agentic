@@ -1,0 +1,175 @@
+     A*****************************************************************
+     A** (C) COPYRIGHT FISERV INSURANCE SOLUTIONS 2007
+     A*****************************************************************
+     A** WCMC EDI TX 837 BILL     '40' RECORDS                       **
+     A**                                                             **
+     A**   PROGRAMMER: C:003                                         **
+     A**   CREATED:   01/07/07      PROJECT: MC283                   **
+     A*****************************************************************
+     A** REVISIONS:
+     A*
+     A*   10/21/15 C:079 Support: 25/37996
+     A*                  Rename fields and add ICD-10 code 9
+     A*
+     A*   04/16/15 C:212 PROJECT: MC395
+     A*                  Add new fields
+     A*
+     A*****************************************************************
+     A**
+     A                                      REF(FSREFP)
+     A          R PBI01                     TEXT('EDI BILL DATA STRUCTURE')
+     A            BIREC#        11A         COLHDG('RECORD ID')
+     A            BIQUAL         2A         TEXT('RECORD TYPE 40')
+     A            BIPACT        30A         TEXT('PATIENT ACCOUNT NUMBER      ')
+     A            BIINAP        14A         TEXT('INITIAL AMOUNT PAID         ')
+     A            BICHRG        14A         TEXT('TOTAL CHARGES FOR CLAIM     ')
+     A            BIPAID        14A         TEXT('TOTAL AMOUNT PAID          M')
+     A            BITNCC        14A         TEXT('TOTAL NON-COVERED CHARGES   ')
+     A            BIBIDT         8A         TEXT('DATE OF BILL                ')
+     A            BIRCVD         8A         TEXT('DATE PAYOR RECEIVED BILL    ')
+     A            BIDPAP         8A         TEXT('DATE PAYOR APPROVED PAYMENT ')
+     A            BIPDDT         8A         TEXT('DATE PAYOR PAID BILL        ')
+     A            BIBTYP         2A         TEXT('BILL TYPE                   ')
+     A            BISBRC         2A         TEXT('BILL SUBMISSION REASON CODE ')
+     A            BIFACC         2A         TEXT('FACILITY CODE               ')
+     A            BIHOSC         2A         TEXT('HOSPITAL CODE               ')
+     A            BIFMTC         2A         TEXT('BILLING FORMAT CODE         ')
+     A            BIFREQ         1A         TEXT('FREQUENCY                   ')
+     A            BIBENF         1A         TEXT('BENEFICIARY                 ')
+     A            BIPMRI         1A         TEXT('PAT MED RELEASE INDICATOR   ')
+     A            BIPAUT        30A         TEXT('PRIOR AUTHORIZATION         ')
+     A            BIADDT        12A         TEXT('ADMISSION DATE & TIME       ')
+     A            BIDSDT        12A         TEXT('DISCHARGE DATE & TIME       ')
+     A            BIRTYP         3A         TEXT('DATE RANGE TYPE             ')
+     A            BISDRG        18A         TEXT('SERVICE BILL DATE RANGE     ')
+     A            BIUID#        30A         TEXT('UNIQUE BILL ID NUMBER       ')
+     A            BIBILD        14A         TEXT('TOTAL AMOUNT BILLED BY PROV ')
+     A            BICCD1         2A         TEXT('CONDITION CODE 1            ')
+     A            BICCD2         2A         TEXT('CONDITION CODE 2            ')
+     A            BICCD3         2A         TEXT('CONDITION CODE 3            ')
+     A            BICCD4         2A         TEXT('CONDITION CODE 4            ')
+     A            BICCD5         2A         TEXT('CONDITION CODE 5            ')
+     A            BIPQAL         2A         TEXT('PRIN PROC CODE QUALIFIER    ')
+     A            BIPCPT        30A         TEXT('PRIN PROCEDURE BILLED CODE  ')
+     A            BIPPDT         8A         TEXT('PRINCIPAL PROCEDURE DATE    ')
+     A            BIPC1Q         2A         TEXT('PROCEDURE CODE-1 QUALIFIER  ')
+     A            BIPCD1         6A         TEXT('PROCEDURE BILLED CODE-1     ')
+     A            BIPC2Q         2A         TEXT('PROCEDURE CODE-2 QUALIFIER  ')
+     A            BIPCD2         6A         TEXT('PROCEDURE BILLED CODE-2     ')
+     A            BIPC3Q         2A         TEXT('PROCEDURE CODE-3 QUALIFIER  ')
+     A            BIPCD3         6A         TEXT('PROCEDURE BILLED CODE-3     ')
+     A            BIPC4Q         2A         TEXT('PROCEDURE CODE-4 QUALIFIER  ')
+     A            BIPCD4         6A         TEXT('PROCEDURE BILLED CODE-4     ')
+     A            BIPC5Q         2A         TEXT('PROCEDURE CODE-5 QUALIFIER  ')
+     A            BIPCD5         6A         TEXT('PROCEDURE BILLED CODE-5     ')
+     A            BIPDIA         6A         TEXT('PRINCIPAL DIAGNOSIS CODE    ')
+     A            BIADIA         6A         TEXT('ADMITTING DIAGNOSIS CODE    ')
+     A            BIDIA1         6A         TEXT('DIAGNOSIS CODE-1           M')
+     A            BIDIA2         6A         TEXT('DIAGNOSIS CODE-2           M')
+     A            BIDIA3         6A         TEXT('DIAGNOSIS CODE-3           M')
+     A            BIDIA4         6A         TEXT('DIAGNOSIS CODE-4           M')
+     A            BIDIA5         6A         TEXT('DIAGNOSIS CODE-5           M')
+     A            BIDIA6         6A         TEXT('DIAGNOSIS CODE-6           M')
+     A            BIDIA7         6A         TEXT('DIAGNOSIS CODE-7           M')
+     A            BIDIA8         6A         TEXT('DIAGNOSIS CODE-8           M')
+     A            BIDIA9         6A         TEXT('DIAGNOSIS CODE-9           M')
+     A            BIIWRI         1A         TEXT('INJURED WORKER REIMBURS IND ')
+     A            BIPOSC         2A         TEXT('PLACE OF SERVICE BILL CODE  ')
+     A            BITRK#         9A         TEXT('TRANSACTION TRACKING #      ')
+     A            BIPBL#        30A         TEXT('PROVIDER UNIQUE BILL ID#    ')
+     A            BIBADJ        11A         TEXT('BILL ADJ AMOUNT')
+     A            BIBAUN         7A         TEXT('BILL ADJ UNITS')
+     A            BISTDT         8A         TEXT('STATEMENT DATE')
+     A            BIPHBL        11A         TEXT('TOTAL PHARM BILLED')
+     A            BISUBL        11A         TEXT('TOTAL SUPPLIES BILLED')
+     A            BIDRG         15A         TEXT('DRG CODE')
+     A            BIPPLN         2A         TEXT('PAYMENT PLAN')
+     A            BIPSIG         1A         TEXT('PROV SIG ON FILE')
+     A            BIPAGR         1A         TEXT('PROV AGREEMENT CODE')
+     A            BIPRDT         8A         TEXT('PROC DATE')
+     A            BICTCD         2A         TEXT('CONTRACT TYPE CODE')
+     A            BIRXDT         8A         TEXT('PRESCRIPTION DATE')
+     A            BIAAMT        11A         TEXT('BILL ADJ AMOUNT')
+     A            BIAUNT         7A         TEXT('BILL ADJ UNITS')
+     A            BIAAM2        11A         TEXT('BILL ADJ AMOUNT2')
+     A            BIAUN2         7A         TEXT('BILL ADJ UNITS2')
+     A***** Beg Add *** 04/16/15 **************************************
+     A            BIICDIND  R               REFFLD(FLAG)
+     A                                      COLHDG('ICD10 INDICATOR')
+     A            BIPRC110  R               REFFLD(DS30)
+     A                                      COLHDG('PRINC' 'PROC' 'ICD10')
+     A            BIPRC210  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('PROC' 'CODE 2' 'ICD10')
+     A                                      COLHDG('PROC' 'CODE 1' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIPRC310  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('PROC' 'CODE 3' 'ICD10')
+     A                                      COLHDG('PROC' 'CODE 2' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIPRC410  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('PROC' 'CODE 4' 'ICD10')
+     A                                      COLHDG('PROC' 'CODE 3' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIPRC510  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('PROC' 'CODE 5' 'ICD10')
+     A                                      COLHDG('PROC' 'CODE 4' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIPRC610  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('PROC' 'CODE 6' 'ICD10')
+     A                                      COLHDG('PROC' 'CODE 5' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIADIA10  R               REFFLD(DS8)
+     A                                      COLHDG('ADMIT' 'DIAG' 'ICD10')
+     A            BIDIA110  R               REFFLD(DS8)
+     A                                      COLHDG('PRINC' 'DIAG' 'ICD10')
+     A            BIDIA210  R               REFFLD(DS8)
+     A***************************
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('DIAG' 'CODE 2' 'ICD10')
+     A                                      COLHDG('DIAG' 'CODE 1' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIDIA310  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('DIAG' 'CODE 3' 'ICD10')
+     A                                      COLHDG('DIAG' 'CODE 2' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIDIA410  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('DIAG' 'CODE 4' 'ICD10')
+     A                                      COLHDG('DIAG' 'CODE 3' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIDIA510  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('DIAG' 'CODE 5' 'ICD10')
+     A                                      COLHDG('DIAG' 'CODE 4' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIDIA610  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('DIAG' 'CODE 6' 'ICD10')
+     A                                      COLHDG('DIAG' 'CODE 5' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIDIA710  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('DIAG' 'CODE 7' 'ICD10')
+     A                                      COLHDG('DIAG' 'CODE 6' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIDIA810  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('DIAG' 'CODE 8' 'ICD10')
+     A                                      COLHDG('DIAG' 'CODE 7' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A            BIDIA910  R               REFFLD(DS8)
+     A***** Beg Chg *** 10/22/15 **************************************
+     A***************************           COLHDG('DIAG' 'CODE 9' 'ICD10')
+     A                                      COLHDG('DIAG' 'CODE 8' 'ICD10')
+     A***** End Chg *** 10/22/15 **************************************
+     A***** End Add *** 04/16/15 **************************************
+     A***** Beg Add *** 10/22/15 **************************************
+     A            BIDIA010  R               REFFLD(DS8)
+     A                                      COLHDG('DIAG' 'CODE 9' 'ICD10')
+     A***** End Add *** 10/22/15 **************************************

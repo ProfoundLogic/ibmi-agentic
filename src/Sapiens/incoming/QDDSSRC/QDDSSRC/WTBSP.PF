@@ -1,0 +1,201 @@
+      * (c) 2023 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*****************************************************************
+     A*  WORKERS' COMP BILLING SCHEDULE CODE TABLE FILE
+     A*****************************************************************
+     A*  REVISIONS:                                                   *
+     H*                                                               *
+     H*  09/17/21 C:079 Project: CN024                                *
+     H*                 Add Portal flag                               *
+     H*                                                               *
+     H*  11/09/17 C:136 Project: 148WAN                               *
+     H*                 Add AmWins Pay Report Flag                    *
+     H*                                                               *
+     H*  01/13/17 C:136 Project: 102WHD                               *
+     H*                 Add maximum deposit limit field               *
+     H*                                                               *
+     H*  12/10/13 C:279 Project: 129WSB                               *
+     H*                 Add field for EFT only flag.                  *
+     H*                                                               *
+     H*  02/08/13 C:190 PROJECT: 140WAU                               *
+     H*                 ADD FIELD FOR ESTIMATING DEPOSIT PERIOD 2     *
+     H*                                                               *
+     H*  03/28/08 C:65  PROJECT: CI019                                *
+     H*                 ADD FLAG FOR ONLINE S/R PROCESSING.           *
+     H*                                                               *
+     H*  03/22/06 C:168  PROJECT: 129WNU                              *
+     H*                  ADDED FLAG FOR BILLING SCHEDULE DATE         *
+     H*                                                               *
+     H*  08/09/05 C:65 PROJECT: 81WXR                                 *
+     H*                ADD FLAG FOR INSTALLMENT BILLING DAY.          *
+     H*                                                               *
+     H*  06/24/05 C:33  Project: 109WDZ                               *
+     H*                 Add "Special" S/R flag                        *
+     H*                     # of months reported                      *
+     H*                     Month deposit is to be transferred        *
+     H*                     S/R Frequency                             *
+     H*                                                               *
+     H*  02/18/03 C:136 PROJECT: WC1115                               *
+     H*                 ADD FIELDS FOR PAYROLL/PREMIUM IMPORT/EXPORT  *
+     H*                                                               *
+     H*  07/09/98 C:65 PROJECT: WC577                                 *
+     H*                ADD SEVERAL NEW FIELDS TO DETAIL FILE.         *
+     A*                                                               *
+     A*  04/10/91 KWK  PROJECT AHE                                    *
+     A*                CHANGED BILLING SCHEDULE PERCENTAGES FROM A32  *
+     A*                TO A98 TO ALLOW THE USER TO SPECIFY            *
+     A*                PERCENTAGES UP TO SIX DECIMAL PLACES (EX.      *
+     A*                33.333333 %).  ALSO, ADDED ROLLOVER CODE THAT  *
+     A*                WILL DETERMINE ON ROLLOVER WHAT THE BILLING    *
+     A*                SCHEDULE CODE WILL BE FOR THE NEW FUND YEAR.   *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PBS01                     TEXT('BILLING SCHEDULE CODE FILE')
+     A            BSCO#     R               REFFLD(CO#)
+     A            BSKEY     R               REFFLD(KEY)
+     A            BSDESC    R               REFFLD(DS30)
+     A            BSSEFL    R               REFFLD(FLAG)
+     A                                      COLHDG('SELF-REPT/' 'ESTIMATE FLAG')
+     A            BSRLCD    R               REFFLD(KEY)
+     A                                      COLHDG('ROLLOVER' 'CODE')
+     A            BSAB01    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH  1')
+     A            BSAB02    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH  2')
+     A            BSAB03    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH  3')
+     A            BSAB04    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH  4')
+     A            BSAB05    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH  5')
+     A            BSAB06    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH  6')
+     A            BSAB07    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH  7')
+     A            BSAB08    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH  8')
+     A            BSAB09    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH  9')
+     A            BSAB10    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 10')
+     A            BSAB11    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 11')
+     A            BSAB12    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 12')
+     A            BSSTAT    R               REFFLD(STAT)
+     A            BSUSER    R               REFFLD(USER)
+     A            BSPGM     R               REFFLD(PGM)
+     A            BSTIME    R               REFFLD(TIME)
+     A            BSDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            BSIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            BSIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL' 'PROGRAM')
+     A            BSITM     R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL' 'TIME')
+     A            BSIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'DATE')
+     A            BSAB13    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 13')
+     A            BSAB14    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 14')
+     A            BSAB15    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 15')
+     A            BSAB16    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 16')
+     A            BSAB17    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 17')
+     A            BSAB18    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 18')
+     A            BSAB19    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 19')
+     A            BSAB20    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 20')
+     A            BSAB21    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 21')
+     A            BSAB22    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 22')
+     A            BSAB23    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 23')
+     A            BSAB24    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 24')
+     A            BSAB25    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 25')
+     A            BSAB26    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 26')
+     A            BSAB27    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 27')
+     A            BSAB28    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 28')
+     A            BSAB29    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 29')
+     A            BSAB30    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 30')
+     A            BSAB31    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 31')
+     A            BSAB32    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 32')
+     A            BSAB33    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 33')
+     A            BSAB34    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 34')
+     A            BSAB35    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 35')
+     A            BSAB36    R               REFFLD(PC98)
+     A                                      COLHDG('ANNUAL BILL' '% MONTH 36')
+     A            BSLPGM    R               REFFLD(FLAG)
+     A                                      COLHDG('PLAN TYPE (I/P/ )')
+     A*** BEGIN ADD ***  07/09/98  ************************************
+     A            BSDBSD    R               REFFLD(RPMY)
+     A                                      COLHDG('DIRECT DEBIT' 'TRANSFER' -
+     A                                      'STARTING PERIOD')
+     A            BSESDP    R               REFFLD(PC74)
+     A                                      COLHDG('ESCROW DEPOSIT %')
+     A*** END ADD *****  07/09/98  ************************************
+     A*** BEG ADD *****  02/18/03  ************************************
+     A            BSFREQ    R               REFFLD(FLAG)
+     A                                      COLHDG('BILLING' 'FREQUENCY')
+     A            BSDOWK         2A         COLHDG('DAY OF WEEK')
+     A*** END ADD *****  02/18/03  ************************************
+     A***  Begin Add  ***  06/24/05  **************************************
+     A            BSMSFL    R               REFFLD(FLAG)
+     A                                      COLHDG('SPECIAL' 'S/R FLAG')
+     A            BS#MTH         3S 0       COLHDG('# OF MONTHS' 'REPORTED')
+     A            BSTMTH         3S 0       COLHDG('MNTH DEPOSIT' 'TRANSFERRED')
+     A            BSSRFQ    R               REFFLD(FLAG)
+     A                                      COLHDG('S/R FREQUENCY')
+     A***  End   Add  ***  06/24/05  **************************************
+     A*** BEG ADD *****  08/09/05  ************************************
+     A            BSBDAY    R               REFFLD(FLAG)
+     A                                      COLHDG('INSTALLMENT' 'BILLING DAY')
+     A*** END ADD *****  08/09/05  ************************************
+     A*** BEG ADD *****  03/22/06  ************************************
+     A            BSON15    R               REFFLD(FLAG)
+     A                                      COLHDG('BILLING ON' '15 DAY FLAG')
+     A*** END ADD *****  03/22/06  ************************************
+     A*** BEGIN ADD ***  03/28/08  ************************************
+     A            BSONLI    R               REFFLD(FLAG)
+     A                                      COLHDG('ONLINE S/R' 'PROCESSING')
+     A*** END ADD *****  03/28/08  ************************************
+     A*** BEGIN ADD ***  02/08/13  ************************************
+     A            BSESD2    R     S         REFFLD(PC74)
+     A                                      COLHDG('EST DEPOSIT' '% PERIOD 2')
+     A*** END ADD *****  02/08/13  ************************************
+     A***** Beg Add ***** 12/10/13 ************************************
+     A            BSEFTF    R               REFFLD(FLAG)
+     A                                      COLHDG('EFT only flag')
+     A***** End Add ***** 12/10/13 ************************************
+     A*** beg add ***** 01/13/17 **************************************
+     A            BSMAXDEP  R     S         REFFLD(A92)
+     A                                      COLHDG('Max Deposit Amt')
+     A*** end add ***** 01/13/17 **************************************
+     A*** beg add ***** 11/09/17 **************************************
+     A            BSPAYR    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay Report Flag')
+     A*** end add ***** 11/09/17 **************************************
+     A*** beg add ***** 09/17/21 **************************************
+     A            BSPORTAL  R               REFFLD(FLAG)
+     A                                      COLHDG('Include in Portal')
+     A*** end add ***** 09/17/21 **************************************

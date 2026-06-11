@@ -1,0 +1,414 @@
+     A****************************************************************
+     A** (C) COPYRIGHT FISERV, INC., 2006 - 2007                    **
+     A****************************************************************
+     A**   W8070O WORKER COMPENSATION REPORT GA STATE               **
+     A**                                                            **
+     A**   PROGRAMMER: C:185                                        **
+     A****************************************************************
+     A**   REVISION:                                                **
+     A**                                                            **
+     A**   10/04/07 C:191 PROJECT: 91WOT                            **
+     A**                  NEW VERSION GA FROI 07/2007               **
+     A**                                                            **
+     A****************************************************************
+     A**  EMPLOYEE LAST, FIRST, MIDDLE NAME, SSN# AND ACCIDENT DATE
+     A*---------------------------------------------------------------
+     A          R NOI3
+     A            CMACL#        25A  O      POSITION(1.5 0.7)
+     A
+     A            CDLSN         30A  O      POSITION(1.5 1.8)
+     A
+     A            CDFSN         15A  O      POSITION(1.5 3.5)
+     A
+     A            CDMID          1A  O      POSITION(1.5 5.2)
+     A
+     A            PRCSS#        11A  O      POSITION(1.5 5.6)
+     A
+     A            PRACDT         8S 0O      POSITION(1.5 6.7)
+     A                                      EDTWRD('  /  /    ')
+     A*---------------------------------------------------------------
+     A*EMPLOYEE SEX, BIRTHDATE, PHONE, EMAIL.
+     A*---------------------------------------------------------------
+     A
+     A            PRSEXM         1A  O      POSITION(1.85 1.41)
+     A
+     A            PRSEXF         1A  O      POSITION(1.96 1.41)
+     A
+     A            PRCDOB         8S 0O      POSITION(2.0 2.1)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A            PRCLAR         3S 0O      POSITION(2.0 3.37)
+     A                                      EDTWRD('0(   )')
+     A
+     A            PRCLPH         7S 0O      POSITION(2.0 3.72)
+     A                                      EDTWRD('0   -    ')
+     A
+     A            PR40A3        40A  O      POSITION(2.0 4.95)
+     A
+     A*---------------------------------------------------------------
+     A*ADDRESS, CITY, STATE, ZIP
+     A*---------------------------------------------------------------
+     A
+     A            PRCLA1        40A  O      POSITION(2.21 0.60)
+     A
+     A            PRCLCY        25A  O      POSITION(2.21 4.10)
+     A
+     A            PRCLST         2A  O      POSITION(2.21 5.85)
+     A
+     A            PRCLZP         9S 0O      POSITION(2.21 6.45)
+     A                                      EDTWRD('     -    ')
+     A
+     A*---------------------------------------------------------------
+     A*EMPLOYER NAME, NAICS, NATURE OF BUSINESS
+     A*---------------------------------------------------------------
+     A
+     A            PRENAM        40A  O      POSITION(2.50 1.40)
+     A
+     A            PRNAIC        10A  O      POSITION(2.50 4.10)
+     A
+     A            PRNAOB        40A  O      POSITION(2.50 5.21)
+     A
+     A
+     A*---------------------------------------------------------------
+     A*EMPLOYER ADDRESS 1, PHONE NUMBER, FEIN
+     A*---------------------------------------------------------------
+     A
+     A*** BEG CHG ****** 10/04/07 *********************************************
+     A*********** PRMAD1        40A  O      POSITION(2.75 0.60)
+     A            PRMAD1        40A  O      POSITION(2.63 1.00)
+     A*
+     A            PRMAD2        40A  O      POSITION(2.73 1.00)
+     A
+     A*********** PRAREA         3S 0O      POSITION(2.75 4.20)
+     A            PRAREA         3S 0O      POSITION(2.70 4.20)
+     A                                      EDTWRD('0(   )')
+     A
+     A*********** PRPHN#         7S 0O      POSITION(2.75 4.55)
+     A            PRPHN#         7S 0O      POSITION(2.70 4.55)
+     A                                      EDTWRD('0   -    ')
+     A
+     A*********** PRFEIN         9S 0O      POSITION(2.75 6.30)
+     A            PRFEIN         9S 0O      POSITION(2.70 6.30)
+     A*** END CHG ****** 10/04/07 *********************************************
+     A*---------------------------------------------------------------
+     A*EMPLOYER ADDRESS 2, EMPLOYER EMAIL ADDRESS
+     A*---------------------------------------------------------------
+     A*** BEG CHG ****** 10/04/07 *********************************************
+     A
+     A*********** PRMAD2        40A  O      POSITION(2.95 0.60)
+     A
+     A            PRMCTY        25A  O      POSITION(2.95 0.60)
+     A            PRMST          2A  O      POSITION(2.95 2.50)
+     A            PRMZIP         9A  O      POSITION(2.95 3.10)
+     A
+     A*********** PRECSZ        40A  O      POSITION(2.90 2.20)
+     A
+     A*********** PREMAL        40A  O      POSITION(2.90 4.55)
+     A            PREMAL        40A  O      POSITION(2.95 4.55)
+     A*** END CHG ****** 10/04/07 *********************************************
+     A
+     A*---------------------------------------------------------------
+     A*INSURER, SELF INSURER, CLAIMS OFFICE ADDRESS TILL FEIN
+     A*---------------------------------------------------------------
+     A*********** PRFNM1        30A  O      POSITION(3.25 1.75)
+     A            PRFNM1        30A  O      POSITION(3.20 1.75)
+     A*** END CHG ****** 10/04/07 *********************************************
+     A*** BEG ADD ****** 10/04/07 **********************************************
+     A            P@FEIN         9S 0O      POSITION(3.20 4.10)
+     A
+     A            PRFND          3S 0O      POSITION(3.20 6.30)
+     A
+     A            PRFYR          3S 0O      POSITION(3.20 6.55)
+     A
+     A            PRCASE         7S 0O      POSITION(3.20 6.80)
+     A*** END ADD ****** 10/04/07 **********************************************
+     A*** BEG DEL ****** 10/04/07 **********************************************
+     A*** MOVED DOWN
+     A*********   PROFA1        20A  O      POSITION(3.25 4.10)
+     A*********
+     A*********   PROFA2        20A  O      POSITION(3.35 4.10)
+     A*********
+     A*** END DEL ****** 10/04/07 **********************************************
+     A*
+     A            PRONM1        20A  O      POSITION(3.50 1.75)
+     A*
+     A*** BEG ADD ****** 10/04/07 **********************************************
+     A* CLAIMS OFFICE FEIN#
+     A            PRCOFE         9S  O      POSITION(3.50 3.75)
+     A* CLAIMS OFFICE PHN
+     A            PROFAR         3S 0O      POSITION(3.50 4.75)
+     A                                      EDTWRD('0(   )')
+     A
+     A            PROFPH         7S 0O      POSITION(3.50 5.10)
+     A                                      EDTWRD('0   -    ')
+     A* CLAIMS OFFICE EMAIL
+     A            PR40A4        40A  O      POSITION(3.50 6.00)
+     A*** END DEL ****** 10/04/07 **********************************************
+     A*** END ADD ****** 10/04/07 **********************************************
+     A*** BEG DEL ****** 10/04/07 **********************************************
+     A*** MOVED DOWN
+     A*********
+     A*********   PROFCY        15A  O      POSITION(3.50 4.10)
+     A*********
+     A*********   PROFST         2A  O      POSITION(3.50 5.10)
+     A*********
+     A*********   PROFZP         9S 0O      POSITION(3.50 5.25)
+     A*********                             EDTWRD('     -    ')
+     A*** END DEL ****** 10/04/07 **********************************************
+     A
+     A*** BEG DEL ****** 10/04/07 **********************************************
+     A*** MOVED UP
+     A****        P@FEIN         9S 0O      POSITION(3.50 6.30)
+     A*** END DEL ****** 10/04/07 **********************************************
+     A*---------------------------------------------------------------
+     A* SBWC ID, INSURER FILE, CLAIMS OFF PHONE, EMAIL
+     A*---------------------------------------------------------------
+     A*** BEG CHG ****** 10/04/07 **********************************************
+     A*********** PR5N3          5S 0O      POSITION(3.75 0.60)
+     A            PR5N3          5S 0O      POSITION(3.70 0.60)
+     A*** END CHG ****** 10/04/07 **********************************************
+     A*
+     A*** BEG ADD ****** 10/04/07 **********************************************
+     A* CLAIMS OFFICE ADDRESS
+     A            PROFA1        35A  O      POSITION(3.70 2.05)
+     A
+     A*********** PROFA2        20A  O      POSITION(3.70 2.45)
+     A
+     A            PROFCY        15A  O      POSITION(3.70 4.10)
+     A
+     A            PROFST         2A  O      POSITION(3.70 5.85)
+     A
+     A            PROFZP         9S 0O      POSITION(3.70 6.45)
+     A                                      EDTWRD('     -    ')
+     A
+     A*** END ADD ****** 10/04/07 **********************************************
+     A
+     A*** BEG DEL ****** 10/04/07 **********************************************
+     A**** MOVED UP
+     A**********  PRFND          3S 0O      POSITION(3.75 2.10)
+     A**********
+     A**********  PRFYR          3S 0O      POSITION(3.75 2.35)
+     A**********
+     A**********  PRCASE         7S 0O      POSITION(3.75 2.60)
+     A**********
+     A**********  PROFAR         3S 0O      POSITION(3.75 3.60)
+     A**********                            EDTWRD('0(   )')
+     A**********
+     A**********  PROFPH         7S 0O      POSITION(3.75 3.95)
+     A**********                            EDTWRD('0   -    ')
+     A**********
+     A**********  PR40A4        40A  O      POSITION(3.75 5.10)
+     A*** END DEL ****** 10/04/07 **********************************************
+     A
+     A*---------------------------------------------------------------
+     A* EMPLOYMENT WAGE, DATE HIRED, JOB CODE, NUMBER DAYS, WAGE RATE
+     A*---------------------------------------------------------------
+     A
+     A*** BEG CHG ****** 10/04/07 **********************************************
+     A*********** PRDOH          8S 0O      POSITION(4.10 2.00)
+     A            PRDOH          8S 0O      POSITION(4.05 2.00)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A*********** PRCLAS         5S 0O      POSITION(4.10 3.00)
+     A            PRCLAS         5S 0O      POSITION(4.05 3.00)
+     A
+     A*********** PRDAYS         1A  O      POSITION(4.10 4.30)
+     A            PRDAYS         1A  O      POSITION(4.05 4.30)
+     A
+     A*********** PRPAWW         7S 2O      POSITION(4.10 6.10)
+     A            PRPAWW         7S 2O      POSITION(4.05 6.10)
+     A                                      EDTCDE(K)
+     A
+     A*********** PRPWWF         1A  O      POSITION(4.14 6.79)
+     A            PRPWWF         1A  O      POSITION(4.07 6.81)
+     A*** END CHG ****** 10/04/07 **********************************************
+     A*** BEG ADD ****** 10/04/07 **********************************************
+     A* INSURER TYPE CODE
+     A            PRICDI         1A  O      POSITION(4.29 0.63)
+     A            PRICDS         1A  O      POSITION(4.29 1.25)
+     A            PRICDG         1A  O      POSITION(4.29 1.85)
+     A*** END ADD ****** 10/04/07 **********************************************
+     A
+     A*** BEG CHG ****** 10/04/07 **********************************************
+     A**********  PRDYOF        20A  O      POSITION(4.30 2.10)
+     A            PRDYOF        20A  O      POSITION(4.30 3.20)
+     A*** END CHG ****** 10/04/07 **********************************************
+     A*---------------------------------------------------------------
+     A* INJURY AND MEDICAL, TIME, COUNTY, DATE EMPLOYER NOTIFIED,...
+     A*---------------------------------------------------------------
+     A
+     A            PRTIME         4S 0O      POSITION(4.65 1.85)
+     A                                      EDTWRD('  :  ')
+     A
+     A            PRTIAM         1A  O      POSITION(4.60 2.47)
+     A
+     A            PRTIPM         1A  O      POSITION(4.72 2.47)
+     A
+     A            XXCNTY        20A  O      POSITION(4.65 3.00)
+     A
+     A            PRDTRP         8S 0O      POSITION(4.65 4.80)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A*** BEG CHG ****** 10/04/07 **********************************************
+     A*********** PRDT1          8S 0O      POSITION(4.63 6.10)
+     A            PRDT1          8S 0O      POSITION(4.63 6.30)
+     A                                      EDTWRD('  /  /    ')
+     A*** END CHG ****** 10/04/07 **********************************************
+     A*---------------------------------------------------------------
+     A* FULL PAY ON DATE OF INJURY.., TYPE OF INJURY,..BODY PART...
+     A*---------------------------------------------------------------
+     A
+     A*** BEG CHG ****** 10/04/07 **********************************************
+     A*********** PRPOIY         1A  O      POSITION(5.03 0.71)
+     A            PRPOIY         1A  O      POSITION(5.05 0.68)
+     A
+     A*********** PRPOIN         1A  O      POSITION(5.03 1.30)
+     A            PRPOIN         1A  O      POSITION(5.05 1.27)
+     A
+     A*********** PRADRY         1A  O      POSITION(5.03 1.87)
+     A            PRADRY         1A  O      POSITION(5.05 1.81)
+     A
+     A*********** PRADRN         1A  O      POSITION(5.03 2.36)
+     A            PRADRN         1A  O      POSITION(5.05 2.40)
+     A
+     A*********** PRNADS        19A  O      POSITION(5.00 2.85)
+     A            PRNADS        19A  O      POSITION(5.00 3.00)
+     A*** END CHG ****** 10/04/07 **********************************************
+     A
+     A            PRBPRT        19A  O      POSITION(5.00 5.30)
+     A*---------------------------------------------------------------
+     A* HOW THE INJURY OCCURED
+     A*---------------------------------------------------------------
+     A
+     A            PRACDS        60A  O      POSITION(5.30 0.60)
+     A
+     A            PRACD2        60A  O      POSITION(5.30 4.10)
+     A
+     A*---------------------------------------------------------------
+     A* TREATING PHYSICIAN, INITIAL TREATMENT, HOSPITAL NAME.....
+     A*---------------------------------------------------------------
+     A
+     A            PRPNAM        35A  O      POSITION(5.60 0.60)
+     A
+     A            PRTRT0         1A  O      POSITION(5.53 2.59)
+     A
+     A            PRTRT1         1A  O      POSITION(5.65 2.59)
+     A
+     A            PRTRT2         1A  O      POSITION(5.78 2.59)
+     A
+     A            PRTRT3         1A  O      POSITION(5.91 2.59)
+     A
+     A            PRTRT4         1A  O      POSITION(6.01 2.59)
+     A
+     A            PRHFSN        15A  O      POSITION(5.70 3.80)
+     A
+     A            PRIRTN         8S 0O      POSITION(5.50 6.80)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A            PRPAD1        35A  O      POSITION(5.70 0.60)
+     A
+     A            PRHOSN        40A  O      POSITION(5.60 3.80)
+     A
+     A            PRPOWW         7S 2O      POSITION(5.70 6.60)
+     A                                      EDTCDE(K)
+     A
+     A            PRPCSZ        25A  O      POSITION(5.80 0.60)
+     A
+     A            PRPZIP        10A  O      POSITION(5.80 1.60)
+     A
+     A            PRHOSA        40A  O      POSITION(5.90 3.80)
+     A
+     A            PR@REA         3S 0O      POSITION(6.00 0.60)
+     A                                      EDTWRD('0(   )')
+     A
+     A            PRPPH#         7S 0O      POSITION(6.00 0.95)
+     A                                      EDTWRD('0   -    ')
+     A
+     A            PRHCSZ        25A  O      POSITION(6.00 3.80)
+     A
+     A            PRDOD          8S 0O      POSITION(6.00 6.70)
+     A                                      EDTWRD('  /  /    ')
+     A*---------------------------------------------------------------
+     A* REPORT PRINTER BY ..., TELEPHONE NUMBER, DATE OF REPORT.
+     A*---------------------------------------------------------------
+     A            PRPREP        40A  O      POSITION(6.40 0.60)
+     A
+     A            PR@FAR         3S 0O      POSITION(6.40 5.20)
+     A                                      EDTWRD('0(   )')
+     A
+     A            PR@FPH         7S 0O      POSITION(6.40 5.50)
+     A                                      EDTWRD('0   -    ')
+     A
+     A            PRRPDT         8S 0O      POSITION(6.40 6.70)
+     A                                      EDTWRD('  /  /    ')
+     A*---------------------------------------------------------------
+     A* INCOME BENEFITS.....PREVIOUS MEDICAL, AVERAGE WAGE ETC.
+     A*---------------------------------------------------------------
+     A*** BEG CHG ****** 10/04/07 **********************************************
+     A*********** PRTHY          1A  O      POSITION(6.88 0.61)
+     A            PRTHY          1A  O      POSITION(6.89 0.68)
+     A
+     A*********** PRTHN          1A  O      POSITION(6.88 1.15)
+     A            PRTHN          1A  O      POSITION(6.89 1.22)
+     A*** END CHG ****** 10/04/07 **********************************************
+     A
+     A            PRAWW          7S 2O      POSITION(6.85 2.90)
+     A                                      EDTCDE(K)
+     A
+     A            PRWKBN         5S 0O      POSITION(6.85 4.90)
+     A                                      EDTCDE(K)
+     A
+     A            PRDT1@         8S 0O      POSITION(6.85 6.25)
+     A                                      EDTWRD('  /  /    ')
+     A*---------------------------------------------------------------
+     A* INCOME BENEFITS.....FIRST PAYMENT, COMPENSATION PAID.
+     A*---------------------------------------------------------------
+     A            PRPADT         8S 0O      POSITION(7.10 1.65)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A            PRAAMT         9S 2O      POSITION(7.10 3.60)
+     A                                      EDTCDE(K)
+     A
+     A            PRNLTY        11S 2O      POSITION(7.10 6.70)
+     A                                      EDTCDE(K)
+     A
+     A            PRPA@T         8S 0O      POSITION(7.10 5.40)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A            PRPAYF         8S 0O      POSITION(7.35 2.10)
+     A                                      EDTWRD('  /  /    ')
+     A*---------------------------------------------------------------
+     A* TEMPORARY TOTAL DISABILITY
+     A*---------------------------------------------------------------
+     A
+     A            PRTT           1A  O      POSITION(7.55 0.62)
+     A
+     A*** BEG CHG ****** 10/04/07 **********************************************
+     A*********** PRTP           1A  O      POSITION(7.55 1.96)
+     A            PRTP           1A  O      POSITION(7.55 2.05)
+     A
+     A*********** PRPP           1A  O      POSITION(7.55 3.29)
+     A            PRPP           1A  O      POSITION(7.55 3.59)
+     A
+     A*********** PRPERC         3S 0O      POSITION(7.55 4.70)
+     A            PRPERC         3S 0O      POSITION(7.55 5.10)
+     A                                      EDTCDE(K)
+     A
+     A*********** PRPART        10A  O      POSITION(7.55 5.60)
+     A            PRPART        10A  O      POSITION(7.55 6.00)
+     A*** END CHG ****** 10/04/07 **********************************************
+     A
+     A            PRWKS          3S 0O      POSITION(7.55 6.90)
+     A                                      EDTCDE(K)
+     A
+     A            PRPAYT         8S 0O      POSITION(7.70 1.00)
+     A                                      EDTWRD('  /  /    ')
+     A
+     A************************************************************
+     A          R NOI4                      ENDPAGE
+     A            PR60A1        60A  O      POSITION(8.45 0.60)
+     A
+     A************************************************************
+     A          R NOI5
+     A            PRXXBK         1A  O      POSITION(0.50 0.50)
+     A************************************************************

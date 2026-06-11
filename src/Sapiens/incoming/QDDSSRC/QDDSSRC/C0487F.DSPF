@@ -1,0 +1,116 @@
+     A*%%TS  SD  19970731  195335  WINNERW     REL-V3R6M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**  REWRITE POLICY PROMPT DISPLAY                             **
+     A**                                                            **
+     A**  PROGRAMMER: C:31                                          **
+     A****************************************************************
+     A**  REVISIONS                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*---------------------------------------------------------------
+     A          R SCR01
+     A*%%TS  SD  19970731  195335  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      CF05
+     A                                      CF07
+     A                                      CF09
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(33)
+     A                                      SETOF(34)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0487F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  9 22'Old policy number:'
+     A            SCPOL#    R        B  9 42REFFLD(POL#)
+     A                                      OVRDTA
+     A  30                                  DSPATR(PC)
+     A  20                                  ERRMSGID(CCR0535 *LIBL/CMESGG)
+     A  21                                  ERRMSGID(CCR0921 *LIBL/CMESGG)
+     A  34                                  ERRMSGID(CCR0943 *LIBL/CMESGG)
+     A                                 11 22'New Policy number:'
+     A            SCNEW#    R        B 11 42REFFLD(POL#)
+     A                                      OVRDTA
+     A  31                                  DSPATR(PC)
+     A  22                                  ERRMSGID(CCR0535 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0910 *LIBL/CMESGG)
+     A                                 13 25'Effective date:'
+     A            SCEFDT    R        B 13 42REFFLD(DT8)
+     A                                      OVRDTA
+     A  32                                  DSPATR(PC)
+     A  25                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                 15 24'Expiration date:'
+     A            SCEXDT    R        B 15 42REFFLD(DT8)
+     A                                      OVRDTA
+     A  33                                  DSPATR(PC)
+     A  26                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  27                                  ERRMSGID(CCR0544 *LIBL/CMESGG)
+     A                                 22  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 29'F5=Policy search'
+     A                                      COLOR(BLU)
+     A                                 22 54'F7=Named insured search'
+     A                                      COLOR(BLU)
+     A                                 23  2'F9=Dba name search'
+     A                                      COLOR(BLU)
+     A                                 23 54'F13=Change user parm'
+     A                                      COLOR(BLU)
+     A*---------------------------------------------------------------
+     A          R SCR02
+     A                                      SETOF(40)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0487F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A                                  9 22'Old policy number:'
+     A            SCPOL#    R        O  9 42REFFLD(POL#)
+     A                                 11 22'New Policy number:'
+     A            SCNEW#    R        O 11 42REFFLD(POL#)
+     A                                 13 25'Effective date:'
+     A            SCEFDT    R        O 13 42REFFLD(DT8)
+     A                                 15 24'Expiration date:'
+     A            SCEXDT    R        O 15 42REFFLD(DT8)
+     A                                 18 25'PRESS ENTER TO SUBMIT REWRITE'
+     A                                      COLOR(WHT)
+     A                                 22  2'F12=Cancel        '
+     A                                      COLOR(BLU)
+     A*---------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

@@ -1,0 +1,396 @@
+      * (c) 2020 Sapiens. All Rights Reserved.                             *
+     A*****************************************************************
+     A* W7511O1 - Printer file - Cert of Insurance
+     A*****************************************************************
+     A*                                                               *
+     A* ANY CHANGES MADE HERE MUST ALSO BE MADE TO W7511O !!!!!!      *
+     A*                                                               *
+     A*****************************************************************
+      * REVISIONS:                                                    *
+      *                                                               *
+      * 12/28/20 C:62  Ticket 91929 (136)                             *
+      *                Make date font the same as rest of report.     *
+      *                                                               *
+      * 12/30/10 C:61  PROJECT: WC1880 PRISS 24                       *
+      *                Print date in mm/dd/ccyy format                *
+      *                                                               *
+      * 04/23/10 C:61  PROJECT: WC1880                                *
+      *              - Print overlay and signature page segment.      *
+      *                (NC ACCORD FORM)                               *
+      *              - Change all offsets to be specified by variable *
+      *                to allow for printing different forms.         *
+      *                (project to enable printing of NJ form)        *
+      *              - Remove prior comments.  Improve readability.   *
+      *                                                               *
+      * 04/04/09 C:61  PROJECT: WC1304                                *
+      *                Allow for printing "Out of Country"            *
+      *                Cert Holder address.                           *
+     A*                                                               *
+     A* 06/20/06 C:33  Project: 45WFB                                 *
+     A*                Back to base for Certs.                        *
+     A*                                                               *
+     A* 03/14/06 C:136 SUPPORT: WA129 51477                           *
+     A*                CORRECT FONT DISCREPANCIES BETWEEN W7511O AND  *
+     A*                W7511O1.                                       *
+     A*                                                               *
+     H* 12/28/05 C:167 WC1364                                         *
+     H*                Add F2NAIC to the print output.                *
+     H*                                                               *
+     A* 09/15/05 C:132 WC1364                                         *
+     A*                Remove EMNAIC from the print output.           *
+     A*                                                               *
+     A*****************************************************************
+     A
+      *
+     A
+     A          R CEOV1
+     A                                      OVERLAY(&XXCEOV &VTCEOV &HZCEOV)
+     A            XXCEOV         8   P
+     A            VTCEOV         5S 3P
+     A            HZCEOV         5S 3P
+      *
+     A          R SPSG1
+     A                                      PAGSEG(&XXSPSG &VTSPSG &HZSPSG)
+     A            XXSPSG         8   P
+     A            VTSPSG         5S 3P
+     A            HZSPSG         5S 3P
+      *
+     A          R DETDT1
+     A N31        DSDATE         6  0       POSITION(&VTDATE &HZDATE)
+     A                                      EDTWRD('  /  /  ')
+     A*** Begin Chg *** 12/28/20 **************************************
+     A**********                            FNTCHRSET(C04200B0 T1V10037)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A*** End   Chg *** 12/28/20 **************************************
+     A  31        X8DATE         8  0       POSITION(&VTDATE &HZDATE)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            VTDATE         5S 3P
+     A            HZDATE         5S 3P
+      *
+      *
+     A          R DETAGT1
+     A            AGNAME        40          POSITION(&VTAGNM &HZAGNM)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            AGMAD1        40          POSITION(&VTMAD1 &HZMAD1)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            AGCSZ         40          POSITION(&VTCSZ &HZCSZ)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      *
+     A            VTAGNM         5S 3P
+     A            HZAGNM         5S 3P
+      *
+     A            VTMAD1         5S 3P
+     A            HZMAD1         5S 3P
+      *
+     A            VTCSZ          5S 3P
+     A            HZCSZ          5S 3P
+      *
+      *
+     A          R FNAM1
+     A            XXFNNM        34          POSITION(&VTFNNM &HZFNNM)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            F2NAIC        10          POSITION(&VTNAIC &HZNAIC)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      *
+     A            VTFNNM         5S 3P
+     A            HZFNNM         5S 3P
+      *
+     A            VTNAIC         5S 3P
+     A            HZNAIC         5S 3P
+      *
+      *
+     A          R INSD1                     FNTCHRSET(C0H20080 T1V10037)
+     A            XXINS1       112          POSITION(&VTINS1 &HZINS1)
+     A            XXINS2       112          POSITION(&VTINS2 &HZINS2)
+     A            XXINS3       112          POSITION(&VTINS3 &HZINS3)
+     A            XXINS4       112          POSITION(&VTINS4 &HZINS4)
+     A            XXINS5       112          POSITION(&VTINS5 &HZINS5)
+     A            XXINS6       112          POSITION(&VTINS6 &HZINS6)
+      *
+     A            VTINS1         5S 3P
+     A            HZINS1         5S 3P
+      *
+     A            VTINS2         5S 3P
+     A            HZINS2         5S 3P
+      *
+     A            VTINS3         5S 3P
+     A            HZINS3         5S 3P
+      *
+     A            VTINS4         5S 3P
+     A            HZINS4         5S 3P
+      *
+     A            VTINS5         5S 3P
+     A            HZINS5         5S 3P
+      *
+     A            VTINS6         5S 3P
+     A            HZINS6         5S 3P
+      *
+      *
+     A          R INSDL1                    FNTCHRSET(C0D0GT24 T1V10037)
+     A            XXINS1       112          POSITION(&VTINS1 &HZINS1)
+     A            XXINS2       112          POSITION(&VTINS2 &HZINS2)
+     A            XXINS3       112          POSITION(&VTINS3 &HZINS3)
+     A            XXINS4       112          POSITION(&VTINS4 &HZINS4)
+     A            XXINS5       112          POSITION(&VTINS5 &HZINS5)
+     A            XXINS6       112          POSITION(&VTINS6 &HZINS6)
+      *
+     A            VTINS1         5S 3P
+     A            HZINS1         5S 3P
+      *
+     A            VTINS2         5S 3P
+     A            HZINS2         5S 3P
+      *
+     A            VTINS3         5S 3P
+     A            HZINS3         5S 3P
+      *
+     A            VTINS4         5S 3P
+     A            HZINS4         5S 3P
+      *
+     A            VTINS5         5S 3P
+     A            HZINS5         5S 3P
+      *
+     A            VTINS6         5S 3P
+     A            HZINS6         5S 3P
+      *
+     A          R CNUM1                     FNTCHRSET(C0H20080 T1V10037)
+     A  31        X1CER#         5  0       POSITION(&VTCER# &HZCER#)
+     A  31        X1REV#         5  0       POSITION(&VTREV# &HZREV#)
+      *
+     A            VTCER#         5S 3P
+     A            HZCER#         5S 3P
+      *
+     A            VTREV#         5S 3P
+     A            HZREV#         5S 3P
+      *
+     A          R BODY1
+     A            XXPRX          1          POSITION(&VTPRX &HZPRX)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A            XXPRA          1          POSITION(&VTPRA &HZPRA)
+     A                                      FNTCHRSET(C0H200H0 T1V10037)
+     A            XXYORN         3          POSITION(&VTYORN &HZYORN)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            XXCAP#        18          POSITION(&VTCAP# &HZCAP#)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A N31        XXFRDT         6  0       POSITION(&VTFRDT &HZFRDT)
+     A                                      EDTWRD('  /  /  ')
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A N31        XXENDT         6  0       POSITION(&VTENDT &HZENDT)
+     A                                      EDTWRD('  /  /  ')
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A  31        X1FRDT         8  0       POSITION(&VTFRDT &HZFRDT)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A  31        X1ENDT         8  0       POSITION(&VTENDT &HZENDT)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            XXACC          7  0       EDTCDE(J)
+     A                                      POSITION(&VTACC &HZACC)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            XXDIS          7  0       EDTCDE(J)
+     A                                      POSITION(&VTDIS &HZDIS)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            XXAGG          7  0       EDTCDE(J)
+     A                                      POSITION(&VTAGG &HZAGG)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A N31        XXREF         11          POSITION(&VTREF &HZREF)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A N31        XXCOM1        10          POSITION(&VTCOM1 &HZCOM1)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      *
+     A            VTPRX          5S 3P
+     A            HZPRX          5S 3P
+      *
+     A            VTPRA          5S 3P
+     A            HZPRA          5S 3P
+      *
+     A            VTYORN         5S 3P
+     A            HZYORN         5S 3P
+      *
+     A            VTCAP#         5S 3P
+     A            HZCAP#         5S 3P
+      *
+     A            VTFRDT         5S 3P
+     A            HZFRDT         5S 3P
+      *
+     A            VTENDT         5S 3P
+     A            HZENDT         5S 3P
+      *
+     A            VTACC          5S 3P
+     A            HZACC          5S 3P
+      *
+     A            VTDIS          5S 3P
+     A            HZDIS          5S 3P
+      *
+     A            VTAGG          5S 3P
+     A            HZAGG          5S 3P
+      *
+     A            VTREF          5S 3P
+     A            HZREF          5S 3P
+      *
+     A            VTCOM1         5S 3P
+     A            HZCOM1         5S 3P
+      *
+      *
+      **********
+     A          R REM1
+     A N85        XXDS01       112          POSITION(&VTDS01 &HZDS01)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  85        XBDS01       112          POSITION(&VTDS01 &HZDS01)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N86        XXDS02       112          POSITION(&VTDS02 &HZDS02)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  86        XBDS02       112          POSITION(&VTDS02 &HZDS02)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N87        XXDS03       112          POSITION(&VTDS03 &HZDS03)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  87        XBDS03       112          POSITION(&VTDS03 &HZDS03)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N88        XXDS04       112          POSITION(&VTDS04 &HZDS04)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  88        XBDS04       112          POSITION(&VTDS04 &HZDS04)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N89   N31  XXDS05       112          POSITION(&VTDS05 &HZDS05)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  89   N31  XBDS05       112          POSITION(&VTDS05 &HZDS05)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N90   N31  XXDS06       112          POSITION(&VTDS06 &HZDS06)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  90   N31  XBDS06       112          POSITION(&VTDS06 &HZDS06)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N91   N31  XXDS07       112          POSITION(&VTDS07 &HZDS07)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  91   N31  XBDS07       112          POSITION(&VTDS07 &HZDS07)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N92   N31  XXDS08       112          POSITION(&VTDS08 &HZDS08)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  92   N31  XBDS08       112          POSITION(&VTDS08 &HZDS08)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N93   N31  XXDS09       112          POSITION(&VTDS09 &HZDS09)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  93   N31  XBDS09       112          POSITION(&VTDS09 &HZDS09)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N94   N31  XXDS10       112          POSITION(&VTDS10 &HZDS10)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  94   N31  XBDS10       112          POSITION(&VTDS10 &HZDS10)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N95   N31  XXDS11       112          POSITION(&VTDS11 &HZDS11)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  95   N31  XBDS11       112          POSITION(&VTDS11 &HZDS11)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N96   N31  XXDS12       112          POSITION(&VTDS12 &HZDS12)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  96   N31  XBDS12       112          POSITION(&VTDS12 &HZDS12)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N97   N31  XXDS13       112          POSITION(&VTDS13 &HZDS13)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  97   N31  XBDS13       112          POSITION(&VTDS13 &HZDS13)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A***
+     A N98   N31  XXDS14       112          POSITION(&VTDS14 &HZDS14)
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A  98   N31  XBDS14       112          POSITION(&VTDS14 &HZDS14)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+      *
+     A            VTDS01         5S 3P
+     A            HZDS01         5S 3P
+      *
+     A            VTDS02         5S 3P
+     A            HZDS02         5S 3P
+      *
+     A            VTDS03         5S 3P
+     A            HZDS03         5S 3P
+      *
+     A            VTDS04         5S 3P
+     A            HZDS04         5S 3P
+      *
+     A            VTDS05         5S 3P
+     A            HZDS05         5S 3P
+      *
+     A            VTDS06         5S 3P
+     A            HZDS06         5S 3P
+      *
+     A            VTDS07         5S 3P
+     A            HZDS07         5S 3P
+      *
+     A            VTDS08         5S 3P
+     A            HZDS08         5S 3P
+      *
+     A            VTDS09         5S 3P
+     A            HZDS09         5S 3P
+      *
+     A            VTDS10         5S 3P
+     A            HZDS10         5S 3P
+      *
+     A            VTDS11         5S 3P
+     A            HZDS11         5S 3P
+      *
+     A            VTDS12         5S 3P
+     A            HZDS12         5S 3P
+      *
+     A            VTDS13         5S 3P
+     A            HZDS13         5S 3P
+      *
+     A            VTDS14         5S 3P
+     A            HZDS14         5S 3P
+      *
+     A***
+      *
+     A          R DAY1
+     A  30        XXDAYS         3  0       POSITION(&VTDAYS &HZDAYS)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      EDTCDE(1)
+     A            VTDAYS         5S 3P
+     A            HZDAYS         5S 3P
+      *
+      *
+     A          R DET1                      ENDPAGE
+     A            XXCE1         55          POSITION(&VTCE1 &HZCE1)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            XXCE2         55          POSITION(&VTCE2 &HZCE2)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            XXCE3         55          POSITION(&VTCE3 &HZCE3)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            XXCE4         55          POSITION(&VTCE4 &HZCE4)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            XXCE5         55          POSITION(&VTCE5 &HZCE5)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            XXCE6         55          POSITION(&VTCE6 &HZCE6)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            XXCE7         55          POSITION(&VTCE7 &HZCE7)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      *
+     A            VTCE1          5S 3P
+     A            HZCE1          5S 3P
+      *
+     A            VTCE2          5S 3P
+     A            HZCE2          5S 3P
+      *
+     A            VTCE3          5S 3P
+     A            HZCE3          5S 3P
+      *
+     A            VTCE4          5S 3P
+     A            HZCE4          5S 3P
+      *
+     A            VTCE5          5S 3P
+     A            HZCE5          5S 3P
+      *
+     A            VTCE6          5S 3P
+     A            HZCE6          5S 3P
+      *
+     A            VTCE7          5S 3P
+     A            HZCE7          5S 3P
+      *
+      *

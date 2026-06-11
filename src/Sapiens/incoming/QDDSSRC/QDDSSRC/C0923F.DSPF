@@ -1,0 +1,298 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   SUBROGATION REQUEST SEARCH DISPLAY                       **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      CF05
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      PUTOVR
+     A                                      SETOF(20)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0923F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  4  2'Claim #:'
+     A            SCCLM#        12A  O  4 11
+     A                                  4 25'Section:'
+     A            SCCC           2A  O  4 34
+     A            SCDESC        40A  O  4 38
+     A                                  5  2'Request #:'
+     A            SCREQ#    R        B  5 13REFFLD(SEQ#)
+     A                                      EDTCDE(4)
+     A*                                     DSPATR(CS)
+     A                                  5 21'Claimant:'
+     A            SCCLID         5A  O  5 31
+     A            SCCNAM        40A  O  5 38
+     A                                  7  4'Req #'
+     A                                      DSPATR(UL)
+     A                                  7 10'Name                          '
+     A                                      DSPATR(UL)
+     A                                  7 42'Date rqs'
+     A                                      DSPATR(UL)
+     A                                  7 52'Amount rqs  '
+     A                                      DSPATR(UL)
+     A                                  7 66'Amount rec  '
+     A                                      DSPATR(UL)
+     A            SCFL01         1A  B  8  2DSPATR(ND)
+     A  30                                  ERRMSGID(CCR0600 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCRS01    R        O  8  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA01        30A  O  8 10
+     A            SCDT01    R        O  8 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR01    R        O  8 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ01    R        O  8 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL02         1A  B  9  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS02    R        O  9  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA02        30A  O  9 10
+     A            SCDT02    R        O  9 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR02    R        O  9 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ02    R        O  9 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL03         1A  B 10  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS03    R        O 10  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA03        30A  O 10 10
+     A            SCDT03    R        O 10 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR03    R        O 10 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ03    R        O 10 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL04         1A  B 11  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS04    R        O 11  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA04        30A  O 11 10
+     A            SCDT04    R        O 11 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR04    R        O 11 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ04    R        O 11 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL05         1A  B 12  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS05    R        O 12  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA05        30A  O 12 10
+     A            SCDT05    R        O 12 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR05    R        O 12 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ05    R        O 12 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL06         1A  B 13  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS06    R        O 13  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA06        30A  O 13 10
+     A            SCDT06    R        O 13 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR06    R        O 13 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ06    R        O 13 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL07         1A  B 14  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS07    R        O 14  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA07        30A  O 14 10
+     A            SCDT07    R        O 14 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR07    R        O 14 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ07    R        O 14 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL08         1A  B 15  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS08    R        O 15  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA08        30A  O 15 10
+     A            SCDT08    R        O 15 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR08    R        O 15 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ08    R        O 15 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL09         1A  B 16  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS09    R        O 16  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA09        30A  O 16 10
+     A            SCDT09    R        O 16 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR09    R        O 16 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ09    R        O 16 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL10         1A  B 17  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS10    R        O 17  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA10        30A  O 17 10
+     A            SCDT10    R        O 17 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR10    R        O 17 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ10    R        O 17 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL11         1A  B 18  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS11    R        O 18  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA11        30A  O 18 10
+     A            SCDT11    R        O 18 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR11    R        O 18 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ11    R        O 18 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL12         1A  B 19  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS12    R        O 19  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA12        30A  O 19 10
+     A            SCDT12    R        O 19 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR12    R        O 19 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ12    R        O 19 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL13         1A  B 20  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS13    R        O 20  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA13        30A  O 20 10
+     A            SCDT13    R        O 20 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR13    R        O 20 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ13    R        O 20 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCFL14         1A  B 21  2DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS14    R        O 21  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCPA14        30A  O 21 10
+     A            SCDT14    R        O 21 42REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR14    R        O 21 52REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ14    R        O 21 66REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 20'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 38'F5=Add request'
+     A                                      COLOR(BLU)
+     A            SCUP           9A  O 23 59OVRDTA
+     A            SCDOWN         9A  O 23 70OVRDTA
+     A            SCERR     R        O 24 78REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A  31                                  ERRMSGID(CCR0627 *LIBL/CMESGG)
+     A          R SCR99
+     A            SCFL01    R        O  1  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      TEXT('DUMMY FIELD')

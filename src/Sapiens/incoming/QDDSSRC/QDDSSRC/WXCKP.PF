@@ -1,0 +1,37 @@
+      * (c) 2014 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+      *****************************************************************
+      *                                                               *
+      *  BANK SELECT FILE FOR EFT/ACH PROCESSING                      *
+      *                                                               *
+      *  This file is used by ACH/EFT process to include/exclude      *
+      *  bank account from processing                                 *
+      *                                                               *
+      *  CREATED: 06/29/09     PROGRAMMER: 191     PROJECT: WC1806    *
+      *****************************************************************
+      * REVISIONS:                                                    *
+      *                                                               *
+      * 05/28/14 C:136 PROJECT: 129WTG                                *
+      *                ADD FIELDS FOR IMMED DEST AND FILE NAME        *
+      *                                                               *
+      * 11/07/13    C:180    SUPPORT 82888                            *
+      *                      EFT lock enhancements - Add Job          *
+      *****************************************************************
+     A                                      REF(WREFP)
+     A          R PCK01                     TEXT('BANK SELECT FILE')
+     A            CKCO#     R               REFFLD(CO#)
+     A            CKACCT    R               REFFLD(NM20)
+     A                                      COLHDG('BANK ACCT #')
+     A            CKINEX    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE' 'EXCLUDE FLAG')
+     A            CKUSER    R               REFFLD(USER)
+     A****** Begin add  **** 11/07/13 *********************************
+     A            CKJOB     R               REFFLD(JOB)
+     A****** End   add  **** 11/07/13 *********************************
+     A*** BEG ADD ***** 05/28/14 **************************************
+     A            CKIDST        10A         COLHDG('Immed Dest')
+     A            CKEFTF        10A         COLHDG('EFT Filename')
+     A            CKBKNM        40A         COLHDG('Bank Name')
+     A            CKBKLT         2S 0       COLHDG('BANK' 'LEAD' 'TIME')
+     A            CKSVCL         3S 0       COLHDG('SERV' 'CLASS')
+     A*** END ADD ***** 05/28/14 **************************************

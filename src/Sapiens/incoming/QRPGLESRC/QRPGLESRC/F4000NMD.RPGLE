@@ -1,0 +1,1325 @@
+    H**********************************************************************
+     Hcopyright('(c) 2010 StoneRiver, Inc. All rights reserved. -
+     H StoneRiver is a trademark of StoneRiver, Inc.')
+     H option(*nodebugio:*srcstmt)
+     H dftactgrp(*no) actgrp(*caller)
+     H*
+    H**********************************************************************
+    H* PROGRAM: F4000NMD                                                  *
+    H* DESCRIPTION: ADJUDICATION PROGRAM FOR MD                           *
+    H**********************************************************************
+    H*  CREATED: 08/19/08  C:198  PROJECT: MD065                          *
+    H**********************************************************************
+    H*  REVISIONS:                                                        *
+    H*                                                                    *
+    H** DO NOT INSTALL THIS PROGRAM WITHOUT INSTALLING F4000N.  A CHANGE **
+    H** TO THE PHARM CALCS FOR SUPPORT 58250 REQUIRES THIS               **
+    H*                                                                    *
+    H*                                                                    *
+     H*  04/27/18 C:180 Project: C114MJS                                   *
+    H*                 Increase xxWAP size.                               *
+    H*                                                                    *
+     H*  06/26/16 C:079 Project MD073                                      *
+     H*                         Load facility prof/tech component          *
+    H*                                                                    *
+     H*  03/24/10 C:198 Project MD067                                      *
+     H*                         Corrected processing for '    T' & '    F' *
+     H*                         codes.                                     *
+    H*                                                                    *
+     H*  05/20/09 C:198 PROJECT MD066 Priss 7                              *
+     H*                         Corrected processing for ORT/NEU.          *
+    H*                                                                    *
+     H*  04/08/09 C:079 PROJECT MD066                                      *
+     H*                         Added loading of by report field for hos.  *
+    H*                                                                    *
+     H*  04/03/09 C:198 PROJECT MD066                                      *
+     H*                         Added processing for spcd ASC and hospital *
+     H*                         bills.                                     *
+    H**********************************************************************
+    H*  INDICATOR USAGE:                                                  *
+    H**********************************************************************
+     Ffdcal13   uf   e           k disk
+     Ffaeolg    if   e           k disk
+     Ffacap     o    e           k disk    usropn
+     F                                     rename(pca01:pcawk2)
+     F*** BEG ADD *** 04/03/09 *********************************************
+     Ffmasl1    if   e           k disk
+     F*** END ADD *** 04/03/09 *********************************************
+    F*
+     Ffmprl     if   e           k disk
+    F*
+     Ffmrcl     if   e           k disk
+    F*
+     Ffmsvl1    if   e           k disk
+     Ffmrxl     if   e           k disk
+     Ffdrul1    if   e           k disk
+    F*
+     Ffdfrl5    if   e           k disk
+     Ffddhl     if   e           k disk
+     Ffdddl     if   e           k disk
+     Ffddpl     if   e           k disk
+     Ffddul     if   e           k disk
+     Fftuml     if   e           k disk
+    D*
+     D qqf             s              7    dim(50)
+    D*
+     D date            s              7  0 dim(999)
+     D mod             s              2    dim(4) ascend
+    D*
+    D*
+     D                 ds
+     D xxcmsv                        11
+     D  xxsvcd                        3  0 overlay(xxcmsv)
+     D  xxcpt4                        5    overlay(xxcmsv:4)
+     D  xxunit                        3  0 overlay(xxcmsv:9)
+    D*  Date/Time Data Structure.
+     D                 ds
+     D dsdttm                        14  0
+     D  dstime                        6  0 overlay(dsdttm)
+     D  dsdate                        8  0 overlay(dsdttm:7)
+     D psds          esds                  extname(szq1p)
+    D*---------------------------------------------------------------------
+    D* Stand Alone Fields - TOP
+    D*---------------------------------------------------------------------
+     D cafolu          s              3  0
+     D cainvl          s              1
+     D camd50          s              3  2
+     D camd51          s              3  2
+     D camd54          s              3  2
+     D camd55          s              3  2
+     D camd56          s              3  2
+     D camd62          s              3  2
+     D camd66          s              3  2
+     D camd80          s              3  2
+     D camd81          s              3  2
+     D camd82          s              3  2
+     D catype          s              1
+     D hlddat          s              7  0
+     D kkdseq          s                   like(cadseq)
+     D kkefdt          s                   like(frefdt)
+     D kkymd           s                   like(frefdt)
+     D mod1            s              8
+     D qqcase          s              7  0
+     D qqco#           s              3  0
+     D qqdcs#          s              5
+     D qqeob#          s              9  0
+     D qqfein          s              9  0
+     D qqfnd           s              3  0
+     D qqfyr           s              3  0
+     D qqmod           s              3  0
+     D qqspcd          s              3
+     D qqst            s              2
+     D qqsub#          s              5  0
+     D srdate          s              8  0
+     D srdti           s              8  0
+     D srdto           s             10
+     D srerr           s              1
+     D srffmt          s              8
+     D srfutr          s              5  0
+     D srrtcd          s              1
+     D srtfmt          s              8
+     D x               s              3  0
+     D xcmra           s              9  2
+     D xppmod          s                   like(capmod)
+      *** Begin Change *** 04/27/18 *********************
+     D****xxawp           s              9  5
+     D xxawp           s                   like(CAawp)
+      *** End   Change *** 04/27/18 *********************
+     D xxdcs#          s              5  0
+     D xxinvl          s              1
+     D xxmd26          s              3  2
+     D xxmd27          s              3  2
+     D xxmra           s                   like(camra)
+     D xxndc           s                   like(dpndc)
+     D xxrcn           s                   like(carcn)
+     D xxymd           s                   like(ruefdt)
+     D xxpos           s              1  0
+    D*---------------------------------------------------------------------
+    D* Stand Alone Fields - BOTTOM
+    D*---------------------------------------------------------------------
+    C*
+     C     caky1         klist
+     C                   kfld                    qqco#
+     C                   kfld                    qqsub#
+     C                   kfld                    qqfnd
+     C                   kfld                    qqfyr
+     C                   kfld                    qqcase
+     C                   kfld                    qqeob#
+    C*
+    C*  Procedure Code file
+     C     prky          klist
+     C                   kfld                    qqco#
+     C                   kfld                    xxcpt4
+     C                   kfld                    cafdat
+    C*
+     C     svky          klist
+     C                   kfld                    qqco#
+     C                   kfld                    xxcmsv
+     C                   kfld                    cafdat
+    C*
+    C* Reasonable & Customary File
+     C     rcky          klist
+     C                   kfld                    qqco#
+     C                   kfld                    cazipa
+     C                   kfld                    xxcpt4
+     C                   kfld                    kkymd
+    C*
+    C*  Usual and Customary Modifier Percent File
+     C     umkey         klist
+     C                   kfld                    caco#
+     C                   kfld                    cacpt4
+     C                   kfld                    kkefdt
+    C*
+    C*  Link to FDRUP to get correct effective date
+     C     ruky          klist
+     C                   kfld                    qqst
+     C                   kfld                    catype
+     C                   kfld                    cafdat
+    C*
+     C     ruky1         klist
+     C                   kfld                    qqst
+     C                   kfld                    catype
+    C*
+    C*
+     C     frky          klist
+     C                   kfld                    qqst
+     C                   kfld                    catype
+     C                   kfld                    kkefdt
+    C*
+     C     frky1         klist
+     C                   kfld                    qqst
+     C                   kfld                    catype
+    C*
+    C* KEY LIST FOR EOMB FILE
+    C*
+     C     eoky          klist
+     C                   kfld                    qqco#
+     C                   kfld                    qqsub#
+     C                   kfld                    qqfnd
+     C                   kfld                    qqfyr
+     C                   kfld                    qqcase
+     C                   kfld                    qqeob#
+    C*
+     C     dhky          klist
+     C                   kfld                    qqco#
+     C                   kfld                    qqsub#
+     C                   kfld                    qqfnd
+     C                   kfld                    qqfyr
+     C                   kfld                    qqcase
+     C                   kfld                    qqeob#
+     C                   kfld                    kkdseq
+    C*
+    C*  DENTAL DETAIL BILL FILE (FDDDL)
+     C     ddky          klist
+     C                   kfld                    qqco#
+     C                   kfld                    qqsub#
+     C                   kfld                    qqfnd
+     C                   kfld                    qqfyr
+     C                   kfld                    qqcase
+     C                   kfld                    qqeob#
+     C                   kfld                    kkdseq
+    C*
+    C*  PHARMACY DETAIL BILL FILE (FDDPL)
+     C     dpky          klist
+     C                   kfld                    qqco#
+     C                   kfld                    qqsub#
+     C                   kfld                    qqfnd
+     C                   kfld                    qqfyr
+     C                   kfld                    qqcase
+     C                   kfld                    qqeob#
+     C                   kfld                    kkdseq
+    C*
+    C*  HOSPITAL DETAIL BILL FILE (FDDUL)
+     C     duky          klist
+     C                   kfld                    qqco#
+     C                   kfld                    qqsub#
+     C                   kfld                    qqfnd
+     C                   kfld                    qqfyr
+     C                   kfld                    qqcase
+     C                   kfld                    qqeob#
+     C                   kfld                    kkdseq
+    C*
+    C*
+    C*  NDC Drug File
+     C     rxky          klist
+     C                   kfld                    qqco#
+     C                   kfld                    xxndc
+    C*
+     C*** BEG ADD *** 04/03/09 *********************************************
+    C*  ASC payment rate file
+     C     asky1         klist
+     C                   kfld                    xxcpt4
+     C                   kfld                    kkefdt
+    C*
+     C     asky2         klist
+     C                   kfld                    xxcpt4
+    C*
+     C*** END ADD *** 04/03/09 *********************************************
+     C     *entry        plist
+     C                   parm                    qqco#
+     C                   parm                    qqsub#
+     C                   parm                    qqfnd
+     C                   parm                    qqfyr
+     C                   parm                    qqcase
+     C                   parm                    qqfein
+     C                   parm                    qqmod
+     C                   parm                    qqdcs#
+     C                   parm                    qqst
+     C                   parm                    qqspcd
+     C                   parm                    qqeob#
+    C*
+     C     datchk        plist
+     C                   parm                    srdti
+     C                   parm      *blanks       srffmt
+     C                   parm      *blanks       srtfmt
+     C                   parm                    srdto
+     C                   parm                    srerr
+    C*
+     C     dtcymd        plist
+     C                   parm                    srdti
+     C                   parm      *blanks       srffmt
+     C                   parm      '*CYMD'       srtfmt
+     C                   parm                    srdto
+     C                   parm                    srerr
+    C*
+     C     dtmdyy        plist
+     C                   parm                    srdti
+     C                   parm      '*CYMD'       srffmt
+     C                   parm      *blanks       srtfmt
+     C                   parm                    srdto
+     C                   parm                    srerr
+    C*
+    C*
+    C*
+    C*
+    C*
+     C                   move      qqdcs#        xxdcs#
+    C*
+     C                   open      facap
+    C*
+     C                   exsr      convrt
+    C*
+    C*  END PROGRAM AND CLOSE ALL FILES
+     C                   close     facap
+    C*
+     C     term          tag
+    C*
+     C                   eval      xcmra = 0
+     C                   return
+     C                   move      *on           *inlr
+    C*
+    C********************************************************************
+    C*  Convert fields into base fields used for determining payment
+    C*  creates workfile with MRA and modifier amounts and prof/tech
+    C*****************************************************************
+     C     convrt        begsr
+    C*
+     C                   eval      x = 0
+     C                   clear                   date
+    C*
+    C* Find the recon number.  If this is a recon.
+     C     eoky          chain     peo01                              60
+    C*
+     C                   if        *in60 = *off
+     C                   eval      xxrcn = eorcn
+    C*
+     C                   else
+     C                   eval      xxrcn = *zero
+    C*
+     C                   endif
+    C*
+    C* Main read of detail charge file
+     C     caky1         setll     pca01
+     C     caky1         reade     pca01                                  54
+    C*
+     C                   dow       *in54 = *off
+    C*
+     C                   clear                   pdd01
+     C                   clear                   pdh01
+     C                   clear                   pdd01
+     C                   clear                   pdu01
+     C                   clear                   mod
+     C                   clear                   mod1
+    C*
+     C                   if        xxrcn = carcn
+    C*
+     C                   eval      kkymd = cafdat
+     C                   eval      kkdseq = cadseq
+    C*
+     C                   if        eobtyp = 'N'
+     C                             and carcfl = 'Y'
+    C*
+    C* Chain out to the Physician Bill Detail file
+    C*
+     C     dhky          chain     pdh01                              60
+    C*
+     C                   if        *in60 = *off
+     C                   move      dhprcd        cacpt4
+     C                   move      dhprcd        xxcpt4
+     C                   exsr      pmodld
+     C                   endif
+    C*
+     C                   movel     'P'           catype
+    C*
+     C                   exsr      recu
+    C*
+     C                   else
+    C*
+     C                   if        eobtyp = 'N'
+     C                             and carcfl = 'C'
+    C*
+    C* Else - treat line item as a procedure code from the CPT4 file
+    C*
+    C* Chain out to the Physician Bill Detail file
+     C     dhky          chain     pdh01                              60
+    C*
+     C                   if        *in60 = *off
+     C                   move      dhprcd        cacpt4
+     C                   move      dhprcd        xxcpt4
+     C                   exsr      pmodld
+     C                   endif
+    C*
+     C                   movel     'P'           catype
+    C*
+     C                   exsr      proc
+     C                   exsr      lodmd
+     C                   else
+    C*
+    C* Else treat line item as a dental code
+    C* Chain out to the Dental Bill Detail file
+     C                   if        eobtyp = 'D'
+     C                             and carcfl = 'C'
+     C     ddky          chain     pdd01                              60
+    C*
+     C                   if        *in60 = *off
+     C                   move      ddprcd        cacpt4
+     C                   move      ddprcd        xxcpt4
+     C                   endif
+    C*
+     C                   movel     'D'           catype
+    C*
+     C                   exsr      dent
+    C*
+     C                   else
+    C*
+     C                   if        eobtyp = 'D'
+     C                             and carcfl = 'Y'
+    C*
+     C     ddky          chain     pdd01                              60
+    C*
+     C                   if        *in60 = *off
+     C                   move      ddprcd        cacpt4
+     C                   move      ddprcd        xxcpt4
+     C                   endif
+    C*
+     C                   movel     'D'           catype
+    C*
+     C                   exsr      recu
+    C*
+     C                   else
+    C*** END ADD *** 08/22/02 *********************************************
+    C*
+    C* Else treat line item as a Pharmacy code
+    C* Chain out to the Pharmacy Bill Detail file
+     C                   if        eobtyp = 'X'
+     C     dpky          chain     pdp01                              60
+    C*
+     C                   if        *in60 = *off
+     C                   move      dpndc         candc
+     C                   endif
+    C*
+     C                   movel     'X'           catype
+    C*
+     C                   exsr      phar
+    C*
+     C                   else
+    C*
+    C* Else treat line item as a Hospital code
+    C* Chain out to the Hospital Bill Detail file
+     C     duky          chain     pdu01                              60
+    C*
+     C                   if        *in60 = *off
+     C                   move      durvcd        casvcd
+     C                   move      durate        cacpt4
+     C                   move      durate        xxcpt4
+     C                   exsr      pmodld
+     C                   endif
+    C*
+     C                   movel     'H'           catype
+    C*
+     C                   exsr      svcd
+    C*
+     C                   endif
+    C*
+     C                   endif
+    C*
+     C                   endif
+    C*
+     C                   endif
+    C*
+     C                   endif
+    C*
+     C                   eval      xxmra = camra
+    C*
+    C* If modifiers are present then adjust CAAMT accordingly.  CAAMT
+    C* is the key field used to process FACAP in highest MRA order.
+    C*
+    C*
+     C                   if        mod1 <> *blanks
+    C*
+     C                   exsr      pmod
+    C*
+     C                   endif
+    C*
+    C*   Add all workfile fields to workfile
+    C*   Load MRA or Charge to CAAMT in highest to lowest MRA order
+     C                   if        xxmra < cachrg
+     C                   z-add     xxmra         caamt                92
+     C                   else
+     C                   eval      caamt = cachrg
+     C                   endif
+    C*
+    C*  Setup correct effective date for rules
+     C     frky          setgt     pfr01
+     C     frky1         readpe    pfr01                                  60
+    C*
+     C                   if        *in60 = *off
+    C*
+     C                   eval      carudt = frefdt
+    C*
+     C                   else
+     C                   move      *hival        carudt
+    C*
+     C                   endif
+    C*
+    C*   Only write this line item out if the date is greater than or
+    C*   or equal to the initial eff. date of F4000N
+    C*
+    C*   Get the initial effective date of F4000N for this state
+     C     ruky          setgt     pru01
+     C     ruky1         readpe    pru01                                  56
+    C*
+     C                   if        *in56 = *off
+     C                             and ruapgm = 'F4000N'
+     C                   move      ruefdt        xxymd
+    C*
+     C                   else
+     C                   move      *hival        xxymd
+    C*
+     C                   endif
+    C*
+    C*  If R&C or CPT4 it is Physician type. Else it is Hospital type
+     C                   if        kkymd >= xxymd
+    C*
+     C                   eval      catotc = cachrg
+     C                   movel     qqspcd        caspcd
+    C*
+     C                   move      q1user        causer
+     C                   move      q1user        caiusr
+     C                   move      q1pgm         capgm
+    C*
+     C                   time                    dsdttm
+    C*
+     C                   move      dstime        catime
+    C*
+     C                   eval      srdti = dsdate
+     C                   call      'SRCVTDAT'    dtcymd
+     C                   movel     srdto         cadt
+     C                   movel     srdto         caidt
+    C*
+     C                   write     pcawk2
+    C*
+    C* Clear FACAP to prevent carryover of values to next record.
+    C*
+    C*
+    C*    Clear CAPAID in detail file to reprocess correctly
+    C*    especially in the multiple surgical rule.
+     C                   if        cacscd = '1  '
+     C                             or cacscd = '001'
+    C*
+     C                   clear                   capaid
+     C                   eval      camraa = xcmra
+    C*
+     C                   update    pca01
+    C*
+     C                   endif
+    C*
+     C                   clear                   pcawk2
+    C*
+     C                   else
+    C*
+    C* Release the record lock
+     C                   except    rca01
+    C*
+     C                   endif
+    C*
+     C                   else
+    C*
+    C* Release the record lock
+     C                   except    rca01
+    C*
+     C                   endif
+    C*
+     C     caky1         reade     pca01                                  54
+    C*
+     C                   enddo
+    C*
+     C     convre        endsr
+    C********************************************************************
+    C** DENTAL CODE MRA SEARCH                             D E N T      *
+    C********************************************************************
+     C     dent          begsr
+    C*
+    C* PROCESS THE FEE SCHEDULED CODES HERE
+    C*
+    C*  Test for Fee Schedule Reimbursement = 'Y'
+    C*
+     C     prky          setgt     ppr01
+     C     nxtpr3        tag
+     C                   readp     ppr01                                  60
+    C*
+    C*  A hard error will cause the program to terminate ASAP.
+     C                   if        *in60 = *on
+     C                   movel     'Y'           cainvl
+    C*
+    C*  Default to use service date for effective date for rules
+     C                   move      cafdat        kkefdt
+    C*
+     C                   else
+    C*
+     C                   eval      cafolu = prfolu
+    C*
+    C*  Setup correct effective date for rules
+     C                   eval      kkefdt = prefdt
+    C*
+    C*
+     C                   eval      xcmra = prmra
+     C                   eval      camra = prmra
+     C                   eval      caprof = prprof
+     C                   eval      catech = pr92n1
+     C                   movel     pr1a2         caanes
+     C                   eval      caanam = pranam
+     C                   move      prsurg        casurg
+     C                   move      prsupp        casupp
+     C                   move      prstat        castat
+     C                   move      prrpt         carpt
+     C*** Beg Chg *** 03/24/10 *************************************************
+     C*******            move      pr1a3         canct
+     C                   move      pr1a4         canct
+     C*** End Chg *** 03/24/10 *************************************************
+     C                   move      pr1ad         casepp
+     C                   move      prfsr         cafsr
+     C                   eval      camd50 = *zero
+     C                   eval      camd51 = *zero
+     C                   eval      camd80 = *zero
+     C                   eval      camd81 = *zero
+     C                   clear                   caplac
+    C*
+     C                   endif
+    C*
+     C     prstat        cabeq     'I'           nxtpr3
+    C*
+     C     dente         endsr
+    C********************************************************************
+    C** FOLLOW UP DAY LOAD SUBROUTINGE                                  *
+    C********************************************************************
+     C     folu          begsr
+    C*
+     C                   movel     'N'           cainvl
+     C                   eval      srdti = cafdat
+    C*
+     C                   call      'SRCVTDAT'    dtmdyy
+    C*
+     C                   movel     srdto         srdate
+    C*
+     C                   eval      srfutr = cafolu
+    C*
+     C                   move      ' '           srrtcd
+    C*
+     C                   call      'SRFUTR8'
+     C                   parm                    srdate
+     C                   parm                    srfutr
+     C                   parm                    srrtcd
+    C*
+     C                   eval      srdti = srdate
+    C*
+     C                   call      'SRCVTDAT'    dtcymd
+    C*
+     C                   movel     srdto         hlddat
+    C*
+    C*
+    C*
+     C     folue         endsr
+    C*
+    C********************************************************************
+    C** PHARMACY SUBROUTINE                                  P H A R    *
+    C********************************************************************
+     C     phar          begsr
+    C*
+    C*  Default to service date for effective date for rules
+     C                   eval      kkefdt = cafdat
+    C*
+    C*  Test for Fee Schedule Reimbursement = 'Y'
+     C                   movel     dpndc         xxndc
+    C*
+     C     rxky          setgt     prx01
+     C     nxtpr4        tag
+     C     rxky          readpe    prx01                                  60
+    C*
+    C*  A hard error will cause the program to terminate ASAP.
+     C                   if        *in60 = *on
+     C                   movel     'Y'           cainvl
+     C                   else
+    C*
+    C* Brand-name Pharmaceuticals
+     C                   if        rxptyp = '01'
+     C                             or rxptyp = '07'
+    C*
+    C* Determine if fill date is less than AWP effective date if so
+    C* use previous AWP unit price else use current AWP unit price
+     C                   if        cafdat < rxawpd
+    C*
+      *** Begin Change *** 04/27/18 **********************
+     C****               eval(h)   xxawp = rx1awp/1000
+     C                   eval(h)   xxawp = rx1awp
+      *** End   Change *** 04/27/18 **********************
+    C*
+     C                   else
+      *** Begin Change *** 04/27/18 **********************
+     C***                eval(h)   xxawp = rxawp/1000
+     C                   eval(h)   xxawp = rxawp
+      *** End   Change *** 04/27/18 **********************
+    C*
+     C                   endif
+    C*
+     C                   else
+    C*
+    C* Generic Pharmaceuticals
+    C* Determine if fill date is less than AWP effective date if so
+    C* use previous AWP unit price else use current AWP unit price
+    C*
+     C                   if        cafdat < rxawpd
+    C*
+     C                   eval(h)   camra = rx1awp
+      *** Begin Change *** 04/27/18 **********************
+     C***                eval(h)   xxawp = rx1awp/1000
+     C                   eval(h)   xxawp = rx1awp
+      *** End   Change *** 04/27/18 **********************
+    C*
+     C                   else
+      *** Begin Change *** 04/27/18 **********************
+     C***                eval(h)   xxawp = rxawp/1000
+     C                   eval(h)   xxawp = rxawp
+      *** End   Change *** 04/27/18 **********************
+    C*
+     C                   endif
+    C*
+     C                   endif
+    C*
+     C                   eval      caunts = dpunts
+     C                   eval      camra = xxawp * caunts
+     C                   eval      caawp = xxawp
+     C                   move      rxstat        castat
+     C                   move      'Y'           cafsr
+    C*
+     C                   endif
+    C*
+     C     rxstat        cabeq     'I'           nxtpr4
+    C*
+     C     phare         endsr
+    C********************************************************************
+    C** PROCEDURE CODE MODIFIER CALCULATIONS                  P M O D   *
+    C********************************************************************
+     C     pmod          begsr
+    C* Adjust MRA depending on MOD
+     C     '80'          lookup    mod(1)                                 99
+    C*
+     C                   if        *in99 = *on
+    C*
+     C                   eval      xxmra = camra * camd80
+    C*
+     C                   endif
+    C*
+     C     '81'          lookup    mod(1)                                 99
+    C*
+     C                   if        *in99 = *on
+    C*
+     C                   eval      xxmra = camra * camd81
+    C*
+     C                   endif
+    C*
+     C     pmode         endsr
+    C********************************************************************
+    C** MODIFIER LOADING                                  P M O D L D   *
+    C********************************************************************
+     C     pmodld        begsr
+    C*
+     C*** BEG ADD *** 04/03/09 *******************************************
+     C                   if        eobtyp = 'H'
+    C*
+     C                   move      dupmod        camod1
+     C                   move      dumod2        camod2
+    C*
+     C                   move      dupmod        mod(1)
+     C                   move      dumod2        mod(2)
+    C*
+     C                   movea     mod           mod1
+    C*
+     C                   else
+    C*
+     C*** END ADD *** 04/03/09 *******************************************
+     C                   move      dhmod1        camod1
+     C                   move      dhmod2        camod2
+     C                   move      dhmod3        camod3
+     C                   move      dhmod4        camod4
+    C*
+     C                   move      dhmod1        mod(1)
+     C                   move      dhmod2        mod(2)
+     C                   move      dhmod3        mod(3)
+     C                   move      dhmod4        mod(4)
+    C*
+     C                   movea     mod           mod1
+     C*** BEG ADD *** 04/03/09 *******************************************
+     C                   endif                                                  eobtyp = 'H'
+     C*** END ADD *** 04/03/09 *******************************************
+    C*
+     C                   endsr
+     C*** END ADD *** 10/17/02 *********************************************
+    C*
+    C********************************************************************
+    C** PROCEDURE CODE MRA SEARCH                             P R O C   *
+    C********************************************************************
+     C     proc          begsr
+    C*
+    C* PROCESS THE FEE SCHEDULED CODES HERE
+    C*
+    C*  Default to service date for effective date for rules
+     C                   eval      kkefdt = cafdat
+    C*
+    C*  Test for Fee Schedule Reimbursement = 'Y'
+    C*
+     C     prky          setgt     ppr01
+     C     nxtpr2        tag
+     C                   readp     ppr01                                  60
+    C*
+    C*  A hard error will cause the program to terminate ASAP.
+     C                   if        *in60 = *on
+     C                   movel     'Y'           cainvl
+    C*
+     C                   else
+    C*
+     C                   eval      cafolu = prfolu
+    C*
+    C*
+     C                   eval      xcmra = prmra
+     C                   eval      camra = prmra
+     C                   eval      caamt = prmra
+     C                   eval      caprof = prprof
+     C                   eval      catech = pr92n1
+    C*
+    C*  Load the professional and technical component amount based on
+    C*  percentages in FTUMP.
+    C*
+     C     umkey         setgt     pum01
+     C                   readp     pum01                                  60
+    C*
+     C                   if        *in60 = *off
+     C                             and cacpt4 <= umtocp
+    C*
+     C                   move      umod26        xxmd26
+     C                   move      umod27        xxmd27
+    C*
+     C                   if        caprof = 0
+     C                   eval      caprof = prmra * xxmd26
+     C                   endif
+    C*
+     C                   if        catech = 0
+     C                   eval      catech = prmra * xxmd27
+     C                   endif
+    C*
+     C                   endif
+    C*
+     C                   movel     pr1a2         caanes
+     C                   eval      caanam = pranam
+     C                   move      prsurg        casurg
+     C                   move      prsupp        casupp
+     C*******            eval      caasc = pr92n1
+     C                   move      prstat        castat
+     C                   move      prrpt         carpt
+     C*** Beg Chg *** 03/24/10 *************************************************
+     C*******            move      pr1a3         canct
+     C                   move      pr1a4         canct
+     C*** End Chg *** 03/24/10 *************************************************
+     C                   move      pr1ad         casepp
+     C*** Beg Del *** 03/24/10 *************************************************
+     C*******            move      pr1a4         capcf
+     C*** End Del *** 03/24/10 *************************************************
+     C                   move      prfsr         cafsr
+     C                   eval      camd50 = *zero
+     C                   eval      camd51 = *zero
+     C                   eval      camd54 = *zero
+     C                   eval      camd55 = *zero
+     C                   eval      camd56 = *zero
+     C                   eval      camd62 = *zero
+     C                   eval      camd66 = *zero
+     C                   eval      camd80 = *zero
+     C                   eval      camd81 = *zero
+     C                   eval      camd82 = *zero
+     C                   move      dhpos         caplac
+     C                   move      dhprcd        cacpt4
+     C                   eval      caunts = dhunts
+    C*
+     C                   if        pr1a2 = 'Y'
+     C                             or dhprcd >= '00100'
+     C                             and dhprcd <= '01999'
+     C                   eval      caanmn = dhunts
+     C                   endif
+    C*
+     C                   move      dharea        capart
+     C                   move      dhrcfl        carcfl
+    C*
+    C*
+     C                   endif
+     C*** BEG ADD *** 04/03/09 **************************************************
+     C                   if        eospcd = 'ASC' and cafdat >= 1090101
+     C                   eval      camra  = pr92n5
+     C     asky1         setgt     pas01                              60
+     C     asky2         readpe    pas01                                  60
+     C                   dow       *in60 = *off
+     C                   if        asstat <> 'I'
+     C                   eval      caaspi = aspi
+     C                   leave
+     C                   else
+     C     asky2         readpe    pas01                                  60
+     C                   endif                                                  asstat <> 'I'
+     C                   enddo                                                  *in60 = *off
+     C*** BEG ADD *** 04/08/09 **************************************************
+     C                   if        pr92n5 > 0
+     C                   eval      carpt = 'N'
+     C                   endif                                                  eospcd = 'ASC'
+     C*** END ADD *** 04/08/09 **************************************************
+     C                   endif                                                  eospcd = 'ASC'
+     C*** END ADD *** 04/03/09 **************************************************
+    C*
+     C     prstat        cabeq     'I'           nxtpr2
+    C*
+     C     proce         endsr
+    C********************************************************************
+    C** REASONABLE AND CUSTOMARY FILE SEARCH                  R E C U   *
+    C********************************************************************
+     C     recu          begsr
+    C*
+    C*  Default to use service date for effective date for rules
+     C                   eval      kkefdt = cafdat
+    C*
+    C*
+    C*
+     C     rcky          setgt     prc01
+     C     nxrc1         tag
+     C                   readp     prc01                                  60
+    C*
+     C                   if        *in60 = *on
+     C                             or rcco# <> qqco#
+     C                             or rczipa <> cazipa
+     C                             or rccpt4 <> xxcpt4
+    C*
+     C                   movel     'Y'           xxinvl
+    C*
+     C                   else
+     C                   move      rcfsr         cafsr
+     C                   eval      cafolu = rcfolu
+     C                   eval      caanes = rc1a2
+     C                   eval      cafsr = rcfsr
+    C*
+    C*
+    C*
+     C                   eval      xcmra = rcmra
+     C                   eval      camra = rcmra
+     C                   eval      caamt = rcmra
+     C                   eval      caprof = rcprof
+     C                   eval      catech = rc92n1
+    C*
+    C*  Load the professional and technical component amount based on
+    C*  percentages in FTUMP.
+    C*
+     C     umkey         setgt     pum01
+     C                   readp     pum01                                  60
+    C*
+     C                   if        *in60 = *off
+     C                             and cacpt4 <= umtocp
+    C*
+     C                   move      umod26        xxmd26
+     C                   move      umod27        xxmd27
+    C*
+     C                   if        caprof = 0
+     C                   eval      caprof = rcmra * xxmd26
+     C                   endif
+    C*
+     C                   if        catech = 0
+     C                   eval      catech = rcmra * xxmd27
+     C                   endif
+    C*
+     C                   endif
+    C*
+     C                   eval      caanam = rcanam
+     C                   move      rcsurg        casurg
+     C                   move      rcsupp        casupp
+     C******             eval      caasc = rc92n1
+     C                   move      rcstat        castat
+     C                   move      rcrpt         carpt
+    C*
+     C                   eval      camd50 = *zeros
+     C                   eval      camd51 = *zeros
+     C                   eval      camd54 = *zeros
+     C                   eval      camd55 = *zeros
+     C                   eval      camd56 = *zeros
+     C                   eval      camd62 = *zeros
+     C                   eval      camd66 = *zeros
+     C                   eval      camd80 = *zeros
+     C                   eval      camd81 = *zeros
+     C                   eval      camd82 = *zeros
+     C*
+     C                   select
+     C*
+     C                   when      eobtyp = 'N'
+     C*
+     C                   move      dhpos         caplac
+     C                   eval      caunts = dhunts
+     C                   move      dharea        capart
+     C                   move      dhrcfl        carcfl
+     C                   if        dhprcd >= '00100' and dhprcd <= '01999'
+     C                   eval      camra = rcconf
+     C                   endif
+     C*
+     C                   when      eobtyp = 'D'
+    C*
+     C                   move      ddpos         caplac
+     C                   eval      caunts = ddunts
+     C                   move      ddpart        capart
+     C                   move      ddrcfl        carcfl
+    C*
+     C                   endsl
+    C*
+     C                   endif
+    C*
+     C     rcstat        cabeq     'I'           nxrc1
+    C*
+     C     recue         endsr
+    C********************************************************************
+    C** SERVICE CODE SEARCH                                   S V C D   *
+    C********************************************************************
+     C     svcd          begsr
+    C*
+     C                   move      durvcd        xxsvcd
+     C                   move      '000'         xxunit
+    C*
+    C*  Default to use service date for effective date for rules
+     C                   eval      kkefdt = cafdat
+    C*
+     C     svky          setgt     psv01
+     C     nxtsv1        tag
+     C                   readp     psv01                                  60
+    C*
+     C                   if        *in60 = *on
+     C                   move      'Y'           cainvl
+    C*
+     C                   else
+     C                   eval      camra = svalow
+     C                   move      'Y'           cafsr
+     C                   move      dupos         caplac
+    C*
+     C                   endif
+    C*
+     C     prstat        cabeq     'I'           nxtsv1
+    C*
+     C*** BEG ADD *** 04/03/09 **************************************************
+    C*  Default to service date for effective date for rules
+     C                   eval      kkefdt = cafdat
+    C*
+    C*  Test for Fee Schedule Reimbursement = 'Y'
+    C*
+     C     prky          setgt     ppr01
+     C     nxtas         tag
+     C                   readp     ppr01                                  60
+    C*  A hard error will cause the program to terminate ASAP.
+     C                   if        *in60 = *on
+     C                   movel     'Y'           cainvl
+    C*
+     C                   else
+    C*
+     C*** BEG ADD *** 04/08/09 *********************************************
+     C                   move      prrpt         carpt
+     C*** END ADD *** 04/08/09 *********************************************
+    C*
+     C                   if        dupos <> ' 11'
+    C*
+     C                   if        EOSPCD = 'NEU' or EOSPCD = 'ORT'
+     C*** BEG ADD *** 05/20/09 *********************************************
+     C                   if        pr1a3 = 'O'
+     C*** END ADD *** 05/20/09 *********************************************
+     C                   eval      camra = pr92n3
+     C*** BEG CHG *** 05/20/09 *********************************************
+     C************       else
+     C                   endif                                                  pr1a3 = 'O'
+     C                   endif                                                  EOSPCD = 'NEU'/ORT'
+     C                   if        ((EOSPCD = 'NEU' or EOSPCD = 'ORT')
+     C                             and pr1a3 <> 'O') or (EOSPCD <> 'NEU' and
+     C                             EOSPCD <> 'ORT')
+     C*** END CHG *** 05/20/09 *********************************************
+     C     '53'          lookup    mod(1)                                 99
+     C                   if        *in99 = *on
+     C                   eval      camra = pr92n9
+     C                   endif                                                  *in99 = *on
+    C*
+     C                   z-add     1             k                 1 0
+     C                   z-add     0             j                 1 0
+     C                   dow       k <= 2
+     C                   if        mod(k) = ' '
+     C                   eval      j = j + 1
+     C                   endif                                                  mod(k) = ' '
+     C                   eval      k = k + 1
+     C                   enddo                                                  k <= 4
+     C                   if        j = 2
+     C                   eval      camra = pr92n4
+     C                   endif                                                  j = 4
+     C                   endif                                                  EOSPCD = 'NEU'/'ORT'
+    C*
+     C                   else
+    C*
+     C                   if        EOSPCD = 'NEU' or EOSPCD = 'ORT'
+     C*** BEG ADD *** 05/20/09 *********************************************
+     C                   if        pr1a3 = 'O'
+     C*** END ADD *** 05/20/09 *********************************************
+     C                   eval      camra = pr92n2
+     C*** BEG CHG *** 05/20/09 *********************************************
+     C************       else
+     C                   endif                                                  pr1a3 = 'O'
+     C                   endif                                                  EOSPCD = 'NEU'/'ORT'
+     C                   if        ((EOSPCD = 'NEU' or EOSPCD = 'ORT')
+     C                             and pr1a3 <> 'O') or (EOSPCD <> 'NEU' and
+     C                             EOSPCD <> 'ORT')
+     C*** END CHG *** 05/20/09 *********************************************
+     C     '26'          lookup    mod(1)                                 99
+     C                   if        *in99 = *on
+     C                   eval      camra = prprof
+     C                   endif                                                  *in99 = *on
+     C     'TC'          lookup    mod(1)                                 99
+     C                   if        *in99 = *on
+     C                   eval      camra = pr92n1
+     C                   endif                                                  *in99 = *on
+     C     '53'          lookup    mod(1)                                 99
+     C                   if        *in99 = *on
+     C                   eval      camra = pr92n8
+     C                   endif                                                  *in99 = *on
+     C                   z-add     1             k                 1 0
+     C                   z-add     0             j                 1 0
+     C                   dow       k <= 2
+     C                   if        mod(k) = ' '
+     C                   eval      j = j + 1
+     C                   endif                                                  mod(k) = ' '
+     C                   eval      k = k + 1
+     C                   enddo                                                  k <= 4
+     C                   if        j = 2
+     C                   eval      camra = prmra
+     C                   endif                                                  j = 4
+     C                   endif                                                  EOSPCD = 'NEU'/'ORT'
+    C*
+     C                   endif                                                  dhpos <> '11'
+    C*
+     C                   endif                                                  *in60 = *off
+    C*
+     C     prstat        cabeq     'I'           nxtas
+    C*
+     C*** END ADD *** 04/03/09 **************************************************
+     C     svcde         endsr
+    C* ==================================================================
+     C     lodmd         begsr
+     C*
+     C                   if        cacpt4 >= '00100' and cacpt4 <='01999'
+     C                   eval      xxpos = %scan('T':cacpt4)
+     C                   if        xxpos = 0
+     C*** Beg Add *** 03/24/10 *********************************************
+     C                   eval      xxpos = %scan('F':cacpt4)
+     C                   if        xxpos = 0
+     C*** End Add *** 03/24/10 *********************************************
+     C                   eval      camra = (pranam + (dhunts/15)) * 40.70
+     C                   eval      xxmra = camra
+     C*** Beg Add *** 03/24/10 *********************************************
+     C                   else
+     C                   eval      carpt = 'F'
+     C                   endif                                                  subst(cacpt4:5:1)=F
+     C*** End Add *** 03/24/10 *********************************************
+     C*** BEG ADD 04/09/09 *************************************************
+     C                   else
+     C                   eval      carpt = 'T'
+     C*** END ADD 04/09/09 *************************************************
+     C                   endif
+     C                   else
+     C*
+     C*** Beg Add *** 03/24/10 *********************************************
+     C                   eval      xxpos = %scan('T':cacpt4)
+     C                   if        xxpos <> 0
+     C                   eval      carpt = 'T'
+     C                   endif
+     C*
+     C                   eval      xxpos = %scan('F':cacpt4)
+     C                   if        xxpos <> 0
+     C                   eval      carpt = 'F'
+     C                   endif
+     C*
+     C*** End Add *** 03/24/10 *********************************************
+     C                   if        eospcd = 'ASC'
+     C     'FC'          lookup    mod(1)                                 99
+     C                   if        *in99 = *on
+     C                   eval      camra = pr92n7
+     C                   eval      xxmra = camra
+     C                   else
+    C*
+     C     'FB'          lookup    mod(1)                                 99
+     C                   if        *in99 = *on
+     C                   eval      camra = pr92n6
+     C                   eval      xxmra = camra
+     C                   else
+     C                   eval      camra = pr92n5
+     C                   eval      xxmra = camra
+     C                   endif                                                  mod(i) = 'FB'
+     C                   endif                                                  mod(i) = 'FC'
+    C*
+     C                   else
+    C*
+     C                   if        dhpos = ' 11'
+    C*
+     C                   if        eospcd = 'NEU' or eospcd = 'ORT'
+     C*** BEG ADD *** 05/20/09 **************************************************
+     C                   if        pr1a3 = 'O'
+     C*** END ADD *** 05/20/09 **************************************************
+     C                   eval      camra = pr92n2
+     C                   eval      xxmra = camra
+     C*** BEG CHG *** 05/20/09 **************************************************
+     C**********         else
+     C                   endif                                                  pr1a3 = 'O'
+     C                   endif                                                  EOSPCD = 'NEU'/'ORT'
+    C*
+     C                   if        ((EOSPCD = 'NEU' or EOSPCD = 'ORT')
+     C                             and pr1a3 <> 'O') or (EOSPCD <> 'NEU' and
+     C                             EOSPCD <> 'ORT')
+    C*
+     C*** END CHG *** 05/20/09 **************************************************
+     C     '26'          lookup    mod(1)                                 99
+    C*
+     C                   if        *in99 = *on
+     C                   eval      camra = prprof
+     C                   eval      xxmra = camra
+     C                   else
+     C     'TC'          lookup    mod(1)                                 99
+    C*
+     C                   if        *in99 = *on
+     C                   eval      camra  = pr92n1
+     C                   eval      catech = pr92n1
+     C                   eval      xxmra  = camra
+     C                   else
+     C     '53'          lookup    mod(1)                                 99
+    C*
+     C                   if        *in99 = *on
+     C                   eval      camra = pr92n8
+     C                   eval      xxmra = camra
+     C                   else
+     C                   eval      camra = prmra
+     C                   eval      xxmra = camra
+     C                   endif                                                  mod(i) = '53'
+     C*
+     C                   endif                                                  mod(i) = 'TC'
+     C                   endif                                                  mod(i) = '26'
+    C*
+     C*** BEG ADD *** 05/20/09 **************************************************
+     C                   z-add     1             k                 1 0
+     C                   z-add     0             j                 1 0
+    C*
+     C                   dow       k <= 4
+     C                   if        mod(k) = ' '
+     C                   eval      j = j + 1
+     C                   endif                                                  mod(k) = ' '
+     C                   eval      k = k + 1
+     C                   enddo                                                  k <= 4
+    C*
+     C                   if        j = 4
+     C                   eval      camra = prmra
+     C                   endif                                                  j = 4
+    C*
+     C*** END ADD *** 05/20/09 **************************************************
+     C                   endif                                                  eospcd = 'NEU'/'ORT
+    C*
+     C                   else                                                   dhpos = '11'
+    C*
+     C                   if        eospcd = 'NEU' or eospcd = 'ORT'
+     C*** BEG ADD *** 05/20/09 *********************************************
+     C                   if        pr1a3 = 'O'
+     C*** END ADD *** 05/20/09 *********************************************
+     C                   eval      camra = pr92n3
+     C                   eval      xxmra = camra
+     C*** BEG CHG *** 05/20/09 *********************************************
+     C************       else
+     C                   endif                                                  pr1a3 = 'O'
+     C                   endif                                                  EOSPCD = 'NEU'/ORT'
+     C                   if        ((EOSPCD = 'NEU' or EOSPCD = 'ORT')
+     C                             and pr1a3 <> 'O') or (EOSPCD <> 'NEU' and
+     C                             EOSPCD <> 'ORT')
+     C*** END CHG *** 05/20/09 *********************************************
+     C     '53'          lookup    mod(1)                                 99
+    C*
+     C                   if        *in99 = *on
+     C                   eval      camra = pr92n9
+     C                   eval      xxmra = camra
+     C                   else
+     C     '26'          lookup    mod(1)                                 99
+    C*
+     C                   if        *in99 = *on
+     C*** Beg Chg *** 01/26/16 *************************************
+     C****************   eval      caprof = prprof
+     C                   eval      caprof = PR92na
+     C*** End Chg *** 01/26/16 *************************************
+     C                   eval      camra = caprof
+     C                   eval      xxmra = camra
+     C                   else
+     C     'TC'          lookup    mod(1)                                 99
+    C*
+     C                   if        *in99 = *on
+     C*** Beg Chg *** 01/26/16 *************************************
+     C*****************  eval      camra  = 0
+     C*****************  eval      catech = 0
+     C                   eval      catech = PR92nb
+     C                   eval      camra  = CAtech
+     C*** End Chg *** 01/26/16 *************************************
+     C                   eval      xxmra  = camra
+     C                   else
+     C                   eval      camra = pr92n4
+     C                   eval      xxmra = camra
+     C                   endif                                                  mod(i) = 'TC'
+     C                   endif                                                  mod(i) = '26'
+     C                   endif                                                  mod(i) = '53'
+    C*
+    C*
+     C*** BEG ADD *** 05/20/09 *********************************************
+     C                   z-add     1             k                 1 0
+     C                   z-add     0             j                 1 0
+     C                   dow       k <= 4
+     C                   if        mod(k) = ' '
+     C                   eval      j = j + 1
+     C                   endif                                                  mod(k) = ' '
+     C                   eval      k = k + 1
+     C                   enddo                                                  k <= 4
+     C                   if        j = 4
+     C                   eval      camra = pr92n4
+     C                   endif                                                  j = 4
+    C*
+     C*** END ADD *** 05/20/09 *********************************************
+     C                   endif                                                  eospcd = 'NEU'/'ORT'
+    C*
+     C                   endif                                                  dhpos = '11'
+    C*
+     C                   endif                                                  eospcd = 'ASC'
+    C*
+     C                   endif                                                  cacpt4 >= '00100'
+     C                   endsr
+     C*** END ADD *** 08/19/08 *******************************************
+     Opca01     e            rca01

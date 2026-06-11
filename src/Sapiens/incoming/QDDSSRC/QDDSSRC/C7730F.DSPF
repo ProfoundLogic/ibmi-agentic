@@ -1,0 +1,60 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   PAYMENT SCHEDULE REPORT PROMPT DISPLAY                   **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A*                                     CHGINPDFT(CS)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF05
+     A                                      CF07
+     A                                      CF09
+     A                                      CF13
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C7730F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 12 21'Policy Number:'
+     A            SCPOL#    R        B 12 41REFFLD(POL#)
+     A                                      TEXT('Policy #')
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0535 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0773 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0774 *LIBL/CMESGG)
+     A                                 22  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 26'F5=Policy # search'
+     A                                      COLOR(BLU)
+     A                                 22 55'F7=Named insured search'
+     A                                      COLOR(BLU)
+     A                                 23  2'F9=Dba name search'
+     A                                      COLOR(BLU)
+     A                                 23 55'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

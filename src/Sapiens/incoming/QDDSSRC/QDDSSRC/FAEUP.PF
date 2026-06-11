@@ -1,0 +1,618 @@
+     A*****************************************************************
+     A* (c) 2021 StoneRiver, Inc. All rights Reserved.                *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                 *
+     A**                                                              *
+     A** WCMC EOMB Hosp/UB Header File                                *
+     A*****************************************************************
+     A*  Created by: C:05    Project: MC152    Date: 01/06/98         *
+     A*  NOTE:  See EXCEL spreadsheet FAEUP.XLS to review information *
+     A*         regarding conversion from old database file(s)        *
+     A*****************************************************************
+     A*  REVISIONS:                                                   *
+     A*
+     A*  08/11/21 C:295 Project: NY056
+     A*                 Add 60A Hospital Name Field: EUHNAM
+     A*
+     A*  04/05/17 C:309 Project: NY041
+     A*                 Adding a new field "AP DRG Severity Level"
+     A*
+     A*  10/21/15 C:079 Support: 25/37996
+     A*                 Rename ICD10 fields and add one field
+     A*
+     A*  04/16/15 C:212 Project: MC395
+     A*                 Add New field
+     A*
+     A*  08/05/13 C:277 Project: MC329 Phase 2
+     A*                  Add  New fields
+     A*
+     A*  05/23/13 C:277 Project: MC329
+     A*                  Add  New fields
+     A*
+     A*  04/04/12 C:251 Project: AR041
+     A*                  Add  Attending Physician First, Last name
+     A*
+     A*  01/10/12 C:251 Project: 25MSO
+     A*                  Add 'Attending Provider License Number'
+     A*
+     A*  08/03/11 C:273 Project: 146MEK
+     A*                 - Add Rendering Provider fields
+     A*
+     A*  07/07/11 C:251 Project: TX070
+     A*                 - Added fields discharge status,condition code,
+     A*                   occurance span, operating physician name etc
+     A*
+     A*  04/08/11 C:251 Project: 114MWT
+     A*                 - Added city/state
+     A*
+     A*  03/11/10 C:227 Project: FL083
+     A*                 - Added Facility License number
+     A*
+     A*  10/30/08 C:198 Project: TX048
+     A*                 - Added Rendering Provider License #
+     A*
+     A*  07/14/08 C:180 Project: MC294 - Phase II
+     A*                 - Add Operating Physician NPI#
+     A*
+     A*  04/07/08 C:189 Project: TX039
+     A*                 - Added TRANSFER STATUS field
+     A*
+     A*  04/03/08 C:198 Project: TX039
+     A*                 - Added Implant Status Field
+     A*
+     A*  05/16/07 C:062 Project: MC294
+     A*                 - Add BILLING PROVIDER NPI #
+     A*
+    A*   03/14/07 C:182 PROJECT: FL067
+    A*                  1.Changed Fld heading for EUPPLN from 'Payment
+    A*                    Plan' to be 'Payment Code'
+    A*                  2.Added fld EUOLIC Operating Phy. Lic. No.
+    A*                  3.Added flds EUCAU1,EUCAU2,EUCAU3 for Ext. cause
+    A*                    of Injury 1,2 3.
+    A*                  4.Added fld EUSCHD Sch/Unsch Indicator.       se
+    A*                                                                se
+     A*   01/15/07 C:118 PROJECT: CA002
+     A*                  ADD FIELD FOR CONT TYPE CODE (CTCD)
+     A*
+     A*   07/03/05 C:79 PROJECT: TN002
+     A*                 ADD FIELD FOR DRG#
+     A*
+     A*   11/17/04 C:79 PROJECT: MA014
+     A*                 ADD FIELD FOR COUNTY
+     A*
+     A*   07/24/04 C:79 PROJECT: MA012
+     A*                 ADD FIELD FOR MA 1993 SPECIAL RATES
+     A*
+     A*   04/28/03 C:79 PROJECT: FL043
+     A*                 ADD FIELD TO STORE FLORIDA LICENSE# EXPANSION
+     A*
+     A*   11/22/00 C:62 PROJECT: FS212
+     A*                 INCREASE ACCOUNT FIELD FROM 15A TO 30A.
+     A*                                                               *
+     A*   07/06/00 C:079 PROJECT: FL026                               *
+     A*                  ADD NEW FIELD(S) FOR DATA SUBMISSION         *
+     A*                                                               *
+     A*   06/05/00 C:117 PROJECT: MCMNT                               *
+     A*                  REVISION OF SCR02 ON PGM F0361RFL            *
+     A*                  ADD EUPPLN (PAYMENT PLAN)
+     A*                                                               *
+     A*   01/07/00 C:117 PROJECT: FL007
+     A*                  ADD FIELD EULIC#
+     A*
+     A*   06/14/99 C:53 PROJECT: MC152
+     A*                 ADD FIELD(S)
+     A*
+     A*  09/22/98 C:56  MC152                                         *
+     A*                 1. Add Submission Date field.                 *
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PEU01                     TEXT('EOMB HOSP/UB HEADER FILE')
+     A            EUCO#     R               REFFLD(CO#)
+     A                                      COLHDG('COMPANY#')
+     A            EUSUB#    R               REFFLD(SUB#)
+     A                                      COLHDG('SUBSCRIBER')
+     A            EUFND     R               REFFLD(FND)
+     A                                      COLHDG('GROUP')
+     A            EUFYR     R               REFFLD(FYR)
+     A                                      COLHDG('YEAR')
+     A            EUCASE    R               REFFLD(CASE)
+     A                                      COLHDG('CASE#')
+     A            EUSS#     R               REFFLD(SS#)
+     A                                      COLHDG('SOC SEC#')
+     A            EUACDT    R               REFFLD(DT)
+     A                                      COLHDG('ACC DATE')
+     A            EUEOB#    R               REFFLD(EOB#)
+     A                                      COLHDG('EOMB#')
+     A*** BEGIN CHG *** 11/22/00 **************************************
+     A            EUACCT    R               REFFLD(DS30)
+     A*** END   CHG *** 11/22/00 **************************************
+     A                                      COLHDG('PATIENT' 'CONTROL#')
+     A            EUBLTY    R               REFFLD(CODE3)
+     A                                      COLHDG('TYPE' 'OF' 'BILL')
+     A            EUSCPF    R               REFFLD(DT)
+     A                                      COLHDG('STATEMENT' 'COVERS FROM')
+     A            EUSCPT    R               REFFLD(DT)
+     A                                      COLHDG('STATEMENT' 'COVERS TO')
+     A            EUDYCV    R               REFFLD(A50)
+     A                                      COLHDG('DAYS' 'COVERED')
+     A            EUNOCV    R               REFFLD(A50)
+     A                                      COLHDG('DAYS' 'NON-COVERED')
+     A            EUADDT    R               REFFLD(DT)
+     A                                      COLHDG('ADMISSION' 'DATE')
+     A            EUADHR    R               REFFLD(TIMEHM)
+     A                                      COLHDG('ADMISSION' 'HOUR')
+     A            EUADTY    R               REFFLD(FLAG)
+     A                                      COLHDG('TYPE OF' 'ADMISSION')
+     A            EUADSC    R               REFFLD(FLAG)
+     A                                      COLHDG('SOURCE OF' 'ADMISSION')
+     A            EUDCHR    R               REFFLD(HOUR)
+     A                                      COLHDG('DISCHARGE' 'HOUR')
+     A            EUPATS    R               REFFLD(CODE)
+     A                                      COLHDG('PATIENT' 'STATUS')
+     A            EUMRC#    R               REFFLD(DS15)
+     A                                      COLHDG('MEDICAL' 'RECORD#')
+     A            EUCOC1    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 1')
+     A            EUCOC2    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 2')
+     A            EUCOC3    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 3')
+     A            EUCOC4    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 4')
+     A            EUCOC5    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 5')
+     A            EUCOC6    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 6')
+     A            EUCOC7    R               REFFLD(DS15)
+     A                                      COLHDG('CONDITION' 'CODE 7')
+     A            EUOCD1    R               REFFLD(DS15)
+     A                                      COLHDG('OCCURRENCE' 'CODE 1')
+     A            EUODT1    R               REFFLD(DT)
+     A                                      COLHDG('OCCURRENCE' 'DATE 1')
+     A            EUOCD2    R               REFFLD(DS15)
+     A                                      COLHDG('OCCURRENCE' 'CODE 2')
+     A            EUODT2    R               REFFLD(DT)
+     A                                      COLHDG('OCCURRENCE' 'DATE 2')
+     A            EUOCD3    R               REFFLD(DS15)
+     A                                      COLHDG('OCCURRENCE' 'CODE 3')
+     A            EUODT3    R               REFFLD(DT)
+     A                                      COLHDG('OCCURRENCE' 'DATE 3')
+     A            EUOCD4    R               REFFLD(DS15)
+     A                                      COLHDG('OCCURRENCE' 'CODE 4')
+     A            EUODT4    R               REFFLD(DT)
+     A                                      COLHDG('OCCURRENCE' 'DATE 4')
+     A            EUOSCD    R               REFFLD(DS15)
+     A                                      COLHDG('OCCURRENCE' 'SPAN CODE')
+     A            EUOSFD    R               REFFLD(DT)
+     A                                      COLHDG('OCCURRENCE' 'SPAN FROM DT')
+     A            EUOSTD    R               REFFLD(DT)
+     A                                      COLHDG('OCCURRENCE' 'SPAN TO DT')
+     A            EUICN     R               REFFLD(CODE)
+     A                                      COLHDG('INTERNAL' 'CONTROL#')
+     A            EUDCN     R               REFFLD(FLAG)
+     A                                      COLHDG('DOCUMENT' 'CONTROL#')
+     A            EUVC01    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 1')
+     A            EUVC02    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 2')
+     A            EUVC03    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 3')
+     A            EUVC04    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 4')
+     A            EUVA01    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 1')
+     A            EUVA02    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 2')
+     A            EUVA03    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 3')
+     A            EUVA04    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 4')
+     A            EUVC05    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 5')
+     A            EUVC06    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 6')
+     A            EUVC07    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 7')
+     A            EUVC08    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 8')
+     A            EUVA05    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 5')
+     A            EUVA06    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 6')
+     A            EUVA07    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 7')
+     A            EUVA08    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 8')
+     A            EUVC09    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 9')
+     A            EUVC10    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 10')
+     A            EUVC11    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 11')
+     A            EUVC12    R               REFFLD(DS15)
+     A                                      COLHDG('VALUE' 'CODE 12')
+     A            EUVA09    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 9')
+     A            EUVA10    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 10')
+     A            EUVA11    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 11')
+     A            EUVA12    R               REFFLD(A112)
+     A                                      COLHDG('VALUE' 'AMT 12')
+     A            EUDIA1    R               REFFLD(DIA)
+     A                                      COLHDG('PRINC' 'DIAG 1')
+     A            EUDIA2    R               REFFLD(DIA)
+     A                                      COLHDG('OTHER' 'DIAG 2')
+     A            EUDIA3    R               REFFLD(DIA)
+     A                                      COLHDG('OTHER' 'DIAG 3')
+     A            EUDIA4    R               REFFLD(DIA)
+     A                                      COLHDG('OTHER' 'DIAG 4')
+     A            EUDIA5    R               REFFLD(DIA)
+     A                                      COLHDG('OTHER' 'DIAG 5')
+     A            EUDIA6    R               REFFLD(DIA)
+     A                                      COLHDG('OTHER' 'DIAG 6')
+     A            EUDIA7    R               REFFLD(DIA)
+     A                                      COLHDG('OTHER' 'DIAG 7')
+     A            EUDIA8    R               REFFLD(DIA)
+     A                                      COLHDG('OTHER' 'DIAG 8')
+     A            EUDIA9    R               REFFLD(DIA)
+     A                                      COLHDG('OTHER' 'DIAG 9')
+     A            EUADDI    R               REFFLD(DIA)
+     A                                      COLHDG('ADMIT' 'DIAG')
+     A            EUADLT    R               REFFLD(FLAG)
+     A                                      COLHDG('ADMIT' 'DIAG' 'LOS')
+     A            EUPCM     R               REFFLD(FLAG)
+     A                                      COLHDG('PROC' 'CODE' 'METH')
+     A            EUPRC1    R               REFFLD(DS7)
+     A                                      COLHDG('PRINC' 'PROC' 'CODE1')
+     A            EUPRD1    R               REFFLD(DT)
+     A                                      COLHDG('PRINC' 'PROC' 'DATE1')
+     A            EUPRC2    R               REFFLD(DS7)
+     A                                      COLHDG('OTHER' 'PROC' 'CODE2')
+     A            EUPRC3    R               REFFLD(DS7)
+     A                                      COLHDG('OTHER' 'PROC' 'CODE3')
+     A            EUPRC4    R               REFFLD(DS7)
+     A                                      COLHDG('OTHER' 'PROC' 'CODE4')
+     A            EUPRC5    R               REFFLD(DS7)
+     A                                      COLHDG('OTHER' 'PROC' 'CODE5')
+     A            EUPRC6    R               REFFLD(DS7)
+     A                                      COLHDG('OTHER' 'PROC' 'CODE6')
+     A            EUPRD2    R               REFFLD(DT)
+     A                                      COLHDG('OTHER' 'PROC' 'DATE2')
+     A            EUPRD3    R               REFFLD(DT)
+     A                                      COLHDG('OTHER' 'PROC' 'DATE3')
+     A            EUPRD4    R               REFFLD(DT)
+     A                                      COLHDG('OTHER' 'PROC' 'DATE4')
+     A            EUPRD5    R               REFFLD(DT)
+     A                                      COLHDG('OTHER' 'PROC' 'DATE5')
+     A            EUPRD6    R               REFFLD(DT)
+     A                                      COLHDG('OTHER' 'PROC' 'DATE6')
+     A            EUTFEI    R               REFFLD(FEIN)
+     A                                      COLHDG('ATTEND' 'PHYS' 'FEIN')
+     A            EUTMOD    R               REFFLD(MOD)
+     A                                      COLHDG('ATTEND' 'PHYS' 'MOD')
+     A            EUOFE1    R               REFFLD(FEIN)
+     A                                      COLHDG('OTHER1' 'PHYS' 'FEIN')
+     A            EUOMO1    R               REFFLD(MOD)
+     A                                      COLHDG('OTHER1' 'PHYS' 'MOD')
+     A            EUOFE2    R               REFFLD(FEIN)
+     A                                      COLHDG('OTHER2' 'PHYS' 'FEIN')
+     A            EUOMO2    R               REFFLD(MOD)
+     A                                      COLHDG('OTHER2' 'PHYS' 'MOD')
+     A            EUEDI     R               REFFLD(FLAG)
+     A                                      COLHDG('ELIGIBLE' 'DATA' 'SUBM')
+     A*********************     Valid values:  Y or N                     ')
+     A            EUMCAR    R               REFFLD(DS12)
+     A                                      COLHDG('MEDICARE#')
+     A            EUROOM    R               REFFLD(A92)
+     A                                      COLHDG('ROOM' 'CHARGE')
+     A            EUSTAT    R               REFFLD(STAT)
+     A                                      COLHDG('STATUS')
+     A            EUUSER    R               REFFLD(USER)
+     A                                      COLHDG('MAINT USER')
+     A            EUPGM     R               REFFLD(PGM)
+     A                                      COLHDG('MAINT PGM')
+     A            EUTIME    R               REFFLD(TIME)
+     A                                      COLHDG('MAINT TIME')
+     A            EUDT      R               REFFLD(DT)
+     A                                      COLHDG('MAINT DATE')
+     A            EUIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INIT USER')
+     A            EUIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INIT PGM')
+     A            EUITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INIT TIME')
+     A            EUIDT     R               REFFLD(DT)
+     A                                      COLHDG('INIT DATE')
+     A*** BEG ADD *** 09/22/98 ****************************************
+     A            EUSBDT    R               REFFLD(DT7)
+     A                                      COLHDG('SUBMISSION DATE')
+     A*** END ADD *** 09/22/98 ****************************************
+     A*** BEG ADD *** 06/14/99 ************************
+     A            EUDCDT    R               REFFLD(DT7)
+     A                                      COLHDG('DISCHARGE DATE')
+     A            EUALIC    R               REFFLD(DS30)
+     A                                      COLHDG('ANES LIC #')
+     A*** END ADD *** 06/14/99 ************************
+     A*** BEG ADD *** 01/07/00 ****************************************
+     A            EULIC#    R               REFFLD(DS9)
+     A                                      COLHDG('PROV LIC #')
+     A*** END ADD *** 01/07/00 ****************************************
+     A*** BEG ADD *** 06/05/00 ****************************************
+     A            EUPPLN    R               REFFLD(CODE)
+    A*** BEG CHG *** 03/14/07 ************************
+     A                                      COLHDG('PAYMENT CODE')
+    A*** END CHG *** 03/14/07 ************************
+     A*** END ADD *** 06/05/00 ****************************************
+     A*** BEG ADD *** 07/06/00 ****************************************
+     A            EUMCID    R               REFFLD(DS5)
+     A                                      COLHDG('MANAGED' 'CARE' 'ID CODE')
+     A*** END ADD *** 07/06/00 ****************************************
+     A*** BEG ADD *** 04/28/03 ************************
+     A            EUFLIC    R               REFFLD(LIC#)
+     A                                      COLHDG('FL' 'LIC#')
+     A*** END ADD *** 04/28/03 ************************
+     A*** BEG ADD *** 07/24/04 ************************
+     A            EUSPRT    R               REFFLD(FLAG)
+     A                                      COLHDG('SPEC' 'RATES')
+     A*** END ADD *** 07/24/04 ************************
+     A*** BEG ADD *** 11/17/04 ************************
+     A            EUCNTY    R               REFFLD(DS3)
+     A                                      COLHDG('COUNTY' 'CODE')
+     A*** END ADD *** 11/17/04 ************************
+     A*** BEG ADD *** 07/03/05 ************************
+     A            EUDRG#         5S 0
+     A                                      COLHDG('DRG#')
+     A*** END ADD *** 07/03/05 ************************
+     A*** BEG ADD *** 01/15/07 ************************
+     A            EUCTCD    R               REFFLD(DS2)
+     A                                      COLHDG('CONT' 'TYPE' 'CODE')
+     A*** END ADD *** 01/15/07 ************************
+    A*** BEG ADD *** 03/14/07 ************************
+     A            EUOLIC    R               REFFLD(LIC#)
+     A                                      COLHDG('OPR PHY' 'LICENSE NO')
+     A            EUCAU1    R               REFFLD(DIA)
+     A                                      COLHDG('EXT CAUSE' 'OF INJ1')
+     A            EUCAU2    R               REFFLD(DIA)
+     A                                      COLHDG('EXT CAUSE' 'OF INJ2')
+     A            EUCAU3    R               REFFLD(DIA)
+     A                                      COLHDG('EXT CAUSE' 'OF INJ3')
+     A            EUSCHD    R               REFFLD(FLAG)
+     A                                      COLHDG('SCHD/UNSCHD' 'INDCTR')
+    A*** END ADD *** 03/14/07 ************************
+     A*** BEG ADD *** 05/16/07 **************************************
+     A            EUANPI    R               REFFLD(DS15)
+     A                                      COLHDG('Attending Provider' +
+     A                                      'NPI#')
+     A            EUNPI1    R               REFFLD(DS15)
+     A                                      COLHDG('Other 1 NPI#')
+     A            EUNPI2    R               REFFLD(DS15)
+     A                                      COLHDG('Other 2 NPI#')
+     A*** END ADD *** 05/16/07 **************************************
+     A*** BEG ADD *** 04/03/08 **************************************
+     A            EUIMST    R               REFFLD(FLAG)
+     A                                      COLHDG('Implant Status')
+     A*** END ADD *** 04/03/08 **************************************
+     A*** BEG ADD *** 04/07/08 **************************************
+     A            EUTRST    R               REFFLD(DS2)
+     A                                      COLHDG('TRANSFER STATUS')
+     A            EUDGDS    R               REFFLD(DS25)
+     A                                      COLHDG('DRG CODE DESCRIPTION')
+     A            EUCBSA    R               REFFLD(DS5)
+     A                                      COLHDG('CBSA FOR WAGE INDEX')
+     A*** END ADD *** 04/07/08 **************************************
+     A*** BEG ADD *** 07/14/08 **************************************
+     A            EUONPI    R               REFFLD(DS15)
+     A                                      COLHDG('Operating Physician' +
+     A                                      ' NPI#')
+     A*** END ADD *** 07/14/08 **************************************
+     A*** BEG ADD *** 10/30/08 **************************************
+     A            EURLIC    R               REFFLD(DS15)
+     A                                      COLHDG('Referring Provider' +
+     A                                      ' License #')
+     A*** END ADD *** 10/30/08 **************************************
+     A*** BEG ADD *** 03/11/10 **************************************
+     A            EUFALC    R               REFFLD(DS15)
+     A                                      COLHDG('Facility License' +
+     A                                      'Number')
+     A*** END ADD *** 03/11/10 **************************************
+     A*** BEG ADD *** 04/08/11 **************************************
+     A            EURCTY    R               REFFLD(DS25)
+     A                                      COLHDG('RENDERING PROVIDER' 'CITY')
+     A            EURST     R               REFFLD(DS2)
+     A                                      COLHDG('RENDERING PROVIDER' 'STATE')
+     A*** END ADD *** 04/08/11 **************************************
+     A*** BEG ADD *** 07/07/11 **************************************
+     A            EUDCST    R               REFFLD(DS2)
+     A                                      COLHDG('DISCHARGE STATUS')
+     A            EUCOC8    R               REFFLD(DS2)
+     A                                      COLHDG('CONDITION CODE 08')
+     A            EUCOC9    R               REFFLD(DS2)
+     A                                      COLHDG('CONDITION CODE 09')
+     A            EUCO10    R               REFFLD(DS2)
+     A                                      COLHDG('CONDITION CODE 10')
+     A            EUCO11    R               REFFLD(DS2)
+     A                                      COLHDG('CONDITION CODE 11')
+     A            EUOSC2    R               REFFLD(DS2)
+     A                                      COLHDG('OCCURRENCE SPAN' 'CODE 2')
+     A            EUOFD2    R     S         REFFLD(DT)
+     A                                      COLHDG('OCCURRENCE SPAN' 'FRM DT 2')
+     A            EUOTD2    R     S         REFFLD(DT)
+     A                                      COLHDG('OCCURRENCE SPAN' 'TO DT 2')
+     A            EUPREA    R               REFFLD(DIA)
+     A                                      COLHDG('PATIENT REASON' 'CODE')
+     A            EUOFSN    R               REFFLD(DS15)
+     A                                      COLHDG('OPERATING PHYSICIAN' +
+     A                                            'FIRST NAME')
+     A            EUOLSN    R               REFFLD(DS30)
+     A                                      COLHDG('OPERATING PHYSICIAN' +
+     A                                            'LAST NAME')
+     A*** END ADD *** 07/07/11 **************************************
+     A*** Beg Add *** 08/03/11 ****************************************
+     A            EURFEI    R     S         REFFLD(FEIN)
+     A                                      COLHDG('Rendering' 'provider'      +
+     A                                             'FEIN')
+     A            EURFSN    R               REFFLD(FSN)
+     A                                      COLHDG('Rendering' 'provider'      +
+     A                                             'first name')
+     A            EURLSN    R               REFFLD(NAME)
+     A                                      COLHDG('Rendering' 'provider'      +
+     A                                             'last/group name')
+     A            EURAD1    R               REFFLD(ADR1)
+     A                                      COLHDG('Rendering' 'provider'      +
+     A                                             'address 1')
+     A            EURAD2    R               REFFLD(ADR2)
+     A                                      COLHDG('Rendering' 'provider'      +
+     A                                             'address 2')
+     A            EURNCT    R               REFFLD(DS25)
+     A                                      COLHDG('Rendering provider' 'city')
+     A            EURNST    R               REFFLD(DS2)
+     A                                      COLHDG('Rendering provider' 'state')
+     A            EURZIP    R     S         REFFLD(ZIP)
+     A                                      COLHDG('Rendering' 'provider'      +
+     A                                             'zip')
+     A*** End Add *** 08/03/11 ****************************************
+     A*** Beg Add *** 01/10/12 ****************************************
+     A            EUATLC    R               REFFLD(DS15)
+     A                                      COLHDG('Attending Provider' +
+     A                                      'License #')
+     A*** End Add *** 01/10/12 ****************************************
+     A*** Beg Add *** 04/04/12 ****************************************
+     A            EUAFSN    R               REFFLD(DS15)
+     A                                      COLHDG('Attending Physician' +
+     A                                      'First Name')
+     A*
+     A            EUALSN    R               REFFLD(DS30)
+     A                                      COLHDG('Attending Physician' +
+     A                                      'Last Name')
+     A*** End Add *** 04/04/12 ****************************************
+     A*** Beg Add *** 05/23/13 ****************************************
+     A            EUICD1001 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A*************                         COLHDG('ICD10 Code 1')
+     A                                      COLHDG('Principal ICD-10' 'Code')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUICD1002 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A**************                        COLHDG('ICD10 Code 2')
+     A                                      COLHDG('ICD10 Code 1')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUICD1003 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A**************                        COLHDG('ICD10 Code 3')
+     A                                      COLHDG('ICD10 Code 2')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUICD1004 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A**************                        COLHDG('ICD10 Code 4')
+     A                                      COLHDG('ICD10 Code 3')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUICD1005 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A**************                        COLHDG('ICD10 Code 5')
+     A                                      COLHDG('ICD10 Code 4')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUICD1006 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A**************                        COLHDG('ICD10 Code 6')
+     A                                      COLHDG('ICD10 Code 5')
+     A*
+     A*** End Chg *** 10/21/15 ****************************************
+     A            EUICD1007 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A**************                        COLHDG('ICD10 Code 7')
+     A                                      COLHDG('ICD10 Code 6')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUICD1008 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A**************                        COLHDG('ICD10 Code 8')
+     A                                      COLHDG('ICD10 Code 7')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUICDIND  R               REFFLD(FLAG)
+     A                                      COLHDG('ICD10 Indicator')
+     A*
+     A            EUPRC1001 R               REFFLD(DS7)
+     A                                      COLHDG('ICD10 Principle' +
+     A                                      'procedure')
+     A*
+     A            EUPRC1002 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A***************                       COLHDG('ICD10 Principle' +
+     A***************                       'procedure (2)')
+     A                                      COLHDG('ICD10 Proc Code 1')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUPRC1003 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A***************                       COLHDG('ICD10 Principle' +
+     A***************                       'procedure (3)')
+     A                                      COLHDG('ICD10 Proc Code 2')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUPRC1004 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A***************                       COLHDG('ICD10 Principle' +
+     A***************                       'procedure (4)')
+     A                                      COLHDG('ICD10 Proc Code 3')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUPRC1005 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A***************                       COLHDG('ICD10 Principle' +
+     A***************                       'procedure (5)')
+     A                                      COLHDG('ICD10 Proc Code 4')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUPRC1006 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A***************                       COLHDG('ICD10 Principle' +
+     A***************                       'procedure (6)')
+     A                                      COLHDG('ICD10 Proc Code 5')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*
+     A            EUCAU1001 R               REFFLD(DS7)
+     A                                      COLHDG('ICD10 External' +
+     A                                      'Cause (1)')
+     A*
+     A            EUCAU1002 R               REFFLD(DS7)
+     A                                      COLHDG('ICD10 External' +
+     A                                      'Cause (2)')
+     A*
+     A            EUCAU1003 R               REFFLD(DS7)
+     A                                      COLHDG('ICD10 External' +
+     A                                      'Cause (3)')
+     A*
+     A            EUADIA1001R               REFFLD(DS7)
+     A                                      COLHDG('ICD10 Admitting' +
+     A                                      'diag code (1)')
+     A*
+     A*** End Add *** 05/23/13 ****************************************
+     A*** Beg Add *** 08/05/13 ****************************************
+     A            EUPREA10  R               REFFLD(DS7)
+     A                                      COLHDG('Patient Reason Code')
+     A*** End Add *** 08/05/13 ****************************************
+     A*** Beg Add *** 04/16/15 ****************************************
+     A            EUICD1009 R               REFFLD(DS7)
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A*************************             COLHDG('ICD10 CODE 9')
+     A                                      COLHDG('ICD10 CODE 8')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*** End Add *** 04/16/15 ****************************************
+     A*** Beg Chg *** 10/21/15 ****************************************
+     A            EUICD1010 R               REFFLD(DS7)
+     A                                      COLHDG('ICD10 CODE 9')
+     A*** End Chg *** 10/21/15 ****************************************
+     A*** Beg Add *** 04/05/17 ****************************************
+     A            EUDGSV    R               REFFLD(FLAG)
+     A                                      COLHDG('AP DRG Severity' +
+     A                                      'Level')
+     A*** End Add *** 04/05/17 ****************************************
+     A*** Beg Add *** 08/11/21 ****************************************
+     A            EUHNAM        60A         COLHDG('HOSPITAL NAME')
+     A*** End Add *** 08/11/21 ****************************************

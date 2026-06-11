@@ -1,0 +1,225 @@
+      * Copyright('(c) 2024 Sapiens. All Rights Reserved.')
+     A*****************************************************************
+     A* SCRIPTURA DATA WORK FILE FOR POLICY PAGES - PAYROLL/PREMIUM   *
+     A*****************************************************************
+     A*                                                               *
+     A*  PROJECT:  SY371        PROGRAMMER:  C:65                     *
+     A*  CREATED:  02/22/16                                           *
+     A*  DESCRIPTION:  THIS IS THE WORK FILE TO HOLD THE DATA FOR     *
+     A*                POLICY PAGE SCHEDULE OF OPERATIONS - PAYROLL   *
+     A*                AND PREMIUM DATA.                              *
+     A*                                                               *
+     A*                TYPES OF LINE ITEMS:                           *
+     A*                ' ' - RECORD FOR STATE PAGE OR SUMMARY PAGE.   *
+     A*                      CONTAINS EXPERIENCE MOD INFO.            *
+     A*                'E' - PAYROLL DATA.                            *
+     A*                'P' - PREMIUM DATA.                            *
+     A*                                                               *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 07/12/23 C:65  PROJECT: 153WAH                                *
+     A*                ADD TWO MORE EXPERIENCE MODIFIER STATUSES.     *
+     A*                                                               *
+     A* 06/01/23 C:291 PROJECT: 153WAH                                *
+     A*                ADD EXPERIENCE MODIFIER STATUS                 *
+     A*                                                               *
+     A* 05/20/19 C:180 PROJECT WC2667                                 *
+     A*                ADD ARP FIELDS                                 *
+     A*                                                               *
+     A* 04/30/18 C:136 SUPPORT: 70391                                 *
+     A*                ADD CAREWEST TERRITORY RATING FIELDS TO        *
+     A*                SCRIPTURA OUTPUT                               *
+     A*                                                               *
+     A* 02/08/18 C:65  PROJECT: 148WAT                                *
+     A*                ADD FLAG FOR ASSESSMENT LINE ITEMS AS WELL AS  *
+     A*                ANNUAL/PRORATED PREMIUM AND TOTAL AMOUNTS.     *
+     A*                                                               *
+     A* 11/07/17 C:65  PROJECT: 148WAN                                *
+     A*                ADD STATE NAMES.                               *
+     A*                                                               *
+     A* 08/16/17 C:65  PROJECT: 150WAO                                *
+     A*                ADD EMPLOYER LINK CODE FOR PAYROLL RECORDS.    *
+     A*                ADD FIELDS FOR TERRORISM BREAKOUT SECTION.     *
+     A*                                                               *
+     A* 07/27/17 C:62  PROJECT: 150WAL                                *
+     A*                ADD TERRITORIAL DIFFERENTITAL FACTOR           *
+     A*                                                               *
+     A* 12/16/16 C:65  PROJECT: SY371                                 *
+     A*                ADD PERCENTAGE AND FACTOR FIELDS FOR PREMIUM   *
+     A*                LINE ITEMS - VALUES REMOVED FROM HEADING.      *
+     A*                                                               *
+     A* 06/20/16 C:65  PROJECT: SY371                                 *
+     A*                CHANGE DATE FIELDS TO BE 8.0S INSTEAD OF       *
+     A*                FORMATTED FIELDS.                              *
+     A*                                                               *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PP301                     TEXT('POL PG PAYROLL/PREM WORKFILE')
+     A*
+     A* KEY FIELDS
+     A*
+     A            P3XML         60A         COLHDG('XML FILE NAME')
+     A*
+     A            P3KEY          9S 0
+     A                                      COLHDG('INCREMENTING' 'KEY')
+     A*
+     A            P3TYPE    R               REFFLD(FLAG)
+     A                                      COLHDG('TYPE OF LINE ITEM')
+     A            P3ST      R               REFFLD(ST)
+     A                                      COLHDG('STATE')
+     A*
+     A            P3NOPAY   R               REFFLD(FLAG)
+     A                                      COLHDG('NO PAYROLL TO PRINT')
+     A*
+     A            P3MODTXT  R               REFFLD(DS40)
+     A                                      COLHDG('EXP MODIFIER TEXT')
+     A*
+     A            P3EXM1    R     S         REFFLD(PC54)
+     A                                      COLHDG('EXPERIENCE' 'MODIFIER 1')
+     A            P3EXM2    R     S         REFFLD(PC54)
+     A                                      COLHDG('EXPERIENCE' 'MODIFIER 2')
+     A            P3EXM3    R     S         REFFLD(PC54)
+     A                                      COLHDG('EXPERIENCE' 'MODIFIER 3')
+     A*
+     A*** BEGIN CHG ***  06/20/16  ********************************************
+     A*****       P3EXMDT1  R               REFFLD(DS10)
+     A*****                                 COLHDG('EXP MOD EFF DATE 1')
+     A*****       P3EXMDT2  R               REFFLD(DS10)
+     A*****                                 COLHDG('EXP MOD EFF DATE 2')
+     A*****       P3EXMDT3  R               REFFLD(DS10)
+     A*****                                 COLHDG('EXP MOD EFF DATE 3')
+     A            P3EXMDT1       8S 0
+     A                                      COLHDG('EXP MOD EFF DATE 1')
+     A            P3EXMDT2       8S 0
+     A                                      COLHDG('EXP MOD EFF DATE 2')
+     A            P3EXMDT3       8S 0
+     A                                      COLHDG('EXP MOD EFF DATE 3')
+     A*** END CHG *****  06/20/16  ********************************************
+     A*
+     A            P3PAYCLS  R     S         REFFLD(CLAS)
+     A                                      COLHDG('PAYROLL CLASS')
+     A            P3PAYSPC  R               REFFLD(FLAG)
+     A                                      COLHDG('PAYROLL CLASS SPEC')
+     A            P3PAYEXT  R               REFFLD(CLA2)
+     A                                      COLHDG('PAYROLL CLASS EXT')
+     A            P3PAYDES  R               REFFLD(DS40)
+     A                                      COLHDG('PAYROLL DESCRIPTION')
+     A            P3PAYAMT  R     S         REFFLD(A112)
+     A                                      COLHDG('PAYROLL AMOUNT')
+     A            P3PAYRTE       9S 4
+     A                                      COLHDG('PAYROLL RATE')
+     A            P3PAYPRM  R     S         REFFLD(A112)
+     A                                      COLHDG('PAYROLL PREMIUM')
+     A*** BEGIN CHG ***  06/20/16  ********************************************
+     A*****       P3PAYEFD  R               REFFLD(DS10)
+     A*****                                 COLHDG('PAYROLL EFF DATE')
+     A*****       P3PAYEXD  R               REFFLD(DS10)
+     A*****                                 COLHDG('PAYROLL EXP DATE')
+     A            P3PAYEFD       8S 0
+     A                                      COLHDG('PAYROLL EFF DATE')
+     A            P3PAYEXD       8S 0
+     A                                      COLHDG('PAYROLL EXP DATE')
+     A*** END CHG *****  06/20/16  ********************************************
+     A            P3PAYADV  R               REFFLD(DS40)
+     A                                      COLHDG('PAYROLL ADDL INFO')
+     A            P3PAYADL  R     S         REFFLD(A112)
+     A                                      COLHDG('PAYROLL ADDL LOAD')
+     A*
+     A            P3PRMHDG  R               REFFLD(DS60)
+     A                                      COLHDG('PREMIUM LINE HDG')
+     A            P3PRMAMT  R     S         REFFLD(A112)
+     A                                      COLHDG('PREMIUM LINE AMT')
+     A*
+     A            P3SIGN    R               REFFLD(FLAG)
+     A                                      COLHDG('LINE ITEM SIGN')
+     A*** BEGIN ADD ***  12/16/16  ********************************************
+     A            P3PRMPRC  R     S         REFFLD(PC96)
+     A                                      COLHDG('PREMIUM PERCENTAGE')
+     A            P3PRMPRCF R     S         REFFLD(PC96)
+     A                                      COLHDG('PREMIUM PERCENT' 'F-CLASS')
+     A            P3PRMFACT R     S         REFFLD(PC96)
+     A                                      COLHDG('PREMIUM FACTOR')
+     A            P3PRMCODE R     S         REFFLD(CLAS)
+     A                                      COLHDG('PREMIUM STAT CODE')
+     A*** END ADD *****  12/16/16  ********************************************
+     A*** BEGIN ADD *** 07/27/17 **********************************************
+     A            P3TDF          5S 4       COLHDG('Territorial' -
+     A                                      ' Differential Factor')
+     A*** END   ADD *** 07/27/17 **********************************************
+     A*
+     A* MAINTENANCE FIELDS
+     A*
+     A            P3USER    R               REFFLD(USER)
+     A                                      COLHDG('USER')
+     A            P3PGM     R               REFFLD(PGM)
+     A                                      COLHDG('PROGRAM')
+     A            P3TIME    R     S         REFFLD(TIME)
+     A                                      COLHDG('TIME')
+     A            P3DT      R     S         REFFLD(DT)
+     A                                      COLHDG('DATE')
+     A*
+     A*** BEGIN ADD ***  08/16/17  ********************************************
+     A            P3PAYLINK R               REFFLD(DS15)
+     A                                      COLHDG('PAYROLL EMPLR' 'LINK CODE')
+     A            P3TERDES  R               REFFLD(DS40)
+     A                                      COLHDG('FOREIGN TERROR' 'DESC')
+     A            P3TERPAY      13S 2
+     A                                      COLHDG('FOREIGN TERROR' 'PAYROLL')
+     A            P3TERRTE  R     S         REFFLD(A53)
+     A                                      COLHDG('FOREIGN TERROR' 'RATE')
+     A            P3TERAMT      13S 2
+     A                                      COLHDG('FOREIGN TERROR' 'CHARGE')
+     A            P3TERNPAY     13S 2
+     A                                      COLHDG('FOREIGN TERROR' 'NON-PAY')
+     A            P3TERNRTE R     S         REFFLD(A53)
+     A                                      COLHDG('FOREIGN TERROR' 'NON-RATE')
+     A            P3TERNAMT     13S 2
+     A                                      COLHDG('FOREIGN TERROR' 'NON-CHRG')
+     A            P3TERTOTL     13S 2
+     A                                      COLHDG('FOREIGN TERROR' 'TOTAL')
+     A            P3DOMDES  R               REFFLD(DS40)
+     A                                      COLHDG('DOMESTIC TERROR' 'DESC')
+     A            P3DOMPAY      13S 2
+     A                                      COLHDG('DOMESTIC TERROR' 'PAYROLL')
+     A            P3DOMRTE  R     S         REFFLD(A53)
+     A                                      COLHDG('DOMESTIC TERROR' 'RATE')
+     A            P3DOMAMT      13S 2
+     A                                      COLHDG('DOMESTIC TERROR' 'CHARGE')
+     A*** END ADD *****  08/16/17  ********************************************
+     A*** BEGIN ADD ***  11/07/17  ********************************************
+     A            P3STATE   R               REFFLD(DS40)
+     A                                      COLHDG('STATE NAME')
+     A*** END ADD *****  11/07/17  ********************************************
+     A*** BEGIN ADD ***  02/08/18  ********************************************
+     A            P3PRMASS  R               REFFLD(FLAG)
+     A                                      COLHDG('PREMIUM - ASSESSMENT')
+     A            P3PREM        13S 2
+     A                                      COLHDG('STATE/SUM PREMIUM')
+     A            P3TOTAL       13S 2
+     A                                      COLHDG('STATE/SUM TOTAL')
+     A*** END ADD *****  02/08/18  ********************************************
+     A*** BEG ADD *****  04/30/18  ********************************************
+     A            P3TERTFCT      5S 4       COLHDG('CAREWEST TERRITORY ' -
+     A                                      ' RATE FACTOR')
+     A            P3TERTHDG     40A         COLHDG('CAREWEST TERRITORY ' -
+     A                                      ' RATE HEADING')
+     A*** END ADD *****  04/30/18  ********************************************
+     A*** BEG ADD *****  05/20/19  ********************************************
+     A            P3ARP1         5S 4        COLHDG('ARAP # 1')
+     A            P3ARP2         5S 4        COLHDG('ARAP # 2')
+     A            P3ARP3         5S 4        COLHDG('ARAP # 3')
+     A*** END ADD *****  05/20/19  ********************************************
+     A*** BEG ADD *****  06/01/23  ********************************************
+     A*** BEGIN CHG ***  07/12/23  ********************************************
+     A*****       P3MODSTS       1A          COLHDG('EXPERIENCE MODIFIER' -
+     A*****                                  'STATUS')
+     A            P3MODSTS1      1A          COLHDG('EXPERIENCE MODIFIER' -
+     A                                       'STATUS 1')
+     A            P3MODSTS2      1A          COLHDG('EXPERIENCE MODIFIER' -
+     A                                       'STATUS 2')
+     A            P3MODSTS3      1A          COLHDG('EXPERIENCE MODIFIER' -
+     A                                       'STATUS 3')
+     A*** END CHG *****  07/12/23  ********************************************
+     A*** END ADD *****  06/01/23  ********************************************

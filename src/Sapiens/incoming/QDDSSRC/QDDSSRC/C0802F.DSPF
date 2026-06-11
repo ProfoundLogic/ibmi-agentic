@@ -1,0 +1,320 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   CLAIM RESERVES GENERAL LIABILITY SEARCH DISPLAY          **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      PUTOVR
+     A                                      SETOF(20)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0802F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      TEXT('POLICY NUMBER')
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 35REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                  5  2'Section Code:'
+     A            SCCC      R        O  5 17REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A            SCCCNM    R        O  5 22REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                  6  2'Claim:'
+     A            SCCLM#    R        O  6 11REFFLD(CLM#)
+     A                                      DSPATR(HI)
+     A                                  6 28'Agent Code:'
+     A            SCAGT#    R        O  6 41REFFLD(AGT#)
+     A                                      DSPATR(HI)
+     A                                  7  2'Claimant ID:'
+     A            SCCLID    R        B  7 16REFFLD(CLID)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                  7 24'Location:'
+     A            SCLOC#    R        B  7 35REFFLD(LOC#)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                  7 42'Building:'
+     A            SCPRM#    R        B  7 53REFFLD(PRM#)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                  8  2'Claimant ID'
+     A                                      DSPATR(UL)
+     A                                  8 17'Location'
+     A                                      DSPATR(UL)
+     A                                  8 29'Building'
+     A                                      DSPATR(UL)
+     A                                  8 41'Subline'
+     A                                      DSPATR(UL)
+     A                                  8 51'Classification'
+     A                                      DSPATR(UL)
+     A                                  8 67'Coverage Code'
+     A                                      DSPATR(UL)
+     A            SCFL01    R        B  9  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  20                                  ERRMSGID(CCR0600 *LIBL/CMESGG)
+     A            SCFL02    R        B 10  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL03    R        B 11  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL04    R        B 12  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL05    R        B 13  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL06    R        B 14  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL07    R        B 15  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL08    R        B 16  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL09    R        B 17  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL10    R        B 18  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL11    R        B 19  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL12    R        B 20  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL13    R        B 21  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL14    R        B 22  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCCI01    R        O  9  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI02    R        O 10  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI03    R        O 11  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI04    R        O 12  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI05    R        O 13  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI06    R        O 14  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI07    R        O 15  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI08    R        O 16  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI09    R        O 17  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI10    R        O 18  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI11    R        O 19  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI12    R        O 20  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI13    R        O 21  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCCI14    R        O 22  5REFFLD(CLID)
+     A                                      OVRDTA
+     A            SCLC01    R        O  9 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC02    R        O 10 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC03    R        O 11 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC04    R        O 12 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC05    R        O 13 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC06    R        O 14 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC07    R        O 15 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC08    R        O 16 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC09    R        O 17 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC10    R        O 18 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC11    R        O 19 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC12    R        O 20 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC13    R        O 21 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCLC14    R        O 22 20REFFLD(LOC#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM01    R        O  9 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM02    R        O 10 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM03    R        O 11 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM04    R        O 12 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM05    R        O 13 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM06    R        O 14 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM07    R        O 15 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM08    R        O 16 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM09    R        O 17 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM10    R        O 18 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM11    R        O 19 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM12    R        O 20 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM13    R        O 21 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCPM14    R        O 22 32REFFLD(PRM#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCV01    R        O  9 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV02    R        O 10 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV03    R        O 11 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV04    R        O 12 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV05    R        O 13 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV06    R        O 14 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV07    R        O 15 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV08    R        O 16 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV09    R        O 17 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV10    R        O 18 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV11    R        O 19 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV12    R        O 20 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV13    R        O 21 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCCV14    R        O 22 73REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCSL01    R        O  9 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL02    R        O 10 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL03    R        O 11 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL04    R        O 12 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL05    R        O 13 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL06    R        O 14 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL07    R        O 15 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL08    R        O 16 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL09    R        O 17 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL10    R        O 18 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL11    R        O 19 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL12    R        O 20 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL13    R        O 21 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCSL14    R        O 22 43REFFLD(SUBL)
+     A                                      OVRDTA
+     A            SCCL01    R        O  9 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL02    R        O 10 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL03    R        O 11 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL04    R        O 12 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL05    R        O 13 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL06    R        O 14 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL07    R        O 15 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL08    R        O 16 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL09    R        O 17 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL10    R        O 18 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL11    R        O 19 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL12    R        O 20 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL13    R        O 21 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A            SCCL14    R        O 22 55REFFLD(CLAS)
+     A                                      OVRDTA
+     A                                 23  8'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 29'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A            SCUP           9A  O 23 52OVRDTA
+     A            SCDOWN         9A  O 23 67OVRDTA
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR99
+     A            SCERR     R        O  1  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      TEXT('DUMMY FIELD')

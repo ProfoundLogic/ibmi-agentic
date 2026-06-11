@@ -1,0 +1,278 @@
+     A*  (C) Copyright Progressive Data Solutions, Inc., 1996, 1997
+     A**
+     A** EDI/NOI 148 Transmission FILE
+     A*
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A*  01/24/00  C:112 Project: 87MIT                               *
+     A*                  Expand field FRACDS to 264A                  *
+     A*                                                               *
+     A*  09/08/99  C:15 Project: 87MAX  (WC087/19545)                 *
+     A*                 Expand field FRPFEI to 11A.                   *
+     A*                                                               *
+     A*  08/18/99  C:112 Project: 87MIK
+     A*                  Add field: FRNAIJ Nature of Injury
+     A*
+     A*   2/18/99  C:58 PROJECT: 87MHS
+     A*                 Add field:   D8RLTW
+     A*
+     A*  08/28/97  C:58 PROJECT: 87MAX
+     A*                 Add fields:
+     A*                              D8REHB, D8SRC AND D8MED
+     A*
+     A*  10/16/97  C:58 PROJECT: 87MAX
+     A*                 Expand field FRPRFI to 11A.
+     A*
+     A*****************************************************************
+     A*
+     A                                      REF(WREFP)
+     A**
+     A          R PFR01                     TEXT('EDI 148 Format')
+     A            FRCO#     R               REFFLD(CO#)
+     A            FREXDT    R               REFFLD(DT)
+     A                                      COLHDG('EXTRACT DATE')
+     A*
+     A***    Transaction
+     A*
+     A            FRTSET    R    3A         REFFLD(CODE)
+     A                                      TEXT('TRANSACTION SET ID')
+     A            FRMTC     R               REFFLD(CODE)
+     A                                      TEXT('MAINT TYPE CODE')
+     A            FRTDT     R    8S 0       REFFLD(DT)
+     A                                      TEXT('MAINT TYPE CODE DATE')
+     A*
+     A***    Jurisdiction
+     A*
+     A            FRJRST    R               REFFLD(CODE)
+     A                                      TEXT('JURISDICTION')
+     A            FRACL#    R   25A         REFFLD(DS20)
+     A                                      COLHDG('AGENCY' 'CLAIM' '#')
+     A*
+     A***    Claim Administrator
+     A*
+     A            FRCLCD    R               REFFLD(DS9)
+     A                                      TEXT('INSURER FEIN')
+     A            FRCLSN    R               REFFLD(LSN)
+     A                                      TEXT('INSURER NAME')
+     A            FRPADC    R               REFFLD(DS9)
+     A                                      COLHDG('INDEP' 'ADJUSTOR' 'CODE')
+     A            FRPLSN    R               REFFLD(LSN)
+     A                                      COLHDG('INDEP' 'ADJUSTOR' 'NAME')
+     A            FRAAD1    R   30A         REFFLD(ADR1)
+     A                                      TEXT('CLM ADMIN ADR1')
+     A            FRAAD2    R   30A         REFFLD(ADR2)
+     A            FRACIT    R   15A         REFFLD(CTY)
+     A                                      TEXT('CLM ADMIN CITY')
+     A            FRAST     R               REFFLD(ST)
+     A                                      TEXT('CLM ADMIN STATE')
+     A            FRAZP     R    9A         REFFLD(ZIP)
+     A                                      TEXT('CLM ADMIN ZIP')
+     A            FRACLC    R   25A         REFFLD(DS20)
+     A                                      COLHDG('ADMIN' 'CLAIM' '#')
+     A*
+     A***    Insured
+     A*
+     A            FREMP#    R    9A         REFFLD(EMP#)
+     A                                      COLHDG('EMPLOYER' 'CODE')
+     A            FRILSN    R               REFFLD(LSN)
+     A                                      COLHDG('INSURED' 'ADMIN' 'NAME')
+     A            FRELSN    R               REFFLD(LSN)
+     A                                      COLHDG('EMPLOYER' 'ADMIN' 'NAME')
+     A                                      TEXT('EMPLOYER NAME')
+     A            FREAD1    R   30A         REFFLD(ADR1)
+     A                                      TEXT('EMPLOYER ADR1')
+     A            FREAD2    R   30A         REFFLD(ADR2)
+     A            FRECIT    R   15A         REFFLD(CTY)
+     A                                      TEXT('EMPLOYER CITY')
+     A            FREST     R               REFFLD(ST)
+     A                                      TEXT('EMPLOYER STATE')
+     A            FREZP     R    9A         REFFLD(ZIP)
+     A                                      TEXT('EMPLOYER ZIP')
+     A            FRSFIN    R               REFFLD(FLAG)
+     A                                      COLHDG('SELF' 'INSURED' 'INDICATOR')
+     A            FRSIC     R    6A         REFFLD(CODE)
+     A                                      COLHDG('SIC' 'CODE')
+     A            FRRPT#    R               REFFLD(DS10)
+     A                                      COLHDG('REPORT' '#')
+     A            FRLOC#    R               REFFLD(DS15)
+     A                                      COLHDG('LOCATION' '#')
+     A*
+     A***    Policy
+     A*
+     A            FRPOL#    R               REFFLD(DS30)
+     A                                      COLHDG('POLICY' '#')
+     A            FRPEFD    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('POLICY' 'EFFECTIVE' 'DATE')
+     A            FRPEXD    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('POLICY' 'EXPIRATION' 'DATE')
+     A*
+     A***    Accident
+     A*
+     A            FRACDT    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('INJURY' 'DATE')
+     A            FRACTM    R    4S 0       REFFLD(TIME)
+     A                                      COLHDG('INJURY' 'TIME')
+     A            FRAZP1    R    9A         REFFLD(ZIP)
+     A                                      COLHDG('INJURY' 'SITE' 'ZIP')
+     A            FREADR    R               REFFLD(FLAG)
+     A                                      COLHDG('EMPLOYERS' 'PREMISIS' 'IND')
+     A            FRNATR    R               REFFLD(NACD)
+     A            FRPART    R               REFFLD(CODE)
+     A                                      COLHDG('BODY' 'PART')
+     A            FRCAUS    R               REFFLD(CODE)
+     A                                      COLHDG('CAUSE' 'OF' 'INJURY')
+     A            FRACDS    R  150A         REFFLD(DS00)
+     A                                      COLHDG('DESCRIPTION' 'OF' 'INJURY')
+     A            FRITRT    R               REFFLD(CODE)
+     A                                      COLHDG('INITIAL' 'TREATMENT')
+     A            FRDTRP    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'REPORTED TO' 'EMPLR')
+     A            FRRCVD    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'REPORTED TO' 'ADMIN')
+     A                                      TEXT('DTE RPT CLM ADMIN          M')
+     A*
+     A***    Claimant
+     A*
+     A            FRSS#     R               REFFLD(SS#)
+     A                                      TEXT('SOC SEC #')
+     A            FRLSN     R               REFFLD(LSN)
+     A                                      TEXT('EMPLOYEE LST NAME')
+     A            FRFSN     R               REFFLD(FSN)
+     A                                      TEXT('EMPLOYEE 1ST NAME')
+     A            FRMID     R               REFFLD(MID)
+     A            FRADR1    R   30A         REFFLD(ADR1)
+     A                                      TEXT('EMPLOYEE ADR1')
+     A            FRADR2    R   30A         REFFLD(ADR2)
+     A            FRCTY     R   15A         REFFLD(CTY)
+     A                                      TEXT('EMPLOYEE CITY')
+     A            FRST      R               REFFLD(ST)
+     A                                      TEXT('EMPLOYEE STATE')
+     A            FRZIP     R    9A         REFFLD(ZIP)
+     A                                      TEXT('EMPLOYEE ZIP')
+     A            FRPHN#    R   10A         REFFLD(PHN#)
+     A            FRDTOB    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'OF' 'BIRTH')
+     A            FRSEX     R               REFFLD(FLAG)
+     A                                      COLHDG('GENDER' 'CODE')
+     A            FRMSTS    R               REFFLD(FLAG)
+     A                                      COLHDG('MARITAL' 'STATUS')
+     A            FRDEP     R    2S 0       REFFLD(A20)
+     A                                      COLHDG('#' 'OF' 'DEPENDENTS')
+     A            FRDBDT    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'DISABILITY' 'BEGAN')
+     A            FRDOD     R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'OF' 'DEATH')
+     A*
+     A***    Employment
+     A*
+     A            FRESTS    R               REFFLD(CODE)
+     A                                      COLHDG('EMPLOYMENT' 'STATUS' 'CODE')
+     A            FRCLAS    R    4A         REFFLD(CODE)
+     A                                      COLHDG('CLASS' 'CODE')
+     A            FROCC     R               REFFLD(DS30)
+     A                                      COLHDG('OCCUPATION')
+     A            FRDOH     R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'OF' 'HIRE')
+     A            FRAWW     R     S         REFFLD(A112)
+     A                                      COLHDG('WAGE')
+     A            FRWGPD    R               REFFLD(CODE)
+     A                                      COLHDG('WAGE' 'PERIOD')
+     A            FRDAYS    R    1S 0       REFFLD(A20)
+     A                                      COLHDG('DAYS' 'WORKED')
+     A            FRDTLW    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'LAST' 'WORKED')
+     A            FRFSAL    R               REFFLD(FLAG)
+     A                                      COLHDG('FULL' 'WAGES')
+     A            FRCSAL    R               REFFLD(FLAG)
+     A                                      COLHDG('CONTINUED' 'SALARY')
+     A            FRRTW     R    8S 0       REFFLD(DT)
+     A                                      COLHDG('DATE' 'RETURN' 'TO WORK')
+     A*
+     A            FRSTAT    R               REFFLD(STAT)
+     A            FRUSER    R               REFFLD(USER)
+     A            FRPGM     R               REFFLD(PGM)
+     A            FRTIME    R               REFFLD(TIME)
+     A            FRDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+ 501 A            FRCVCD         2A         TEXT('02-COVERAGE CODE')
+ 502 A            FREMPN        14A         TEXT('07-EMPLOYER POLICY NUMBER')
+ 503 A            FREMCN        30A         TEXT('10-EMPLOYEE COUNTRY')
+ 504 A            FRACTY         2A         TEXT('14-TYPE OF ACCIDENT')
+ 505 A            FREDID        20A         TEXT('15-USER ID EDI SENDER')
+ 506 A            FRCRDT         8A         TEXT('17-CERTIFICATION DATE')
+ 507 A            FRCRDS       150A         TEXT('18-CERTIFICATION DESC')
+ 508 A            FRCRTY         1A         TEXT('19-CERTIFICATION TYPE')
+ 509 A            FRCRLN        30A         TEXT('20-CERTIFIER LAST NAME')
+ 510 A            FRCRFN        15A         TEXT('20-CERTIFIER FIRST NAME')
+ 511 A            FRCRMI         1A         TEXT('20-CERTIFIER MIDDLE INITIAL')
+ 512 A            FRCRTI        30A         TEXT('21-CERTIFIER TITLE')
+ 513 A            FRDTIT         8A         TEXT('22-DT OF INITIAL TREATMENT')
+ 517 A            FREMWP        10A         TEXT('28-EMPLOYEE WORK PHONE')
+ 518 A            FRDEPT        80A         TEXT('30-DEPARTMENT')
+ 519 A            FREMCY        30A         TEXT('32-EMPLOYEE COUNTY')
+ 520 A            FRERWP        10A         TEXT('40-EMPLOYER PHONE #')
+ 521 A            FRNCCI         6A         TEXT('41-MANUAL/NCCI NUMBER')
+ 522 A            FRPBEG         8A         TEXT('43-PHYS/RECORD BEGIN DATE')
+ 523 A            FRPEND         8A         TEXT('43-PHYS/RECORD END DATE')
+     A* *** BEGIN CHG *** 10/16/97 ************************************V #')
+     A*********** FRPRFI         9A         TEXT('44-PHYS OF RECORD PROV #')
+ 524 A            FRPRFI        11A         TEXT('44-PHYS OF RECORD PROV #')
+     A* *** END CHANGE ** 10/16/97 ************************************V #')
+     A*** BEGIN CHG *** 09/08/99 **************************************
+     A*********** FRPFEI         9A         TEXT('45-PROVIDER #')
+ 525 A            FRPFEI        11A         TEXT('45-PROVIDER #')
+     A*** END CHG ***** 09/08/99 **************************************
+ 526 A            FRDIIA         1A         TEXT('46-INDUSTRIAL ACCIDENT Y/N')
+ 527 A            FRAPA1        30A         TEXT('47-ACCIDENT PLACE ADDRESS 1')
+ 528 A            FRAPA2        30A         TEXT('47-ACCIDENT PLACE ADDRESS 2')
+ 529 A            FRAPCI        25A         TEXT('48-ACCIDENT PLACE CITY')
+ 530 A            FRAPST         2A         TEXT('49-ACCIDENT PLACE STATE')
+ 531 A            FRELRI        11A         TEXT('52-EMPLOYER LEGAL REP ID')
+ 532 A            FREEFI        11A         TEXT('53-EMPLOYEE LEGAL REP ID')
+ 533 A            FRWKDY         2A         TEXT('55-REGULAR WORK DAYS')
+ 534 A            FRSHIS         4A         TEXT('56-SHIFT START TIME')
+ 535 A            FRSHIE         4A         TEXT('57-SHIFT END TIME')
+ 536 A            FRSTHI         2A         TEXT('58-STATE OF HIRE')
+ 537 A            FRWPED         8A         TEXT('61-WAGE PERIOD END DATE')
+ 538 A            FRWTYP         2A         TEXT('63-WAGE TYPE')
+ 539 A            FRSUBF         1A         TEXT('65-SUBROGATION FLAG')
+ 540 A            FRCLOP         1A         TEXT('66-CLAIMANT OWNER/PARTN Y/N')
+ 541 A            FRMEDF         1A         TEXT('67-$1000 MED ONLY PGM Y/N')
+ 542 A            FRMEDD         8A         TEXT('68-$1000 MED ONLY LIMIT DT')
+ 543 A            FRCLIN         2A         TEXT('69-CLAIM INDICATOR')
+ 544 A            FRCLID         8A         TEXT('70-CLAIM INDICATOR DATE')
+ 545 A            FRCLST         2A         TEXT('71-CLAIM STATUS')
+ 546 A            FRCLSD         8A         TEXT('72-CLAIM STATUS DATE')
+ 547 A            FRHPPD         8A         TEXT('73-HPP BEGIN DATE')
+ 554 A            FRSMDT         8A         TEXT('80-SETTLED MEDICAL DATE')
+ 555 A            FRSRC#        30A         TEXT('81-SOURCE CLAIM NUMBER')
+ 556 A            FRBWCA        30A         TEXT('82-BWC CLAIM ASSIGNMENT')
+     A*
+     A            FRI9SG         2A         TEXT('   ICD-9 VARIABLE SEGMENT')
+     A            FRAUSG         2A         TEXT('   PRIOR AUTH VARI SEGMENT')
+     A*
+ 557 A            FRHRWK         3A         TEXT('   HOURS/WEEK WORKED')
+     A            FRNATD        30A         TEXT('   NATURE OF ACCIDENT-DESC')
+     A*** BEGIN ADD * 08/28/97 ****************************************
+     A            FRREHB    R               REFFLD(FLAG)
+     A                                      COLHDG('REHAB IND FOR MED/LT')
+     A            FRSRC     R               REFFLD(DS20)
+     A                                      COLHDG('SRC OF FROI')
+     A            FRMED     R               REFFLD(DS20)
+     A                                      COLHDG('MEDIUM FILING FROI')
+     A*** END ADD *** 08/28/97 ****************************************
+     A*** BEG ADD *** 02/18/99 ****************************************
+     A            FRRLTW         8A         TEXT('DATE  RELEASED TO WORK')
+     A*** END ADD *** 02/18/99 ****************************************
+     A*** BEGIN ADD *** 08/18/99 **************************************
+     A            FRNAIJ       184A         TEXT('NATURE OF INJURY')
+     A*               pos.   1-30: Nature of table's desc
+     A*               pos.  31-32: ', '
+     A*               pos.  33-62: Part table's desc
+     A*               pos.  63-64: ', '
+     A*               pos. 65-184: Nature of Injury from FMCMP/CM40A1-3
+     A*** END ADD ***** 08/18/99 **************************************
+     A*** BEGIN ADD ****** 01/24/00 ***********************************
+     A            FRACD2       114A         COLHDG('ACCIDENT DESC 2')
+     A*** END ADD ******** 01/24/00 ***********************************

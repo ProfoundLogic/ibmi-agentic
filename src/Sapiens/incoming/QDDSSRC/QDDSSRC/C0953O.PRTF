@@ -1,0 +1,184 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   CANCELLATIONS WORKSHEET PRINT FILE                       **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A**   <---------------------------------------------------->   **
+     A**   <-|        THIS FILE MUST BE COMPILED WITH         |->   **
+     A**   <-|              DEVTYPE = *AFPDS                  |->   **
+     A**   <-|              OVRFLW  = 65                      |->   **
+     A**   <---------------------------------------------------->   **
+     A****************************************************************
+     A**  REVISIONS                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      REF(*LIBL/CREFP)
+     A*----------------------------------------------------------------
+     A          R HEAD1                     FONT(155)
+     A*----------------------------------------------------------------
+     A            COMAME        40A     4 32
+     A*
+     A                                  5 33'CANCELLATION WORKSHEET'
+     A*
+     A                                  6 31'COMMERCIAL AUTO DEPARTMEN-
+     A                                      T'
+     A*
+     A                                  8  6'INSURED''S NAME:'
+     A            PMFIN     R           8 22REFFLD(NAME)
+     A                                      FONT(071)
+     A*
+     A                                  9  6'GENERAL AGENT:'
+     A            AGNAME    R           9 22REFFLD(NAME)
+     A                                      FONT(071)
+     A                                  9 41'PRODUCER:'
+     A            PRDBA     R           9 51REFFLD(NM40)
+     A                                      FONT(071)
+     A*
+     A                                 10  6'POLICY NO.'
+     A            PMPOL#    R          10 17REFFLD(POL#)
+     A                                      FONT(072)
+     A                                 10 41'POLICY EFFECTIVE DATE:'
+     A            XXEFDT    R          10 64REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FONT(071)
+     A*
+     A*
+     A                                 11  6'CANCELLATION DATE:'
+     A            XXCNDT    R          11 26REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      FONT(071)
+     A                                 11 36'METHOD: P/R____ S/R____ F-
+     A                                      LAT____ FACTOR______'
+     A            XXPROR    R          11 48REFFLD(STAT)
+     A                                      FONT(012)
+     A            XXSHRT    R          11 56REFFLD(STAT)
+     A                                      FONT(012)
+     A            XXFLAT    R          11 65REFFLD(STAT)
+     A                                      FONT(012)
+     A            XXFACT         4  3  11 74
+     A                                      FONT(012)
+     A                                      EDTCDE(3)
+     A                                 12  6'REASON:'
+     A            CRDESC    R          12 14REFFLD(DS50)
+     A                                      FONT(072)
+     A*
+     A                                 15 16'(PREMIUM SHOWN: ANNUAL PR-
+     A                                      EMIUM/UNEARNED PREMIUM)'
+     A*
+     A                                 16  6'Covered'
+     A*
+     A                                 17  6'Auto No.'
+     A                                 17 16'BI'
+     A                                 17 26'MP'
+     A                                 17 36'UM'
+     A                                 17 45'PIP'
+     A                                 17 54'COMP'
+     A                                 17 64'COLL'
+     A                                 17 74'TOTAL'
+     A*----------------------------------------------------------------
+     A          R HEAD2                     SPACEA(02)
+     A*----------------------------------------------------------------
+     A*
+     A*----------------------------------------------------------------
+     A          R DETAIL                    FONT(204)
+     A                                      SPACEA(01)
+     A*----------------------------------------------------------------
+     A            A1ITM#    R              6REFFLD(AGT#)
+     A            XXSLB         13        12
+     A            XXMED         13        22
+     A            XXUNM         13        32
+     A            XXPIP         13        42
+     A            XXNCL         13        52
+     A            XXCOL         13        62
+     A            XXTOT         13        72
+     A*----------------------------------------------------------------
+     A          R TOTAL1                    SPACEB(01)
+     A*----------------------------------------------------------------
+     A                                     6'Total Gross Premium/Unear-
+     A                                      ned Premium'
+     A            XXGRS         18        70
+     A                                      FONT(204)
+     A*----------------------------------------------------------------
+     A          R TOTAL2
+     A*----------------------------------------------------------------
+     A                                 43  6'CANCELLATION SUMMARY:'
+     A                                      FONT(155)
+     A*
+     A                                 45  6'ANNUAL GROSS PREMIUM:'
+     A            LINE1         16A  O 45 41UNDERLINE
+     A            XXTOTA         9  2  45 42
+     A                                      FONT(071)
+     A                                      EDTCDE(L)
+     A*
+     A                                 46  6'CANCELLATION FACTOR (   )'
+     A            XXFACT         4  3  46 26
+     A                                      FONT(071)
+     A                                      EDTCDE(M)
+     A*
+     A                                 47  6'UNEARNED GROSS RETURN PRE-
+     A                                      MIUM:'
+     A            LINE2         16A  O 47 41UNDERLINE
+     A            XXTOTP         9  2  47 42
+     A                                      FONT(071)
+     A                                      EDTCDE(L)
+     A*
+     A                                 48  6'MINIMUM PREMIUM ADJUSTMENT:'
+     A            LINE2B        16A  O 48 41UNDERLINE
+     A            XXMADJ         9  2  48 42
+     A                                      FONT(071)
+     A                                      EDTCDE(L)
+     A*
+     A                                 49  6'UNEARNED COMMISSION (     -
+     A                                      %):'
+     A            PMCMNR         5  2  49 27
+     A                                      FONT(071)
+     A                                      EDTCDE(M)
+     A            LINE3         16A  O 49 41UNDERLINE
+     A            XXCOMM         9  2  49 42
+     A                                      FONT(071)
+     A                                      EDTCDE(L)
+     A*
+     A                                 50  6'NET UNEARNED PREMIUM:'
+     A            LINE4         16A  O 50 41UNDERLINE
+     A            XXUNEP         9  2  50 42
+     A                                      FONT(071)
+     A                                      EDTCDE(L)
+     A*
+     A                                 51  6'OUTSTANDING BALANCE (+/-)'
+     A            LINE5         16A  O 51 41UNDERLINE
+     A*
+     A                                 52  6'* NET AMOUNT DUE'
+     A            LINE6         16A  O 52 41UNDERLINE
+     A            XXBAL          9  2  52 42
+     A                                      FONT(071)
+     A                                      EDTCDE(L)
+     A*
+     A                                 53  6'* This amount must be equ-
+     A                                      al to the check request am-
+     A                                      ount.'
+     A*
+     A                                 55  6'Person Processing Cancell-
+     A                                      ation:____________________-
+     A                                      _  Date:_______________'
+     A            UPSTAF    R          55 40REFFLD(STAF)
+     A            DSDAT8    R          55 66REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A*
+     A                                 56  6'Person Verifying Cancella-
+     A                                      tion:_____________________-
+     A                                      _  Date:_______________'
+     A*
+     A                                 58  6'CHECK REQUEST INFORMATION'
+     A*
+     A                                 59  6'AMOUNT: $__________SENT T-
+     A                                      O:( )ACCOUNTING ( )OTHER__-
+     A                                      ________  ON:__________'
+     A*
+     A                                 60  6'APPROVED BY:_____________-
+     A                                      ____________   ON:________-
+     A                                      __'
+     A*

@@ -1,0 +1,492 @@
+     A*  (C) Copyright Progressive Data Solutions, Inc., 1997
+     A*%%TS  SD  19961218  090157  WINNERW     REL-V3R6M0  5716-PW1
+     A****************************************************************
+     A****************************************************************
+     A* REVISIONS
+     A*   02/28/95 C:26 Project: WC337
+     A*            Add Claims Examiner field. Shorten Claimant name
+     A****************************************************************
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/WREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A*
+     A                                      CF05
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'W0577F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  6 29'Social Sec.#:'
+     A            SCSS#     R        B  6 45REFFLD(SS#)
+     A                                      OVRDTA
+     A                                      DSPATR(UL)
+     A  20                                  ERRMSGID(WCR0600 WMESGG)
+     A                                 23  2'F3=Exit         '
+     A                                      COLOR(BLU)
+     A                                 23 21'F5=Alpha search   '
+     A                                      COLOR(BLU)
+     A*            17:14:01    SAJ         REL-R08M00  5714-UT1
+     A*
+     A          R SCR02
+     A*%%TS  SD  19961218  090157  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      PUTOVR
+     A                                      SETOF(20)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'W0577F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A                                  4  3'Social Sec.Number:'
+     A            SCSS#     R        B  4 22REFFLD(SS#)
+     A                                      OVRDTA
+     A                                      DSPATR(UL)
+     A                                  6  2'Soc.Sec.#'
+     A                                  6 12'Claimant Name'
+     A                                  6 28'Yr'
+     A                                  6 31'Case'
+     A                                  6 38'St'
+     A                                  6 50'Acc.Date'
+     A                                  6 62'Emp.#'
+     A                                  6 72'Div'
+     A            SCSS01    R        O  8  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM01    R        O  8 12REFFLD(DS15)
+     A            SCCO01    R        O  8 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN01    R        O  8 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR01    R        O  8 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA01    R        O  8 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC01    R        O  8 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT01    R        O  8 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD01    R        O  8 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM01    R        O  8 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV01    R        O  8 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS02    R        O  9  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM02    R        O  9 12REFFLD(DS15)
+     A            SCCO02    R        O  9 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN02    R        O  9 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR02    R        O  9 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA02    R        O  9 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC02    R        O  9 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT02    R        O  9 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD02    R        O  9 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM02    R        O  9 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV02    R        O  9 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS03    R        O 10  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM03    R        O 10 12REFFLD(DS15)
+     A            SCCO03    R        O 10 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN03    R        O 10 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR03    R        O 10 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA03    R        O 10 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC03    R        O 10 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT03    R        O 10 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD03    R        O 10 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM03    R        O 10 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV03    R        O 10 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS04    R        O 11  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM04    R        O 11 12REFFLD(DS15)
+     A            SCCO04    R        O 11 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN04    R        O 11 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR04    R        O 11 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA04    R        O 11 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC04    R        O 11 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT04    R        O 11 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD04    R        O 11 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM04    R        O 11 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV04    R        O 11 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS05    R        O 12  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM05    R        O 12 12REFFLD(DS15)
+     A            SCCO05    R        O 12 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN05    R        O 12 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR05    R        O 12 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA05    R        O 12 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC05    R        O 12 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT05    R        O 12 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD05    R        O 12 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM05    R        O 12 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV05    R        O 12 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS06    R        O 13  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM06    R        O 13 12REFFLD(DS15)
+     A            SCCO06    R        O 13 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN06    R        O 13 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR06    R        O 13 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA06    R        O 13 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC06    R        O 13 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT06    R        O 13 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD06    R        O 13 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM06    R        O 13 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV06    R        O 13 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS07    R        O 14  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM07    R        O 14 12REFFLD(DS15)
+     A            SCCO07    R        O 14 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN07    R        O 14 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR07    R        O 14 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA07    R        O 14 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC07    R        O 14 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT07    R        O 14 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD07    R        O 14 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM07    R        O 14 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV07    R        O 14 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS08    R        O 15  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM08    R        O 15 12REFFLD(DS15)
+     A            SCCO08    R        O 15 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN08    R        O 15 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR08    R        O 15 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA08    R        O 15 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC08    R        O 15 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT08    R        O 15 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD08    R        O 15 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM08    R        O 15 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV08    R        O 15 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS09    R        O 16  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM09    R        O 16 12REFFLD(DS15)
+     A            SCCO09    R        O 16 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN09    R        O 16 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR09    R        O 16 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA09    R        O 16 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC09    R        O 16 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT09    R        O 16 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD09    R        O 16 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM09    R        O 16 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV09    R        O 16 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS10    R        O 17  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM10    R        O 17 12REFFLD(DS15)
+     A            SCCO10    R        O 17 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN10    R        O 17 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR10    R        O 17 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA10    R        O 17 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC10    R        O 17 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT10    R        O 17 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD10    R        O 17 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM10    R        O 17 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV10    R        O 17 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS11    R        O 18  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM11    R        O 18 12REFFLD(DS15)
+     A            SCCO11    R        O 18 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN11    R        O 18 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR11    R        O 18 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA11    R        O 18 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC11    R        O 18 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT11    R        O 18 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD11    R        O 18 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM11    R        O 18 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV11    R        O 18 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS12    R        O 19  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM12    R        O 19 12REFFLD(DS15)
+     A            SCCO12    R        O 19 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN12    R        O 19 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR12    R        O 19 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA12    R        O 19 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC12    R        O 19 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT12    R        O 19 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD12    R        O 19 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM12    R        O 19 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV12    R        O 19 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS13    R        O 20  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM13    R        O 20 12REFFLD(DS15)
+     A            SCCO13    R        O 20 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN13    R        O 20 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR13    R        O 20 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA13    R        O 20 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC13    R        O 20 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT13    R        O 20 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD13    R        O 20 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM13    R        O 20 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV13    R        O 20 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCSS14    R        O 21  2REFFLD(SS#)
+     A                                      OVRDTA
+     A            SCNM14    R        O 21 12REFFLD(DS15)
+     A            SCCO14    R        O 21 39REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCFN14    R        O 21 41REFFLD(FND)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCYR14    R        O 21 28REFFLD(YR)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCCA14    R        O 21 31REFFLD(CASE)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNC14    R        O 21 46REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCLT14    R        O 21 60REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCAD14    R        O 21 49REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEM14    R        O 21 62REFFLD(EMP#)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCDV14    R        O 21 72REFFLD(DIV)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                 23 10'F3=Exit         '
+     A                                      COLOR(BLU)
+     A                                 23 31'F12=Cancel      '
+     A                                      COLOR(BLU)
+     A            SCUP           9A  O 23 52OVRDTA
+     A            SCDOWN         9A  O 23 67OVRDTA
+     A                                  6 78'Adj'
+     A            SCAJ01    R        O  8 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ02    R        O  9 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ03    R        O 10 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ04    R        O 11 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ05    R        O 12 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ06    R        O 13 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ07    R        O 14 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ08    R        O 15 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ09    R        O 16 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ10    R        O 17 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ11    R        O 18 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ12    R        O 19 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ13    R        O 20 78REFFLD(DS3)
+     A                                      OVRDTA
+     A            SCAJ14    R        O 21 78REFFLD(DS3)
+     A                                      OVRDTA
+     A                                  6 41'Fnd'
+     A                                  6 45'NCCI'
+     A                                  6 59'LT'
+     A          R SCR99
+     A*            14:24:17    TLB         REL-R08M00  5714-UT1
+     A            SCFL01    R        O  1  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      TEXT('DUMMY FIELD')

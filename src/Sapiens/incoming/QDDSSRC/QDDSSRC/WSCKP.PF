@@ -1,0 +1,152 @@
+      * (c) 2025 Sapiens. All Rights Reserved.                             *
+     A**
+     A** CHECK TRACKING FILE
+     A*************************************************************************
+     A* REVISIONS:                                                            *
+     A*                                                                       *
+     A*  03/17/25 C:291 Project: WC3002                                       *
+     A*                 Add new field Pad block with 9s.                      *
+     A*                                                                       *
+     A*  09/14/22 C:291 Project: 129WXH                                       *
+     A*                 Add flag Override E-Pay with EFT                      *
+     A*                                                                       *
+     A* 04/11/22 C:340 Project: WC2663                                        *
+     A*                Invoice Cloud - Add Invoice Type ID                    *
+     A*                                                                       *
+     A*  07/20/20 C:079 Project: WC2749                                       *
+     A*                 1.  Add Next Avail E-Pay Number                       *
+     A*                 2.  Add Claims E-Pay Vendor                           *
+     A*                                                                       *
+     A*  05/05/15 C:062 PROJECT: 114MRH                                       *
+     A*                 Add EFT Sequence #                                    *
+     A*                                                                       *
+     A*  03/12/12 C:255 PROJECT: 114WDE                                       *
+     A*                 Add EFT Special procedure code.                       *
+     A*                                                                       *
+     A*  01/19/12 C:255 PROJECT: WC2112                                       *
+     A*                 Add Immediate destination & Origin Alpha fields.      *
+     A*                                                                       *
+     A*  06/25/09 C:136 PROJECT: WC1806                                       *
+     A*                 ADD EFT INFORMATION                                   *
+     A*                                                                       *
+     A*  08/09/07 C:191 PROJECT: WC1453                                       *
+     A*                 Added field for EFT processing filename               *
+     A*                                                                       *
+     A*  07/18/07 C:136 PROJECT: WC1491                                       *
+     A*                 ADD THE RETURN DEPOSIT REFUND AND VOID/STOP PAY CODES.*
+     A*                                                                       *
+     A*  06/09/05 C: 58 Project: 105WAP                                       *
+     A*                 Add Client number and download flag for               *
+     A*                 Wachovia Positive Pay                                 *
+     A*                                                                       *
+     A*  06/17/03 C:136 Project: WC1033                                       *
+     A*                 Add default A/R codes for return premium.             *
+     A*                                                                       *
+     A*  04/15/97 C:30 Project: WC500                                         *
+     A*                                                                       *
+     A*************************************************************************
+     A                                      REF(WREFP)
+     A          R PCK01                     TEXT('CHECK SUMMARY FILE')
+     A            CKCO#     R               REFFLD(CO#)
+     A            CKACCT    R               REFFLD(NM20)
+     A                                      COLHDG('CURRENT BANK ACCT #')
+     A            CKLCHK    R               REFFLD(CHK#)
+     A                                      COLHDG('Next' 'Available' 'Check #')
+     A            CKCKRC    R               REFFLD(FLAG)
+     A                                      COLHDG('CHECK' 'REC FLAG')
+      **                                          (Y/BLANK)
+      *** BEGIN ADD *** 04/15/97 ******************************************
+     A            CKVCHR    R               REFFLD(FLAG)
+     A                                      COLHDG('Voucher' 'Y/N')
+     A            CKCRUP    R               REFFLD(FLAG)
+     A                                      COLHDG('Check Rec' 'Update' 'Y/N')
+     A            CKAI01    R               REFFLD(DS40)
+     A                                      COLHDG('Bank Name')
+     A            CKAI02    R               REFFLD(DS40)
+     A                                      COLHDG('Bank Address')
+     A            CKAI03    R               REFFLD(DS40)
+     A                                      COLHDG('Bank City, ST Zip')
+      *** END   ADD *** 04/15/97 ******************************************
+     A            CKSTAT    R               REFFLD(STAT)
+     A            CKUSER    R               REFFLD(USER)
+     A            CKPGM     R               REFFLD(PGM)
+     A            CKTIME    R               REFFLD(TIME)
+     A            CKDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+      *** BEG ADD ***** 06/13/03 ******************************************
+     A            CKRPCD    R               REFFLD(CODE)
+     A                                      COLHDG('RET PRM' 'RFND CD')
+     A            CKRPVS    R               REFFLD(CODE)
+     A                                      COLHDG('RET PRM' 'VOID CD')
+      *** END ADD ***** 06/13/03 ******************************************
+     A*** BEG ADD ***** 06/09/05 ******************************************
+     A            CKWPP     R               REFFLD(FLAG)
+     A                                      COLHDG('WACH' 'POS PAY')
+     A*                                           (Y/BLANK)
+     A            CKWBK#         4S 0       COLHDG('WACH' 'BANK #')
+     A*** END ADD ***** 06/09/05 ******************************************
+      *** BEG ADD ***** 07/18/07 ******************************************
+     A            CKRDCD    R               REFFLD(CODE)
+     A                                      COLHDG('RET DEP' 'RFND CD')
+     A            CKRDVS    R               REFFLD(CODE)
+     A                                      COLHDG('RET DEP' 'VOID CD')
+      *** END ADD ***** 07/18/07 ******************************************
+      *** BEG ADD ****** 08/09/07 ******************************************
+     A            CKEFTF        10A         COLHDG('EFT FILENAME')
+      *** END ADD ****** 08/09/07 ******************************************
+      *** BEG ADD ***** 06/25/09 *******************************************
+     A            CKEFDT         7S 0       COLHDG('EFT EFF DT')
+     A            CKEXDT         7S 0       COLHDG('EFT EXP DT')
+     A            CKIDST        10S 0       COLHDG('IMMED DEST')
+     A            CKIORG        10S 0       COLHDG('IMMED ORIG')
+     A            CKBNAM        23A         COLHDG('DESTINATION NAME')
+     A            CKCONM        23A         COLHDG('ORIGIN NAME')
+     A            CKCEDS        10A         COLHDG('CO ENTR DES')
+     A            CKRFCD         8A         COLHDG('REF CODE')
+     A            CKORDI         8S 0       COLHDG('ORIG DFI ID')
+     A            CKSVCL         3S 0       COLHDG('SERV' 'CLASS')
+     A            CKONUS        19A         COLHDG('ON-US')
+     A            CKCKDG         1S 0       COLHDG('TRANS CK' 'DIGIT')
+     A            CKBNK#         4A         COLHDG('TRANS' 'BANK#')
+     A            CKTRNS         4A         COLHDG('TRANS' 'ROUTE#')
+     A            CKAXOU        21A         COLHDG('AUX ON-US')
+     A            CKNAM1        30A         COLHDG('SIGN 1 FULL NAME')
+     A            CKNAM2        30A         COLHDG('SIGN 2 FULL NAME')
+     A            CKRTUP         7A         COLHDG('ROUTE' 'ENTRY' 'UPPER')
+     A            CKRTLW         7A         COLHDG('ROUTE' 'ENTRY' 'LOWER')
+     A            CKACID         2S 0       COLHDG('ACH' 'INTERIM' 'DAYS')
+     A            CKBKLT         2S 0       COLHDG('BANK' 'LEAD' 'TIME')
+     A            CKBYPN         1A         COLHDG('BYPASS' 'PRENOTE')
+     A            CKPACH         1A         COLHDG('ALLOW ACH' 'POST DATE'-
+     A                                      'IN PAST')
+     A*** END ADD ***** 06/25/09 *******************************************
+     A*** Beg Add ***** 01/19/12 *******************************************
+     A            CKIDSA        10A         COLHDG('IMMEDIATE' 'DESTINATION'-
+     A                                      ' -ALPHA')
+     A            CKIORA        10A         COLHDG('IMMEDIATE' 'ORIGIN'-
+     A                                      ' -ALPHA')
+     A*** End Add ***** 01/19/12 *******************************************
+     A*** Beg Add ***** 03/12/12 *******************************************
+     A            CKEFSP         3A         COLHDG('EFT SPEC' 'PROC CODE')
+     A*** End Add ***** 03/12/12 *******************************************
+     A*** Beg Add ***** 05/05/15 *******************************************
+     A            CKEFT#    R               REFFLD(A70)
+     A                                      COLHDG('EFT Sequence #')
+     A*** End Add ***** 05/05/15 *******************************************
+     A*** Beg Add ***** 07/20/20 *******************************************
+     A            CKEPAY#   R     S         REFFLD(A70)
+     A                                      COLHDG('Next Avail E-Pay #')
+     A            CKEPAYVN  R               REFFLD(DS5)
+     A                                      COLHDG('E-Pay Vendor')
+     A*** End Add ***** 07/20/20 *******************************************
+      *** Beg Add ***** 04/11/22 ************************************
+     A            CKINVTYPID    15S         COLHDG('Invoice Type ID')
+      *** End Add ***** 04/11/22 ************************************
+      *** Beg Add ***** 09/14/22 ************************************
+     A            CKOVREPAY R               REFFLD(FLAG)
+     A                                      COLHDG('Override' 'E-Pay with EFT')
+      *** End Add ***** 09/14/22 ************************************
+      *** Beg Add ***** 03/17/25 ************************************
+     A            CKPAD9    R               REFFLD(FLAG)
+     A                                      COLHDG('Pad block with 9s')
+      *** End Add ***** 03/17/25 ************************************

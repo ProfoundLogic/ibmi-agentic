@@ -1,0 +1,463 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   BUSINESS OWNERS DETAIL SEARCH DISPLAY                    **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      SETOF(20)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C0610F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A                                  3 28'TRANSACTION DETAIL DISPLAY'
+     A                                      DSPATR(HI)
+     A                                  4  4'Policy Number:'
+     A            SCPOL#    R        O  4 19REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      TEXT('POLICY NUMBER')
+     A                                  4 35'Name:'
+     A            SCFIN     R        O  4 41REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  5  4'Coverage Code:'
+     A            SCCC      R        O  5 19REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COVERAGE CODE')
+     A            SCCCDS    R        O  5 24REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COV CD DESCRIPTION')
+     A                                  6  4'Location Number:'
+     A            SCLOC#    R        B  6 21REFFLD(PRM#)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                  6 28'Premises Number:'
+     A            SCPRM#    R        B  6 45REFFLD(PRM#)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                  7 13'Cov'
+     A                                  7 56'Trans'
+     A                                  7 63'Trans'
+     A                                  8  2'Loc#'
+     A                                      DSPATR(UL)
+     A                                  8  7'Prem#'
+     A                                      DSPATR(UL)
+     A                                  8 13'Cd'
+     A                                      DSPATR(UL)
+     A                                  8 16'Description                       -
+     A                                            '
+     A                                      DSPATR(UL)
+     A                                  8 58'Cd'
+     A                                      DSPATR(UL)
+     A                                  8 61'  Date  '
+     A                                      DSPATR(UL)
+     A                                  8 70'End #'
+     A                                      DSPATR(UL)
+     A                                  8 76'Stat'
+     A                                      DSPATR(UL)
+     A            SCFL01    R        B  9  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  20                                  ERRMSGID(CCR0600 *LIBL/CMESGG)
+     A                                      TEXT('FLAG')
+     A            SCFL02    R        B 10  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL03    R        B 11  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL04    R        B 12  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL05    R        B 13  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL06    R        B 14  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL07    R        B 15  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL08    R        B 16  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL09    R        B 17  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL10    R        B 18  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL11    R        B 19  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL12    R        B 20  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL13    R        B 21  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCFL14    R        B 22  1REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLO01    R        O  9  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      TEXT('LOCATION NUMBER')
+     A                                      EDTCDE(4)
+     A            SCLO02    R        O 10  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO03    R        O 11  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO04    R        O 12  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO05    R        O 13  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO06    R        O 14  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO07    R        O 15  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO08    R        O 16  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO09    R        O 17  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO10    R        O 18  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO11    R        O 19  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO12    R        O 20  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO13    R        O 21  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCLO14    R        O 22  3REFFLD(LOC#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR01    R        O  9  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('PREMISIS #')
+     A            SCPR02    R        O 10  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR03    R        O 11  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR04    R        O 12  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR05    R        O 13  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR06    R        O 14  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR07    R        O 15  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR08    R        O 16  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR09    R        O 17  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR10    R        O 18  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR11    R        O 19  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR12    R        O 20  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR13    R        O 21  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR14    R        O 22  8REFFLD(PRM#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCCO01    R        O  9 13REFFLD(PRTC)
+     A                                      OVRDTA
+     A                                      TEXT('Transaction Code')
+     A            SCCO02    R        O 10 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO03    R        O 11 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO04    R        O 12 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO05    R        O 13 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO06    R        O 14 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO07    R        O 15 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO08    R        O 16 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO09    R        O 17 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO10    R        O 18 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO11    R        O 19 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO12    R        O 20 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO13    R        O 21 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCCO14    R        O 22 13REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCDS01    R        O  9 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS02    R        O 10 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS03    R        O 11 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS04    R        O 12 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS05    R        O 13 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS06    R        O 14 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS07    R        O 15 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS08    R        O 16 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS09    R        O 17 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS10    R        O 18 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS11    R        O 19 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS12    R        O 20 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS13    R        O 21 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCDS14    R        O 22 16REFFLD(DS40)
+     A                                      OVRDTA
+     A            SCTR01    R        O  9 58REFFLD(PRTC)
+     A                                      OVRDTA
+     A                                      TEXT('Transaction Code')
+     A            SCTR02    R        O 10 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR03    R        O 11 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR04    R        O 12 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR05    R        O 13 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR06    R        O 14 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR07    R        O 15 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR08    R        O 16 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR09    R        O 17 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR10    R        O 18 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR11    R        O 19 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR12    R        O 20 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR13    R        O 21 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTR14    R        O 22 58REFFLD(PRTC)
+     A                                      TEXT('Transaction Code')
+     A                                      OVRDTA
+     A            SCTD01    R        O  9 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD02    R        O 10 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD03    R        O 11 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD04    R        O 12 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD05    R        O 13 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD06    R        O 14 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD07    R        O 15 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD08    R        O 16 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD09    R        O 17 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD10    R        O 18 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD11    R        O 19 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD12    R        O 20 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD13    R        O 21 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCTD14    R        O 22 61REFFLD(DT8)
+     A                                      TEXT('Transaction Date')
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCEN01    R        O  9 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN02    R        O 10 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN03    R        O 11 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN04    R        O 12 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN05    R        O 13 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN06    R        O 14 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN07    R        O 15 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN08    R        O 16 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN09    R        O 17 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN10    R        O 18 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN11    R        O 19 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN12    R        O 20 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN13    R        O 21 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCEN14    R        O 22 71REFFLD(END#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                      TEXT('Endorsement number')
+     A            SCST01    R        O  9 78REFFLD(FLAG)
+     A                                      ALIAS(STATUS)
+     A                                      OVRDTA
+     A            SCST02    R        O 10 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST03    R        O 11 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST04    R        O 12 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST05    R        O 13 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST06    R        O 14 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST07    R        O 15 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST08    R        O 16 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST09    R        O 17 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST10    R        O 18 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST11    R        O 19 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST12    R        O 20 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST13    R        O 21 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCST14    R        O 22 78REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCUP           9A  O 23 53OVRDTA
+     A            SCDOWN         9A  O 23 67OVRDTA
+     A                                 23 10'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 31'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCFL01    R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

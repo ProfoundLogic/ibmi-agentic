@@ -1,0 +1,281 @@
+     H* (C) Copyright STONERIVER, INC. 2009
+     H*****************************************************************
+     H/TITLE SC950R1- PROCESS  DARTS EXTRACT
+     H*****************************************************************
+     H*    CALLED FROM:                                               *
+     H*      MENU                                                     *
+     H*    CALLS TO:                                                  *
+     H*      XXXXXXX - SUBMITTER                                      *
+     H*****************************************************************
+     H*  REVISIONS:                                                   *
+     H*                                                               *
+     H* 09/20/17  C:062  PROJECT: 114WCS                              *
+     H*                  ADD AGENCY PROCESSING                       *
+     H*
+     H* 02/18/16  C:53   Project: 114IWR
+     H*                  Code for Opt to Delete DARTS/attachments
+     H*                                                               *
+     H* 12/27/09  C:002  PROJECT: 135INT                              *
+     H*                  *** DARTS EXTRACT PROCESSING                *
+     H*                                                               *
+     H*****************************************************************
+     H*  INDICATOR USAGE:                                             *
+     H*                                                               *
+     H*****************************************************************
+     F*** HISTORY FILE - WRITE THIS
+     FSDEHP   O   E                    DISK                      A
+     F*
+     IPSDS      ESDSSZQ1P
+     I            DS
+     I                                        1  120DSDTTM
+     I                                        1   60DSTIME
+     I                                        7  120DSDATE
+     I*** BEGIN CHG *** 09/20/17 ***************************
+     I*LDA         DS
+     I**********                              1   1 DSCLMF
+     I**********                              2   2 DSPOLF
+     I**********                              3  24 DSCPTH
+     I**********                             25  46 DSPPTH
+     I**********                             47  54 DSFRDT
+     I**********                             55  62 DSTODT
+     ILDA         DS
+     I                                        1   1 DSCLMF
+     I                                        2   2 DSPOLF
+     I                                        3   3 DSAGTF
+     I                                        4  25 DSCPTH
+     I                                       26  47 DSPPTH
+     I                                       48  69 DSAPTH
+     I                                       70  77 DSFRDT
+     I                                       78  85 DSTODT
+     I*** END   CHG *** 09/20/17 ***************************
+     I*****
+     *********************************************************
+     I*
+     I              '\DARTS_EXTRACT'      C         ROOTFL
+     *** PROCESSING:
+     ***     * GET DATE/TIME, CREATE DIRECTORY
+     ***     * CHANGE *LDA TO CONTAIN TEH INFO (DATE/TIME FLAGS, ETC.
+     ***
+     C           *ENTRY    PLIST
+     C                     PARM           QQGRP   3
+     C                     PARM           QQFRDT  8
+     C                     PARM           QQTODT  8
+     C                     PARM           QQCLMF  1
+     C                     PARM           QQPOLF  1
+     C*** BEGIN ADD *** 09/20/17 ***************************
+     C                     PARM           QQAGTF  1
+     C*** END   ADD *** 09/20/17 ***************************
+     C                     PARM           QQFCYD  7
+     C                     PARM           QQTCYD  7
+     C                     PARM           QQJDAT  7
+     C                     PARM           QQCPTH 22
+     C                     PARM           QQPPTH 22
+     C*** BEGIN ADD *** 09/20/17 ***************************
+     C                     PARM           QQAPTH 22
+     C*** END   ADD *** 09/20/17 ***************************
+     C                     PARM           QQJNBR  6
+     C*** Beg Add *** 02/18/16 *************************************
+     C                     PARM           QQDLT   1
+     C*** End Add *** 02/18/16 *************************************
+     ***
+     C                     TIME           DSDTTM
+     C                     MOVE DSTIME    QQTIME  6           TIME FOR PATH
+     C           *NAMVAR   DEFN *LDA      LDA
+     C**
+     C           '\'       CAT  'CLAIMS':0QQCPTH 22 P
+     C                     CAT  '_':0     QQCPTH 22 P
+     C                     CAT  QQJDAT:0  QQCPTH 22 P
+     C                     CAT  '_':0     QQCPTH 22 P
+     C                     CAT  QQTIME:0  QQCPTH 22
+     ***
+     C           '\'       CAT  'POLICY':0QQPPTH 22 P
+     C                     CAT  '_':0     QQPPTH 22 P
+     C                     CAT  QQJDAT:0  QQPPTH 22 P
+     C                     CAT  '_':0     QQPPTH 22 P
+     C                     CAT  QQTIME:0  QQPPTH 22
+     ****
+     C*** BEGIN ADD *** 09/20/17 ***************************
+     C           '\'       CAT  'AGENCY':0QQAPTH 22 P
+     C                     CAT  '_':0     QQAPTH 22 P
+     C                     CAT  QQJDAT:0  QQAPTH 22 P
+     C                     CAT  '_':0     QQAPTH 22 P
+     C                     CAT  QQTIME:0  QQAPTH 22
+     ****
+     C*** END   ADD *** 09/20/17 ***************************
+     C                     MOVE QQJDAT    EHTRDT
+     C                     MOVE DSTIME    EHTRTM
+     ****** FROM AND TO DATE IN MMDDYYYY FORMAT HERE *****
+     C                     MOVE QQFRDT    EHFRDT
+     C                     MOVE QQTODT    EHTODT
+     ****
+     C                     MOVELQQCLMF    EHCLMF
+     C                     MOVELQQPOLF    EHPOLF
+     C*** BEGIN ADD *** 09/20/17 ***************************
+     C                     MOVELQQAGTF    EHAGTF
+     C*** END   ADD *** 09/20/17 ***************************
+     C**
+     C           QQCLMF    IFEQ 'Y'
+     C                     MOVELQQCPTH    EHCPTH    P
+     C                     ELSE
+     C                     MOVEL*BLANKS   EHCPTH
+     C                     ENDIF
+     ***
+     C           QQPOLF    IFEQ 'Y'
+     C                     MOVELQQPPTH    EHPPTH    P
+     C                     ELSE
+     C                     MOVEL*BLANKS   EHPPTH
+     C                     ENDIF
+     ****
+     C*** BEGIN ADD *** 09/20/17 ***************************
+     C           QQAGTF    IFEQ 'Y'
+     C                     MOVELQQAPTH    EHAPTH    P
+     C                     ELSE
+     C                     MOVEL*BLANKS   EHAPTH
+     C                     ENDIF
+     ****
+     C                     CALL 'SA030R'
+     C                     PARM ' '       SUFFIX  3
+     C                     PARM ' '       PREFIX 80
+     C*** END   ADD *** 09/20/17 ***************************
+     C           '/'       CAT  PREFIX:0  XXCPTH255 P
+     C                     CAT  '/':0     XXCPTH    P
+     C                     CAT  ROOTFL:0  XXCPTH    P
+     C                     CAT  QQCPTH:0  XXCPTH    P
+     C*
+     C           '/'       CAT  PREFIX:0  XXPPTH255 P
+     C                     CAT  '/':0     XXPPTH    P
+     C                     CAT  ROOTFL:0  XXPPTH    P
+     C                     CAT  QQPPTH:0  XXPPTH    P
+     C*
+     C           '/'       CAT  PREFIX:0  XXAPTH255 P
+     C                     CAT  '/':0     XXAPTH    P
+     C                     CAT  ROOTFL:0  XXAPTH    P
+     C                     CAT  QQAPTH:0  XXAPTH    P
+     C*
+     C                     MOVEL'S'       EHSTAT             SUBMITTED
+     C                     MOVELQ1USER    EHIUSR
+     C                     MOVE QQJDAT    EHIDT
+     C                     MOVE DSTIME    EHITIM
+     C                     MOVELQ1USER    EHUSER
+     C                     MOVELQQJNBR    EHPGM              JOBNUMBER HERE
+     C                     MOVE QQJDAT    EHDT
+     C                     MOVE DSTIME    EHTIME
+     C                     MOVELQQGRP     EHGRP
+************ CREATE
+     C                     WRITEPEH01
+     ***
+     ******* OK, NOW CREATE THE DIRECTORIES
+     **  IF CLAIMS WILL BE PROCESSED
+     ***
+     C           QQCLMF    IFEQ 'Y'
+     C                     MOVEL*BLANKS   Q1DIR 255
+     C********** '/PDS/'   CAT  '135':0   Q1DIR 255 P
+     C*******************  CAT  XXCPTH:0  Q1DIR     P
+     C                     MOVELXXCPTH    Q1DIR
+     C**
+     C**
+     C*** Beg Add *** 02/18/16 *************************************
+     C           QQDLT     IFNE 'Y'
+     C*** End Add *** 02/18/16 *************************************
+     C                     CALL 'SMDIFS'
+     C                     PARM Q1DIR     Q1PATH 80
+     C                     PARM *BLANKS   Q1RTNC  1
+     C*** Beg Add *** 02/18/16 *************************************
+     C                     ENDIF
+     C*** End Add *** 02/18/16 *************************************
+     **
+     C                     ENDIF
+     ***
+     C** IF POLICIES WILL BE PROCESSED
+     C           QQPOLF    IFEQ 'Y'
+     C                     MOVEL*BLANKS   Q1DIR
+     C***********'/PDS/'   CAT  '135':0   Q1DIR 255 P
+     C*******************  CAT  XXPPTH:0  Q1DIR     P
+     C                     MOVELXXPPTH    Q1DIR
+     C**
+     **
+     C*** Beg Add *** 02/18/16 *************************************
+     C           QQDLT     IFNE 'Y'
+     C*** End Add *** 02/18/16 *************************************
+     C                     CALL 'SMDIFS'
+     C                     PARM Q1DIR     Q1PATH 80
+     C                     PARM *BLANKS   Q1RTNC  1
+     C*** Beg Add *** 02/18/16 *************************************
+     C                     ENDIF
+     C*** End Add *** 02/18/16 *************************************
+     **
+     C                     ENDIF
+     ***
+     C***
+     C*** BEGIN ADD *** 09/20/17 ***************************
+     C** IF AGENCIES WILL BE PROCESSED
+     C           QQAGTF    IFEQ 'Y'
+     C                     MOVEL*BLANKS   Q1DIR
+     C                     MOVELXXAPTH    Q1DIR
+     C**
+     **
+     C*** Beg Add *** 02/18/16 *************************************
+     C           QQDLT     IFNE 'Y'
+     C*** End Add *** 02/18/16 *************************************
+     C                     CALL 'SMDIFS'
+     C                     PARM Q1DIR     Q1PATH 80
+     C                     PARM *BLANKS   Q1RTNC  1
+     C*** Beg Add *** 02/18/16 *************************************
+     C                     ENDIF
+     C*** End Add *** 02/18/16 *************************************
+     **
+     C                     ENDIF
+     ***
+     C***
+     C*** END   ADD *** 09/20/17 ***************************
+     ***** NOW PROCESS THE ITEMS
+     **
+     C*** UPDATE THE *LDA WITH THE VALUES
+     **
+     C                     IN   LDA
+     **** UPDATE LDA VALUES HERE
+     C                     MOVELQQCLMF    DSCLMF
+     C                     MOVELQQPOLF    DSPOLF
+     C*** BEGIN ADD *** 09/20/17 ***************************
+     C                     MOVELQQAGTF    DSAGTF
+     C*** END   ADD *** 09/20/17 ***************************
+     C                     MOVELQQCPTH    DSCPTH
+     C                     MOVELQQPPTH    DSPPTH
+     C*** BEGIN ADD *** 09/20/17 ***************************
+     C                     MOVELQQAPTH    DSAPTH
+     C*** END   ADD *** 09/20/17 ***************************
+     C                     MOVELQQFRDT    DSFRDT
+     C                     MOVELQQTODT    DSTODT
+     C                     OUT  LDA
+     C*
+     **
+     **
+     C*****                MOVEL'000'     QQGRP   3   **** GRP PASSED IN ***
+     **
+     C                     CALL 'SC950CX'
+     C                     PARM           QQGRP   3
+     C                     PARM           QQFRDT  8
+     C                     PARM           QQTODT  8
+     C                     PARM           QQCLMF  1
+     C                     PARM           QQPOLF  1
+     C*** BEGIN ADD *** 09/20/17 ***************************
+     C                     PARM           QQAGTF  1
+     C*** END   ADD *** 09/20/17 ***************************
+     C                     PARM           QQFCYD  7
+     C                     PARM           QQTCYD  7
+     C                     PARM           QQJDAT  7
+     C                     PARM           QQCPTH 22
+     C                     PARM           QQPPTH 22
+     C*** BEGIN ADD *** 09/20/17 ***************************
+     C                     PARM           QQAPTH 22
+     C*** END   ADD *** 09/20/17 ***************************
+     C                     PARM           QQJNBR
+     C*** Beg Add *** 02/18/16 *************************************
+     C                     PARM           QQDLT
+     C*** End Add *** 02/18/16 *************************************
+     **
+     C**
+     **
+     **
+     ***
+     C                     MOVE *ON       *INLR

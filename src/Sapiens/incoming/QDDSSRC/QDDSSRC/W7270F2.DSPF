@@ -1,0 +1,75 @@
+     A*%%TS  SD  20051114  080630  ROGULSKI    REL-V4R4M0  5769-PW1
+     A*  (C) Copyright Fiserv, Inc., 2005
+     A*
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/WREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A*%%TS  SD  20051114  080630  ROGULSKI    REL-V4R4M0  5769-PW1
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A                                      CF10
+     A                                      CF13
+     A            HREC          10A  H
+     A            HFLD          10A  H
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR01'
+     A                                  6  2'Type choices, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  8  4'Group  . . . . . . . . . . :'
+     A            SCFND     R        B  8 33REFFLD(FND)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  71 89                               DSPATR(PC)
+     A  71N89                               ERRMSGID(WCR0508 *LIBL/WMESGG)
+     A  72N89                               ERRMSGID(WCR0517 *LIBL/WMESGG)
+     A                                  8 39'(Blank for all)'
+     A                                 10  4'Policy year  . . . . . . . :'
+     A            SCFYR     R        B 10 33REFFLD(FYR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  72 89                               DSPATR(PC)
+     A  72N89                               ERRMSGID(WCR0517 *LIBL/WMESGG)
+     A                                 10 39'(Blank for all)'
+     A                                 12  4'Premium type for Loss Ratio:'
+     A            SCPREM    R        B 12 33REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A  73 89                               DSPATR(PC)
+     A  73N89                               ERRMSG('Value must be -
+     A                                      ''M'' or ''W''.')
+     A                                 12 39'(M=Manual, W=Written)'
+     A                                 14  4'As of date . . . . . . . . :'
+     A            SCASOF    R        B 14 33REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A  74 89                               DSPATR(PC)
+     A  74N89                               ERRMSGID(WCR0500 *LIBL/WMESGG)
+     A                                 16  4'Output type  . . . .(P/F/B):'
+     A            SCTYPO    R        B 16 33REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A  75 89                               DSPATR(PC)
+     A  75N89                               ERRMSGID(WCR1300 *LIBL/WMESGG)
+     A                                 16 39'(P=Print, F=File, B=Both)'
+     A                                 19 18'This report will produce output fi-
+     A                                      le WFLJP2'
+     A                                 20 22'in library'
+     A            SCRPTL        23A  O 20 33
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 12'F10=Search'
+     A                                      COLOR(BLU)
+     A                                 23 25'F13=Chg user parms'
+     A                                      COLOR(BLU)

@@ -1,0 +1,165 @@
+     A*%%TS  SD  19980223  130943  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   CLAIM PAYMENT HISTORY PROMPT DISPLAY                     **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A*%%TS  SD  19980223  130943  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      CF05
+     A                                      CF13
+     A                                      CF10
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(33)
+     A                                      SETOF(39)
+     A                                      SETOF(40)
+     A                                      SETOF(41)
+     A                                      SETOF(42)
+     A                                      SETOF(43)
+     A                                      SETOF(44)
+     A                                      SETOF(45)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7700F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  5 21'Claim Number:'
+     A            SCCLM#    R        B  5 39REFFLD(CLM#)
+     A                                      OVRDTA
+     A  39                                  DSPATR(PC)
+     A  20                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A                                      TEXT('CASE NUMBER')
+     A                                  7 21'Section Code:'
+     A            SCCC      R        B  7 42REFFLD(CDE)
+     A  21                                  ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A  40                                  DSPATR(PC)
+     A  22                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A                                      TEXT('CODE')
+     A                                  9 21'Location Range:'
+     A            SCFLOC    R        B  9 41REFFLD(LOC#)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A  41                                  DSPATR(PC)
+     A  23                                  ERRMSGID(CCR0853 *LIBL/CMESGG)
+     A  25                                  ERRMSGID(CCR0531 *LIBL/CMESGG)
+     A                                      TEXT('LOCATION NUMBER')
+     A                                  9 46'-'
+     A            SCTLOC    R        B  9 51REFFLD(LOC#)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A  23                                  ERRMSGID(CCR0853 *LIBL/CMESGG)
+     A  25                                  ERRMSGID(CCR0531 *LIBL/CMESGG)
+     A                                      TEXT('LOCATION NUMBER')
+     A                                 10 21'Building Range:'
+     A            SCFBLG    R        B 10 41REFFLD(PRM#)
+     A  24                                  ERRMSGID(CCR0853 *LIBL/CMESGG)
+     A  25                                  ERRMSGID(CCR0531 *LIBL/CMESGG)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(Z)
+     A                                      TEXT('PREMISIS #')
+     A                                      OVRDTA
+     A                                 10 46'-'
+     A            SCTBLG    R        B 10 51REFFLD(PRM#)
+     A  24                                  ERRMSGID(CCR0853 *LIBL/CMESGG)
+     A  25                                  ERRMSGID(CCR0531 *LIBL/CMESGG)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(Z)
+     A                                      TEXT('PREMISIS #')
+     A                                      OVRDTA
+     A                                 12 21'Vehicle Number:'
+     A            SCFVEH    R     S  B 12 39REFFLD(ITM#)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  26                                  ERRMSGID(CCR0853 *LIBL/CMESGG)
+     A                                 12 46'-'
+     A            SCTVEH    R     S  B 12 49REFFLD(ITM#)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A  26                                  ERRMSGID(CCR0853 *LIBL/CMESGG)
+     A                                 14 21'Date Range:'
+     A            SCFRDT    R        B 14 35REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  27                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  29                                  ERRMSGID(CCR0847 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A                                 14 46'-'
+     A            SCTODT    R        B 14 49REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  28                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  29                                  ERRMSGID(CCR0847 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A                                 16 21'Payment Code:'
+     A            SCTRCD    R        B 16 42REFFLD(CODE)
+     A  42                                  DSPATR(PC)
+     A                                      OVRDTA
+     A                                      TEXT('PAYMENT TRANSACTION CODE')
+     A  30                                  ERRMSGID(CCR0524 *LIBL/CMESGG)
+     A                                 17 21'Transaction Type:'
+     A            SCTYPE    R        B 17 43REFFLD(FLAG)
+     A  43                                  DSPATR(PC)
+     A                                      OVRDTA
+     A                                      TEXT('TRANSACTION TYPE')
+     A  31                                  ERRMSGID(CCR0680 *LIBL/CMESGG)
+     A                                 18 21'Reserve Code:'
+     A            SCRECD    R        B 18 42REFFLD(CODE)
+     A                                      OVRDTA
+     A  44                                  DSPATR(PC)
+     A                                      TEXT('RESERVE CODE')
+     A  32                                  ERRMSGID(CCR0677 *LIBL/CMESGG)
+     A                                 19 21'Reserve Type:'
+     A            SCRETP    R        B 19 43REFFLD(FLAG)
+     A  45                                  DSPATR(PC)
+     A                                      OVRDTA
+     A                                      TEXT('RESERVE TYPE')
+     A  33                                  ERRMSGID(CCR0576 *LIBL/CMESGG)
+     A                                 22  3'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23  3'F5=Claim search'
+     A                                      COLOR(BLU)
+     A                                 23 32'F10=Table search'
+     A                                      COLOR(BLU)
+     A                                 23 60'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

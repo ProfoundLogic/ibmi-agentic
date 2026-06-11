@@ -1,0 +1,355 @@
+<div class="ag-app">
+  <header class="ag-topbar">
+    <div class="ag-brand">
+      <img class="ag-logo" alt="Sapiens"
+           src="https://sapiens.com/wp-content/themes/sapiens/assets/img/sapiens_logo-2.png" />
+      <div class="ag-titles">
+        <h1>Agency Configuration</h1>
+        <p class="ag-sub">Master records · Assignments · Producers · Compliance</p>
+      </div>
+    </div>
+    <nav class="ag-topbar-actions">
+      <button type="button" class="ag-btn ag-btn-ghost" onclick="pui.submit({action:'EXIT'})">
+        <svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4v8M2 8h8m-2-2l2 2-2 2M11 2h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Exit
+      </button>
+      <button type="button" class="ag-btn ag-btn-secondary" onclick="wtagtcfe.openEdit()">Edit</button>
+      <button type="button" class="ag-btn ag-btn-primary" onclick="wtagtcfe.openNew()">
+        <svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+        New Agency
+      </button>
+    </nav>
+  </header>
+
+  <section class="ag-stats">
+    <article class="ag-stat">
+      <div class="ag-stat-label">Total agencies</div>
+      <div class="ag-stat-value"><%= numagts %></div>
+      <div class="ag-stat-foot">In Sapiens master file</div>
+    </article>
+    <article class="ag-stat ag-stat-positive">
+      <div class="ag-stat-label">Active</div>
+      <div class="ag-stat-value"><%= numactive %></div>
+      <div class="ag-stat-foot">Currently servicing policies</div>
+    </article>
+    <article class="ag-stat ag-stat-warm">
+      <div class="ag-stat-label">Master agents</div>
+      <div class="ag-stat-value"><%= nummaster %></div>
+      <div class="ag-stat-foot">Top-tier control flag set</div>
+    </article>
+    <article class="ag-stat ag-stat-info">
+      <div class="ag-stat-label">Total producers</div>
+      <div class="ag-stat-value"><%= numprods %></div>
+      <div class="ag-stat-foot">Sum of WMAAP assignments</div>
+    </article>
+  </section>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+  <div class="ag-msg" role="status"><%= msg %></div>
+  <% } %>
+
+  <div class="ag-toolbar">
+    <div class="ag-search">
+      <svg class="ag-search-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M10.5 10.5l3 3" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
+      <input class="ag-input" type="text" name="sfilter" id="ag-sfilter"
+             value="<%= sfilter %>" placeholder="Search by name, FEIN, contact, or city..." />
+    </div>
+    <select class="ag-select" name="sstatfltr" id="ag-sstatfltr">
+      <option value=" " <% if(!sstatfltr || sstatfltr.trim() === '') print('selected'); %>>All statuses</option>
+      <option value="A" <% if(sstatfltr && sstatfltr.trim() === 'A') print('selected'); %>>Active only</option>
+      <option value="I" <% if(sstatfltr && sstatfltr.trim() === 'I') print('selected'); %>>Inactive only</option>
+      <option value="H" <% if(sstatfltr && sstatfltr.trim() === 'H') print('selected'); %>>On hold</option>
+    </select>
+    <button type="button" class="ag-btn ag-btn-primary" onclick="pui.submit({action:'SEARCH'})">Search</button>
+    <span class="ag-count"><strong><%= numagts %></strong> result<%= numagts == 1 ? '' : 's' %></span>
+  </div>
+
+  <main class="ag-main">
+
+    <section class="ag-card ag-list">
+      <div class="ag-card-head">
+        <h2 class="ag-card-title">Agencies</h2>
+        <p class="ag-card-sub">Click a row to load the full record</p>
+      </div>
+      <div class="ag-grid-scroll">
+        <table class="ag-grid">
+          <thead><tr>
+            <th class="col-status">Status</th>
+            <th class="col-name">Agency</th>
+            <th class="col-fein">FEIN</th>
+            <th class="col-agents r"># Agents</th>
+            <th class="col-contact">Marketing contact</th>
+            <th class="col-phone">Phone</th>
+            <th class="col-loc">Location</th>
+            <th class="col-tags">Flags</th>
+          </tr></thead>
+          <tbody>
+          <% if (typeof agtsfl !== 'undefined' && agtsfl && agtsfl.length > 0) {
+               agtsfl.forEach(function(r) {
+                 var sel = (typeof selrrn !== 'undefined') && Number(selrrn) === Number(r.srrn);
+                 var s = (r.sstatus || '').toString().trim().toUpperCase();
+                 var lbl = {A:'Active', I:'Inactive', H:'Hold', P:'Pending'}[s] || s || '—';
+                 var master = (r.smaster || '').toString().trim().toUpperCase() === 'Y';
+                 var spa    = (r.sspa    || '').toString().trim().toUpperCase() === 'Y';
+                 var bkup   = (r.sbkup   || '').toString().trim().toUpperCase() === 'Y'; %>
+          <tr class="<%= sel ? 'is-sel' : '' %>" onclick="wtagtcfe.selectRow('<%= r._rrn %>','<%= r.srrn %>')">
+            <td><span class="ag-pill ag-pill-<%= s %>"><%= lbl %></span></td>
+            <td class="name">
+              <div class="name-main"><%= r.sname %></div>
+              <% if(r.sshnm && r.sshnm.trim() && r.sshnm.trim() !== r.sname.trim()) { %>
+              <div class="name-sub">DBA <%= r.sshnm %></div>
+              <% } %>
+            </td>
+            <td class="m"><%= r.sfein %></td>
+            <td class="m r"><%= r.sagent %></td>
+            <td><%= r.scontact %></td>
+            <td class="m"><%= r.sphone %></td>
+            <td><%= r.scity %><% if(r.sstate && r.sstate.trim()){ %>, <%= r.sstate %><% } %></td>
+            <td class="tags">
+              <% if(master) { %><span class="ag-tag ag-tag-warm" title="Master agent">Master</span><% } %>
+              <% if(spa)    { %><span class="ag-tag ag-tag-info" title="Special agent processing">SPA</span><% } %>
+              <% if(bkup)   { %><span class="ag-tag ag-tag-alert" title="Backup withholding">BWH</span><% } %>
+            </td>
+          </tr>
+          <% }); } else { %>
+          <tr><td colspan="8" class="ag-empty">
+            <div class="ag-empty-glyph">∅</div>
+            <h3>No agencies match</h3>
+            <p>Try clearing the status filter or adjusting your search term.</p>
+          </td></tr>
+          <% } %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="ag-card ag-detail">
+      <% if (dname && dname.trim()) {
+         var ds = (dstatus || '').toString().trim().toUpperCase();
+         var dlbl = {A:'Active', I:'Inactive', H:'Hold', P:'Pending'}[ds] || ds || '—';
+         var dmaster = (dmasterf || '').toString().trim().toUpperCase() === 'Y';
+         var dspa    = (dspaf    || '').toString().trim().toUpperCase() === 'Y';
+         var dbkup   = (dbkupf   || '').toString().trim().toUpperCase() === 'Y';
+         var dexp    = (dexpf    || '').toString().trim().toUpperCase() === 'Y';
+         var d1099   = (d1099f   || '').toString().trim().toUpperCase() === 'N';
+         %>
+      <header class="dh">
+        <div class="dh-titles">
+          <h2><%= dname %></h2>
+          <% if(dshnm && dshnm.trim() && dshnm.trim() !== dname.trim()){ %>
+          <p class="dba">DBA <%= dshnm %></p>
+          <% } %>
+          <% if(dfdnm && dfdnm.trim() && dfdnm.trim().toUpperCase() !== dname.trim().toUpperCase()){ %>
+          <p class="federal">Federal: <%= dfdnm %></p>
+          <% } %>
+        </div>
+        <div class="dh-badges">
+          <span class="ag-pill ag-pill-<%= ds %>"><%= dlbl %></span>
+          <% if(dmaster) { %><span class="ag-tag ag-tag-warm">Master agent</span><% } %>
+          <% if(dspa)    { %><span class="ag-tag ag-tag-info">SPA</span><% } %>
+        </div>
+      </header>
+
+      <section class="d-section">
+        <h3 class="d-section-title">Profile</h3>
+        <dl class="d-grid">
+          <div><dt>Federal Tax ID</dt><dd class="m"><%= dfein %></dd></div>
+          <div><dt>Modifier</dt><dd class="m"><%= dmod %></dd></div>
+          <div><dt># Producers</dt><dd class="m"><%= dagent %></dd></div>
+          <% if(dtype && dtype.trim()) { %><div><dt>Type code</dt><dd class="m"><%= dtype %></dd></div><% } %>
+          <% if(dgroup && dgroup.trim()) { %><div><dt>Group code</dt><dd class="m"><%= dgroup %></dd></div><% } %>
+          <% if(dexternal && Number(dexternal) > 0) { %><div><dt>External agt#</dt><dd class="m"><%= dexternal %></dd></div><% } %>
+        </dl>
+      </section>
+
+      <section class="d-section">
+        <h3 class="d-section-title">Locations</h3>
+        <div class="d-loc-grid">
+          <article class="d-loc">
+            <span class="d-loc-tag">Mailing</span>
+            <p><%= daddr %></p>
+          </article>
+          <% if(dpaddr && dpaddr.trim() && dpaddr.trim() !== daddr.trim()) { %>
+          <article class="d-loc">
+            <span class="d-loc-tag">Physical</span>
+            <p><%= dpaddr %></p>
+          </article>
+          <% } %>
+          <% if(diaddr && diaddr.trim()) { %>
+          <article class="d-loc">
+            <span class="d-loc-tag">Internal</span>
+            <p><%= diaddr %></p>
+          </article>
+          <% } %>
+          <% if(dcounty && dcounty.trim()) { %>
+          <article class="d-loc">
+            <span class="d-loc-tag">County</span>
+            <p><%= dcounty %></p>
+          </article>
+          <% } %>
+        </div>
+      </section>
+
+      <section class="d-section">
+        <h3 class="d-section-title">People &amp; contact</h3>
+        <dl class="d-grid">
+          <% if(dcontact && dcontact.trim()) { %><div><dt>Marketing contact</dt><dd><%= dcontact %></dd></div><% } %>
+          <% if(dsecy && dsecy.trim()) { %><div><dt>Secretary</dt><dd><%= dsecy %></dd></div><% } %>
+          <% if(dhcon && dhcon.trim()) { %><div><dt>Contact</dt><dd><%= dhcon %></dd></div><% } %>
+          <% if(demail && demail.trim()) { %><div class="full"><dt>Email</dt><dd class="email"><%= demail %></dd></div><% } %>
+          <div><dt>Phone</dt><dd class="m"><%= dphone %></dd></div>
+          <% if(dphone2 && dphone2.trim() && dphone2 !== '(0) -') { %>
+          <div><dt>Phone 2</dt><dd class="m"><%= dphone2 %></dd></div>
+          <% } %>
+          <% if(dfax && dfax.trim() && dfax !== '(0) -') { %>
+          <div><dt>Fax</dt><dd class="m"><%= dfax %></dd></div>
+          <% } %>
+        </dl>
+      </section>
+
+      <section class="d-section">
+        <h3 class="d-section-title">Compliance</h3>
+        <dl class="d-grid">
+          <div><dt>W9 sent</dt><dd class="m"><%= dw9sent %></dd></div>
+          <div><dt>W9 received</dt><dd class="m"><%= dw9recv %></dd></div>
+          <div><dt>Background check</dt><dd class="m"><%= dbgchk %></dd></div>
+          <div><dt>1099 exclusion</dt><dd><% if(d1099) { %><span class="ag-tag ag-tag-alert">Excluded</span><% } else { %><span class="ag-tag ag-tag-positive">Included</span><% } %></dd></div>
+          <div><dt>Backup withholding</dt><dd><% if(dbkup) { %><span class="ag-tag ag-tag-alert">Yes</span><% } else { %><span class="ag-tag ag-tag-positive">No</span><% } %></dd></div>
+          <div><dt>Excluded from export</dt><dd><% if(dexp) { %><span class="ag-tag ag-tag-alert">Yes</span><% } else { %><span class="ag-tag ag-tag-positive">No</span><% } %></dd></div>
+        </dl>
+      </section>
+
+      <% if((dmktrep && dmktrep.trim()) || (dmktstf && dmktstf.trim()) || (dmktrg && dmktrg.trim()) || (dsvcr && dsvcr.trim())) { %>
+      <section class="d-section">
+        <h3 class="d-section-title">Marketing</h3>
+        <dl class="d-grid">
+          <% if(dmktrep && dmktrep.trim()) { %><div><dt>Marketing rep</dt><dd class="m"><%= dmktrep %></dd></div><% } %>
+          <% if(dmktstf && dmktstf.trim()) { %><div><dt>Staff code</dt><dd class="m"><%= dmktstf %></dd></div><% } %>
+          <% if(dmktrg && dmktrg.trim()) { %><div><dt>Region</dt><dd class="m"><%= dmktrg %></dd></div><% } %>
+          <% if(dsvcr && dsvcr.trim()) { %><div><dt>Service rep</dt><dd class="m"><%= dsvcr %></dd></div><% } %>
+        </dl>
+      </section>
+      <% } %>
+
+      <% if((deftp && deftp.trim()) || (deftpd && deftpd.trim())) { %>
+      <section class="d-section">
+        <h3 class="d-section-title">Email / FTP delivery</h3>
+        <dl class="d-grid">
+          <% if(deftp && deftp.trim()) { %><div class="full"><dt>FTP site</dt><dd class="m"><%= deftp %></dd></div><% } %>
+          <% if(deftpd && deftpd.trim()) { %><div class="full"><dt>FTP directory</dt><dd class="m"><%= deftpd %></dd></div><% } %>
+        </dl>
+      </section>
+      <% } %>
+
+      <section class="d-section d-section-muted">
+        <h3 class="d-section-title">Audit trail</h3>
+        <dl class="d-grid">
+          <div><dt>Last updated</dt><dd class="m"><%= dlastdt %><% if(dlastusr && dlastusr.trim()) { %> · <%= dlastusr %><% } %></dd></div>
+          <div><dt>Created</dt><dd class="m"><%= dinitdt %><% if(dinitusr && dinitusr.trim()) { %> · <%= dinitusr %><% } %></dd></div>
+        </dl>
+      </section>
+
+      <footer class="df">
+        <button type="button" class="ag-btn ag-btn-ghost-on-light">View producers</button>
+        <button type="button" class="ag-btn ag-btn-ghost-on-light">Service requests</button>
+        <button type="button" class="ag-btn ag-btn-secondary">History</button>
+        <button type="button" class="ag-btn ag-btn-primary" onclick="wtagtcfe.openEdit()">Edit agency</button>
+      </footer>
+
+      <% } else { %>
+      <div class="empty">
+        <div class="empty-icon">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" fill="none"/><path d="M32 18v18M32 42v4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Select an agency</h3>
+        <p>Click a row in the list to view the full agency record, compliance status, marketing assignments, and audit trail.</p>
+      </div>
+      <% } %>
+    </aside>
+  </main>
+
+  <footer class="ag-footer">
+    <div class="ag-footer-kbd">
+      <span><kbd>Click</kbd> select &nbsp; <kbd>Esc</kbd> exit</span>
+    </div>
+    <div class="ag-footer-meta">Sapiens · Agency Configuration · Client 079</div>
+  </footer>
+
+  <input type="hidden" name="action" id="ag-action" value="" />
+  <input type="hidden" name="selrrn" id="ag-selrrn" value="<%= selrrn %>" />
+
+  <!-- ===== Selected-agency data carrier (read by openEdit) ========== -->
+  <div id="ag-detail-data" hidden
+       data-selrrn="<%= selrrn %>"
+       data-name="<%= (dname || '').toString().trim() %>"
+       data-contact="<%= (dcontact || '').toString().trim() %>"
+       data-email="<%= (demail || '').toString().trim() %>"
+       data-city="<%= (dcity || '').toString().trim() %>"
+       data-state="<%= (dstate || '').toString().trim() %>"
+       data-status="<%= (dstatus || '').toString().trim() || 'A' %>"
+       data-fein="<%= (dfein || '').toString().trim() %>"
+       data-mod="<%= (dmod || '0').toString().trim() %>"></div>
+
+  <!-- ===== Edit modal ============================================== -->
+  <div id="ag-modal" class="ag-modal" hidden>
+    <div class="ag-modal-backdrop" onclick="wtagtcfe.closeEdit()"></div>
+    <div class="ag-modal-card" role="dialog" aria-modal="true" aria-labelledby="ag-modal-title">
+      <header class="ag-modal-head">
+        <div>
+          <h2 id="ag-modal-title">Edit agency</h2>
+          <p class="ag-modal-sub" id="ag-modal-sub"><%= dname %></p>
+        </div>
+        <button type="button" class="ag-modal-close" onclick="wtagtcfe.closeEdit()" aria-label="Close">×</button>
+      </header>
+
+      <!-- Inputs intentionally have NO name= attribute: PUI's automatic
+           form binding fights with client-side .value updates on these
+           modal fields. Values are passed explicitly via pui.submit({...})
+           in agency.js. -->
+      <form class="ag-modal-body" onsubmit="wtagtcfe.saveEdit(event)" id="ag-edit-form">
+        <div class="ag-field full ag-new-only" hidden>
+          <label for="ag-efein">Federal EIN <span class="ag-req">required</span></label>
+          <input id="ag-efein" type="text" maxlength="11" placeholder="XX-XXXXXXX" pattern="\d{2}-?\d{7}" />
+        </div>
+        <div class="ag-field ag-new-only" hidden>
+          <label for="ag-emod">Mod</label>
+          <input id="ag-emod" type="number" min="0" max="999" value="0" />
+        </div>
+        <div class="ag-field full">
+          <label for="ag-ename">Agency name</label>
+          <input id="ag-ename" type="text" maxlength="40" />
+        </div>
+        <div class="ag-field full">
+          <label for="ag-econtact">Marketing contact</label>
+          <input id="ag-econtact" type="text" maxlength="40" />
+        </div>
+        <div class="ag-field full">
+          <label for="ag-eemail">Email</label>
+          <input id="ag-eemail" type="email" maxlength="60" placeholder="contact@example.com" />
+        </div>
+        <div class="ag-field">
+          <label for="ag-ecity">City</label>
+          <input id="ag-ecity" type="text" maxlength="25" />
+        </div>
+        <div class="ag-field">
+          <label for="ag-estate">State</label>
+          <input id="ag-estate" type="text" maxlength="2" pattern="[A-Za-z]{2}" />
+        </div>
+        <div class="ag-field full">
+          <label for="ag-estatus">Status</label>
+          <select id="ag-estatus">
+            <option value="A">Active</option>
+            <option value="I">Inactive</option>
+            <option value="H">On hold</option>
+            <option value="P">Pending</option>
+          </select>
+        </div>
+      </form>
+
+      <footer class="ag-modal-foot">
+        <button type="button" class="ag-btn ag-btn-ghost-on-light" onclick="wtagtcfe.closeEdit()">Cancel</button>
+        <button type="button" class="ag-btn ag-btn-primary" id="ag-modal-save" onclick="wtagtcfe.saveEdit()">Save changes</button>
+      </footer>
+    </div>
+  </div>
+</div>

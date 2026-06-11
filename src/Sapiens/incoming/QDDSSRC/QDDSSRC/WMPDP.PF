@@ -1,0 +1,154 @@
+      * (c) 2012 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*****************************************************************
+     A** WORKERS' COMP PAYEE DEMOGRAPHICS MASTER FILE
+     A*****************************************************************
+     A****              I M P O R T A N T    N O T E               ****
+     A****                                                         ****
+     A****  BEFORE MAKING DATA BASE CHANGES TO THIS FILE, YOU NEED ****
+     A****  TO INFORM THE FEE SCHEDULE PROJECT LEADER BECAUSE IT   ****
+     A****  WILL AFFECT THE FSMS SYSTEM !!!!!!!!!                  ****
+     A****                                                         ****
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 01/31/12 C:189 Project: WC2109                                *
+     A*                Transform: Add Clm Contacts email fields       *
+     A*                                                               *
+     A* 04/19/10 C:235 Project: 25WRG                                 *
+     A*                CLAIM GENERAL RETROFIT                         *
+     A*                                                               *
+     A* 10/05/09 C:33  Project: WC1770                                *
+     A*                Add Firm Name.                                 *
+     A*                                                               *
+     A* 12/10/07 C:198 Project: FL064                                 *
+     A*                Expanded license# field to 13 characters.      *
+     A*                                                               *
+     A* 03/07/04  C:15   PROJECT: WC1269                              *
+     A*                  Added out of country address fields.         *
+     A*                                                               *
+     A* 06/04/04  C:35   PROJECT: WC577                               *
+     A*                  ADD INITIAL MAINT FIELDS.                    *
+     A*                                                               *
+     A*  09/04/01 C:132  PROJECT: WC1047                              *
+     A*                  ADD PDSS# FIELD to Identify if is a FEIN     *
+     A*                  or a SS# - 'Y' = SS#, 'N' or Blank = FEIN    *
+     A*                                                               *
+     A*  11/04/99 C:118  PROJECT: 44WCS                               *
+     A*                  ADD PDPSIG FIELD.                            *
+     A*                                                               *
+     A*  11/05/96 C:30 Project: 68MDI                                 *
+     A*           Add fields PDADR2, PDDBA1, PDFXAR, PDFAX#, PDW9SE,  *
+     A*           PDW9RC, PDBKUP, PDWCCE.                             *
+     A*           All date fields are defined using DT7 (Packed 7,0). *
+     A*           First digit is Century (0 = 1900, 1 = 2000).        *
+     A*                                                               *
+     A**  03/06/97 *** C:31 *** 87MBQ ***                            **
+     A**           1. Load BWC Providers/Anthem                      **
+     A*                                                               *
+     A**  10/19/97 *** C:58 *** WC468 ***                            **
+     A**           1. Add OHIO BWC Provider Type - PDBWCT
+     A*****************************************************************
+
+
+     A                                      REF(WREFP)
+     A          R PPD01                     TEXT('PAYEE DEMOGRAPHICS MSTR FILE')
+     A            PDFEIN    R               REFFLD(FEIN)
+     A            PDMOD     R               REFFLD(MOD)
+     A            PDNAME    R               REFFLD(NAME)
+     A            PDFSN     R               REFFLD(FSN)
+     A            PDTITL    R               REFFLD(TITL)
+     A            PDADR1    R               REFFLD(ADR1)
+     A            PDCTY     R               REFFLD(CTY)
+     A            PDST      R               REFFLD(ST)
+     A            PDZIP     R               REFFLD(ZIP)
+     A            PDAREA    R               REFFLD(AREA)
+     A            PDPHN#    R               REFFLD(PHN#)
+     A            PDSHNM    R               REFFLD(NM10)
+     A                                      COLHDG('SHORT' 'NAME')
+     A            PD1099    R               REFFLD(FLAG)
+     A                                      COLHDG('1099' 'FLAG')
+     A            PDTYPE    R               REFFLD(FLAG)
+     A                                      COLHDG('PAYEE' 'TYPE')
+     A            PDSPCD    R               REFFLD(SPEC)
+     A            PDSTAT    R               REFFLD(STAT)
+     A            PDUSER    R               REFFLD(USER)
+     A            PDPGM     R               REFFLD(PGM)
+     A            PDTIME    R               REFFLD(TIME)
+     A            PDDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A*** BEGIN ADD FOR FEE SCHEDULE FL STATE TAPE SUBMISSION *************
+     A            PDFLIC    R               REFFLD(FEI2)
+     A                                      COLHDG('PHYS' 'FL LIC#')
+     A            PDVFLG    R               REFFLD(FLAG)
+     A                                      COLHDG('LIC#' 'VERIFICATION' 'FLAG')
+     A***** END ADD FOR FEE SCHEDULE FL STATE TAPE SUBMISSION *************
+     A*** BEGIN ADD *** 11/05/96 ****************************************
+     A            PD109M    R               REFFLD(MOD)
+     A                                      COLHDG('1099 MAILED' 'TO MOD')
+     A            PDADR2    R               REFFLD(ADR2)
+     A                                      COLHDG('Address Line 2')
+     A            PDDBA1    R               REFFLD(FLAG)
+     A                                      COLHDG('ADDR1' 'Used as DBA' '(Y/bl-
+     A                                      ank')
+     A            PDFXAR    R               REFFLD(AREA)
+     A                                      COLHDG('FAX#' 'Area' 'Code')
+     A            PDFAX#    R               REFFLD(PHN#)
+     A                                      COLHDG('FAX#' 'Phone')
+     A            PDW9SE    R               REFFLD(DT7)
+     A                                      COLHDG('W9' 'Sent' 'Date')
+     A            PDW9RC    R               REFFLD(DT7)
+     A                                      COLHDG('W9' 'Received' 'Date')
+     A            PDBKUP    R               REFFLD(FLAG)
+     A                                      COLHDG('Backup' 'Withholding' 'Y/N')
+     A            PDWCCE    R               REFFLD(FLAG)
+     A                                      COLHDG('WC' 'Certified' 'Y/N')
+     A*** END   ADD *** 11/05/96 ****************************************
+     A*** BEGIN ADD ** 03/06/97 ************************************************
+     A            PDWCDT    R               REFFLD(DT7)
+     A                                      COLHDG('WC' 'Cert' 'Date')
+     A            PDBWC#        11          TEXT('BWC ID Number')
+     A*** END ADD ** 03/06/97 **************************************************
+     A*** BEGIN ADD ** 10/19/97 ************************************************
+     A            PDBWCT    R               REFFLD(A30)
+     A                                      COLHDG('OH BWC' 'Prov Type')
+     A*** END ADD ** 10/19/97 **************************************************
+     A***** BEGIN ADD **** 11/04/99 ***********************************
+     A            PDPSIG    R               REFFLD(FLAG)
+     A                                      COLHDG('Prevent' 'signatures' 'flg')
+     A***** BEGIN END **** 11/04/99 ***********************************
+     A***** BEGIN ADD **** 09/04/01 ***********************************
+     A            PDSS#     R               REFFLD(FLAG)
+     A                                      COLHDG('SS# or' 'FEIN' 'flg')
+     A***** BEGIN END **** 09/04/01 ***********************************
+     A***** BEGIN ADD **** 06/04/04 ***********************************
+     A            PDIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL USER')
+     A            PDIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL PGM')
+     A            PDITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL TIME')
+     A            PDIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL DATE')
+     A***** END   ADD **** 06/04/04 ***********************************
+     A*** Begin add *** 03/07/05 **************************************
+     A            PDCTRY         3A         COLHDG('COUNTRY CODE')
+     A            PDADR3    R               REFFLD(DS40)
+     A                                      COLHDG('CITY/PROV/POSTAL CD')
+     A*** End add ***** 03/07/05 **************************************
+     A*** Begin Add *** 12/10/07 **************************************
+     A            PDLIC#        13A         COLHDG('PHYS' 'FL LIC#')
+     A*** End   Add *** 12/10/07 **************************************
+     A***  Begin Add  ***  10/05/09  **************************************
+     A            PDRFNM        80
+     A                                      COLHDG('Representative' 'Firm Name')
+     A***  End   Add  ***  10/05/09  **************************************
+     A***  BEG   ADD  ***  04/19/10  **************************************
+     A            PDXDPE    R               REFFLD(FLAG)
+     A                                      COLHDG('Exclude from dup pay' +
+     A                                      'edit')
+     A***  END   ADD  ***  04/19/10  **************************************
+     A*** Beg Add *** 01/31/12 **********************************************
+     A            PDEMAD    R               REFFLD(DS60)
+     A                                      COLHDG('E-mail Address')
+     A*** End Add *** 01/31/12 **********************************************

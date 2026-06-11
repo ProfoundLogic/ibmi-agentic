@@ -1,0 +1,228 @@
+     A*%%TS  SD  19970814  162254  COLEMANR    REL-V3R6M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DAILY VEHICLE MAINTENANCE                                **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A*---------------------------------------------------------------
+     A*  SCR01     PROMPT FOR POLICY NUMBER
+     A*---------------------------------------------------------------
+     A          R SCR01
+     A*%%TS  SD  19950111  150642  ELANE       REL-V2R3M0  5738-PW1
+     A                                      CF05
+     A                                      CF07
+     A                                      CF13
+     A                                      SETOF(24)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0065F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 11 27'Policy number:'
+     A            SCPOL#    R        B 11 43REFFLD(POL#)
+     A                                      TEXT('policy number')
+     A  24                                  ERRMSGID(CCR0535 *LIBL/CMESGG)
+     A*                                     DSPATR(CS)
+     A                                 24  1'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 19'F5=Number search'
+     A                                      COLOR(BLU)
+     A                                 24 40'F7=Name search'
+     A                                      COLOR(BLU)
+     A                                 24 59'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A*---------------------------------------------------------------
+     A*  SCR02     DISPLAY VEHICLES
+     A*---------------------------------------------------------------
+     A          R SCR02
+     A*%%TS  SD  19970814  161815  COLEMANR    REL-V3R6M0  5716-PW1
+     A                                      CF12
+     A                                      SETOF(24)
+     A                                      SETOF(61)
+     A                                      SETOF(62)
+     A                                      SETOF(63)
+     A                                      SETOF(64)
+     A                                      SETOF(65)
+     A                                      SETOF(66)
+     A                                      SETOF(67)
+     A                                      SETOF(68)
+     A                                      SETOF(69)
+     A                                      SETOF(70)
+     A                                      SETOF(71)
+     A                                      SETOF(72)
+     A                                      SETOF(73)
+     A                                      SETOF(74)
+     A                                      SETOF(75)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0065F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A                                  4  3'Policy Number:'
+     A            SCPOL#    R        O  4 19REFFLD(POL#)
+     A                                      COLOR(WHT)
+     A            SCFIN     R        O  4 37REFFLD(DS40)
+     A                                      COLOR(WHT)
+     A                                  6  3'Item'
+     A                                  6  9'Coverage'
+     A                                  6 20'--------------------- Vehicle -----
+     A                                      -----------------'
+     A                                  6 74'Date'
+     A                                  7  2'Number'
+     A                                      DSPATR(UL)
+     A                                  7 10'Code'
+     A                                      DSPATR(UL)
+     A                                  7 18'Year'
+     A                                      DSPATR(UL)
+     A                                  7 24'    Make    '
+     A                                      DSPATR(UL)
+     A                                  7 38'    Model   '
+     A                                      DSPATR(UL)
+     A                                  7 52'  Identification '
+     A                                      DSPATR(UL)
+     A                                  7 71' Covered  '
+     A                                      DSPATR(UL)
+     A            SCLN01        68A  O  8  2TEXT('LINE  1')
+     A                                      COLOR(WHT)
+     A  81        SCDT01    R        B  8 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  61                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN02        68A  O  9  2TEXT('LINE  2')
+     A                                      COLOR(WHT)
+     A  82        SCDT02    R        B  9 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  62                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN03        68A  O 10  2TEXT('LINE  3')
+     A                                      COLOR(WHT)
+     A  83        SCDT03    R        B 10 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  63                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN04        68A  O 11  2TEXT('LINE  4')
+     A                                      COLOR(WHT)
+     A  84        SCDT04    R        B 11 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  64                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN05        68A  O 12  2TEXT('LINE  5')
+     A                                      COLOR(WHT)
+     A  85        SCDT05    R        B 12 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  65                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN06        68A  O 13  2TEXT('LINE  6')
+     A                                      COLOR(WHT)
+     A  86        SCDT06    R        B 13 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  66                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN07        68A  O 14  2TEXT('LINE  7')
+     A                                      COLOR(WHT)
+     A  87        SCDT07    R        B 14 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  67                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN08        68A  O 15  2TEXT('LINE  8')
+     A                                      COLOR(WHT)
+     A  88        SCDT08    R        B 15 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  68                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN09        68A  O 16  2TEXT('LINE  9')
+     A                                      COLOR(WHT)
+     A  89        SCDT09    R        B 16 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  69                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN10        68A  O 17  2TEXT('LINE 10')
+     A                                      COLOR(WHT)
+     A  90        SCDT10    R        B 17 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  70                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN11        68A  O 18  2TEXT('LINE 11')
+     A                                      COLOR(WHT)
+     A  91        SCDT11    R        B 18 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  71                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN12        68A  O 19  2TEXT('LINE 12')
+     A                                      COLOR(WHT)
+     A  92        SCDT12    R        B 19 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  72                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN13        68A  O 20  2TEXT('LINE 13')
+     A                                      COLOR(WHT)
+     A  93        SCDT13    R        B 20 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  73                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN14        68A  O 21  2TEXT('LINE 14')
+     A                                      COLOR(WHT)
+     A  94        SCDT14    R        B 21 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  74                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCLN15        68A  O 22  2TEXT('LINE 15')
+     A                                      COLOR(WHT)
+     A  95        SCDT15    R        B 22 71REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A  75                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      EDTWRD('  /  /    ')
+     A            SCROLL         8A  O 23 70TEXT('MORE ...')
+     A                                      DSPATR(HI)
+     A                                 24  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 29'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A*---------------------------------------------------------------
+     A*  SCR99     RESET CURRENT SCREEN
+     A*---------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND PR)

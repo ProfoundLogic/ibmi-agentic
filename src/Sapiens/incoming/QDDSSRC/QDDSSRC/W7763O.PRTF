@@ -1,0 +1,463 @@
+     A* (c) 2015 StoneRiver, Inc. All rights Reserved.                     *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*
+     A*  Written vs Collected premium - Printer File
+     A*
+     A*****************************************************************
+     A* Created on 05/19/09 by c:62 for Project 114WRL
+     A*****************************************************************
+     A* Revisions:                                                    *
+     A*                                                               *
+     A* 08/05/15 C:307 Project: SY354                                 *
+     A*                -Adding 'Route To:'                            *
+     A*                                                               *
+     A* 08/26/14 C:307 PROJECT: SY354                                 *
+     A*                -IMPLEMENT ROUTING PAGE CHANGES.               *
+     A*                                                               *
+     A*  06/21/10  C:191 Project: 114WVX                              *
+     A*                   Written vs Collected Report Changes         *
+     A*                                                               *
+     A* 01/28/10  C:249  PROJECT: SY215                               *
+     A*           C:189  RETRIEVE BRAND NAME
+     A*                                                               *
+     A*****************************************************************
+     A*---                                  PAGESIZE(66 198)
+     A*---                                  OVRFLW(60)
+     A*---                                  FOLD(*NO)
+     A          R ROUTE
+      ***** Beg Del ***** 08/26/14 ************************************
+     A**********                           1'XXXXXXXX'
+     A**********                            SKIPB(6)
+     A**********                          15'XXXXXX'
+     A**********                          25'XX      XX'
+     A**********                          36'XXXXXXXXXX'
+     A**********                          47'XXXXXXXXXX'
+     A**********                          58'XXX     XX'
+     A**********                          72'XXXXXX'
+     A**********                            SPACEA(1)
+     A*---
+     A**********                           1'XXXXXXXXX'
+     A**********                          14'XXXXXXXX'
+     A**********                          25'XX      XX'
+     A**********                          36'XXXXXXXXXX'
+     A**********                          47'XXXXXXXXXX'
+     A**********                          58'XXXX    XX'
+     A**********                          71'XXXXXXXX'
+     A**********                            SPACEA(1)
+     A*---
+     A**********                           1'XX      XX'
+     A**********                          13'XX      XX'
+     A**********                          25'XX      XX'
+     A**********                          40'XX'
+     A**********                          51'XX'
+     A**********                          58'XXXX    XX'
+     A**********                          70'XX      XX'
+     A**********                            SPACEA(1)
+     A*---
+     A**********                           1'XX      XX'
+     A**********                          13'XX      XX'
+     A**********                          25'XX      XX'
+     A**********                          40'XX'
+     A**********                          51'XX'
+     A**********                          58'XX XX   XX'
+     A**********                          70'XX'
+     A**********                            SPACEA(1)
+     A*---
+     A**********                           1'XXXXXXXXX'
+     A**********                          13'XX      XX'
+     A**********                          25'XX      XX'
+     A**********                          40'XX'
+     A**********                          51'XX'
+     A**********                          58'XX XX   XX'
+     A**********                          70'XX'
+     A**********                            SPACEA(1)
+     A*---
+     A**********                           1'XXXXXXXX'
+     A**********                          13'XX      XX'
+     A**********                          25'XX      XX'
+     A**********                          40'XX'
+     A**********                          51'XX'
+     A**********                          58'XX  XX  XX'
+     A**********                          70'XX'
+     A**********                            SPACEA(1)
+     A*---
+     A**********                           1'XXXX'
+     A**********                          13'XX      XX'
+     A**********                          25'XX      XX'
+     A**********                          40'XX'
+     A**********                          51'XX'
+     A**********                          58'XX  XX  XX'
+     A**********                          70'XX    XXXX'
+     A**********                            SPACEA(1)
+     A*---
+     A**********                           1'XXXXX'
+     A**********                          13'XX      XX'
+     A**********                          25'XX      XX'
+     A**********                          40'XX'
+     A**********                          51'XX'
+     A**********                          58'XX   XX XX'
+     A**********                          70'XX    XXXX'
+     A**********                            SPACEA(1)
+     A*---
+     A**********                           1'XX XXX'
+     A**********                          13'XX      XX'
+     A**********                          25'XX      XX'
+     A**********                          40'XX'
+     A**********                          51'XX'
+     A**********                          58'XX   XX XX'
+     A**********                          70'XX      XX'
+     A**********                            SPACEA(1)
+     A*---
+     A**********                           1'XX  XXX'
+     A**********                          13'XX      XX'
+     A**********                          25'XX      XX'
+     A**********                          40'XX'
+     A**********                          51'XX'
+     A**********                          58'XX    XXXX'
+     A**********                          70'XX      XX'
+     A**********                            SPACEA(1)
+     A*---
+     A**********                           1'XX   XXX'
+     A**********                          14'XXXXXXXX'
+     A**********                          26'XXXXXXXX'
+     A**********                          40'XX'
+     A**********                          47'XXXXXXXXXX'
+     A**********                          58'XX    XXXX'
+     A**********                          71'XXXXXXXX'
+     A**********                            SPACEA(1)
+     A*---
+     A**********                           1'XX    XXX'
+     A**********                          15'XXXXXX'
+     A**********                          27'XXXXXX'
+     A**********                          40'XX'
+     A**********                          47'XXXXXXXXXX'
+     A**********                          58'XX     XXX'
+     A**********                          72'XXXXXX'
+     A**********                            SPACEA(3)
+     A*---
+     A**********                           7'ROUTE TO:'
+     A**08        ORDIS1    R             21REFFLD(POR01/ORDIS1 SMORL)
+     A**09        UPUSNM        50A       18
+     A**********                            SPACEA(1)
+     A*---
+     A**08        ORDIS2    R             21REFFLD(POR01/ORDIS2 SMORL)
+     A**********                            SPACEA(1)
+     A*---
+     A**08        ORDIS3    R             21REFFLD(POR01/ORDIS3 SMORL)
+     A**********                            SPACEA(1)
+     A*---
+     A**08        ORDIS4    R             21REFFLD(POR01/ORDIS4 SMORL)
+     A**********                            SPACEA(2)
+     A*---
+      ***** End Del ***** 08/26/14 ************************************
+      ***** Beg Add ***** 08/05/15 ************************************
+     A                                     7'ROUTE TO:'
+     A  08        ORDIS1    R             21REFFLD(POR01/ORDIS1 SMORL)
+     A  09        UPUSNM        50A       18
+     A                                      SPACEA(1)
+     A*---
+     A  08        ORDIS2    R             21REFFLD(POR01/ORDIS2 SMORL)
+     A                                      SPACEA(1)
+     A*---
+     A  08        ORDIS3    R             21REFFLD(POR01/ORDIS3 SMORL)
+     A                                      SPACEA(1)
+     A*---
+     A  08        ORDIS4    R             21REFFLD(POR01/ORDIS4 SMORL)
+     A                                      SPACEA(2)
+      ***** End Add ***** 08/05/15 ************************************
+     A                                     7'REPORT TITLE:'
+     A            ORTITL    R             21REFFLD(POR01/ORTITL SMORL)
+     A                                      SPACEA(2)
+      ***** Beg Del ***** 08/26/14 ************************************
+     A*---
+     A**********                           7'PROGRAM NAME:'
+     A**********  ORPNAM    R             21REFFLD(POR01/ORPNAM SMORL)
+     A**********                          32'FILE:'
+     A**********  ORFIL#    R             38REFFLD(POR01/ORFIL# SMORL)
+     A**********                          40'COPIES:'
+     A**********  ORCOPY    R             49REFFLD(POR01/ORCOPY SMORL)
+     A**********                            DLTEDT
+     A**********                            EDTCDE(Z)
+     A**********                          52'HOLD:'
+     A**********  ORHOLD    R             58REFFLD(POR01/ORHOLD SMORL)
+     A**********                            SPACEA(2)
+     A*---
+     A**********                           7'OUTPUT QUEUE:'
+     A**08        OROUTQ    R             21REFFLD(POR01/OROUTQ SMORL)
+     A**09        XXQUE         10A       21
+     A**********                          32'FORMS:'
+     A**********  ORFORM    R             39REFFLD(POR01/ORFORM SMORL)
+     A**********                          52'SAVE:'
+     A**********  ORSAVE    R             58REFFLD(POR01/ORSAVE SMORL)
+     A**********                            SPACEA(2)
+      ***** End Del ***** 08/26/14 ************************************
+     A*---
+     A                                     7'Company  . . :'
+     A            XXCO#          3  0     23
+     A                                      SPACEA(2)
+     A*---
+     A                                     7'Group Range  :'
+     A            XXGRPRNG      10A       23
+     A                                      SPACEA(2)
+     A*---
+     A                                     7'As of date   :'
+     A            X8ASOD         8  0     23
+     A                                      EDTWRD('  /  /    ')
+     A                                      SPACEA(2)
+     A*---
+     A                                     7'Print  . . . :'
+     A            XXPRTVB        3A       23
+     A                                      SPACEA(2)
+     A*---
+     A                                     7'File  (WFWCP):'
+     A            XXFILVB        3A       23
+     A                                      SPACEA(2)
+     A*---
+      *** BEG CHG ***** 01/28/10 **********************************************
+     A******                               1'(C) Copyright Progressive'
+     A******                                SKIPB(60)
+     A******                              27'Data Solutions, Inc.,'
+     A                                     1 '(c)'
+     A******      SYS_DATE        L       49
+     A******                                DATFMT(*USA)
+     A******                                SPACEA(1)
+     A            #BRND1        80A        1SKIPB(59) SPACEA(1)
+     A            #BRND2        80A        1SPACEA(1)
+      *** END CHG ***** 01/28/10 **********************************************
+     A*---
+     A          R POLHEADER1
+     A            SYS_TIME        T        1
+     A                                      SKIPB(6)
+     A                                      TIMFMT(*HMS)
+     A                                      TIMSEP(':')
+     A            COMPANYNM     40A       75
+     A            SYS_DATE        L      189
+     A                                      DATFMT(*USA)
+     A                                      SPACEA(1)
+     A*---
+     A            Q1PGM         10A        1
+     A            XXTITLE       60A       65
+     A                                   188'PAGE:'
+     A                                   195PAGNBR
+     A                                      EDTCDE(Z)
+     A                                      SPACEA(2)
+     A*---
+     A          R POLHEADER2
+     A                                     1'Group/Name:'
+     A            WCFND     R             14REFFLD(PEU01/EUFND WFEUP)
+     A                                      DLTEDT
+     A            WCFNNM        40A       19
+     A                                      SPACEA(2)
+     A*---
+      *** BEG CHG ***** 06/21/10 ***************************************
+      ***********
+     A***********                          4'Employer'
+     A***********                         16'Div'
+     A***********                         22'Yr'
+     A****BEGIN*CHG ****** 06/21/10 ************************************
+     A***********                         26'Policy #'
+     A***********                         26'Insured Name'
+     A****END***CHG ****** 06/21/10 ************************************
+     A***********                         54'Eff. Date'
+     A***********                         66'Exp. Date'
+     A***********                         80'Written Prem'
+     A***********                         98'Assessments'
+     A***********                        114'Paid Premium'
+     A***********                        128'Paid Assessment'
+     A***********                        148'Wrtn-Pd Prem'
+     A***********                        166'Assess Rcvd'
+     A***********                        184'Total Rcvd'
+     A                                     1'Grp'
+     A                                     6'Employer'
+     A                                    18'Div'
+     A                                    24'Yr'
+     A*** BEGIN CHG ****** 06/21/10 ************************************
+     A**********                          26'Policy #'
+     A                                    28'Insured Name'
+     A*** END   CHG ****** 06/21/10 ************************************
+     A                                    56'Eff. Date'
+     A                                    68'Exp. Date'
+     A                                    82'Written Prem'
+     A                                   100'Assessments'
+     A                                   116'Paid Premium'
+     A                                   130'Paid Assessment'
+     A                                   151'Premium Bal'
+     A                                   169'Assess Bal'
+     A                                   187'Total Bal'
+      *** END CHG ***** 06/21/10 ***************************************
+     A            LINE1        198A        1
+     A                                      SPACEA(1)
+     A*---
+     A          R POLDETAIL
+      *** BEG CHG ***** 06/21/10 ***************************************
+     A*********** WCEMP#    R              3REFFLD(PWC01/WCEMP# WFWCP)
+     A***********                           DLTEDT
+     A***********                           EDTCDE(4)
+     A*********** WCDIV     R             14REFFLD(PWC01/WCDIV WFWCP)
+     A***********                           DLTEDT
+     A*********** WCFYR     R             21REFFLD(PWC01/WCFYR WFWCP)
+     A***********                           DLTEDT
+     A***********                           EDTCDE(4)
+     A****BEGIN*CHG ****** 01/14/10 ************************************
+     A*********** XXPOL#        25A       26
+     A*********** XXINNM        25A       26
+     A****END***CHG ****** 01/14/10 ************************************
+     A*********** WCPFDT    R             53REFFLD(PWC01/WCPFDT WFWCP)
+     A***********                           DLTEDT
+     A***********                           EDTWRD('  /  /    ')
+     A*********** WCPTDT    R             65REFFLD(PWC01/WCPTDT WFWCP)
+     A***********                           DLTEDT
+     A***********                           EDTWRD('  /  /    ')
+     A*********** WCWRPR        11  2     77
+     A***********                           EDTCDE(J $)
+     A*********** WCSURB        11  2     94
+     A***********                           EDTCDE(J $)
+     A*********** WCCLPR        11  2    111
+     A***********                           EDTCDE(J $)
+     A*********** WCSURP        11  2    128
+     A***********                           EDTCDE(J $)
+     A*********** WCPRMB    R            145REFFLD(PWC01/WCBAL WFWCP)
+     A***********                           DLTEDT
+     A***********                           EDTCDE(J $)
+     A*********** WCASSB    R            162REFFLD(PWC01/WCBAL WFWCP)
+     A***********                           DLTEDT
+     A***********                           EDTCDE(J $)
+     A*********** XXTVAL    R            179REFFLD(PWC01/WCBAL WFWCP)
+     A***********                           DLTEDT
+     A***********                           EDTCDE(J $)
+     A***********                           SPACEA(1)
+     A            WCFND     R              1REFFLD(PWC01/WCFND WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(4)
+     A            WCEMP#    R              5REFFLD(PWC01/WCEMP# WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(4)
+     A            WCDIV     R             16REFFLD(PWC01/WCDIV WFWCP)
+     A                                      DLTEDT
+     A            WCFYR     R             23REFFLD(PWC01/WCFYR WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(4)
+     A            XXINNM        25A       28
+     A            WCPFDT    R             55REFFLD(PWC01/WCPFDT WFWCP)
+     A                                      DLTEDT
+     A                                      EDTWRD('  /  /    ')
+     A            WCPTDT    R             67REFFLD(PWC01/WCPTDT WFWCP)
+     A                                      DLTEDT
+     A                                      EDTWRD('  /  /    ')
+     A            WCWRPR        11  2     79
+     A                                      EDTCDE(J $)
+     A            WCSURB        11  2     96
+     A                                      EDTCDE(J $)
+     A            WCCLPR        11  2    113
+     A                                      EDTCDE(J $)
+     A            WCSURP        11  2    130
+     A                                      EDTCDE(J $)
+     A            WCPRMB    R            147REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A            WCASSB    R            164REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A            XXTVAL    R            181REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A                                      SPACEA(1)
+      *** END CHG ***** 06/21/10 ***************************************
+     A*---
+     A          R EMPTOTALS
+     A                                    58'Employer totals:'
+     A            EEWRPR        11  2     77
+     A                                      EDTCDE(J $)
+     A            EESURB        11  2     94
+     A                                      EDTCDE(J $)
+     A            EECLPR        11  2    111
+     A                                      EDTCDE(J $)
+     A            EESURP        11  2    128
+     A                                      EDTCDE(J $)
+     A            EEPRMB    R            145REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A            EEASSB    R            162REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A            EETVAL    R            179REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A                                      SPACEA(1)
+     A*---
+     A          R GRPTOTALS
+      *** BEG CHG ***** 06/21/10 ***********************************************
+      ***********
+     A***********                         58'Group totals   :'
+     A*********** GGWRPR        11  2     77
+     A***********                           EDTCDE(J $)
+     A*********** GGSURB        11  2     94
+     A***********                           EDTCDE(J $)
+     A*********** GGCLPR        11  2    111
+     A***********                           EDTCDE(J $)
+     A*********** GGSURP        11  2    128
+     A***********                           EDTCDE(J $)
+     A*********** GGPRMB    R            145REFFLD(PWC01/WCBAL WFWCP)
+     A***********                           DLTEDT
+     A***********                           EDTCDE(J $)
+     A*********** GGASSB    R            162REFFLD(PWC01/WCBAL WFWCP)
+     A***********                           DLTEDT
+     A***********                           EDTCDE(J $)
+     A*********** GGTVAL    R            179REFFLD(PWC01/WCBAL WFWCP)
+     A***********                           DLTEDT
+     A***********                           EDTCDE(J $)
+     A***********                           SPACEA(1)
+     A                                    61'Group totals   :'
+     A            GGWRPR        11  2     79
+     A                                      EDTCDE(J $)
+     A            GGSURB        11  2     96
+     A                                      EDTCDE(J $)
+     A            GGCLPR        11  2    113
+     A                                      EDTCDE(J $)
+     A            GGSURP        11  2    130
+     A                                      EDTCDE(J $)
+     A            GGPRMB    R            147REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A            GGASSB    R            164REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A            GGTVAL    R            181REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A                                      SPACEA(1)
+      *** END CHG ***** 06/21/10 ***********************************************
+     A*---
+     A          R TOTHEADER
+     A                                    80'Written Prem'
+     A                                    98'Assessments'
+     A                                   114'Paid Premium'
+     A                                   128'Paid Assessment'
+     A                                   149'Premium Bal'
+     A                                   167'Assess Bal'
+     A                                   185'Total Bal'
+     A*---
+     A            LINE2        120A       78
+     A                                      SPACEA(1)
+     A*---
+     A          R TOTDETAIL
+     A                                    58'Report totals  :'
+     A            TTWRPR        11  2     77
+     A                                      EDTCDE(J $)
+     A            TTSURB        11  2     94
+     A                                      EDTCDE(J $)
+     A            TTCLPR        11  2    111
+     A                                      EDTCDE(J $)
+     A            TTSURP        11  2    128
+     A                                      EDTCDE(J $)
+     A            TTPRMB    R            145REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A            TTASSB    R            162REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A            TTTVAL    R            179REFFLD(PWC01/WCBAL WFWCP)
+     A                                      DLTEDT
+     A                                      EDTCDE(J $)
+     A                                      SPACEA(1)
+     A*---

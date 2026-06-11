@@ -1,0 +1,410 @@
+     A                                      REF(*LIBL/WREFP)
+     A                                      INDARA
+     A          R RCDPANEL
+     A                                  1  2HTML('QPUIREC2    ROVERLAY   0     -
+     A                                      RASSUME    0     ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"rcdPanel","description":"Base P-
+     A                                      anel for Financial Earned Premium R-
+     A                                      eport","overlay":"true","assume":"t-
+     A                                      rue"},"items":[{"id":"HeadingFEPrmR-
+     A                                      pt","field type":"output field","cs-
+     A                                      s class":"heading","description":"F-
+     A                                      inancial Earned Premium Report","va-
+     A                                      lue":"Financial Earned Premium Repo-
+     A                                      rt","left":"250px","top":"10px","wi-
+     A                                      dth":"345px","heading type":"Page T-
+     A                                      itle"},{"id":"btnRefresh","field ty-
+     A                                      pe":"button","css class":"button","-
+     A                                      value":"Refresh","response":{"field-
+     A                                      Name":"BtnRefresh","customTrue":"",-
+     A                                      "customFalse":"","dataType":"indica-
+     A                                      tor","formatting":"Indicator","indF-
+     A                                      ormat":"1 / 0"},"left":"1085px","to-
+     A                                      p":"35px","width":"100px","visibili-
+     A                                      ty":"hidden"},{"id":"TabFEPrmRpt","-
+     A                                      field type":"tab panel","css class"-
+     A                                      :"tab-panel","left":"250px","top":"-
+     A                                      70px","width":"970px","height":{"fi-
+     A                                      eldName":"pnlHeight","dataLength":"-
+     A                                      5","decPos":"0","numSep":"false","z-
+     A                                      eroBalance":"false","numBlankFill":-
+     A                                      "false","zeroFill":"false","noExtra-
+     A                                      Spaces":"false","curSym":"","dataTy-
+     A                                      pe":"zoned","formatting":"Number","-
+     A                                      negNum":"-999.00","units":"px","des-
+     A                                      ignValue":""},"tab names":"Financia-
+     A                                      l Earned Premium Report","z index":-
+     A                                      "8","tab panel style":"CompSuite Ta-
+     A                                      b Panel","active tab":{"fieldName":-
+     A                                      "tabIndex","dataLength":"5","decPos-
+     A                                      ":"0","numSep":"false","zeroBalance-
+     A                                      ":"false","numBlankFill":"false","z-
+     A                                      eroFill":"false","curSym":"","dataT-
+     A                                      ype":"zoned","formatting":"Number",-
+     A                                      "negNum":"-999.00","units":""},"ont-
+     A                                      abclick":"pui.click(\"BtnTabClick\"-
+     A                                      );"},{"id":"btnSave","field type":"-
+     A                                      button","css class":"button","value-
+     A                                      ":"Save","response":{"fieldName":"B-
+     A                                      tnSave","customTrue":"","customFals-
+     A                                      e":"","dataType":"indicator","forma-
+     A                                      tting":"Indicator","indFormat":"1 /-
+     A                                       0"},"left":"980px","top":"35px","w-
+     A                                      idth":"100px","visibility":"hidden"-
+     A                                      }]}')
+     A            BTNREFRESH     1A  H
+     A            BTNSAVE        1A  H
+     A            PNLHEIGHT      5S 0H
+     A            TABINDEX       5S 0H
+     A          R SFLFEPSUM                 SFL
+     A            QPUI000001     1A  O  2  2
+     A            SCFEPAMT       9S 2H
+     A            SCMMYYYY       6S 0H
+     A          R QSFLCTL001                SFLCTL(SFLFEPSUM)
+     A                                      SFLSIZ(0001)
+     A                                      SFLPAG(0001)
+     A                                      SFLDSP
+     A                                  1  2HTML('QPUISFLRCDFEPRPT')
+     A          R RCDFEPRPT
+     A                                  1  2HTML('QPUICTL1    SFLFEPSUM 6    RS-
+     A                                      FLDSP    0    FSCSFLDSP  RSFLDSPCTL-
+     A                                       0    FSCSFLDSP  RSFLINZ    0    FS-
+     A                                      CSFLINZ  RSFLCLR    0    FSCSFLCLR -
+     A                                       RSFLPAG    1    C1    6 RSFLSIZ   -
+     A                                       1    C4    9999 0    6    ROVERLAY-
+     A                                         0     RASSUME    0     RROWS    -
+     A                                        2    C1    1C1    1 REMSGID    5 -
+     A                                         C11   TxbPopGroupFMSFND     C6  -
+     A                                        WMESGGC5    *LIBLC0    FERFND    -
+     A                                       REMSGID    5    C13   DrpPolicyYea-
+     A                                      rFMSYEAR    C6    WMESGGC5    *LIBL-
+     A                                      C0    FERYEAR    REMSGID    5    C1-
+     A                                      2   TxbMonthYearFMSDATE    C6    WM-
+     A                                      ESGGC5    *LIBLC0    FERDATE    ')
+     A                                  1  2HTML('{"screen":{"record format nam-
+     A                                      e":"rcdFEPRpt","overlay":"true","ex-
+     A                                      ternal css":"label","description":"-
+     A                                      Financial Earned Premium Report","a-
+     A                                      ssume":"true","overlay range":"1-1"-
+     A                                      ,"design overlay formats":"rcdPanel-
+     A                                      ","header text align":"Left,Right",-
+     A                                      "csv file name":"Payment Value 1 Co-
+     A                                      des","selection value":"A","onload"-
+     A                                      :"debugger;\nvar co = get(\"TxbSCCO-
+     A                                      #\");\n\n// Code for group and Year-
+     A                                      \nvar group = get(\"TxbPopGroup\");-
+     A                                      \nvar groupid = group.substr(0,3);\-
+     A                                      n\napplyProperty(\"DrpPolicyYear\",-
+     A                                      \"choices selection criteria\",\"F1-
+     A                                      CO# = \" + co + \" and F1FND = \" +-
+     A                                       groupid + \" and F1STAT <> ''I''\"-
+     A                                      );\napplyProperty(\"DrpPolicyYear\"-
+     A                                      , \"field type\", \"select box\");\-
+     A                                      napplyProperty(\"DrpPolicyYear\",\"-
+     A                                      disabled\",\"false\");\nchangeEleme-
+     A                                      ntValue(\"DrpPolicyYear\", '''');\n-
+     A                                      \nif (get(\"TxbPopGroup\") === ''''-
+     A                                      ) {\n  applyProperty(\"DrpPolicyYea-
+     A                                      r\",\"disabled\",\"true\");\n}\n\n"-
+     A                                      },"items":[{"id":"FldSetCon1","fiel-
+     A                                      d type":"field set panel","css clas-
+     A                                      s":"fieldset","left":"255px","top":-
+     A                                      "95px","width":"950px","height":"55-
+     A                                      0px","z index":"8","visibility":{"f-
+     A                                      ieldName":"indCont1","dataType":"in-
+     A                                      dicator","formatting":"Indicator","-
+     A                                      indFormat":"visible / hidden"},"loc-
+     A                                      ked in place":"true"},{"id":"LblPop-
+     A                                      Group","field type":"output field",-
+     A                                      "css class":"label","description":"-
+     A                                      Group Label","value":"Group ","left-
+     A                                      ":"265px","top":"115px","width":"50-
+     A                                      px"},{"id":"ImgPopGroup","field typ-
+     A                                      e":"image","css class":"image","ima-
+     A                                      ge source":"/profoundui/userdata/im-
+     A                                      ages/asterisk_orange_small.png","le-
+     A                                      ft":"305px","top":"115px","height":-
+     A                                      "8px","width":"8px"},{"id":"LblPoli-
+     A                                      cyYear","field type":"output field"-
+     A                                      ,"css class":"label","description":-
+     A                                      "Group year Label","value":"Group Y-
+     A                                      ear ","left":"645px","top":"115px",-
+     A                                      "width":"80px"},{"id":"ImgPolicyYea-
+     A                                      r","field type":"image","css class"-
+     A                                      :"image","image source":"/profoundu-
+     A                                      i/userdata/images/asterisk_orange_s-
+     A                                      mall.png","left":"715px","top":"115-
+     A                                      px","height":"8px","width":"8px"},{-
+     A                                      "id":"LblMonthYear","field type":"o-
+     A                                      utput field","css class":"label","v-
+     A                                      alue":"Run Report for Month/Year ",-
+     A                                      "left":"750px","top":"115px","width-
+     A                                      ":"165px","heading type":"Subsectio-
+     A                                      n Header"},{"id":"ImgMonthYear","fi-
+     A                                      eld type":"image","css class":"imag-
+     A                                      e","image source":"/profoundui/user-
+     A                                      data/images/asterisk_orange_small.p-
+     A                                      ng","left":"910px","top":"115px","h-
+     A                                      eight":"8px","width":"8px","css cla-
+     A                                      ss 2":"required-icon","visibility":-
+     A                                      "visible"},{"id":"TxbSCCO#","field -
+     A                                      type":"textbox","css class":"input"-
+     A                                      ,"description":"SCCO# box","value":-
+     A                                      {"fieldName":"scCo#","refField":"el-
+     A                                      co# wdelp","numSep":"false","zeroBa-
+     A                                      lance":"false","numBl')
+     A                                  1  2HTML('ankFill":"false","zeroFill":"-
+     A                                      false","noExtraSpaces":"false","cur-
+     A                                      Sym":"","dataType":"reference","for-
+     A                                      matting":"Number","negNum":"-999.00-
+     A                                      ","units":"","designValue":"[scCo#]-
+     A                                      "},"left":"1050px","top":"125px","w-
+     A                                      idth":"70px","css class 2":"textbox-
+     A                                      ","visibility":"hidden"},{"id":"Txb-
+     A                                      PopGroup","field type":"textbox","c-
+     A                                      ss class":"input","description":"Gr-
+     A                                      oup Selection Drop Down box","value-
+     A                                      ":{"fieldName":"scFnd","refField":"-
+     A                                      elfnd wdelp","numSep":"false","zero-
+     A                                      Balance":"false","numBlankFill":"fa-
+     A                                      lse","zeroFill":"true","curSym":"",-
+     A                                      "dataType":"reference","formatting"-
+     A                                      :"Number","negNum":"-999.00","units-
+     A                                      ":"","designValue":"[scFnd]"},"erro-
+     A                                      r messages":"1 message","error mess-
+     A                                      age id":{"fieldName":"msFnd","dataL-
+     A                                      ength":"10","trimLeading":"false","-
+     A                                      trimTrailing":"true","blankFill":"f-
+     A                                      alse","rjZeroFill":"false","dataTyp-
+     A                                      e":"char","formatting":"Text","text-
+     A                                      Transform":"none"},"error message f-
+     A                                      ile":"WMESGG","error message librar-
+     A                                      y":"*LIBL","error condition":{"fiel-
+     A                                      dName":"erFnd","customTrue":"","cus-
+     A                                      tomFalse":"","dataType":"indicator"-
+     A                                      ,"formatting":"Indicator","indForma-
+     A                                      t":"1 / 0"},"error enhanced mode":"-
+     A                                      1","choices database file":"WMFNP",-
+     A                                      "choice options field":"FNFND|| ''--
+     A                                      '' ||TRIM(FNNAME)","choice values f-
+     A                                      ield":"FNFND","choices selection cr-
+     A                                      iteria":"FNSTAT <> ''I''","contains-
+     A                                       match":"true","left":"265px","top"-
+     A                                      :"130px","width":"350px","css class-
+     A                                       2":"textbox","onchange":"debugger;-
+     A                                      \nvar co = get(\"TxbSCCO#\");\n\n//-
+     A                                       Code for group and Year\nvar group-
+     A                                       = get(\"TxbPopGroup\");\nvar n1 = -
+     A                                      group.search(\"-\");\nvar groupid =-
+     A                                       group.substr(0,n1);\n\napplyProper-
+     A                                      ty(\"DrpPolicyYear\",\"choices sele-
+     A                                      ction criteria\",\"F1CO# = \" + co -
+     A                                      + \" and F1FND = \" + groupid + \" -
+     A                                      and F1STAT <> ''I''\");\napplyPrope-
+     A                                      rty(\"DrpPolicyYear\", \"field type-
+     A                                      \", \"select box\");\napplyProperty-
+     A                                      (\"DrpPolicyYear\",\"disabled\",\"f-
+     A                                      alse\");\nchangeElementValue(\"DrpP-
+     A                                      olicyYear\", '''');\n\nif (get(\"Tx-
+     A                                      bPopGroup\") === '''') {\n  applyPr-
+     A                                      operty(\"DrpPolicyYear\",\"disabled-
+     A                                      \",\"true\");\n}\n\n\n// Load Blank-
+     A                                       subfile when group is changes\nwin-
+     A                                      dow.loadDetail = function() {\n   v-
+     A                                      ar gridFEPSum = getObj(\"sflFEPSum\-
+     A                                      ");\n\t//var Group = gridMaster.gri-
+     A                                      d.getDataValue(inRow, \"scFnd\");\n-
+     A                                        debugger;\n  var sql = \" \";\n  -
+     A                                      gridFEPSum.grid.setProperty(\"custo-
+     A                                      m sql\", sql);\n  gridFEPSum.grid.r-
+     A                                      ender();\n\tgridFEPSum.grid.refresh-
+     A                                      ();\n\t\n};\n\nloadDetail();\n\n\n"-
+     A                                      },{"id":"DrpPolicyYear","field type-
+     A                                      ":"select box","css class":"input",-
+     A                                      "description":"Policy Year","value"-
+     A                                      :{"fieldName":"scYear","dataLength"-
+     A                                      :"3","decPos":"0","numSep":"false",-
+     A                                      "zeroBalance":"true",')
+     A                                  1  2HTML('"numBlankFill":"false","zeroF-
+     A                                      ill":"false","noExtraSpaces":"false-
+     A                                      ","curSym":"","dataType":"zoned","f-
+     A                                      ormatting":"Number","negNum":"999.0-
+     A                                      0","units":"","designValue":"[scYea-
+     A                                      r]"},"error messages":"1 message","-
+     A                                      error message id":{"fieldName":"msY-
+     A                                      ear","dataLength":"10","trimLeading-
+     A                                      ":"false","trimTrailing":"true","bl-
+     A                                      ankFill":"false","rjZeroFill":"fals-
+     A                                      e","dataType":"char","formatting":"-
+     A                                      Text","textTransform":"none"},"erro-
+     A                                      r message file":"WMESGG","error mes-
+     A                                      sage library":"*LIBL","error condit-
+     A                                      ion":{"fieldName":"erYear","customT-
+     A                                      rue":"","customFalse":"","dataType"-
+     A                                      :"indicator","formatting":"Indicato-
+     A                                      r","indFormat":"1 / 0"},"error enha-
+     A                                      nced mode":"1","choices database fi-
+     A                                      le":"WDF1P","choice options field":-
+     A                                      "F1FYR ","choice values field":"F1F-
+     A                                      YR","left":"645px","top":"130px","w-
+     A                                      idth":"50px","css class 2":"dropdow-
+     A                                      n","onchange":"//pui.click(\"BtnRow-
+     A                                      Click\");\npui.click();","order by"-
+     A                                      :"F1FYR DESC"},{"id":"TxbMonthYear"-
+     A                                      ,"field type":"textbox","css class"-
+     A                                      :"input","value":{"fieldName":"scDa-
+     A                                      te","dataLength":"6","decPos":"0","-
+     A                                      numSep":"false","zeroBalance":"fals-
+     A                                      e","numBlankFill":"false","zeroFill-
+     A                                      ":"true","noExtraSpaces":"false","e-
+     A                                      dtWrd":"''  /    ''","curSym":"","d-
+     A                                      ataType":"zoned","formatting":"Numb-
+     A                                      er","negNum":"999.00","units":"","d-
+     A                                      esignValue":"[scDate]"},"text align-
+     A                                      ":"left","required":"false","error -
+     A                                      messages":"1 message","left":"750px-
+     A                                      ","top":"130px","width":"50px","loc-
+     A                                      ked in place":"false","css class 2"-
+     A                                      :"textbox","error message id":{"fie-
+     A                                      ldName":"msDate","dataLength":"10",-
+     A                                      "trimLeading":"false","trimTrailing-
+     A                                      ":"true","blankFill":"false","rjZer-
+     A                                      oFill":"false","dataType":"char","f-
+     A                                      ormatting":"Text","textTransform":"-
+     A                                      none"},"error message file":"WMESGG-
+     A                                      ","error message library":"*LIBL","-
+     A                                      error condition":{"fieldName":"erDa-
+     A                                      te","customTrue":"","customFalse":"-
+     A                                      ","dataType":"indicator","formattin-
+     A                                      g":"Indicator","indFormat":"1 / 0"}-
+     A                                      ,"error enhanced mode":"1"},{"id":"-
+     A                                      HdgFEPRptSummary","field type":"out-
+     A                                      put field","css class":"heading","v-
+     A                                      alue":"Financial Earned Premium Sum-
+     A                                      mary","left":"265px","top":"165px",-
+     A                                      "height":"17px","width":"245px","he-
+     A                                      ading type":"Section Header"},{"id"-
+     A                                      :"sflFEPSum","field type":"grid","c-
+     A                                      ss class":"subfilegrid","left":"265-
+     A                                      px","top":"200px","number of rows":-
+     A                                      "7","number of columns":"3","column-
+     A                                       widths":"90,145,20","column headin-
+     A                                      gs":"Month/Year,Earned Premium Amou-
+     A                                      nt","header height":"21","row heigh-
+     A                                      t":"20","csv export":"true","export-
+     A                                       with headings":"true","sortable co-
+     A                                      lumns":"true","find option":"true",-
+     A                                      "filter option":"true","persist sta-
+     A                                      te":"true","resizable columns":"tru-
+     A                                      e","movable columns":')
+     A                                  1  2HTML('"true","height":"141px","widt-
+     A                                      h":"256px","record format name":"sf-
+     A                                      lFEPSum","description":"Summary Rec-
+     A                                      ords for Financial Earned Premium",-
+     A                                      "display subfile":{"fieldName":"scS-
+     A                                      flDsp","customTrue":"","customFalse-
+     A                                      ":"","dataType":"indicator","format-
+     A                                      ting":"Indicator","indFormat":"true-
+     A                                       / false"},"display control record"-
+     A                                      :{"fieldName":"scSflDsp","customTru-
+     A                                      e":"","customFalse":"","dataType":"-
+     A                                      indicator","formatting":"Indicator"-
+     A                                      ,"indFormat":"true / false"},"text -
+     A                                      align":"center","header text align"-
+     A                                      :"right,right","export file name":"-
+     A                                      Financial Earned Premium Summary","-
+     A                                      clear subfile":{"fieldName":"scSflC-
+     A                                      lr","customTrue":"","customFalse":"-
+     A                                      ","dataType":"indicator","formattin-
+     A                                      g":"Indicator","indFormat":"true / -
+     A                                      false"},"subfile size":"9999","subf-
+     A                                      ile record number":{"fieldName":"sc-
+     A                                      SflRRN","dataLength":"5","decPos":"-
+     A                                      0","numSep":"false","zeroBalance":"-
+     A                                      false","numBlankFill":"false","zero-
+     A                                      Fill":"false","noExtraSpaces":"fals-
+     A                                      e","curSym":"","dataType":"zoned","-
+     A                                      formatting":"Number","negNum":"-999-
+     A                                      .00","units":""},"initialize subfil-
+     A                                      e":{"fieldName":"scSflinz","customT-
+     A                                      rue":"","customFalse":"","dataType"-
+     A                                      :"indicator","formatting":"Indicato-
+     A                                      r","indFormat":"true / false"},"pos-
+     A                                      ition at top":"true","cursor record-
+     A                                       number":{"fieldName":"scSflRRN","d-
+     A                                      ataLength":"5","decPos":"0","numSep-
+     A                                      ":"false","zeroBalance":"false","nu-
+     A                                      mBlankFill":"false","zeroFill":"fal-
+     A                                      se","noExtraSpaces":"false","curSym-
+     A                                      ":"","dataType":"zoned","formatting-
+     A                                      ":"Number","negNum":"-999.00","unit-
+     A                                      s":""},"row selection":"single","se-
+     A                                      lection value":"1"},{"id":"BtnCance-
+     A                                      l","field type":"button","css class-
+     A                                      ":"button","value":"Cancel","left":-
+     A                                      "735px","top":"370px","width":"90px-
+     A                                      ","height":"25px","description":"Ca-
+     A                                      ncel","response":{"fieldName":"BtnC-
+     A                                      ancel","customTrue":"","customFalse-
+     A                                      ":"","dataType":"indicator","format-
+     A                                      ting":"Indicator","indFormat":"1 / -
+     A                                      0"},"shortcut key":"Escape","cursor-
+     A                                      ":"default"},{"id":"BtnSubmit","fie-
+     A                                      ld type":"button","css class":"butt-
+     A                                      on","description":"Submit","value":-
+     A                                      "Submit","response":{"fieldName":"B-
+     A                                      tnSubmit","customTrue":"","customFa-
+     A                                      lse":"","dataType":"indicator","for-
+     A                                      matting":"Indicator","indFormat":"1-
+     A                                       / 0"},"shortcut key":"Enter","left-
+     A                                      ":"835px","top":"370px","height":"2-
+     A                                      5px","width":"90px"},{"id":"LblMMYY-
+     A                                      YY","field type":"output field","cs-
+     A                                      s class":"label","value":"(MM/YYYY)-
+     A                                      ","left":"750px","top":"150px","wid-
+     A                                      th":"70px","css class 2":"sublabel"-
+     A                                      },{"id":"OutMMYYYY","field type":"o-
+     A                                      utput field","css class":"output-fi-
+     A                                      eld","value":{"fieldName":"scMMYYYY-
+     A                                      ","dataLength":"6","decPos":"0","nu-
+     A                                      mSep":"false","zeroBalance":"false"-
+     A                                      ,"numBlankFill":"fals')
+     A                                  1  2HTML('e","zeroFill":"false","noExtr-
+     A                                      aSpaces":"false","edtWrd":"''  /   -
+     A                                       ''","curSym":"","dataType":"zoned"-
+     A                                      ,"formatting":"Number","negNum":"-9-
+     A                                      99.00","units":"","designValue":"[s-
+     A                                      cMMYYYY]"},"text align":"right","le-
+     A                                      ft":"5px","top":"5px","width":"80px-
+     A                                      ","grid":"sflFEPSum","column":"0"},-
+     A                                      {"id":"OutFEPAmt","field type":"out-
+     A                                      put field","css class":"output-fiel-
+     A                                      d","value":{"fieldName":"scFEPAmt",-
+     A                                      "dataLength":"9","decPos":"2","numS-
+     A                                      ep":"true","zeroBalance":"false","n-
+     A                                      umBlankFill":"false","zeroFill":"fa-
+     A                                      lse","noExtraSpaces":"false","curSy-
+     A                                      m":"","dataType":"zoned","formattin-
+     A                                      g":"Number","negNum":"-999.00","uni-
+     A                                      ts":"","designValue":"[scFEPAmt]"},-
+     A                                      "text align":"right","left":"20px",-
+     A                                      "top":"5px","width":"120px","grid":-
+     A                                      "sflFEPSum","column":"1"}]}')
+     A            BTNCANCEL      1A  H
+     A            BTNSUBMIT      1A  H
+     A            ERDATE         1A  H
+     A            ERFND          1A  H
+     A            ERYEAR         1A  H
+     A            INDCONT1       1A  H
+     A            MSDATE        10A  H
+     A            MSFND         10A  H
+     A            MSYEAR        10A  H
+     A            SCDATE         6S 0H
+     A            SCSFLCLR       1A  H
+     A            SCSFLDSP       1A  H
+     A            SCSFLINZ       1A  H
+     A            SCSFLRRN       5S 0H
+     A            SCYEAR         3S 0H
+     A            SCCO#     R        H      REFFLD(ELCO# WDELP)
+     A            SCFND     R        H      REFFLD(ELFND WDELP)

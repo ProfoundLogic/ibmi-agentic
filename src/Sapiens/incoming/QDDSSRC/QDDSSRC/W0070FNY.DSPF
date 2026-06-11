@@ -1,0 +1,437 @@
+     A*%%TS  SD  20060531  101323  WINNERW     REL-V5R2M0  5722-WDS
+    A*********************************************************************
+    A*  (C) Copyright Fiserv Insurance Solutions, Inc., 2005
+    A*********************************************************************
+    A*/TITLE  LOUISIANA STATE SPECIFIC INFORMATION ENTRY PROGRAM
+    A*********************************************************************
+    A*  DESCRIPTION:                                                     *
+    A*                                                                   *
+    A*  CREATED: 07/08/05      C:132     PROJECT: 133WBQ                 *
+    A*********************************************************************
+    A*  REVSIONS:                                                        *
+    A*                                                                   *
+    A*********************************************************************
+     A*
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/WREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A*
+     A          R SCR01
+     A*%%TS  SD  20060531  101118  WINNERW     REL-V5R2M0  5722-WDS
+     A                                      KEEP
+     A                                      ASSUME
+     A                                      SETOF(70)
+     A                                      SETOF(71)
+     A                                      SETOF(72)
+     A                                      SETOF(73)
+     A                                      SETOF(74)
+     A                                      SETOF(75)
+     A                                      SETOF(76)
+     A                                      SETOF(77)
+     A                                      SETOF(78)
+     A                                      SETOF(79)
+     A                                      SETOF(80)
+     A                                      SETOF(81)
+     A                                      SETOF(82)
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR01'
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A                                  4  2'Group:'
+     A            SCFND     R        O  4  9REFFLD(FND)
+     A                                      EDTCDE(4)
+     A            SCFNAM    R        O  4 13REFFLD(NM20)
+     A                                      TEXT('FUND NAME')
+     A                                  4 34'SS#:'
+     A            SCSS#         11A  O  4 39
+     A            SCCNAM    R        O  4 51REFFLD(NM20)
+     A                                  5  2'Emp# :'
+     A            SCEDN         70A  O  5  9TEXT('Emp#, DIV, & NAME')
+     A                                  6  2'Case#:'
+     A            SCYRCS        11A  O  6  9TEXT('FYR-CASE')
+     A                                  6 22'NY UI#:'
+     A            SCSCL#    R        O  6 30REFFLD(DS20)
+     A                                      TEXT('STATE CLAIM #')
+     A                                  6 54'DOI:'
+     A            SCACDT    R        O  6 59REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A            SCATME         6Y 0O  6 72EDTWRD('  :  :  ')
+     A*
+     A                                  7  2'Employee info:'
+     A                                      COLOR(BLU)
+     A                                  8  4'Hour Employee began working . :'
+     A            SCTIM2         6Y 0B  8 36EDTWRD('  :  :  ')
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  70                                  ERRMSGID(WCR0542 *LIBL/WMESGG)
+     A                                      CHECK(RB)
+     A                                  8 47'Tot earn (52 wks):'
+     A            SC5N1     R        B  8 66REFFLD(A50)
+     A  71                                  ERRMSGID(WCR0502 *LIBL/WMESGG)
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A*
+     A                                  9  4'Injured emp work week . . . . :'
+     A                                  9 36'Mon'
+     A            SCMON          1A  B  9 40
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  83                                  ERRMSG('Valid values are "X" and bl-
+     A                                      ank.')
+     A                                  9 43'Tues'
+     A            SCTUE          1A  B  9 48
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  84                                  ERRMSG('Valid values are "X" and bl-
+     A                                      ank.')
+     A                                  9 51'Wed'
+     A            SCWED          1A  B  9 55
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  85                                  ERRMSG('Valid values are "X" and bl-
+     A                                      ank.')
+     A                                  9 58'Thurs'
+     A            SCTHU          1A  B  9 64
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  86                                  ERRMSG('Valid values are "X" and bl-
+     A                                      ank.')
+     A                                 10 36'Fri'
+     A            SCFRI          1A  B 10 40
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  87                                  ERRMSG('Valid values are "X" and bl-
+     A                                      ank.')
+     A                                 10 43'Sat'
+     A            SCSAT          1A  B 10 48
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  88                                  ERRMSG('Valid values are "X" and bl-
+     A                                      ank.')
+     A                                 10 51'Sun'
+     A            SCSUN          1A  B 10 55
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  89                                  ERRMSG('Valid values are "X" and bl-
+     A                                      ank.')
+     A                                 10 58'X or blank'
+     A                                      COLOR(BLU)
+     A                                 11  4'Accident County . . . . . . . :'
+     A            SC30A3        30A  B 11 36
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A                                 12  4'Department where employed . . :'
+     A            SC40A4        40A  B 12 36
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A*
+     A                                 13  2'Injury or illness info:'
+     A                                      COLOR(BLU)
+     A                                 14  4'Employer provide medical (Y/N):'
+     A            SC1A1     R        B 14 36REFFLD(FLAG)
+     A  75                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A  76                                  ERRMSGID(WCR0501 *LIBL/WMESGG)
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                 14 38'Medical care provided date:'
+     A            SCDT1     R        B 14 66REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A  77                                  ERRMSGID(WCR0500 *LIBL/WMESGG)
+     A  78                                  ERRMSG('Date Required if Medical Ca-
+     A                                      re = Y')
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                 15  4'Employee treated in ER . (Y/N):'
+     A            SC1A2          1A  B 15 36
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  79                                  ERRMSGID(WCR0501 *LIBL/WMESGG)
+     A                                 15 38'Employee in hospital overnight(Y/N-
+     A                                      ):'
+     A            SC1A3          1A  B 15 75
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  80                                  ERRMSGID(WCR0501 *LIBL/WMESGG)
+     A                                 16  4'What was employee doing when injur-
+     A                                      ed:'
+     A            SC60A5        60A  B 17  6
+     A                                      DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A  81                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A            SC60A6        60A  B 18  6
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A                                 19  4'How did the accident or exposure o-
+     A                                      ccur?:'
+     A            SC60A3        60A  B 20  6
+     A                                      DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A  82                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A            SC60A4        60A  B 21  6
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A*
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A*
+     A*
+     A          R SCR02
+     A*%%TS  SD  20060531  101323  WINNERW     REL-V5R2M0  5722-WDS
+     A                                      SETOF(70)
+     A                                      SETOF(71)
+     A                                      SETOF(72)
+     A                                      SETOF(73)
+     A                                      SETOF(74)
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR02'
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A                                  4  2'Group:'
+     A            SCFND     R        O  4  9REFFLD(FND)
+     A                                      EDTCDE(4)
+     A            SCFNAM    R        O  4 13REFFLD(NM20)
+     A                                      TEXT('FUND NAME')
+     A                                  4 34'SS#:'
+     A            SCSS#         11A  O  4 39
+     A            SCCNAM    R        O  4 51REFFLD(NM20)
+     A                                  5  2'Emp# :'
+     A            SCEDN         70A  O  5  9TEXT('Emp#, DIV, & NAME')
+     A                                  6  2'Case#:'
+     A            SCYRCS        11A  O  6  9TEXT('FYR-CASE')
+     A                                  6 22'NY UI#:'
+     A            SCSCL#    R   20   O  6 30REFFLD(DS20)
+     A                                      TEXT('STATE CLAIM #')
+     A                                  6 54'DOI:'
+     A            SCACDT    R        O  6 59REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      COLOR(BLU)
+     A*
+     A                                  8  2'Injury or illness info (continued)-
+     A                                      :'
+     A                                      COLOR(BLU)
+     A                                  9  4'Object or substance that directly -
+     A                                      injured employee:'
+     A            SC60A1        60A  B 10  6
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A  70                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A            SC60A2        60A  B 11  6
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A                                 13  4'Name and address of nearest relati-
+     A                                      ve:'
+     A                                 13 50'Relationship:'
+     A            SC80A5A       40A  B 14  6
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A            SC20A3        20A  B 14 50
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A  71                                  ERRMSG('Required if Nearest Relativ-
+     A                                      e is Entered')
+     A            SC80A5B       40A  B 15  6
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A            SC80A6A       40A  B 16  6
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A            SCRCTY        25A  B 17  6
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A            SCRST          2A  B 17 32
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A            SCRZP1         5Y 0B 17 35
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 17 41'-'
+     A            SCRZP2         4Y 0B 17 43
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 19  4'Preparer name:'
+     A            SCPRNM        20A  B 19 19
+     A  72                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                      DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A                                 19 41'Title:'
+     A            SCPRTI        19A  B 19 48
+     A  73                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                      DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A                                 20  4'Phone# . . . :'
+     A            SCPRPH        10Y 0B 20 19DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  74                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                      EDTWRD('   -   -    ')
+     A                                      EDTMSK('   &   &    ')
+     A*
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A*
+     A*
+     A          R SCR03
+     A*%%TS  SD  20060531  100059  WINNERW     REL-V5R2M0  5722-WDS
+     A                                      SETOF(70)
+     A                                      SETOF(71)
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR03'
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A                                  4  2'Group:'
+     A            SCFND     R        O  4  9REFFLD(FND)
+     A                                      EDTCDE(4)
+     A            SCFNAM    R        O  4 13REFFLD(NM20)
+     A                                      TEXT('FUND NAME')
+     A                                  4 34'SS#:'
+     A            SCSS#         11A  O  4 39
+     A            SCCNAM    R        O  4 51REFFLD(NM20)
+     A                                  5  2'Emp# :'
+     A            SCEDN         70A  O  5  9TEXT('Emp#, DIV, & NAME')
+     A                                  6  2'Case#:'
+     A            SCYRCS        11A  O  6  9TEXT('FYR-CASE')
+     A                                  6 22'NY UI#:'
+     A            SCSCL#    R   20   O  6 30REFFLD(DS20)
+     A                                      TEXT('STATE CLAIM #')
+     A                                  6 54'DOI:'
+     A            SCACDT    R        O  6 59REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      COLOR(BLU)
+     A*
+     A                                  8  2'Injury or illness info (continued)-
+     A                                      :'
+     A                                      COLOR(BLU)
+     A                                 10  4'Third Party information:'
+     A                                 12  6'Company name and address:'
+     A            SC80A7A       40A  B 13  8
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A            SC80A7B       40A  B 14  8
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A            SC80A8A       40A  B 15  8
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A            SCTCTY        25A  B 16  8
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A            SCTST          2A  B 16 34
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A            SCTZP1         5Y 0B 16 37
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 16 43'-'
+     A            SCTZP2         4Y 0B 16 45
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                 18  6'Contact name:'
+     A            SC40A5        40A  B 19  8
+     A  70                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(LC)
+     A                                 21  6'Phone#:'
+     A*
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A            SC30A5        30A  B 21 14
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  71                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A                                      CHECK(LC)

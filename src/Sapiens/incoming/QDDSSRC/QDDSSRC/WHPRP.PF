@@ -1,0 +1,205 @@
+      * (c) 2009 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A****************************************************************
+     A* WC WAREHOUSE DIVISION PREMIUM INFORMATION FILE
+     A****************************************************************
+     A*  CREATED: 03.10.00   C:58     PROJECT: WC924
+     A****************************************************************
+     A* REVISIONS:                                                   *
+      *
+      * 08/12/09  C:33  Project: CI077
+      *                 Expand name.
+     A*                                                              *
+     A* 03/25/08  C:61  PROJECT CI041                                *
+     A*                - Add "Division Status" and "Division Cancel  *
+     A*                  Effective Date" fields.                     *
+      *
+      * 01/23/08  C:61  support CI132 61860
+      *                 add fields to store mailing address.
+     A*                                                              *
+     A* 03/11/05  C:132 PROJECT WC1202                               *
+     A*                - REVERSE Expand Employer Name field to 100   *
+     A*                                                              *
+     A* 03/10/05  C:132 PROJECT WC1202                               *
+     A*                - Expand Employer Name field to 100 positions *
+     A*                                                              *
+     A* 11/23/04  C:062 PROJECT 91DLL                                *
+     A*                - Schedule DB/CR Factor                       *
+     A*                - Schedule DB/CR Effective Date               *
+     A*                - Schedule DB/CR Expiration Date              *
+     A*                - Calculated Stock Discount %                 *
+     A*                                                              *
+     A* 05/30/02  C:132 PROJECT WC924                                *
+     A*                - Add Pay Plan Type Code                      *
+     A*                - Add Pay Plan Type Description               *
+     A*                - Add Rating Tier Code                        *
+     A*                - Add Rating Tier Description                 *
+     A*                                                              *
+     A* 02/06/01  C:61  PROJECT WC924                                *
+     A*                - Change FEIN from 10 to 11                   *
+     A*                                                              *
+     A*   C:58 5.15.00  ADD field: PRAODT - Data AS OF date.         *
+     A*                                                              *
+     A****************************************************************
+     A                                      REF(WREFP)
+     A          R PPR01                     TEXT('DIVISION PREMIUM')
+     A*
+     A*      ==>GRP/EMP#/YR
+     A            PRPONR        25          TEXT('Policy Number')
+     A*
+     A* WMEMP==>EMCO#
+     A            PRCO#          3S 0       TEXT('Owner code')
+     A                                      COLHDG('Owner')
+     A* WDELP==>ELDIV
+     A            PRDIV          5S 0       TEXT('Division')
+     A                                      COLHDG('Division')
+     A* WMEMP==>EMPST
+     A            PREST          2          TEXT('Exposure state')
+     A                                      COLHDG('Exp' 'ST')
+     A* WDELP==>TT EANPR or EAAPR    @ ELFAF E vs A
+     A            PRTTPR        16S 2       TEXT('Total premium')
+     A                                      COLHDG('Total premium')
+     A* WMEMP==>EMNAME
+      ***** BEG CHG ***** 03/10/05 ***************************************
+      ***** BEG CHG ***** 03/11/05 ***************************************
+     A***  Begin Chg  ***  08/12/09  **************************************
+     A**********  PRNAME        40A         TEXT('Employer name')
+     A            PRNAME       100A         TEXT('Employer name')
+     A***  End   Chg  ***  08/12/09  **************************************
+     A**********  PRNAME       100A         TEXT('Employer name')
+      ***** END CHG ***** 03/11/05 ***************************************
+      ***** END CHG ***** 03/10/05 ***************************************
+     A                                      COLHDG('Employer' 'Name')
+     A* WMEMP==>EMPAD1
+     A            PRAD1         50A         TEXT('Address 1:')
+     A                                      COLHDG('Address 1')
+     A* WMEMP==>EMPAD2
+     A            PRAD2         50A         TEXT('Address 2:')
+     A                                      COLHDG('Address 2')
+     A* WMEMP==>EMPCTY
+     A            PRCTY         25A         TEXT('City')
+     A                                      COLHDG('City')
+     A* WMEMP==>EMCNTY ==> WTCNP==>CNDESC
+     A            PRCNDS        25A         TEXT('County Description')
+     A                                      COLHDG('County' 'Description')
+     A* WMEMP==>EMFAXA & EMFAX#
+     A            PRFAX#        20A         TEXT('Fax #')
+     A                                      COLHDG('Fax #')
+     A* WMEMP==>EMAREA & EMPHN#
+     A            PRPHN#        20A         TEXT('Phone #')
+     A                                      COLHDG('Phone #')
+     A* WMEMP==>EMPST
+     A            PRST           2A         TEXT('State')
+     A                                      COLHDG('State')
+     A* WMEMP==>EMPZIP
+     A            PRZIP         10A         TEXT('Zip Code')
+     A                                      COLHDG('Zip Code')
+     A* WMEMP==>EMFEIN
+     A****** BEG CHG ***** 02/06/01 **********************************
+     A*********** PRFEIN        10A         TEXT('Fed Id Num')
+     A            PRFEIN        11A         TEXT('Fed Id Num')
+     A****** BEG CHG ***** 02/06/01 **********************************
+     A                                      COLHDG('Fed Id Num')
+     A* WMEMP==>EMNAOB
+     A            PRNAOB        50A         TEXT('Nature of Business')
+     A                                      COLHDG('Nature' 'of' 'Business')
+     A* WMEMP==>EMIADR
+     A            PRIADR        60A         TEXT('Email Address')
+     A                                      COLHDG('Email Address')
+     A* WDELP==>EMPFDT
+     A            PRPFDT        10A         TEXT('DIV Begin Date')
+     A                                      COLHDG('DIV Begin Date')
+     A* WDELP==>EMPTDT
+     A            PRPTDT        10A         TEXT('DIV End Date')
+     A                                      COLHDG('DIV End Date')
+     A* SRPRT1
+     A            PREPWC        16S 2       TEXT('Earned Prem w/expense const')
+     A                                      COLHDG('Earned Prem' +
+     A                                      'with' 'Expense Constant')
+     A* SRPRTD
+     A            PREPXC        16S 2       TEXT('Earned Prem w/expense const')
+     A                                      COLHDG('Earned Prem' +
+     A                                      'excluding' 'Expense Constant')
+     A* WDEHP==>EHTRDT
+     A            PRTRDT        10A         TEXT('Initial Transaction Date')
+     A                                      COLHDG('Initial' +
+     A                                      'Transaction' 'Date')
+     A*** BEG ADD ******* 05/30/02 ************************************
+     A* WDELP==>ELBSCD
+     A* Pay Plan Type Code
+     A            PRBSCD        10          TEXT('Pay Plan Type Code')
+     A                                      COLHDG('Pay Pln' 'Typ Cde')
+     A* WDELP/ELBSCD ==> WTBSP/BSDESC
+     A* Pay Plan Type Deacription
+     A            PRBDES        40          TEXT('Pay Plan Type Description')
+     A                                      COLHDG('Pay Pln' 'Descrptn')
+     A* WDELP==>ELRTCD
+     A* Rating Tier Code
+     A            PRRTCD        10          TEXT('Rating Tier Code')
+     A                                      COLHDG('Rating' 'Tier Cde')
+     A* WDELP/ELRTCD ==> WMRSP/RSDESC
+     A* Rating Tier Description
+     A            PRRDES        40          TEXT('Rating Tier Description')
+     A                                      COLHDG('Rating Tier' 'Descriptn')
+     A*** END ADD ******* 05/30/02 ************************************
+     A*** BEGIN ADD *** 11/23/04 **************************************
+     A            PRDBCR         5S 4       COLHDG('Schedule DB/CR' +
+     A                                      'Factor')
+     A            PRSDEF        10A         COLHDG('Schedule DB/CR' +
+     A                                      'Effective Date')
+     A            PRSDEX        10A         COLHDG('Schedule DB/CR' +
+     A                                      'Expiration Date')
+     A            PRDISP         5S 2       COLHDG('Calculated'     +
+     A                                      'Stock Discount')
+     A*** END   ADD *** 11/23/04 **************************************
+      ***** beg add ***** 01/23/08 ***********************************
+      * WMEMP==>PRMAD1
+     A            PRMAD1        50A         TEXT('Mail Addr 1')
+     A                                      COLHDG('Mail Address 1')
+      * WMEMP==>PRMAD2
+     A            PRMAD2        50A         TEXT('Mail Addr 2')
+     A                                      COLHDG('Mail Address 2')
+      * WMEMP==>PRMCTY
+     A            PRMCTY        25A         TEXT('Mail City')
+     A                                      COLHDG('Mail City')
+      * WMEMP==>PRMST
+     A            PRMST          2A         TEXT('Mail State')
+     A                                      COLHDG('Mail State')
+      * WMEMP==>PRMZIP
+     A            PRMZIP        10A         TEXT('Mail zip code')
+     A                                      COLHDG('Mail Zip code')
+      * WMEMP==>PRMPFL
+     A            PRMPFL         1A         TEXT('Mail/Phys Address')
+     A                                      COLHDG('Mail/Phys Address')
+      *
+      ***** end add ***** 01/23/08 ***********************************
+      ***** beg add *** 03/25/08 **************************************
+      *
+     A            PRSTCD         1A         COLHDG('Division Status' +
+     A                                      'Code')
+      *                 Valid values: 'P'ending
+      *                               'I'nforce
+      *                               'D'eleted
+      *                               'C'ancelled
+      *                               'E'xpired
+      *
+     A            PRCAD         10A         COLHDG('Division Cancel' +
+     A                                      'Effective Date')
+      *
+      ***** end add *** 03/25/08 **************************************
+     A*** BEGIN ADD *** 05/15/00 **************************************
+     A*  TIME: DSDATE ==>
+     A            PRAODT        10          TEXT('Data as of date')
+     A                                      COLHDG('As Of Date')
+     A*** END ADD ***** 05/15/00 **************************************
+     A* ============================================================ *
+     A*
+     A*  NOTE: ANY FIELDS ADDED TO THIS FILE NEED TO BE ADDED IN
+     A*        FRONT OF THE AS OF DATE FIELD AT END OF THE FILE -
+     A*        OR THIS COULD CAUSE RECORDS TO BE MISSED/SKIPPED
+     A*        DURING THE IMPORT PROCESS AFTER THE EXTRACT IS RUN.
+     A*
+     A* ============================================================ *
+     A*
+     A          K PRPONR
+     A*

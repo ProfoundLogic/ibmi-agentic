@@ -1,0 +1,129 @@
+     A*%%TS  SD  19980122  144149  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   FORMS MASTER MAINTENANCE DISPLAY                         **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*----------------------------------------------------------------
+     A*    SCR01  - SCREEN 1
+     A*----------------------------------------------------------------
+     A          R SCR01
+     A                                      CF05
+     A                                      SETOF(21)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C2060F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 12 26'Section Code:'
+     A            SCCC      R        B 12 41REFFLD(CDE)
+     A                                      TEXT('SECTION CODE')
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A                                 16 22'Use Section code   **  for policy -
+     A                                       forms'
+     A                                 24  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 26'F5=Section code search'
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A*    SCR02S - SCREEN 2 SUBFILE RECORD
+     A*----------------------------------------------------------------
+     A          R SCR02S                    SFL
+     A*%%TS  SD  19980122  144149  COLEMANR    REL-V3R7M0  5716-PW1
+     A            SHFORM         6A  H
+     A            SHEFDT         4S 0H
+     A            SHMMYY         4A  H
+     A            SCFORM         6A  B  6 32TEXT('FORM')
+     A                                      DSPATR(UL)
+     A  31                                  DSPATR(PC)
+     A  31                                  DSPATR(RI)
+     A            SCEFYR         4A  B  6 47TEXT('EFFECTIVE MMYY')
+     A                                      DSPATR(UL)
+     A  32                                  DSPATR(PC)
+     A  32                                  DSPATR(RI)
+     A            SCEFMM         2A  B  6 42TEXT('EFFECTIVE MMYY')
+     A                                      DSPATR(UL)
+     A  32                                  DSPATR(PC)
+     A  32                                  DSPATR(RI)
+     A                                  6 45'/'
+     A*----------------------------------------------------------------
+     A*    SCR02C - SCREEN 2 SUBFILE CONTROL RECORD
+     A*----------------------------------------------------------------
+     A          R SCR02C                    SFLCTL(SCR02S)
+     A*%%TS  SD  19980122  144149  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      SFLSIZ(0016)
+     A                                      SFLPAG(0015)
+     A                                      PAGEDOWN(17)
+     A                                      PAGEUP(18)
+     A                                      OVERLAY
+     A                                      CF12
+     A  90                                  SFLCLR
+     A  91                                  SFLDSP
+     A  91                                  SFLDSPCTL
+     A  99                                  SFLEND(*MORE)
+     A                                      SFLCSRRRN(&SFRRN)
+     A  22                                  SFLMSGID(CCR0932 *LIBL/CMESGG)
+     A  23                                  SFLMSGID(CCR0933 *LIBL/CMESGG)
+     A  24                                  SFLMSGID(CCR0502 *LIBL/CMESGG)
+     A            SFRNO          4S 0H      SFLRCDNBR(CURSOR)
+     A            SFRRN          5S 0H
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C2060F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A                                  4 42'EFFECTIVE'
+     A                                      DSPATR(HI)
+     A                                  5  2'SECTION CODE:'
+     A            SCCC      R        O  5 16REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A                                  5 33'FORM'
+     A                                      DSPATR(HI)
+     A                                  5 42'MM / YEAR'
+     A                                      DSPATR(HI)
+     A*----------------------------------------------------------------
+     A*    SCR02R - SCREEN 2 SUBFILE OPTION LINE RECORD
+     A*----------------------------------------------------------------
+     A          R SCR02R
+     A                                      OVERLAY
+     A                                 22 19'To remove an entry - blank out -
+     A                                      form number'
+     A                                 24  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 21'F12=Cancel        '
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A*    SCR99 - SCREEN 99
+     A*----------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG *LIBL/SREFP)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

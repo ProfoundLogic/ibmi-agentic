@@ -1,0 +1,99 @@
+<div class="ag-root">
+  <header class="ag-top">
+    <div class="ag-brand">
+      <img class="ag-logo" alt="Sapiens"
+           src="https://sapiens.com/wp-content/themes/sapiens/assets/img/sapiens_logo-2.png" />
+      <div>
+        <h1>Agency Configuration</h1>
+        <p class="ag-sub">Master records, assignments & producers</p>
+      </div>
+    </div>
+    <nav class="ag-actions">
+      <button class="ag-btn ag-btn-ghost" onclick="pui.submit({action:'EXIT'})">Exit</button>
+      <button class="ag-btn ag-btn-2" onclick="pui.submit({action:'SAVE'})">Save</button>
+      <button class="ag-btn ag-btn-1" onclick="pui.submit({action:'NEW'})">+ New</button>
+    </nav>
+  </header>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+  <div class="ag-msg"><%= msg %></div>
+  <% } %>
+
+  <div class="ag-toolbar">
+    <input class="ag-input" type="text" name="sfilter" id="ag-sfilter"
+           value="<%= sfilter %>" placeholder="Search by name, FEIN, contact, or city..." />
+    <button class="ag-btn ag-btn-1" onclick="pui.submit({action:'SEARCH'})">Search</button>
+    <span class="ag-count"><%= numagts %> <%= numagts == 1 ? 'agency' : 'agencies' %></span>
+  </div>
+
+  <main class="ag-grid-2col">
+    <section class="ag-card">
+      <table class="ag-grid">
+        <thead><tr>
+          <th>Agency</th><th>FEIN</th><th>Mod</th><th># Agents</th>
+          <th>Contact</th><th>Phone</th><th>Location</th><th>Status</th>
+        </tr></thead>
+        <tbody>
+        <% if (typeof agtsfl !== 'undefined' && agtsfl && agtsfl.length > 0) {
+             agtsfl.forEach(function(r) {
+               var sel = (typeof selrrn !== 'undefined') && Number(selrrn) === Number(r.srrn);
+               var s = (r.sstatus || '').toString().trim().toUpperCase();
+               var lbl = {A:'Active', I:'Inactive', H:'Hold', P:'Pending'}[s] || s || '—'; %>
+        <tr class="<%= sel ? 'is-sel' : '' %>" onclick="wtagtcfe.selectRow('<%= r._rrn %>','<%= r.srrn %>')">
+          <td class="name"><%= r.sname %></td>
+          <td class="m"><%= r.sfein %></td>
+          <td class="m"><%= r.smod %></td>
+          <td class="m"><%= r.sagent %></td>
+          <td><%= r.scontact %></td>
+          <td class="m"><%= r.sphone %></td>
+          <td><%= r.scity %><% if(r.sstate && r.sstate.trim()){ %>, <%= r.sstate %><% } %></td>
+          <td><span class="ag-pill ag-pill-<%= s %>"><%= lbl %></span></td>
+        </tr>
+        <% }); } else { %>
+        <tr><td colspan="8" class="ag-empty">No agencies match. Adjust the search above.</td></tr>
+        <% } %>
+        </tbody>
+      </table>
+    </section>
+
+    <aside class="ag-detail">
+      <% if (dname && dname.trim()) {
+         var ds = (dstatus || '').toString().trim().toUpperCase();
+         var dlbl = {A:'Active', I:'Inactive', H:'Hold', P:'Pending'}[ds] || ds || '—'; %>
+      <header class="dh">
+        <div>
+          <h2><%= dname %></h2>
+          <% if(dshnm && dshnm.trim() && dshnm.trim() !== dname.trim()){ %>
+          <p class="dba">DBA <%= dshnm %></p>
+          <% } %>
+        </div>
+        <span class="ag-pill ag-pill-<%= ds %>"><%= dlbl %></span>
+      </header>
+      <dl class="dg">
+        <div><dt>Federal Tax ID</dt><dd class="m"><%= dfein %></dd></div>
+        <div><dt>Modifier</dt><dd class="m"><%= dmod %></dd></div>
+        <div><dt># Agents</dt><dd class="m"><%= dagent %></dd></div>
+        <div><dt>Contact</dt><dd><%= dcontact %></dd></div>
+        <div><dt>Phone</dt><dd class="m"><%= dphone %></dd></div>
+        <div><dt>Email</dt><dd><%= demail %></dd></div>
+        <div class="full"><dt>Mailing Address</dt><dd><%= daddr %></dd></div>
+        <div><dt>County</dt><dd><%= dcounty %></dd></div>
+      </dl>
+      <footer class="df">
+        <button class="ag-btn ag-btn-ghost">View History</button>
+        <button class="ag-btn ag-btn-2">Producers</button>
+        <button class="ag-btn ag-btn-1">Edit Agency</button>
+      </footer>
+      <% } else { %>
+      <div class="empty">
+        <div class="empty-icon">i</div>
+        <h3>Select an agency</h3>
+        <p>Click any row to view the agency record and drill into producers, assignments, and history.</p>
+      </div>
+      <% } %>
+    </aside>
+  </main>
+
+  <input type="hidden" name="action" id="ag-action" value="" />
+  <input type="hidden" name="selrrn" id="ag-selrrn" value="<%= selrrn %>" />
+</div>

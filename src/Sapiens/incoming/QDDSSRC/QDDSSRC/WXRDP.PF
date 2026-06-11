@@ -1,0 +1,75 @@
+     A* (c) 2018 StoneRiver, Inc. All rights Reserved.                 *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                  *
+     A**                                                               *
+     A** EDI Transmission Data - Benefit ACR                           *
+     A******************************************************************
+     A* MODIFICATIONS:                                                 *
+     A*                                                                *
+     A* 05/30/18  C:274 Project: WC2515                                *
+     A*                 Added field are RDWIAO                         *
+     A*                 Change text on file and record format          *
+     A*                                                                *
+     A* 12/31/09  C:180 SUPPORT 71140                                  *
+     A*                 CONVERT DATE MAITAINED TO SIGNED.              *
+     A*                                                                *
+     A* 10/19/07  C:191  Project: WC1584                               *
+     A*                  Added fields for Phase 2 EDI Release 3        *
+     A*                  Processing.                                   *
+     A*                                                                *
+     A******************************************************************
+     A                                      REF(WREFP)
+     A**
+     A*** Begin Change ***** 05/30/18 ***********************************************
+     A***       R PRD01                     TEXT('EDI A49 Format - RD')
+     A          R PRD01                     TEXT('EDI - Benefit ACR')
+     A*** End Change ******* 05/30/18 ***********************************************
+     A            RDCO#     R               REFFLD(CO#)
+     A            RDEXDT    R               REFFLD(DT)
+     A                                      COLHDG('EXTRACT DATE')
+     A*
+     A***    Transaction
+     A*
+     A            RDTSET    R    3A         REFFLD(CODE)
+     A                                      TEXT('TRANSACTION SET ID')
+     A            RDMTC     R               REFFLD(CODE)
+     A                                      TEXT('MAINT TYPE CODE')
+     A            RDTDT     R    8S 0       REFFLD(DT)
+     A                                      TEXT('MAINT TYPE CODE DATE')
+     A*
+     A***    Jurisdiction
+     A*
+     A            RDJRST    R               REFFLD(CODE)
+     A                                      TEXT('JURISDICTION')
+     A*
+     A*  ACCIDENT
+     A*
+     A            RDACLC    R   25A         REFFLD(DS20)
+     A                                      COLHDG('ADMIN' 'CLAIM' '#')
+     A*
+     A*  BENEFITS ADJUSTMENTS OCCURS UP TO 10 TIMES
+     A*
+     A            RDBACD         4          TEXT('BENEFITS ADJ CODE')
+     A                                      COLHDG('BENEFITS' 'ADJ CODE')
+     A            RDWAAM         9  2       TEXT('BENEFITS ADJ AMOUNT')
+     A                                      COLHDG('BENEFITS' 'ADJ' 'AMOUNT')
+     A            RDASDT    R    8S 0       REFFLD(DT)
+     A                                      COLHDG('ADJ START DATE')
+     A*
+     A            RDSTAT    R               REFFLD(STAT)
+     A            RDUSER    R               REFFLD(USER)
+     A            RDPGM     R               REFFLD(PGM)
+     A            RDTIME    R               REFFLD(TIME)
+     A*** BEGIN CHNGE ***** 12/31/09 **********************************
+     A***         RDDT      R               REFFLD(DT)
+     A***                                   COLHDG('DATE' 'MAINTAINED')
+     A            RDDT           8S 0
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A*** END CHNGE ***** 12/31/09 ************************************
+     A*** Beg Add ***** 10/19/07 ***********************************************
+     A            RDENDT    R    8S 0       COLHDG('END DATE')
+     A                                      REFFLD(DT)
+     A*** End Add ***** 10/19/07 ***********************************************
+     A*** Begin Add ***** 05/30/18 ***********************************************
+     A            RDWIAO         9S 2       TEXT('Weekly Income Amt 4 Offset')
+     A                                      COLHDG('Wkly Inc Amt 4 Offst')
+     A*** End Add ******* 05/30/18 ***********************************************

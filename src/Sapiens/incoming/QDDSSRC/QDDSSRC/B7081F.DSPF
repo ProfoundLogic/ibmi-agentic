@@ -1,0 +1,85 @@
+     A*(C) Copyright Progressive Data Solutions, Inc., 1998
+     A*****************************************************************
+     A*  REVISIONS:                                                   *
+     A*                                                               *
+     A*   11/18/98 C:112 Project: WC577                               *
+     A*                 Correct Program to conform with PDS standards *
+     A*                 Ensure dates are accurately handled (i.e.     *
+     A*                 dates are 7.0 Numeric (used in date           *
+     A*                 comparisons) or 8.0 Numeric (used for display)*
+     A*****************************************************************
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(BREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A          R SCR01
+     A                                      CHGINPDFT
+     A                                      CF10
+     A                                      CF13
+     A                                      SETOF(20)
+     A**** BEGIN CHANGE *** 11/18/98 **********************************
+     A**** Error detection enabled for field error messaging
+     A*********************************     SETOF(21)
+     A*********************************     SETOF(22)
+     A**** END CHANGE ***** 11/18/98 **********************************
+     A                                      SETOF(23)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                      DSPATR(HI)
+     A*** BEGIN CHANGE *** 11/18/98 ***********************************
+     A********************************* 1 73DATE
+     A                                  1 73DATE EDTCDE(Y)
+     A************************************* EDTWRD('  /  /  ')
+     A*** END CHANGE ***** 11/18/98 ***********************************
+     A            SCFILE    R        O  2  2REFFLD(FLE SREFP)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                      DSPATR(HI)
+     A            SCRECF    R        O  2 76REFFLD(RECF SREFP)
+     A                                  6  2'Type Changes, press Enter'
+     A                                      COLOR(BLU)
+     A                                  8  4'From Date:'
+     A            SCFDT     R        B  8 15REFFLD(DT8)
+     A                                      DSPATR(UL)
+     A  30                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A  20                                  ERRMSGID(BCR0035 BMESGG)
+     A  22                                  ERRMSGID(BCR0036 BMESGG)
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                  9  4'To Date  :'
+     A            SCTDT     R        B  9 15REFFLD(DT8)
+     A                                      DSPATR(UL)
+     A  31                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A  21                                  ERRMSGID(BCR0035 BMESGG)
+     A  22                                  ERRMSGID(BCR0036 BMESGG)
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                 10  4'File Key :'
+     A            SCKEY     R        B 10 15REFFLD(KEY20)
+     A                                      DSPATR(UL)
+     A  32                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A  23                                  ERRMSGID(BCR0040 BMESGG)
+     A                                      TEXT('FILE KEY')
+     A                                 23  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 12'F10=Search'
+     A                                      COLOR(BLU)
+     A                                 23 25'F13=Chg usr parm'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

@@ -1,0 +1,182 @@
+     A*COPYRIGHT('(C) COPYRIGHT FISERV, INC., 2006')
+     A*
+     A*****************************************************************
+     A* Created on 11/26/2006 by C:183 for Project 132WHL
+     A*****************************************************************
+     A* Purpose: A/R Reconciliation File
+     A*****************************************************************
+     A* Revisions:
+     A*
+     A* 05/01/07 C:183 PROJECT: 132WHL
+     A*          Added A2MADJ field.
+     A*
+     A* 03/19/07 C:183 PROJECT: 132WIA
+     A*          Changed the format of the Month-end date from CYYMM to
+     A*          YYYYMM. Also changed the column heading of the fields.
+     A*
+     A* 03/15/07 C:183 PROJECT: 132WIA
+     A*          Added 2 new fields A2ACDT-Account Current record crea-
+     A*          tion date and A2STMT-Statement date (Month/year)
+     A*
+     A*****************************************************************
+     A          R PA201
+     A            A2CO#          3S 0       COLHDG('Company')
+     A            A2CONM        40A         COLHDG('Company Name')
+     A            A2FND          3S 0       COLHDG('Group')
+     A            A2FNNM        40A         COLHDG('Group Name')
+     A            A2FSNM        30A         COLHDG('Group Short Name')
+     A            A2EMP#         9S 0       COLHDG('Employer')
+     A            A2DIV          5S 0       COLHDG('Division')
+     A            A2EMNM        40A         COLHDG('Employer Name')
+     A            A2FYR          3S 0       COLHDG('Policy Year')
+     A            A2BSCD         3S 0       COLHDG('Billing Schedule' 'Code')
+     A            A2SEFL         1A         COLHDG('Estimated vs' 'S/R Billing')
+     A            A2PFDT         8S 0       COLHDG('Policy From Date')
+     A            A2PTDT         8S 0       COLHDG('Policy To Date')
+     A            A2CXDT         8S 0       COLHDG('Cancellation Date')
+     A            A2CAP#        25A         COLHDG('Carrier Policy#')
+     A            A2TPFL         1A         COLHDG('Transaction Type' +
+     A                                      '(D=Direct, A=Acct' 'Current)')
+     A            A2DFFL         1A         COLHDG('Deferred Billing' +
+     A                                      'Transaction(Y/)')
+     A            A2CMFL         1A         COLHDG('Flag to designate' +
+     A                                      'if transaction' 'is commisionable')
+     A            A2ARCD         2A         COLHDG('A/R Code')
+     A            A2ARTY         1A         COLHDG('A/R Type')
+     A            A2CTTY         1A         COLHDG('A/R Category Type')
+     A            A2DESC        30A         COLHDG('A/R Description')
+     A            A2QTFL         1A         COLHDG('Quote/Live Flag')
+     A            A2AMT          9S 2       COLHDG('A/R Amount')
+     A            A2CLAM         9S 2       COLHDG('Collection Amount')
+     A            A2BLAM         9S 2       COLHDG('Billing Amount')
+     A            A2OTAM         9S 2       COLHDG('Other Amount')
+     A            A2TRDT         8S 0       COLHDG('Transaction Date')
+     A            A2PODT         8S 0       COLHDG('Posting Date')
+     A            A2CHK#         7S 0       COLHDG('Check#')
+     A            A2INV#        10S 0       COLHDG('Invoice#')
+     A            A2LTFL         1A         COLHDG('Late Flag')
+     A            A2RTST         2A         COLHDG('Rating State')
+     A            A2RGN#         3S 0       COLHDG('Region')
+     A            A2RGDS        30A         COLHDG('Region Desc')
+     A            A2CHAP         3S 0       COLHDG('Chapter')
+     A            A2CHDS        30A         COLHDG('Chapter Desc')
+     A            A2OFC#         5A         COLHDG('Office#')
+     A            A2OFNM        40A         COLHDG('Office Name')
+     A            A2PFCO         5A         COLHDG('Premium Finance Co')
+     A            A2PFNM        40A         COLHDG('Premium Finance Co' 'Name')
+     A            A2SRFL         1A         COLHDG('Surcharge Flag')
+     A            A2AGT1         5S 0       COLHDG('Primary Commission' +
+     A                                      'Agent#(for Agency or' +
+     A                                      'Direct scenarios)')
+     A            A2ANM1        40A         COLHDG('Primary Commission' +
+     A                                      'Agent Name')
+     A            A2AFE1         9S 0       COLHDG('Primary Commission' +
+     A                                      'Agent FEIN')
+     A            A2AMD1         3S 0       COLHDG('Primary Commission' +
+     A                                      'Agent Mod')
+     A            A2AAD1        40A         COLHDG('Primary Commission' +
+     A                                      'Agent Address')
+     A            A2ACT1        15A         COLHDG('Primary Commission' +
+     A                                      'Agent City')
+     A            A2AST1         2A         COLHDG('Primary Commission' +
+     A                                      'Agent State')
+     A            A2AZP1         9S 0       COLHDG('Primary Commission' +
+     A                                      'Agent Zip')
+     A            A2ARC1         3S 0       COLHDG('Primary Agent' +
+     A                                      'Rate Number')
+     A            A2ARD1        30A         COLHDG('Primary Agent' +
+     A                                      'Rate Description')
+     A            A2ARV1         5S 2       COLHDG('Primary Agent' +
+     A                                      'Rate Value')
+     A            A2APR1         5S 0       COLHDG('Primary Agent' +
+     A                                      'Producer')
+     A            A2APN1        40A         COLHDG('Primary Agent' +
+     A                                      'Producer Name')
+     A            A2AMT1         9S 2       COLHDG('Primary Agent' +
+     A                                      'Commission Amount')
+     A            A2NET1        11S 2       COLHDG('Primary Agent' +
+     A                                      'Net Amount')
+     A            A2AGT2         5S 0       COLHDG('Secondary Commission' +
+     A                                      'Agent#(for Agency or' +
+     A                                      'Direct scenarios)')
+     A            A2ANM2        40A         COLHDG('Secondary Commission' +
+     A                                      'Agent Name')
+     A            A2AFE2         9S 0       COLHDG('Secondary Commission' +
+     A                                      'Agent FEIN')
+     A            A2AMD2         3S 0       COLHDG('Secondary Commission' +
+     A                                      'Agent Mod')
+     A            A2AAD2        40A         COLHDG('Secondary Commission' +
+     A                                      'Agent Address')
+     A            A2ACT2        15A         COLHDG('Secondary Commission' +
+     A                                      'Agent City')
+     A            A2AST2         2A         COLHDG('Secondary Commission' +
+     A                                      'Agent State')
+     A            A2AZP2         9S 0       COLHDG('Secondary Commission' +
+     A                                      'Agent Zip')
+     A            A2ARC2         3S 0       COLHDG('Secondary Agent' +
+     A                                      'Rate Number')
+     A            A2ARD2        30A         COLHDG('Secondary Agent' +
+     A                                      'Rate Description')
+     A            A2ARV2         5S 2       COLHDG('Secondary Agent' +
+     A                                      'Rate Value')
+     A            A2APR2         5S 0       COLHDG('Secondary Agent' +
+     A                                      'Producer')
+     A            A2APN2        40A         COLHDG('Secondary Agent' +
+     A                                      'Producer Name')
+     A            A2AMT2         9S 2       COLHDG('Secondary Agent' +
+     A                                      'Commission Amount')
+     A            A2NET2        11S 2       COLHDG('Secondary Agent' +
+     A                                      'Net Amount')
+     A            A2AGTC         5S 0       COLHDG('Current Commission' +
+     A                                      'Agent#(for Agency or' +
+     A                                      'Direct scenarios)')
+     A            A2ANMC        40A         COLHDG('Current Commission' +
+     A                                      'Agent Name')
+     A            A2AFEC         9S 0       COLHDG('Current Commission' +
+     A                                      'Agent FEIN')
+     A            A2AMDC         3S 0       COLHDG('Current Commission' +
+     A                                      'Agent Mod')
+     A            A2AADC        40A         COLHDG('Current Commission' +
+     A                                      'Agent Address')
+     A            A2ACTC        15A         COLHDG('Current Commission' +
+     A                                      'Agent City')
+     A            A2ASTC         2A         COLHDG('Current Commission' +
+     A                                      'Agent State')
+     A            A2AZPC         9S 0       COLHDG('Current Commission' +
+     A                                      'Agent Zip')
+     A            A2ARCC         3S 0       COLHDG('Current Agent' +
+     A                                      'Rate Number')
+     A            A2ARDC        30A         COLHDG('Current Agent' +
+     A                                      'Rate Description')
+     A            A2ARVC         5S 2       COLHDG('Current Agent' +
+     A                                      'Rate Value')
+     A            A2APRC         5S 0       COLHDG('Current Agent' +
+     A                                      'Producer')
+     A            A2APNC        40A         COLHDG('Current Agent' +
+     A                                      'Producer Name')
+     A            A2AMTC         9S 2       COLHDG('Current Agent' +
+     A                                      'Commission Amount')
+     A            A2NETC        11S 2       COLHDG('Current Agent' +
+     A                                      'Net Amount')
+     A            A2IPGM        10A         COLHDG('Initial Program')
+     A            A2IUSR        10A         COLHDG('Initial User')
+     A            A2IDT          8S         COLHDG('Initial Date')
+     A            A2TIME         6S 0       COLHDG('Initial Time')
+      **** BEGIN CHG **** 03/19/07 ************************************
+     A*           A2CYM          5S 0       COLHDG('Month-end date' '(CYYMM)')
+     A            A2MEDT         6S 0       COLHDG('Month-end date' '(YYYYMM)')
+      **** END   CHG **** 03/19/07 ************************************
+     A            A2SEQ#        11S 0       COLHDG('Sequence#')
+      **** BEGIN ADD **** 03/15/07 ************************************
+     A            A2ACDT         8S 0       COLHDG('Account Current' +
+     A                                      ' record creation' +
+     A                                      ' date')
+      **** BEGIN CHG **** 03/19/07 ************************************
+     A*           A2STMT         6S 0       COLHDG('Statement Date' +
+     A*                                     '(Month/Year)')
+     A            A2STDT         6S 0       COLHDG('Statement Date')
+      **** END   CHG **** 03/19/07 ************************************
+      **** END   ADD **** 03/15/07 ************************************
+      **** BEGIN ADD **** 05/01/07 ************************************
+     A            A2MADJ         1          COLHDG('Manual Entry (Y/ )')
+      **** END   ADD **** 05/01/07 ************************************

@@ -1,0 +1,323 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   A/R DETAIL REPORT PROMPT DISPLAY                         **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A*                                     CHGINPDFT(CS)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF05
+     A                                      CF07
+     A                                      CF09
+     A                                      CF13
+     A                                      PUTOVR
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(33)
+     A                                      SETOF(34)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(39)
+     A                                      SETOF(40)
+     A                                      SETOF(41)
+     A                                      SETOF(42)
+     A                                      SETOF(43)
+     A                                      SETOF(44)
+     A                                      SETOF(45)
+     A                                      SETOF(46)
+     A                                      SETOF(47)
+     A                                      SETOF(48)
+     A                                      SETOF(49)
+     A                                      SETOF(50)
+     A                                      SETOF(51)
+     A                                      SETOF(52)
+     A                                      SETOF(53)
+     A                                      SETOF(54)
+     A                                      SETOF(55)
+     A                                      SETOF(56)
+     A                                      SETOF(57)
+     A                                      SETOF(58)
+     A                                      SETOF(59)
+     A                                      SETOF(62)
+     A                                      SETOF(63)
+     A                                      SETOF(64)
+     A                                      SETOF(65)
+     A                                      SETOF(66)
+     A                                      SETOF(67)
+     A                                      SETOF(68)
+     A                                      SETOF(69)
+     A                                      SETOF(70)
+     A                                      SETOF(71)
+     A                                      SETOF(72)
+     A                                      SETOF(73)
+     A                                      SETOF(74)
+     A                                      SETOF(79)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C7560F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  4 22'Agent Number:'
+     A            SCAGT#    R        B  4 49REFFLD(AGT#)
+     A                                      CHECK(RB)
+     A  62                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A  71                                  DSPATR(PC)
+     A                                      EDTCDE(4)
+     A                                  6 22'Policy Number:'
+     A            SCPOL#    R        B  6 49REFFLD(POL#)
+     A                                      OVRDTA
+     A  57                                  ERRMSGID(CCR0535 *LIBL/CMESGG)
+     A*                                     DSPATR(CS)
+     A  72                                  DSPATR(PC)
+     A                                  8 22'Date Selection:'
+     A            SCDTSL    R        B  8 49REFFLD(FLAG)
+     A                                      OVRDTA
+     A  79                                  ERRMSGID(CCR0750 *LIBL/CMESGG)
+     A*                                     DSPATR(CS)
+     A  79                                  DSPATR(PC)
+     A                                  9 24'T = Transaction Date'
+     A                                 10 24'P = Posting Date'
+     A                                 12 22'From and To Dates:'
+     A            SCFDT     R        B 12 49REFFLD(DT8)
+     A  58                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  59                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A  73                                  DSPATR(PC)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A                                 12 56'-'
+     A            SCTDT     R        B 12 58REFFLD(DT8)
+     A  63                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  59                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A                                 14 22'Section Code:'
+     A            SCSCDE    R        B 14 49REFFLD(CODE)
+     A  64                                  ERRMSGID(CCR0598 *LIBL/CMESGG)
+     A  74                                  DSPATR(PC)
+     A                                      OVRDTA
+     A                                 16 22'A/R codes:'
+     A                                 16 38'1.'
+     A            SCCD01    R        B 16 41REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  22 65                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  27                                  DSPATR(PC)
+     A                                 16 46'2.'
+     A            SCCD02    R        B 16 49REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  23 65                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  28                                  DSPATR(PC)
+     A                                 16 54'3.'
+     A            SCCD03    R        B 16 57REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  24 65                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  29                                  DSPATR(PC)
+     A                                 16 62'4.'
+     A            SCCD04    R        B 16 65REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  25 65                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  30                                  DSPATR(PC)
+     A                                 16 70'5.'
+     A            SCCD05    R        B 16 73REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  26 65                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  31                                  DSPATR(PC)
+     A                                 17 38'6.'
+     A            SCCD06    R        B 17 41REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  22 66                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  32                                  DSPATR(PC)
+     A                                 17 46'7.'
+     A            SCCD07    R        B 17 49REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  23 66                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  33                                  DSPATR(PC)
+     A                                 17 54'8.'
+     A            SCCD08    R        B 17 57REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  24 66                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  34                                  DSPATR(PC)
+     A                                 17 62'9.'
+     A            SCCD09    R        B 17 65REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  25 66                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  35                                  DSPATR(PC)
+     A                                 17 69'10.'
+     A            SCCD10    R        B 17 73REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  26 66                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  36                                  DSPATR(PC)
+     A                                 18 37'11.'
+     A            SCCD11    R        B 18 41REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  22 67                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  37                                  DSPATR(PC)
+     A                                 18 45'12.'
+     A            SCCD12    R        B 18 49REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  23 67                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  38                                  DSPATR(PC)
+     A                                 18 53'13.'
+     A            SCCD13    R        B 18 57REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  24 67                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  39                                  DSPATR(PC)
+     A                                 18 61'14.'
+     A            SCCD14    R        B 18 65REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  25 67                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  40                                  DSPATR(PC)
+     A                                 18 69'15.'
+     A            SCCD15    R        B 18 73REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  26 67                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  41                                  DSPATR(PC)
+     A                                 19 37'16.'
+     A            SCCD16    R        B 19 41REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  22 68                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  42                                  DSPATR(PC)
+     A                                 19 45'17.'
+     A            SCCD17    R        B 19 49REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  23 68                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  43                                  DSPATR(PC)
+     A                                 19 53'18.'
+     A            SCCD18    R        B 19 57REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  24 68                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  44                                  DSPATR(PC)
+     A                                 19 61'19.'
+     A            SCCD19    R        B 19 65REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  25 68                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  45                                  DSPATR(PC)
+     A                                 19 69'20.'
+     A            SCCD20    R        B 19 73REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  26 68                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  46                                  DSPATR(PC)
+     A                                 20 37'21.'
+     A            SCCD21    R        B 20 41REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  22 69                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  47                                  DSPATR(PC)
+     A                                 20 45'22.'
+     A            SCCD22    R        B 20 49REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  23 69                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  48                                  DSPATR(PC)
+     A                                 20 53'23.'
+     A            SCCD23    R        B 20 57REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  24 69                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  49                                  DSPATR(PC)
+     A                                 20 61'24.'
+     A            SCCD24    R        B 20 65REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  25 69                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  50                                  DSPATR(PC)
+     A                                 20 69'25.'
+     A            SCCD25    R        B 20 73REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  26 69                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  51                                  DSPATR(PC)
+     A                                 21 37'26.'
+     A            SCCD26    R        B 21 41REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  22 70                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  52                                  DSPATR(PC)
+     A                                 21 45'27.'
+     A            SCCD27    R        B 21 49REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  23 70                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  53                                  DSPATR(PC)
+     A                                 21 53'28.'
+     A            SCCD28    R        B 21 57REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  24 70                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  54                                  DSPATR(PC)
+     A                                 21 61'29.'
+     A            SCCD29    R        B 21 65REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  25 70                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  55                                  DSPATR(PC)
+     A                                 21 69'30.'
+     A            SCCD30    R        B 21 73REFFLD(CODE)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  26 70                               ERRMSGID(CCR0567 *LIBL/CMESGG)
+     A  56                                  DSPATR(PC)
+     A                                 23 18'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 46'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A                                 24  5'F5=Agent # search'
+     A                                      COLOR(BLU)
+     A                                 24 30'F7=Policy # search'
+     A                                      COLOR(BLU)
+     A                                 24 59'F9=Section code search'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

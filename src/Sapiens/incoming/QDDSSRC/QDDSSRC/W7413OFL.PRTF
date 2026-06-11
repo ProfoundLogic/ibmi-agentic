@@ -1,0 +1,842 @@
+      * (c) 2013 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*****************************************************************
+     A*                                                               *
+     A*   Be sure to check for changes within all W7413O* PRTF's.     *
+     A*                                                               *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 10/07/13 C:190 Project: 25WSS                                 *
+     A*                Change the printer file to determine if        *
+     A*                Premium or Contribution should be printed      *
+     A*                based on Group setup.                          *
+     A*
+     A* 05/13/11  C:180 SUPPORT 75300
+     A*                 Donot truncate type of business,
+     A*                 Print other type of business within
+     A*                 form margins.
+     A*
+     A* 11/18/10 C:136 SUPPORT: WA139 74791                           *
+     A*                STANDARDIZE NAME ADDRESS FORMATTING FOR GIC    *
+     A*                OUTPUT.                                        *
+     A*                                                               *
+     A* 12/11/09  C:189 SUPPORT 70538                                 *
+     A*                 Federal Name and DBA Name should print        *
+     A*                 on different lines                            *
+     A*                                                               *
+     A* 05/05/09  C:65 PROJECT 139WLU                                 *
+     A*                Various changes to text.                       *
+     A*                                                               *
+     A* 09/11/07  C:61 PROJECT 139WIB                                 *
+     A*                Various changes to text.                       *
+     A*                                                               *
+     A*****************************************************************
+      *
+     A                                      REF(WREFP)
+     A*____________________________________________________________________
+     A*
+     A          R NEWPAGEFL
+     A                                      ENDPAGE
+     A*____________________________________________________________________
+     A*
+     A          R CONSTFL
+     A                                    25'WORKERS COMPENSATION AND -
+     A                                      EMPLOYERS LIABILITY INSURANCE -
+     A                                      POLICY'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(5)
+      ******** beg chg ****** 09/11/07 ********************************
+     A************                        51'FLORIDA INFORMATION PAGE'
+     A************                          FNTCHRSET(C0H40000 T1V10037)
+     A************                          SKIPB(6)
+     A                                    54'INFORMATION PAGE'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(6)
+      ******** end chg ****** 09/11/07 ********************************
+     A                                    10'NCCI Co. No.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(8)
+     A                                    93'Policy No.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    93'Renewal of Policy No.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(12)
+     A*____________________
+     A*
+     A                                     6' '
+     A                                      SKIPB(17)
+     A  14                                92'X'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    94'Individual'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A  18                               105'X'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                   107'Partnership'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                    10'1.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(18)
+     A                                    12'The Insured/Mailing address:'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                     6' '
+     A                                      SKIPB(19)
+     A*** BEGIN CHG ***  05/13/11  ************************************
+     A**16                                92'X'
+     A***                                   FNTCHRSET(C0H20080 T1V10037)
+     A  16
+     AON14N16N18                          92'X'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A*** END CHG *****  05/13/11  ************************************
+     A*** BEGIN CHG ***  05/13/11  ************************************
+     A**                                  94'Corporation or'
+     A**                                    FNTCHRSET(C0H20090 T1V10037)
+     A  14
+     AO 16
+     AO 18                                94'Corporation   '
+     A  14
+     AO 16
+     AO 18                                  FNTCHRSET(C0H20090 T1V10037)
+     A N14N16N18                          94'Corporation or'
+     A N14N16N18                            FNTCHRSET(C0H20090 T1V10037)
+     A*** END CHG *****  05/13/11  ************************************
+     A*** BEGIN CHG ***  05/08/06  ************************************
+     A******** N14N16N18  TYPEOFBUSI    15       107
+     A*** BEGIN DELETE ****  05/13/11  ********************************
+     A*N14N16N18  TYPEOFBUSI    20       107
+     A*** END DELETE ****  05/13/11  **********************************
+     A*** END CHG *****  05/08/06  ************************************
+     A*** BEGIN ADD    ****  05/13/11  ********************************
+     A N14N16N18  BUSTYPA       12       107
+     A N14N16N18                            FNTCHRSET(C0H20090 T1V10037)
+     A N14N16N18  BUSTYPB       32        94SKIPB(20)
+     A N14N16N18                            FNTCHRSET(C0H20090 T1V10037)
+     A*** END ADD    ****  05/13/11  **********************************
+     A                                    93'Insured''s I.D. No(s)., if -
+     A                                      applicable'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(22)
+     A                                    93'FEIN'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(25)
+      ******** beg add ****** 09/11/07 ********************************
+      *
+     A                                    11'Other named insureds -
+     A                                      not shown above:'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(27)
+     A  53                                42'See Item 1. Schedule WC 99 06 58'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A N53                                42'None'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A
+      ******** end add ****** 09/11/07 ********************************
+     A                                    11'Other workplaces not shown above:'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(28)
+      ******** beg chg ****** 09/11/07 ********************************
+     A**23********                        39'See Schedule'
+     A************                          FNTCHRSET(C0H40090 T1V10037)
+     A  23                                39'See Item 1. Schedule WC 99 06 57'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+      ******** end chg ****** 09/11/07 ********************************
+     A N23                                39'None'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A*____________________
+     A*
+     A                                    10'2.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(30)
+     A                                    12'The policy period is from'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    50'to'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ******** beg del ****** 09/11/07 ********************************
+     A********                            70'12:01 A.M. Standard Time, at the'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                            30'insured''s mailing address'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                              SKIPB(31)
+      ******** end del ****** 09/11/07 ********************************
+      ******** beg add ****** 09/11/07 ********************************
+     A                                    70'12:01 A.M. Standard Time, at the -
+     A                                      insured''s mailing address.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(30)
+      ******** end add ****** 09/11/07 ********************************
+     A*____________________
+     A*
+     A                                    10'3.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(33)
+     A                                    12'A.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    14'Workers Compensation Insurance:  -
+     A                                      Part One of the policy applies to -
+     A                                      the Workers Compensation Law of -
+     A                                      the states listed here:'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    12'B.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(37)
+     A                                    14'Employers Liability Insurance:  -
+     A                                      Part Two of the policy applies to -
+     A                                      work in each state listed in item -
+     A                                      3.A.  The limits of our'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    14'liability under Part Two are:'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(38)
+     A                                    35'Bodily Injury by Accident $'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    68'each accident'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    35'Bodily Injury by Disease $'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(39)
+     A                                    68'policy limit'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    35'Bodily Injury by Disease $'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(40)
+     A                                    68'each employee'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    12'C.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(42)
+     A                                    14'Other States Insurance:  -
+     A                                      Part Three of the policy applies -
+     A                                      to the states, if any, listed here:'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    12'D.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(46)
+     A                                    14'This policy includes these -
+     A                                      endorsements and schedules:'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A*____________________
+     A*
+     A                                    10'4.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(48)
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                               12'The premium for this policy will -
+     A*****                                 be determined by our Manuals of -
+     A*****                                 Rules, Classifications, Rates and -
+     A*****                                 Rating Plans.  All information -
+     A*****                                 required'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A  57                                12'The premium for this policy will -
+     A                                      be determined by our Manuals of -
+     A                                      Rules, Classifications, Rates and -
+     A                                      Rating Plans.  All information -
+     A                                      required'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A N57                                12'The contribution for this policy -
+     A                                      will be determined by our Manua-
+     A                                      ls of Rules, Classifications, -
+     A                                      Rates and Rating Plans.  All -
+     A                                      information required'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A                                    12'below is subject to verification -
+     A                                      and change by audit.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(49)
+     A*____________________
+     A*
+     A                                    49'Code'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(51)
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                               58'Premium Basis'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A  57                                58'Premium Basis'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A N57                                58'Contribution Basis'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A                                    81'Rate Per'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    25'Classifications'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(52)
+     A                                    50'No.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    58'Total Estimated'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A*** BEGIN CHG ***  05/05/09  *************************************
+     A*********                           82'$100 or'
+     A                                    82'$100 of'
+     A*** END CHG *****  05/05/09  *************************************
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                   100'Estimated Annual'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    56'Annual Remuneration'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(53)
+     A                                    80'Remuneration'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                              103'Premium'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A  57                               103'Premium'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A N57                               103'Contribution'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A*____________________
+     A*
+      ******** beg del ****** 09/11/07 ********************************
+      ********
+     A********                            50'See Item 4. Extension -
+     A********                              WC 99 06 55'
+     A********                              FNTCHRSET(C0H40090 T1V10037)
+     A********                              SKIPB(55)
+     A*____________________
+     A********
+     A********                            12'If indicated below, interim -
+     A********                              adjustments of premium'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                              SKIPB(57)
+     A********                            64'Premium for Increased Limits -
+     A********                              Part Two,'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                            12'shall be made -'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                              SKIPB(58)
+     A********                            64'  if applicable'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                           101'$'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                            64'Total Premium Subject to the -
+     A********                              Experience'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                              SKIPB(59)
+     A********                            64'  Modification'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                              SKIPB(60)
+     A********                           101'$'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                            15'Semiannually;'
+     A********                              FNTCHRSET(C0H20090 T1V10037)
+     A********                              SKIPB(61)
+     A********                            30'Quarterly;'
+     A********                              FNTCHRSET(C0H20090 T1V10037)
+     A********                            42'Monthly'
+     A********                              FNTCHRSET(C0H20090 T1V10037)
+     A********                            15'This is a Three Year Fixed -
+     A********                              Rate Policy'
+     A********                              FNTCHRSET(C0H20090 T1V10037)
+     A********                              SKIPB(63)
+     A********                            64'Total Estimated Standard Premium'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                              SKIPB(64)
+     A********                           101'$'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                            64'Premium Discount, if applicable'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                              SKIPB(65)
+     A********                           101'$'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                            64'Expense Constant Charge'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                              SKIPB(66)
+     A********                           101'$'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                            64'Total Estimated Annual Premium'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+     A********                              SKIPB(72)
+     A********                           101'$'
+     A********                              FNTCHRSET(C0H20080 T1V10037)
+      ******** end del ****** 09/11/07 ********************************
+      ******** beg add ****** 09/11/07 ********************************
+     A*____________________
+     A                                    50'See Item 4. Schedule -
+     A                                      WC 99 06 55'
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      SKIPB(55)
+     A*____________________
+     A*
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                               12'If indicated below, interim -
+     A*****                                 adjustments of premium'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A*****                                 SKIPB(57)
+      **
+     A*****                               64'Manual Premium'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A  57                                12'If indicated below, interim -
+     A                                      adjustments of premium'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(57)
+     A N57                                12'If indicated below, interim -
+     A                                      adjustments of contribution'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(57)
+     A  57                                64'Manual Premium'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A N57                                64'Manual Contribution'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A                                   101'$'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      **
+     A                                    12'shall be made -'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(58)
+      **
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A******                              64'Employers Liability -
+     A******                                Increased Limits Premium'
+     A******                                FNTCHRSET(C0H20080 T1V10037)
+     A  57                                64'Employers Liability -
+     A                                      Increased Limits Premium'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A N57                                64'Employers Liability -
+     A                                      Increased Limits Contribution'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A                                   101'$'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      **
+     A                                    64'Safety Factor Credit'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(59)
+     A                                   101'$'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      **
+     A                                    64'Drug-Free Workplace Credit'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(60)
+     A                                   101'$'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      **
+     A                                    15'Semiannually;'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      SKIPB(61)
+     A                                    30'Quarterly;'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                    42'Monthly'
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+      **
+     A                                    64'Experience Rating -
+     A                                      Modification Factor'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      *** ZZZ
+     A                                    94'('
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    99')'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                   101'$'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      **
+     A                                    64'Florida CCPAP Credit'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(62)
+     A                                   101'$'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      **
+     A*** BEGIN DEL ***  05/05/09  *************************************
+     A*********                           15'This is a Three Year Fixed -
+     A*********                             Rate Policy'
+     A*********                             FNTCHRSET(C0H20090 T1V10037)
+     A*********                             SKIPB(63)
+     A*** END DEL *****  05/05/09  *************************************
+      **
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                               64'Premium Discount'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A*** BEGIN ADD ***  05/05/09  *************************************
+     A*****                                 SKIPB(63)
+     A                                    64'Premium Discount'
+     A  57                                  FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(63)
+     A N57                                64'Contribution Discount'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(63)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A*** END ADD *****  05/05/09  *************************************
+     A                                   101'$'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      **
+     A                                    64'Expense Constant'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(64)
+     A                                   101'$'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      **
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                               64'Terrorism Premium'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A*****                                 SKIPB(65)
+     A  57                                64'Terrorism Premium'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(65)
+     A N57                                64'Terrorism Contribution'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(65)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A                                   101'$'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      **
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                               64'Estimated Annual Premium'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A*****                                 SKIPB(66)
+     A  57                                64'Total Estimated Annual Premium'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(66)
+     A N57                                64'Total Estimated Annual Contributio-
+     A                                      n'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(66)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A                                   101'$'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      **
+      ******** end add ****** 09/11/07 ********************************
+     A*____________________
+     A*
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                               10'Minimum Premium $'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A*****                                 SKIPB(74)
+     A  57                                10'Minimum Premium $'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(74)
+     A N57                                10'Minimum Contribution $'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(74)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A*** BEGIN DEL ***  05/05/09  *************************************
+     A*********                           56'Deposit Premium $'
+     A*********                             FNTCHRSET(C0H20080 T1V10037)
+     A*** END DEL *****  05/05/09  *************************************
+     A*____________________
+     A*
+     A                                    10'Name of Producer:'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(76)
+     A                                    10'Producer Address:'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(77)
+     A                                    62'Countersigned By'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(80)
+     A                                    80'Authorized Representative'
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A                                      SKIPB(81)
+     A                                   110'Date'
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A*____________________
+     A*
+     A                                    25'THIS INFORMATION PAGE WITH THE-
+     A                                       WORKERS COMPENSATION AND EMPLOYERS-
+     A                                       LIABILITY INSURANCE POLICY'
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A                                      SKIPB(83)
+     A                                    25'AND ENDORSEMENTS, IF ANY, ISSUED-
+     A                                       TO FORM A PART THEREOF, COMPLETES-
+     A                                       THE ABOVE NUMBERED POLICY.'
+     A                                      FNTCHRSET(C0H20070 T1V10037)
+     A                                      SKIPB(84)
+     A                                   105'WC 00 00 01 A'
+     A                                      FNTCHRSET(C0H40060 T1V10037)
+     A                                      SKIPB(85)
+     A*____________________________________________________________________
+     A*
+     A          R BOXESFL
+     A* Border
+     A                                      BOX(0.38 0.50 10.25 8.00 .008)
+     A* NCCI Co. No.
+     A                                      BOX(1.05 0.63 1.25 1.19 .008)
+     A* Policy #
+     A                                      BOX(1.06 6.13 1.31 7.93 .008)
+     A* Prior Policy #
+     A                                      BOX(1.56 6.13 1.81 7.93 .008)
+     A* Individual
+     A                                      BOX(2.00 6.05 2.13 6.18 .015)
+     A* Partnership
+     A                                      BOX(2.00 6.91 2.13 7.04 .015)
+     A* Corporation
+     A                                      BOX(2.25 6.05 2.38 6.18 .015)
+     A* Other
+     A**** DELETE 05/13/11                  LINE(2.39 7.04 0.75 *HRZ .008)
+     A* Insured's I.D.
+     A                                      LINE(2.90 6.13 1.80 *HRZ .008)
+     A* FEIN
+     A                                      LINE(3.10 6.53 1.40 *HRZ .008)
+     A                                      LINE(3.30 6.53 1.40 *HRZ .008)
+     A* Semiannually
+     A                                      BOX(7.50 0.77 7.63 0.90 .015)
+     A* Quarterly
+     A                                      BOX(7.50 1.77 7.63 1.90 .015)
+     A* Monthly
+     A                                      BOX(7.50 2.55 7.63 2.68 .015)
+     A*** BEGIN DEL ***  05/05/09  *************************************
+     A* Fixed Rate
+     A*************                         BOX(7.75 0.77 7.88 0.90 .015)
+     A*** END DEL *****  05/05/09  *************************************
+     A* Signature
+     A                                      LINE(10.00 5.00 2.75 *HRZ .008)
+     A*
+     A                                      LINE(3.50 0.50 7.50 *HRZ .008)
+     A                                      LINE(3.88 0.50 7.50 *HRZ .008)
+     A                                      LINE(5.81 0.50 7.50 *HRZ .008)
+     A                                      LINE(6.13 0.50 7.50 *HRZ .008)
+     A                                      LINE(6.69 0.50 7.50 *HRZ .008)
+     A                                      LINE(6.88 0.50 7.50 *HRZ .008)
+     A                                      LINE(6.88 4.13 2.25 *VRT .008)
+     A                                      LINE(6.88 6.63 2.25 *VRT .008)
+     A                                      LINE(9.13 0.50 7.50 *HRZ .008)
+     A                                      LINE(9.31 0.50 7.50 *HRZ .008)
+     A*____________________________________________________________________
+     A*
+     A          R FORMFL
+     A*____________________
+     A*
+     A            GRPNAME   R               REFFLD(PFN01/FNNAME WMFNP)
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      POSITION( 1.06  &GRPNMVRT)
+     A            GRPADR1   R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      POSITION( 1.30  &GRPA1VRT)
+     A            GRPADR2   R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H40090 T1V10037)
+     A                                      POSITION( 1.45  &GRPA2VRT)
+     A            GRPADR3   R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 1.60  &GRPA3VRT)
+     A            GRPADR4   R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 1.75  &GRPA4VRT)
+     A            GRPADR5   R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 1.90  &GRPA5VRT)
+     A            GRPADR6   R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 2.05  &GRPA6VRT)
+     A            GRPADR7   R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      POSITION( 2.20  &GRPA7VRT)
+     A*____________________                                            ____
+     A*
+      *** BEG CHG ***** 11/18/10 **************************************
+      ******** BEG CHG ****** 12/11/09 ********************************
+     A*************     EMPNAME   R               REFFLD(DS00)
+     A************X1NAME        57
+      *********END CHG ****** 12/11/09 ********************************
+     A************                          FNTCHRSET(C0H20090 T1V10037)
+     A************                          POSITION( 2.45  0.80)
+      *********BEG ADD ****** 12/11/09 ********************************
+     A************X2NAME        57
+     A************                          FNTCHRSET(C0H20090 T1V10037)
+     A************                          POSITION( 2.60  0.80)
+      *********END ADD ****** 12/11/09 ********************************
+     A************EMPADR1   R               REFFLD(DS00)
+     A************                          FNTCHRSET(C0H20090 T1V10037)
+      *********BEG CHG ****** 12/11/09 ********************************
+     A************                          POSITION( 2.60  0.80)
+     A************                          POSITION( 2.75  0.80)
+      *********END CHG ****** 12/11/09 ********************************
+     A************EMPADR2   R               REFFLD(DS00)
+     A************                          FNTCHRSET(C0H20090 T1V10037)
+      *********BEG CHG ****** 12/11/09 ********************************
+     A************                          POSITION( 2.75  0.80)
+     A************                          POSITION( 2.90  0.80)
+      *********END CHG ****** 12/11/09 ********************************
+     A************EMPADR3   R               REFFLD(DS00)
+     A************                          FNTCHRSET(C0H20090 T1V10037)
+      *********BEG CHG ****** 12/11/09 ********************************
+     A************                          POSITION( 2.90  0.80)
+     A************                          POSITION( 3.05  0.80)
+      *********END CHG ****** 12/11/09 ********************************
+     A************EMPADR4   R               REFFLD(DS00)
+     A************                          FNTCHRSET(C0H20090 T1V10037)
+      *********BEG CHG ****** 12/11/09 ********************************
+     A************                          POSITION( 3.05  0.80)
+     A************                          POSITION( 3.20  0.80)
+      *********END CHG ****** 12/11/09 ********************************
+     A************EMPADR5   R               REFFLD(DS00)
+     A************                          FNTCHRSET(C0H20090 T1V10037)
+      *********BEG CHG ****** 12/11/09 ********************************
+     A************                          POSITION( 3.20  0.80)
+     A************                          POSITION( 3.35  0.80)
+      ******** END CHG ****** 12/11/09 ********************************
+
+     A            NAMADD1       60          FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 2.45  0.80)
+     A            NAMADD2       60          FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 2.60  0.80)
+     A            NAMADD3       60          FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 2.75  0.80)
+     A            NAMADD4       60          FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 2.90  0.80)
+     A            NAMADD5       60          FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 3.05  0.80)
+     A            NAMADD6       60          FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 3.20  0.80)
+     A            NAMADD7       60          FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 3.35  0.80)
+      *** END CHG ***** 11/18/10 **************************************
+     A*____________________                                            ____
+     A*
+     A            NCCICONO  R               REFFLD(CLAS)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 1.20  0.70)
+     A            CURRPOL#      18
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 1.22  6.20)
+     A            PREVPOL#      18
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 1.73  6.20)
+     A*____________________                                            ____
+     A*
+     A            EMPRISK#  R               REFFLD(RISK#)
+     A                                      POSITION( 2.85  6.40)
+     A            EMPFEIN   R     A         REFFLD(FEIN)
+     A                                      POSITION( 3.05  6.60)
+     A*____________________                                            ____
+     A*
+     A            POLFRDT       10
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 3.70  2.20)
+     A            POLTODT       10
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 3.70  3.60)
+     A*____________________                                            ____
+     A*
+     A            ITEM3A1   R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 4.25  1.00)
+     A            ITEM3A2   R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 4.50  1.00)
+     A            ITEM3B1        9  0       EDTCDE(J)
+     A                                      UNDERLINE
+     A                                      POSITION( 4.70  3.60)
+     A            ITEM3B2        9  0       EDTCDE(J)
+     A                                      UNDERLINE
+     A                                      POSITION( 4.85  3.60)
+     A            ITEM3B3        9  0       EDTCDE(J)
+     A                                      UNDERLINE
+     A                                      POSITION( 5.00  3.60)
+     A            ITEM3C1   R               REFFLD(DS60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 5.40  1.00)
+     A            ITEM3C2   R               REFFLD(DS60)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 5.55  1.00)
+     A            ITEM3D1   R               REFFLD(DS50)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 5.75  3.75)
+     A*____________________                                            ____
+     A*
+     A            SEMIFLAG  R               REFFLD(FLAG)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      POSITION( 7.60  0.80)
+     A            QRTFLAG   R               REFFLD(FLAG)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      POSITION( 7.60  1.80)
+     A            MNTHFLAG  R               REFFLD(FLAG)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      POSITION( 7.60  2.58)
+     A            FIXFLAG   R               REFFLD(FLAG)
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      POSITION( 7.85  0.80)
+     A*____________________                                            ____
+     A*
+      ******** beg del ****** 09/11/07 ********************************
+     A********    INL2PREM  R               REFFLD(A112)
+     A********                              EDTCDE(1)
+     A********                              POSITION( 7.25  6.90)
+     A********    EXPMPREM  R               REFFLD(A112)
+     A********                              EDTCDE(1)
+     A********                              POSITION( 7.50  6.90)
+     A********    STDPREM   R               REFFLD(A112)
+     A********                              EDTCDE(1)
+     A********                              POSITION( 8.00  6.90)
+     A********    PREMDISC  R               REFFLD(A112)
+     A********                              EDTCDE(1)
+     A********                              POSITION( 8.12  6.90)
+     A********    EXPCONST  R               REFFLD(A112)
+     A********                              EDTCDE(1)
+     A********                              POSITION( 8.24  6.90)
+     A********    ANNPREM   R               REFFLD(A112)
+     A********                              EDTCDE(1)
+     A********                              POSITION( 9.00  6.90)
+      ******** end del ****** 09/11/07 ********************************
+      ******** beg add ****** 09/11/07 ********************************
+      *
+     A            MANPREM   R               REFFLD(A112)
+     A                                      EDTCDE(1)
+     A                                      POSITION( 7.10  6.90)
+     A            INL2PREM  R               REFFLD(A112)
+     A                                      EDTCDE(1)
+     A                                      POSITION( 7.225 6.90)
+     A            SAFEDISC  R               REFFLD(A112)
+     A                                      EDTCDE(1)
+     A                                      POSITION( 7.35  6.90)
+     A            DRUGDISC  R               REFFLD(A112)
+     A                                      EDTCDE(1)
+     A                                      POSITION( 7.475 6.90)
+      * ZZZ
+     A            MODEXFAC       3  2
+     A                                      EDTWRD(' .  ')
+     A                                      POSITION( 7.60  6.25)
+     A            MODEXPRM  R               REFFLD(A112)
+     A                                      EDTCDE(1)
+     A                                      POSITION( 7.60  6.90)
+     A            CONTDISC  R               REFFLD(A112)
+     A                                      EDTCDE(1)
+     A                                      POSITION( 7.725 6.90)
+     A            PREMDISC  R               REFFLD(A112)
+     A                                      EDTCDE(1)
+     A                                      POSITION( 7.85  6.90)
+     A            EXPCONST  R               REFFLD(A112)
+     A                                      EDTCDE(1)
+     A                                      POSITION( 7.975 6.90)
+     A            TERRPREM  R               REFFLD(A112)
+     A                                      EDTCDE(1)
+     A                                      POSITION( 8.10  6.90)
+     A            ANNPREM   R               REFFLD(A112)
+     A                                      EDTCDE(1)
+     A                                      POSITION( 8.225 6.90)
+      *
+      ******** end add ****** 09/11/07 ********************************
+     A            MINPREM   R               REFFLD(A112)
+     A                                      EDTCDE(1)
+     A                                      POSITION( 9.25  1.75)
+     A*** BEGIN DEL ***  05/05/09  *************************************
+     A*********   DEPPREM   R               REFFLD(A112)
+     A*********                             EDTCDE(1)
+     A*********                             POSITION( 9.25  4.75)
+     A*** END DEL *****  05/05/09  *************************************
+     A*____________________                                            ____
+     A*
+     A            PRODNAME  R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 9.50  1.60)
+     A            PRODADR1  R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 9.65  1.60)
+     A            PRODADR2  R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 9.80  1.60)
+     A            PRODADR3  R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION( 9.95  1.60)
+     A            PRODADR4  R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20090 T1V10037)
+     A                                      POSITION(10.10  1.60)
+     A*____________________                                            ____
+     A*
+     A            GRPNMVRT       5S 3P
+     A            GRPA1VRT       5S 3P
+     A            GRPA2VRT       5S 3P
+     A            GRPA3VRT       5S 3P
+     A            GRPA4VRT       5S 3P
+     A            GRPA5VRT       5S 3P
+     A            GRPA6VRT       5S 3P
+     A            GRPA7VRT       5S 3P

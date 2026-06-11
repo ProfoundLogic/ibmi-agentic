@@ -1,0 +1,61 @@
+     A*%%TS  SD  19971229  140319  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   AGENT ACCOUNT CURRENT STATEMENTS PROMPT DISPLAY          **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF05
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C7601F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  8 26'Statement Date (MM/YY):'
+     A            SCACMY    R        B  8 51REFFLD(A60 CREFP)
+     A                                      TEXT('STATEMEN run date month/year')
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /    ')
+     A  20                                  ERRMSGID(CCR0737 *LIBL/CMESGG)
+     A                                 10 38'Agent #:'
+     A            SCAGT#    R        B 10 48REFFLD(AGT#)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  21                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 10 55'(Default = all)'
+     A                                 23  3'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 29'F5=Agent search'
+     A                                      COLOR(BLU)
+     A                                 23 58'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

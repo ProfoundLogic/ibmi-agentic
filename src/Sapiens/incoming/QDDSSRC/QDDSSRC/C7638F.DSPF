@@ -1,0 +1,48 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   OPEN CLAIMS BY ADJUSTER - PROMPT DISPLAY                 **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A*----------------------------------------------------------------
+     A          R SCR01
+     A                                      CF13
+     A                                      SETOF(21)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7638F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  7 25'Adjuster Number:'
+     A            SCADJR    R        B  7 42REFFLD(STAF)
+     A*                                     DSPATR(CS)
+     A  21                                  ERRMSGID(CCR0641 *LIBL/CMESGG)
+     A                                  7 47'(Default = ALL)'
+     A                                 24  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 64'F13=Chg usr parm'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A*----------------------------------------------------------------
+     A            SCERR     R        I  3  3REFFLD(FLAG *LIBL/SREFP)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

@@ -1,0 +1,237 @@
+      * (c) 2009 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A****************************************************************
+     A*  WORKERS' COMP CLAIMS LISTING WORK FILE
+     A****************************************************************
+     A*  PROGRAMMER: C:118                                           *
+     A*  CREATED:    03/20/00    PROJECT: WC577                      *
+     A****************************************************************
+     A*                                                              *
+     A*  REVISIONS:                                                  *
+     A*                                                              *
+     A* 04/20/09  C:190  Project: WC1473                               *
+     A*                  Add field to hold class code extension.       *
+     A*                                                                *
+     A*  02/18/05  C:132  PROJECT: WC1221                            *
+     A*                   Add additonal fields for Gross paid and    *
+     A*                   recovered amounts.                         *
+     A*                                                              *
+     A*  06/26/00  C:61   PROJECT: WC577                             *
+     A*                   Add policy FROM and policy TO date to file *
+     A*                   in CCYYMMDD format.                        *
+     A*                                                              *
+     A*  04/12/00  C:118  PROJECT: WC577                             *
+     A*                   ADDED THE FOLLOWING FIELDS:                *
+     A*                   CONAME, GROUP NAME, REGION DESC, EMP NAME  *
+     A*                   CLASS DESC, NCCI DESC, NATURE CODE DESC,   *
+     A*                   PART CODE DESC, CAUSE CODE DESC, SUPR NAME *
+     A*                   ADJUSTER NAME, UNIT MGR NAME, FIELD ADJ    *
+     A*                   AND JURISDICTION STATE.                    *
+     A*                   CHANGED NUMERIC FIELDS FROM PACKED NUM TO  *
+     A*                   SIGNED.                                    *
+     A*                   CHANGED DATE FORMAT FROM DT TO DT8         *
+     A*
+     A****************************************************************
+     A*
+     A                                      REF(WREFP)
+     A          R PCL01                     TEXT('CLAIM LIST WORK FIL  E')
+     A            CLCO#          3S 0
+     A                                      COLHDG('COMPANY#')
+     A            CLCONM    R               REFFLD(NAME)
+     A                                      COLHDG('COMPANY NAME')
+     A            CLFND          3S 0
+     A                                      COLHDG('GROUP')
+     A            CLFNNM    R               REFFLD(NM60)
+     A                                      COLHDG('GROUP NAME')
+     A            CLFYR          3S 0
+     A                                      COLHDG('YEAR')
+     A            CLRGN#         3S 0
+     A                                      COLHDG('REGION')
+     A            CLRDES    R               REFFLD(DS30)
+     A                                      COLHDG('REGION DESC')
+     A            CLEMP#         9S 0
+     A                                      COLHDG('EMPLOYER')
+     A            CLEMNM    R               REFFLD(NAME)
+     A                                      COLHDG('EMPLOYER' 'NAME')
+     A            CLDIV          5S 0
+     A                                      COLHDG('DIVISION')
+     A            CLCASE         7S 0
+     A                                      COLHDG('CASE')
+     A            CLCLAS         5S 0
+     A                                      COLHDG('CLASS')
+     A            CLCLDS    R               REFFLD(DS30)
+     A                                      COLHDG('CLASS' 'DESC')
+     A            CLAWW          7S 2
+     A                                      COLHDG('AWW')
+     A            CLRATE         7S 2
+     A                                      COLHDG('RATE')
+     A            CLACDT    R               REFFLD(DT8)
+     A                                      COLHDG('ACC DATE')
+     A            CLRCDT    R               REFFLD(DT8)
+     A                                      COLHDG('RECVD DATE')
+     A            CLENDT    R               REFFLD(DT8)
+     A                                      COLHDG('ENTERED DATE')
+     A            CLCLDT    R               REFFLD(DT8)
+     A                                      COLHDG('CLOSED DATE')
+     A            CLNCCI    R               REFFLD(CODE)
+     A                                      COLHDG('NCCI')
+     A            CLNCDS    R               REFFLD(DS30)
+     A                                      COLHDG('NCCI' 'DESC')
+     A            CLNATR    R               REFFLD(CODE)
+     A                                      COLHDG('NATURE CODE')
+     A            CLNADS    R               REFFLD(DS30)
+     A                                      COLHDG('NATURE CODE DESC')
+     A            CLPART    R               REFFLD(CODE)
+     A                                      COLHDG('PART CODE')
+     A            CLPADS    R               REFFLD(DS30)
+     A                                      COLHDG('PART CODE' 'DESC')
+     A            CLCAUS    R               REFFLD(CODE)
+     A                                      COLHDG('CAUSE CODE')
+     A            CLCADS    R               REFFLD(DS30)
+     A                                      COLHDG('CAUSE CODE' 'DESC')
+     A            CLCLMT    R               REFFLD(NAME)
+     A                                      COLHDG('CLAIMANT')
+     A            CLSS#     R               REFFLD(SS#)
+     A                                      COLHDG('SOC SEC NUM')
+     A            CLRCMP        11S 2
+     A                                      COLHDG('RES COMP')
+     A            CLRMED        11S 2
+     A                                      COLHDG('RES MED')
+     A            CLROTH        11S 2
+     A                                      COLHDG('RES OTHER')
+     A            CLRTOT        11S 2
+     A                                      COLHDG('RES TOT')
+     A            CLPCMP        11S 2
+     A                                      COLHDG('PAY COMP')
+     A            CLPMED        11S 2
+     A                                      COLHDG('PAY MED')
+     A            CLPOTH        11S 2
+     A                                      COLHDG('PAY OTHER')
+     A            CLPTOT        11S 2
+     A                                      COLHDG('PAY TOT')
+     A            CLICMP        11S 2
+     A                                      COLHDG('INC COMP')
+     A            CLIMED        11S 2
+     A                                      COLHDG('INC MED')
+     A            CLIOTH        11S 2
+     A                                      COLHDG('INC OTHER')
+     A            CLITOT        11S 2
+     A                                      COLHDG('INC TOT')
+     A            CLSUPR    R               REFFLD(STAF)
+     A                                      COLHDG('SUPR')
+     A            CLSUNM    R               REFFLD(NM50)
+     A                                      COLHDG('SUPR NAME')
+     A            CLCLEX    R               REFFLD(STAF)
+     A                                      COLHDG('ADJUSTER')
+     A            CLEXNM    R               REFFLD(NM50)
+     A                                      COLHDG('ADJ NAME')
+     A            CLUMAN    R               REFFLD(STAF)
+     A                                      COLHDG('UNIT MGR')
+     A            CLUMNM    R               REFFLD(NM50)
+     A                                      COLHDG('UNIT MGR' 'NAME')
+     A            CLFEAD    R               REFFLD(STAF)
+     A                                      COLHDG('FIELD ADJ')
+     A            CLFANM    R               REFFLD(NM50)
+     A                                      COLHDG('FIELD ADJ' 'NAME')
+     A            CLSTAT    R               REFFLD(STAT)
+     A                                      COLHDG('CLAIM STATUS')
+     A***** BEGIN ADD **** 04/12/00 ***********************************
+     A            CLJRST    R               REFFLD(ST)
+     A                                      COLHDG('JURIS STATE')
+     A            CLACST    R               REFFLD(CODE)
+     A                                      COLHDG('ACTIVITY STATUS')
+     A            CLASDS    R               REFFLD(DS40)
+     A                                      COLHDG('ACTIVITY STS DESC')
+     A            CLDNY     R               REFFLD(FLAG)
+     A                                      COLHDG('DENIED FLAG')
+     A            CLCVFL    R               REFFLD(FLAG)
+     A                                      COLHDG('CONTROVERT FLAG')
+     A            CLSUBR    R               REFFLD(FLAG)
+     A                                      COLHDG('SUBRO FLAG')
+     A            CLSDF     R               REFFLD(FLAG)
+     A                                      COLHDG('SDF FLAG')
+     A            CLMCO     R               REFFLD(FLAG)
+     A                                      COLHDG('MCO FLAG')
+     A            CLDTH     R               REFFLD(FLAG)
+     A                                      COLHDG('DEATH FLAG')
+     A            CLDOD     R               REFFLD(DT8)
+     A                                      COLHDG('DATE OF DEATH')
+     A            CLDBDT    R               REFFLD(DT8)
+     A                                      COLHDG('DISABILITY DATE')
+     A            CLRTW     R               REFFLD(DT8)
+     A                                      COLHDG('RTW DATE')
+     A            CLLOC     R               REFFLD(CTGY)
+     A                                      COLHDG('LOCATION #')
+     A            CLLCNM    R               REFFLD(NAME)
+     A                                      COLHDG('LOCATION NAME')
+     A            CLCTG2    R               REFFLD(CTGY)
+     A                                      COLHDG('CATEGORY 2')
+     A            CLOFF#    R               REFFLD(DS5)
+     A                                      COLHDG('OFFICE #')
+     A            CLDEPT    R               REFFLD(DS10)
+     A                                      COLHDG('DEPARTMENT')
+     A            CLDPDS    R               REFFLD(DS40)
+     A                                      COLHDG('DEPT DESC')
+     A            CLESTS    R               REFFLD(CODE)
+     A                                      COLHDG('EMPLOY STS')
+     A            CLESDS    R               REFFLD(DS40)
+     A                                      COLHDG('EMPLOY STS DESC')
+     A            CLSHFT    R               REFFLD(FLAG)
+     A                                      COLHDG('SHIFT')
+     A            CLSHDS    R               REFFLD(DS40)
+     A                                      COLHDG('SHIFT DESC')
+     A            CLDTRP    R               REFFLD(DT8)
+     A                                      COLHDG('DT REPORTED')
+     A            CLACDS    R               REFFLD(DS60)
+     A                                      COLHDG('ACC DESC')
+     A            CLACD2    R               REFFLD(DS60)
+     A                                      COLHDG('ACC DESC 2')
+     A            CLCHAP         3S 0
+     A                                      COLHDG('CHAPTER')
+     A            CLCHDS    R               REFFLD(DS30)
+     A                                      COLHDG('CHAP DESC')
+     A            CLLTFL    R               REFFLD(FLAG)
+     A                                      COLHDG('LOST TIME FLAG')
+     A***** END   ADD **** 04/12/00 ***********************************
+     A            CLUSER    R               REFFLD(USER)
+     A            CLPGM     R               REFFLD(PGM)
+     A            CLTIME    R               REFFLD(TIME)
+     A            CLDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A**** BEG ADD ***** 06/26/00 ************************************
+      *
+     A            CLPFDT    R               REFFLD(DT8)
+     A                                      COLHDG('POLICY FROM' 'DATE')
+      *
+     A            CLPTDT    R               REFFLD(DT8)
+     A                                      COLHDG('POLICY TO' 'DATE')
+      *
+     A**** END ADD ***** 06/26/00 ************************************
+      *
+     A***** BEG ADD ***** 02/18/05 ************************************
+     A*  GROSS PAID
+     A            CLGCMP        11S 2       TEXT('COMP GROSS PAID')
+     A                                      COLHDG('COMP GROSS PD')
+     A            CLGMED        11S 2       TEXT('MEDICAL GROSS PD')
+     A                                      COLHDG('MED GROSS PAID')
+     A            CLGOTH        11S 2       TEXT('OTHER GROSS PAID')
+     A                                      COLHDG('OTHER GROSS PD')
+     A            CLGTOT        11S 2       TEXT('TOTAL GROSS PAID')
+     A                                      COLHDG('TOTAL GROSS PD')
+     A*  RECOVERIES
+     A            CLRCCO        11S 2       TEXT('COMP RECOVERED')
+     A                                      COLHDG('COMP RECOVERED')
+     A            CLRCME        11S 2       TEXT('MEDICAL RECOVERED')
+     A                                      COLHDG('MED RECOVERED')
+     A            CLRCOT        11S 2       TEXT('OTHER RECOVERED')
+     A                                      COLHDG('OTHER RECOVERED')
+     A            CLRCTL        11S 2       TEXT('TOTAL RECOVERED')
+     A                                      COLHDG('TOTAL RECOVERED')
+     A***** END ADD ***** 02/18/05 ************************************
+     A*** Beg Add *** 04/20/09 **************************************  *********
+     A            CLSPEC    R               REFFLD(FLAG)
+     A                                      COLHDG('PAYROLL CLS' 'SPEC DESG')
+     A            CLEXT     R               REFFLD(CLA2)
+     A                                      COLHDG('Payroll Class' +
+     A                                      'Extension')
+     A*** End Add *** 04/20/09 **************************************  *********

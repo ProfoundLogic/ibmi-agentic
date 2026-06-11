@@ -1,0 +1,793 @@
+      *Copyright('(c) 2022 Sapiens. All Rights Reserved.')                 *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*
+     A*  WORKERS' COMP  CLAIM/DARTS CONTROL DEFINITION FILE
+     A*
+     A*****************************************************************
+     A*  REVISIONS:                                                   *
+     A*                                                               *
+     A* 08/29/22  C:340  Project: WC2823                              *
+     A*                  Add Print FROI Field - CXPRTFROI             *
+     A*                                                               *
+     A* 07/16/18  C:062  Project: 133WQO                              *
+     A*                  Add Auto-Diary flag for adding addtl payees. *
+     A*                                                               *
+     A* 09/01/17  C:180  Project: WC2499                              *
+     A*                  Add flag to display CVT claim number on EOB. *
+     A*                                                               *
+     A* 07/19/17  C:053  Project: WC2499
+     A*                  Add FROI hardcover print remark code
+     A*
+     A* 02/14/17  C:212  Project: 90MHY                               *
+     A*                  PBM INTERFACE                                *
+     A*                                                               *
+     A* 09/04/14  C:279  Project: 114WOE                              *
+     A*                  Field CXCLMINST (Claim Handling Instructions)*
+     A*                  added.
+     A*                                                               *
+     A* 07/28/14  C:295  Project: 114WMD                              *
+     A*                  Added field.                                 *
+     A*                  CLAIM ACTION PLAN DART REMARK CODE           *
+     A*                                                               *
+     A* 11/25/13  C:282  Project: 129WSC                              *
+     A*                  Added field.                                 *
+     A*                  1. APPORTIONMENT RMK                         *
+     A*                  2. LEGAL RESERVE HEADING                     *
+     A*                                                               *
+     A* 08/29/13  C:279  Project: WC2213                              *
+     A*                  New field CXAWWR (AWW is required) added.    *
+     A*                                                               *
+     A* 03/16/12  C:282  Project: 113WML                              *
+     A*                  Added field.                                 *
+     A*                  1. Removal of CMS submission flag diary code *
+     A*                  2. Removal of CMS submission flag diary user *
+     A*                  3. Removal of CMS submission flag diary user *
+     A*                                                               *
+     A* 07/27/11  C:190  Project: 114WZT                              *
+     A*                  Added field.                                 *
+     A*                  1. Loss Condition - Recovery Type.           *
+     A*                  2. Method Of Determining Preinjury.          *
+     A*                                                               *
+     A* 06/01/11  C:190  Project: 25WPW                               *
+     A*                  Added a new field: 'Wage calc review diary'  *
+     A*                                                               *
+     A* 05/05/11  C:235  Project: 114MZL                              *
+     A*                  Added field  "Exclude from NCCI Medical Data *
+     A*                  Call Reporting"                              *
+     A*                                                               *
+     A*  3/28/11  C: 58  Project: 133WKZ                              *
+     A*                  Add Flags: require DOH, DOB, Gender at claim *
+     A*                  entry.                                       *
+     A*                                                               *
+     A* 12/13/10  C:198  Project: WC1963                              *
+     A*                  Added a new field.                           *
+     A*                                                               *
+     A* 12/02/10  C:235  Project: 133WKI                              *
+     A*                  Added fields for open/close table desc. flag *
+     A*                                                               *
+     A* 05/18/10  C:198  Project: WC1879                              *
+     A*                  Added fields for re-submission authority.    *
+     A*                                                               *
+     A* 01/18/10  C:247  Project: 25WPT:                              *
+     A*                  Litigation_Scrn_Tracking_Attorney_Fees       *
+     A*                                                               *
+     A* 10/26/09  C:198  Project: WC1819 Phase 3.                     *
+     A*                  Changed CXCEDU from 3 to 2 and CXCESU from   *
+     A*                  2 to 3A.                                     *
+     A*                                                               *
+     A* 08/14/09  C:232  Project: WC1819 Phase 5.                     *
+     A*                  Added new fields.                            *
+     A*                                                               *
+     A* 07/21/09  C:062  Project: 114WTT                              *
+     A*                  Add Devereax processing fields               *
+      *                                                               *
+     A*                                                               *
+     A* 07/16/09  C:198  Project: WC1819                              *
+     A*                  Added new fields.                            *
+     A*                                                               *
+     A* 07/14/09  C:189  Project: 114WOJ                              *
+     A*                  Change of Address Tracking/Force new Darts   *
+     A*                  Remark                                       *
+      *                                                               *
+      * 05/20/09  C:33   Project: WC1770                              *
+      *                  Add new fields to store the Medical          *
+      *                   Beneficiary Submission security information.*
+     A*                                                               *
+     A*  10/19/07 C:191 Project: WC1584                               *
+     A*               - Add EDI Mailing date increment #              *
+     A*                                                               *
+     A*  05/07/07 C:191 Project: WC1438                               *
+     A*               - Add Claim Summary Flag                        *
+     A*                                                               *
+     A*  04/26/07 C:132 Project: 133web                               *
+     A*               - Added Possible Duplicate Payment fields.      *
+     A*               - Modified Text on Duplicate Payment fields     *
+     A*                 that were added on 01/25/07                   *
+     A*                                                               *
+     A*  01/25/07 C:183 Project: 114WLY                               *
+     A*                 Added Duplicate Payment fields.               *
+     A*                                                               *
+     A*  01/24/06 C:168 Project: 132WBU                               *
+     A*                 Add security for the decision date override   *
+     A*                                                               *
+     A*  10/14/03 C:136 Project: WC1159                               *
+     A*                 Add security type/leve fields to override edit*
+     A*                 on zero audited payroll that has associated   *
+     A*                 claims.                                       *
+     A*                                                               *
+     A*  06/09/03  C: 53 Project: WC1128                              *
+     A*                  Add field                                    *
+     A*                                                               *
+     A*  08/12/99  C:112 Project: WC861                               *
+     A*                  Add field, CXRLBL, as a flag to be used in   *
+     A*                  determining if Record Only claim labels      *
+     A*                  should be printed. Flag will have a value of *
+     A*                  'Y' for yes or will be blank.                *
+     A*                                                               *
+     A*  09/24/98  C:87  PROJECT: WC577                               *
+     A*                  ADDED THE FIELDS: CXTB#, CXTBID, CXTBPW,     *
+     A*                  CXTBNP, CXRAD2, CXBAD2, CXNRS, CXNRSD        *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PCX01                     TEXT('NOI/CLAIM INTAKE DARTS')
+     A            CXCO#     R               REFFLD(CO#)
+     A            CXFND     R               REFFLD(FND)
+     A            CXSECL    R               REFFLD(LVL)
+     A                                      COLHDG('CLAIM DELETION' 'SEC LVL')
+     A            CXCKDL    R               REFFLD(LVL)
+     A                                      COLHDG('EOMB CHK RQST' +
+     A                                        'DLT SEC LVL')
+     A            CXLOCT    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM LOCATION' +
+     A                                        'ENTRY FLAG')
+     A            CXSTAT    R               REFFLD(STAT)
+     A            CXUSER    R               REFFLD(USER)
+     A            CXPGM     R               REFFLD(PGM)
+     A            CXTIME    R               REFFLD(TIME)
+     A            CXDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            CXIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            CXIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'DATE')
+     A            CXSECC    R               REFFLD(LVL)
+     A                                      COLHDG('OVERRIDE CANCEL' +
+     A                                        'EDIT SEC LVL')
+     A            CXSE01    R               REFFLD(LVL)
+     A                                      COLHDG('SEC LVL 1')
+     A            CXSE02    R               REFFLD(LVL)
+     A                                      COLHDG('SEC LVL 2')
+     A            CXSE03    R               REFFLD(LVL)
+     A                                      COLHDG('SEC LVL 3')
+     A            CXSE04    R               REFFLD(LVL)
+     A                                      COLHDG('SEC LVL 4')
+     A            CXSE05    R               REFFLD(LVL)
+     A                                      COLHDG('SEC LVL 5')
+     A            CXSE06    R               REFFLD(LVL)
+     A                                      COLHDG('SEC LVL 6')
+     A            CXSE07    R               REFFLD(LVL)
+     A                                      COLHDG('SEC LVL 7')
+     A            CXSE08    R               REFFLD(LVL)
+     A                                      COLHDG('SEC LVL 8')
+     A            CXSE09    R               REFFLD(LVL)
+     A                                      COLHDG('SEC LVL 9')
+     A            CXSE10    R               REFFLD(LVL)
+     A                                      COLHDG('SEC LVL 10')
+     A            CXFL01    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 1')
+     A            CXFL02    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 2')
+     A            CXFL03    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 3')
+     A            CXFL04    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 4')
+     A            CXFL05    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 5')
+     A            CXFL06    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 6')
+     A            CXFL07    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 7')
+     A            CXFL08    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 8')
+     A            CXFL09    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 9')
+     A            CXFL10    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG 10')
+     A            CXDR01    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS REMARK 1')
+     A            CXDR02    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS REMARK 2')
+     A            CXDR03    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS REMARK 3')
+     A            CXDR04    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS REMARK 4')
+     A            CXDR05    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS REMARK 5')
+     A            CXDR06    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS REMARK 6')
+     A            CXDR07    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS REMARK 7')
+     A            CXDR08    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS REMARK 8')
+     A            CXDR09    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS REMARK 9')
+     A            CXDR10    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS REMARK 10')
+     A            CXRFFA    R               REFFLD(RMCD)
+     A                                      COLHDG('CHG FROM ADJ')
+     A            CXRTFA    R               REFFLD(RMCD)
+     A                                      COLHDG('CHG TO ADJ')
+     A            CXRCNC    R               REFFLD(RMCD)
+     A                                      COLHDG('CLAIMANT NAME CHG')
+     A            CXRADS    R               REFFLD(RMCD)
+     A                                      COLHDG('MED ADJ DIARY')
+     A            CXRSSD    R               REFFLD(RMCD)
+     A                                      COLHDG('SUPV SET UP DIARY')
+     A            CXRUMD    R               REFFLD(RMCD)
+     A                                      COLHDG('MANAGER SET UP DIARY')
+     A            CXRCAD    R               REFFLD(RMCD)
+     A                                      COLHDG('COMP ADJ DIARY')
+     A            CXRSRD    R               REFFLD(RMCD)
+     A                                      COLHDG('STATE RPT DIARY')
+     A            CXBADJ    R               REFFLD(A30)
+     A                                      COLHDG('ADJ BENEFIT' 'DIARY DAYS')
+     A            CXBSPV    R               REFFLD(A30)
+     A                                      COLHDG('SUPV BENEFIT' 'DIARY DAYS')
+     A            CXBMGR    R               REFFLD(A30)
+     A                                      COLHDG('MGR BENEFIT' 'DIARY DAYS')
+     A            CXDLTD    R               REFFLD(A30)
+     A                                      COLHDG('DLT PND PMT' 'SEC LVL')
+     A            CXPMTS    R               REFFLD(CODE)
+     A                                      COLHDG('RLS TO PND' 'PMT STS CD')
+     A            CXMJR     R               REFFLD(DS3)
+     A                                      COLHDG('MAJOR PERIL DEFAULT')
+     A            CXROPN    R               REFFLD(RMCD)
+     A                                      COLHDG('REOPEN MED DARTS' 'RMK ADJ')
+     A            CXRODY    R               REFFLD(A30)
+     A                                      COLHDG('REOPEN MED DIARY' '# DAYS')
+     A            CXCSDF    R               REFFLD(CODE)
+     A                                      COLHDG('CLAIM SRCH' 'SORT DEFAULT')
+     A            CXAIP     R               REFFLD(DS5)
+     A                                      TEXT('ADJ/SUPV INIT PAY DARTS CODE')
+     A                                      COLHDG('ADJ/SUPV' 'INIT PY DART CD')
+     A            CXAIPD    R               REFFLD(A30)
+     A                                      TEXT('# DAYS FROM DT LOST TIME')
+     A                                      COLHDG('INIT PY RMRK' 'DAYS FRM LT')
+     A            CXAAD     R               REFFLD(DS5)
+     A                                      TEXT('ADJ/SUPV ACPT/DNY DARTS CODE')
+     A                                      COLHDG('ADJ/SUPV' 'ACP/DNY DART CD')
+     A            CXAADD    R               REFFLD(A30)
+     A                                      TEXT('# DAYS FROM DT RECEIVED')
+     A                                      COLHDG('ACPT/DNY' 'DAYS FRM RCVD')
+     A            CXAFA     R               REFFLD(DS5)
+     A                                      TEXT('ADJ/SUPV FNL ACP/DNY DART CD')
+     A                                      COLHDG('ADJ/SUPV' 'FNL ACP/DNY CD')
+     A            CXAFAD    R               REFFLD(A30)
+     A                                      TEXT('# DAYS FROM DT RECEIVED')
+     A                                      COLHDG('FNL ACP/DNY' 'DAYS FRM RCV')
+     A            CXALLD    R               REFFLD(A30)
+     A                                      TEXT('AUTO LATE LTR DAYS FR ACC DT')
+     A                                      COLHDG('AUTO LATE LTR' 'DYS FR ACC')
+     A            CXARC     R               REFFLD(DS5)
+     A                                      TEXT('ADJ RVW FOR CLOSING DARTS CD')
+     A                                      COLHDG('ADJ RVW CLOSING' 'DARTS CD')
+     A            CXARCD    R               REFFLD(A30)
+     A                                      TEXT('# INTERVAL DAYS FROM DT RCVD')
+     A                                      COLHDG('ADJ RVW CLS' 'DAYS FR RCVD')
+     A            CXSRC     R               REFFLD(DS5)
+     A                                      TEXT('SUP RVW FOR CLOSING DARTS CD')
+     A                                      COLHDG('SUP RVW CLOSING' 'DARTS CD')
+     A            CXSRCD    R               REFFLD(A30)
+     A                                      TEXT('# INTERVAL DAYS FROM DT RCVD')
+     A                                      COLHDG('SUP RVW CLS' 'DAYS FR RCVD')
+     A            CXAIC     R               REFFLD(DS5)
+     A                                      TEXT('ADJ INDEX CLM DIARY DARTS CD')
+     A                                      COLHDG('ADJ IDX CLM' 'DARTS CD')
+     A            CXAICD    R               REFFLD(A30)
+     A                                      TEXT('# DAYS FROM ENTRY/REOPEN')
+     A                                      COLHDG('ADJ IDX CLM' 'DAYS FR ENTR')
+     A            CXJRST    R               REFFLD(ST)
+     A                                      COLHDG('JURISDICTION STATE')
+     A            CXPYOD    R               REFFLD(A30)
+     A                                      COLHDG('PAY ON DENIAL' 'SEC LVL')
+     A            CXRWSD    R               REFFLD(RMCD)
+     A                                      TEXT('REQ WAGE STMT DIARY')
+     A            CXPSC2    R               REFFLD(CODE)
+     A                                      COLHDG('PND TO RLS' 'PMT STS CD')
+     A            CXACCP    R               REFFLD(FLAG)
+     A                                      COLHDG('ALLOW CLAIM' 'CLOSE IF' -
+     A                                      'PENDED PMTS EXIST')
+      *
+      * THE CONTACT HEADING APPEARS IN W0070R06 SCREEN WDW01
+      *
+     A            CXCONH         7A
+     A                                      COLHDG('NOT USED')
+      *
+      * THE CATEGORY HEADING APPEARS IN W0070R07 SCREEN SCR01
+      *
+     A            CXCAT2        11A
+     A                                      COLHDG('HEADING FOR' 'CATEGORY 2')
+      *
+      * THE CATEGORY HEADING APPEARS IN W0070R09 SCREEN SCR01
+      *
+     A            CXADJ         19A
+     A                                      COLHDG('HEADING FOR' 'ADJUSTER')
+     A            CXDCCT    R               REFFLD(CODE)
+     A                                      COLHDG('DEFAULT CLAIM' 'CHECK TYPE')
+     A            CXCDT     R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM DEL TYPE')
+     A            CXOCAT    R               REFFLD(FLAG)
+     A                                      COLHDG('OVR CX < ACC DT')
+     A            CXCKDT    R               REFFLD(FLAG)
+     A                                      COLHDG('EOB CK RQST DEL')
+     A            CXDPPT    R               REFFLD(FLAG)
+     A                                      COLHDG('DEL PENDED PMTS')
+     A            CXPDCT    R               REFFLD(FLAG)
+     A                                      COLHDG('PAY ON DENIAL CLM')
+     A            CXRT01    R               REFFLD(FLAG)
+     A                                      COLHDG('RESERVE TYPE 1')
+     A            CXRT02    R               REFFLD(FLAG)
+     A                                      COLHDG('RESERVE TYPE 2')
+     A            CXRT03    R               REFFLD(FLAG)
+     A                                      COLHDG('RESERVE TYPE 3')
+     A            CXRT04    R               REFFLD(FLAG)
+     A                                      COLHDG('RESERVE TYPE 4')
+      *
+      * Do you want the following Claim
+      *   Entry screens to appear in Add Mode (Y/N)?   (W0069F/SCR04)
+      *
+     A            CXMEDI    R               REFFLD(FLAG)
+     A                                      COLHDG('MED INFO SCREEN')
+     A            CXBENI    R               REFFLD(FLAG)
+     A                                      COLHDG('BEN INFO SCREEN')
+     A            CXRPS     R               REFFLD(FLAG)
+     A                                      COLHDG('RSV/PMT SCREEN')
+     A            CXSTSP    R               REFFLD(FLAG)
+     A                                      COLHDG('STATE SPECIFIC')
+     A            CXDBEN    R               REFFLD(FLAG)
+     A                                      COLHDG('DARTS BENEFIT' 'SCREEN')
+     A            CXDART    R               REFFLD(FLAG)
+     A                                      COLHDG('DARTS SCREEN')
+      *
+      *   AUTO CLAIM CLOSING CRITERIA  (W0069F/SCR04)
+      *
+      * MEDICAL ONLY
+     A            CXMOC     R               REFFLD(FLAG)
+     A                                      COLHDG('MEDICAL ONLY' 'CLAIMS')
+     A            CXACCM    R               REFFLD(FLAG)
+     A                                      COLHDG('ACTUAL CLAIM' 'CLOSING')
+     A            CXNFAM    R               REFFLD(A30)
+     A                                      TEXT('# DAYS OF NO FINANCIAL -
+     A                                      ACTIVITY')
+     A            CXADRM    R               REFFLD(RMCD)
+     A                                      TEXT('ADJ DIARY REMARK')
+      * INDEMNITY CLAIMS
+     A            CXINC     R               REFFLD(FLAG)
+     A                                      COLHDG('INDEMNITY' 'CLAIMS')
+     A            CXACCI    R               REFFLD(FLAG)
+     A                                      COLHDG('ACTUAL CLAIM' 'CLOSING')
+     A            CXNFAI    R               REFFLD(A30)
+     A                                      TEXT('# DAYS OF NO FINANCIAL -
+     A                                      ACTIVITY')
+     A            CXADRI    R               REFFLD(RMCD)
+     A                                      TEXT('ADJ DIARY REMARK')
+     A            CXVSZL    R               REFFLD(LVL)
+     A                                      COLHDG('V/S/Z PMT' 'SEC LVL')
+     A            CXVSZT    R               REFFLD(FLAG)
+     A                                      COLHDG('V/S/Z PMT' 'SEC TYPE')
+     A            CXFSVL    R               REFFLD(LVL)
+     A                                      COLHDG('FULL SALARY' 'VOUCHER LVL')
+     A            CXFSVT    R               REFFLD(FLAG)
+     A                                      COLHDG('FULL SALARY' 'VOUCHER TYP')
+      *
+      * ENTER RESERVE CHANGE AMOUNT (Y) OR TOTAL INCURRED AMOUNT
+      *
+     A            CXRCHG    R               REFFLD(FLAG)
+     A                                      COLHDG('ENTER RESERVE' 'CHANGE?')
+      * SECURITY TYPES 2
+     A            CXCDT2    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM DEL TYPE' 'TYPE 2')
+     A            CXOCA2    R               REFFLD(FLAG)
+     A                                      COLHDG('OVR CX < ACC DT' 'TYPE 2')
+     A            CXCKD2    R               REFFLD(FLAG)
+     A                                      COLHDG('EOB CK RQST DEL' 'TYPE 2')
+     A            CXDPP2    R               REFFLD(FLAG)
+     A                                      COLHDG('DEL PENDED PMTS' 'TYPE 2')
+     A            CXPDC2    R               REFFLD(FLAG)
+     A                                      COLHDG('PAY ON DENIAL CLM' 'TYPE 2')
+     A            CXVSZ2    R               REFFLD(FLAG)
+     A                                      COLHDG('V/S/Z PMT' 'SEC TYPE 2')
+     A            CXFSV2    R               REFFLD(FLAG)
+     A                                      COLHDG('FULL SALARY' 'VOUCHER TYP2')
+      *
+      * SECURITY TYPES 3
+     A            CXCDT3    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM DEL TYPE' 'TYPE 3')
+     A            CXOCA3    R               REFFLD(FLAG)
+     A                                      COLHDG('OVR CX < ACC DT' 'TYPE 3')
+     A            CXCKD3    R               REFFLD(FLAG)
+     A                                      COLHDG('EOB CK RQST DEL' 'TYPE 3')
+     A            CXDPP3    R               REFFLD(FLAG)
+     A                                      COLHDG('DEL PENDED PMTS' 'TYPE 3')
+     A            CXPDC3    R               REFFLD(FLAG)
+     A                                      COLHDG('PAY ON DENIAL CLM' 'TYPE 3')
+     A            CXVSZ3    R               REFFLD(FLAG)
+     A                                      COLHDG('V/S/Z PMT' 'SEC TYPE 3')
+     A            CXFSV3    R               REFFLD(FLAG)
+     A                                      COLHDG('FULL SALARY' 'VOUCHER TYP3')
+      *
+      * SECURITY TYPES 4
+     A            CXCDT4    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM DEL TYPE' 'TYPE 4')
+     A            CXOCA4    R               REFFLD(FLAG)
+     A                                      COLHDG('OVR CX < ACC DT' 'TYPE 4')
+     A            CXCKD4    R               REFFLD(FLAG)
+     A                                      COLHDG('EOB CK RQST DEL' 'TYPE 4')
+     A            CXDPP4    R               REFFLD(FLAG)
+     A                                      COLHDG('DEL PENDED PMTS' 'TYPE 4')
+     A            CXPDC4    R               REFFLD(FLAG)
+     A                                      COLHDG('PAY ON DENIAL CLM' 'TYPE 4')
+     A            CXVSZ4    R               REFFLD(FLAG)
+     A                                      COLHDG('V/S/Z PMT' 'SEC TYPE 4')
+     A            CXFSV4    R               REFFLD(FLAG)
+     A                                      COLHDG('FULL SALARY' 'VOUCHER TYP4')
+      *
+      * SECURITY TYPES 5
+     A            CXCDT5    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM DEL TYPE' 'TYPE 5')
+     A            CXOCA5    R               REFFLD(FLAG)
+     A                                      COLHDG('OVR CX < ACC DT' 'TYPE 5')
+     A            CXCKD5    R               REFFLD(FLAG)
+     A                                      COLHDG('EOB CK RQST DEL' 'TYPE 5')
+     A            CXDPP5    R               REFFLD(FLAG)
+     A                                      COLHDG('DEL PENDED PMTS' 'TYPE 5')
+     A            CXPDC5    R               REFFLD(FLAG)
+     A                                      COLHDG('PAY ON DENIAL CLM' 'TYPE 5')
+     A            CXVSZ5    R               REFFLD(FLAG)
+     A                                      COLHDG('V/S/Z PMT' 'SEC TYPE 5')
+     A            CXFSV5    R               REFFLD(FLAG)
+     A                                      COLHDG('FULL SALARY' 'VOUCHER TYP5')
+     A***  BEGIN ADD  ***  09/24/98  **********************************
+     A            CXTB#         11A         COLHDG('TX BANK' 'ACCOUNT NUMBER')
+     A            CXTBID         8A         COLHDG('TX BANK' 'TRANSMISSION ID')
+     A            CXTBPW         7A         COLHDG('TX BANK BATCH ID/OLD')
+     A            CXTBNP         7A         COLHDG('TX BANK BATCH ID/NEW')
+     A            CXRAD2    R               REFFLD(RMCD)
+     A                                      COLHDG('ADJ ALL CLMS' 'DIARY RMK')
+     A            CXBAD2    R               REFFLD(DYS)
+     A                                      COLHDG('ADJ ALL CLM' 'DIARY # DAYS')
+     A            CXNRS     R               REFFLD(RMCD)
+     A                                      COLHDG('CASE NURSE DIARY RMK')
+     A            CXNRSD    R               REFFLD(DYS)
+     A                                      COLHDG('CASE NURSE # DAYS')
+     A***  END   ADD  ***  09/24/98  **********************************
+     A*** BEGIN ADD *** 09/12/99 **************************************
+     A            CXRLBL         1A         COLHDG('PRNT RCD ONLY' 'CLM LBL')
+     A*** END ADD ***** 09/12/99 **************************************
+     A*** BEG ADD *** 06/09/03 **************************************
+     A            CXSDRO    R               REFFLD(FLAG)
+     A                                      COLHDG('SEND DRY ON' 'RCD ONLY')
+     A*** END ADD *** 06/09/03 **************************************
+     A*** BEG ADD ***** 10/14/03 ************************************
+     A            CXAUT1    R               REFFLD(FLAG)
+     A                                      COLHDG('0 PAYROLL' 'WITH CLAIMS' +
+     A                                      'SECURITY TYPE 1')
+     A            CXAUT2    R               REFFLD(FLAG)
+     A                                      COLHDG('0 PAYROLL' 'WITH CLAIMS' +
+     A                                      'SECURITY TYPE 2')
+     A            CXAUT3    R               REFFLD(FLAG)
+     A                                      COLHDG('0 PAYROLL' 'WITH CLAIMS' +
+     A                                      'SECURITY TYPE 3')
+     A            CXAUT4    R               REFFLD(FLAG)
+     A                                      COLHDG('0 PAYROLL' 'WITH CLAIMS' +
+     A                                      'SECURITY TYPE 4')
+     A            CXAUT5    R               REFFLD(FLAG)
+     A                                      COLHDG('0 PAYROLL' 'WITH CLAIMS' +
+     A                                      'SECURITY TYPE 5')
+     A            CXAUSL         3S 0
+     A                                      COLHDG('0 PAYROLL' 'WITH CLAIMS' +
+     A                                      'SECURITY LEVEL')
+     A*** END ADD ***** 10/14/03 ************************************
+     A*** BEG ADD *** 01/24/06 **************************************
+     A            CXDSLV         3S 0       COLHDG('DECISION DATE' +
+     A                                      'SECURITY LEVEL')
+     A            CXDS01         1A         COLHDG('DECISION DATE' +
+     A                                      'SECURITY TYPE 1')
+     A            CXDS02         1A         COLHDG('DECISION DATE' +
+     A                                      'SECURITY TYPE 2')
+     A            CXDS03         1A         COLHDG('DECISION DATE' +
+     A                                      'SECURITY TYPE 3')
+     A            CXDS04         1A         COLHDG('DECISION DATE' +
+     A                                      'SECURITY TYPE 4')
+     A            CXDS05         1A         COLHDG('DECISION DATE' +
+     A                                      'SECURITY TYPE 5')
+     A            CXDSRC         5A         COLHDG('DECISION DATE' +
+     A                                      'CHANGE DARTS' 'REMARK CODE')
+     A*** END ADD *** 01/24/06 **************************************
+     A*** BEG ADD *** 01/25/07 **************************************
+     A            CXDPPC         2A         COLHDG('DUPLICATE PAYMENT' +
+     A                                      'PEND STATUS CODE')
+     A***** BEG CHG ***** 04/26/07 **************************************
+     A********    CXDPLV         3S 0       COLHDG('DUPLICATE PAYMENT' +
+     A********                              'RELEASE SECURITY' 'LEVEL')
+     A            CXDPLV         3S 0       COLHDG('EXACT DUPLICATE' +
+     A                                      'PAYMENT RELEASE' 'SECURITY LEVEL')
+     A                                      TEXT('Exact Duplicate Pymt entry-
+     A                                      /release Security Level')
+     A********    CXDPT1         1A         COLHDG('DUPLICATE PAYMENT' +
+     A********                              'RELEASE SECURITY' 'TYPE 1')
+     A            CXDPT1         1A         COLHDG('EXACT DUPLICATE' +
+     A                                      'PAYMENT RELEASE' 'SECURITY TYPE 1')
+     A                                      TEXT('Exact Duplicate Pymt entry-
+     A                                      /release Security Type 1')
+     A********    CXDPT2         1A         COLHDG('DUPLICATE PAYMENT' +
+     A********                              'RELEASE SECURITY' 'TYPE 2')
+     A            CXDPT2         1A         COLHDG('EXACT DUPLICATE' +
+     A                                      'PAYMENT RELEASE' 'SECURITY TYPE 2')
+     A                                      TEXT('Exact Duplicate Pymt entry-
+     A                                      /release Security Type 2')
+     A********    CXDPT3         1A         COLHDG('DUPLICATE PAYMENT' +
+     A********                              'RELEASE SECURITY' 'TYPE 3')
+     A            CXDPT3         1A         COLHDG('EXACT DUPLICATE' +
+     A                                      'PAYMENT RELEASE' 'SECURITY TYPE 3')
+     A                                      TEXT('Exact Duplicate Pymt entry-
+     A                                      /release Security Type 3')
+     A********    CXDPT4         1A         COLHDG('DUPLICATE PAYMENT' +
+     A********                              'RELEASE SECURITY' 'TYPE 4')
+     A            CXDPT4         1A         COLHDG('EXACT DUPLICATE' +
+     A                                      'PAYMENT RELEASE' 'SECURITY TYPE 4')
+     A                                      TEXT('Exact Duplicate Pymt entry-
+     A                                      /release Security Type 4')
+     A********    CXDPT5         1A         COLHDG('DUPLICATE PAYMENT' +
+     A********                              'RELEASE SECURITY' 'TYPE 5')
+     A            CXDPT5         1A         COLHDG('EXACT DUPLICATE' +
+     A                                      'PAYMENT RELEASE' 'SECURITY TYPE 5')
+     A                                      TEXT('Exact Duplicate Pymt entry-
+     A                                      /release Security Type 5')
+     A***** END CHG ***** 04/26/07 **************************************
+     A*** END ADD *** 01/25/07 **************************************
+     A***** BEG ADD ***** 04/26/07 ************************************
+     A            CXDPL2         3S 0       COLHDG('POSSIBLE DUP PAYMENT' +
+     A                                      'RELEASE SECURITY' 'LEVEL')
+     A                                      TEXT('Possible Dup Payment en-
+     A                                      try/release Security Level')
+     A            CXDPT6         1A         COLHDG('POSSIBLE DUP PAYMENT' +
+     A                                      'RELEASE SECURITY' 'TYPE 1')
+     A                                      TEXT('Possible Dup Payment en-
+     A                                      try/release Security Type 1')
+     A            CXDPT7         1A         COLHDG('POSSIBLE DUP PAYMENT' +
+     A                                      'RELEASE SECURITY' 'TYPE 2')
+     A                                      TEXT('Possible Dup Payment en-
+     A                                      try/release Security Type 2')
+     A            CXDPT8         1A         COLHDG('POSSIBLE DUP PAYMENT' +
+     A                                      'RELEASE SECURITY' 'TYPE 3')
+     A                                      TEXT('Possible Dup Payment en-
+     A                                      try/release Security Type 3')
+     A            CXDPT9         1A         COLHDG('POSSIBLE DUP PAYMENT' +
+     A                                      'RELEASE SECURITY' 'TYPE 4')
+     A                                      TEXT('Possible Dup Payment en-
+     A                                      try/release Security Type 4')
+     A            CXDPT0         1A         COLHDG('POSSIBLE DUP PAYMENT' +
+     A                                      'RELEASE SECURITY' 'TYPE 5')
+     A                                      TEXT('Possible Dup Payment en-
+     A                                      try/release Security Type 5')
+     A***** END ADD ***** 04/26/07 ************************************
+     A*** BEG ADD ****** 05/07/07 **********************************************
+     A            CXCDSM         1A         COLHDG('CLAIM SUMMARY' 'FLAG')
+     A                                      TEXT('Claim Summary Flag')
+     A*** END ADD ****** 05/07/07 **********************************************
+     A*** BEG ADD ****** 10/19/07 ************************************
+     A            CXEDIM         1S 0       COLHDG('EDI mailing' 'date-
+     A                                      increment#')
+     A                                      TEXT('EDI mailing date-
+     A                                      increment#')
+     A*** END ADD ****** 10/19/07 ************************************
+     A***  Begin Add  ***  05/20/09  **************************************
+     A            CXMBS     R     S         REFFLD(LVL)
+     A                                      COLHDG('CMS Submission' -
+     A                                      'Level')
+     A            CXMBS1    R               REFFLD(FLAG)
+     A                                      COLHDG('CMS Submission' -
+     A                                      'Type 1')
+     A            CXMBS2    R               REFFLD(FLAG)
+     A                                      COLHDG('CMS Submission' -
+     A                                      'Type 2')
+     A            CXMBS3    R               REFFLD(FLAG)
+     A                                      COLHDG('CMS Submission' -
+     A                                      'Type 3')
+     A            CXMBS4    R               REFFLD(FLAG)
+     A                                      COLHDG('CMS Submission' -
+     A                                      'Type 4')
+     A            CXMBS5    R               REFFLD(FLAG)
+     A                                      COLHDG('CMS Submission' -
+     A                                      'Type 5')
+     A***  End   Add  ***  05/20/09  **************************************
+     A***  Beg   Add  ***  07/14/09  **************************************
+     A            CXNMAD    R               REFFLD(DS5)
+     A                                      COLHDG('Claimant ' +
+     A                                      'name/address change ' +
+     A                                      'DARTS dft rmk code')
+     A            CXAADP    R               REFFLD(DS5)
+     A                                      COLHDG('Additional add.' +
+     A                                      'dependent change '  +
+     A                                      'DARTS Dft rmk code')
+     A***  End   Add  ***  07/14/09  **************************************
+     A*** Beg Add *** 07/16/09 ****************************************
+     A            CXCERD         5A
+     A                                      COLHDG('CMS Error Diary code')
+     A*** Beg Chg *** 07/26/09 ****************************************
+     A********    CXCEDU         3A
+     A********                              COLHDG('CMS Error Diary user')
+     A********    CXCESU         2A
+     A********                              COLHDG('CMS Error Specific' -
+     A********                              'user')
+     A            CXCEDU         2A
+     A                                      COLHDG('CMS Error Diary user')
+     A            CXCESU         3A
+     A                                      COLHDG('CMS Error Specific' -
+     A                                      'user')
+     A*** End Chg *** 10/26/09 ****************************************
+     A*** End Add *** 07/16/09 ****************************************
+     A***  Begin Add  ***  07/21/09  **************************************
+     A            CXDEVF    R               REFFLD(FLAG)
+     A                                      COLHDG('Devereux Group Flag')
+     A***  End   Add  ***  07/21/09  **************************************
+     A*** Beg Add *** 08/14/09 ****************************************
+     A            CXQRSD    R               REFFLD(RMCD)
+     A                                      COLHDG('Query Response Diary' -
+     A                                      'Code')
+     A            CXQRDU    R               REFFLD(DS3)
+     A                                      COLHDG('Query Response Diary' -
+     A                                      'User')
+     A            CXQRSU    R               REFFLD(DS3)
+     A                                      COLHDG('Query Response' -
+     A                                      'Specific User')
+     A*** End Add *** 08/14/09 ****************************************
+     A*** Beg Add *** 01/18/10 ****************************************
+     A            CXAPV1    R               REFFLD(CODE)
+     A                                      COLHDG('Attorney order' -
+     A                                      'PV1 Code 1')
+     A            CXAPV2    R               REFFLD(CODE)
+     A                                      COLHDG('Attorney order' -
+     A                                      'PV1 Code 2')
+     A            CXAPV3    R               REFFLD(CODE)
+     A                                      COLHDG('Attorney order' -
+     A                                      'PV1 Code 3')
+     A            CXAPV4    R               REFFLD(CODE)
+     A                                      COLHDG('Attorney order' -
+     A                                      'PV1 Code 4')
+     A            CXAPV5    R               REFFLD(CODE)
+     A                                      COLHDG('Attorney order' -
+     A                                      'PV1 Code 5')
+     A*** End Add *** 01/18/10 ****************************************
+     A*** Beg Add *** 05/18/10 ****************************************
+     A            CXRBS     R     S         REFFLD(LVL)
+     A                                      COLHDG('CMS Re-Submission' -
+     A                                      'Level')
+     A            CXRBS1    R               REFFLD(FLAG)
+     A                                      COLHDG('CMS Re-Submission' -
+     A                                      'Type 1')
+     A            CXRBS2    R               REFFLD(FLAG)
+     A                                      COLHDG('CMS Re-Submission' -
+     A                                      'Type 2')
+     A            CXRBS3    R               REFFLD(FLAG)
+     A                                      COLHDG('CMS Re-Submission' -
+     A                                      'Type 3')
+     A            CXRBS4    R               REFFLD(FLAG)
+     A                                      COLHDG('CMS Re-Submission' -
+     A                                      'Type 4')
+     A            CXRBS5    R               REFFLD(FLAG)
+     A                                      COLHDG('CMS Re-Submission' -
+     A                                      'Type 5')
+     A*** End Add *** 05/18/10 ****************************************
+     A*** BEG ADD *** 12/02/10 ****************************************
+     A            CXOPCL    R               REFFLD(FLAG)
+     A                                      COLHDG('Open/Close table' +
+     A                                        'description flag')
+     A*** END ADD *** 12/02/10 ****************************************
+     A*** Beg Add *** 12/13/10 ****************************************
+     A            CXMBQF    R               REFFLD(FLAG)
+     A                                      COLHDG('Incl Med Benef' +
+     A                                        'in query file')
+     A*** END ADD *** 12/13/10 ****************************************
+     A*** Beg Add *** 03/28/11 ****************************************
+     A            CXDOHR    R    1A         COLHDG('DOH' 'Reqd')
+     A                                      TEXT('Date of Hire Req-
+     A                                      uired Y/ ')
+     A                                      REFFLD(FLAG)
+     A            CXDOBR    R               COLHDG('DOB' 'Reqd')
+     A                                      TEXT('Date of Birth Req-
+     A                                      uired Y/ ')
+     A                                      REFFLD(FLAG)
+     A            CXGDRR    R               COLHDG('Gender' 'Reqd')
+     A                                      TEXT('Gender Required Y/ ')
+     A                                      REFFLD(FLAG)
+     A*** End Add *** 03/28/11 ****************************************
+     A*** BEG ADD *** 05/05/11 ****************************************
+     A            CXEXNM    R               REFFLD(FLAG)
+     A                                      COLHDG('Exclude Group From' +
+     A                                      'NCCI Medical' 'Data Call Report-
+     a                                      ing')
+     A*** END ADD *** 05/05/11 ****************************************
+     A*** BEG ADD *** 06/01/11 ****************************************
+     A            CXWCR     R               REFFLD(RMCD)
+     A                                      COLHDG('Wage calc' +
+     A                                      'review diary')
+     A*** END ADD *** 06/01/11 ****************************************
+     A*** BEG ADD *** 07/27/11 ****************************************
+     A            CXLSRV    R               REFFLD(FLAG)
+     A                                      COLHDG('Loss Condition' +
+     A                                      'Recovery Type')
+     A            CXWMTH    R               REFFLD(FLAG)
+     A                                      COLHDG('Method of Detemining' +
+     A                                      'Preinj/Avg Wkly Amt')
+     A*** BEG ADD *** 03/16/12 ****************************************
+     A            CXRCSC    R               REFFLD(RMCD)
+     A                                      COLHDG('Removal of CMS' +
+     A                                      'submission flag' +
+     A                                      'diary code')
+     A            CXRCDU         2          COLHDG('Removal of CMS' +
+     A                                      'submission flag' +
+     A                                      'diary user')
+     A            CXRCSU    R               REFFLD(DS3)
+     A                                      COLHDG('Removal of CMS' +
+     A                                      'sub flag specific' +
+     A                                      'user')
+     A*** BEG ADD *** 03/16/12 ****************************************
+     A*** BEG ADD *** 08/29/13 ****************************************
+     A            CXAWWR    R               REFFLD(FLAG)
+     A                                      COLHDG('AWW is required')
+     A*** END ADD *** 08/29/13 ****************************************
+     A*** BEG ADD *** 11/25/13 ****************************************
+     A            CXAPRM    R               REFFLD(RMCD)
+     A                                      COLHDG('Apportionment Rmk')
+     A            CXLGRH    R               REFFLD(DS10)
+     A                                      COLHDG('Legal Reserve' -
+     A                                      'Heading')
+     A*** END ADD *** 11/25/13 ****************************************
+     A*** BEG ADD *** 07/28/14 ****************************************
+     A            CXCAPD    R               REFFLD(RMCD)
+     A                                      COLHDG('CLM ACT PLAN CODE')
+     A*** END ADD *** 07/28/14 ****************************************
+     A***** beg add ***** 09/04/14 ************************************
+     A            CXCLMINST R               REFFLD(FLAG)
+     A                                      COLHDG('Include Claim' +
+     A                                      'Handling Instruction')
+     A***** end add ***** 09/04/14 ************************************
+     A***** Beg Add *** 02/14/17 **************************************
+     A            CXPBMEL   R               REFFLD(LVL)
+     A                                      COLHDG('PBM Eligible' 'Level')
+     A            CXPBME1   R               REFFLD(FLAG)
+     A                                      COLHDG('PBM Eligible' 'Type 1')
+     A            CXPBME2   R               REFFLD(FLAG)
+     A                                      COLHDG('PBM Eligible' 'Type 2')
+     A            CXPBME3   R               REFFLD(FLAG)
+     A                                      COLHDG('PBM Eligible' 'Type 3')
+     A            CXPBME4   R               REFFLD(FLAG)
+     A                                      COLHDG('PBM Eligible' 'Type 4')
+     A            CXPBME5   R               REFFLD(FLAG)
+     A                                      COLHDG('PBM Eligible' 'Type 5')
+     A            CXPBME    R               REFFLD(FLAG)
+     A                                      COLHDG('PBM Eligible')
+     A***** End Add *** 02/14/17 **************************************
+     A*** Beg Add *** 09/01/17 ****************************************
+     A            CXCVT#    R               REFFLD(FLAG)
+     A                                      COLHDG('CVT Claim Number' +
+     A                                      ' is diplayed on the ' +
+     A                                      'EOB')
+     A*** End Add *** 09/01/17 ****************************************
+     A*** Beg Add *** 07/19/17 ****************************************
+     A            CXHCPR    R               REFFLD(RMCD)
+     A                                      COLHDG('FROI Hard Cover ' +
+     A                                      'Pring Remark Code')
+     A*** End Add *** 07/19/17 ****************************************
+     A*** Beg Add *** 07/16/18 ****************************************
+     A            CXAADR    R               REFFLD(FLAG)
+     A                                      COLHDG('Generate diary on' +
+     A                                      'add of Addtl Payee')
+     A*** End Add *** 07/16/18 ****************************************
+     A*** Beg Add *** 08/29/22 ****************************************
+     A            CXPRTFROI R               REFFLD(FLAG)
+     A                                      COLHDG('Print FROI Screen')
+     A*** End Add *** 08/29/22 ****************************************

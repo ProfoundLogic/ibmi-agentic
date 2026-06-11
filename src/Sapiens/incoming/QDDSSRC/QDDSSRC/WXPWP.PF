@@ -1,0 +1,549 @@
+      * (c) 2022 Sapiens. All Rights Reserved.                             *
+     A*****************************************************************
+     A* SCRIPTURA DATA WORK FILE FOR POLICY PAGES                     *
+     A*****************************************************************
+     A*                                                               *
+     A*  PROJECT:  SY371        PROGRAMMER:  C:65                     *
+     A*  CREATED:  02/22/16                                           *
+     A*  DESCRIPTION:  THIS IS THE WORK FILE TO HOLD THE DATA FOR     *
+     A*                POLICY PAGES.                                  *
+     A*                                                               *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 10/17/22 C:291 Project: 140WBZ                                *
+     A*                Add Suppress Deposit Printing field.           *
+     A*                                                               *
+     A* 08/13/20 C:65  Project: 150WEV                                *
+     A*                Add fields for all states assessment total and *
+     A*                policy cost (total prem + total assessments).  *
+     A*                                                               *
+     A* 12/18/19 C:136 Project: WC2720                                *
+     A*                Add the FWCIGA Surcharge and Total field to    *
+     A*                Scriptura workfile for the FL Dec Page         *
+     A*                                                               *
+     A* 10/09/18 C:65  PROJECT: 150WCZ                                *
+     A*                ADD PRORATED EXP CNST FIELD.                   *
+     A*                                                               *
+     A* 07/10/18 C:65  PROJECT: 150WCZ                                *
+     A*                ADD PREMIUM DISCOUNT FIELD.                    *
+     A*                                                               *
+     A* 02/08/18 C:65  PROJECT: 148WAT                                *
+     A*                ADD REWRITE POLICY FIELD.                      *
+     A*                                                               *
+     A* 11/21/17 C:65  PROJECT: 148WAN                                *
+     A*                ADD INSTALLMENT SCHEDULE FORM # FIELD.         *
+     A*                                                               *
+     A* 11/09/17 C:136 PROJECT: 148WAN                                *
+     A*                ADD INSTALLMENT SCHEDULE FIELDS                *
+     A*                                                               *
+     A* 10/30/17 C:65  PROJECT: 148WAN                                *
+     A*                ADD EDITION DATE FIELDS FOR DECLARATION PAGE   *
+     A*                AND SCHEDULES AS WELL AS SEQUENCE #.           *
+     A*                                                               *
+     A* 08/16/17 C:65  PROJECT: 150WAO                                *
+     A*                ADD FLAG FOR PRINTING EMPLOYER LINK CODE.      *
+     A*                                                               *
+     A* 03/01/16 C:65  PROJECT: SY371                                 *
+     A*                ADD FIELDS BACK FOR FORMATTED NAME/ADDRESS     *
+     A*                FOR THE DECLARATION PAGE/HEADER SECTION.       *
+     A*                                                               *
+     A* 06/20/16 C:65  PROJECT: SY371                                 *
+     A*                CHANGE DATE FIELDS TO BE 8.0S INSTEAD OF       *
+     A*                FORMATTED FIELDS. CHANGE CITY/STATE/ZIP TO BE  *
+     A*                SEPARATE FIELDS.                               *
+     A*                                                               *
+     A* 06/03/16 C:65  PROJECT: SY371                                 *
+     A*                REMOVE NAME 1-6 AND ADDRESS 1-3 FIELDS FOR DEC *
+     A*                PAGE AND REPLACE THEM WITH INDIVIDUAL FIELDS.  *
+     A*                                                               *
+     A* 04/27/16 C:65  PROJECT: SY371                                 *
+     A*                REMOVE TITLE FIELD AND ADD REISSUE AND RENEWAL *
+     A*                FIELDS IN ITS PLACE.  ADD CA PRINTING FIELD.   *
+     A*                REMOVE ENDORSEMENT FORM FIELDS.  ADD NET RATE  *
+     A*                FLAG                                           *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PPW01                     TEXT('POLICY PAGE WORKFILE')
+     A*
+     A* KEY FIELDS
+     A*
+     A            PWXML         60A         COLHDG('XML FILE NAME')
+     A*
+     A            PWCO#     R     S         REFFLD(CO#)
+     A            PWFND     R     S         REFFLD(FND)
+     A            PWEMP#    R     S         REFFLD(EMP#)
+     A            PWDIV     R     S         REFFLD(DIV)
+     A            PWFYR     R     S         REFFLD(FYR)
+     A*
+     A            PWNJ      R               REFFLD(FLAG)
+     A                                      COLHDG('NEW JERSEY STYLE')
+     A            PWCA      R               REFFLD(FLAG)
+     A                                      COLHDG('CALIFORNIA STYLE')
+     A            PW2NDLMT  R               REFFLD(FLAG)
+     A                                      COLHDG('2ND LIAB LIMITS')
+     A            PWNETRATE R               REFFLD(FLAG)
+     A                                      COLHDG('NET RATE FLAG')
+     A*
+     A            PWIMAGE       20A
+     A                                      COLHDG('POLICY PAGE IMAGE')
+     A*
+     A            PWPRMWORD     12A
+     A                                      COLHDG('PREMIUM/CONTRI WORD')
+     A*
+     A            PWRENEW   R               REFFLD(DS40)
+     A                                      COLHDG('RENEWAL TEXT')
+     A            PWREISSUE R               REFFLD(DS40)
+     A                                      COLHDG('REISSUE TEXT')
+     A            PWINSNAM  R               REFFLD(DS60)
+     A                                      COLHDG('INSURER NAME')
+     A            PWINSAD1  R               REFFLD(DS40)
+     A                                      COLHDG('INSURER ADDRESS 1')
+     A            PWINSAD2  R               REFFLD(DS40)
+     A                                      COLHDG('INSURER ADDRESS 2')
+     A            PWINSCSZ  R               REFFLD(DS40)
+     A                                      COLHDG('INSURER CITY/ST/ZIP')
+     A*** BEGIN ADD ***  06/20/16  ********************************************
+     A            PWINSCITY R               REFFLD(CTY)
+     A                                      COLHDG('INSURER' 'CITY')
+     A            PWINSST   R               REFFLD(ST)
+     A                                      COLHDG('INSURER' 'STATE')
+     A            PWINSZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('INSURER' 'ZIP CODE')
+     A*** END ADD *****  06/20/16  ********************************************
+     A*
+     A            PWPRDHDG  R               REFFLD(DS20)
+     A                                      COLHDG('PRODUCER HEADING')
+     A            PWAGTHDG  R               REFFLD(DS20)
+     A                                      COLHDG('AGENT HEADING')
+     A            PWAGT#    R     S         REFFLD(AGT#)
+     A                                      COLHDG('AGENT #')
+     A            PWAGTNAM  R               REFFLD(DS40)
+     A                                      COLHDG('AGENT NAME')
+     A            PWAGTADR  R               REFFLD(DS40)
+     A                                      COLHDG('AGENT ADDRESS')
+     A            PWAGTCSZ  R               REFFLD(DS40)
+     A                                      COLHDG('AGENT CITY/ST/ZIP')
+     A*** BEGIN ADD ***  06/20/16  ********************************************
+     A            PWAGTCITY R               REFFLD(CTY)
+     A                                      COLHDG('AGENT' 'CITY')
+     A            PWAGTST   R               REFFLD(ST)
+     A                                      COLHDG('AGENT' 'STATE')
+     A            PWAGTZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('AGENT' 'ZIP CODE')
+     A*** END ADD *****  06/20/16  ********************************************
+     A*
+     A            PWCAR#    R     S         REFFLD(CLAS)
+     A                                      COLHDG('GROUP/NCCI CARR #')
+     A*
+     A            PWPEONAME    120A
+     A                                      COLHDG('PEO NAME')
+     A*
+     A            PWPEOTAX  R               REFFLD(DS60)
+     A                                      COLHDG('NJ PEO TAX ID')
+     A*
+     A            PWPOLHDG  R               REFFLD(DS20)
+     A                                      COLHDG('POLICY # HEADING')
+     A            PWPOL#    R               REFFLD(DS20)
+     A                                      COLHDG('POLICY #')
+     A*
+     A            PWPPOLHDG R               REFFLD(DS30)
+     A                                      COLHDG('PRIOR POLICY # HDG')
+     A            PWPPOL#   R               REFFLD(DS20)
+     A                                      COLHDG('PRIOR POLICY #')
+     A*
+     A            PWNJTAXHD R               REFFLD(DS40)
+     A                                      COLHDG('NJ TAXPAYER ID HDG')
+     A            PWNJTAXID R               REFFLD(DS20)
+     A                                      COLHDG('NJ TAXPAYER ID #')
+     A*
+     A            PWFILEHDG R               REFFLD(DS10)
+     A                                      COLHDG('FILE # HEADING')
+     A            PWFILE#   R               REFFLD(DS20)
+     A                                      COLHDG('POLICY FILE #')
+     A*
+     A            PWFEIN         9A
+     A                                      COLHDG('POLICY FEIN #')
+     A*
+     A*** BEGIN CHG ***  06/03/16  ********************************************
+     A*********   PWPOLNAM1 R               REFFLD(DS60)
+     A*********                             COLHDG('POLICY NAME #1')
+     A*********   PWPOLNAM2 R               REFFLD(DS60)
+     A*********                             COLHDG('POLICY NAME #2')
+     A*********   PWPOLNAM3 R               REFFLD(DS60)
+     A*********                             COLHDG('POLICY NAME #3')
+     A*********   PWPOLNAM4 R               REFFLD(DS60)
+     A*********                             COLHDG('POLICY NAME #4')
+     A*********   PWPOLNAM5 R               REFFLD(DS60)
+     A*********                             COLHDG('POLICY NAME #5')
+     A*********   PWPOLNAM6 R               REFFLD(DS60)
+     A*********                             COLHDG('POLICY NAME #6')
+     A*
+     A*********   PWPOLADR1 R               REFFLD(DS40)
+     A*********                             COLHDG('POLICY ADDR #1')
+     A*********   PWPOLADR2 R               REFFLD(DS40)
+     A*********                             COLHDG('POLICY ADDR #2')
+     A*********   PWPOLADR3 R               REFFLD(DS40)
+     A*********                             COLHDG('POLICY ADDR #3')
+     A            PWPOLFDNM    120A
+     A                                      COLHDG('POLICY FEDERAL NAME')
+     A            PWPOLNAME    120A
+     A                                      COLHDG('POLICY NAME')
+     A            PWPOLADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('POLICY' 'ADDRESS 1')
+     A            PWPOLADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('POLICY' 'ADDRESS 2')
+     A            PWPOLCITY R               REFFLD(CTY)
+     A                                      COLHDG('POLICY' 'CITY')
+     A            PWPOLST   R               REFFLD(ST)
+     A                                      COLHDG('POLICY' 'STATE')
+     A            PWPOLZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('POLICY' 'ZIP CODE')
+     A*** END CHG *****  06/03/16  ********************************************
+     A*
+     A            PWBUSTYPE R               REFFLD(DS40)
+     A                                      COLHDG('TYPE OF BUSINESS')
+     A*
+     A            PWOTHERW  R               REFFLD(DS40)
+     A                                      COLHDG('OTHER WORKPLACE TEXT')
+     A*
+     A            PWRISK#   R               REFFLD(DS20)
+     A                                      COLHDG('RISK #')
+     A*
+     A*** BEGIN CHG ***  06/20/16  ********************************************
+     A*****       PWFRMDATE R               REFFLD(DS10)
+     A*****                                 COLHDG('POLICY FROM DATE')
+     A*****       PWTODATE  R               REFFLD(DS10)
+     A*****                                 COLHDG('POLICY TO DATE')
+     A            PWFRMDATE      8S 0
+     A                                      COLHDG('POLICY FROM DATE')
+     A            PWTODATE       8S 0
+     A                                      COLHDG('POLICY TO DATE')
+     A*** END CHG *****  06/20/16  ********************************************
+     A*
+     A            PWLMTACC  R     S         REFFLD(A90)
+     A                                      COLHDG('LIMITS - ACCIDENT')
+     A            PWLMTAGG  R     S         REFFLD(A90)
+     A                                      COLHDG('LIMITS - AGGREGATE')
+     A            PWLMTDIS  R     S         REFFLD(A90)
+     A                                      COLHDG('LIMITS - DISEASE')
+     A*
+     A*** BEGIN CHG ***  06/20/16  ********************************************
+     A*****       PWLMT2DT  R               REFFLD(DS10)
+     A*****                                 COLHDG('2ND LIMITS EFF DATE')
+     A            PWLMT2DT       8S 0
+     A                                      COLHDG('2ND LIMITS EFF DATE')
+     A*** END CHG *****  06/20/16  ********************************************
+     A*
+     A            PWLMTACC2 R     S         REFFLD(A90)
+     A                                      COLHDG('2ND LIMITS - ACCIDNT')
+     A            PWLMTAGG2 R     S         REFFLD(A90)
+     A                                      COLHDG('2ND LIMITS - AGGREGT')
+     A            PWLMTDIS2 R     S         REFFLD(A90)
+     A                                      COLHDG('2ND LIMITS - DISEASE')
+     A*
+     A            PW3CTEXT1 R               REFFLD(DS60)
+     A                                      COLHDG('ITEM 3C TEXT #1')
+     A            PW3CTEXT2 R               REFFLD(DS60)
+     A                                      COLHDG('ITEM 3C TEXT #2')
+     A*
+     A            PW3DTEXT  R               REFFLD(DS60)
+     A                                      COLHDG('ITEM 3D TEXT')
+     A*
+     A            PWCLSTEXT R               REFFLD(DS40)
+     A                                      COLHDG('CLASSIFICATIONS TEXT')
+     A*
+     A            PWESTPRM  R     S         REFFLD(A112)
+     A                                      COLHDG('TOTAL EST ANNUAL PRM')
+     A            PWPROPRM  R     S         REFFLD(A112)
+     A                                      COLHDG('PRORATED PREMIUM')
+     A            PWMINPRM  R     S         REFFLD(A112)
+     A                                      COLHDG('MINIMUM PREMIUM')
+     A            PWEXPCST  R     S         REFFLD(A112)
+     A                                      COLHDG('EXPENSE CONSTANT')
+     A            PWDEPPRM  R     S         REFFLD(A112)
+     A                                      COLHDG('DEPOSIT PREMIUM')
+     A*
+     A            PWEXPMOD  R     S         REFFLD(PC54)
+     A                                      COLHDG('EXPERIENCE MODIFIER')
+     A*
+     A            PWFORM#   R               REFFLD(DS20)
+     A                                      COLHDG('DEC PAGE FORM #')
+     A            PWCAFRM#1 R               REFFLD(DS00)
+     A                                      COLHDG('CA DEC PAGE FORM #1')
+     A            PWCAFRM#2 R               REFFLD(DS00)
+     A                                      COLHDG('CA DEC PAGE FORM #2')
+     A*
+     A*** BEGIN CHG ***  06/20/16  ********************************************
+     A*****       PWPRTDATE R               REFFLD(DS10)
+     A*****                                 COLHDG('PRINT DATE')
+     A            PWPRTDATE      8S 0
+     A                                      COLHDG('PRINT DATE')
+     A*** END CHG *****  06/20/16  ********************************************
+     A*
+     A            PWSRVOFF  R               REFFLD(DS00)
+     A                                      COLHDG('SERVICING OFFICE')
+     A*
+     A            PWPRMADJ  R               REFFLD(DS30)
+     A                                      COLHDG('PREMIUM ADJ PERIOD')
+     A*
+     A* SCHEDULE OF OPERATIONS HEADER FIELDS
+     A*
+     A            PWSCHNAM1 R               REFFLD(DS00)
+     A                                      COLHDG('SCHEDULE NAME #1')
+     A            PWSCHNAM2 R               REFFLD(DS00)
+     A                                      COLHDG('SCHEDULE NAME #2')
+     A*
+     A            PWSCHADR1 R               REFFLD(DS40)
+     A                                      COLHDG('SCHEDULE ADDR #1')
+     A            PWSCHADR2 R               REFFLD(DS40)
+     A                                      COLHDG('SCHEDULE ADDR #2')
+     A            PWSCHADR3 R               REFFLD(DS40)
+     A                                      COLHDG('SCHEDULE ADDR #3')
+     A*
+     A            PWSCHRISK R               REFFLD(DS40)
+     A                                      COLHDG('SCHEDULE RISK ID')
+     A            PWSCHDIVH R     S         REFFLD(DIV)
+     A                                      COLHDG('SCHED HDG DIV #')
+     A            PWSCHLOCH R     S         REFFLD(A100)
+     A                                      COLHDG('SCHED HDG LOC #')
+     A*
+     A* SCHEDULE OF OPERATIONS FOOTER/FORM# INFO
+     A*
+     A* ADDITIONAL NAMED INSURED
+     A            PWADDFRM# R               REFFLD(DS20)
+     A                                      COLHDG('ADDL NAME INS FORM #')
+     A            PWADDCF#1 R               REFFLD(DS00)
+     A                                      COLHDG('CA ADDL NAME FORM #1')
+     A            PWADDCF#2 R               REFFLD(DS00)
+     A                                      COLHDG('CA ADDL NAME FORM #2')
+     A            PWADDCF#3 R               REFFLD(DS00)
+     A                                      COLHDG('CA ADDL NAME FORM #3')
+     A*
+     A* ADDITIONAL WORKPLACES
+     A            PWLOCFRM# R               REFFLD(DS20)
+     A                                      COLHDG('ADDL LOCATION FORM #')
+     A            PWLOCCF#1 R               REFFLD(DS00)
+     A                                      COLHDG('CA LOCATIONS FORM #1')
+     A            PWLOCCF#2 R               REFFLD(DS00)
+     A                                      COLHDG('CA LOCATIONS FORM #2')
+     A            PWLOCCF#3 R               REFFLD(DS00)
+     A                                      COLHDG('CA LOCATIONS FORM #3')
+     A* PREMIUM
+     A            PWPRMFRM# R               REFFLD(DS20)
+     A                                      COLHDG('PAY/PREMIUM FORM #')
+     A            PWPRMCF#1 R               REFFLD(DS00)
+     A                                      COLHDG('CA PAY/PREM FORM #1')
+     A            PWPRMCF#2 R               REFFLD(DS00)
+     A                                      COLHDG('CA PAY/PREM FORM #2')
+     A            PWPRMCF#3 R               REFFLD(DS00)
+     A                                      COLHDG('CA PAY/PREM FORM #3')
+     A* ENDORSEMENTS
+     A            PWENDFRM# R               REFFLD(DS20)
+     A                                      COLHDG('ENDORSEMENTS FORM #')
+     A            PWENDCF#1 R               REFFLD(DS00)
+     A                                      COLHDG('CA ENDORSE FORM #1')
+     A            PWENDCF#2 R               REFFLD(DS00)
+     A                                      COLHDG('CA ENDORSE FORM #2')
+     A            PWENDCF#3 R               REFFLD(DS00)
+     A                                      COLHDG('CA ENDORSE FORM #3')
+     A*
+     A* MAINTENANCE FIELDS
+     A*
+     A            PWUSER    R               REFFLD(USER)
+     A                                      COLHDG('USER')
+     A            PWPGM     R               REFFLD(PGM)
+     A                                      COLHDG('PROGRAM')
+     A            PWTIME    R     S         REFFLD(TIME)
+     A                                      COLHDG('TIME')
+     A            PWDT      R     S         REFFLD(DT)
+     A                                      COLHDG('DATE')
+     A*
+     A            PW3AST01  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 01')
+     A            PW3AST02  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 02')
+     A            PW3AST03  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 03')
+     A            PW3AST04  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 04')
+     A            PW3AST05  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 05')
+     A            PW3AST06  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 06')
+     A            PW3AST07  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 07')
+     A            PW3AST08  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 08')
+     A            PW3AST09  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 09')
+     A            PW3AST10  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 10')
+     A            PW3AST11  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 11')
+     A            PW3AST12  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 12')
+     A            PW3AST13  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 13')
+     A            PW3AST14  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 14')
+     A            PW3AST15  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 15')
+     A            PW3AST16  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 16')
+     A            PW3AST17  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 17')
+     A            PW3AST18  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 18')
+     A            PW3AST19  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 19')
+     A            PW3AST20  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 20')
+     A            PW3AST21  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 21')
+     A            PW3AST22  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 22')
+     A            PW3AST23  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 23')
+     A            PW3AST24  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 24')
+     A            PW3AST25  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 25')
+     A            PW3AST26  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 26')
+     A            PW3AST27  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 27')
+     A            PW3AST28  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 28')
+     A            PW3AST29  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 29')
+     A            PW3AST30  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 30')
+     A            PW3AST31  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 31')
+     A            PW3AST32  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 32')
+     A            PW3AST33  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 33')
+     A            PW3AST34  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 34')
+     A            PW3AST35  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 35')
+     A            PW3AST36  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 36')
+     A            PW3AST37  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 37')
+     A            PW3AST38  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 38')
+     A            PW3AST39  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 39')
+     A            PW3AST40  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 40')
+     A            PW3AST41  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 41')
+     A            PW3AST42  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 42')
+     A            PW3AST43  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 43')
+     A            PW3AST44  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 44')
+     A            PW3AST45  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 45')
+     A            PW3AST46  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 46')
+     A            PW3AST47  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 47')
+     A            PW3AST48  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 48')
+     A            PW3AST49  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 49')
+     A            PW3AST50  R               REFFLD(ST)
+     A                                      COLHDG('ITEM 3A STATE 50')
+     A*
+     A*** BEGIN ADD ***  03/01/17  ********************************************
+     A            PWDECNAM1    120A
+     A                                      COLHDG('POLICY DEC NAME #1')
+     A            PWDECNAM2    120A
+     A                                      COLHDG('POLICY DEC NAME #2')
+     A            PWDECNAM3    120A
+     A                                      COLHDG('POLICY DEC NAME #3')
+     A            PWDECNAM4    120A
+     A                                      COLHDG('POLICY DEC NAME #4')
+     A*
+     A            PWDECADR1 R               REFFLD(DS40)
+     A                                      COLHDG('POLICY DEC ADDR #1')
+     A            PWDECADR2 R               REFFLD(DS40)
+     A                                      COLHDG('POLICY DEC ADDR #2')
+     A            PWDECADR3 R               REFFLD(DS40)
+     A                                      COLHDG('POLICY DEC ADDR #3')
+     A*** END ADD *****  03/01/17  ********************************************
+     A*** BEGIN ADD ***  08/16/17  ********************************************
+     A            PWPRTLINK R               REFFLD(FLAG)
+     A                                      COLHDG('PRINT EMPLR' 'LINK CODE')
+     A*** END ADD *****  08/16/17  ********************************************
+     A*** BEGIN ADD ***  10/30/17  ********************************************
+     A            PWFORMDT       8S 0
+     A                                      COLHDG('DEC PAGE' 'EDITION DT')
+     A            PWADDDT        8S 0
+     A                                      COLHDG('ADD NAMED' 'EDITION DT')
+     A            PWLOCDT        8S 0
+     A                                      COLHDG('LOCATION' 'EDITION DT')
+     A            PWPRMDT        8S 0
+     A                                      COLHDG('PREMIUM' 'EDITION DT')
+     A            PWENDDT        8S 0
+     A                                      COLHDG('ENDORSE' 'EDITION DT')
+     A            PWADDSEQ       3S 0
+     A                                      COLHDG('ADD NAMED' 'SEQ#')
+     A            PWLOCSEQ       3S 0
+     A                                      COLHDG('LOCATION' 'SEQ#')
+     A            PWPRMSEQ       3S 0
+     A                                      COLHDG('PREMIUM' 'SEQ#')
+     A            PWENDSEQ       3S 0
+     A                                      COLHDG('ENDORSE' 'SEQ#')
+     A*** END ADD *****  10/30/17  ********************************************
+     A*** BEG ADD ***** 11/09/17 *****************************************
+     A            PWINSDT        8S 0
+     A                                      COLHDG('INSTALL' 'EDITION DT')
+     A            PWINSSEQ       3S 0
+     A                                      COLHDG('INSTALL' 'SEQ#')
+     A*** END ADD ***** 11/09/17 *****************************************
+     A*** BEGIN ADD *** 11/21/17 *****************************************
+     A            PWINSFRM# R               REFFLD(DS20)
+     A                                      COLHDG('INSTALLMENT SCHD' 'FORM #')
+     A            PWINSCF#1 R               REFFLD(DS00)
+     A                                      COLHDG('CA INSTALL SCHD' 'FORM #1')
+     A            PWINSCF#2 R               REFFLD(DS00)
+     A                                      COLHDG('CA INSTALL SCHD' 'FORM #2')
+     A            PWINSCF#3 R               REFFLD(DS00)
+     A                                      COLHDG('CA INSTALL SCHD' 'FORM #3')
+     A*** END ADD ***** 11/21/17 *****************************************
+     A*** BEGIN ADD *** 02/08/18 *****************************************
+     A            PWREWRITE R               REFFLD(FLAG)
+     A                                      COLHDG('REWRITE FLAG')
+     A*** END ADD ***** 02/08/18 *****************************************
+     A*** BEGIN ADD *** 07/10/18 *****************************************
+     A            PWPRMDISC R     S         REFFLD(A112)
+     A                                      COLHDG('PREMIUM DISCOUNT')
+     A*** END ADD ***** 07/10/18 *****************************************
+     A*** BEGIN ADD *** 10/09/18 *****************************************
+     A            PWPROEXP  R     S         REFFLD(A112)
+     A                                      COLHDG('PRORATED' 'EXP CONSTANT')
+     A*** END ADD ***** 10/09/18 *****************************************
+     A*** Beg Add ***** 12/18/19 *****************************************
+     A            PWFWCIGA  R     S         REFFLD(A112)
+     A                                      COLHDG('FWCIGA Surcharge')
+     A            PWFLTTLA  R     S         REFFLD(A112)
+     A                                      COLHDG('FL Dec Page' 'Total Amount')
+     A*** End Add ***** 12/18/19 *****************************************
+     A*** BEGIN ADD *** 08/13/20 *****************************************
+     A            PWASSTTL  R     S         REFFLD(A112)
+     A                                      COLHDG('ASSESSMENTS TOTAL')
+     A            PWTOTAL   R     S         REFFLD(A112)
+     A                                      COLHDG('POLICY COST TOTAL')
+     A*** END ADD ***** 08/13/20 *****************************************
+     A*** Beg Add ***** 10/17/22 *****************************************
+     A            PWSUPD         1A
+     A                                      COLHDG('Suppress Deposit' -
+     A                                      'Printing')
+     A*** End Add ***** 10/17/22 *****************************************

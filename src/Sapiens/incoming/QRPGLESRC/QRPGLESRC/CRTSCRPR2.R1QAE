@@ -1,0 +1,164 @@
+     HCopyright('(c) 2021 Sapiens. All Rights Reserved.')
+     H option(*nodebugio:*srcstmt)
+     H dftactgrp(*no) actgrp(*CALLER) bnddir('STBNDDIR')
+     H*                                                                   *
+     H*********************************************************************
+     H*  Revisions:                                                       *
+     H*                                                                   *
+     H*  03/29/23 C:230 Support: 108796                                   *
+     H*                 Correct file names for fields in STSFP to use     *
+     H*                 the correct field names for files.                *
+     H*                                                                   *
+     H*********************************************************************
+
+     fstsfp     uf a e           k disk    rename(psf01:psf0p)
+     fstscp     if   e             disk    rename(psc01:psc0p)
+
+     d #ofRcd          c                   100
+     d sf              s             20    dim(#ofRcd) ctdata perrcd(1)
+
+     d fldsSF        e ds                  extname(STSFP)
+     d isClearRcd      s              1n   inz('0')
+     d isWriteRcd      s              1n   inz('0')
+     d sysDate7        s              7  0
+     d sysTime6        s              6  0
+
+     d psds          esds                  extname(szq1p)
+     d index                          3  0
+     d xxClt#          s              3
+
+      *entry
+     dCrtScrpR2        pr                  ExtPgm('CRTSCRPR2')
+     d inClearRcd                     1n   options(*nopass)
+     dCrtScrpR2        pi
+     d inClearRcd                     1n   options(*nopass)
+
+     dRtvCltId         pr                  ExtPgm('RTVCLTID')
+     d cltId                          3
+
+     d/copy sPrDate
+     d/copy sPrTable
+
+      /Free
+       // Do nothing if Phase I not loaded
+       Read psc0p;
+       If %eof;
+          Return;
+       Endif;
+
+       If %parms >= 1;
+          isClearRcd = inClearRcd;
+       Endif;
+
+       RtvCltId(xxClt#);
+       sysDate7 = DateTo7(SystemDate);
+       sysTime6 = TimeTo6(SystemTime);
+
+       For index = 1 to #ofRcd;
+          If sf(index) <> *blanks;
+             Clear psf0p;
+             fldsSF = sf(index);
+             Chain SFfile STSFP;
+             Select;
+             When %found and isClearRcd;
+                Delete psf0p;
+                isWriteRcd = *on;
+             When %found;
+                isWriteRcd = *off;
+             Other;
+                isWriteRcd = *on;
+             Endsl;
+             If isWriteRcd;
+                fldsSF = sf(index);
+                SFstat = 'A';
+                SFpgm  = q1Pgm;
+                SFuser = q1User;
+                SFdt   = sysDate7;
+                SFtime = sysTime6;
+                SFiPgm = SFpgm;
+                SFiUsr = SFuser;
+                SFiDt  = SFdt;
+                SFiTim = SFtime;
+                Write psf0p;
+             Endif;
+          Endif;
+       Endfor;
+       *inlr = *on;
+      /End-free
+      *  1         2         3         4         5         6         7         8         9
+123456*890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+SFfile*   SFdtFld
+** sf (field values)
+XMLPREP   XPDT
+XMLTEMP   XTDT
+SXDMP     DMDT
+SXDOP     DODT
+WXACPSTMT1ACDT
+WXACPSTMT2ACDT
+WXACPSTMT3ACDT
+WXACPSTMT4ACDT
+WXACPSTMT5ACDT
+WXACPSTMT6ACDT
+WXACPSTMTCACDT
+WXFMPMULTIFMDT
+WXWXFMP   FMDT
+SXACP     ACIDT
+SXCCP     CCIDT
+SXFRP     FRIDT
+SXPCP     PCIDT
+SXPHPCLM  PHCIDT
+SXPHPCLMT PH1IDT
+SXPHPDTL  PHDIDT
+SXPHPRPT  PHRIDT
+SXPHPRPTT PH2IDT
+SXTRPXML  TRDT
+SXTRPREC  TRDT
+SXTRPOUT0 TRDT
+SXTRPOUT1 TRDT
+SXTRPOUT2 TRDT
+WXPWP     PWDT
+WXP2P     P2DT
+WXP3P     P3DT
+WXP4P     P4DT
+WXP6P     P6DT
+WXP7P     P7DT
+SXCNEOBP  CNIDT
+SXCPOP    CPOIDT
+SXCPSP    CPSIDT
+SXDCNTEOBPDCNIDT
+SXDECEOBP DECIDT
+SXDGEOBP  DGIDT
+SXDMP     DMDT
+SXDNTEOBP DNTIDT
+SXDOP1    DODT
+SXDOP2    DODT
+SXDTEOBP  DTIDT
+SXFTEOBP  FTIDT
+SXGDEOBP  GDEOBIDT
+SXGNEOBP  GNIDT
+SXGTEOBP  GTEOBIDT
+SXHDEOBP  HDIDT
+SXLOCK    LODATE
+WXBLP     BLDT
+WXBLP1    BLDT
+WXBLP2    BLDT
+WXCHP     CHDT
+WXCHP1    CHDT
+WXC7P     C7DT
+WXL8P     L8DT
+WXMIP     MIDT
+WXMIP1    M1DT
+WXMIP2    M2DT
+WXMLENP1  ENDT
+WXPNP1    PNDT
+WXPOP1    PO1DT
+WXPOP2    PO2DT
+WIACINDI  CIDT
+WIACLOCS  LODT
+WIACMAIN  ACDT
+WIACPRCAR PCDT
+WIACQST   QSDT
+WIACSTPRM SPDT
+WIACSTRAT SRDT
+WIACSTS   STDT
+SXTOKENS  CRT_DATE

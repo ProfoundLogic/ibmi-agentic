@@ -1,0 +1,85 @@
+     A*%%TS  SD  20000427  225013  ROGULSKI    REL-V4R4M0  5769-PW1
+     A*  91/09/15  12:59:59    KASSI       REL-R03M00  5728-PW1
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/BKREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      ALTHELP
+     A                                      HELP
+     A                                      VLDCMDKEY(11)
+     A*  91/09/15  12:59:59    KASSI       REL-R03M00  5728-PW1
+     A          R SCR01
+     A*%%TS  SD  20000427  225013  ROGULSKI    REL-V4R4M0  5769-PW1
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      CF05
+     A  20                                  MSGALARM
+     A          H                           HLPDOC('SCRN1' 'GLB550F.F' 'BK.HLP')
+     A                                      HLPARA(01 001 24 080)
+     A            SCFILE    R        O  1  3REFFLD(FLE)
+     A                                  1 27'Print General Ledger Detail'
+     A                                      DSPATR(HI)
+     A            SCRECF    R        O  1 71REFFLD(RECF)
+     A            SCUSER    R        O  2 71REFFLD(USER)
+     A                                  4  2'Select Date Range and Accounts to -
+     A                                      Print:'
+     A                                  4 51'___Blank for Single Period'
+     A                                  5 50'|'
+     A                                  6 50'V'
+     A                                  7 12'Acct Period Range...:'
+     A            SCFRMY    R        B  7 34REFFLD(ACTM)
+     A                                      EDTWRD('  /    ')
+     A                                      CHECK(RB)
+     A                                      TEXT('FROM DATE')
+     A  21                                  ERRMSGID(GLM0112 *LIBL/BKMES)
+     A  24                                  ERRMSGID(GLM0134 *LIBL/BKMES)
+     A                                  7 43'to'
+     A            SCTOMY    R        B  7 47REFFLD(ACTM)
+     A                                      EDTWRD('  /    ')
+     A                                      CHECK(RB)
+     A                                      TEXT('TO DATE')
+     A  23                                  ERRMSGID(GLM0112 *LIBL/BKMES)
+     A  24                                  ERRMSGID(GLM0134 *LIBL/BKMES)
+     A                                  9 35' Co Fac Dpt Acc Sub'
+     A                                 10 16'G/L Account From:'
+     A            S1CO#          3Y 0B 10 35EDTCDE(4)
+     A                                      CHECK(RB)
+     A            S1FAC#         3Y 0B 10 39EDTCDE(4)
+     A                                      CHECK(RB)
+     A            S1GLD#         3Y 0B 10 43EDTCDE(4)
+     A                                      CHECK(RB)
+     A            S1ACC#         3Y 0B 10 47EDTCDE(4)
+     A                                      CHECK(RB)
+     A            S1SUB#         3Y 0B 10 51EDTCDE(4)
+     A                                      CHECK(RB)
+     A                                 10 56'(Blank for All)'
+     A                                 11 30'To:'
+     A            S2CO#          3Y 0B 11 35EDTCDE(4)
+     A                                      CHECK(RB)
+     A  20                                  ERRMSG('An invalid range has been k-
+     A                                      eyed')
+     A            S2FAC#         3Y 0B 11 39EDTCDE(4)
+     A                                      CHECK(RB)
+     A            S2GLD#         3Y 0B 11 43EDTCDE(4)
+     A                                      CHECK(RB)
+     A            S2ACC#         3Y 0B 11 47EDTCDE(4)
+     A                                      CHECK(RB)
+     A            S2SUB#         3Y 0B 11 51EDTCDE(4)
+     A                                      CHECK(RB)
+     A                                 14 17'Output Queue...:'
+     A            SCQUE     R        B 14 35REFFLD(QUE)
+     A  22                                  ERRMSGID(BKM4501 *LIBL/BKMES)
+     A                                      DSPATR(HI)
+     A                                 23  3'F1=Help  F3=Exit   F5=Search g/l a-
+     A                                      ccount'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

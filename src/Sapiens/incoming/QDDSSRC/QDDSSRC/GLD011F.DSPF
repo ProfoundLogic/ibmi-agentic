@@ -1,0 +1,357 @@
+     A*%%TS  SD  19971208  092827  COLEMANR    REL-V3R7M0  5716-PW1
+     A*  (C) Copyright Progressive Data Solutions, Inc., 1997
+     A*  91/07/31  18:16:06    KASSI       REL-R03M00  5728-PW1
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/BKREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      ALTHELP
+     A                                      HELP
+     A                                      VLDCMDKEY(11)
+     A                                      ROLLUP(18)
+     A                                      CF03
+     A                                      CF06
+     A          R SCR01S                    SFL
+     A*  91/08/13  14:47:05    KASSI       REL-R03M00  5728-PW1
+     A            SCCO#     R        O 10  7REFFLD(CO#)
+     A            SCFAC#    R        O 10 12REFFLD(FAC#)
+     A            SCGLD#    R        O 10 17REFFLD(DEPT)
+     A            SCACC#    R        O 10 22REFFLD(ACCT)
+     A            SCSUB#    R        O 10 27REFFLD(SUBA)
+     A            SCSEL          1A  B 10  3TEXT('Selection Field')
+     A N06                                  DSPATR(CS)
+     A N06                                  DSPATR(UL)
+     A  20                                  DSPATR(RI)
+     A  20                                  DSPATR(PC)
+     A            SCDESC    R        O 10 32REFFLD(DS30)
+     A                                      TEXT('Description')
+     A            SCAMT         11Y 2O 10 64EDTCDE(J)
+     A          R SCR01C                    SFLCTL(SCR01S)
+     A*  91/08/13  14:51:56    KASSI       REL-R03M00  5728-PW1
+     A                                      CHGINPDFT
+     A                                      SFLSIZ(0999)
+     A                                      SFLPAG(0013)
+     A                                      OVERLAY
+     A                                      TEXT('Subfile Control for Chart of -
+     A                                      Accounts .')
+     A                                      SETOF(20)
+     A                                      SETOF(22)
+     A  01                                  SFLDSP
+     A  01                                  SFLDSPCTL
+     A  02                                  SFLINZ
+     A  03                                  SFLDLT
+     A  04                                  SFLCLR
+     A  05                                  SFLEND
+     A  20                                  SFLMSGID(BKM9910 *LIBL/BKMES)
+     A  32 18                               SFLMSGID(CPF5203 *LIBL/QCPFMSG)
+     A          H                           HLPDOC('SCRN1' 'GLD011F.F' 'BK.HLP')
+     A                                      HLPARA(01 001 24 080)
+     A            SCFILE    R        O  1  2REFFLD(FLE)
+     A            SCRECF    R        O  1 70REFFLD(RECF)
+     A            SCUSER    R        O  2 70REFFLD(USER)
+     A                                  4  2'Position to.....:'
+     A            SCCO#     R     Y  B  4 21REFFLD(CO#)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            SCFAC#    R     Y  B  4 26REFFLD(FAC#)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            SCGLD#    R     Y  B  4 31REFFLD(DEPT)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            SCACC#    R     Y  B  4 36REFFLD(ACCT)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            SCSUB#    R     Y  B  4 41REFFLD(SUBA)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            #@$2           3S 0H      SFLRCDNBR(CURSOR)
+     A                                  7  4'5=Display'
+     A                                  7 16'8-Display Detail'
+     A                                  9  2'Opt  General Ledger No.       Desc-
+     A                                      ription                     '
+     A                                      DSPATR(HI)
+     A                                  6  2'Type option, press Enter'
+     A                                  1 26'General Ledger Inquiry'
+     A                                      DSPATR(HI)
+     A                                  2 31'--Search--'
+     A                                      DSPATR(HI)
+     A                                  9 70'Amount'
+     A                                      DSPATR(HI)
+     A                                  5  2'Accounting Month:'
+     A                                  5 25'(Blank for Current Period)'
+     A            SACTMO         2Y 0B  5 21DSPATR(CS)
+     A                                      DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(GLM0123 *LIBL/BKMES)
+     A          R SCR01
+     A                                      OVERLAY
+     A                                 23  2'F1=Help'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A                                 23 13'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A          R SCR02
+     A*  91/06/11  08:50:38    CAROL       REL-R03M00  5728-PW1
+     A                                      CF12
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A            SCFILE    R        O  1  3REFFLD(FLE)
+     A                                  1 26'General Ledger Inquiry'
+     A                                      DSPATR(HI)
+     A            SCRECF    R        O  1 70REFFLD(RECF)
+     A            SCMODE    R        O  2 31REFFLD(NM10)
+     A                                      DSPATR(HI)
+     A            SCUSER    R        O  2 70REFFLD(USER)
+     A                                  4  4'General Ledger#:'
+     A            SCCO#     R        O  4 21REFFLD(CO#)
+     A                                      EDTCDE(Z)
+     A            SCFAC#    R        O  4 25REFFLD(FAC#)
+     A                                      EDTCDE(Z)
+     A            SCGLD#    R        O  4 29REFFLD(DEPT)
+     A                                      EDTCDE(Z)
+     A            SCACC#    R        O  4 33REFFLD(ACCT)
+     A                                      EDTCDE(Z)
+     A            SCSUB#    R        O  4 37REFFLD(SUBA)
+     A                                      EDTCDE(Z)
+     A                                  5  4'Description....:'
+     A            SCDESC    R        O  5 21REFFLD(DS30)
+     A                                      DSPATR(HI)
+     A                                  6  4'Account Type...:'
+     A            SCTYPE    R        O  6 21REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                  7  4'Account Code...:'
+     A            SCCODE    R        O  7 21REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                  8  4'Total Level....:'
+     A            SCTOTL    R        O  8 21REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A  08                              9 26'Current Year'
+     A  08                              9 45'Last Year'
+     A  08                              9 63'Budget'
+     A  08                             10  4'Beginning Balance'
+     A  08        SCCF00    R     S  O 10 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF00    R     S  O 10 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF01    R     S  O 11 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF01    R     S  O 11 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG01    R     S  O 11 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF02    R     S  O 12 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF02    R     S  O 12 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG02    R     S  O 12 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF03    R     S  O 13 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF03    R     S  O 13 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG03    R     S  O 13 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF04    R     S  O 14 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF04    R     S  O 14 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG04    R     S  O 14 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF05    R     S  O 15 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF05    R     S  O 15 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG05    R     S  O 15 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF06    R     S  O 16 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF06    R     S  O 16 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG06    R     S  O 16 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF07    R     S  O 17 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF07    R     S  O 17 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG07    R     S  O 17 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF08    R     S  O 18 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF08    R     S  O 18 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG08    R     S  O 18 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF09    R     S  O 19 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF09    R     S  O 19 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG09    R     S  O 19 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF10    R     S  O 20 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF10    R     S  O 20 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG10    R     S  O 20 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF11    R     S  O 21 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF11    R     S  O 21 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG11    R     S  O 21 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCCF12    R     S  O 22 26REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCLF12    R     S  O 22 42REFFLD(A112)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08        SCBG12    R     S  O 22 59REFFLD(A90)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(M)
+     A  08                             11 11'1'
+     A  08                             12 11'2'
+     A  08                             13 11'3'
+     A  08                             14 11'4'
+     A  08                             15 11'5'
+     A  08                             16 11'6'
+     A  08                             17 11'7'
+     A  08                             18 11'8'
+     A  08                             19 11'9'
+     A  08                             20 10'10'
+     A  08                             21 10'11'
+     A  08                             22 10'12'
+     A                                 23  2'F1=Help'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A                                 23 13'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A*  91/08/13  14:51:56    KASSI       REL-R03M00  5728-PW1
+     A          R SCR03S                    SFL
+     A*%%TS  SD  19970320  083428  WINNERW     REL-V3R6M0  5716-PW1
+     A            S3AMT         11Y 2O  9 13EDTCDE(K)
+     A            S3DESC        30A  O  9 29
+     A            S3DATE         8Y 0O  9  2EDTWRD('  /  /    ')
+     A            S3REF          8A  O  9 60
+     A            S3SRC          2A  O  9 70
+     A*  91/07/31  18:16:06    KASSI       REL-R03M00  5728-PW1
+     A          R SCR03C                    SFLCTL(SCR03S)
+     A*%%TS  SD  19971208  092827  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      CHGINPDFT
+     A                                      SFLSIZ(0999)
+     A                                      SFLPAG(0013)
+     A                                      OVERLAY
+     A                                      TEXT('Subfile Control for Chart of -
+     A                                      Accounts .')
+     A                                      SETOF(20)
+     A                                      SETOF(22)
+     A  01                                  SFLDSP
+     A  01                                  SFLDSPCTL
+     A  02                                  SFLINZ
+     A  03                                  SFLDLT
+     A  04                                  SFLCLR
+     A  05                                  SFLEND
+     A                                      CF12
+     A  20                                  SFLMSGID(BKM9910 *LIBL/BKMES)
+     A  32 18                               SFLMSGID(CPF5203 *LIBL/QCPFMSG)
+     A          H                           HLPDOC('SCRN1' 'BKD010F.F' 'BK.HLP')
+     A                                      HLPARA(01 001 24 080)
+     A            SCFILE    R        O  1  2REFFLD(FLE)
+     A            SCRECF    R        O  1 70REFFLD(RECF)
+     A            SCUSER    R        O  2 70REFFLD(USER)
+     A                                  6  2'Position at Date:'
+     A            SCCO#     R     Y  O  4 20REFFLD(CO#)
+     A                                      EDTCDE(Z)
+     A            SCFAC#    R     Y  O  4 24REFFLD(FAC#)
+     A                                      EDTCDE(Z)
+     A            SCGLD#    R     Y  O  4 28REFFLD(DEPT)
+     A                                      EDTCDE(Z)
+     A            SCACC#    R     Y  O  4 32REFFLD(ACCT)
+     A                                      EDTCDE(Z)
+     A            SCSUB#    R     Y  O  4 36REFFLD(SUBA)
+     A                                      EDTCDE(Z)
+     A            #@$3           3S 0H      SFLRCDNBR(CURSOR)
+     A                                  1 26'General Ledger Inquiry'
+     A                                      DSPATR(HI)
+     A                                  2 31'--Search--'
+     A                                      DSPATR(HI)
+     A            SCDATE         8Y 0B  6 20TEXT('Date')
+     A  22                                  ERRMSGID(BKM0102 *LIBL/BKMES)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A                                  4  2'Account Number..:'
+     A            SCDESC        30A  O  4 41
+     A                                  5  2'Accounting Month:'
+     A            S3ACTM         2Y 0O  5 20EDTCDE(Z)
+     A            SACTYR         4S 0O  5 23
+     A                                  8  2'  Date         Amount      Descrip-
+     A                                      tion                    Reference S-
+     A                                      rc'
+     A                                      DSPATR(HI)
+     A            SCCPRD         7A  O  5 29
+     A          R SCR03
+     A                                      OVERLAY
+     A                                 23  2'F1=Help'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A                                 23 13'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A                                 23 23'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

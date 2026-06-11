@@ -1,0 +1,127 @@
+     A*%%TS  SD  19970814  132804  COLEMANR    REL-V3R6M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   CLAIMS WITHIN POLICY SEARCH DISPLAY                      **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**                                                            **
+     A** 03/12/03 C:15  Support: PC128/36269                        **
+     A**                Fixed screen to display correct dt of loss. **
+     A**                                                            **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*----------------------------------------------------------------
+     A*    SCR01S - SCREEN 1 SUBFILE RECORD
+     A*----------------------------------------------------------------
+     A          R SCR01S                    SFL
+     A*%%TS  SD  19970814  131859  COLEMANR    REL-V3R6M0  5716-PW1
+     A            SCFLAG    R        B  7  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCCLM#    R        O  7  4REFFLD(CLM#)
+     A            SCDESC        36A  O  7 18TEXT('DESCRIPTION')
+     A*** Begin chg *** 03/12/03 **************************************
+     A**********  SCLSDT    R        O  7 45REFFLD(DT8)
+     A            SCLSDT    R        O  7 56REFFLD(DT8)
+     A*** End chg ***** 03/12/03 **************************************
+     A                                      EDTWRD('  /  /    ')
+     A            SCSTAT         6A  O  7 70TEXT('SCSTAT')
+     A*** Begin dlt *** 03/12/03 **************************************
+     A**********  SCEFDT    R        O  7 56REFFLD(DT8)
+     A**********                            EDTWRD('  /  /    ')
+     A*** End dlt ***** 03/12/03 **************************************
+     A*** Begin add *** 03/12/03 **************************************
+     A            SCEFDT    R        H      REFFLD(DT8)
+     A*** End add ***** 03/12/03 **************************************
+     A*----------------------------------------------------------------
+     A*    SCR01C - SCREEN 1 SUBFILE CONTROL RECORD
+     A*----------------------------------------------------------------
+     A          R SCR01C                    SFLCTL(SCR01S)
+     A*%%TS  SD  19970814  132804  COLEMANR    REL-V3R6M0  5716-PW1
+     A                                      SFLSIZ(0017)
+     A                                      SFLPAG(0016)
+     A                                      ROLLUP(18)
+     A                                      SETOF(20)
+     A                                      KEEP
+     A                                      OVERLAY
+     A  90                                  SFLCLR
+     A  91                                  SFLDSP
+     A N90                                  SFLDSPCTL
+     A  99                                  SFLEND(*MORE)
+     A                                      SFLCSRRRN(&SFRRN)
+     A  20                                  SFLMSG('NO RECORDS FOUND')
+     A                                      CSRLOC(SFROW      SFCOL)
+     A            SFROW          3S 0H
+     A            SFCOL          3S 0H
+     A            SFRNO          4S 0H      SFLRCDNBR(CURSOR)
+     A            SFRRN          5S 0H
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C0707F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  3 30'CLAIMS WITHIN POLICY'
+     A                                      DSPATR(HI)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A  05                              3  2'CANCELLATION PENDING'
+     A                                      DSPATR(RI)
+     A  06                              6  2'REINSTATEMENT PENDING'
+     A                                      DSPATR(RI)
+     A  04                              3 63'POLICY NON-RENEWED'
+     A                                      DSPATR(RI)
+     A                                  4  4'Policy Number:'
+     A            SCPOL#    R        O  4 19REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      TEXT('POLICY NUMBER')
+     A                                  4 35'Name:'
+     A            SCFIN     R        O  4 41REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  5  5'Claim Number:'
+     A            SCCLM     R        B  5 19REFFLD(CLM#)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                  5 57'Date  of'
+     A                                  6  4'Claim #     '
+     A                                      DSPATR(UL)
+     A                                  6 18'Description                       '
+     A                                      DSPATR(UL)
+     A                                  6 56'   Loss   '
+     A                                      DSPATR(UL)
+     A                                  6 68'Last Status'
+     A                                      DSPATR(UL)
+     A*----------------------------------------------------------------
+     A*    SCR01R - SCREEN 1 SUBFILE OPTION LINE RECORD
+     A*----------------------------------------------------------------
+     A          R SCR01R
+     A                                      OVERLAY
+     A                                 24  8'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 29'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A*    SCR99  - RESET SCREEN
+     A*----------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

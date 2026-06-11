@@ -1,0 +1,67 @@
+     A*%%TS  SD  19980610  100544  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   CLAIM FOLDER LABELS PROMPT DISPLAY                       **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT(UL)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A  33                                  CF12
+     A  34                                  CF05
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C7720F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  9 22'Claim number:'
+     A            SCCLM#    R        B  9 41REFFLD(CLM#)
+     A*                                     DSPATR(CS)
+     A  31 34                               DSPATR(PC)
+     A  20                                  ERRMSGID(CCR0675 *LIBL/CMESGG)
+     A N34                                  DSPATR(PR)
+     A  35                                  DSPATR(RI)
+     A                                 11 22'Number of labels:'
+     A            SCLBL#    R        B 11 48REFFLD(CASE)
+     A*                                     DSPATR(CS)
+     A  32                                  DSPATR(PC)
+     A  21                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                 22  3'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 31'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A N33                                  DSPATR(ND)
+     A                                 22 31'F5=Claim # search'
+     A                                      COLOR(BLU)
+     A N34                                  DSPATR(ND)
+     A                                 22 60'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

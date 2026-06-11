@@ -1,0 +1,70 @@
+     A*%%TS  SD  19971229  160934  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DIRECT BILL COMMISSION STATEMENTS - PROMPT DISPLAY       **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A          R SCR01
+     A                                      CF05
+     A                                      CF10
+     A                                      CF13
+     A                                      SETOF(42)
+     A                                      SETOF(43)
+     A                                      SETOF(44)
+     A                                      SETOF(45)
+     A                                      SETOF(46)
+     A                                      SETOF(47)
+     A                                      SETOF(48)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7672F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  9 28'From Date:'
+     A            SCFRDT    R        B  9 45REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A  22                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A  20                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A                                 11 28'To Date:'
+     A            SCTODT    R        B 11 45REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      CHECK(RB)
+     A  23                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A                                 17  8'Enter the period for which Commiss-
+     A                                      ion records are to be processed.'
+     A                                 19 25'A valid date entry is required.'
+     A                                 22 33'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 63'F13=Chg usr parm'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

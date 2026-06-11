@@ -1,0 +1,242 @@
+     A* (C) Copyright Fiserv, Inc., 2002 - 2006
+     A*****************************************************************
+     A* OUT FILE FOR AGT ACTIVITY REPORT
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 06/01/09  C:62  Project: 133WGX                               *
+     A*                 Add: Fast Quote Business                      *
+     A*                                                               *
+     A* 05/21/09  C:62  Project: 133WGW                               *
+     A*                 Add: Producer #                               *
+     A*                      Producer Name                            *
+     A*                      Control Agent Flag                       *
+     A*                                                               *
+     A* 05/01/06  C:33  Project: 132WFE                               *
+     A*                 Add:                                          *
+     A*                  Governing Class Code, Experience Modifier    *
+     A*                  (all three) and effective dates, Schedule    *
+     A*                  Debit/Credit Factor, and Commission Rate     *
+     A*                  Percentage.                                  *
+     A*                                                               *
+     A* 07/06/05  C:58  WC1310
+     A*                 Add automatic update to lost flag.
+     A*                                                               *
+     A* 07/20/04  C:61  SUPPORT WA093 43252                           *
+     A*                 Expand Quote Type Description Field size      *
+     A*                                                               *
+     A*                                                               *
+     A* CREATED  11/08/02  C:61  PROJECT WC1073                       *
+     A*****************************************************************
+      *
+     A                                      REF(WREFP)
+     A          R PQ201                     TEXT('OUTFILE - AGT ACT RPT')
+      *
+     A            Q2CO#          3S 0
+     A                                      COLHDG('COMPANY NUMBER')
+      *
+     A            Q2CONM    R               REFFLD(NAME)
+     A                                      COLHDG('COMPANY NAME')
+      *
+     A            Q2FND          3S 0
+     A                                      COLHDG('GROUP NUMBER')
+      *
+     A            Q2FNNM    R               REFFLD(NM60)
+     A                                      COLHDG('GROUP NAME')
+      *
+     A            Q2EMP#         9S 0
+     A                                      COLHDG('EMPLOYER NUMBER')
+      *
+     A            Q2DIV          5S 0
+     A                                      COLHDG('DIVISION')
+      *
+     A            Q2ENAM    R               REFFLD(NAME)
+     A                                      COLHDG('EMPLOYER NAME')
+      *
+     A            Q2RTCD    R               REFFLD(BSCO)
+     A                                      COLHDG('RATE SET' 'CODE')
+      *
+     A            Q2RSDS    R               REFFLD(DS30)
+     A                                      COLHDG('RATE SET' 'CODE' +
+     A                                      'DESCRIPTION')
+      *
+     A            Q2JRST    R               REFFLD(ST)
+     A                                      COLHDG('PREMIUM RATING STATE')
+      *
+     A            Q2EMOD         5S 4
+     A                                      COLHDG('EXPERIENCE MODIFIER')
+      *
+     A            Q2MKRP    R               REFFLD(STAF)
+     A                                      COLHDG('MARKETING REP')
+      *
+     A            Q2MKRN    R               REFFLD(NM50)
+     A                                      COLHDG('MARKETING REP' +
+     A                                      'NAME')
+      *
+     A            Q2CHAP         3S 0
+     A                                      COLHDG('CHAPTER')
+      *
+     A            Q2CHDS    R               REFFLD(DS30)
+     A                                      COLHDG('CHAPTER DESCRIPTION')
+      *
+     A            Q2RGN#         3S 0
+     A                                      COLHDG('REGION')
+      *
+     A            Q2REDS    R               REFFLD(DS30)
+     A                                      COLHDG('REGION' 'DESCRIPTION')
+      *
+     A            Q2CNTY    R               REFFLD(CODE)
+     A                                      COLHDG('EMPLOYER COUNTY' +
+     A                                      'CODE')
+      *
+     A            Q2CNDS    R               REFFLD(DS30)
+     A                                      COLHDG('EMPLOYER COUNTY' +
+     A                                      'CODE' 'DESCRIPTION')
+      *
+     A            Q2EUWT    R               REFFLD(STAF)
+     A                                      COLHDG('EMPLOYER' +
+     A                                      'UNDERWRITER')
+      *
+     A            Q2EUWN    R               REFFLD(NM50)
+     A                                      COLHDG('EMPLOYER' +
+     A                                      'UNDERWRITER' 'NAME')
+      *
+     A            Q2AUWT    R               REFFLD(STAF)
+     A                                      COLHDG('AGENT' +
+     A                                      'UNDERWRITER')
+      *
+     A            Q2AUWN    R               REFFLD(NM50)
+     A                                      COLHDG('AGENT' +
+     A                                      'UNDERWRITER' 'NAME')
+      *
+     A            Q2AGT#         5S 0
+     A                                      COLHDG('AGENT NUMBER')
+      *
+     A            Q2AGNM    R               REFFLD(NAME)
+     A                                      COLHDG('AGENT NAME')
+      *
+     A            Q2FEIN         9S 0
+     A                                      COLHDG('AGENT FEIN')
+      *
+     A            Q2AMOD         5S 0
+     A                                      COLHDG('AGENT MODIFIER')
+      *
+     A            Q2AEDT    R               REFFLD(DT8)
+     A                                      COLHDG('AGENT' +
+     A                                       'EFFECTIVE DATE')
+      *
+     A            Q2CMT          9S 0
+     A                                      COLHDG('COMMITMENT AMOUNT')
+      *
+     A            Q2CMDT    R               REFFLD(DT8)
+     A                                      COLHDG('COMMITMENT DATE')
+      *
+     A            Q2BAL          9S 0
+     A                                      COLHDG('COMMITMENT BALANCE')
+      *
+     A            Q2QTYP    R               REFFLD(FLAG)
+     A                                      COLHDG('QUOTE TYPE')
+      *
+     A            Q2QSRT         3S 0
+     A                                      COLHDG('QUOTE TYPE' +
+     A                                       'SORT PRIORITY')
+      *
+     A            Q2QTDS    R               REFFLD(DS30)
+     A                                      COLHDG('NOT USED')
+      *
+     A            Q2EFDT    R               REFFLD(DT8)
+     A                                      COLHDG('POLICY' +
+     A                                       'EFFECTIVE DATE')
+      *
+     A            Q2EXDT    R               REFFLD(DT8)
+     A                                      COLHDG('POLICY' +
+     A                                       'EXPIRATION DATE')
+      *
+     A            Q2WKDT    R               REFFLD(DT8)
+     A                                      COLHDG('TYPE CHANGE DATE')
+      *
+     A            Q2ORDT    R               REFFLD(DT8)
+     A                                      COLHDG('ORIGINAL' +
+     A                                       'SUBMISSION DATE')
+      *
+     A            Q2NBDT    R               REFFLD(DT8)
+     A                                      COLHDG('NEW BUSINESS DATE')
+      *
+     A            Q2FXDT    R               REFFLD(DT8)
+     A                                      COLHDG('QUOTE FAX DATE')
+      *
+     A            Q2CARR    R               REFFLD(DS15)
+     A                                      COLHDG('CARRIER NAME')
+      *
+     A            Q2PREM         9S 0
+     A                                      COLHDG('PREMIUM AMT')
+      *
+     A            Q2COM1    R               REFFLD(DS40)
+     A                                      COLHDG('COMMENT 1')
+      *
+     A            Q2COM2    R               REFFLD(DS40)
+     A                                      COLHDG('COMMENT 2')
+      *
+      *
+     A            Q2USER    R               REFFLD(USER)
+     A                                      COLHDG('MAINT' 'USER')
+     A            Q2PGM     R               REFFLD(PGM)
+     A                                      COLHDG('MAINT' 'PROGRAM')
+     A            Q2DT      R               REFFLD(DT7S)
+     A                                      COLHDG('MAINT' 'DATE')
+     A            Q2TIME    R               REFFLD(TIME)
+     A                                      COLHDG('MAINT' 'TIME')
+     A******* beg add ******* 07/20/04 ********************************
+      *
+     A            Q2QDES        35A
+     A                                      COLHDG('QUOTE TYPE DESC')
+      *
+     A******* end add ******* 07/20/04 ********************************
+     A******* BEGIN ADD ***** 07/06/05 ********************************
+     A            Q2AULS    R               REFFLD(FLAG)
+     A                                      COLHDG('AUTO' 'LOST')
+     A******* END ADD ******* 07/06/05 ********************************
+      *
+     A***  Begin Add  ***  05/01/06  **************************************
+     A            Q2GOVC    R               REFFLD(CLAS)
+     A                                      COLHDG('GOVERNING' 'CLASS CODE')
+     A            Q2EXM1    R               REFFLD(PC54)
+     A                                      COLHDG('EXP' 'MOD 1')
+     A            Q2EXD1    R               REFFLD(DT8)
+     A                                      COLHDG('EXP MOD 1' 'EFF DT')
+     A            Q2EXM2    R               REFFLD(PC54)
+     A                                      COLHDG('EXP' 'MOD 2')
+     A            Q2EXD2    R               REFFLD(DT8)
+     A                                      COLHDG('EXP MOD 2' 'EFF DT')
+     A            Q2EXM3    R               REFFLD(PC54)
+     A                                      COLHDG('EXP' 'MOD 3')
+     A            Q2EXD3    R               REFFLD(DT8)
+     A                                      COLHDG('EXP MOD 3' 'EFF DT')
+     A            Q2DBCR    R               REFFLD(PC54)
+     A                                      COLHDG('SCHEDULE' 'DB/CR FACTOR')
+     A            Q2SDEF    R               REFFLD(DT8)
+     A                                      COLHDG('SCHEDULE' 'DB/CR EFF DT')
+     A            Q2SDEX    R               REFFLD(DT8)
+     A                                      COLHDG('SCHEDULE' 'DB/CR EXP DT')
+     A            Q2RT#     R               REFFLD(RT#)
+     A                                      COLHDG('RATE #')
+     A            Q2NWRT    R               REFFLD(A52)
+     A                                      COLHDG('NEW RATE')
+     A            Q2RNRT    R               REFFLD(A52)
+     A                                      COLHDG('RENEW RATE')
+     A***  End   Add  ***  05/01/06  **************************************
+     A***  Begin Add  ***  05/21/09  **************************************
+     A            Q2PROD    R               REFFLD(AGT#)
+     A                                      COLHDG('PRODUCER #')
+     A            Q2PNAM    R               REFFLD(DS60)
+     A                                      COLHDG('PRODUCER NAME')
+     A            Q2CAFL    R               REFFLD(FLAG)
+     A                                      COLHDG('CTRL AGT FLAG')
+     A***  End   Add  ***  05/21/09  **************************************
+     A***  Begin Add  ***  06/01/09  **************************************
+     A            Q2FQFL    R               REFFLD(FLAG)
+     A                                      COLHDG('FAST QUOTE' +
+     A                                      'BUSINESS')
+     A*
+     A*          Valid values: Y or Blank
+     A***  End   Add  ***  06/01/09  **************************************

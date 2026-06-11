@@ -1,0 +1,130 @@
+     A*%%TS  SD  19980306  161536  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DETAIL CLAIM REPORT PROMPT - DISPLAY                     **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A          R SCR01
+     A*%%TS  SD  19980306  161536  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(33)
+     A                                      SETOF(34)
+     A                                      CF05
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(45)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7585F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  6 16'Policy Effective Date From:'
+     A            SCPFDT    R        B  6 44REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A  20                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0531 *LIBL/CMESGG)
+     A                                  6 56'To'
+     A            SCPTDT    R        B  6 60REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0531 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0760 *LIBL/CMESGG)
+     A                                  8 16'Accident Date From:'
+     A            SCAFDT    R        B  8 44REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A  24                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0531 *LIBL/CMESGG)
+     A                                  8 56'To'
+     A            SCATDT    R        B  8 60REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A  25                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0531 *LIBL/CMESGG)
+     A  27                                  ERRMSGID(CCR0760 *LIBL/CMESGG)
+     A                                 10 16'As Of Date:'
+     A            SCTDT     R        B 10 44REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A  28                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  29                                  ERRMSGID(CCR0879 *LIBL/CMESGG)
+     A                                 12 16'Section Code:'
+     A            SCCC      R        B 12 50REFFLD(CDE)
+     A  45                                  ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A                                      TEXT('SECTION CODE')
+     A                                 12 54'(Default is all)'
+     A                                 14 16'Claim Number Order:'
+     A            SCBYCM    R        B 14 51REFFLD(FLAG)
+     A                                      OVRDTA
+     A  31                                  ERRMSGID(CCR0750 *LIBL/CMESGG)
+     A  33                                  ERRMSGID(CCR0764 *LIBL/CMESGG)
+     A  34                                  ERRMSGID(CCR0765 *LIBL/CMESGG)
+     A                                 16 16'Subline Order:'
+     A            SCBYSB    R        B 16 51REFFLD(FLAG)
+     A                                      OVRDTA
+     A  36                                  ERRMSG('Subline order not selected.-
+     A                                      ')
+     A  32                                  ERRMSGID(CCR0750 *LIBL/CMESGG)
+     A  33                                  ERRMSGID(CCR0764 *LIBL/CMESGG)
+     A  34                                  ERRMSGID(CCR0765 *LIBL/CMESGG)
+     A                                 17 34'Subline Code:'
+     A            SCSUBL    R        B 17 49REFFLD(SUBL)
+     A                                      TEXT('SUBLINE CODE')
+     A  36                                  ERRMSG('Subline order not selected.-
+     A                                      ')
+     A  35                                  ERRMSGID(CCR0554 *LIBL/CMESGG)
+     A                                 20  8'Key a subline code to run for that-
+     A                                       subline or leave blank for all.'
+     A                                 19 26'Key X to select report order.'
+     A                                 22  5'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 27'F5=Subline search'
+     A                                      COLOR(BLU)
+     A                                 22 53'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

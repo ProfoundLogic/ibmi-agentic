@@ -1,0 +1,120 @@
+      * (c) 2021 Sapiens. All Rights Reserved.
+     A*=========================================================================
+     A* Revisions:
+     A*
+     A*   03/29/21 C:180 PROJECT: WC1986
+     A*                  Add Starting Pol Yr, Env, and
+     A*                  Default St Rpt Div Info.
+     A*
+     A*   05/05/15 C:062 PROJECT: 114MRH
+     A*                  Add EOB Type
+     A*
+     A*   04/21/11 C:190 PROJECT: 114WYI
+     A*                  ADD FIELDS FOR EMPLOYER AC/TYPE.
+     A*
+     A*   06/29/09 C:191 PROJECT: WC1806
+     A*                  ADD RECORD KEY AND REMOVE EFCSFL
+     A*
+     A*   06/25/09 C:136 PROJECT: WC1806
+     A*                  ADD FIELDS FOR EMPLOYER EFT
+     A*
+     A*  03/24/09  C:33  Project: 114WTQ
+     A*                  New fields to store account type
+     A*                   (i.e. checking vs. savings)
+     A*
+     A*   09/20/07 C:136 PROJECT: WC997
+     A*
+     A*   08/09/07  C:191  Project: WC1453
+     A*                    Add payee name field
+     A*=========================================================================
+     A** WORKERS' COMP EFT ACCOUNT FILE
+     A*
+     A                                      REF(WREFP)
+     A          R PEF01                     TEXT('EFT ACCOUNT FILE')
+     A            EFCO#     R               REFFLD(CO#)
+     A            EFEFDT    R               REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE DATE')
+     A            EFEXDT    R               REFFLD(DT)
+     A                                      COLHDG('EXPIRATION DATE')
+     A            EFTRCD    R               REFFLD(CODE)
+     A                                      COLHDG('TRANSACTION CODE')
+     A            EFPRE     R               REFFLD(CODE)
+     A                                      COLHDG('PRENOTE TRANS CODE')
+     A            EFID#          8A         COLHDG('RECIEVING DFI ID#')
+     A            EFDGIT    R               REFFLD(FLAG)
+     A                                      COLHDG('RECIEVE DFI' 'CHECK DIGIT')
+     A            EFACCT        17A         COLHDG('DFI ACCOUNT #')
+     A            EFPDT     R               REFFLD(DT)
+     A                                      COLHDG('PRENOTE DATE')
+     A            EFADT     R               REFFLD(DT)
+     A                                      COLHDG('APPROVED DATE')
+     A            EFFTDT    R               REFFLD(DT)
+     A                                      COLHDG('DATE OF' 'FIRST TRANSFER')
+     A            EFLTDT    R               REFFLD(DT)
+     A                                      COLHDG('DATE OF' 'LAST TRANSFER')
+     A*
+     A            EFFND     R               REFFLD(FND)
+     A            EFFYR     R               REFFLD(FYR)
+     A            EFCASE    R               REFFLD(CASE)
+     A            EFSEQ#    R               REFFLD(SEQ#)
+     A                                      COLHDG('ADDL ADDR SEQ#')
+     A            EFFEIN    R               REFFLD(FEIN)
+     A            EFMOD     R               REFFLD(MOD)
+     A            EFTYPE    R               REFFLD(FLAG)
+     A                                      COLHDG('TYPE OF PAYEE')
+     A*
+     A            EFSTAT    R               REFFLD(STAT)
+     A            EFUSER    R               REFFLD(USER)
+     A            EFPGM     R               REFFLD(PGM)
+     A            EFTIME    R               REFFLD(TIME)
+     A            EFDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            EFIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            EFIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL' 'PROGRAM')
+     A            EFITM     R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL' 'TIME')
+     A            EFIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'DATE')
+     A*** BEG ADD ****** 08/09/07 **********************************************
+     A            EFPNAM        40A
+     A                                      COLHDG('PAYEE' 'NAME')
+     A*** END ADD ****** 08/09/07 **********************************************
+     A*** BEG ADD ****** 09/20/07 **********************************************
+     A            EFAGT#    R     S         REFFLD(AGT#)
+     A                                      COLHDG('AGENT #')
+     A*** END ADD ****** 09/20/07 **********************************************
+     A***  Begin Add  ***  03/24/09  **************************************
+     A            EFACTP         2A         COLHDG('ACCOUNT' 'TYPE')
+     A***  End   Add  ***  03/24/09  **************************************
+     A*** BEG ADD ****** 06/25/09 **********************************************
+     A            EFEMP#    R     S         REFFLD(EMP#)
+     A                                      COLHDG('EMPLOYER')
+     A            EFDIV     R     S         REFFLD(DIV)
+     A                                      COLHDG('DIV')
+     A*** BEGIN DEL ****** 06/29/09 ************************************
+     A* EFACTP ALREADY EXISTS FOR THE SAME PURPOSE
+     A*********** EFCSFL    R               REFFLD(FLAG)
+     A***********                           COLHDG('CK/SV' 'FLAG')
+     A*** END   DEL ****** 06/29/09 ************************************
+     A            EFCXDT    R     S         REFFLD(DT7)
+     A                                      COLHDG('CX DATE')
+     A*** END ADD ****** 06/25/09 **********************************************
+     A*** BEGIN ADD ****** 06/29/09 ************************************
+     A            EFKEY         30A         COLHDG('RECORD' 'KEY')
+     A*** END   ADD ****** 06/29/09 ************************************
+     A*** BEGIN ADD ****** 04/21/11 ************************************
+     A            EFEATP         2A         COLHDG('EMPLOYER' 'AC/TYPE')
+     A*** END   ADD ****** 04/21/11 ************************************
+     A*** BEGIN ADD ****** 05/05/15 ************************************
+     A            EFEOBT         3A         COLHDG('EOB Type')
+     A*                                     Valid Values:
+     A*                                        PDF - EOB PDF Print
+     A*                                        Blank - Spool File
+     A*** END   ADD ****** 05/05/15 ************************************
+     A*** BEGIN ADD ****** 03/29/21 ************************************
+     A            EFSFYR         3S 0       COLHDG('Starting' 'Pol Year')
+     A            EFENVFLG       1A         COLHDG('Environment Q/ ')
+     A            EFDFTSRD       1A         COLHDG('Dflt St' 'Rpt Info' 'Y/ ')
+     A*** END   ADD ****** 03/29/21 ************************************

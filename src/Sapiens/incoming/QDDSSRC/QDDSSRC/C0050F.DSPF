@@ -1,0 +1,633 @@
+     A*%%TS  SD  19980811  174621  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   COVERAGE MAINTENANCE - GENERAL LIABILITY DISPLAY         **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT(UL)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF05
+     A                                      CF07
+     A                                      CF09
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0050F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  9 26'Policy number:'
+     A            SCPOL#    R        B  9 42REFFLD(POL#)
+     A                                      TEXT('policy number')
+     A                                      OVRDTA
+     A  20                                  ERRMSGID(CCR0535 *LIBL/CMESGG)
+     A*                                     DSPATR(CS)
+     A                                 11 26'Section Code:'
+     A            SCCC      R        B 11 42REFFLD(CDE)
+     A                                      OVRDTA
+     A                                      TEXT('CODE')
+     A*                                     DSPATR(CS)
+     A  21                                  ERRMSGID(CCR0721 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0552 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A  24                                  DSPATR(PC)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 31'F5=Policy search'
+     A                                      COLOR(BLU)
+     A                                 23 54'F7=Named insured search'
+     A                                      COLOR(BLU)
+     A                                 24  9'F9=Policy section search'
+     A                                      COLOR(BLU)
+     A                                 24 46'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A                                      CF12
+     A                                      CF05
+     A N09                                  CF07
+     A                                      CF09
+     A                                      CF10
+     A                                      CF15
+     A                                      CF17
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(33)
+     A                                      SETOF(34)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0050F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A            SCERR     R        I 21  2REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)
+     A  27                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A                                  5  2'Policy:'
+     A            SCPOL#    R        O  5 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  5 27'Name:'
+     A            SCFIN     R        O  5 34REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  6  2'Section Code:'
+     A            SCCC      R        O  6 17REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A            SCCODS    R        O  6 21REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COV CD DESCRIPTION')
+     A                                  8 24'Location number:'
+     A            SCLOC#    R        B  8 52REFFLD(LOC#)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                      TEXT('LOCATION NUMBER')
+     A*                                     DSPATR(CS)
+     A  30                                  DSPATR(PC)
+     A  20                                  ERRMSGID(CCR0553 *LIBL/CMESGG)
+     A  28                                  ERRMSGID(CCR0568 *LIBL/CMESGG)
+     A                                 10 24'Building number:'
+     A            SCPRM#    R        B 10 52REFFLD(PRM#)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      TEXT('PREMISIS #')
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A  20                                  ERRMSGID(CCR0553 *LIBL/CMESGG)
+     A  28                                  ERRMSGID(CCR0568 *LIBL/CMESGG)
+     A                                 12 24'Subline:'
+     A            SCSUBL    R     A  B 12 52REFFLD(SUBL)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      TEXT('SUBLINE ISO')
+     A  31                                  DSPATR(PC)
+     A  21                                  ERRMSGID(CCR0554 *LIBL/CMESGG)
+     A                                 14 24'Classification:'
+     A            SCCLAS    R     A  B 14 49REFFLD(CLAS)
+     A*                                     DSPATR(CS)
+     A                                      OVRDTA
+     A                                      TEXT('CLASS CODE ISO')
+     A  32                                  DSPATR(PC)
+     A  22                                  ERRMSGID(CCR0556 *LIBL/CMESGG)
+     A                                      CHECK(RB)
+     A                                 16 24'Transaction code:'
+     A            SCTRNS    R        B 16 53REFFLD(CDE)
+     A                                      OVRDTA
+     A                                      TEXT('CODE')
+     A*                                     DSPATR(CS)
+     A  33                                  DSPATR(PC)
+     A  23                                  ERRMSGID(CCR0524 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A                                 18 24'Transaction date:'
+     A            SCTRDT    R        B 18 47REFFLD(DT8)
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                      OVRDTA
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  34                                  DSPATR(PC)
+     A  25                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0530 *LIBL/CMESGG)
+     A  36                                  ERRMSGID(CCR0697 *LIBL/CMESGG)
+     A                                 20 24'Update/Review Policy Limits:'
+     A            SCUPRV    R        B 20 54REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A  35                                  DSPATR(PC)
+     A  29                                  ERRMSGID(CCR0513 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A  90                             22  2'F3=Return to initial pgm'
+     A                                      COLOR(BLU)
+     A N90                             22  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 34'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 22 59'F5=Detail search'
+     A                                      COLOR(BLU)
+     A N09                             23  2'F7=Add loc/bldg'
+     A                                      COLOR(BLU)
+     A                                 23 25'F9=Location building search'
+     A                                      COLOR(BLU)
+     A                                 23 59'F10=Table search'
+     A                                      COLOR(BLU)
+     A                                 24 11'F15=Subline search'
+     A                                      COLOR(BLU)
+     A                                 24 43'F17=Classification search'
+     A                                      COLOR(BLU)
+     A                                  3 24'COVERAGE SECTION TRANSACTION CODIN-
+     A                                      G'
+     A                                      DSPATR(HI)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR03
+     A*%%TS  SD  19980811  174621  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      CF12
+     A                                      CF01
+     A N09                                  CF05
+     A N09                                  CF10
+     A N09N61                               CF20
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      SETOF(33)
+     A                                      SETOF(34)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(39)
+     A                                      SETOF(41)
+     A                                      SETOF(42)
+     A                                      SETOF(43)
+     A                                      SETOF(44)
+     A                                      SETOF(45)
+     A                                      SETOF(46)
+     A                                      SETOF(47)
+     A                                      SETOF(48)
+     A                                      SETOF(49)
+     A                                      SETOF(70)
+     A                                      SETOF(71)
+     A                                      SETOF(72)
+     A                                      SETOF(73)
+     A                                      SETOF(74)
+     A                                      SETOF(75)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0050F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR03'
+     A N09        SCMOD3    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  5  2'Policy:'
+     A            SCPOL#    R        O  5 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  5 29'Name:'
+     A            SCFIN     R        O  5 36REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                      TEXT('NAME')
+     A                                  6  2'Section code:'
+     A            SCCC      R        O  6 17REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A            SCCODS    R        O  6 21REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COV CD DESCRIPTION')
+     A                                  6 66'Status:'
+     A            SCSTA3    R        O  6 75REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  7  2'Trans Code:'
+     A            SCTRNS    R     A  O  7 15REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  7 21'Trans date:'
+     A            SCTRDT    R        O  7 34REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A                                  7 46'Endorsement #:'
+     A            SCEND3    R        O  7 62REFFLD(END#)
+     A                                      DSPATR(HI)
+     A                                 10  2'Limit'
+     A                                 10 15'Limit BI/CSL'
+     A                                 10 35'Ded Cd'
+     A                                 10 54'Limit PD'
+     A                                 10 71'Ded Cd'
+     A                                 11  2' Id  '
+     A                                      DSPATR(UL)
+     A                                 11 16'    Amount'
+     A                                      DSPATR(UL)
+     A                                 11 52'    Amount'
+     A                                      DSPATR(UL)
+     A                                 11 71'  PD  '
+     A                                      DSPATR(UL)
+     A            SCLIMT    R     A  B 12  4REFFLD(LIMT)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                      TEXT('LIMITS IDENTIFIER ISO')
+     A  20                                  ERRMSGID(CCR0558 *LIBL/CMESGG)
+     A            SCBLMT    R        B 12 16REFFLD(A80)
+     A  09                                  DSPATR(HI)
+     A                                      OVRDTA
+     A                                      TEXT('AMOUNT')
+     A                                      EDTCDE(2)
+     A  70                                  DSPATR(PC)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  21                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A            SCBIDC    R     A  B 12 37REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                      TEXT('CODE')
+     A  71                                  DSPATR(PC)
+     A  22                                  ERRMSGID(CCR0537 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A            SCPLMT    R        B 12 52REFFLD(A80)
+     A  09                                  DSPATR(HI)
+     A                                      OVRDTA
+     A                                      TEXT('AMOUNT')
+     A                                      EDTCDE(2)
+     A  72                                  DSPATR(PC)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  24                                  ERRMSGID(CCR0746 *LIBL/CMESGG)
+     A  75                                  ERRMSGID(CCR0747 *LIBL/CMESGG)
+     A            SCPDDC    R     A  B 12 73REFFLD(CDE)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                      TEXT('CODE')
+     A  73                                  DSPATR(PC)
+     A  25                                  ERRMSGID(CCR0537 *LIBL/CMESGG)
+     A  26                                  ERRMSGID(CCR0536 *LIBL/CMESGG)
+     A                                 14  2'Broad Form'
+     A                                 14 43'Risk'
+     A                                 14 50'Cov'
+     A                                 14 57'Retro'
+     A                                 14 66'Claims'
+     A                                 14 74'Ext.'
+     A                                 15  5'CGL'
+     A                                      DSPATR(UL)
+     A                                 15 12'         Exclusions         '
+     A                                      DSPATR(UL)
+     A                                 15 43' Id '
+     A                                      DSPATR(UL)
+     A                                 15 50' Cd'
+     A                                      DSPATR(UL)
+     A                                 15 56'  Date  '
+     A                                      DSPATR(UL)
+     A                                 15 66' Made '
+     A                                      DSPATR(UL)
+     A                                 15 74'Tail'
+     A                                      DSPATR(UL)
+     A            SCBFGL    R        B 16  6REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  74                                  DSPATR(PC)
+     A  27                                  ERRMSGID(CCR0513 *LIBL/CMESGG)
+     A            SCEC01    R        B 16 12REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  28                                  ERRMSGID(CCR0696 *LIBL/CMESGG)
+     A            SCEC02    R        B 16 15REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  29                                  ERRMSGID(CCR0696 *LIBL/CMESGG)
+     A            SCEC03    R        B 16 18REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  30                                  ERRMSGID(CCR0696 *LIBL/CMESGG)
+     A            SCEC04    R        B 16 21REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  31                                  ERRMSGID(CCR0696 *LIBL/CMESGG)
+     A            SCEC05    R        B 16 24REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  32                                  ERRMSGID(CCR0696 *LIBL/CMESGG)
+     A            SCEC06    R        B 16 27REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  33                                  ERRMSGID(CCR0696 *LIBL/CMESGG)
+     A            SCEC07    R        B 16 30REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  34                                  ERRMSGID(CCR0696 *LIBL/CMESGG)
+     A            SCEC08    R        B 16 33REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  35                                  ERRMSGID(CCR0696 *LIBL/CMESGG)
+     A            SCEC09    R        B 16 36REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  36                                  ERRMSGID(CCR0696 *LIBL/CMESGG)
+     A            SCEC10    R        B 16 39REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  37                                  ERRMSGID(CCR0696 *LIBL/CMESGG)
+     A            SCRISK    R     A  B 16 45REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  39                                  ERRMSGID(CCR0560 *LIBL/CMESGG)
+     A                                      TEXT('FLAG')
+     A            SCCOVG    R     A  B 16 51REFFLD(COVG)
+     A  09                                  DSPATR(HI)
+     A                                      OVRDTA
+     A                                      TEXT('COV CODE GL ISO')
+     A  09                                  DSPATR(PR)
+     A  41                                  ERRMSGID(CCR0557 *LIBL/CMESGG)
+     A            SCECMD    R     Y  B 16 55REFFLD(DT8)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A  42                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A            SCCMMD    R        B 16 67REFFLD(CMMD)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCEXTL    R        B 16 76REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  44                                  ERRMSGID(CCR0513 *LIBL/CMESGG)
+     A                                 18  7'Fire Damage'
+     A                                 18 28'Med Pay'
+     A                                 18 48'General'
+     A                                 18 65'Prod/CoOp'
+     A                                 19  8'   Limit '
+     A                                      DSPATR(UL)
+     A                                 19 27'   Limit '
+     A                                      DSPATR(UL)
+     A                                 19 46'Aggregate'
+     A                                      DSPATR(UL)
+     A                                 19 65'Aggregate'
+     A                                      DSPATR(UL)
+     A            SCFDML    R        B 20  8REFFLD(A80)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  45                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('AMOUNT')
+     A            SCMDPL    R        B 20 27REFFLD(A80)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  46                                  ERRMSGID(CCR0623 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('AMOUNT')
+     A            SCGAG     R        B 20 47REFFLD(A80)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  47                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('AMOUNT')
+     A            SCPCPA    R        B 20 66REFFLD(A80)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  48                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A  49                                  ERRMSGID(CCR0695 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('AMOUNT')
+     A  90                             23  2'F3=Return to initial pgm'
+     A                                      COLOR(BLU)
+     A N90                             23  7'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 34'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 58'F1=Restart'
+     A                                      COLOR(BLU)
+     A N09                             24 34'F10=Table search'
+     A                                      COLOR(BLU)
+     A N09N61                          24 58'F20=Change status'
+     A                                      COLOR(BLU)
+     A                                  3 34'COVERAGE/LIMITS'
+     A                                      DSPATR(HI)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A                                 11 35'  BI  '
+     A                                      DSPATR(UL)
+     A          R SCR04
+     A*%%TS  SD  19971229  125511  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      CF12
+     A                                      CF01
+     A N09N62                               CF20
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0050F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR04'
+     A N09        SCMOD4    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  5  2'Policy:'
+     A            SCPOL#    R        O  5 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  5 29'Name:'
+     A            SCFIN     R        O  5 36REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                      TEXT('NAME')
+     A                                  6  2'Section code:'
+     A            SCCC      R        O  6 17REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A            SCCODS    R        O  6 21REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COV CD DESCRIPTION')
+     A                                  6 66'Status:'
+     A            SCSTA4    R        O  6 75REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  7  2'Location Number:'
+     A            SCLOC#    R        O  7 19REFFLD(LOC#)
+     A                                      DSPATR(HI)
+     A                                  7 25'Building Number:'
+     A            SCPRM#    R        O  7 42REFFLD(PRM#)
+     A                                      DSPATR(HI)
+     A                                  7 48'Subline:'
+     A            SCSUBL    R        O  7 57REFFLD(SUBL)
+     A                                      DSPATR(HI)
+     A                                  7 63'Class:'
+     A            SCCLAS    R        O  7 70REFFLD(CLAS)
+     A                                      DSPATR(HI)
+     A                                  8  2'Trans Code:'
+     A            SCTRNS    R     A  O  8 15REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  8 21'Trans date:'
+     A            SCTRDT    R        O  8 34REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A                                      EDTWRD('  /  /    ')
+     A                                  8 47'Endorsement #:'
+     A            SCEND4    R        O  8 63REFFLD(END#)
+     A                                      DSPATR(HI)
+     A                                 12 12'Prem'
+     A                                 12 40'BI/CSL'
+     A                                 12 57'PD'
+     A                                 13  2'Terr'
+     A                                      DSPATR(UL)
+     A                                 13 12'Basis'
+     A                                      DSPATR(UL)
+     A                                 13 23' Exposure '
+     A                                      DSPATR(UL)
+     A                                 13 39' Premium '
+     A                                      DSPATR(UL)
+     A                                 13 54' Premium '
+     A                                      DSPATR(UL)
+     A                                 13 69'Acct Dt'
+     A                                      DSPATR(UL)
+     A            SCTERF    R     A  B 14  3REFFLD(TERF)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  20                                  ERRMSGID(CCR0609 *LIBL/CMESGG)
+     A            SCPRBS    R     A  B 14 14REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A            SCEXP     R     S  B 14 23REFFLD(EXP)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A                                      TEXT('EXPOSURE')
+     A            SCPREM    R     S  B 14 39REFFLD(A80)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCPDPM    R        B 14 54REFFLD(A80)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      OVRDTA
+     A            SCACMY    R     S  B 14 69REFFLD(A60)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /    ')
+     A                                      OVRDTA
+     A                                      TEXT('ACCNT MN & YR')
+     A  25                                  ERRMSGID(CCR0551 *LIBL/CMESGG)
+     A  90                             23  2'F3=Return to initial pgm'
+     A                                      COLOR(BLU)
+     A N90                             23  7'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 34'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 23 58'F1=Restart'
+     A                                      COLOR(BLU)
+     A N09N62                          24 58'F20=Change status'
+     A                                      COLOR(BLU)
+     A                                  3 26'COVERAGE SECTION PREMIUM ENTRY'
+     A                                      DSPATR(HI)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR99
+     A            SCERR     R        I  2  4REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

@@ -1,0 +1,114 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DRIVERS LAST NAME SEARCH DISPLAY                         **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*----------------------------------------------------------------
+     A*    SCR01S - SCREEN 1 SUBFILE RECORD
+     A*----------------------------------------------------------------
+     A          R SCR01S                    SFL
+     A            SCFLAG    R        B  8  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCLSN     R        O  8  4REFFLD(LSN)
+     A            SCFSN     R        O  8 35REFFLD(FSN)
+     A            SCMID     R        O  8 52REFFLD(MID)
+     A            SCSTI     R        O  8 56REFFLD(ST)
+     A            SCLIC#    R        O  8 60REFFLD(LIC#)
+     A            SCSTAT    R        O  8 77REFFLD(STAT)
+     A*----------------------------------------------------------------
+     A*    SCR01C - SCREEN 1 SUBFILE CONTROL RECORD
+     A*----------------------------------------------------------------
+     A          R SCR01C                    SFLCTL(SCR01S)
+     A                                      ROLLUP(18)
+     A                                      SETOF(20)
+     A                                      KEEP
+     A                                      OVERLAY
+     A  90                                  SFLCLR
+     A  91                                  SFLDSP
+     A N90                                  SFLDSPCTL
+     A                                      SFLSIZ(16)
+     A                                      SFLPAG(15)
+     A  99                                  SFLEND(*MORE)
+     A                                      SFLCSRRRN(&SFRRN)
+     A  20                                  SFLMSG('NO RECORDS FOUND')
+     A                                      CSRLOC(SFROW SFCOL)
+     A            SFROW          3S 0H
+     A            SFCOL          3S 0H
+     A            SFRNO          4S 0H
+     A                                      SFLRCDNBR(CURSOR)
+     A            SFRRN          5S 0H
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C0671F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  3 28'DRIVERS LAST NAME DISPLAY'
+     A                                      DSPATR(HI)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A  05                              3  2'CANCELLATION PENDING'
+     A                                      DSPATR(RI)
+     A  06                              6  2'REINSTATEMENT PENDING'
+     A                                      DSPATR(RI)
+     A  04                              3 63'POLICY NON-RENEWED'
+     A                                      DSPATR(RI)
+     A                                  5  4'Policy Number:'
+     A            SCPOL#    R        O  5 19REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      TEXT('POLICY NUMBER')
+     A                                  5 35'Name:'
+     A            SCFIN     R        O  5 41REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  6  4'Drivers Last Name:'
+     A            SCLNAM    R        B  6 23REFFLD(LSN)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                  7  4'Last Name                     '
+     A                                      DSPATR(UL)
+     A                                  7 35'First Name     '
+     A                                      DSPATR(UL)
+     A                                  7 51'MI'
+     A                                      DSPATR(UL)
+     A                                  7 54'State'
+     A                                      DSPATR(UL)
+     A                                  7 60'License       '
+     A                                      DSPATR(UL)
+     A                                  7 75'Status'
+     A                                      DSPATR(UL)
+     A*----------------------------------------------------------------
+     A*    SCR01R - SCREEN 1 SUBFILE OPTION LINE RECORD
+     A*----------------------------------------------------------------
+     A          R SCR01R
+     A                                      OVERLAY
+     A                                 24  8'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 29'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A*    SCR99  - RESET SCREEN
+     A*----------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

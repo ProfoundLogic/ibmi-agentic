@@ -1,0 +1,287 @@
+     A** (C) COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC. 2005
+     A**********************************************************
+     A**
+     A**  03/10/05  C:62  PROJECT: MC260
+     A**                  ADD ALTERNATIVE FEIN
+     A**
+     A**  04/02/93  C:06  PROJECT: MD060
+     A**                  USED F1FLG1 FLAG FIELD FOR USIS (#044)
+     A**                  TO DETERMINE IF THE EMRE (MEDICAL REVIEW
+     A**                  COMPANY) WILL RECEIVE PMT FOR SERVICES.
+     A**
+     A** 03/22/94  C:20  REQ/PROJ: 98/NW001
+     A**                 1. ADDED F1FL01-10, F110A1-A5, F16N1-5
+     A**                    F192N1-5, F1NW01-10, F1NF01-10
+     A**
+     A**  12/20/94  C:20  REQ/PROJ: 44/68ABR
+     A**                  USED F1FLG1 FLAG FIELD FOR PCA (#068)
+     A**                  TO INDICATE IF ALTERNATE ADDRESS SHOULD BE
+     A**                  USED ON EOMB/LETTERS.
+     A**
+     A**  06/15/95  C:33  REQ/PROJ:   /FL006
+     A**  07/25/95  C:02  REQ/PROJ:   25MAL
+     A**
+     A**
+     A** 07/28/95  C:28  REQ/PROJ: 25MAA
+     A**                 1. ADDED F1ANME, F1AAD1, F1AAD2, F1ACTY,
+     A**                    F1AST, F1AZIP, F1AARA, F1APHN FOR
+     A**                    ALTERNATE ADDRESS AT GRUP LEVEL.
+     A**                 2. CHANGED F1FLG1, NOW USED TO IDENTIFY
+     A**                    IF ALTERNATE ADDR 'Y' OR 'N'.
+     A**********************************************************
+     A** WCMC FUND AUX FILE
+     A**
+     A                                      REF(FSREFP)
+     A          R PF101                     TEXT('FND AUX FILE')
+     A            F1CO#     R               REFFLD(CO#)
+     A            F1FND     R               REFFLD(FND)
+     A            F1CRA#    R               REFFLD(AUD#)
+     A                                      COLHDG('No longer used')
+     A            F1AGA#    R               REFFLD(AUD#)
+     A                                      COLHDG('No longer used')
+     A            F1STAT    R               REFFLD(STAT)
+     A            F1USER    R               REFFLD(USER)
+     A            F1PGM     R               REFFLD(PGM)
+     A            F1TIME    R               REFFLD(TIME)
+     A            F1DT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            F1IUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            F1IDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'ENTRY' 'DATE')
+     A*** ADDED FOR INVOICING SYSTEM *******************************************
+     A            F1BRTC    R               REFFLD(BRTC) TEXT('BILL RATE CODE')
+     A                                      COLHDG('BILL' 'RATE' 'CODE')
+     A            F1SUB#    R               REFFLD(SUB#)
+     A                                      COLHDG('SUBSCRIBER')
+     A            F1OUTA    R               REFFLD(FLAG)
+     A                                      COLHDG('OUTSIDE' 'ACCOUNT')
+     A            F1NTWK    R               REFFLD(FLAG)
+     A                                      COLHDG('FLAG')
+     A            F1FLG1    R               REFFLD(FLAG)
+     A                                      COLHDG('Use alternate addr')
+     A            F1FLG2    R               REFFLD(FLAG)
+     A                                      COLHDG('Bill Review paid' +
+     A                                      'flag')
+     A            F1FLG3    R               REFFLD(FLAG)
+     A                                      COLHDG('No longer used')
+     A            F1FLG4    R               REFFLD(FLAG)
+     A                                      COLHDG('No longer used')
+     A            F1FLG5    R               REFFLD(FLAG)
+     A                                      COLHDG('No longer used')
+     A* FLAG FIELDS
+     A            F1FL01    R               REFFLD(FLAG)
+     A                                      COLHDG('Which addr on EOMB')
+     A            F1FL02    R               REFFLD(FLAG)
+     A                                      COLHDG('Invoice this group')
+     A            F1FL03    R               REFFLD(FLAG)
+     A                                      COLHDG('24hr health group')
+     A            F1FL04    R               REFFLD(FLAG)
+     A                                      COLHDG('WCMC chk issuance' +
+     a                                      'W0080R')
+     A            F1FL05    R               REFFLD(FLAG)
+     A                                      COLHDG('No longer used')
+     A            F1FL06    R               REFFLD(FLAG)
+     A                                      COLHDG('No longer used')
+     A            F1FL07    R               REFFLD(FLAG)
+     A                                      COLHDG('No longer used')
+     A            F1FL08    R               REFFLD(FLAG)
+     A                                      COLHDG('No longer used')
+     A            F1FL09    R               REFFLD(FLAG)
+     A                                      COLHDG('No longer used')
+     A            F1FL10    R               REFFLD(FLAG)
+     A                                      COLHDG('No longer used')
+     A* 10 ALPHA FIELDS
+     A            F110A1    R               REFFLD(DS10)
+     A                                      COLHDG('No longer used')
+     A            F110A2    R               REFFLD(DS10)
+     A                                      COLHDG('No longer used')
+     A            F110A3    R               REFFLD(DS10)
+     A                                      COLHDG('No longer used')
+     A            F110A4    R               REFFLD(DS10)
+     A                                      COLHDG('No longer used')
+     A            F110A5    R               REFFLD(DS10)
+     A                                      COLHDG('No longer used')
+     A* 6.0 NUMERIC FIELDS
+     A* F16N1 is being used as 5.2.
+     A            F16N1     R               REFFLD(A60)
+     A                                      COLHDG('Bill Review' +
+     A                                      ' Service %')
+     A            F16N2     R               REFFLD(A60)
+     A                                      COLHDG('No longer used')
+     A            F16N3     R               REFFLD(A60)
+     A                                      COLHDG('No longer used')
+     A            F16N4     R               REFFLD(A60)
+     A                                      COLHDG('No longer used')
+     A            F16N5     R               REFFLD(A60)
+     A                                      COLHDG('No longer used')
+     A* 9.2 NUMERIC FIELDS
+     A            F192N1    R               REFFLD(A92)
+     A                                      COLHDG('No longer used')
+     A            F192N2    R               REFFLD(A92)
+     A                                      COLHDG('No longer used')
+     A            F192N3    R               REFFLD(A92)
+     A                                      COLHDG('No longer used')
+     A            F192N4    R               REFFLD(A92)
+     A                                      COLHDG('No longer used')
+     A            F192N5    R               REFFLD(A92)
+     A                                      COLHDG('No longer used')
+     A* NETWORK CODES
+     A            F1NW01    R               REFFLD(NWCD)
+     A                                      COLHDG('NETWORK' 'CODE 1')
+     A            F1NW02    R               REFFLD(NWCD)
+     A                                      COLHDG('NETWORK' 'CODE 2')
+     A            F1NW03    R               REFFLD(NWCD)
+     A                                      COLHDG('NETWORK' 'CODE 3')
+     A            F1NW04    R               REFFLD(NWCD)
+     A                                      COLHDG('NETWORK' 'CODE 4')
+     A            F1NW05    R               REFFLD(NWCD)
+     A                                      COLHDG('NETWORK' 'CODE 5')
+     A            F1NW06    R               REFFLD(NWCD)
+     A                                      COLHDG('NETWORK' 'CODE 6')
+     A            F1NW07    R               REFFLD(NWCD)
+     A                                      COLHDG('NETWORK' 'CODE 7')
+     A            F1NW08    R               REFFLD(NWCD)
+     A                                      COLHDG('NETWORK' 'CODE 8')
+     A            F1NW09    R               REFFLD(NWCD)
+     A                                      COLHDG('NETWORK' 'CODE 9')
+     A            F1NW10    R               REFFLD(NWCD)
+     A                                      COLHDG('NETWORK' 'CODE 10')
+     A* OUTSIDE NETWORK FLAGS
+     A*     Valid Values:
+     A*            I = Company's Network, billing based on Bill Rate Code
+     A*            N = Outside Organization's Network, discounting on PDS
+     A*                Calc of amt owed organization handled per client mod
+     A*            Y = Outside Organization's Network, discounting downloaded
+     A*                Calc of amt owed organization uploaded from organization
+     A            F1NF01    R               REFFLD(FLAG)
+     A                                      COLHDG('OUTSIDE' 'NTWK' 'FLAG 1')
+     A            F1NF02    R               REFFLD(FLAG)
+     A                                      COLHDG('OUTSIDE' 'NTWK' 'FLAG 2')
+     A            F1NF03    R               REFFLD(FLAG)
+     A                                      COLHDG('OUTSIDE' 'NTWK' 'FLAG 3')
+     A            F1NF04    R               REFFLD(FLAG)
+     A                                      COLHDG('OUTSIDE' 'NTWK' 'FLAG 4')
+     A            F1NF05    R               REFFLD(FLAG)
+     A                                      COLHDG('OUTSIDE' 'NTWK' 'FLAG 5')
+     A            F1NF06    R               REFFLD(FLAG)
+     A                                      COLHDG('OUTSIDE' 'NTWK' 'FLAG 6')
+     A            F1NF07    R               REFFLD(FLAG)
+     A                                      COLHDG('OUTSIDE' 'NTWK' 'FLAG 7')
+     A            F1NF08    R               REFFLD(FLAG)
+     A                                      COLHDG('OUTSIDE' 'NTWK' 'FLAG 8')
+     A            F1NF09    R               REFFLD(FLAG)
+     A                                      COLHDG('OUTSIDE' 'NTWK' 'FLAG 9')
+     A            F1NF10    R               REFFLD(FLAG)
+     A                                      COLHDG('OUTSIDE' 'NTWK' 'FLAG 10')
+     A* 9.2 NUMERIC FIELDS - NETWORK FEE RATE 1 - 10
+     A            F1N$01    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'FEE' 'RATE')
+     A            F1N$02    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'FEE' 'RATE')
+     A            F1N$03    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'FEE' 'RATE')
+     A            F1N$04    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'FEE' 'RATE')
+     A            F1N$05    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'FEE' 'RATE')
+     A            F1N$06    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'FEE' 'RATE')
+     A            F1N$07    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'FEE' 'RATE')
+     A            F1N$08    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'FEE' 'RATE')
+     A            F1N$09    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'FEE' 'RATE')
+     A            F1N$10    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'FEE' 'RATE')
+     A*
+     A* 1 A FLAG FIELDS - NETWORK FEE TYPE 1 - 10
+     A            F1NT01    R               REFFLD(FLAG)
+     A                                      COLHDG('NETWORK' 'FEE' 'TYPE 1')
+     A            F1NT02    R               REFFLD(FLAG)
+     A                                      COLHDG('NETWORK' 'FEE' 'TYPE 2')
+     A            F1NT03    R               REFFLD(FLAG)
+     A                                      COLHDG('NETWORK' 'FEE' 'TYPE 3')
+     A            F1NT04    R               REFFLD(FLAG)
+     A                                      COLHDG('NETWORK' 'FEE' 'TYPE 4')
+     A            F1NT05    R               REFFLD(FLAG)
+     A                                      COLHDG('NETWORK' 'FEE' 'TYPE 5')
+     A            F1NT06    R               REFFLD(FLAG)
+     A                                      COLHDG('NETWORK' 'FEE' 'TYPE 6')
+     A            F1NT07    R               REFFLD(FLAG)
+     A                                      COLHDG('NETWORK' 'FEE' 'TYPE 7')
+     A            F1NT08    R               REFFLD(FLAG)
+     A                                      COLHDG('NETWORK' 'FEE' 'TYPE 8')
+     A            F1NT09    R               REFFLD(FLAG)
+     A                                      COLHDG('NETWORK' 'FEE' 'TYPE 9')
+     A            F1NT10    R               REFFLD(FLAG)
+     A                                      COLHDG('NETWORK' 'FEE' 'TYPE 10')
+     A*
+     A* 9.0 NUMERIC FIELDS - NETWORK FEDERAL ID 1 - 10
+     A            F1NI01    R               REFFLD(FEIN)
+     A                                      COLHDG('NETWORK' 'FED' 'ID')
+     A            F1NI02    R               REFFLD(FEIN)
+     A                                      COLHDG('NETWORK' 'FED' 'ID')
+     A            F1NI03    R               REFFLD(FEIN)
+     A                                      COLHDG('NETWORK' 'FED' 'ID')
+     A            F1NI04    R               REFFLD(FEIN)
+     A                                      COLHDG('NETWORK' 'FED' 'ID')
+     A            F1NI05    R               REFFLD(FEIN)
+     A                                      COLHDG('NETWORK' 'FED' 'ID')
+     A            F1NI06    R               REFFLD(FEIN)
+     A                                      COLHDG('NETWORK' 'FED' 'ID')
+     A            F1NI07    R               REFFLD(FEIN)
+     A                                      COLHDG('NETWORK' 'FED' 'ID')
+     A            F1NI08    R               REFFLD(FEIN)
+     A                                      COLHDG('NETWORK' 'FED' 'ID')
+     A            F1NI09    R               REFFLD(FEIN)
+     A                                      COLHDG('NETWORK' 'FED' 'ID')
+     A            F1NI10    R               REFFLD(FEIN)
+     A                                      COLHDG('NETWORK' 'FED' 'ID')
+     A*
+     A* 3.0 NUMERIC FIELDS - NETWORK FEDERAL ID MODIFIER 1 - 10
+     A            F1NM01    R               REFFLD(MOD)
+     A                                      COLHDG('NETWORK' 'FED ID' 'MOD')
+     A            F1NM02    R               REFFLD(MOD)
+     A                                      COLHDG('NETWORK' 'FED ID' 'MOD')
+     A            F1NM03    R               REFFLD(MOD)
+     A                                      COLHDG('NETWORK' 'FED ID' 'MOD')
+     A            F1NM04    R               REFFLD(MOD)
+     A                                      COLHDG('NETWORK' 'FED ID' 'MOD')
+     A            F1NM05    R               REFFLD(MOD)
+     A                                      COLHDG('NETWORK' 'FED ID' 'MOD')
+     A            F1NM06    R               REFFLD(MOD)
+     A                                      COLHDG('NETWORK' 'FED ID' 'MOD')
+     A            F1NM07    R               REFFLD(MOD)
+     A                                      COLHDG('NETWORK' 'FED ID' 'MOD')
+     A            F1NM08    R               REFFLD(MOD)
+     A                                      COLHDG('NETWORK' 'FED ID' 'MOD')
+     A            F1NM09    R               REFFLD(MOD)
+     A                                      COLHDG('NETWORK' 'FED ID' 'MOD')
+     A            F1NM10    R               REFFLD(MOD)
+     A                                      COLHDG('NETWORK' 'FED ID' 'MOD')
+     A            F1ANME    R               REFFLD(NAME)
+     A                                      COLHDG('ALTERNATE' 'NAME')
+     A            F1AAD1    R               REFFLD(ADR1)
+     A                                      COLHDG('ALTERNATE' 'ADDR 1')
+     A            F1AAD2    R               REFFLD(ADR2)
+     A                                      COLHDG('ALTERNATE' 'ADDR 2')
+     A            F1ACTY    R               REFFLD(CTY)
+     A                                      COLHDG('ALTERNATE' 'CITY')
+     A            F1AST     R               REFFLD(ST)
+     A                                      COLHDG('ALTERNATE' 'STATE')
+     A            F1AZIP    R               REFFLD(ZIP)
+     A                                      COLHDG('ALTERNATE' 'ZIP')
+     A            F1AARA    R               REFFLD(AREA)
+     A                                      COLHDG('ALTERNATE' 'AREA CODE')
+     A            F1APHN    R               REFFLD(PHN#)
+     A                                      COLHDG('ALTERNATE' 'PHONE #')
+     A            F1IPGM    R               REFFLD(PGM)
+     A                                      COLHDG('Initial program')
+     A            F1ITIM    R               REFFLD(TIME)
+     A                                      COLHDG('Initial time')
+     A*** BEGIN ADD *** 03/10/05 **************************************
+     A            F1AFEI    R               REFFLD(FEIN)
+     A                                      COLHDG('ALTERNATE FEIN')
+     A*** END   ADD *** 03/10/05 **************************************

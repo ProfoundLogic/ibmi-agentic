@@ -1,0 +1,323 @@
+      * (c) 2024 Sapiens. All Rights Reserved.                             *
+     A*                                                               *
+     A*****************************************************************
+     A* SCRIPTURA DATA WORK FILE FOR MONTHLY INTERIMS                 *
+     A*****************************************************************
+     A*                                                               *
+     A*  PROJECT:  SY371        PROGRAMMER:  C:65                     *
+     A*  CREATED:  06/21/16                                           *
+     A*  DESCRIPTION:  THIS IS THE WORK FILE TO HOLD THE DATA FOR     *
+     A*                MONTHLY INTERIMS.                              *
+     A*                                                               *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 06/24/24 C:333 Project: 146WKR                                *
+     A*                Collateral Processing.                         *
+     A*                                                               *
+     A* 05/13/24 C:062 Project: 146WKQ                                *
+     A*                Add Bill Assessments for S/R                   *
+     A*                                                               *
+     A* 05/31/23  C:65  Project: PHW#110481 (UBIC)                    *
+     A*                 ADD FIELD FOR TEXT WHEN PREV BALANCE INCLUDES *
+     A*                 WAIVER/OTHER ITEMS.                           *
+     A*                                                               *
+     A* 07/13/20 C:136 Project: SY407                                 *
+     A*                Add remittance header for 3rd Party, EFT, etc  *
+     A*                                                               *
+     A* 07/15/18  C:62  Project: SY407                                *
+     A*                 ADD FORM COMPLETION FLAG                      *
+     A*                                                               *
+     A* 06/21/17  C:62  Project: CI143                                *
+     A*                 ADD THREE NEW FIELDS FOR PAID, PAID DATE AND  *
+     A*                 PAYMENT TYPE                                  *
+     A*                                                               *
+     A* 07/27/16  C:65  Project: SY371                                *
+     A*                 ADD NEW FIELDS FOR NET RATE VERBIAGE, OFFICE  *
+     A*                 PHONE #, AND PRORATED PERCENTAGE FLAG.        *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PMI01                     TEXT('MONTHLY INTERIM WORKFILE')
+     A*
+     A* KEY FIELDS
+     A*
+     A            M1XML         60A         COLHDG('XML FILE NAME')
+     A*
+     A            M1CO#     R     S         REFFLD(CO#)
+     A            M1FND     R     S         REFFLD(FND)
+     A            M1EMP#    R     S         REFFLD(EMP#)
+     A            M1DIV     R     S         REFFLD(DIV)
+     A            M1FYR     R     S         REFFLD(FYR)
+     A*
+     A            M1PRMWORD     12A
+     A                                      COLHDG('PREMIUM/CONTRI WORD')
+     A            M1NETRATE      1A
+     A                                      COLHDG('NET RATED')
+     A*** BEGIN ADD ***  07/27/16  ********************************************
+     A            M1NETVERB     20A
+     A                                      COLHDG('NET RATE VERBIABE')
+     A            M1PROPERC      1A
+     A                                      COLHDG('PRORATED PERCENTAGE' 'FLAG')
+     A*** END ADD *****  07/27/16  ********************************************
+     A            M1MERIT        1A
+     A                                      COLHDG('MERIT RATED')
+     A            M1WAIVBAL      1A
+     A                                      COLHDG('WAIVER IN BALANCE')
+     A*
+     A            M1LOGO    R               REFFLD(DS10)
+     A                                      COLHDG('BILLING LOGO')
+     A*
+     A            M1FNDNAM  R               REFFLD(DS60)
+     A                                      COLHDG('FUND NAME')
+     A*
+     A            M1PRTDATE      8S 0
+     A                                      COLHDG('PRINT DATE')
+     A            M1PAYDATE      8S 0
+     A                                      COLHDG('PAYMENT DUE DATE')
+     A            M1PFDATE       8S 0
+     A                                      COLHDG('POLICY FROM DATE')
+     A            M1PTDATE       8S 0
+     A                                      COLHDG('POLICY TO DATE')
+     A            M1RFDATE       8S 0
+     A                                      COLHDG('REPORTING FROM DATE')
+     A            M1RTDATE       8S 0
+     A                                      COLHDG('REPORTING TO DATE')
+     A*
+     A            M1AGTHDG  R               REFFLD(DS20)
+     A                                      COLHDG('AGENT HEADING')
+     A            M1AGT#    R     S         REFFLD(AGT#)
+     A                                      COLHDG('AGENT #')
+     A            M1AGTNAM  R               REFFLD(DS40)
+     A                                      COLHDG('AGENT NAME')
+     A            M1AGTADR  R               REFFLD(DS40)
+     A                                      COLHDG('AGENT ADDRESS')
+     A            M1AGTCITY R               REFFLD(CTY)
+     A                                      COLHDG('AGENT' 'CITY')
+     A            M1AGTST   R               REFFLD(ST)
+     A                                      COLHDG('AGENT' 'STATE')
+     A            M1AGTZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('AGENT' 'ZIP CODE')
+     A            M1AGTPHN       7S 0
+     A                                      COLHDG('AGENT PHONE#')
+     A            M1AGTAREA      3S 0
+     A                                      COLHDG('AGENT AREA CODE')
+     A*
+     A            M1POLFDNM    120A
+     A                                      COLHDG('POLICY FEDERAL NAME')
+     A            M1POLNAME    120A
+     A                                      COLHDG('POLICY NAME')
+     A            M1POLCONT    120A
+     A                                      COLHDG('POLICY CONTACT')
+     A            M1POLADR1 R               REFFLD(ADR1)
+     A                                      COLHDG('POLICY' 'ADDRESS 1')
+     A            M1POLADR2 R               REFFLD(ADR2)
+     A                                      COLHDG('POLICY' 'ADDRESS 2')
+     A            M1POLCITY R               REFFLD(CTY)
+     A                                      COLHDG('POLICY' 'CITY')
+     A            M1POLST   R               REFFLD(ST)
+     A                                      COLHDG('POLICY' 'STATE')
+     A            M1POLZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('POLICY' 'ZIP CODE')
+     A*
+     A            M1REFHDG  R               REFFLD(DS20)
+     A                                      COLHDG('POL REF HEADING')
+     A            M1POLICY# R               REFFLD(DS20)
+     A                                      COLHDG('POLICY NUMBER')
+     A            M1RATEST  R               REFFLD(DS10)
+     A                                      COLHDG('RATING STATE')
+     A            M1CARHDG  R               REFFLD(DS20)
+     A                                      COLHDG('CARRIER POL# HEADING')
+     A            M1CARPOL  R               REFFLD(DS25)
+     A                                      COLHDG('CARRIER POLICY#')
+     A*
+     A            M1OFFNAM  R               REFFLD(DS60)
+     A                                      COLHDG('OFFICE NAME')
+     A            M1OFFAD1  R               REFFLD(DS60)
+     A                                      COLHDG('OFFICE ADR 1')
+     A            M1OFFAD2  R               REFFLD(DS60)
+     A                                      COLHDG('OFFICE ADR 2')
+     A            M1OFFCITY R               REFFLD(CTY)
+     A                                      COLHDG('OFFICE' 'CITY')
+     A            M1OFFST   R               REFFLD(ST)
+     A                                      COLHDG('OFFICE' 'STATE')
+     A            M1OFFZIP  R     S         REFFLD(ZIP)
+     A                                      COLHDG('OFFICE' 'ZIP CODE')
+     A            M1DIRINQ  R               REFFLD(DS60)
+     A                                      COLHDG('DIRECT INQUIRIES')
+     A*** BEGIN ADD ***  07/27/16  ********************************************
+     A            M1OFFPHN       7S 0
+     A                                      COLHDG('ACCT OFFICE' 'PHONE#')
+     A            M1OFFAREA      3S 0
+     A                                      COLHDG('ACCT OFFICE' 'AREA CODE')
+     A*** END ADD *****  07/27/16  ********************************************
+     A*
+     A            M1EXPHDG  R               REFFLD(DS40)
+     A                                      COLHDG('EXP MOD/MERIT TEXT')
+     A            M1TERHDG  R               REFFLD(DS40)
+     A                                      COLHDG('TERROR HEADING/TEXT')
+     A            M1TAXHDG  R               REFFLD(DS40)
+     A                                      COLHDG('STATE TAX HEADING')
+     A*
+     A            M1INCLMT       5S 3       COLHDG('INCREASED LIMITS %')
+     A            M1BEFMOD       9S 6       COLHDG('BEFORE MODIFIER FAC')
+     A            M1EXPMOD       5S 4       COLHDG('EXP MOD/MERIT FAC')
+     A            M1AFTMOD       9S 6       COLHDG('AFTER MODIFIER FAC')
+     A            M1TERRTE       5S 3       COLHDG('TERRORISM RATE')
+     A            M1TAXRTE       6S 4       COLHDG('STATE TAX %')
+     A            M1PRVBAL      11S 2       COLHDG('PREVIOUS BALANCE')
+     A            M1SRFEE        7S 2       COLHDG('S/R INSTALLMENT FEE')
+     A*
+     A            M1TOTMAN      11S 2       COLHDG('TOTAL MANUAL PREMIUM')
+     A            M1INCAMT      11S 2       COLHDG('INCR LIMITS AMOUNT')
+     A            M1SUBTOT1     11S 2       COLHDG('SUB TOTAL 01')
+     A            M1SUBTOT2     11S 2       COLHDG('SUB TOTAL 02')
+     A            M1SUBTOT3     11S 2       COLHDG('SUB TOTAL 03')
+     A            M1TOTPRM      11S 2       COLHDG('TOTAL PREMIUM DUE')
+     A            M1TERAMT      11S 2       COLHDG('TERRORISM AMOUNT')
+     A            M1TAXAMT      11S 2       COLHDG('TAX AMOUNT')
+     A            M1TOTDUE      11S 2       COLHDG('TOTAL DUE')
+     A*
+     A            M1MONTH01      3A         COLHDG('MISSING MONTH 01')
+     A            M1MONTH02      3A         COLHDG('MISSING MONTH 02')
+     A            M1MONTH03      3A         COLHDG('MISSING MONTH 03')
+     A            M1MONTH04      3A         COLHDG('MISSING MONTH 04')
+     A            M1MONTH05      3A         COLHDG('MISSING MONTH 05')
+     A            M1MONTH06      3A         COLHDG('MISSING MONTH 06')
+     A            M1MONTH07      3A         COLHDG('MISSING MONTH 07')
+     A            M1MONTH08      3A         COLHDG('MISSING MONTH 08')
+     A            M1MONTH09      3A         COLHDG('MISSING MONTH 09')
+     A            M1MONTH10      3A         COLHDG('MISSING MONTH 10')
+     A            M1MONTH11      3A         COLHDG('MISSING MONTH 11')
+     A            M1MONTH12      3A         COLHDG('MISSING MONTH 12')
+     A            M1MONTH13      3A         COLHDG('MISSING MONTH 13')
+     A            M1MONTH14      3A         COLHDG('MISSING MONTH 14')
+     A            M1MONTH15      3A         COLHDG('MISSING MONTH 15')
+     A            M1MONTH16      3A         COLHDG('MISSING MONTH 16')
+     A            M1MONTH17      3A         COLHDG('MISSING MONTH 17')
+     A            M1MONTH18      3A         COLHDG('MISSING MONTH 18')
+     A            M1MONTH19      3A         COLHDG('MISSING MONTH 19')
+     A            M1MONTH20      3A         COLHDG('MISSING MONTH 20')
+     A            M1MONTH21      3A         COLHDG('MISSING MONTH 21')
+     A            M1MONTH22      3A         COLHDG('MISSING MONTH 22')
+     A            M1MONTH23      3A         COLHDG('MISSING MONTH 23')
+     A            M1MONTH24      3A         COLHDG('MISSING MONTH 24')
+     A*
+     A            M1USER    R               REFFLD(USER)
+     A                                      COLHDG('USER')
+     A            M1PGM     R               REFFLD(PGM)
+     A                                      COLHDG('PROGRAM')
+     A            M1TIME    R     S         REFFLD(TIME)
+     A                                      COLHDG('TIME')
+     A            M1DT      R     S         REFFLD(DT)
+     A                                      COLHDG('DATE')
+     A            M1PREMPAID    11S 2       COLHDG('PREMIUM PAID AMOUNT')
+     A            M1PAYTYPE     10A         COLHDG('PAYMENT TYPE')
+     A            M1PAIDDATE     8S 0       COLHDG('DATE PAID')
+     A            M1FORMCMP      1A         COLHDG('FORM COMPLETED')
+      *** beg add ***** 07/13/20 ***********************************
+     A            M1REMITHDR    60A         COLHDG('REMITTANCE HDR')
+     A            M1REMITFTR    60A         COLHDG('REMITTANCE FTR')
+     A            M1PRVBILLD    11S 2       COLHDG('PREVIOUS BILLED')
+     A            M1PAYAMT       9S 2       COLHDG('REMIT PAY AMT')
+     A            M1PAYDAT2      8S 0       COLHDG('REMIT PAY DATE')
+      *** end add ***** 07/13/20 ***********************************
+     A*** BEGIN ADD ***  05/31/23  ***************************************
+     A            M1PBALTXT    100A         COLHDG('PREV BAL INC TEXT')
+     A*** END ADD *****  05/31/23  ***************************************
+     A*** Begin Add *** 05/13/24 **************************************
+     A            M1SRAS    R               REFFLD(FLAG)
+     A                                      COLHDG('Print Assessments')
+     A            M11STH        20A
+     A                                      COLHDG('1st Assessments' +
+     A                                      'Headings')
+     A            M12NDH        20A
+     A                                      COLHDG('2nd Assessments' +
+     A                                      'Headings')
+     A            M13RDH        20A
+     A                                      COLHDG('3rd Assessments' +
+     A                                      'Headings')
+     A            M14THH        20A
+     A                                      COLHDG('4th Assessments' +
+     A                                      'Headings')
+     A            M15THH        20A
+     A                                      COLHDG('5th Assessments' +
+     A                                      'Headings')
+     A            M16THH        20A
+     A                                      COLHDG('6th Assessments' +
+     A                                      'Headings')
+     A            M17THH        20A
+     A                                      COLHDG('7th Assessments' +
+     A                                      'Headings')
+     A            M11STP         6S 4
+     A                                      COLHDG('1st Assessments' +
+     A                                      'Percentage')
+     A            M12NDP         6S 4
+     A                                      COLHDG('2nd Assessments' +
+     A                                      'Percentage')
+     A            M13RDP         6S 4
+     A                                      COLHDG('3rd Assessments' +
+     A                                      'Percentage')
+     A            M14THP         6S 4
+     A                                      COLHDG('4th Assessments' +
+     A                                      'Percentage')
+     A            M15THP         6S 4
+     A                                      COLHDG('5th Assessments' +
+     A                                      'Percentage')
+     A            M16THP         6S 4
+     A                                      COLHDG('6th Assessments' +
+     A                                      'Percentage')
+     A            M17THP         6S 4
+     A                                      COLHDG('7th Assessments' +
+     A                                      'Percentage')
+     A            M11STA        11S 2
+     A                                      COLHDG('1st Assessments' +
+     A                                      'Amount')
+     A            M12NDA        11S 2
+     A                                      COLHDG('2nd Assessments' +
+     A                                      'Amount')
+     A            M13RDA        11S 2
+     A                                      COLHDG('3rd Assessments' +
+     A                                      'Amount')
+     A            M14THA        11S 2
+     A                                      COLHDG('4th Assessments' +
+     A                                      'Amount')
+     A            M15THA        11S 2
+     A                                      COLHDG('5th Assessments' +
+     A                                      'Amount')
+     A            M16THA        11S 2
+     A                                      COLHDG('6th Assessments' +
+     A                                      'Amount')
+     A            M17THA        11S 2
+     A                                      COLHDG('7th Assessments' +
+     A                                      'Amount')
+     A            M11STS         2S 0
+     A                                      COLHDG('1st Assessments' +
+     A                                      'Sequence #')
+     A            M12NDS         2S 0
+     A                                      COLHDG('2nd Assessments' +
+     A                                      'Sequence #')
+     A            M13RDS         2S 0
+     A                                      COLHDG('3rd Assessments' +
+     A                                      'Sequence #')
+     A            M14THS         2S 0
+     A                                      COLHDG('4th Assessments' +
+     A                                      'Sequence #')
+     A            M15THS         2S 0
+     A                                      COLHDG('5th Assessments' +
+     A                                      'Sequence #')
+     A            M16THS         2S 0
+     A                                      COLHDG('6th Assessments' +
+     A                                      'Sequence #')
+     A            M17THS         2S 0
+     A                                      COLHDG('7th Assessments' +
+     A                                      'Sequence #')
+     A            M1TOTSEQ#      2S 0
+     A                                      COLHDG('Totals Sequence #')
+     A*** End   Add *** 05/13/24 **************************************
+     A*** Beg Add *****  06/24/24  ************************************
+     A            M1COLRP        5S 2       COLHDG('Collateral Reported' +
+     A                                             'Percentage')
+     A
+     A            M1COLRA       11S 2       COLHDG('Collateral Amount')
+     A*** End Add ***** 06/24/24  *************************************

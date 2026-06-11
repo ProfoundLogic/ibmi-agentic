@@ -1,0 +1,196 @@
+     A* (c) 2022 Sapiens. All Rights Reserved.                             *
+     A*********************************************************************
+     A*  NAME: W1099O3 - Form 1099 MISC - Copy A - for 2020
+     A*
+     A*================================================================Yr
+     A*
+     A* Two Up on 8 1/2 X 11 Inch Form
+     A* 6 Lines per Inch, Overflow at 60
+     A*
+     A*===============================================================*****
+     A* BY: 132   PROJECT: WC1036 - 05/16/01
+     A*===============================================================*****
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 11/09/22 C:62 Project WC2890                                  *
+     A*               Add year to print.                              *
+     A*                                                               *
+     A* 01/11/21 C:62 Ticket 93619(111)                               *
+     A*               Move adresses over to fit in box for MPE        *
+     A*                                                               *
+     A*  10/08/20  C:062 PROJECT: WC2750                              *
+     A*                  Make 2020 1099 changes                       *
+     A*                  -Remove box 7 amount                         *
+     A*                  -Move Box 14 to Box 10                       *
+     A*                                                               *
+     A*  01/29/16  C:300 SUPPORT: 39519 (xrefn 33062)                 *
+     A*                  1099 processing for CareWest                 *
+     A*                  Field 14 (XPMTC) got out of alignment        *
+     A*                  while creating new F10992 record             *
+     A*                                                               *
+     A*  01/27/15  C:180 SUPPORT: 32827                               *
+     A*                  Reposition box 6, 2 spaces to the left.      *
+     A*                                                               *
+     A*  01/20/15  C:283 SUPPORT: 32794                               *
+     A*                  Change the Support 81524 to be specific to   *
+     A*                  LCTA 045 client.                             *
+     A*                                                               *
+     A*  02/01/13  C:283 SUPPORT: WC045 81524                         *
+     A*                  Shift the later form on the same page        *
+     A*                  3 lines downward.                            *
+     A*                                                               *
+     A*  08/29/02  C:132 PROJECT: WC957                               *
+     A*                  Add Box 14 For Payments to Attorneys         *
+     A*                                                               *
+     A*  02/15/02  C:132 PROJECT: WC091 SEQ: 31289                    *
+     A*                  ADD SECOND ADDRESS LINE                      *
+     A*                                                               *
+     A*  09/07/01  C:132 PROJECT: WC1047                              *
+     A*                  *IN51 if ON then FEIN is a Soc Sec # - Then  *
+     A*                  use SS# Edit Format rather than FEIN format  *
+     A*                                                               *
+     A*===============================================================*****
+     A                                      REF(*LIBL/WREFP PREF01)
+     A          R F10991
+     A N53        APRN1     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(006)
+     A  53        APRN1MPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(006)
+     A N53        APRAD     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(007)
+     A  53        APRADMPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(007)
+     A N53        APRAD2    R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(008)
+     A  53        APRAD2MPE R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(008)
+     A*** BEGIN ADD *** 11/09/22 **************************************
+     A  53        RPTYEARMPE     2   O    69
+     A*** END   ADD *** 11/09/22 **************************************
+     A N53        APRCS     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(009)
+     A*** BEGIN ADD *** 11/09/22 **************************************
+     A N53        RPTYEAR        2   O    70
+     A*** END   ADD *** 11/09/22 **************************************
+     A  53        APRCSMPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(009)
+     A N53        APPH#         13   O     6
+     A N53                                  SKIPB(010)
+     A  53        APPH#MPE      13   O     9
+     A  53                                  SKIPB(010)
+     A            XPMT3         12  2O    48EDTCDE(4)
+     A                                      SKIPB(011)
+     A            APRIN1        10   O    11TEXT('PAYER FEIN')
+     A                                      SKIPB(014)
+     A     51     BFSS#1        11   O    33TEXT('SOC SEC # EDITED')
+     A    N51     BFEIN1        10   O    33TEXT('FEIN # EDITED')
+     A            XPMT6         12  2O    63EDTCDE(4)
+     A N53        BPNM1     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(018)
+     A  53        BPNM1MPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(018)
+     A N53        BPRAD     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(020)
+     A  53        BPRADMPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(020)
+     A N52        XPMTC         12  2O    65EDTCDE(4)
+     A N52                                  SKIPB(020)
+     A N53        BPRA2     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(021)
+     A  53        BPRA2MPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(021)
+     A N53        BXCSZ     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(023)
+     A  53        BXCSZMPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(023)
+     A  52        XPMTC_CLT     12  2O    65EDTCDE(4)
+     A  52                                  SKIPB(023)
+     A          R F1099CLT
+     A            APRN1     R        O     6REFFLD(DS40)
+     A                                      SKIPB(042)
+     A            APRAD     R        O     6REFFLD(DS40)
+     A                                      SKIPB(043)
+     A            APRAD2    R        O     6REFFLD(DS40)
+     A                                      SKIPB(044)
+     A            APRCS     R        O     6REFFLD(DS40)
+     A                                      SKIPB(045)
+     A*** BEGIN ADD *** 11/09/22 **************************************
+     A            RPTYEAR        2   O    70
+     A*** END   ADD *** 11/09/22 **************************************
+     A            APPH#         13   O     6
+     A                                      SKIPB(046)
+     A            XPMT3         12  2O    48EDTCDE(4)
+     A                                      SKIPB(047)
+     A            APRIN1        10   O    11TEXT('PAYER FEIN')
+     A                                      SKIPB(050)
+     A     51     BFSS#1        11   O    33
+     A    N51     BFEIN1        10   O    33
+     A            XPMT6         12  2O    63EDTCDE(4)
+     A            BPNM1     R        O     6REFFLD(DS40)
+     A                                      SKIPB(054)
+     A            BPRAD     R        O     6REFFLD(DS40)
+     A                                      SKIPB(056)
+     A            XPMTC         12  2O    65EDTCDE(4)
+     A                                      SKIPB(056)
+     A            BPRA2     R        O     6REFFLD(DS40)
+     A                                      SKIPB(057)
+     A            BXCSZ     R        O     6REFFLD(DS40)
+     A                                      SKIPB(059)
+     A          R F10992
+     A N53        APRN1     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(039)
+     A  53        APRN1MPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(039)
+     A N53        APRAD     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(040)
+     A  53        APRADMPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(040)
+     A N53        APRAD2    R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(041)
+     A  53        APRAD2MPE R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(041)
+     A*** BEGIN ADD *** 11/09/22 **************************************
+     A  53        RPTYEARMPE     2   O    69
+     A*** END   ADD *** 11/09/22 **************************************
+     A N53        APRCS     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(042)
+     A*** BEGIN ADD *** 11/09/22 **************************************
+     A N53        RPTYEAR        2   O    70
+     A*** END   ADD *** 11/09/22 **************************************
+     A  53        APRCSMPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(042)
+     A N53        APPH#         13   O     6
+     A N53                                  SKIPB(043)
+     A  53        APPH#MPE      13   O     9
+     A  53                                  SKIPB(043)
+     A            XPMT3         12  2O    48EDTCDE(4)
+     A                                      SKIPB(044)
+     A            APRIN1        10   O    11TEXT('PAYER FEIN')
+     A                                      SKIPB(047)
+     A     51     BFSS#1        11   O    33
+     A    N51     BFEIN1        10   O    33
+     A            XPMT6         12  2O    63EDTCDE(4)
+     A N53        BPNM1     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(051)
+     A  53        BPNM1MPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(051)
+     A N53        BPRAD     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(053)
+     A  53        BPRADMPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(053)
+     A N52        XPMTC         12  2O    65EDTCDE(4)
+     A N52                                  SKIPB(053)
+     A N53        BPRA2     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(054)
+     A  53        BPRA2MPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(054)
+     A*N52        XPMTC         12  2O    65EDTCDE(4)
+     A*N52                                  SKIPB(053)
+     A**52        XPMTC_CLT     12  2O    65EDTCDE(4)
+     A**52                                  SKIPB(056)
+     A N53        BXCSZ     R        O     6REFFLD(DS40)
+     A N53                                  SKIPB(056)
+     A  53        BXCSZMPE  R        O     9REFFLD(DS40)
+     A  53                                  SKIPB(056)
+     A  52        XPMTC_CLT     12  2O    65EDTCDE(4)
+     A  52                                  SKIPB(056)

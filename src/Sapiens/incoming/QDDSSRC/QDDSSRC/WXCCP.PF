@@ -1,0 +1,136 @@
+     A* COPYRIGHT (C) 2019 SAPIENS INTERNATIONAL. ALL RIGHTS RESERVED.
+     A*
+     A* WORKERS' COMP CANCELATION NOTICE CRITERIA WORK FILE
+     A*****************************************************************
+     A*  DESCRIPTIONS:                                                *
+     A*  A TEMPORARY FILE TO HOLD THE SELECTION CRITERIA FROM THE     *
+     A*  "BUILD CANCELLATION NOTICE FILE" OPTION--ONE RECORD FOR EACH *
+     A*  RUN.  ALL EMPLOYERS WHO MEET THESE SAME CRITERIA ARE LISTED  *
+     A*  IN THE 'CANCELLATION NOTICE WORKFILE'.  THIS FILE ACTS AS A  *
+     A*  GUIDE OR HEADER TO THAT WORKFILE FOR THE "CANCELLATION NOTICE*
+     A*  MAINTENANCE" OPTION.                                         *
+     A*                                                               *
+     A*  CREATED: 11/15/96 C:57 PROJECT CM024                         *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 11/21/19  C:180  PROJECT 102WIC                               *
+     A*                  Add State Inclusion/Exclusion fields.        *
+     A*                                                               *
+     A* 03/07/05 C:136 PROJECT: WC1199 (REVAMPT DUNNING II)           *
+     A*                POPULATE CCINCP TO INDICATE THAT DEPOSIT IS    *
+     A*                INCLUDED IN BALANCE CALCULATION.               *
+     A*                                                               *
+     A* 05/02/03 C:61  PROJECT: WC1108                                *
+     A*                Add flag for Batch Based on Amount/Premium.    *
+     A*                                                               *
+     A* 02/18/03 C:136 PROJECT: WC1115 (PREM/PAYROLL IMPORT/EXPORT)   *
+     A*                Add field for reporting frequency, 'M' -       *
+     A*                'M' - monthly, 'W' - weekly, 'B' - Both        *
+     A*                                                               *
+     A* 08/13/02  C:61   PROJECT: 126WAK                              *
+     A*                  Add fields for week ending date and          *
+     A*                  exclude after date.                          *
+     A*                                                               *
+     A* 11/28/00  C:61   PROJECT: 109CF                               *
+     A*                  Add Agent# field.                            *
+     A*                                                               *
+     A* 12/01/99  C:90   PROJECT: WC912                               *
+     A*                  ADDED A NEW FIELD FOR THE ESTIMATED/AUDITED  *
+     A*                  SELECTION FLAG.                              *
+     A*                                                               *
+     A* 08/12/99  C:35   PROJECT: WC894                               *
+     A*                  ADDED FIELD FOR PAYMENTS THROUGH DATE.       *
+     A*                  CHANGED HEADING ON BALANCE DATE TO BILLINGS  *
+     A*                  THROUGH DATE.                                *
+     A*                                                               *
+     A*  08/20/98 C:87 PROJECT WC852                                  *
+     A*                ADDED CCOFF# - OFFICE #                        *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A*
+     A          R PCC01                     TEXT('CANCEL NOTICE CRITERIA WORKF')
+     A            CCCO#     R               REFFLD(CO#)
+     A            CCFND     R               REFFLD(FND)
+     A            CCFYR     R               REFFLD(FYR)
+     A                                      COLHDG('FIELD NOT USED')
+     A            CCETYP    R               REFFLD(FLAG)
+     A                                      COLHDG('ACCOUNT TYPE')
+     A            CCBLDT    R               REFFLD(DT)
+      **** BEGIN CHG **** 08/12/99 ************************************
+     A************************************* COLHDG('BALANCE DATE')
+     A                                      COLHDG('BILLING' 'THROUGH DATE')
+      **** END   CHG **** 08/12/99 ************************************
+     A            CCMIN     R               REFFLD(A72)
+     A                                      COLHDG('MINIMUM BALANCE')
+     A            CCRPMY    R               REFFLD(RMY5)
+     A                                      COLHDG('REPORTING MONTH/YEAR')
+     A            CCSTAT    R               REFFLD(STAT) COLHDG('STATUS')
+     A            CCUSER    R               REFFLD(USER)
+     A            CCPGM     R               REFFLD(PGM)
+     A            CCTIME    R               REFFLD(TIME)
+     A            CCDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            CCBAT#    R               REFFLD(BUL#1)
+     A                                      COLHDG('CANCEL BATCH #')
+     A            CCBPF     R               REFFLD(FLAG)
+     A                                      COLHDG('BATCH PROCESSED' 'Y/N')
+     A            CCRSN     R               REFFLD(CODE)
+     A                                      COLHDG('REASON CODE')
+     A            CCCOM1    R               REFFLD(DS60)
+     A                                      COLHDG('COMMENT LINE 1')
+     A            CCCOM2    R               REFFLD(DS60)
+     A                                      COLHDG('COMMENT LINE 2')
+     A            CCFRDT    R               REFFLD(DT)
+     A                                      COLHDG('POLICY EFF LOW DATE')
+     A            CCTODT    R               REFFLD(DT)
+     A                                      COLHDG('POLICY EFF HI DATE')
+     A            CCDAY          2  0
+     A                                      COLHDG('EXCL NW ACCTS' 'FROM DAY')
+     A*** BEGIN ADD *** 08/20/98 **********************************************
+     A            CCOFF#    R               REFFLD(DS5)
+     A                                      COLHDG('OFFICE NUMBER')
+     A*** END   ADD *** 08/20/98 **********************************************
+      **** BEGIN ADD **** 08/12/99 ************************************
+     A            CCPTDT    R               REFFLD(DT)
+     A                                      COLHDG('PAYMENT' 'THROUGH DATE')
+      **** END   CHG **** 08/12/99 ************************************
+      **** BEGIN ADD **** 12/01/99 ************************************
+     A            CCEAFL    R               REFFLD(FLAG)
+     A                                      COLHDG('EST./AUDIT FLAG')
+      **** END   ADD **** 12/01/99 ************************************
+     A***** BEG ADD ***** 11/28/00 ***********************************
+     A            CCAGT#    R               REFFLD(AGT#)
+     A                                      COLHDG('AGENT #')
+     A***** END ADD ***** 11/28/00 ***********************************
+     A***** BEG ADD ***** 08/13/02 ***********************************
+      *
+     A            CCWEDT    R               REFFLD(DT7S)
+     A                                      COLHDG('Week Ending date')
+      *
+     A            CCXADT    R               REFFLD(DT7S)
+     A                                      COLHDG('Exclude After date')
+     A***** END ADD ***** 08/13/02 ***********************************
+     A***** BEG ADD ***** 02/18/03 ***********************************
+      *
+     A            CCFREQ    R               REFFLD(FLAG)
+     A                                      COLHDG('Reporting' 'Frequency')
+     A***** END ADD ***** 02/18/03 ***********************************
+     A***** BEG ADD ***** 05/02/03 ***********************************
+      *
+     A            CCADPP    R               REFFLD(FLAG)
+     A                                      COLHDG('Batch based on' +
+     A                                      'Amount due or' '% Premium')
+     A***** END ADD ***** 05/02/03 ***********************************
+     A***** BEG ADD ***** 03/07/05 ***********************************
+      *
+     A            CCINDP    R               REFFLD(FLAG)
+     A                                      COLHDG('Include deposit' +
+     A                                      'in calculation')
+     A***** END ADD ***** 03/07/05 ***********************************
+     ***** BEG ADD ***** 11/21/19 ***********************************
+     A            CCSTINEX  R               REFFLD(FLAG)
+     A                                      COLHDG('Incl/Excl States Flg')
+     A            CCSTLIST     150A         COLHDG('Incl/Excl States')
+     ***** END ADD ***** 11/21/19 ***********************************

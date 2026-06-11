@@ -1,0 +1,168 @@
+     A* (c) 2021 Sapiens. All Rights Reserved.                             *
+     A*****************************************************************
+     A*  NCCI REPORTING - NAME/ADDRESS TRANSACTION
+     A*****************************************************************
+     A* REVISIONS                                                     *
+     A*                                                               *
+     A* 12/22/21 C:079 Project: WC2840                                *
+     A*                Add email address                              *
+     A*                                                               *
+     A* 07/18/18  C:65  PROJECT: 150WAD                               *
+     A*                 ADD A NAME AND AN ADDRESS EFFECTIVE DATE FIELD*
+     A*                 FOR STORING THE BEGIN DATE OF THE NAME/ADDR.  *
+     A*                 DELETED RECORDS WILL CONTINUE TO HAVE SAME    *
+     A*                 DATE IN THE EFF/EXP DATE FIELDS BUT WILL NEED *
+     A*                 TO REPORT THE COVERAGE RANGE FOR INDEPENDENT  *
+     A*                 BUREAUS.                                      *
+     A*                                                               *
+     A* 02/19/18 C:291 Project: WC2521                                *
+     A*                Add Non Specific Address.                      *
+     A*                                                               *
+     A* 07/09/08  C:65   PROJECT: SUPP#64177/WC1633                   *
+     A*                  ADD DELETION REPORTED FLAGS FOR NAME AND     *
+     A*                  ADDRESS TO INDICATE IF A NAME/ADDRESS HAS    *
+     A*                  BEEN REPORTED IN A SUBMISSION.               *
+     A*                                                               *
+     A* 09/02/06 C:65  SEQ#: 114WGH/114WFI                            *
+     A*                WXNAP WILL HAVE A NEW NAME FIELD ADDED TO      *
+     A*                HANDLE THE FULL POSSIBLE NAME FOR NJ PEO'S,    *
+     A*                WHICH REACH UP TO 312 CHARACTERS CURRENTLY.    *
+     A*                                                               *
+     A* 04/25/06  C:65   PROJECT: 132WAY                              *
+     A*                  ADDED PERSONAL NAME FLAGS FOR NAME FIELDS.   *
+     A*                                                               *
+     A* 10/11/05  C:65   PROJECT: 132WAY                              *
+     A*                  ADDED FIELD FOR NATURE OF BUSINESS DESC.     *
+     A*                                                               *
+     A* 07/26/05  C:65   PROJECT: 114WGH                              *
+     A*                  ADD TWO MORE STATE/TAX ID FIELDS FOR NJ. ADD *
+     A*                  CONTINUATION FIELD AS WELL. ADD A NEW STATE  *
+     A*                  FIELD FOR THE FIRST UNEMPLOYMENT # AS THE    *
+     A*                  STORED # MAY NOT BE SAME STATE AS THE NAME/  *
+     A*                  ADDRESS.                                     *
+     A*                                                               *
+     A* 09/23/04  C:65   PROJECT: SUPP#43907                          *
+     A*                  ADD EFF/EXP DATE FIELDS FOR THE ADDRESS.     *
+     A*                                                               *
+     A* 09/10/04  C:33  Project: WC1242                               *
+     A*                 Add 'Name Link Counter Identifier' field.     *
+     A*                                                               *
+     A* 05/14/04  C:65   PROJECT: WC1202                              *
+     A*                  ADD EXTENSION FIELD FOR EMPLOYER NAME.       *
+     A*                                                               *
+     A* 05/02/03  C:132  PROJECT: Add continuation field for Name,    *
+     A*                  to extend name length from 40 to 80 Chars    *
+     A*                                                               *
+     A* 01/30/01  C:61  PROJECT 114WAK                                *
+     A*                 Add field for EXPOSURE LINK                   *
+     A*                                                               *
+     A* 10/24/00  C:35   PROJECT: 95WEU                               *
+     A*                  ADD FIELD FOR FEDERAL NAME.                  *
+     A*                                                               *
+     A* 07/14/00  C:53   PROJECT: 95WER                               *
+     A*                  ADDED FIELDS FOR NJ WCPOLS                   *
+     A*                                                               *
+     A* 01/14/99  C:35   PROJECT: WC878                               *
+     A*                  ADDED FIELDS FOR NUMBER OF EMPLOYEES AND     *
+     A*                  SIC CODE                                     *
+     A*                                                               *
+     A* 06/15/94 C:24 PROJECT 03AZK                                   *
+     A*               NEW TRANSACTION FILE FOR NCCI REPORTING.        *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PNA01                     TEXT('POLICY PAGE HEADER TRAN')
+     A            NACO#     R               REFFLD(CO#)
+     A            NAFND     R               REFFLD(FND)
+     A            NAEMP#    R               REFFLD(EMP#)
+     A            NAFYR     R               REFFLD(FYR)
+     A            NAUNID    R               REFFLD(A120)
+     A                                      COLHDG('UNIQUE' 'IDENTIFIER')
+     A            NAENCD    R               REFFLD(A30)
+     A                                      COLHDG('ENTITY' 'CODE')
+     A            NANAME    R               REFFLD(NAME)
+     A            NAFEIN    R               REFFLD(FEIN)
+     A            NAMADT    R               REFFLD(FLAG)
+     A                                      COLHDG('TYPE OF' 'ADDRESS')
+     A            NAMAD1    R               REFFLD(ADR1)
+     A                                      COLHDG('MAILING' 'ADDRESS 1')
+     A            NAMAD2    R               REFFLD(ADR2)
+     A                                      COLHDG('MAILING' 'ADDRESS 2')
+     A            NAMCTY    R               REFFLD(CTY)
+     A                                      COLHDG('MAILING' 'CITY')
+     A            NAMST     R               REFFLD(ST)
+     A                                      COLHDG('MAILING' 'STATE')
+     A            NAMZIP    R               REFFLD(ZIP)
+     A                                      COLHDG('MAILING' 'ZIP CODE')
+     A            NAAREA    R               REFFLD(AREA)
+     A            NAPHN#    R               REFFLD(PHN#)
+     A            NAPFDT    R               REFFLD(DT)
+     A                                      COLHDG('POLICY' 'FROM DATE')
+     A            NAPTDT    R               REFFLD(DT)
+     A                                      COLHDG('POLICY' 'TO DATE')
+     A            NALEGN    R               REFFLD(FLAG)
+     A                                      COLHDG('LEGAL' 'NATURE OF' 'ENTITY')
+     A            NASTAT    R               REFFLD(STAT)
+     A            NAUSER    R               REFFLD(USER)
+     A            NAPGM     R               REFFLD(PGM)
+     A            NATIME    R               REFFLD(TIME)
+     A            NADT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            NAIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            NAIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'ENTRY' 'DATE')
+     A            NAEMPY    R               REFFLD(A70)
+     A                                      COLHDG('NUMBER' 'OF EMPLOYEES')
+     A            NASIC     R               REFFLD(SIC)
+     A            NAUE#     R               REFFLD(DS15)
+     A                                      COLHDG('STATE UNEMPLOYMENT #')
+     A            NAST      R               REFFLD(CODE)
+     A                                      COLHDG('STATE CODE')
+     A            NAFDNM    R               REFFLD(NAME)
+     A                                      COLHDG('FEDERAL NAME')
+      *
+     A            NAELCD         5S 0
+     A                                      COLHDG('EXPOSURE' 'LINK')
+      *
+      *
+     A            NANAM2    R               REFFLD(NAME)
+     A                                      COLHDG('NAME' 'CONTINUED')
+     A                                      TEXT('Name Field Continued')
+     A            NANAM3    R               REFFLD(NM60)
+     A                                      COLHDG('EMPLR NAME EXTENSION')
+     A            NANLKC    R     S         REFFLD(A20)
+     A                                      COLHDG('NAME LINK' 'COUNTER')
+     A            NAPFD2    R     S         REFFLD(DT)
+     A                                      COLHDG('ADDRESS POLICY' 'FROM DATE')
+     A            NAPTD2    R     S         REFFLD(DT)
+     A                                      COLHDG('ADDRESS POLICY' 'TO DATE')
+     A            NAST1     R               REFFLD(CODE)
+     A                                      COLHDG('STATE CODE 1')
+     A            NAUE#2    R               REFFLD(DS15)
+     A                                      COLHDG('STATE UNEMPLOYMENT 2')
+     A            NAST2     R               REFFLD(CODE)
+     A                                      COLHDG('STATE CODE 2')
+     A            NAUE#3    R               REFFLD(DS15)
+     A                                      COLHDG('STATE UNEMPLOYMENT 3')
+     A            NAST3     R               REFFLD(CODE)
+     A                                      COLHDG('STATE CODE 3')
+     A            NASUS#    R     S         REFFLD(A20)
+     A                                      COLHDG('ST UNEMPLOYMNT SEQ #')
+     A            NANAOB    R               REFFLD(DS40)
+     A                                      COLHDG('NATURE OF BUSINESS')
+     A            NANAMP    R               REFFLD(FLAG)
+     A                                      COLHDG('PERSONAL NAME FLAG')
+     A            NANAM4       360A         COLHDG('EMPLR NAME EXT #2')
+     A            NANAMD    R               REFFLD(FLAG)
+     A                                      COLHDG('NAME DELETION' 'REPORTED')
+     A            NAADRD    R               REFFLD(FLAG)
+     A                                      COLHDG('ADDR DELETION' 'REPORTED')
+     A            NANONA         1A         COLHDG('NON SPECIFIC' 'ADDRESS')
+     A            NANAMEFD  R     S         REFFLD(DT)
+     A                                      COLHDG('NAME EFFECTIVE DATE')
+     A            NAADREFD  R     S         REFFLD(DT)
+     A                                      COLHDG('ADDR EFFECTIVE DATE')
+     A*** Beg Add *** 12/22/21 **************************************************************
+     A            NAMAIL        60A         COLHDG('Email Address')
+     A*** End Add *** 12/22/21 **************************************************************

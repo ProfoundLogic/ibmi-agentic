@@ -1,0 +1,18 @@
+     D* Non-Protect
+     d dspNormal       c                   const(x'20')
+     d dspRvsImg       c                   const(x'21')
+     d dspHigh         c                   const(x'22')
+     d dspHighRvs      c                   const(x'23')
+     d dspUnd          c                   const(x'24')
+     d dspUndRvs       c                   const(x'25')
+     d dspUndHigh      c                   const(x'26')
+     d dspNonDsp       c                   const(x'27')
+     D* Protect
+     d prtNormal       c                   const(x'A0')
+     d prtRvsImg       c                   const(x'A1')
+     d prtHigh         c                   const(x'A2')
+     d prtHighRvs      c                   const(x'A3')
+     d prtUnd          c                   const(x'A4')
+     d prtUndRvs       c                   const(x'A5')
+     d prtUndHigh      c                   const(x'A5')
+     d prtNonDsp       c                   const(x'A7')

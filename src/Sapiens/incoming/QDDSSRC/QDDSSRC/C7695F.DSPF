@@ -1,0 +1,73 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   LARGE LOSS REPORT PROMPT DISPLAY                         **
+     A**                                                            **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A          R SCR01
+     A                                      CF13
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7695F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  7 31'Run Date:'
+     A            SCRNDT    R        B  7 42REFFLD(DT8)
+     A*                                     DSPATR(CS)
+     A                                      EDTWRD('  /  /    ')
+     A  22                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                  9 28'Loss Amount:'
+     A            SCLAMT    R        B  9 42REFFLD(A112)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A  21                                  ERRMSGID(CCR0724 *LIBL/CMESGG)
+     A                                      TEXT('loss amount')
+     A                                      OVRDTA
+     A                                 11 27'Section Code:'
+     A            SCCC      R        B 11 42REFFLD(CDE)
+     A*                                     DSPATR(CS)
+     A  25                                  ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A                                      TEXT('SECTION CODE')
+     A                                 11 46'(Default is all)'
+     A                                 13 27'Claim status:'
+     A            SCSTAT    R        B 13 42REFFLD(FLAG)
+     A*                                     DSPATR(CS)
+     A  26                                  ERRMSGID(CCR0944 *LIBL/CMESGG)
+     A                                      TEXT('TYPE')
+     A                                 13 46'("O" = Open, "C" = Closed)'
+     A                                 14 46'(Default = ALL)'
+     A                                 22  5'F3=Exit       '
+     A                                      COLOR(BLU)
+     A                                 22 56'F13=Change user parm '
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A*            09:59:04    MSHARPE     REL-R08M00  5714-UT1
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

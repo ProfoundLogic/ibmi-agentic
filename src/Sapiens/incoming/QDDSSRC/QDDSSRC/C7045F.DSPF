@@ -1,0 +1,59 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DISPLAY FOR BINDER SELECTION PROMPT                      **
+     A**                                                            **
+     A**   PROGRAMMER: 31                                           **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A*
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*---------------------------------------------------------------
+     A          R SCR01
+     A*---------------------------------------------------------------
+     A                                      CF05
+     A                                      CF07
+     A                                      CF13
+     A                                      SETOF(21)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C7045F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 11 25'Policy number:'
+     A            SCPOL#    R     A  B 11 44REFFLD(POL#)
+     A*                                     DSPATR(CS)
+     A                                      TEXT('POLICY NUMBER')
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0535 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0648 *LIBL/CMESGG)
+     A                                 22  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 22 28'F5=Policy search'
+     A                                      COLOR(BLU)
+     A                                 22 54'F7=Named insured search'
+     A                                      COLOR(BLU)
+     A                                 23 54'F13=Change user parameters'
+     A                                      COLOR(BLU)
+     A*---------------------------------------------------------------
+     A          R SCR99
+     A*---------------------------------------------------------------
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

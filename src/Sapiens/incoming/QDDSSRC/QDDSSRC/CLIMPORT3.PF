@@ -1,0 +1,83 @@
+     A*****************************************************************
+     A*  (c) Copyright Fiserv, Inc., 2005 - 2007
+     A*
+     A*  WORKERS' COMPENSATION Claim Import Flat File
+     A*****************************************************************
+     A*  DESCRIPTION:                                                 *
+     A*    CLIMPORT3 - Claim Import-Format 03 CLaim Payment Info      *
+     A*****************************************************************
+     A*  CREATED: 12/08/05       PROJECT: 139WAI               C:132  *
+     A*****************************************************************
+     A*  REVISIONS:                                                   *
+     A*  10/24/08  C:220  PROJECT: 132WLN                             *
+     A*                   Expand Check # Field                        *
+     A*                                                               *
+     A*  10/23/08  C:220  PROJECT: 132WLM                             *
+     A*                   Add Group/Non-Group Check Type to Claims    *
+     A*                   backfill                                    *
+     A*                                                               *
+     A*  06/12/07  C:191  PROJECT: 81WZF                              *
+     A*                   - MOVED TO BASE                             *
+     A*****************************************************************
+     A
+     A                                      REF(WREFP)
+     A
+     A          R PV301                     TEXT('CLAIM IMPORT  +
+     A                                            Record 01 Format')
+     A
+     A            V3RCID         2A         TEXT('Record ID-Format 02')
+     A            V3FND          3S 0       TEXT('Group Number')
+     A            V3CLM#    R               REFFLD(DS40)
+     A                                      TEXT('CLAIM#=CMPDS#, XREF +
+     A                                            TO CMCASE')
+     A            V3TRDT         8A         TEXT('Transaction Date in CCYYMMDD +
+     A                                            format')
+     A                                      COLHDG('Transaction' ' Date ')
+     A            V3TYPE    R               REFFLD(FLAG)
+     A                                      TEXT('Transaction Type')
+     A*                                     P = Payment
+     A*                                     R = Refund
+     A*                                     S = Stop Pay
+     A*                                     V = Void
+     A*                                     Z = Stop Pay Reversal
+     A            V3RECD    R               REFFLD(CODE)
+     A                                      TEXT('Reserve Code')
+     A*                                     11 = Medical
+     A*                                     12 = Indemnity
+     A*                                     13 = Expensey
+     A*                                     14 = Rehabilitation
+     A*                                     16 = Legal
+     A            V3BR2     R               REFFLD(CODE)
+     A                                      TEXT('Payment Value 1 Code')
+     A            V3CHK#         7S 0       TEXT('Check Number')
+     A            V3AMT          9S 2       TEXT('Check Amount')
+     A            V3AMTS    R               REFFLD(FLAG)
+     A                                      TEXT('Amount Sign, Blank = Positive+
+     A                                            , "-" = Negative')
+     A            V3PNAM    R               REFFLD(DS40)
+     A                                      TEXT('Payee Name')
+     A            V3PODT         8A         TEXT('Posting Date in CCYYMMDD +
+     A                                            format')
+     A                                      COLHDG('Posting' ' Date ')
+     A            V3FRDT         8A         TEXT('Payment From date in +
+     A                                            CCYYMMDD Format')
+     A                                      COLHDG('Payment' 'From Dte')
+     A            V3TODT         8A         TEXT('Payment To date in +
+     A                                            CCYYMMDD Format')
+     A*** BEG CHG ****** 10/23/08 ************************************
+     A*********** V3LINK        10A         TEXT('Payee Primary Link')
+     A            V3LINK        12A         TEXT('Payee Primary Link')
+     A*                                     XREF for FEIN/MOD in WDPAP
+     A                                      COLHDG('Payment' 'TO Date')
+     A*
+     A            V3PGTP         1A         TEXT('Check type Group/Non-Group')
+     A*
+     A*** BEG CHG ****** 10/24/08 ************************************
+     A            V3ECK#        10S         TEXT('EXTERNAL CHECK #')
+     A*
+     A***         V3FILL       584A         TEXT('FILLER Format 03 Record')
+     A***         V3FILL       583A         TEXT('FILLER Format 03 Record')
+     A            V3FILL       571A         TEXT('FILLER Format 03 Record')
+     A*
+     A*** END CHG ****** 10/24/08 ************************************
+     A*** END CHG ****** 10/23/08 ************************************

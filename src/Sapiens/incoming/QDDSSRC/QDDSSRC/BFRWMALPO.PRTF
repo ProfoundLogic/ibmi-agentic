@@ -1,0 +1,50 @@
+      *       (C) Copyright Progressive Data Solutions, Inc., 1997         *
+      *  AFTWMALPO: Conversion query for new WMALP                         *
+      **********************************************************************
+      *  DESCRIPTION:                                                      *
+      *  This query produces a record count on the new file.               *
+      *                                                                    *
+      *  CREATED: 01/26/98         PROGRAMMER: 84         PROJECT: 60ANY   *
+      **********************************************************************
+      *  REVISIONS:                                                        *
+      *                                                                    *
+      **********************************************************************
+     A                                      REF(WMALP)
+     A          R PRTHDR                    SKIPB(2)           SPACEA(2)
+     A            PTRDAT        10A        1
+     A            PTTITL        50A       41
+     A                                   125'Page'
+     A            PTPAGE         4S 0    129                   EDTCDE(4)
+     A            PTRTIM         8A        1SPACEB(1)          SPACEA(2)
+     A                                     1'File:'
+     A            PTQFIL        21A        7                   SPACEA(2)
+     A                                     3'Company/Fund'
+     A                                    +9'Emp #'
+     A                                    +6'Div'
+     A                                    +9'Count'
+
+      * Print totals on ALEMP#/ALDIV break
+
+     A          R PRTBK1                                       SPACEA(1)
+     A            XXCO#     R              5REFFLD(ALCO#)      EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXFND     R             +4REFFLD(ALFND)      EDTCDE(3)
+     A  61                                                     UNDERLINE
+     A            XXEMP#    R             +5REFFLD(ALEMP#)     EDTCDE(3)
+     A            XXDIV     R             +4REFFLD(ALDIV)      EDTCDE(3)
+     A            XXCOUNT1       9S 0     +5                   EDTCDE(3)
+     A  61                                                     UNDERLINE
+
+      * Print totals on ALCO#/ALFND break
+
+     A          R PRTBK2                                       SPACEA(2)
+     A                                     1'**'
+     A            XXCO#     R              5REFFLD(ALCO#)      EDTCDE(3)
+     A            XXFND     R             +4REFFLD(ALFND)      EDTCDE(3)
+     A            XXCOUNT2       9S 0    +28                   EDTCDE(3)
+
+      * Print grand totals
+
+     A          R PRTTOT                                       SPACEA(1)
+     A                                     1'Grand totals:'
+     A            XXCOUNT        9S 0    +29                   EDTCDE(3)

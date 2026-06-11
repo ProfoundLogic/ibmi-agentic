@@ -1,0 +1,144 @@
+     A*%%TS  SD  19980813  100403  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DISPLAY FOR ADDITIONAL INSURED GLOBAL MAINTENANCE        **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT(UL)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF12
+     A                                      CF05
+     A                                      PUTOVR
+     A                                      SETOF(20)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C2195F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  8  8'Name:'
+     A            SCNAME    R     A  B  8 14REFFLD(NM60)
+     A                                      OVRDTA
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                      TEXT('NAME')
+     A*                                     DSPATR(CS)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 23'F12=Cancel        '
+     A                                      COLOR(BLU)
+     A                                 23 59'F5=Search'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A                                      PUTOVR
+     A                                      CF12
+     A                                      CF20
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C2195F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A            SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  8 13'Name:'
+     A            SCNAME    R     A  B  8 19REFFLD(NM60)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('NAME')
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 10  2'Address'
+     A                                 10 10'Line'
+     A                                 10 16'1:'
+     A                                 12  2'Address'
+     A                                 12 10'Line'
+     A                                 12 16'2:'
+     A            SCADR2    R     A  B 12 19REFFLD(ADR2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A            SCADR1    R     A  B 10 19REFFLD(ADR1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('ADDRESS LINE 1')
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 14 13'City:'
+     A            SCCTY     R     A  B 14 19REFFLD(CTY)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('CITY')
+     A  22                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 14 47'State:'
+     A            SCST      R     A  B 14 54REFFLD(ST)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('STATE')
+     A  23                                  ERRMSGID(CCR0505 *LIBL/CMESGG)
+     A                                 14 59'ZIP:'
+     A            SCZIP1    R        B 14 64REFFLD(ZIP1)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A                                      TEXT('ZIP 1')
+     A  24                                  ERRMSGID(CCR0504 *LIBL/CMESGG)
+     A            SCZIP2    R        B 14 71REFFLD(ZIP2)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      TEXT('ZIP 2')
+     A                                 16  2'Additional'
+     A                                 16 13'Interest'
+     A                                 16 22'Type:'
+     A            SCIN      R     A  B 16 28REFFLD(FLAG)
+     A  09                                  DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(PR)
+     A                                      TEXT('FLAG')
+     A  25                                  ERRMSGID(CCR0590 *LIBL/CMESGG)
+     A                                 16 46'Status:'
+     A            SCSTAT    R        O 16 54REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 30'F12=Cancel        '
+     A                                      COLOR(BLU)
+     A                                 23 63'F20=Change status'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(PREF01/FLAG *LIBL/SREFP)
+     A                                      DSPATR(ND PR)

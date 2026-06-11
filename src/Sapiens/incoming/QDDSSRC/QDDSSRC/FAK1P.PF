@@ -1,0 +1,355 @@
+     A* (C) Copyright Progressive Data Solutions, Inc., 2016
+     A*
+     A* PerformRx Pharmacy Payment File
+     A*
+     A*****************************************************************
+     A* Created on 04/12/2016 by C:309 for Project 114MXO
+     A*****************************************************************
+     A* REVISIONS
+     A*
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PK101                     TEXT('PerformRx Pharmacy Payment')
+     A*
+     A            K1RECID   R               REFFLD(FLAG)
+     A                                      COLHDG('Record Identifier')
+     A*
+     A            K1RX#OLD  R               REFFLD(DS7)
+     A                                      COLHDG('Prescripn' '/Service' 'Nbr')
+     A*
+     A            K1RX#QU   R               REFFLD(FLAG)
+     A                                      COLHDG('Prescripn Nbr' 'Qaulifier')
+     A*
+     A            K1BCH#    R               REFFLD(DS7)
+     A                                      COLHDG('Batch Number')
+     A*
+     A            K1FDAT    R               REFFLD(DS8)
+     A                                      COLHDG('Date of Service')
+     A*
+     A            K1CHRG    R               REFFLD(DS8)
+     A                                      COLHDG('Submitted Amount')
+     A*
+     A            K1PAID    R               REFFLD(DS8)
+     A                                      COLHDG('Amount Paid')
+     A*
+     A            K1AMTADJ  R               REFFLD(DS8)
+     A                                      COLHDG('Amount Adjusted')
+     A*
+     A            K1ADJDT   R               REFFLD(DS8)
+     A                                      COLHDG('Adjustment Date')
+     A*
+     A            K1AMTREJ  R               REFFLD(DS8)
+     A                                      COLHDG('Amount Rejected')
+     A*
+     A            K1MSEQ1   R               REFFLD(DS2)
+     A                                      COLHDG('Master Sequence' 'Nbr 1')
+     A*
+     A            K1ADJ1    R               REFFLD(DS3)
+     A                                      COLHDG('Adjustment/' 'Reject Code1')
+     A*
+     A            K1MSEQ2   R               REFFLD(DS2)
+     A                                      COLHDG('Master Sequence' 'Nbr 2')
+     A*
+     A            K1ADJ2    R               REFFLD(DS3)
+     A                                      COLHDG('Adjustment/' 'Reject Code2')
+     A*
+     A            K1MSEQ3   R               REFFLD(DS2)
+     A                                      COLHDG('Master Sequence' 'Nbr 3')
+     A*
+     A            K1ADJ3    R               REFFLD(DS3)
+     A                                      COLHDG('Adjustment/' 'Reject Code3')
+     A*
+     A            K1MQTY    R               REFFLD(DS10)
+     A                                      COLHDG('Plan Metric' 'Decimal Qty')
+     A*
+     A            K1SMQTY   R               REFFLD(DS10)
+     A                                      COLHDG('Submitted' 'Metric Dec Qty')
+     A*
+     A            K1DAYS    R               REFFLD(DS3)
+     A                                      COLHDG('Plan Days Supply')
+     A*
+     A            K1SDAYS   R               REFFLD(DS3)
+     A                                      COLHDG('Submitted' 'Days Supply')
+     A*
+     A            K1INCOSPD R               REFFLD(DS8)
+     A                                      COLHDG('Ingredient' 'Cost Paid')
+     A*
+     A            K1SINCOSPDR               REFFLD(DS8)
+     A                                      COLHDG('Ingredient' 'Cost Paid')
+     A*
+     A            K1COPAY   R               REFFLD(DS8)
+     A                                      COLHDG('Copay Amount')
+     A*
+     A            K1SCOAY   R               REFFLD(DS8)
+     A                                      COLHDG('Submitted' 'Copay')
+     A*
+     A            K1COINS   R               REFFLD(DS8)
+     A                                      COLHDG('Plan' 'CoInsurance Amount')
+     A*
+     A            K1DISPF   R               REFFLD(DS8)
+     A                                      COLHDG('Dispense Fee')
+     A*
+     A            K1SDISPF  R               REFFLD(DS8)
+     A                                      COLHDG('Submitted' 'Dispense Fee')
+     A*
+     A            K1SALTAXP R               REFFLD(DS8)
+     A                                      COLHDG('Flat Sales' 'Tax Amnt Paid')
+     A*
+     A            K1SALTAXS R               REFFLD(DS8)
+     A                                      COLHDG('Flat Sales' 'Tax Amnt Sbmt')
+     A*
+     A            K1UCR     R               REFFLD(DS8)
+     A                                      COLHDG('Usual' 'and Customary Amnt')
+     A*
+     A            K1AWP     R               REFFLD(DS8)
+     A                                      COLHDG('Avg Wholesal' 'Price Cost')
+     A*
+     A            K1ACQCOST R               REFFLD(DS8)
+     A                                      COLHDG('Wholesale' 'Acqn Cost Amt')
+     A*
+     A            K1SDAW    R               REFFLD(FLAG)
+     A                                      COLHDG('Submtd' 'Dispense As Wrtn')
+     A*
+     A            K1SCLAR   R               REFFLD(DS2)
+     A                                      COLHDG('Submssn' 'Clarification Cd')
+     A*
+     A            K1REFL#   R               REFFLD(DS2)
+     A                                      COLHDG('Refill Number')
+     A*
+     A            K1PRSRC   R               REFFLD(FLAG)
+     A                                      COLHDG('Pricing Source')
+     A*
+     A            K1CICS    R               REFFLD(DS3)
+     A                                      COLHDG('CICS Claim' 'Status Code')
+     A*
+     A            K1RESRC   R               REFFLD(FLAG)
+     A                                      COLHDG('Record' 'Source Flag')
+     A*
+     A            K1BCDET   R               REFFLD(DS2)
+     A                                      COLHDG('BasisOf' 'Cost Determinatn')
+     A*
+     A            K1WAMT    R               REFFLD(DS8)
+     A                                      COLHDG('Withholding' 'Amount')
+     A*
+     A            K1CAE     R               REFFLD(DS8)
+     A                                      COLHDG('Plan Client' 'Admn Expnese')
+     A*
+     A            K1SAVFEE  R               REFFLD(DS8)
+     A                                      COLHDG('Savings' 'Fee Amount')
+     A*
+     A            K1ORALLW  R               REFFLD(DS8)
+     A                                      COLHDG('Original Plan' 'Allowd Amt')
+     A*
+     A            K1MRI     R               REFFLD(FLAG)
+     A                                      COLHDG('Mbr' 'Reimbursement Indctr')
+     A*
+     A            K1MPD     R               REFFLD(DS8)
+     A                                      COLHDG('Mbr Pay' 'Diff. (MPD) Amt')
+     A*
+     A            K1CCIC    R               REFFLD(DS8)
+     A                                      COLHDG('Cstmr Calculated' 'Ing.Cst')
+     A*
+     A            K1CDFEE   R               REFFLD(DS8)
+     A                                      COLHDG('Cstmr Calculatd' 'Desp Fee')
+     A*
+     A            K1CCST    R               REFFLD(DS8)
+     A                                      COLHDG('Cstmr Calculatd' 'Sale Tax')
+     A*
+     A            K1CCC     R               REFFLD(DS8)
+     A                                      COLHDG('Customer' 'Calculatd Copay')
+     A*
+     A            K1DEDPID  R               REFFLD(DS4)
+     A                                      COLHDG('Deductible' 'Plan ID')
+     A*
+     A            K1DAIC    R               REFFLD(DS8)
+     A                                      COLHDG('Deductibl Appld' 'Ing.Cost')
+     A*
+     A            K1DADF    R               REFFLD(DS8)
+     A                                      COLHDG('Deductibl Appld' 'DspnsFee')
+     A*
+     A            K1DAST    R               REFFLD(DS8)
+     A                                      COLHDG('Deductibl Appld' 'SalesTax')
+     A*
+     A            K1PSFEE   R               REFFLD(DS8)
+     A                                      COLHDG('Prof. Service' 'Fee Submtd')
+     A*
+     A            K1INCAMT  R               REFFLD(DS8)
+     A                                      COLHDG('Incentive Amnt' 'Submitted')
+     A*
+     A            K1CLMTYP  R               REFFLD(FLAG)
+     A                                      COLHDG('Claim Type')
+     A*
+     A            K1FILL1        5A         COLHDG('Filler 1')
+     A*
+     A            K1DTPD    R               REFFLD(DS8)
+     A                                      COLHDG('Financial' 'Cutoff' 'Date')
+     A*
+     A            K1FILL1A     127A         COLHDG('Filler 1A')
+     A*
+     A            K1NDC     R               REFFLD(NDC)
+     A                                      COLHDG('NDC Nbr/' 'Prodct/Servc Id')
+     A*
+     A            K1PSIDQ   R               REFFLD(DS2)
+     A                                      COLHDG('Product/Servic' 'ID Qaulfr')
+     A*
+     A            K1GCN     R               REFFLD(DS5)
+     A                                      COLHDG('Generic Code' 'Nbr (GCN)')
+     A*
+     A            K1DCI     R               REFFLD(FLAG)
+     A                                      COLHDG('Drug Class' 'Indicator')
+     A*
+     A            K1DCC     R               REFFLD(FLAG)
+     A                                      COLHDG('Drug Category' 'Code')
+     A*
+     A            K1GTC     R               REFFLD(DS2)
+     A                                      COLHDG('Generic Therapeutic' 'Clas')
+     A*
+     A            K1STC     R               REFFLD(DS2)
+     A                                      COLHDG('Standrd Therapeutic' 'Clas')
+     A*
+     A            K1SPTC    R               REFFLD(DS3)
+     A                                      COLHDG('Specifc Therapeutic' 'Clas')
+     A*
+     A            K1DNAME   R               REFFLD(DS30)
+     A                                      COLHDG('Drug Name')
+     A*
+     A            K1GPI     R               REFFLD(FLAG)
+     A                                      COLHDG('Generic Price' 'Indicator')
+     A*
+     A            K1FI      R               REFFLD(FLAG)
+     A                                      COLHDG('Formulary' 'Indicator')
+     A*
+     A            K1MDI     R               REFFLD(FLAG)
+     A                                      COLHDG('Maintenance' 'Drg Indicatr')
+     A*
+     A            K1MNAME   R               REFFLD(DS10)
+     A                                      COLHDG('Manufacturer Name')
+     A*
+     A            K1PKGSZ   R               REFFLD(CMSV)
+     A                                      COLHDG('Package Size')
+     A*
+     A            K1DSTR    R               REFFLD(DS10)
+     A                                      COLHDG('Drug Strength')
+     A*
+     A            K1CLM#    R               REFFLD(DS12)
+     A                                      COLHDG('Claim Number')
+     A*
+     A            K1PATID       18A         COLHDG('Patient ID')
+     A*
+     A            K1PATIDA       2A         COLHDG('Patient ID' 'Qual')
+     A*
+     A            K1FILL2      407A         COLHDG('Filler 2')
+     A*
+     A            K1DOI     R               REFFLD(DS8)
+     A                                      COLHDG('Date of Injury')
+     A*
+     A            K1CRN     R               REFFLD(DS30)
+     A                                      COLHDG('Claim Ref.' 'Number(CRN)')
+     A*
+     A            K1FILL3      988A         COLHDG('Filler 3')
+     A*
+     A            K1ADJDEL  R               REFFLD(FLAG)
+     A                                      COLHDG('Adjust/Del' 'Code')
+     A*
+     A            K1FILL3A      85A         COLHDG('Filler 3A')
+     A*
+     A            K1MLSN    R               REFFLD(DS20)
+     A                                      COLHDG('Member Last Name')
+     A*
+     A            K1MFSN    R               REFFLD(DS15)
+     A                                      COLHDG('Member First Name')
+     A*
+     A            K1MMID    R               REFFLD(FLAG)
+     A                                      COLHDG('Member' 'Middle Initial')
+     A*
+     A            K1MSS#    R               REFFLD(DS9)
+     A                                      COLHDG('SSN Number')
+     A*
+     A            K1FILL4      170A         COLHDG('Filler 4')
+     A*
+     A            K1REFUSED R               REFFLD(DS2)
+     A                                      COLHDG('Refills' 'Used')
+     A*
+     A            K1FILL4A      23A         COLHDG('Filler 4A')
+     A*
+     A            K1RX#     R               REFFLD(DS12)
+     A                                      COLHDG('Prescription' 'ID Number')
+     A*
+     A            K1APRID   R               REFFLD(DS12)
+     A                                      COLHDG('Associated' 'Presc ID Nbr')
+     A*
+     A            K1FILL5      462A         COLHDG('Filler 5')
+     A*
+     A            K1POS     R               REFFLD(DS2)
+     A                                      COLHDG('Place of Service')
+     A*
+     A            K1FILL6      659A         COLHDG('Filler 6')
+     A*
+     A            K1MBR#    R               REFFLD(DS10)
+     A                                      COLHDG('FAK9P Member #')
+     A*
+     A            K1CO#     R     S         REFFLD(CO#)
+     A                                      COLHDG('Company #')
+     A*
+     A            K1SUB#    R     S         REFFLD(SUB#)
+     A                                      COLHDG('Subscriber #')
+     A*
+     A            K1FND     R     S         REFFLD(FND)
+     A                                      COLHDG('Group #')
+     A*
+     A            K1FYR     R     S         REFFLD(FYR)
+     A                                      COLHDG('Year ')
+     A*
+     A            K1CASE    R     S         REFFLD(CASE)
+     A                                      COLHDG('Case #')
+     A*
+     A            K1PSS#    R               REFFLD(DS9)
+     A                                      COLHDG('SS#')
+     A*
+     A            K1ACDT    R     S         REFFLD(DT7)
+     A                                      COLHDG('ACDT')
+     A*
+     A            K1PFEI    R     S         REFFLD(FEIN)
+     A                                      COLHDG('FEIN')
+     A*
+     A            K1MOD     R     S         REFFLD(MOD)
+     A                                      COLHDG('Provider Mod')
+     A*
+     A            K1EOB#    R     S         REFFLD(EOB#)
+     A                                      COLHDG('EOMB')
+     A*
+     A            K1RCN     R     S         REFFLD(RCN)
+     A                                      COLHDG('RCN#')
+     A*
+     A            K1DLUS    R               REFFLD(USER)
+     A                                      COLHDG('Delete User')
+     A*
+     A            K1DLPG    R               REFFLD(PGM)
+     A                                      COLHDG('Delete Program')
+     A*
+     A            K1DLTM    R     S         REFFLD(TIME)
+     A                                      COLHDG('Delete Time')
+     A*
+     A            K1DLDT    R     S         REFFLD(DT7)
+     A                                      COLHDG('Delete Date')
+     A*
+     A            K1DLRE    R               REFFLD(DS70)
+     A                                      COLHDG('Delete Reason')
+     A*
+     A            K1ULDT    R     S         REFFLD(DT7)
+     A                                      COLHDG('Upload Date')
+     A*
+     A            K1ULTM    R     S         REFFLD(TIME)
+     A                                      COLHDG('Upload Time')
+     A*
+     A            K1PRDT    R     S         REFFLD(DT7)
+     A                                      COLHDG('Process Date')
+     A*
+     A            K1PRTM    R     S         REFFLD(TIME)
+     A                                      COLHDG('Process Time')
+     A*
+     A            K1PRUS    R               REFFLD(USER)
+     A                                      COLHDG('Process User')
+     A*
+     A            K1PRFL    R               REFFLD(FLAG)
+     A                                      COLHDG('Processed Flag')

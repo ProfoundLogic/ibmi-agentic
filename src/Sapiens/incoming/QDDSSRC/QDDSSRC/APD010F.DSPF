@@ -1,0 +1,214 @@
+     A*  (C) Copyright Progressive Data Solutions, Inc., 1997
+     A*%%TS  SD  19920102  185200  KASSI       REL-V2R1M0  5738-PW1
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/BKREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      ALTHELP
+     A                                      HELP
+     A                                      VLDCMDKEY(11)
+     A                                      ROLLUP(18)
+     A                                      CF03
+     A                                      CF06
+     A          R SCR01S                    SFL
+     A            SCVDR     R        O 10  7REFFLD(VDR)
+     A            SCCO#     R        H      REFFLD(CO#)
+     A            SCFAC#    R        H      REFFLD(FAC#)
+     A            SCSEL          1A  B 10  3TEXT('Selection Field')
+     A N06                                  DSPATR(CS)
+     A N06                                  DSPATR(UL)
+     A  22
+     AO 20                                  DSPATR(RI)
+     A  22
+     AO 20                                  DSPATR(PC)
+     A            SCNAME    R        O 10 16REFFLD(NAME)
+     A                                      TEXT('Description')
+     A          R SCR01C                    SFLCTL(SCR01S)
+     A*%%TS  SD  19920102  185200  KASSI       REL-V2R1M0  5738-PW1
+     A                                      CHGINPDFT
+     A                                      SFLSIZ(0999)
+     A                                      SFLPAG(0013)
+     A                                      OVERLAY
+     A                                      TEXT('Subfile Control for CUSTOM GR-
+     A                                      OUP MAINT.')
+     A                                      SETOF(20)
+     A                                      SETOF(22)
+     A                                      CF12
+     A  01                                  SFLDSP
+     A  01                                  SFLDSPCTL
+     A  02                                  SFLINZ
+     A  03                                  SFLDLT
+     A  04                                  SFLCLR
+     A  05                                  SFLEND
+     A  20                                  SFLMSGID(BKM9910 *LIBL/BKMES)
+     A  22                                  SFLMSGID(APM0135 *LIBL/BKMES)
+     A  32 18                               SFLMSGID(CPF5203 *LIBL/QCPFMSG)
+     A          H                           HLPDOC('SCRN1' 'APD010F.F' 'BK.HLP')
+     A                                      HLPARA(01 001 24 080)
+     A            SCFILE    R        O  1  2REFFLD(FLE)
+     A            SCRECF    R        O  1 70REFFLD(RECF)
+     A            SCUSER    R        O  2 70REFFLD(USER)
+     A                                  4  2'Position to Alpha Order:'
+     A            SCALPH    R        B  4 28REFFLD(NM10)
+     A                                      DSPATR(CS UL PC)
+     A            #@$2           3S 0H      SFLRCDNBR(CURSOR)
+     A                                  7  4'1=Select request'
+     A                                  7 32'5=Display'
+     A                                  7 43'6=Open Voucher'
+     A                                  7 59'7=Voucher History'
+     A                                  7 22'4=Delete'
+     A  09                                  DSPATR(ND)
+     A                                  9  2'Opt  Vendor#  Description         -
+     A                                                          '
+     A                                      DSPATR(HI)
+     A                                  6  2'Type option, press Enter'
+     A                                  1 27'Work Vendor Master'
+     A                                      DSPATR(HI)
+     A                                  2 31'--Search--'
+     A                                      DSPATR(HI)
+     A          R SCR01
+     A                                      OVERLAY
+     A                                 24  2'F1=Help'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A                                 24 13'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A                                 24 23'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A          R SCR02
+     A                                      CF12
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A            SCFILE    R        O  1  3REFFLD(FLE)
+     A            SCRECF    R        O  1 70REFFLD(RECF)
+     A            SCUSER    R        O  2 70REFFLD(USER)
+     A                                  1 27'Display Vendor Data'
+     A                                      DSPATR(HI)
+     A            SCMODE    R        O  2 31REFFLD(NM10) DSPATR(HI)
+     A                                  4  4'Vendor Number..:'
+     A            SCVDR     R        O  4 21REFFLD(VDR)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A                                  5  4'Vendor Name....:'
+     A            SCNAME    R        O  5 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  6  4'Address........:'
+     A            SCADR1    R        O  6 21REFFLD(ADR1)
+     A                                      DSPATR(HI)
+     A            SCADR2    R        O  7 21REFFLD(ADR2)
+     A                                      DSPATR(HI)
+     A                                  8  4'City/State/Zip.:'
+     A            SCCITY    R        O  8 21REFFLD(CITY)
+     A                                      DSPATR(HI)
+     A            SCST      R        O  8 48REFFLD(ST)
+     A                                      DSPATR(HI)
+     A            SCZIP1    R     Y  O  8 53REFFLD(ZIP1)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A            SCZIP2    R     Y  O  8 60REFFLD(ZIP2)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A                                  9  4'Telephone No...:'
+     A            SCAREA    R     Y  O  9 21REFFLD(AREA)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A            SCPHN#    R     Y  O  9 26REFFLD(PHN#)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A                                 10  4'Contact Name...:'
+     A            SCCONT    R        O 10 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                 11  4'Telephone No...:'
+     A            SCFAXA    R     Y  O 11 21REFFLD(AREA)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A            SCFAX#    R     Y  O 11 26REFFLD(PHN#)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A                                 12  4'Terms..........:'
+     A            SCTERM    R        O 12 21REFFLD(TERM)
+     A                                      DSPATR(HI)
+     A                                 13  4'Discount Percnt:'
+     A            SCPCT4    R        O 13 21REFFLD(PCT4)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(Z)
+     A                                 14  4'GL#-DDD/AAA/SSS:'
+     A            SCGLD#    R     Y  O 14 21REFFLD(DEPT)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A            SCACC#    R     Y  O 14 26REFFLD(ACCT)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A            SCSUB#    R     Y  O 14 31REFFLD(SUBA)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A                                 15  4'Alpha Order....:'
+     A            SCALPH    R        O 15 21REFFLD(NM10)
+     A                                      DSPATR(HI)
+     A                                 16  4'1099 Code/No...:'
+     A            SCFIDC    R        O 16 21REFFLD(FLAG)
+     A                                      DSPATR(HI)
+     A            SCFEIN    R        O 16 23REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A                                 17  4'Company No.....:'
+     A            SCCO#     R     Y  O 17 21REFFLD(CO#)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A                                 18  4'Facility No....:'
+     A            SCFAC#    R     Y  O 18 21REFFLD(FAC#)
+     A                                      EDTCDE(Z)
+     A                                      DSPATR(HI)
+     A                                 23  3'F1=Help'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A                                 23 12'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A                                 23 23'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A          R SCR04S                    SFL
+     A            SCVDR     R        O  7  7REFFLD(VDR)
+     A            SCSEL          1A  O  7  3TEXT('Selection Field')
+     A            SCNAME    R        O  7 16REFFLD(NAME)
+     A          R SCR04C                    SFLCTL(SCR04S)
+     A                                      CHGINPDFT
+     A                                      SFLSIZ(999)
+     A                                      SFLPAG(0016)
+     A                                      OVERLAY
+     A                                      TEXT('Subfile Control for CUSTOM GR-
+     A                                      OUP MAINT.')
+     A                                      SETOF(20)
+     A  01                                  SFLDSP
+     A  01                                  SFLDSPCTL
+     A  02                                  SFLINZ
+     A  03                                  SFLDLT
+     A  04                                  SFLCLR
+     A  05                                  SFLEND
+     A                                      CF12
+     A  20                                  SFLMSGID(BKM9910 *LIBL/BKMES)
+     A  32 18                               SFLMSGID(CPF5203 *LIBL/QCPFMSG)
+     A            SCFILE    R        O  1  2REFFLD(FLE)
+     A            SCRECF    R        O  1 70REFFLD(RECF)
+     A            SCUSER    R        O  2 70REFFLD(USER)
+     A            #@$4           3S 0H      SFLRCDNBR
+     A                                  3  4'Press Enter to confirm your -
+     A                                      choices for 4=Delete.'
+     A                                  4  4'Press F12 to return to change -
+     A                                      your choices.'
+     A                                  1 24'Confirm Delete of your Choice'
+     A                                      DSPATR(HI)
+     A          R SCR04
+     A                                      OVERLAY
+     A                                 23 23'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A                                      DSPATR(HI)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

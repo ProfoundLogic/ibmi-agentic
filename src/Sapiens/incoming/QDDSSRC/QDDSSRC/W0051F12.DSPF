@@ -1,0 +1,226 @@
+     A*%%TS  SD  20040518  162028  ANDERSON    REL-V4R4M0  5769-PW1
+      * (c) 2012 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     H*****************************************************************
+     H* REVISIONS:                                                    *
+     H*                                                               *
+     H* 08/22/12 C:282 SUPPORT: WA045 80398                           *
+     H*                Recompile only.                                *
+     H*                                                               *
+     H*****************************************************************
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/WREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A          R SCR01
+     A*%%TS  SD  20040518  162028  ANDERSON    REL-V4R4M0  5769-PW1
+     A N09                                  CF10
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A            HFLD          10A  H
+     A            HREC          10A  H
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR01'
+     A                                  3  2'Group:'
+     A            SCFND     R        O  3 10REFFLD(FND)
+     A                                      EDTCDE(4)
+     A            SCNAME    R   55   O  3 15REFFLD(NM60)
+     A                                      TEXT('NAME')
+     A N09        SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      DSPATR(HI)
+     A                                  4  2'Emp #:'
+     A            SCEDN     R        O  4 10REFFLD(DS50)
+     A  58                              4 62'Cx Date:'
+     A  58        SCCXDT    R     Y  O  4 71REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                  5  2'Agt #:'
+     A            SCAGT#    R        O  5 10REFFLD(AGT#)
+     A                                      EDTCDE(Z)
+     A            SCANAM    R        O  5 17REFFLD(NM20)
+     A                                  5 44'Producer:'
+     A            SCPROD    R        O  5 55REFFLD(AGT#)
+     A                                      EDTCDE(Z)
+     A            SCPNAM    R        O  5 61REFFLD(NM20)
+     A                                  6  2'Endorsement Effective Date:'
+     A            SCEEDT    R     Y  O  6 30REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Endorsement Eff Dt')
+     A N09                              8  2'Type Mailing Address Changes, pres-
+     A                                      s Enter.'
+     A                                      COLOR(BLU)
+     A                                 10  4'Address 1 . . . :'
+     A            SCMAD1    R        B 10 22REFFLD(ADR1)
+     A                                      TEXT('MAILING ADDRESS LINE 1')
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  71                                  ERRMSGID(WCR0525 *LIBL/WMESGG)
+     A  93                                  ERRMSGID(WC30000 *LIBL/WMESGG)
+     A                                 11  4'Address 2 . . . :'
+     A            SCMAD2    R        B 11 22REFFLD(ADR2)
+     A                                      TEXT('MAILING ADDRESS LINE 2')
+     A                                      CHECK(LC)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  72                                  ERRMSGID(WCR0450 *LIBL/WMESGG)
+     A                                 12  4'City, State, Zip:'
+     A            SCMCTY    R        B 12 22REFFLD(CTY)
+     A                                      TEXT('MAILING CITY')
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  72                                  ERRMSGID(WCR0450 *LIBL/WMESGG)
+     A  73                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A            SCMST     R        B 12 49REFFLD(ST)
+     A                                      TEXT('MAILING STATE')
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  72                                  ERRMSGID(WCR0450 *LIBL/WMESGG)
+     A  74                                  ERRMSGID(WCR0503 *LIBL/WMESGG)
+     A  75                                  ERRMSGID(WCR0504 *LIBL/WMESGG)
+     A            SCMZP1    R     Y  B 12 53REFFLD(ZIP1)
+     A                                      TEXT('MAILING ZIP 1')
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  72                                  ERRMSGID(WCR0450 *LIBL/WMESGG)
+     A  76                                  ERRMSGID(WCR0502 *LIBL/WMESGG)
+     A            SCMZP2    R     Y  B 12 61REFFLD(ZIP2)
+     A                                      TEXT('MAILING ZIP 2')
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A                                      CHECK(RB)
+     A  72                                  ERRMSGID(WCR0450 *LIBL/WMESGG)
+     A                                 14  4'County  . . . . :'
+     A            SCCNTY    R        B 14 22REFFLD(CODE)
+     A                                      TEXT('COUNTY CODE')
+     A                                      DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  77                                  ERRMSGID(WCR0513 *LIBL/WMESGG)
+     A  78                                  ERRMSGID(WCR0690 *LIBL/WMESGG)
+     A            SCCNTD    R     A  O 14 27REFFLD(DS20)
+     A  09                                  DSPATR(HI)
+     A                                 17  4'Change both Addresses in employer -
+     A                                      master  . . . . (Y/N):'
+     A            SCCHGB    R        B 17 61REFFLD(FLAG)
+     A                                      TEXT('CHG BOTH ADDR IN WMEMP Y/N')
+     A N09                                  DSPATR(UL)
+     A  79                                  ERRMSGID(WCR0501 *LIBL/WMESGG)
+     A                                      DSPATR(HI)
+     A                                 19  4'Update mailing addresses on all en-
+     A                                      tities / locations'
+     A                                 20  6'under this employer/div . . . . . -
+     A                                      . . . . . . . (Y/N):'
+     A            SCUMFL    R        B 20 61REFFLD(FLAG)
+     A                                      TEXT('Upd Mail Addr on all Ent/Loc?-
+     A                                      ')
+     A N09                                  DSPATR(UL)
+     A                                      DSPATR(HI)
+     A  80                                  ERRMSGID(WCR0501 *LIBL/WMESGG)
+     A  09                             23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A N09                             23  2'F3=Exit   F5=Refresh   F10=Search -
+     A                                        F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A*%%TS  SD  19980129  110523  CELLANAT    REL-V3R7M0  5716-PW1
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A            HFLD          10A  H
+     A            HREC          10A  H
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR02'
+     A                                  3  2'Group:'
+     A            SCFND     R        O  3 10REFFLD(FND)
+     A                                      EDTCDE(4)
+     A            SCNAME    R   55   O  3 15REFFLD(NM60)
+     A                                      TEXT('NAME')
+     A N09        SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      DSPATR(HI)
+     A                                  4  2'Emp #:'
+     A            SCEDN     R        O  4 10REFFLD(DS50)
+     A  58                              4 62'Cx Date:'
+     A  58        SCCXDT    R     Y  O  4 71REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                  5  2'Agt #:'
+     A            SCAGT#    R        O  5 10REFFLD(AGT#)
+     A                                      EDTCDE(Z)
+     A            SCANAM    R        O  5 17REFFLD(NM20)
+     A                                  5 44'Producer:'
+     A            SCPROD    R        O  5 55REFFLD(AGT#)
+     A                                      EDTCDE(Z)
+     A            SCPNAM    R        O  5 61REFFLD(NM20)
+     A                                  6  2'Endorsement Effective Date:'
+     A            SCEEDT    R     Y  O  6 30REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Endorsement Eff Dt')
+     A N09                             23  2'F3=Exit   F5=Refresh   F12=Cancel'
+     A                                      COLOR(BLU)
+     A  09                             23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R SCR03
+     A*%%TS  SD  19980129  110523  CELLANAT    REL-V3R7M0  5716-PW1
+     A N09                                  CF10
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A            HFLD          10A  H
+     A            HREC          10A  H
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR03'
+     A                                  3  2'Group:'
+     A            SCFND     R        O  3 10REFFLD(FND)
+     A                                      EDTCDE(4)
+     A            SCNAME    R   55   O  3 15REFFLD(NM60)
+     A                                      TEXT('NAME')
+     A N09        SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      DSPATR(HI)
+     A                                  4  2'Emp #:'
+     A            SCEDN     R        O  4 10REFFLD(DS50)
+     A  58                              4 62'Cx Date:'
+     A  58        SCCXDT    R     Y  O  4 71REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                  5  2'Agt #:'
+     A            SCAGT#    R        O  5 10REFFLD(AGT#)
+     A                                      EDTCDE(Z)
+     A            SCANAM    R        O  5 17REFFLD(NM20)
+     A                                  5 44'Producer:'
+     A            SCPROD    R        O  5 55REFFLD(AGT#)
+     A                                      EDTCDE(Z)
+     A            SCPNAM    R        O  5 61REFFLD(NM20)
+     A                                  6  2'Endorsement Effective Date:'
+     A            SCEEDT    R     Y  O  6 30REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Endorsement Eff Dt')
+     A N09                              8  2'Type information, press Enter.'
+     A                                      COLOR(BLU)
+     A N09                             23  2'F3=Exit   F5=Refresh   F10=Search -
+     A                                        F12=Cancel'
+     A                                      COLOR(BLU)
+     A  09                             23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)

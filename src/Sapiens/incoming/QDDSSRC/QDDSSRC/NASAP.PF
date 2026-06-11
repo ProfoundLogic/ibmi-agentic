@@ -1,0 +1,89 @@
+     A*****************************************************************
+     A* (C) Copyright Progressive Data Solutions, Inc., 2004
+     A*****************************************************************
+     A* SHN Provider/Contract Audit file - This file will house all   *
+     A* Synergy data including history and records with data errors.  *
+     A*                                                               *
+     A*****************************************************************
+     A* Created on 04/28/2003 by c:62 for Project 10MBX               *
+     A*****************************************************************
+     A* Revisions:                                                    *
+     A*                                                               *
+     A* 07/06/04 c:62 Project 10MDT                                   *
+     A*               -Add Network Type flag                          *
+     A*               -Add Status                                     *
+     A*                                                               *
+     A* 06/13/03 c:62 Project 10MBX                                   *
+     A*               Add contract state                              *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PSA01                     TEXT('Prov/Contract Audit File')
+     A            SAFEIN         9A         TEXT('FEIN')
+     A            SAID#         11A         TEXT('ID Number')
+     A            SANAME        60A         TEXT('Physician Name')
+     A            SAFSN         30A         TEXT('Phys First Name')
+     A            SASPDS        50A         TEXT('Specialty Description')
+     A            SAMAD1        40A         TEXT('Mailing Address 1')
+     A            SAMAD2        40A         TEXT('Mailing Address 2')
+     A            SAMCTY        30A         TEXT('Mailing City')
+     A            SAMST          2A         TEXT('Mailing City')
+     A            SAMZIP        10A         TEXT('Mailing Zip')
+     A            SABAD1        40A         TEXT('Billing Address 1')
+     A            SABAD2        40A         TEXT('Billing Address 2')
+     A            SABCTY        30A         TEXT('Billing City')
+     A            SABST          2A         TEXT('Billing State')
+     A            SABZIP        10A         TEXT('Billing Zip')
+     A            SAPHN#        10A         TEXT('Office Number')
+     A            SANPCT         6A         TEXT('WC Schedule %')
+     A            SAEFDT        10A         TEXT('Effective Date')
+     A            SACXDT        10A         TEXT('Canceled Date')
+     A            SASPCD        20A         TEXT('Specialty Code')
+     A*** BEGIN ADD *** 06/13/03 **************************************
+     A            SACST          2A         TEXT('Contract State')
+     A*** END   ADD *** 06/13/03 **************************************
+     A*================================================================---------
+     A* The following fields are used for PDS audit tracking
+     A*================================================================---------
+     A            SAGSEQ        15P 0       TEXT('Generic Sequence #')
+     A            SACONV    R               REFFLD(FLAG)
+     A                                      COLHDG('Status of Assignment')
+     A*                                            A = Assignment made by user
+     A*                                            E = Assignment not made
+     A*                                            U = Update done by Process
+     A*                                            W = Written made by Process
+     A*
+     A            SAFEI2    R               REFFLD(FEIN)
+     A                                      COLHDG('Assigned FEIN')
+     A            SAMOD2    R               REFFLD(MOD)
+     A                                      COLHDG('Assigned Modifer')
+     A            SAUSER    R               REFFLD(USER)
+     A                                      COLHDG('Convert User')
+     A            SAPGM     R               REFFLD(PGM)
+     A                                      COLHDG('Convert Program')
+     A            SATIME    R               REFFLD(TIME)
+     A                                      COLHDG('Convert Time')
+     A            SADT      R               REFFLD(DT)
+     A                                      COLHDG('Convert Date')
+     A            SAIUSR    R               REFFLD(USER)
+     A                                      COLHDG('Initial User')
+     A            SAIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('Initial Program')
+     A            SAITIM    R               REFFLD(TIME)
+     A                                      COLHDG('Initial Time')
+     A            SAIDT     R               REFFLD(DT)
+     A                                      COLHDG('Initial Date')
+     A*** BEGIN ADD *** 07/06/04 **************************************
+     A            SANTYP         1A         TEXT('Network Type')
+     A*
+     A*           Valid values:
+     A*              "C" = % of Charge
+     A*              " " = % of MRA
+     A*
+     A            SASTAT         1A         TEXT('Status')
+     A*
+     A*           Valid values:
+     A*              "D" = Deleted
+     A*              " " = Not Deleted
+     A*
+     A*** END   ADD *** 07/06/04 **************************************

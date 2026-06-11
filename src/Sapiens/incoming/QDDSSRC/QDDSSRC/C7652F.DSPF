@@ -1,0 +1,63 @@
+     A*%%TS  SD  19980310  083757  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   ANNUAL CLOSED CLAIMS REPORT PROMPT DISPLAY               **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*---------------------------------------------------------------
+     A          R SCR01
+     A*%%TS  SD  19980310  083757  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      CF13
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(29)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C7652F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 10 17'Closed Claims from:'
+     A            SCCFDT    R        B 10 37REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      CHECK(RB)
+     A                                 10 48'to'
+     A            SCCTDT    R        B 10 51REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A  22                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0570 *LIBL/CMESGG)
+     A                                      CHECK(RB)
+     A  29                             18 17'Annual Claim Report has been submi-
+     A                                      tted to batch.'
+     A                                      COLOR(WHT)
+     A                                 24  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 30'F13=Change user parameters'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A*---------------------------------------------------------------
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

@@ -1,0 +1,412 @@
+     A*****************************************************************
+     A* (c) 2014 StoneRiver, Inc. All rights Reserved.                *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                 *
+     A**                                                              *
+     A** WCMC Control File                                            *
+     A*****************************************************************
+     A*  Purpose:  This file will contain those values that will be   *
+     A*            variable in the application.  These values will be *
+     A*            defined at the Subscriber/Group level.  Values     *
+     A*            include headings & file/fields used in display &   *
+     A*            printing, as well as security for certain processes*
+     A*            that are NOT controlled by Function or Option.     *
+     A*****************************************************************
+     A*  Created by: C:05    Project: MC157    Date: 01/07/98         *
+     A*****************************************************************
+     A*  REVISIONS:                                                   *
+     A*                                                               *
+     A* 09/01/17  C:180  Project: WC2499                              *
+     A*                  Add flag to display CVT claim number on EOB. *
+     A*                                                               *
+     A*  07/26/17 C:079 Project: SY395                                *
+     A*                 Add remark code for EOB's                     *
+     A*                                                               *
+     A*  08/01/14 C:212 Project: 114MNV                               *
+     A*                 Procura/Bill review : Add field               *
+     A*                                                               *
+     A*  06/11/12 C:251 Project: 114MER                               *
+     A*                 Change description to say ClaimCheck          *
+     A*
+     A*  01/14/10 C:247 Project: 25WQH                                *
+     A*                 Pre-Auth diary to adjuster and nurse          *
+     A*
+     A*  07/28/06 C:062 Project: 139MEL                               *
+     A*                 Add Referral date processing fields           *
+     A*
+     A*  04/25/02 C:079 Project: 114MDC
+     A*                 Add CXCRUS for CodeReview
+     A*                                                               *
+     A*  05/06/99  C:53  PROJECT: 44MCH                               *
+     A*                  ADD SECURITY FIELDS FOR CONTROVERTED CASE    *
+     A*                                                               *
+     A*  03/05/99  C:53  PROJECT: MC145                               *
+     A*                  CHG CXRCRM TO "NOT USED"                     *
+     A*                                                               *
+     A*  11/19/98  C:53  PROJECT: MC145                               *
+     A*                  ADD SECURITY FIELDS                          *
+     A*                                                               *
+     A*  10/20/98  C:53  PROJECT: MC145                               *
+     A*                  ADD SECURITY FIELDS & REMARK CODES           *
+     A*                                                               *
+     A*  09/09/98  C:53  PROJECT: MC145                               *
+     A*                  ADD SECURITY FIELDS & REMARK CODES           *
+     A*                                                               *
+     A*  08/20/98  C:53  PROJECT: MC145                               *
+     A*                  ADD SECURITY FIELDS REMOVE WORKFLOW FIELDS   *
+     A*                                                               *
+     A*  06/30/98  C:94  PROJECT: MC157                               *
+     A*                  ADDED DARTS CONTROL FIELDS.                  *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PCX01                     TEXT('WCMC CONTROL FILE')
+     A            CXCO#     R               REFFLD(CO#)
+     A                                      COLHDG('COMPANY#')
+     A            CXSUB#    R               REFFLD(SUB#)
+     A                                      COLHDG('SUBSCRIBER')
+     A            CXFND     R               REFFLD(FND)
+     A                                      COLHDG('GROUP')
+     A**
+     A** Staff Code Headings ******************************************
+     A            CXHDNU    R               REFFLD(DS20)
+     A                                      COLHDG('HEADING' 'FOR CMCMNU')
+     A            CXHDS3    R               REFFLD(DS20)
+     A                                      COLHDG('HEADING' 'FOR CMSTF3')
+     A            CXHDSU    R               REFFLD(DS20)
+     A                                      COLHDG('HEADING' 'FOR CMCMSU')
+     A            CXHDCS    R               REFFLD(DS20)
+     A                                      COLHDG('HEADING' 'FOR CMCLSU')
+     A            CXHDCA    R               REFFLD(DS20)
+     A                                      COLHDG('HEADING' 'FOR CMCLAD')
+     A            CXHDFA    R               REFFLD(DS20)
+     A                                      COLHDG('HEADING' 'FOR CMCLFA')
+     A**
+     A** Claim Master Security ****************************************
+     A            CXCLDL    R               REFFLD(LVL)
+     A                                      COLHDG('CLM DLT' 'SEC LVL')
+     A            CXCLDT    R               REFFLD(FLAG)
+     A                                      COLHDG('CLM DLT' 'SEC TYP')
+     A*******      Valid values: *blank (for all) or FTGTP via 'SECT'
+     A            CXCLTL    R               REFFLD(LVL)
+     A                                      COLHDG('CLM XFER' 'SEC LVL')
+     A            CXCLTT    R               REFFLD(FLAG)
+     A                                      COLHDG('CLM XFER' 'SEC TYP')
+     A*******      Valid values: *blank (for all) or FTGTP via 'SECT'
+     A            CXWCUP    R               REFFLD(FLAG)
+     A                                      COLHDG('ALLOW' 'UPD OF' 'WCMS CLM')
+     A*******      Valid values: Y = update WCMS claim fields in WCMC
+     A*******                    N = WCMS claim fields are protected in WCMC
+     A*******                        and kept in sync only thru WCMS Claim Mstr
+     A**
+     A** EOMB/Provider Bill Security **********************************
+     A            CXCKDL    R               REFFLD(LVL)
+     A                                      COLHDG('EOMB W/CHK' 'DLT SEC LVL')
+     A            CXCKDT    R               REFFLD(FLAG)
+     A                                      COLHDG('EOMB W/CHK' 'DLT SEC TYP')
+     A*******      Valid values: *blank (for all) or FTGTP via 'SECT'
+     A*******      NOTE:  The security is set here, because there will
+     A*******             be two different security processes in EOMB
+     A*******             Delete:
+     A*******                1.  User can delete an EOMB - will be
+     A*******                    controlled by the Function/Option
+     A*******                    special authority process off the
+     A*******                    4=Delete option in "Work w/EOMBs".
+     A*******                2.  User can delete an EOMB if there is
+     A*******                    a WCMS Check (WDPAP) attached - will
+     A*******                    be controlled by CXCKDL/CXCKDT security
+     A*******                    within the deletion program itself.
+     A            CXRCAL    R               REFFLD(FLAG)
+     A                                      COLHDG('EOMB RECON' 'ALLOWED')
+     A*******      Valid values: Y = Recon allowed
+     A*******      Valid values: N = Recon NOT allowed
+     A            CXRCSL    R               REFFLD(LVL)
+     A                                      COLHDG('EOMB RECON' 'SEC LVL')
+     A            CXRCST    R               REFFLD(FLAG)
+     A                                      COLHDG('EOMB RECON' 'SEC TYP')
+     A*******      Valid values: *blank (for all) or FTGTP via 'SECT'
+     A            CXRCRM    R               REFFLD(RMCD)
+     A*** BEG CHG *** 03/05/99 **************************
+     A******************************        COLHDG('EOMB RECON' 'DARTS RMK CD')
+     A                                      COLHDG('NOT USED')
+     A*** BEG CHG *** 03/05/99 **************************
+     A*******      Valid values: STCTP
+     A**
+     A** EOMB/Provider Bill Heading/Field Usage ***********************
+     A            CXHEX     R               REFFLD(DS20)
+     A                                      COLHDG('HEADING FOR' 'MED EXAMINER')
+     A            CXFLEX    R               REFFLD(FLD)
+     A                                      COLHDG('FILE NAME' 'MED EXAMINER')
+     A            CXFDEX    R               REFFLD(FLD)
+     A                                      COLHDG('FIELD NAME' 'MED EXAMINER')
+     A            CXHMRA    R               REFFLD(DS10)
+     A                                      COLHDG('HEADING FOR' 'MRA REDUCT')
+     A            CXHOT1    R               REFFLD(DS10)
+     A                                      COLHDG('HEADING FOR' 'OTH 1 REDUCT')
+     A            CXHOT2    R               REFFLD(DS10)
+     A                                      COLHDG('HEADING FOR' 'OTH 2 REDUCT')
+     A            CXHNET    R               REFFLD(DS10)
+     A                                      COLHDG('HEADING FOR' 'NTWK REDUCT')
+     A**
+     A** EOMB/Provider Bill Workflow **********************************
+     A            CXAPSC    R               REFFLD(FLAG)
+     A                                      COLHDG('SHOW' 'ADJ/PEND' 'SCRN')
+     A*******      Valid values: Y = show Adj/Pend screen
+     A*******                    *blank = show Adj/Pend screen
+     A            CXAPDF    R               REFFLD(FLAG)
+     A                                      COLHDG('ADJ/PEND' 'DEFAULT')
+     A*******      Valid values: A = Adj will be marked "Y"
+     A*******                    P = Pend will be marked "Y"
+     A            CXAPPN    R               REFFLD(CODE3)
+     A                                      COLHDG('ADJ/PEND' 'DEFAULT' 'CODE')
+     A*******      Valid values: based on "P" type FTBSP/BSCODE
+     A*******      NOTE:  Required if Pend chosen as default
+     A            CXCPSC    R               REFFLD(FLAG)
+     A                                      COLHDG('SHOW' 'CMPLT/PEND' 'SCRN')
+     A*******      Valid values: Y = show Cmplt/Pend screen
+     A*******                    *blank = show Cmplt/Pend screen
+     A            CXCPDF    R               REFFLD(FLAG)
+     A                                      COLHDG('CMPLT/PEND' 'DEFAULT')
+     A*******      Valid values: C = Complete will be marked "Y"
+     A*******                    P = Pend will be marked "Y"
+     A            CXCPPN    R               REFFLD(CODE3)
+     A                                      COLHDG('CMPL/PEND' 'DEFAULT' 'CODE')
+     A*******      Valid values: based on "P" type FTBSP/BSCODE
+     A*******      NOTE:  Required if Pend chosen as default
+     A**
+     A*** BEG DEL *** 08/20/98 **************************
+     A** Medical/Case Management workflow *****************************
+     A*********** CXMP01    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'PGM 1')
+     A*********** CXMS01    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'SCRN 1')
+     A*********** CXMP02    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'PGM 2')
+     A*********** CXMS02    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'SCRN 2')
+     A*********** CXMP03    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'PGM 3')
+     A*********** CXMS03    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'SCRN 3')
+     A*********** CXMP04    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'PGM 4')
+     A*********** CXMS04    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'SCRN 4')
+     A*********** CXMP05    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'PGM 5')
+     A*********** CXMS05    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'SCRN 5')
+     A*********** CXMP06    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'PGM 6')
+     A*********** CXMS06    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'SCRN 6')
+     A*********** CXMP07    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'PGM 7')
+     A*********** CXMS07    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'SCRN 7')
+     A*********** CXMP08    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'PGM 8')
+     A*********** CXMS08    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'SCRN 8')
+     A*********** CXMP09    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'PGM 9')
+     A*********** CXMS09    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'SCRN 9')
+     A*********** CXMP10    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'PGM 10')
+     A*********** CXMS10    R               REFFLD(PGM)
+     A***********                           COLHDG('MGMT' 'SCRN 10')
+     A***********
+     A***UR*Pre/Re-Cert Maintenance workflow **************************
+     A*********** CXUP01    R               REFFLD(PGM)
+     A***********                           COLHDG('UR' 'PGM 1')
+     A*********** CXUS01    R               REFFLD(PGM)
+     A***********                           COLHDG('UR' 'SCRN 1')
+     A*********** CXUP02    R               REFFLD(PGM)
+     A***********                           COLHDG('UR' 'PGM 2')
+     A*********** CXUS02    R               REFFLD(PGM)
+     A***********                           COLHDG('UR' 'SCRN 2')
+     A*********** CXUP03    R               REFFLD(PGM)
+     A***********                           COLHDG('UR' 'PGM 3')
+     A*********** CXUS03    R               REFFLD(PGM)
+     A***********                           COLHDG('UR' 'SCRN 3')
+     A*********** CXUP04    R               REFFLD(PGM)
+     A***********                           COLHDG('UR' 'PGM 4')
+     A*********** CXUS04    R               REFFLD(PGM)
+     A***********                           COLHDG('UR' 'SCRN 4')
+     A*********** CXUP05    R               REFFLD(PGM)
+     A***********                           COLHDG('UR' 'PGM 5')
+     A*********** CXUS05    R               REFFLD(PGM)
+     A***********                           COLHDG('UR' 'SCRN 5')
+     A*** BEG DEL *** 08/20/98 **************************
+     A**
+     A** Maintenance fields *******************************************
+     A            CXSTAT    R               REFFLD(STAT)
+     A                                      COLHDG('STATUS')
+     A            CXUSER    R               REFFLD(USER)
+     A                                      COLHDG('MAINT USER')
+     A            CXPGM     R               REFFLD(PGM)
+     A                                      COLHDG('MAINT PGM')
+     A            CXTIME    R               REFFLD(TIME)
+     A                                      COLHDG('MAINT TIME')
+     A            CXDT      R               REFFLD(DT7)
+     A                                      COLHDG('MAINT DATE')
+     A            CXIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INIT USER')
+     A            CXIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INIT PGM')
+     A            CXITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INIT TIME')
+     A            CXIDT     R               REFFLD(DT7)
+     A                                      COLHDG('INIT DATE')
+     A*** BEG ADD *** 06/30/98 *************************************
+     A*** DARTS CONTROL FIELDS *************************************
+     A            CXRVDT    R               REFFLD(RMCD)
+     A                                      COLHDG('PRE CERT REVIEW DATE')
+     A*******      PURPOSE:  U0060R01/SCR01 CHANGE IN REVIEW DATE
+     A*
+     A*** OTHER CONTROL FIELDS *************************************
+     A            CXCLMC    R               REFFLD(FLAG)
+     A                                      COLHDG('CLOSE MC CASE FRM WC')
+     A            CXPVMC    R               REFFLD(A10)
+     A                                      COLHDG('INIT MED CASE SRCH')
+     A            CXPVPR    R               REFFLD(A10)
+     A                                      COLHDG('INIT PROV SRCH')
+     A*** END ADD *** 06/30/98 *************************************
+     A*** BEG ADD *** 08/20/98 *************************************
+     A            CXSDCL    R               REFFLD(LVL)
+     A                                      COLHDG('SETTLE DATE SEC LVL')
+     A            CXSDCT    R               REFFLD(FLAG)
+     A                                      COLHDG('SETTLE DATE SEC TYP')
+     A            CXBSCL    R               REFFLD(LVL)
+     A                                      COLHDG('BWC STS SEC LVL')
+     A            CXBSCT    R               REFFLD(FLAG)
+     A                                      COLHDG('BWC STS SEC TYP')
+     A            CXDCDL    R               REFFLD(LVL)
+     A                                      COLHDG('DEL DIAG CD SEC LVL')
+     A            CXDCDT    R               REFFLD(FLAG)
+     A                                      COLHDG('DEL DIAG CD SEC TYP')
+     A            CXDCCL    R               REFFLD(LVL)
+     A                                      COLHDG('CHG DIAG STS SEC LVL')
+     A            CXDCCT    R               REFFLD(FLAG)
+     A                                      COLHDG('DEL DIAG STS SEC TYP')
+     A            CXC#CL    R               REFFLD(LVL)
+     A                                      COLHDG('CLT CASE SEC LVL')
+     A            CXC#CT    R               REFFLD(FLAG)
+     A                                      COLHDG('CLT CASE SEC TYP')
+     A            CXFIMR    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS RMCD: FROM IMR')
+     A            CXTIMR    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS RMCD: TO IMR')
+     A            CXFRN     R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS RMCD: FROM RN')
+     A            CXTRN     R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS RMCD: TO RN')
+     A*** END ADD *** 08/20/98 *************************************
+     A*** BEG ADD *** 09/09/98 *************************************
+     A***
+     A***  CLT087, PROJECT: 87MFX - NEXT FIELD
+     A***
+     A            CXNPOR    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS RMCD: NEW POR')
+     A***
+     A***  CLT025, PROJECT: 25MKK - NEXT 3 FIELDS
+     A***
+     A            CXNWPA    R               REFFLD(RMCD)
+     A                                      COLHDG('DART RMCD-NEW PREAUT')
+     A*** ABOVE CODE USED TO DIARY THE PRE-AUTH NURSE WHEN PRE-AUTH IS
+     A*** 1ST ENTERED
+     A***
+     A            CXCPAA    R               REFFLD(RMCD)
+     A                                      COLHDG('RMCD-CG PRE/A LI:A/N')
+     A*** ABOVE CODE USED TO DIARY THE ADJUSTER WHEN LIABILITY CHANGES
+     A*** TO 'A' OR 'N'
+     A***
+     A            CXCPAD    R               REFFLD(RMCD)
+     A                                      COLHDG('RMCD-CG PRE/A LIAB:D')
+     A*** ABOVE CODE USED TO DIARY THE ADJUSTER WHEN LIABILITY CHANGES
+     A*** TO A 'D'
+     A***
+     A            CXPLCL    R               REFFLD(LVL)
+     A                                      COLHDG('LIAB CHG SEC LVL')
+     A            CXPLCT    R               REFFLD(FLAG)
+     A                                      COLHDG('LIAB CHG SEC TYP')
+     A*** ABOVE LVL/TYPE USED TO RESTRICT WHO CAN CHANGE A LIABILITY
+     A***
+     A*** END ADD *** 09/09/98 *************************************
+     A*** BEG ADD *** 10/20/98 *************************************
+     A***
+     A***  CLT087, PROJECT: 87MGU - NEXT 4 FIELDS
+     A***
+     A            CXNERC    R               REFFLD(RMCD)
+     A                                      COLHDG('DARTS RMCD:NEW EMPLR')
+     A            CXMEUS    R               REFFLD(USER)
+     A                                      COLHDG('USR PROF - NEW EMPLR')
+     A            CXCS#L    R               REFFLD(LVL)
+     A                                      COLHDG('SCL# CHG SEC LVL')
+     A            CXCS#T    R               REFFLD(FLAG)
+     A                                      COLHDG('SCL# CHG SEC TYP')
+     A*** END ADD *** 10/20/98 *************************************
+     A*** BEG ADD *** 11/19/98 *************************************
+     A***
+     A***  SECURITY TO OVERRIDE A DENIED CLAIM
+     A***
+     A            CXDNSL    R               REFFLD(LVL)
+     A                                      COLHDG('OVR DNYD CLM SEC LVL')
+     A            CXDNST    R               REFFLD(FLAG)
+     A                                      COLHDG('OVR DNYD CLM SEC TYP')
+     A*** END ADD *** 11/19/98 *************************************
+     A*** BEG ADD *** 05/06/99 *************************************
+     A***
+     A***  SECURITY TO OVERRIDE A DENIED CLAIM
+     A***
+     A            CXCVSL    R               REFFLD(LVL)
+     A                                      COLHDG('OVR CTRV CLM SEC LVL')
+     A            CXCVST    R               REFFLD(FLAG)
+     A                                      COLHDG('OVR CTRV CLM SEC TYP')
+     A*** END ADD *** 05/06/99 *************************************
+     A*** BEG ADD *** 04/25/02 *************************************
+     A            CXCRUS    R               REFFLD(FLAG)
+     A*** Beg Chg *** 06/11/12 ******************************************
+     A*******                               COLHDG('CodeReview' 'Usage')
+     A*******                    Valid Values:
+     A*******                          Y = Use CodeReview
+     A*******                          N = Do not use CodeReview
+     A                                      COLHDG('ClaimCheck' 'Usage')
+     A*                          Valid Values:
+     A*                                Y = Use ClaimCheck
+     A*                                N = Do not use ClaimCheck
+     A*** End Chg *** 06/11/12 ******************************************
+     A*** END ADD *** 04/25/02 *************************************
+     A*** BEG ADD *** 07/28/06 *************************************
+     A            CXRDRC    R               REFFLD(DS5)
+     A                                      COLHDG('Referral date' +
+     A                                      'remark code')
+     A*
+     A*                          Valid Values: STCTP/CTRMCD
+     A*
+     A            CXDDAY    R     S         REFFLD(A30)
+     A                                      COLHDG('Days to diary')
+     A*** END ADD *** 07/28/06 *************************************
+     A*** BEG ADD *** 01/14/10 *************************************
+     A            CXADPA    R               REFFLD(RMCD)
+     A                                      COLHDG('Pre-Auth adjuster' +
+     A                                      'diary')
+     A*** END ADD *** 01/14/10 *************************************
+     A***** Beg Add *** 08/01/14 ***********************************
+     A            CXPAUF    R               REFFLD(FLAG)
+     A                                      COLHDG('Procura Audit' +
+     A                                      'Flag')
+     A*******                               Valid Values:
+     A*******                               Y = Procura Audited
+     A*******                               N = No Procura Audited
+     A***** End Add *** 08/01/14 ***********************************
+     A*** Beg Add *** 07/26/17 ***********************************
+     A            CXRMEB    R               REFFLD(RMCD)
+     A                                      COLHDG('Remark Code for EOBs')
+     A*** End Add *** 07/26/17 ***********************************
+     A*** Beg Add *** 09/01/17 ****************************************
+     A            CXCVT#    R               REFFLD(FLAG)
+     A                                      COLHDG('CVT Claim Number' +
+     A                                      ' is diplayed on the ' +
+     A                                      'EOB')
+     A*** End Add *** 09/01/17 ****************************************

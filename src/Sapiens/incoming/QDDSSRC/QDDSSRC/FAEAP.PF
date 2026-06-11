@@ -1,0 +1,518 @@
+     A*****************************************************************
+      * (c) 2010 StoneRiver, Inc. All rights Reserved.                *
+      * StoneRiver is a trademark of StoneRiver, Inc.                 *
+     A**                                                              *
+     A** WCMC EOMB Header Amount Transaction File                     *
+     A*****************************************************************
+     A*  Created by: C:05    Project: MC152    Date: 01/05/98         *
+     A*  NOTE:  See EXCEL spreadsheet FAEAP.XLS for information       *
+     A*         regarding conversion mapping from WCMC/V3 data.       *
+     A*****************************************************************
+     A*                                                               *
+     A*         * * * *  N O T E  * * * *                             *
+     A*                                                               *
+     A*   ************* IF ANYTHING IS CHANGED IN THIS FILE ***********
+     A*   ************* YOU MUST RECOMPILE FYEAP ALSO!!!!   ***********
+     A*                                                               *
+     A*   THE FOLLOWING FIELDS ARE SIZE 8(SIGNED) NOT 7(PACKED)       *
+     A*   1.  EAWCPD                                                  *
+     A*   2.  EAWCBD                                                  *
+     A*   3.  EAWCND                                                  *
+     A*   THESE FIELDS WILL HAVE THE FORMAT OF CCYYMMDD.              *
+     A*                                                               *
+     A*****************************************************************
+     A*  REVISIONS:                                                   *
+     A*
+     A*  02/08/18 C:180 Project: 114MJC
+     A*                 Add 835 Extract Qualify Flag,
+     A*                 835 Extract Flag, and Type of Bill.
+     A*
+     A*  01/10/17 C:062 Project: 114MCZ
+     A*                 Add EOB Extract Flag
+     A*
+     A*  05/05/15 C:062 Project: 114MRH
+     A*                 Add EFT Flag
+     A*
+     A*  09/29/10 C:257 Project: 133MJN
+     A*                 ADD EATAX
+     A*
+     A*  04/21/08 C:47  PROJECT: 129MPN
+     A*                 Added comment to EANSNT:
+     A*                   'C' = When pended send to Coventry
+     A*                                                               *
+     A*  06/13/07 C:182 PROJECT: 10MKP                                *
+     A*                 F0340R EOMB Print Summary Report.             *
+     A*                 -ADDED EAPOST
+     A*
+     A*  05/16/07 C:062 Project: MC294                                *
+     A*                 - Add BILLING PROVIDER NPI #                  *
+     A*                                                               *
+     A*  03/07/04 C:15  PROJECT: WC1269                               *
+     A*                 Added out of country address field.           *
+     A*
+     A*  05/12/03 C:062 Project: 129MBO
+     A*                 -ADDED EACNTL
+     A*                 -ADDED EAOC#1
+     A*                 -ADDED EAOCD1
+     A*                 -ADDED EAOCA1
+     A*                 -ADDED EAOC#2
+     A*                 -ADDED EAOCD2
+     A*                 -ADDED EAOCA2
+     A*                 -ADDED EAOC#3
+     A*                 -ADDED EAOCD3
+     A*                 -ADDED EAOCA3
+     A*                 -ADDED EAINPE
+     A*                 -ADDED EAINPN
+     A*                 -ADDED EAOUTE
+     A*                 -ADDED EAOUTN
+     A*                 -ADDED EAASCE
+     A*                 -ADDED EAASCN
+     A*                 -ADDED EACLNE
+     A*                 -ADDED EACLNN
+     A*                 -ADDED EALABE
+     A*                 -ADDED EALABN
+     A*                 -ADDED EAGRPE
+     A*                 -ADDED EAGRPN
+     A*                 -ADDED EAINDE
+     A*                 -ADDED EAINDN
+     A*                 -ADDED EAPNWC
+     A*                                                               *
+     A*   11/14/02 C:079 Support: MC025 34876                         *
+     A*                  ADD FIELDS FOR PROVIDER NAME AND ADDRESS     *
+     A*                                                               *
+     A*   11/14/02 C:079 Project: 114MEI                              *
+     A*                  ADD IMAGE DOCUMENT ID FIELD                  *
+     A*                                                               *
+     A*   09/17/02 C:062 Project: 128MAC                              *
+     A*                  Added EASINV to hold the Corvel control #.   *
+     A*                                                               *
+     A*   04/25/02 C:079 Project: 114MDC                              *
+     A*                  Add EACRKB,EAPMKB,EAMEKB,EAFQKB for CodeRev. *
+     A*                                                               *
+     A*   02/13/02 C:062 Project: 48MEZ                               *
+     A*                  -Add Calc % of MRA reductions.               *
+     A*                  -Add Calc % of Other 1 + Other 2 reductions. *
+     A*                  -Add Calc % of Network reductions.           *
+     A*                  -Add Flat rate per bill.                     *
+     A*                  -Add Calc Flat rate for all lines.           *
+     A*                                                               *
+     A*   10/03/01 C:079 Project: MCMNT                               *
+     A*                  Changed/Added source comments for EACVI#     *
+     A*                                                               *
+     A*   09/07/01 C:062 Project: FS231                               *
+     A*                  Added EAEPDT.                                *
+     A*                                                               *
+     A*   10/06/00 C:062 Project: 25MMR                               *
+     A*                  Added EANPDT.                                *
+     A*                                                               *
+     A*   08/30/00 C:062 Project: 113AL                               *
+     A*                  Added EACVI#.                                *
+     A*                                                               *
+     A*   08/29/00 C:062 Project: 25MMR                               *
+     A*                  Added EANSNT.                                *
+     A*                                                               *
+     A*   10/19/99 C:062 Project: MC212                               *
+     A*                  Adding field EACHIN FOR REINVOICING.         *
+     A*                                                               *
+     A*   06/17/99 C:117 Project: FL021                               *
+     A*                  Adding fields EACNTL for the FL Tape Sub-    *
+     A*                  mission project                              *
+     A*                                                               *
+     A*  03/19/99 C:94  PROJECT: 25MKL
+     A*                 ADD EATMFL - THIS FLAG WILL BE USED IN F3040R
+     A*                 AND N7120R TO DETERMINE IF THERE IS TIME &
+     A*                 MATERIALS ASSOCIATED WITH A BILL
+     A*
+     A*  03/04/99 C:53  PROJECT: 48MBV                                *
+     A*                 ADD EABR2-WARPP PAYMENT VALUE 1               *
+     A*                                                               *
+     A*  02/24/99 C:94  PROJECT: 25MKL                                *
+     A*                 CHANGE COL. HEADING FOR EASYS                 *
+     A*                                                               *
+     A*  02/08/99 C:94  PROJECT: 25MKL                                *
+     A*                 ADDED FIELDS PER LD                           *
+     A*                                                               *
+     A*  02/03/99 C:94  PROJECT: 25MKL                                *
+     A*                 ADDED FIELDS PER LD                           *
+     A*                                                               *
+     A*  12/11/98 C:94  PROJECT: MC152                                *
+     A*                 ADDED FIELDS PER LORRI DAPPER                 *
+     A*                                                               *
+     A*  09/01/98 C:56  Project: MC152                                *
+     A*                 1. Add fields per Lorri Dapper                *
+     A*                                                               *
+     A*  11/19/98 C:56  Project: MC152                                *
+     A*                 1. Add EAPBRC field                           *
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PEA01                     TEXT('EOMB HEADER AMT TRANS FILE')
+     A            EACO#     R               REFFLD(CO#)
+     A                                      COLHDG('COMPANY#')
+     A            EASUB#    R               REFFLD(SUB#)
+     A                                      COLHDG('SUBSCRIBER')
+     A            EAFND     R               REFFLD(FND)
+     A                                      COLHDG('GROUP')
+     A            EAFYR     R               REFFLD(FYR)
+     A                                      COLHDG('YEAR')
+     A            EACASE    R               REFFLD(CASE)
+     A                                      COLHDG('CASE#')
+     A            EASS#     R               REFFLD(SS#)
+     A                                      COLHDG('SOC SEC#')
+     A            EAACDT    R               REFFLD(DT)
+     A                                      COLHDG('ACC DATE')
+     A            EAEOB#    R               REFFLD(EOB#)
+     A                                      COLHDG('EOMB#')
+     A            EARCN     R               REFFLD(RCN)
+     A                                      COLHDG('RECON#')
+     A            EATRDT    R               REFFLD(DT)
+     A                                      COLHDG('TRANS' 'DATE')
+     A            EACHRG    R               REFFLD(A112)
+     A                                      COLHDG('CHARGE' 'AMOUNT')
+     A            EAMRA     R               REFFLD(A112)
+     A                                      COLHDG('MRA' 'REDUCT' 'AMOUNT')
+     A            EAOTHR    R               REFFLD(A112)
+     A                                      COLHDG('OTHER 1' 'REDUCT' 'AMOUNT')
+     A            EAOTH2    R               REFFLD(A112)
+     A                                      COLHDG('OTHER 2' 'REDUCT' 'AMOUNT')
+     A            EANDIS    R               REFFLD(A112)
+     A                                      COLHDG('NTWK' 'REDUCT' 'AMOUNT')
+     A            EAPAID    R               REFFLD(A112)
+     A                                      COLHDG('PAID' 'AMOUNT')
+     A            EASTAT    R               REFFLD(STAT)
+     A                                      COLHDG('STATUS')
+     A            EAUSER    R               REFFLD(USER)
+     A                                      COLHDG('MAINT USER')
+     A            EAPGM     R               REFFLD(PGM)
+     A                                      COLHDG('MAINT PGM')
+     A            EATIME    R               REFFLD(TIME)
+     A                                      COLHDG('MAINT TIME')
+     A            EADT      R               REFFLD(DT)
+     A                                      COLHDG('MAINT DATE')
+     A            EAIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INIT USER')
+     A            EAIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INIT PGM')
+     A            EAITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INIT TIME')
+     A            EAIDT     R               REFFLD(DT)
+     A                                      COLHDG('INIT DATE')
+     A*** BEG ADD *** 09/01/98 ****************************************
+     A            EAWCPC    R               REFFLD(CHK#)
+     A                                      COLHDG('WC Prov Chk#')
+     A            EAWCPD    R               REFFLD(DT8)
+     A                                      COLHDG('Prov Chk# Date')
+     A            EAWCBC    R               REFFLD(CHK#)
+     A                                      COLHDG('WC BRS Chk#')
+     A            EAWCBD    R               REFFLD(DT8)
+     A                                      COLHDG('BRS Chk# Date')
+     A            EAWCNC    R               REFFLD(CHK#)
+     A                                      COLHDG('WC NWS Chk#')
+     A            EAWCND    R               REFFLD(DT8)
+     A                                      COLHDG('NWS Chk# Date')
+     A            EABAMT    R               REFFLD(A92)
+     A                                      COLHDG('BRS Amount')
+     A            EANAMT    R               REFFLD(A92)
+     A                                      COLHDG('NWS Amt(outside ntwk')
+     A            EARMDS    R               REFFLD(DS30)
+     A                                      COLHDG('WC Check remarks')
+     A            EARMK1    R               REFFLD(CODE)
+     A                                      COLHDG('WC Check Rmrk code 1')
+     A            EARMK2    R               REFFLD(CODE)
+     A                                      COLHDG('WC Check Rmrk code 2')
+     A            EARMK3    R               REFFLD(CODE)
+     A                                      COLHDG('WC Check Rmrk code 3')
+     A            EACKST    R               REFFLD(CODE)
+     A                                      COLHDG('WC Check status code')
+     A            EATRCD    R               REFFLD(CODE)
+     A                                      COLHDG('WC Transaction code')
+     A*** END ADD *** 09/01/98 ****************************************
+     A*
+     A*** BEG ADD *** 11/19/98 ****************************************
+     A            EAPBRC    R               REFFLD(FLAG)
+     A                                      COLHDG('Produce BRS check?')
+     A*                                VALID VALUES Y OR N
+     A*** END ADD *** 11/19/98 ****************************************
+     A*** BEG ADD *** 12/11/98 ****************************************
+     A            EABHRF    R               REFFLD(FLAG)
+     A                                      COLHDG('BRS Inv H/R flag')
+     A            EABBLF    R               REFFLD(FLAG)
+     A                                      COLHDG('BRS Inv proc flag')
+     A            EABINV    R               REFFLD(A90)
+     A                                      COLHDG('BRS Invoice #')
+     A            EABCAM    R               REFFLD(A92)
+     A                                      COLHDG('BRS Calc Amount')
+     A            EANHRF    R               REFFLD(FLAG)
+     A                                      COLHDG('NWS Inv H/R flag')
+     A            EANBLF    R               REFFLD(FLAG)
+     A                                      COLHDG('NWS Inv proc flag')
+     A            EANINV    R               REFFLD(A90)
+     A                                      COLHDG('NWS Invoice #')
+     A            EANCAM    R               REFFLD(A92)
+     A                                      COLHDG('NWS Calc Amount')
+     A            EAESDT    R               REFFLD(DT7)
+     A                                      COLHDG('EDI sent date')
+     A            EAEDI     R               REFFLD(FLAG)
+     A                                      COLHDG('EDI submission')
+     A*** NOTE: ***                           This field will be populated by
+     A***                                     the BEAST record
+     A*** VALID VALUES ***                    *BLANK = Not sent through EDI or
+     A***                                              data submission
+     A***                                       'Y'  = Eligible to be sent throu
+     A***                                              gh EDI or data submission
+     A            EAEPFL    R               REFFLD(FLAG)
+     A                                      COLHDG('EOMB print flag')
+     A*** VALID VALUES ***                    *BLANK = Not processed in DBP yet
+     A***                                       'P'  = Processed in DBP (will
+     A***                                              be used to write to
+     A***                                              workfile in F7071R1)
+     A            EABPFL    R               REFFLD(FLAG)
+     A                                      COLHDG('Billing process flag')
+     A*** VALID VALUES ***                    *BLANK = Not processed in N6180R
+     A***                                              yet
+     A***                                       'P'  = Processed through N6180R
+     A            EASYS     R               REFFLD(FLAG)
+     A*** BEG CHG *** 02/24/99 **************************************
+     A                                      COLHDG('System')
+     A**********                            COLHDG('Type of Service')
+     A*** END CHG *** 02/24/99 **************************************
+     A*** NOTE: ***                           This must correspond with EOSYS
+     A*** VALID VALUES ***                      'P' = Provider Bill Review
+     A***                                       'H' = Hospital Bill Audit
+     A***                                       'U' = Utilization Review (Pre-
+     A***                                             Cert/Re-Certs)
+     A***                                       'M' = Medical Management
+     A***                                       'N' = Network Only
+     A            EAFEIN    R               REFFLD(FEIN)
+     A                                      COLHDG('Payee Federal ID#')
+     A            EAMOD     R               REFFLD(MOD)
+     A                                      COLHDG('Modifier')
+     A            EAPLNK    R               REFFLD(FLAG)
+     A                                      COLHDG('Linked/Not Linked')
+     A*** VALID VALUES ***                      '1' = Standalone
+     A***                                       '2' = Linked With WC - but Prov
+     A***                                             ider is not paid
+     A***                                       '3' = Linked With WC - and Prov
+     A***                                             ider is paid
+     A            EABIDT    R               REFFLD(DT7)
+     A                                      COLHDG('BRS Inv date')
+     A            EANIDT    R               REFFLD(DT7)
+     A                                      COLHDG('NWS Inv date')
+     A*** END ADD *** 12/11/98 ****************************************
+     A*** BEG ADD *** 02/03/99 ****************************************
+     A            EAAPPF    R               REFFLD(FLAG)
+     A                                      COLHDG('Auto Ck Pmt Proc Flg')
+     A*** VALID VALUES ***                      ' ' = Not processed yet
+     A***                                       'Y' = Ck request issued (thru
+     A***                                             W0081R in F6000C)
+     A***                                       'P' = Invoice issued (thru
+     A***                                             F7302R in W6000C)
+     A*** END ADD *** 02/03/99 ****************************************
+     A*** BEG ADD *** 02/08/99 ****************************************
+     A            EABDIF    R               REFFLD(FLAG)
+     A                                      COLHDG('Deleted from Inv BRS')
+     A*** VALID VALUES ***                      ' ' = N/A or Not Deleted
+     A***                                       'Y' = EOMB/Rcn deleted from
+     A***                                             BRS Invoice
+     A            EANDIF    R               REFFLD(FLAG)
+     A                                      COLHDG('Deleted from Inv NWS')
+     A*** VALID VALUES ***                      ' ' = N/A or Not Deleted
+     A***                                       'Y' = EOMB/Rcn deleted from
+     A***                                             NWS Invoice
+     A*** END ADD *** 02/08/99 ****************************************
+     A*** BEG ADD *** 03/04/99 ****************************************
+     A            EABR2     R               REFFLD(CODE)
+     A                                      COLHDG('WARPP PYMNT VALUE 1')
+     A*      VALID VALUES: BASED ON LOOKUP IN WCMS/WTB2P
+     A*** BEG ADD *** 03/04/99 ****************************************
+     A*** BEG ADD *** 03/19/99 ****************************************
+     A            EATMFL    R               REFFLD(FLAG)
+     A                                      COLHDG('T/M Assoc. billing')
+     A*** VALID VALUES ***                      ' ' = No associated T/M
+     A***                                             billing
+     A***                                       'Y' = Associated T/M billing
+     A*** END ADD *** 03/19/99 ****************************************
+     A*** BEG ADD *** 06/17/99 ** FL TAPE SUBMISSION ******************
+     A            EACNTL    R               REFFLD(DS20)
+     A                                      COLHDG('DATA SUBM EOMB ')
+     A*** END ADD *** 06/17/99 ** FL TAPE SUBMISSION ******************
+     A*** BEGIN ADD *** 10/19/99 **************************************
+     A            EACHIN    R               REFFLD(FLAG)
+     A                                      COLHDG('CHG INV FLAG')
+     A*                                     VALID VALUES ARE:
+     A*                                       'Y' CHANGE
+     A*                                       ' ' DO NOT CHANGE
+     A*** BEGIN ADD *** 08/29/00 **************************************
+     A            EANSNT    R               REFFLD(FLAG)
+     A                                      COLHDG('Network process flag')
+     A*                           Valid values are:
+     A*                           ' ' = Do not send to network.
+     A*                           'C' = When pended send to Coventry
+     A*                           'R' = When pended, send to network.
+     A*                           'S' = Sent to network.
+     A*                           'P' = Returned from network & processed.
+     A*** END   ADD *** 08/29/00 **************************************
+     A*** BEGIN ADD *** 08/30/00 **************************************
+     A            EACVI#    R               REFFLD(DS10)
+     A                                      COLHDG('Vendor Invoice #')
+     A*                           CLT113: Corvel Invoice#
+     A*                           CLT025: Rockport Invoice#
+     A*** END   ADD *** 08/30/00 **************************************
+     A*** BEGIN ADD *** 10/06/00 **************************************
+     A            EANPDT         8S 0       COLHDG('Network process' +
+     A                                      'date')
+     A*** END   ADD *** 10/06/00 **************************************
+     A*** BEGIN ADD *** 09/07/01 **************************************
+     A            EAEPDT         8S 0       COLHDG('Original EOMB' +
+     A                                      'Print date')
+     A*** END   ADD *** 09/07/01 **************************************
+     A*** BEGIN ADD *** 02/13/02 **************************************
+     A            EAPCMR         9S 2       COLHDG('Calc % of MRA' +
+     A                                      'reductions')
+     A            EAPCOT         9S 2       COLHDG('Calc % of Other 1' +
+     A                                      '+ Other 2 reductions')
+     A            EAPCNW         9S 2       COLHDG('Calc % of Network' +
+     A                                      'reductions')
+     A            EAFLBL         9S 2       COLHDG('Flat rate per bill')
+     A            EAFLLN         9S 2       COLHDG('Flat rate for all' +
+     A                                      'lines')
+     A*** END   ADD *** 02/13/02 **************************************
+     A*** BEG ADD *** 04/24/02 ****************************************
+     A            EACRKB    R               REFFLD(CODE)
+     A                                      COLHDG('CodeReview' 'Knowledge'+
+     A                                            'Base used')
+     A*                           Valid values are: 01-99
+     A            EAPMKB    R               REFFLD(CODE)
+     A                                      COLHDG('ProMatch' 'Knowledge'+
+     A                                            'Base used')
+     A*                           Valid values are: 01-99
+     A            EAMEKB    R               REFFLD(CODE)
+     A                                      COLHDG('Medicare' 'Knowledge'+
+     A                                            'Base used')
+     A*                           Valid values are: 01-99
+     A            EAFQKB    R               REFFLD(CODE)
+     A                                      COLHDG('Frequency' 'Knowledge'+
+     A                                            'Base used')
+     A*                           Valid values are: 01-99
+     A*** END ADD *** 04/24/02 ****************************************
+     A*** BEGIN ADD *** 09/17/02 **************************************
+     A            EASINV    R               REFFLD(DS35)
+     A                                      COLHDG('SOURCE INVOICE#')
+     A*** END   ADD *** 09/17/02 **************************************
+     A*** BEGIN ADD *** 11/14/02 **************************************
+     A            EAIDOC    R               REFFLD(DCID)
+     A                                      COLHDG('IMAGE DOC' 'ID')
+     A*** END   ADD *** 11/14/02 **************************************
+     A*** BEGIN ADD *** 11/14/02 **************************************
+     A            EAPNAM    R               REFFLD(NAME)
+     A                                      COLHDG('PROVIDER' 'NAME')
+     A            EAADR1    R               REFFLD(ADR1)
+     A                                      COLHDG('ADDRESS 1')
+     A            EAADR2    R               REFFLD(ADR2)
+     A                                      COLHDG('ADDRESS 2')
+     A            EACTY     R               REFFLD(CTY)
+     A                                      COLHDG('CITY')
+     A            EAST      R               REFFLD(ST)
+     A                                      COLHDG('STATE')
+     A            EAZIP     R               REFFLD(ZIP)
+     A                                      COLHDG('ZIP' 'CODE')
+     A*** END   ADD *** 11/14/02 **************************************
+     A*** BEGIN ADD *** 05/12/03 **************************************
+     A            EAOC#1    R     S         REFFLD(CHK#)
+     A                                      COLHDG('OTHER CHECK # 1')
+     A            EAOCD1    R               REFFLD(DT8)
+     A                                      COLHDG('OTHER CHECK DATE 1')
+     A            EAOCA1    R     S         REFFLD(A92)
+     A                                      COLHDG('OTHER CHECK AMT 1')
+     A            EAOC#2    R     S         REFFLD(CHK#)
+     A                                      COLHDG('OTHER CHECK # 2')
+     A            EAOCD2    R               REFFLD(DT8)
+     A                                      COLHDG('OTHER CHECK DATE 2')
+     A            EAOCA2    R     S         REFFLD(A92)
+     A                                      COLHDG('OTHER CHECK AMT 2')
+     A            EAOC#3    R     S         REFFLD(CHK#)
+     A                                      COLHDG('OTHER CHECK # 3')
+     A            EAOCD3    R               REFFLD(DT8)
+     A                                      COLHDG('OTHER CHECK DATE 3')
+     A            EAOCA3    R     S         REFFLD(A92)
+     A                                      COLHDG('OTHER CHECK AMT 3')
+     A            EAINPE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'INPAT ELECTOR')
+     A            EAINPN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'INPAT NON-ELECTOR')
+     A            EAOUTE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'OUTP ELECTOR')
+     A            EAOUTN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'OUTP NON-ELECTOR')
+     A            EAASCE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'ASC ELECTOR')
+     A            EAASCN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'ASC NON-ELECTOR')
+     A            EACLNE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'CLN ELECTOR')
+     A            EACLNN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'CLN NON-ELECTOR')
+     A            EALABE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'LAB ELECTOR')
+     A            EALABN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'LAB NON-ELECTOR')
+     A            EAGRPE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'GROUP ELECTOR')
+     A            EAGRPN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'GROUP NON-ELECTOR')
+     A            EAINDE    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'IND ELECTOR')
+     A            EAINDN    R     S         REFFLD(A92)
+     A                                      COLHDG('NY SURCHARGE' +
+     A                                      'IND NON-ELECTOR')
+     A            EAPNWC    R               REFFLD(FLAG)
+     A                                      COLHDG('PRODUCE NETWORK' +
+     A                                      'CHECK')
+     A*** END   ADD *** 05/12/03 **************************************
+     A*** Begin add *** 03/07/05 **************************************
+     A            EAADR3    R               REFFLD(DS40)
+     A                                      COLHDG('CITY/PROV/POSTAL CD')
+     A*** End add ***** 03/07/05 **************************************
+     A*** BEG ADD *** 05/16/07 **************************************
+     A            EABNPI    R               REFFLD(DS15)
+     A                                      COLHDG('Billing Provider' +
+     A                                      'NPI#')
+     A*** END ADD *** 05/16/07 **************************************
+     A*** Begin add *** 06/13/07 **************************************
+     A            EAPOST    R               REFFLD(ST)
+     A                                      COLHDG('POLICY STATE')
+     A*** End add ***** 06/13/07 **************************************
+     A*** Beg Add *** 09/29/10 **************************************
+     A            EATAX     R     S         REFFLD(A92)
+     A                                      COLHDG('Pharmacy Tax')
+     A*** End Add *** 09/29/10 **************************************
+     A*** Beg Add *** 05/05/15 **************************************
+     A            EAEFTC    R               REFFLD(FLAG)
+     A                                      COLHDG('EFT Flag')
+     A*** End Add *** 05/05/15 **************************************
+     A*** Beg Add *** 01/10/17 **************************************
+     A            EAEXPR    R               REFFLD(FLAG)
+     A                                      COLHDG('EOB Extract Process' +
+     A                                      'Flag')
+     A*** End Add *** 01/10/17 **************************************
+     A*** Beg Add *** 02/08/17 **************************************
+     A            EA835Q    R               REFFLD(FLAG)
+     A                                      COLHDG('835 Extract Qualify' +
+     A                                      'Flag')
+     A            EA835E    R               REFFLD(FLAG)
+     A                                      COLHDG('835 Extract Flag')
+     A            EABTYP    R               REFFLD(BTYP)
+     A                                      COLHDG('Bill Type')
+     A*** End Add *** 02/08/17 **************************************

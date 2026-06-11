@@ -1,0 +1,267 @@
+     A*%%TS  SD  19970723  155505  WINNERW     REL-V3R6M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   CLAIM PAYMENT HISTORY SEARCH DISPLAY                     **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A*
+     A*  02/08/05 C:53  Project: PC011
+     A*                 Code for CLM# incoming from C0071R
+     A*                 Use *IN15
+     A*
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*----------------------------------------------------------------
+     A*    SCR01 - SCREEN 1
+     A*----------------------------------------------------------------
+     A          R SCR01
+     A N15                                  CF05
+     A                                      CF07
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(41)
+     A                                      SETOF(42)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A            Q1PGM         10   O  2  2
+     A***********                       2  2'C0428F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR01'
+     A                                  8 28'Claim Number:'
+     A            SCCLM#    R        B  8 42REFFLD(CLM#)
+     A  20                                  ERRMSGID(CCR0675 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A*                                     DSPATR(CS)
+     A  15                                  DSPATR(PR)
+     A  41                                  DSPATR(PC)
+     A                                      DSPATR(UL)
+     A                                      DSPATR(HI)
+     A                                 10 28'Section Code:'
+     A            SCCC      R        B 10 42REFFLD(CDE)
+     A                                      CHGINPDFT
+     A  21                                  ERRMSGID(CCR0684 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0833 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A*                                     DSPATR(CS)
+     A  42                                  DSPATR(PC)
+     A                                      DSPATR(UL)
+     A                                 22  3'F3=Exit      '
+     A                                      COLOR(BLU)
+     A N15                             22 29'F5=Claim search'
+     A                                      COLOR(BLU)
+     A                                 22 52'F7=Claim section code search'
+     A                                      COLOR(BLU)
+     A            SCERR     R        O 24 78REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A*----------------------------------------------------------------
+     A*    SCR02S - SCREEN 2 SUBFILE RECORD
+     A*----------------------------------------------------------------
+     A          R SCR02S                    SFL
+     A*%%TS  SD  19970723  155505  WINNERW     REL-V3R6M0  5716-PW1
+     A            SCFL01    R        B  7  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCCHK#    R        O  7  4REFFLD(CHK#)
+     A                                      COLOR(WHT)
+     A            SCTD01    R        O  7 12REFFLD(DT8)
+     A                                      COLOR(WHT)
+     A                                      EDTWRD('  /  /    ')
+     A            SCNAM1        23A  O  7 23TEXT('NAME')
+     A                                      COLOR(WHT)
+     A            SCTRCD         4A  O  7 47TEXT('TRANSACTION')
+     A                                      COLOR(WHT)
+     A            SCLINE        15A  O  7 52TEXT('LINE')
+     A                                      COLOR(WHT)
+     A            SCNAMT    R        O  7 68REFFLD(A92)
+     A                                      COLOR(WHT)
+     A                                      EDTCDE(K)
+     A                                  8  4'Fein:'
+     A                                      DSPATR(UL)
+     A            SCFEIN    R     Y  O  8 10REFFLD(FEIN)
+     A                                      COLOR(YLW)
+     A                                  8 21'Mod:'
+     A                                      DSPATR(UL)
+     A            SCMOD     R     Y  O  8 26REFFLD(MOD)
+     A                                      COLOR(YLW)
+     A                                  8 30'Deduction Amt:'
+     A                                      DSPATR(UL)
+     A            SCDEDU    R        O  8 45REFFLD(A72)
+     A                                      COLOR(YLW)
+     A                                      EDTCDE(K)
+     A                                  8 57'Gross Amt:'
+     A                                      DSPATR(UL)
+     A            SCGAMT    R        O  8 68REFFLD(A92)
+     A                                      COLOR(YLW)
+     A                                      EDTCDE(K)
+     A                                  9  4'Claimant ID:'
+     A                                      DSPATR(UL)
+     A            SCCLID    R        O  9 17REFFLD(CLID)
+     A                                      COLOR(YLW)
+     A                                  9 24'Loc:'
+     A                                      DSPATR(UL)
+     A            SCLOC#    R     Y  O  9 29REFFLD(LOC#)
+     A                                      COLOR(YLW)
+     A                                  9 33'Bld:'
+     A                                      DSPATR(UL)
+     A            SCPRM#    R     Y  O  9 38REFFLD(PRM#)
+     A                                      COLOR(YLW)
+     A                                  9 43'Cov code:'
+     A                                      DSPATR(UL)
+     A            SCCOVF    R        O  9 53REFFLD(FLAG)
+     A                                      COLOR(YLW)
+     A                                  9 56'Subline:'
+     A                                      DSPATR(UL)
+     A            SCSUBL    R        O  9 65REFFLD(SUBL)
+     A                                      COLOR(YLW)
+     A                                  9 69'Item:'
+     A                                      DSPATR(UL)
+     A            SCITM#    R     Y  O  9 75REFFLD(ITM#)
+     A                                      COLOR(YLW)
+     A                                 10  4'Form:'
+     A                                      DSPATR(UL)
+     A            SCFRM     R        O 10 10REFFLD(FRM)
+     A                                      COLOR(YLW)
+     A                                 10 13'Rate group:'
+     A                                      DSPATR(UL)
+     A            SCRTGP    R        O 10 25REFFLD(RTGP)
+     A                                      COLOR(YLW)
+     A                                 10 28'Class:'
+     A                                      DSPATR(UL)
+     A            SCCLAS    R        O 10 35REFFLD(CLAS)
+     A                                      COLOR(YLW)
+     A                                 10 42'Rsv code:'
+     A                                      DSPATR(UL)
+     A            SCRECD    R        O 10 52REFFLD(CDE)
+     A                                      COLOR(YLW)
+     A                                 10 55'Rsv type:'
+     A                                      DSPATR(UL)
+     A            SCRETY    R        O 10 65REFFLD(CDE)
+     A                                      COLOR(YLW)
+     A                                 10 69'Adj sts:'
+     A                                      DSPATR(UL)
+     A            SCADST    R        O 10 78REFFLD(STAT)
+     A                                      COLOR(YLW)
+     A*----------------------------------------------------------------
+     A*    SCR02C - SCREEN 2 SUBFILE CONTROL RECORD
+     A*----------------------------------------------------------------
+     A          R SCR02C                    SFLCTL(SCR02S)
+     A*%%TS  SD  19970723  155505  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      SFLSIZ(0005)
+     A                                      SFLPAG(0004)
+     A                                      CF12
+     A                                      ROLLUP(18)
+     A                                      SETOF(20)
+     A                                      KEEP
+     A                                      OVERLAY
+     A  90                                  SFLCLR
+     A  91                                  SFLDSP
+     A N90                                  SFLDSPCTL
+     A  99                                  SFLEND(*MORE)
+     A                                      SFLDROP(CA04)
+     A                                      SFLCSRRRN(&SFRRN)
+     A  20                                  SFLMSG('NO RECORDS FOUND')
+     A                                      CSRLOC(SFROW      SFCOL)
+     A            SFROW          3S 0H
+     A            SFCOL          3S 0H
+     A            SFRNO          4S 0H      SFLRCDNBR(CURSOR)
+     A            SFRRN          5S 0H
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A****************                  2  2'C0428F'
+     A            Q1PGM         10   O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  3  2'Policy Number:'
+     A            SCPOL#    R        O  3 17REFFLD(POL#)
+     A                                      COLOR(WHT)
+     A                                      DSPATR(HI)
+     A                                      TEXT('POLICY NUMBER')
+     A                                  3 33'Name:'
+     A            SCFIN     R        O  3 39REFFLD(NM40)
+     A                                      COLOR(WHT)
+     A                                      DSPATR(HI)
+     A                                  4  3'Claim Number:'
+     A            SCCLM#    R        O  4 17REFFLD(CLM#)
+     A                                      COLOR(WHT)
+     A                                      DSPATR(HI)
+     A                                      TEXT('CLAIM NUMBER')
+     A                                  4 33'Section Code:'
+     A            SCCC      R        O  4 47REFFLD(CODE)
+     A                                      COLOR(WHT)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COVERAGE CODE')
+     A            SCDES1        30A  O  4 50TEXT('COVERAGE DESCRIPTION')
+     A                                      COLOR(WHT)
+     A                                      DSPATR(HI)
+     A                                  5  3'Claim Status:'
+     A            SCSTAT    R        O  5 17REFFLD(STAT)
+     A                                      COLOR(WHT)
+     A                                      DSPATR(HI)
+     A                                      TEXT('CLAIM STATUS')
+     A                                  5 33'Claim Desc:'
+     A            SCDES2        35A  O  5 45TEXT('CLAIM DESCRIPTION')
+     A                                      COLOR(WHT)
+     A                                  6  4'CHECK #'
+     A                                      DSPATR(UL)
+     A                                  6 12'  DATE    '
+     A                                      DSPATR(UL)
+     A                                  6 23'PAYEE                  '
+     A                                      DSPATR(UL)
+     A                                  6 52' LINE          '
+     A                                      DSPATR(UL)
+     A                                  6 68'     NET AMT'
+     A                                      DSPATR(UL)
+     A                                  6 47'TRNS'
+     A                                      DSPATR(UL)
+     A*----------------------------------------------------------------
+     A*    SCR02R - SCREEN 2 SUBFILE OPTION LINE RECORD
+     A*----------------------------------------------------------------
+     A          R SCR02R
+     A                                      OVERLAY
+     A  03                             24  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A  05                             24  2'CANCEL PENDING'
+     A                                      DSPATR(RI)
+     A  06                             24  2'REINSTATE PENDING'
+     A                                      DSPATR(RI)
+     A                                 24 20'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 35'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A                                 24 52'F4=Fold'
+     A                                      COLOR(BLU)
+     A  04                             24 62'POLICY NON-RENEWED'
+     A                                      DSPATR(RI)
+     A*----------------------------------------------------------------
+     A*    SCR99  - RESET SCREEN
+     A*----------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

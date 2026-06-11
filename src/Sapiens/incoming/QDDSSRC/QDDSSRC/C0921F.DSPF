@@ -1,0 +1,473 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   RECOVERY REQUEST SEARCH DISPLAY                          **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      PUTOVR
+     A                                      SETOF(20)
+     A                                      SETOF(30)
+     A                                      SETOF(31)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0922F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  4  2'Claim #:'
+     A            SCCLM#    R        O  4 11REFFLD(CLM#)
+     A                                      DSPATR(HI)
+     A                                  4 28'Section:'
+     A            SCCC      R        O  4 37REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A            SCDESC    R        O  4 41REFFLD(NM40)
+     A                                      DSPATR(HI)
+     A                                  5  2'Request #:'
+     A            SCREQ#    R        B  5 13REFFLD(SEQ#)
+     A                                      EDTCDE(4)
+     A*                                     DSPATR(CS)
+     A                                      DSPATR(HI)
+     A                                  7  4'Req #'
+     A                                      DSPATR(UL)
+     A                                  7 10'Fed ID # '
+     A                                      DSPATR(UL)
+     A                                  7 20'Mod'
+     A                                      DSPATR(UL)
+     A                                  7 24'Name           '
+     A                                      DSPATR(UL)
+     A                                  7 40'Date rqs'
+     A                                      DSPATR(UL)
+     A                                  7 49'Amount rqs  '
+     A                                      DSPATR(UL)
+     A                                  7 63'Amount rec  '
+     A                                      DSPATR(UL)
+     A                                  7 76'Sb/Sv'
+     A                                      TEXT('Recovery Type')
+     A                                      DSPATR(UL)
+     A            SCFL01    R        B  8  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A  30                                  ERRMSGID(CCR0600 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A            SCRS01    R        O  8  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE01    R        O  8 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO01    R        O  8 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM01    R        O  8 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT01    R        O  8 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR01    R        O  8 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ01    R        O  8 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP01    R        O  8 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL02    R        B  9  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS02    R        O  9  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE02    R        O  9 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO02    R        O  9 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM02    R        O  9 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT02    R        O  9 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR02    R        O  9 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ02    R        O  9 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP02    R        O  9 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL03    R        B 10  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS03    R        O 10  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE03    R        O 10 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO03    R        O 10 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM03    R        O 10 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT03    R        O 10 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR03    R        O 10 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ03    R        O 10 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP03    R        O 10 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL04    R        B 11  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS04    R        O 11  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE04    R        O 11 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO04    R        O 11 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM04    R        O 11 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT04    R        O 11 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR04    R        O 11 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ04    R        O 11 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP04    R        O 11 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL05    R        B 12  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS05    R        O 12  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE05    R        O 12 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO05    R        O 12 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM05    R        O 12 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT05    R        O 12 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR05    R        O 12 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ05    R        O 12 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP05    R        O 12 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL06    R        B 13  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS06    R        O 13  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE06    R        O 13 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO06    R        O 13 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM06    R        O 13 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT06    R        O 13 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR06    R        O 13 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ06    R        O 13 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP06    R        O 13 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL07    R        B 14  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS07    R        O 14  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE07    R        O 14 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO07    R        O 14 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM07    R        O 14 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT07    R        O 14 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR07    R        O 14 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ07    R        O 14 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP07    R        O 14 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL08    R        B 15  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS08    R        O 15  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE08    R        O 15 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO08    R        O 15 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM08    R        O 15 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT08    R        O 15 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR08    R        O 15 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ08    R        O 15 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP08    R        O 15 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL09    R        B 16  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS09    R        O 16  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE09    R        O 16 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO09    R        O 16 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM09    R        O 16 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT09    R        O 16 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR09    R        O 16 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ09    R        O 16 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP09    R        O 16 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL10    R        B 17  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS10    R        O 17  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE10    R        O 17 10REFFLD(FEIN)
+     A                                      OVRDTA
+     A                                      EDTCDE(Z)
+     A            SCMO10    R        O 17 20REFFLD(MOD)
+     A                                      OVRDTA
+     A                                      EDTCDE(Z)
+     A            SCNM10    R        O 17 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT10    R        O 17 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR10    R        O 17 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ10    R        O 17 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP10    R        O 17 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL11    R        B 18  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS11    R        O 18  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE11    R        O 18 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO11    R        O 18 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM11    R        O 18 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT11    R        O 18 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR11    R        O 18 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ11    R        O 18 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP11    R        O 18 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL12    R        B 19  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS12    R        O 19  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE12    R        O 19 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO12    R        O 19 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM12    R        O 19 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT12    R        O 19 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR12    R        O 19 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ12    R        O 19 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP12    R        O 19 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL13    R        B 20  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS13    R        O 20  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE13    R        O 20 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO13    R        O 20 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM13    R        O 20 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT13    R        O 20 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR13    R        O 20 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ13    R        O 20 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP13    R        O 20 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A            SCFL14    R        B 21  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A            SCRS14    R        O 21  4REFFLD(SEQ#)
+     A                                      TEXT('REQUEST NUMBER')
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCFE14    R        O 21 10REFFLD(FEIN)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCMO14    R        O 21 20REFFLD(MOD)
+     A                                      EDTCDE(Z)
+     A                                      OVRDTA
+     A            SCNM14    R        O 21 24REFFLD(FSN)
+     A                                      TEXT('Payee name')
+     A                                      OVRDTA
+     A            SCDT14    R        O 21 40REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A            SCAR14    R        O 21 49REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRQ14    R        O 21 63REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCTP14    R        O 21 78REFFLD(FLAG)
+     A                                      TEXT('Recovery Type')
+     A                                      OVRDTA
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 25'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A            SCUP           9A  O 23 55OVRDTA
+     A            SCDOWN         9A  O 23 70OVRDTA
+     A            SCERR     R        O 24 78REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      OVRDTA
+     A  31                                  ERRMSGID(CCR0627 *LIBL/CMESGG)
+     A          R SCR99
+     A            SCFL01    R        O  1  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      TEXT('DUMMY FIELD')

@@ -1,0 +1,717 @@
+     A*****************************************************************
+      * (c) 2023 Sapiens. All Rights Reserved.                             *
+     A*****************************************************************
+     A**   FEE SCHEDULE RULES -- DETERMINED BY STATE AND EFFECTIVE   **
+     A**                         DATE                                **
+     A*****************************************************************
+     A** REVISIONS:                                                   *
+     A*****************************************************************
+     A*                                                               *
+     A*   05/08/23 C:079  Project: NY060                              *
+     A*                   Added new fields FREOBCD1 and FREOBCD2      *
+     A*                                                               *
+     A*   06/03/19 C:212  Project: NY046                              *
+     A*                   Added new fields FRBFAD and FRCTPC          *
+     A*                                                               *
+     A*   12/09/16 C:309  Project: MS032                              *
+     A*                   Added new field                             *
+     A*                   "FRCAPCSI- Compared to APC Status Indicator *
+     A*                                                               *
+     A*   05/30/16 C:309  Project:FS497(OPPS status indicator Update) *
+     A*                   Added new field                             *
+     A*                   "FRAPCSI - OPPS APC Status Indicator"       *
+     A*                                                               *
+     A*    09/01/15 C:079 Support: 129/33851                          *
+     A*             Added invalid code field                          *
+     A*                                                               *
+     A*    10/24/14 C:274 Project: SY359                              *
+     A*             Added new fields - FRREL (Release Name)           *
+     A*                              - FRPROJ (Project / Support)     *
+     A*                                                               *
+     A*    11/14/08 C:212 Project: TX043                              *
+     A*             Added new field - FRASPI (ASC Payment Indicator)  *
+     A*                                                               *
+     A*    04/03/08 C:198 Project:TX039                               *
+     A*             Added FRAPSI and FRIMST.                          *
+     A*                                                               *
+    A*    11/03/06 C:182 Project:TX033                               *
+     A*             Add #Days Frm SRC DT Field                        *
+   A*                                                               *
+     A*    09/25/04 C:79 Project:TX027                                *
+     A*             Add billed HPSA eligibility field                 *
+     A*                                                               *
+     A*    02/27/04 C:79 Project:FL048                                *
+     A*             Add compared multiple units                       *
+     A*                                                               *
+     A*    11/05/03 C:79 Project:FS272                                *
+     A*             Add Billed From/To Acc Date Fields                *
+     A*                                                               *
+     A*    11/01/03 C:79 Project:FS262                                *
+     A*             Add Billed Assistant Surgery Flag                 *
+     A*                                                               *
+     A*    10/31/03 C:79 Project:FS270                                *
+     A*             Add Client Number                                 *
+     A*                                                               *
+     A*    09/25/03 C:79 Project:TX020                                *
+     A*             1. Add field for rural/urban zip area             *
+     A*             2. Add field for modifier indicators              *
+     A*                                                               *
+     A*    09/15/03 C:79 Project:TX020                                *
+     A*             1. Add fields for additional billed modifiers     *
+     A*                                                               *
+     A*    04/07/03 C:79 Project:PA020                                *
+     A*             1. Add field to pay P/T per visit rates           *
+     A*                                                               *
+     A*    10/17/02 C:79 Project:FS239                                *
+     A*             1. Add field to pay pharmacy AWP                  *
+     A*                                                               *
+     A*    10/04/02 C:79 Project:CA001                                *
+     A*             1. Add fields for "To" Hospital Type of Service   *
+     A*                                                               *
+     A*    01/16/02 C:79 Project:114MAO                               *
+     A*             1. Add field for Correct Coding flag              *
+     A*                                                               *
+     A*    11/29/01 C:79 Project:GA015                                *
+     A*             1. Add field for DRG exempt providers             *
+     A*                                                               *
+     A*    10/11/01 C:79 Project:VT001                                *
+     A*             1. Add field for type of follow up day logic      *
+     A*                                                               *
+     A*    07/20/01 C:79 Project:114MCG                               *
+     A*             1. Add fields to pay PA hospital amounts          *
+     A*                                                               *
+     A*    01/04/01 C:79 Support:MC048 25150                          *
+     A*             1. Add field to ignore overrides when counting    *
+     A*                history items.                                 *
+     A*                                                               *
+     A*    12/08/00 C:79 Project:PA008                                *
+     A*             1. Add field to ignore compared to modifier SCIGMD*
+     A*                                                               *
+     A*    11/01/00 C:79 Project:TXMNT 24805                          *
+     A*             1. Add field to pay count Phy Ther time FRPTTM    *
+     A*                                                               *
+     A*    09/26/00 C:79 Support:MC095/24432                          *
+     A*             1. Add field to pay ASC amount FRPASC             *
+     A*                                                               *
+     A*    09/01/00 C:79 Support: MC072/#23810                        *
+     A*             1. Add FRTRMT (initial treatment period)          *
+     A*                                                               *
+     A*    04/08/00 C:79 Support:MC095/22094                          *
+     A*             1. Add billed and compared MRI/CAT fields         *
+     A*                                                               *
+     A*    02/24/00 C:79 Project: KS012                               *
+     A*             1. Add stop loss field                            *
+     A*             2. Add stop loss type                             *
+     H*                                                               *
+     H*    02/16/00 C:79  Project: NE007                              *
+     H*             1. Add compared to body area field                *
+     H*             2. Add hosp service code field                    *
+     A*                                                               *
+     A*    01/04/00 C:79 Project: MS008                               *
+     A*             1. Add Pay difference between charged-MRA field   *
+     A*                                                               *
+     A*    12/04/99 C:79 Project: 48MDA                               *
+     A*             1. Add Outlier payment field                      *
+     A*                                                               *
+     A*    11/16/99 C:79 Project: FL024                               *
+     A*             1. Add Compare to same bill field                 *
+     A*                                                               *
+     A*    11/04/99 C:79 Project: KS012                               *
+     A*             1. Add Peer Group field                           *
+     A*                                                               *
+     A*    09/29/99 C:79 Project: AL036                               *
+     A*             1. Add field to select drug type (generic or      *
+     A*                name brand.                                    *
+     A*                                                               *
+     A*    09/09/99 C:79 Project: SC006                               *
+     A*             1. Add field to calculate anesthesia correctly    *
+     A*                                                               *
+     A*    07/02/99 C:79 Support#:18078                               *
+     A*             1. Add FRPAS2 to process 2nd pass                 *
+     A*                                                               *
+     A*    04/27/99 C:79 PROJ:FL019                                   *
+     A*             1. Add FRCOMP Compare MRA to Billed amount to see *
+     A*                which is greater                               *
+     A*             2. Add FRAVAL to determine if a valid value exists*
+     A*                for the ASC amount                             *
+     A*                                                               *
+     A*    12/16/98 C:79 PROJ:MS006                                   *
+     A*             Add FRPFAC Field - Pay ASC Facility Fee           *
+     A*                                                               *
+     A*    12/02/98 C:79 PROJ:GA010                                   *
+     A*             ADD FRPANE FIELD - PAY ANESTHESIA AMOUNT          *
+     A*                                                               *
+     A*    11/24/98 C:79 SUPP:13540                                   *
+     A*             Add FRHMRA Field - Higher MRA than billed MRA     *
+     A*                                                               *
+     A*    10/16/98 C:91 SUPP:11215                                   *
+     A*             Add FRRND field - Rounding Indicator              *
+     A*                                                               *
+     A*    03/24/98 C:57 PROJ:FSMNT                                   *
+     A*             Add FRMR field - Multiple Reductions              *
+     A*                                                               *
+     A*    02/03/98 C:79 PROJ:FS139                                   *
+     A*             Add FRMR field - Multiple Reductions              *
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PFR01                     TEXT('CLAIM FILE')
+     A            FRST      R               REFFLD(ST)
+     A                                      COLHDG('STATE')
+     A            FREFDT    R               REFFLD(DT7)
+     A                                      COLHDG('EFFECTIVE DATE')
+     A            FREXDT    R               REFFLD(DT7)
+     A                                      COLHDG('EXPIRATION DATE')
+     A            FRRULE         9P 0
+     A                                      COLHDG('RULE #')
+     A            FRPCAT    R               REFFLD(DS10)
+     A                                      COLHDG('PROCEDURE CATEGORY')
+     A*           VALID VALUES:
+     A*                 BASED ON FTGTP VIA "PCAT"
+     A*
+     A            FRDESC        60A
+     A                                      COLHDG('DESCRIPTION')
+     A            FRPAGE    R               REFFLD(A30)
+     A                                      COLHDG('FS MANUAL' 'PAGE NUMBER')
+     A            FRINFO    R               REFFLD(DS15)
+     A                                      COLHDG('FS MANUAL' 'INFORMATION')
+     A            FRPTY          3P 0
+     A                                      COLHDG('RULE PRIORITY')
+     A            FRSYS     R               REFFLD(SYS)
+     A                                      COLHDG('SYSTEM TYPE')
+     A*           VALID VALUES:
+     A*                 BASED ON FTGTP VIA "SYS"
+     A*
+     A            FRSPCD         3A
+     A                                      COLHDG('SPECIALTY CODE')
+     A*           VALID VALUES:
+     A*                 BASED ON FTSPP
+     A*
+     A            FRBFCD        11A
+     A                                      COLHDG('BILLED FROM CODE')
+     A            FRBTCD        11A
+     A                                      COLHDG('BILLED TO CODE')
+     A            FRBFMD    R               REFFLD(PMOD)
+     A                                      COLHDG('BILLED FROM MODIFIER')
+     A            FRBTMD    R               REFFLD(PMOD)
+     A                                      COLHDG('BILLED TO MODIFIER')
+     A            FRBFPS         3P 0
+     A                                      COLHDG('BILLED FROM ' ' PLACE SVC ')
+     A*           VALID VALUES:
+     A*                 BASED ON FTPSPXX
+     A*
+     A            FRBTPS         3P 0
+     A                                      COLHDG('BILLED TO ' 'PLACE SVC')
+     A*           VALID VALUES:
+     A*                 BASED ON FTPSPXX
+     A*
+     A            FRBTOS         2A
+     A                                      COLHDG('BILLED TYPE' ' OF SERVICE')
+     A*           VALID VALUES:
+     A*                 BASED ON FTTSPXX
+     A*
+     A            FRBPRT         2A
+     A                                      COLHDG('BILLED BODY PART')
+     A*           VALID VALUES:
+     A*                 BASED ON FTPAPXX
+     A*
+     A            FRCFCD        11A
+     A                                      COLHDG('COMPARED FROM CODE')
+     A            FRCTCD        11A
+     A                                      COLHDG('COMPARED TO CODE')
+     A            FRCMOD    R               REFFLD(PMOD)
+     A                                      COLHDG('COMPARED TO MODIFIER')
+     A            FRCPOS         3P 0
+     A                                      COLHDG('COMPARE PLACE' 'OF SERVICE')
+     A*           VALID VALUES:
+     A*                 BASED ON FTPSPXX
+     A            FRCTOS         2A
+     A                                      COLHDG('COMPARE TYPE' ' OF SERVICE')
+     A*           VALID VALUES:
+     A*                 BASED ON FTTSPXX
+     A            FRCTOB         3A
+     A                                      COLHDG('TYPE OF BILL')
+     A*           VALID VALUES:
+     A*                 BASED ON FTGTP VIA "BLTY"
+     A*
+     A            FRCSDT    R               REFFLD(FLAG)
+     A                                      COLHDG('COMPARE SAME DATE')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRCHDT    R               REFFLD(FLAG)
+     A                                      COLHDG('COMPARE HISTORY DATE')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRCSPR    R               REFFLD(FLAG)
+     A                                      COLHDG('COMPARE' ' SAME PROVIDER')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRCDPR    R               REFFLD(FLAG)
+     A                                      COLHDG('COMPARE' ' DIFF PROVIDER')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRCFDY         5P 0
+     A                                      COLHDG('COMPARE DAY ' 'IN FUTURE')
+     A            FRCPDY         5P 0
+     A                                      COLHDG('COMPARE DAYS IN PAST')
+     A            FR#PRC         5P 0
+     A                                      COLHDG('COMPARE #' ' OF PROCEDURES')
+     A            FR#DAY         5P 0
+     A                                      COLHDG('COMPARE #' ' OF DAYS')
+     A            FREOB          3A
+     A                                      COLHDG('EOB CODE')
+     A*           VALID VALUES:
+     A*                 BASED ON FTEBPXX
+     A*
+     A            FRMSG          7A
+     A                                      COLHDG('ERROR MESSAGE')
+     A*           VALID VALUES:
+     A*                 BASED ON FTMIP
+     A*
+     A            FRPMR     R               REFFLD(FLAG)
+     A                                      COLHDG('PAY MRA FLAG')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRPCH     R               REFFLD(FLAG)
+     A                                      COLHDG('PAY CHARGED AMOUNT')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRDIS     R               REFFLD(FLAG)
+     A                                      COLHDG('DISALLOW MRA FLAG')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRPCT     R               REFFLD(PC52)
+     A                                      COLHDG('PERCENTAGE TO PAY')
+     A            FRAMT     R               REFFLD(A92)
+     A                                      COLHDG('FLAT FEE TO PAY')
+     A*
+     A            FRSTAT    R               REFFLD(STAT)
+     A                                      COLHDG('STATUS')
+     A            FRUSER    R               REFFLD(USER)
+     A                                      COLHDG('MAINT USER')
+     A            FRPGM     R               REFFLD(PGM)
+     A                                      COLHDG('MAINT PROGRAM')
+     A            FRTIME    R               REFFLD(TIME)
+     A                                      COLHDG('MAINT TIME')
+     A            FRDT      R               REFFLD(DT7)
+     A                                      COLHDG('MAINTAINED DATE')
+     A            FRIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL USER')
+     A            FRIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL PROGRAM')
+     A            FRITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL TIME')
+     A            FRIDT     R               REFFLD(DT7)
+     A                                      COLHDG('INITIAL DATE' 'MAINTAINED')
+     A*
+     A            FRPROF    R               REFFLD(FLAG)
+     A                                      COLHDG('PAY PROF AMT FLAG')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRTECH    R               REFFLD(FLAG)
+     A                                      COLHDG('PAY TECH AMOUNT'   )
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FR#GPC    R               REFFLD(FLAG)
+     A                                      COLHDG('GREATER THAN PROC:')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FR#GDY    R               REFFLD(FLAG)
+     A                                      COLHDG('GREATER THAN DAYS:')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A*
+     A            FRCPTS    R               REFFLD(FLAG)
+     A                                      COLHDG('SAME PROC FLAG')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRBSEP    R               REFFLD(FLAG)
+     A                                      COLHDG('BILLED SEPP PROC')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRCSEP    R               REFFLD(FLAG)
+     A                                      COLHDG('COMPARE SEPP PROC')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRBRT     R               REFFLD(FLAG)
+     A                                      COLHDG('BY REPORT')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRBAST    R               REFFLD(FLAG)
+     A                                      COLHDG('BILLED' ' ASTERSIK PROC:')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRCAST    R               REFFLD(FLAG)
+     A                                      COLHDG('COMPARE' ' ASTERSIKPROC:')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRPCVL    R               REFFLD(FLAG)
+     A                                      COLHDG('VALID PROF' ' COMP VALUE:')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRTCVL    R               REFFLD(FLAG)
+     A                                      COLHDG('VALID TECH' ' COMP VALUE:')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRVAL     R               REFFLD(FLAG)
+     A                                      COLHDG('VALID' ' MODIFIER VALUE:')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRPCPT         5A
+     A                                      COLHDG('CPT4 VALUE TO PAY')
+     A*
+     A            FRBSPB    R               REFFLD(FLAG)
+     A                                      COLHDG('BILLED BLANK SPEC')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRUNIT         3P 0
+     A                                      COLHDG('PAY UNIT AMOUNT')
+     A*
+     A            FRAUNT         3P 0
+     A                                      COLHDG('ADD UNIT AMOUNT')
+     A*
+     A            FRCONV         5P 2
+     A                                      COLHDG('CONVERSION FACTOR')
+     A*
+     A            FRFUD     R               REFFLD(FLAG)
+     A                                      COLHDG('FOLLOW UP DAYS')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*
+     A            FRTMDV         3P 0
+     A                                      COLHDG('TIME DIVISION ')
+     A*
+     A            FRCT      R               REFFLD(FLAG)
+     A                                      COLHDG('PROC CODE TYPE')
+     A*
+     A            FRNCT     R               REFFLD(FLAG)
+     A                                      COLHDG('NO - CUT FLAG')
+     A*
+     A            FRHTOS    R               REFFLD(FLAG)
+     A                                      COLHDG('HOSPITAL TOS')
+     A*
+     A            FRMSG2         7A
+     A                                      COLHDG('ERROR MESSAGE #2')
+     A*
+     A            FRMSG3         7A
+     A                                      COLHDG('ERROR MESSAGE #3')
+     A*
+     A            FRMAJ     R               REFFLD(FLAG)
+     A                                      COLHDG('MAJOR / MINOR')
+     A*
+     A            FRCON2         5P 2
+     A                                      COLHDG('CONVERSION FACTOR 2')
+     A*
+     A            FRFTM          5P 0
+     A                                      COLHDG('FROM TIME UNITS')
+     A*
+     A            FRTTM          5P 0
+     A                                      COLHDG('TO TIME UNITS')
+     A*
+     A* BEG ADD *** 02/03/98 ******************************************
+     A            FRMR      R               REFFLD(FLAG)
+     A                                      COLHDG('MULT. REDUCTIONS')
+     A* BEG ADD *** 02/03/98 ******************************************
+     A*** BEG ADD ***** 03/24/98 ***********************************************
+     A            FREFCD        11A
+     A                                      COLHDG('EXCEPT COMPARED' -
+     A                                      'FROM CODE')
+     A            FRETCD        11A
+     A                                      COLHDG('EXCEPT COMPARED' -
+     A                                      'TO CODE')
+     A*** END ADD ***** 03/24/98 ***********************************************
+     A* BEG ADD *** 10/16/98 ******************************************
+     A            FRRND     R               REFFLD(FLAG)
+     A                                      COLHDG('ROUNDING IND.')
+     A* END ADD *** 10/16/98 ******************************************
+     A* BEG ADD *** 11/24/98 ******************************************
+     A            FRHMRA    R               REFFLD(FLAG)
+     A                                      COLHDG('HIGHER MRA FLAG')
+     A* END ADD *** 11/24/98 ******************************************
+     A*** BEG ADD *** 12/02/98 ****************************************
+     A            FRPANE    R               REFFLD(FLAG)
+     A                                      COLHDG('PAY ANES FIELD AMT')
+     A*           VALID VALUES:
+     A*                 'Y' OR *BLANK
+     A*** END ADD *** 12/02/98 ****************************************
+     A* BEG ADD *** 12/16/98 ******************************************
+     A            FRPFAC    R               REFFLD(FLAG)
+     A                                      COLHDG('PAY FACILITY FEE')
+     A            FRPPDM    R               REFFLD(FLAG)
+     A                                      COLHDG('PAY INPAT PER DIEM')
+     A* END ADD *** 12/16/98 ******************************************
+     A* BEG ADD *** 04/27/99 ******************************************
+     A            FRCOMP    R               REFFLD(FLAG)
+     A                                      COLHDG('COMP CHARGED VS MRA')
+     A            FRAVAL    R               REFFLD(FLAG)
+     A                                      COLHDG('ASC VALID VALUE')
+     A* END ADD *** 04/27/99 ******************************************
+     A* BEG ADD *** 07/02/99 ******************************************
+     A            FRPAS2    R               REFFLD(FLAG)
+     A                                      COLHDG('2nd Pass')
+     A* END ADD *** 07/02/99 ******************************************
+     A* BEG ADD *** 09/09/99 ******************************************
+     A            FRTANE    R               REFFLD(FLAG)
+     A                                      COLHDG('Type of ane calc')
+     A* END ADD *** 09/09/99 ******************************************
+     A* BEG ADD *** 09/29/99 ******************************************
+     A            FRPTYP         2A
+     A                                      COLHDG('Type of drug')
+     A* END ADD *** 09/29/99 ******************************************
+     A* BEG ADD *** 11/04/99 ******************************************
+     A            FRPGRP         5A
+     A                                      COLHDG('Peer Group')
+     A            FRPPGP    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay Peer')
+     A* END ADD *** 11/04/99 ******************************************
+     A* BEG ADD *** 12/02/99 ******************************************
+     A            FRPOUT    R               REFFLD(FLAG)
+     A                                      COLHDG('Outlier payment')
+     A* END ADD *** 12/02/99 ******************************************
+     A* BEG ADD *** 11/16/99 ******************************************
+     A            FRCSBL    R               REFFLD(FLAG)
+     A                                      COLHDG('Compare' ' same bill')
+     A* END ADD *** 11/16/99 ******************************************
+     A* BEG ADD *** 01/04/00 ******************************************
+     A            FRPDIF    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay dif' ' chrg-MRA')
+     A* END ADD *** 01/04/00 ******************************************
+     A* BEG ADD *** 02/24/00 ******************************************
+     A            FRLOSS    R               REFFLD(A92)
+     A                                      COLHDG('STOP LOSS AMOUNT')
+     A* END ADD *** 02/24/00 ******************************************
+     A*
+     A* BEG ADD *** 02/16/00 ******************************************
+     A            FRCPRT         2A
+     A                                      COLHDG('COMPARED BODY PART')
+     A* END ADD *** 02/16/00 ******************************************
+     A* BEG ADD *** 02/16/00 ******************************************
+     A            FRPSRV         1A
+     A                                      COLHDG('PAY HOSP SERV CODE')
+     A* END ADD *** 02/16/00 ******************************************
+     A* BEG ADD *** 02/24/00 ******************************************
+     A            FRTLOS    R               REFFLD(FLAG)
+     A                                      COLHDG('STOP LOSS TYPE')
+     A* END ADD *** 02/24/00 ******************************************
+     A* BEG ADD *** 04/08/00 ******************************************
+     A            FRBMRI    R               REFFLD(FLAG)
+     A                                      COLHDG('Billed' 'MRI/CAT')
+     A            FRCMRI    R               REFFLD(FLAG)
+     A                                      COLHDG('Compare' 'MRI/CAT')
+     A* END ADD *** 04/08/00 ******************************************
+     A* BEG ADD *** 09/26/00 ******************************************
+     A            FRPASC    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay ASC')
+     A* END ADD *** 09/26/00 ******************************************
+     A* BEG ADD *** 11/01/00 ******************************************
+     A            FRPTTM         5S 2
+     A                                      COLHDG('P/T Time')
+     A* END ADD *** 11/01/00 ******************************************
+     A* BEG ADD *** 09/01/00 ******************************************
+     A            FRTRMT         5P 0
+     A                                      COLHDG('Init Treat' 'Period')
+     A* END ADD *** 09/01/00 ******************************************
+     A* BEG ADD *** 01/04/01 ******************************************
+     A            FROVRD    R               REFFLD(FLAG)
+     A                                      COLHDG('Ignore' 'Overrides')
+     A* END ADD *** 01/04/01 ******************************************
+     A* BEG ADD *** 12/08/00 ******************************************
+     A            FRIGMD    R               REFFLD(FLAG)
+     A                                      COLHDG('Ignore' 'Modifiers')
+     A* END ADD *** 12/08/00 ******************************************
+     A* BEG ADD *** 07/20/01 ******************************************
+     A            FRPPSC    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'Service' 'Code')
+     A            FRPCRF    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'CORF')
+     A            FRPSNI    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'SNF' 'Inpt')
+     A            FRPSNO    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'SNF' 'Outp')
+     A            FRPHHI    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'Home Hlth' 'Inpat')
+     A            FRPHHO    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'Home hlth' 'Outpat')
+     A            FRPDRG    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'DRG')
+     A            FRFTOB         3A
+     A                                      COLHDG('From' 'Type of' 'Bill')
+     A            FRTTOB         3A
+     A                                      COLHDG('To' 'Type of' 'Bill')
+     A            FRFEMA    R               REFFLD(FLAG)
+     A                                      COLHDG('Fed Reg' 'Match')
+     A            FRPOMA    R               REFFLD(FLAG)
+     A                                      COLHDG('Pros Pay' 'Match')
+     A            FRMEMA    R               REFFLD(FLAG)
+     A                                      COLHDG('Med#' 'Match')
+     A            FRSCMA    R               REFFLD(FLAG)
+     A                                      COLHDG('Serv' 'Code' 'Match')
+     A            FRMRMA    R               REFFLD(FLAG)
+     A                                      COLHDG('Med#' 'RCC' 'Match')
+     A            FRDRMA    R               REFFLD(FLAG)
+     A                                      COLHDG('DRG#' 'RCC' 'Match')
+     A            FRSVAL    R               REFFLD(FLAG)
+     A                                      COLHDG('Serv' 'Code has' 'Value')
+     A            FRPPHO    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'Pharm' 'Outpat')
+     A            FRPPHI    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'Pharm' 'Inpat')
+     A            FRPORC    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'Outp' 'RCC')
+     A            FRPPOR    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'Outp' 'Phar RCC')
+     A            FRPPIR    R               REFFLD(FLAG)
+     A                                      COLHDG('Pay' 'Inp' 'Phar RCC')
+     A            FRBFUT    R               REFFLD(FLAG)
+     A                                      COLHDG('Follow' 'Up day' 'type')
+     A* END ADD *** 07/20/01 ******************************************
+     A* BEG ADD *** 10/11/01 ******************************************
+     A            FRBDEX    R               REFFLD(FLAG)
+     A                                      COLHDG('DRG' 'Exempt')
+     A* END ADD *** 10/11/01 ******************************************
+     A* BEG ADD *** 01/16/02 ******************************************
+     A            FRCCOD    R               REFFLD(FLAG)
+     A                                      COLHDG('Correct' 'Coding' 'Flag')
+     A*                                      VALID VALUES:
+     A*                                       C=Component code rule
+     A*                                       M=Mutually exclusive rule
+     A*                                       0=Modifier not allowed
+     A*                                       1=Modifier allowed
+     A*                                       9=Code pairs with same del date
+     A* END ADD *** 01/16/02 ******************************************
+     A* BEG ADD *** 10/04/02 ******************************************
+     A            FRFTOS    R               REFFLD(DS2)
+     A                                      COLHDG('Fr Hosp' 'TOS')
+     A            FRFTSS    R               REFFLD(FLAG)
+     A                                      COLHDG('Fr Hosp' 'TOS' 'Status')
+     A            FRTTOS    R               REFFLD(DS2)
+     A                                      COLHDG('To Hosp' 'TOS')
+     A            FRTTSS    R               REFFLD(FLAG)
+     A                                      COLHDG('To Hosp' 'TOS' 'Status')
+     A* END ADD *** 10/04/02 ******************************************
+     A* BEG ADD *** 10/17/02 ******************************************
+     A            FRPRX     R               REFFLD(FLAG)
+     A                                      COLHDG('PAY' 'PHAR' 'AWP')
+     A* END ADD *** 10/17/02 ******************************************
+     A* BEG ADD *** 04/07/03 ******************************************
+     A            FRPPTV    R               REFFLD(FLAG)
+     A                                      COLHDG('PAY PT' 'PER VISIT')
+     A* END ADD *** 04/07/03 ******************************************
+     A* BEG ADD *** 09/15/03 ******************************************
+     A            FRBMD2    R               REFFLD(PMOD)
+     A                                      COLHDG('2ND BILLED' 'MOD')
+     A            FRBMD3    R               REFFLD(PMOD)
+     A                                      COLHDG('3ND BILLED' 'MOD')
+     A            FRBMD4    R               REFFLD(PMOD)
+     A                                      COLHDG('4TH BILLED' 'MOD')
+     A* END ADD *** 09/15/03 ******************************************
+     A* BEG ADD *** 09/25/03 ******************************************
+     A            FRPARE    R               REFFLD(FLAG)
+     A                                      COLHDG('AREA' 'RURAL, ETC')
+     A            FRPCIN    R               REFFLD(FLAG)
+     A                                      COLHDG('PC/TC' 'MOD' 'IND')
+     A            FR50IN    R               REFFLD(FLAG)
+     A                                      COLHDG('BILAT' 'SURG' 'IND')
+     A            FR51IN    R               REFFLD(FLAG)
+     A                                      COLHDG('BILAT' 'SURG' 'IND')
+     A            FR62IN    R               REFFLD(FLAG)
+     A                                      COLHDG('CO' 'SURG' 'IND'   )
+     A            FR66IN    R               REFFLD(FLAG)
+     A                                      COLHDG('TEAM' 'SURG' 'IND' )
+     A            FR80IN    R               REFFLD(FLAG)
+     A                                      COLHDG('ASST' 'SURG' 'IND' )
+     A* END ADD *** 09/25/03 ******************************************
+     A* BEG ADD *** 10/31/03 ******************************************
+     A            FRCLT#    R               REFFLD(A30)
+     A                                      COLHDG('CLIENT' 'NUMBER')
+     A* END ADD *** 10/31/03 ******************************************
+     A* BEG ADD *** 11/01/03 ******************************************
+     A            FRBSRG    R               REFFLD(FLAG)
+     A                                      COLHDG('BILLED' 'ASST' 'SURG')
+     A* END ADD *** 11/01/03 ******************************************
+     A* BEG ADD *** 11/05/03 ******************************************
+     A            FRFADT         7S 0
+     A                                      COLHDG('FROMD' 'ACC' 'DATE')
+     A            FRTADT         7S 0
+     A                                      COLHDG('TO' 'ACC' 'DATE')
+     A* END ADD *** 11/05/03 ******************************************
+     A* BEG ADD *** 11/01/03 ******************************************
+     A            FRMUNT    R               REFFLD(FLAG)
+     A                                      COLHDG('COMP' 'MULT' 'UNITS')
+     A* END ADD *** 11/01/04 ******************************************
+     A* BEG ADD *** 09/25/04 ******************************************
+     A            FRBFHE    R               REFFLD(FLAG)
+     A                                      COLHDG('HPSA' 'ELIGIBLE')
+     A* END ADD *** 09/25/04 ******************************************
+    A* BEG ADD ***** 11/03/06 *************************************************
+     A            FR#DSD         3S 0
+     A                                      COLHDG('#DAYS FRM SRV DT')
+    A* END ADD ***** 11/03/06 *************************************************
+     A* Beg Add ***** 04/03/08 *************************************************
+     A            FRAPSI         1A
+     A                                      COLHDG('APC Payment Status' +
+     A                                      ' Indicator')
+     A            FRIMST         1A
+     A                                      COLHDG('Implant Status')
+     A* End Add ***** 04/03/08 *************************************************
+     A* Beg Add ***** 11/14/08 *************************************************
+     A            FRASPI         2A
+     A                                      COLHDG('ASC Payment' +
+     A                                      ' Indicator')
+     A* End Add ***** 11/14/08 *************************************************
+     A* Beg Add *** 10/24/14 ******************************************
+     A            FRREL     R               REFFLD(DS6)
+     A                                      COLHDG('RELEASE' 'NAME')
+     A            FRPROJ    R               REFFLD(DS6)
+     A                                      COLHDG('PROJECT /' 'SUPPORT')
+     A* End Add *** 10/24/14 ******************************************
+     A* Beg Add *** 09/01/15 ******************************************
+     A            FRBINVL   R               REFFLD(FLAG)
+     A                                      COLHDG('INVALID' 'CODE')
+     A* End Add *** 09/01/15 *****************************************
+     A*
+     A****** Beg Add *** 05/30/16 **********************************************
+     A            FRAPCSI   R
+     A                                      REFFLD(DS2)
+     A                                      COLHDG('OPPS APC Sts Ind')
+     A****** End Add *** 05/30/16 **********************************************
+     A****** Beg Add *** 12/09/16 **********************************************
+     A            FRCAPCSI  R
+     A                                      REFFLD(DS2)
+     A                                      COLHDG('Compared To' 'APC Sts Ind')
+     A****** End Add *** 05/30/16 **********************************************
+     A****** Beg Add *** 06/03/19 **********************************************
+     A            FRBFAD    R               REFFLD(FLAG)
+     A                                      COLHDG('Billed From' +
+     A                                      'Add-on code flag')
+     A*
+     A            FRCTPC    R               REFFLD(FLAG)
+     A                                      COLHDG('Compared To' +
+     A                                      'Primary Code')
+     A****** End Add *** 06/03/19 **********************************************
+     A*
+     A****** Beg Add *** 05/08/23 **********************************************
+     A            FREOBCD1       6A         COLHDG('EOB Code 1')
+     A*
+     A            FREOBCD2       6A         COLHDG('EOB Code 2')
+     A****** End Add *** 05/08/23 **********************************************

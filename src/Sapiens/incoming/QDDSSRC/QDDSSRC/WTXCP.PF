@@ -1,0 +1,213 @@
+     A*copyright('(c) 2012 StoneRiver, Inc. All rights reserved. -
+     A*StoneRiver is a trademark of StoneRiver, Inc.')
+     A*****************************************************************
+     A** CANCELLATION MAINTENANCE FILE
+     A** FILE:       WTXCP
+     A** DATE:       06/06/97
+     A** PROJECT:    WC704
+     A** PROGRAMMER: C:65
+     A*****************************************************************
+     A** REVISIONS:
+     A**
+     A** 09/05/18  C:291  PROJECT: WC2602
+     A**                  Add field Generate CX on State Removal.
+     A**
+     A** 06/21/12  C:282  PROJECT: WC2086
+     A**                  Add field Require Reinstatement Reason
+     A**                  Code.
+     A**
+     A** 09/02/05  C:61   PROJECT: WC1359 129WLT
+     A**                  Add fields to control printing of CX/Rein
+     A**                  Forms and Letters.
+     A**
+     A** 07/25/05  C:61   PROJECT: 133WBV
+     A**                  Add fields for Cancellation Letter
+     A**                  folders/documents.
+     A**
+     A** 01/13/99  C:87   PROJECT: 96WBO
+     A**                  Add 5 more comment fields.  Add 14 comment fields
+     A**                  of 50 characters to correspond to the 60 char
+     A**                  comment fields.
+     A**
+     A** 11/16/98  C:87   PROJECT: 96WAV
+     A**                  Add nine comment fields for special verbiage.
+     A**
+     A** 09/13/98  C:35   PROJECT: WC839
+     A**                  ADD FIELDS FOR STATE CANCELLATION FOLDER AND
+     A**                  DOCUMENT AND STATE REINSTATEMENT FOLDER AND
+     A**                  DOCUMENT
+     A**
+     A** 08/20/98  C:87  PROJECT 81WMR
+     A**                 ADDED XCCXLM - CANCELLATION LIMIT
+     A**                 ADDED XCCXMN - # OF MONTHS FOR CANX LIMIT
+     A**
+     A** 12/29/97  C:87  PROJECT WC752
+     A**                 ADD FIELD FOR ACORD DEFAULT REMARK1
+     A**
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PXC01                     TEXT('CANCELLATION MAINT FILE')
+     A            XCCO#     R               REFFLD(CO#)
+     A                                      COLHDG('COMPANY #')
+     A            XCFND     R               REFFLD(FND)
+     A                                      COLHDG('FUND #')
+     A            XCST      R               REFFLD(ST)
+     A                                      COLHDG('STATE')
+     A            XCEFDT    R               REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE' 'DATE')
+     A            XCNOTC    R               REFFLD(DYS)
+     A                                      COLHDG('CANCEL NOTICE DAYS')
+     A            XCADDM    R               REFFLD(DYS)
+     A                                      COLHDG('ADDITIONAL' 'MAILING DAYS')
+     A            XCSTNM    R               REFFLD(DS60)
+     A                                      COLHDG('STATE DEPARTMENT' 'NAME')
+     A            XCRFEE    R               REFFLD(A72)
+     A                                      COLHDG('REINSTATEMENT FEE')
+     A            XCUSER    R               REFFLD(USER)
+     A                                      COLHDG('USER')
+     A            XCPGM     R               REFFLD(PGM)
+     A                                      COLHDG('PROGRAM')
+     A            XCDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE')
+     A            XCTIME    R               REFFLD(TIME)
+     A                                      COLHDG('TIME')
+     A            XCIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL USER')
+     A            XCIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL PROGRAM')
+     A            XCIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL DATE')
+     A            XCITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL TIME')
+     A            XCDREM    R               REFFLD(DS60)
+     A                                      COLHDG('ACORD REMARK 1' 'DEFAULT')
+     A            XCCXLM    R               REFFLD(A30)
+     A                                      COLHDG('CANCELLATION LIMIT')
+     A            XCCXMN    R               REFFLD(A30)
+     A                                      COLHDG('# OF MTHS' 'FOR CX LIMIT')
+     A            XCCXFL    R               REFFLD(FLDR)
+     A                                      COLHDG('STATE CX FORM' 'FOLDER')
+     A            XCCXDC    R               REFFLD(DCID)
+     A                                      COLHDG('STATE CX FORM' 'DOCUMENT')
+     A            XCREFL    R               REFFLD(FLDR)
+     A                                      COLHDG('STATE REIN FORM' 'FOLDER')
+     A            XCREDC    R               REFFLD(DCID)
+     A                                      COLHDG('STATE REIN FORM' 'DOCUMENT')
+     A            XCCM01        60A         COLHDG('COMMENT 1')
+     A            XCCM02        60A         COLHDG('COMMENT 2')
+     A            XCCM03        60A         COLHDG('COMMENT 3')
+     A            XCCM04        60A         COLHDG('COMMENT 4')
+     A            XCCM05        60A         COLHDG('COMMENT 5')
+     A            XCCM06        60A         COLHDG('COMMENT 6')
+     A            XCCM07        60A         COLHDG('COMMENT 7')
+     A            XCCM08        60A         COLHDG('COMMENT 8')
+     A            XCCM09        60A         COLHDG('COMMENT 9')
+     A            XCCM10        60A         COLHDG('COMMENT 10')
+     A            XCCM11        60A         COLHDG('COMMENT 11')
+     A            XCCM12        60A         COLHDG('COMMENT 12')
+     A            XCCM13        60A         COLHDG('COMMENT 13')
+     A            XCCM14        60A         COLHDG('COMMENT 14')
+     A            XCC01B        60A         COLHDG('COMMENT 1 B')
+     A            XCC02B        60A         COLHDG('COMMENT 2 B')
+     A            XCC03B        60A         COLHDG('COMMENT 3 B')
+     A            XCC04B        60A         COLHDG('COMMENT 4 B')
+     A            XCC05B        60A         COLHDG('COMMENT 5 B')
+     A            XCC06B        60A         COLHDG('COMMENT 6 B')
+     A            XCC07B        60A         COLHDG('COMMENT 7 B')
+     A            XCC08B        60A         COLHDG('COMMENT 8 B')
+     A            XCC09B        60A         COLHDG('COMMENT 9 B')
+     A            XCC10B        60A         COLHDG('COMMENT 10 B')
+     A            XCC11B        60A         COLHDG('COMMENT 11 B')
+     A            XCC12B        60A         COLHDG('COMMENT 12 B')
+     A            XCC13B        60A         COLHDG('COMMENT 13 B')
+     A            XCC14B        60A         COLHDG('COMMENT 14 B')
+      *
+     A            XC#1LF        80A
+     A                                      COLHDG('CX LETTER FOLDER 1')
+     A            XC#1LD        12A
+     A                                      COLHDG('CX LETTER DOCUMENT 1')
+     A            XC#1DR         5A
+     A                                      COLHDG('CX LETTER DARTS CD 1')
+      *
+     A            XC#2LF        80A
+     A                                      COLHDG('CX LETTER FOLDER 2')
+     A            XC#2LD        12A
+     A                                      COLHDG('CX LETTER DOCUMENT 2')
+     A            XC#2DR         5A
+     A                                      COLHDG('CX LETTER DARTS CD 2')
+      *
+     A            XC#3LF        80A
+     A                                      COLHDG('CX LETTER FOLDER 3')
+     A            XC#3LD        12A
+     A                                      COLHDG('CX LETTER DOCUMENT 3')
+     A            XC#3DR         5A
+     A                                      COLHDG('CX LETTER DARTS CD 3')
+      *
+     A            XC#4LF        80A
+     A                                      COLHDG('CX LETTER FOLDER 4')
+     A            XC#4LD        12A
+     A                                      COLHDG('CX LETTER DOCUMENT 4')
+     A            XC#4DR         5A
+     A                                      COLHDG('CX LETTER DARTS CD 4')
+      *
+      *
+     A            XCCCLF        80A
+     A                                      COLHDG('CANCELLATION' +
+     A                                      'COVER LETTER' +
+     A                                      'FOLDER')
+     A            XCCCLD        12A
+     A                                      COLHDG('CANCELLATION' +
+     A                                      'COVER LETTER' +
+     A                                      'DOCUMENT')
+     A            XCCCRS         2A
+     A                                      COLHDG('CANCELLATION' +
+     A                                      'COVER LETTER' +
+     A                                      'REASON CODE')
+      *
+     A            XCCFLF        80A
+     A                                      COLHDG('CLIENT SPECIFIC' +
+     A                                      'CANCEL CONFIRM CERT' +
+     A                                      'LETTER FOLDER')
+     A            XCCFLD        12A
+     A                                      COLHDG('CLIENT SPECIFIC' +
+     A                                      'CANCEL CONFIRM CERT' +
+     A                                      'LETTER DOCUMENT')
+      *
+     A            XCCSCF        80A
+     A                                      COLHDG('CLIENT SPECIFIC' +
+     A                                      'CANCELLATION CERT' +
+     A                                      'LETTER FOLDER')
+     A            XCCSCD        12A
+     A                                      COLHDG('CLIENT SPECIFIC' +
+     A                                      'CANCELLATION CERT' +
+     A                                      'LETTER DOCUMENT')
+      *
+     A            XCCSRF        80A
+     A                                      COLHDG('CLIENT SPECIFIC' +
+     A                                      'REINSTATEMENT CERT' +
+     A                                      'LETTER FOLDER')
+     A            XCCSRD        12A
+     A                                      COLHDG('CLIENT SPECIFIC' +
+     A                                      'REINSTATEMENT CERT' +
+     A                                      'LETTER DOCUMENT')
+      *
+     A            XCRCLF        80A
+     A                                      COLHDG('CANCELLATION' +
+     A                                      'COVER LETTER' +
+     A                                      'FOLDER')
+     A            XCRCLD        12A
+     A                                      COLHDG('CANCELLATION' +
+     A                                      'COVER LETTER' +
+     A                                      'DOCUMENT')
+      *
+      ***** beg add ******* 06/21/12 **********************************
+      *
+     A            XCRRCD    R               REFFLD(FLAG)
+     A                                      COLHDG('REQUIRE' +
+     A                                      'REINSTATEMENT' 'REASON CODE')
+      *
+      ***** end add ******* 06/21/12 **********************************
+      ***** beg add ******* 09/05/18 **********************************
+     A            XCSTCX         1A         COLHDG('GENERATE CX ON ' +
+     A                                      'STATE REMOVAL FLAG')
+      ***** end add ******* 09/05/18 **********************************

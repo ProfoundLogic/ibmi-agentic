@@ -1,0 +1,59 @@
+     A* (c) 2018 StoneRiver, Inc. All rights Reserved.                 *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                  *
+     A**                                                               *
+     A** EDI Transmission Data - Permanent Impairment                  *
+     A******************************************************************
+     A* MODIFICATIONS:                                                 *
+     A*                                                                *
+     A* 05/30/18  C:274 Project: WC2515                                *
+     A*                 Added field are PIMLC                          *
+     A*                 Change the text on the file and record format  *
+     A*                                                                *
+     A******************************************************************
+     A                                      REF(WREFP)
+     A**
+     A*** Begin Change ***** 05/30/18 ***********************************************
+     A***       R PPI01                     TEXT('EDI A49 Format - PIP')
+     A          R PPI01                     TEXT('EDI - Perm Impairments')
+     A*** End Change ******* 05/30/18 ***********************************************
+     A            PICO#     R               REFFLD(CO#)
+     A            PIEXDT    R               REFFLD(DT)
+     A                                      COLHDG('EXTRACT DATE')
+     A*
+     A***    Transaction
+     A*
+     A            PITSET    R    3A         REFFLD(CODE)
+     A                                      TEXT('TRANSACTION SET ID')
+     A            PIMTC     R               REFFLD(CODE)
+     A                                      TEXT('MAINT TYPE CODE')
+     A            PITDT     R    8S 0       REFFLD(DT)
+     A                                      TEXT('MAINT TYPE CODE DATE')
+     A*
+     A***    Jurisdiction
+     A*
+     A            PIJRST    R               REFFLD(CODE)
+     A                                      TEXT('JURISDICTION')
+     A*
+     A*  ACCIDENT
+     A*
+     A            PIACLC    R   25A         REFFLD(DS20)
+     A                                      COLHDG('ADMIN' 'CLAIM' '#')
+     A*
+     A*  PERMANENT IMPAIRMENT OCCURS UP TO 8 TIMES
+     A*
+     A            PIIBPC         3          TEXT('IMP BODY PT CODE')
+     A                                      COLHDG('IMP BODY' 'PT CODE')
+     A            PIIMPP         5  2       TEXT('IMPAIRMENT PERCENTAGE')
+     A                                      COLHDG('IMP PCT')
+     A*
+     A            PISTAT    R               REFFLD(STAT)
+     A            PIUSER    R               REFFLD(USER)
+     A            PIPGM     R               REFFLD(PGM)
+     A            PITIME    R               REFFLD(TIME)
+     A            PIDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A*** Begin Add ***** 05/30/18 ***********************************************
+     A            PIIMLC    R               REFFLD(FLAG)
+     A                                      TEXT('Location code')
+     A                                      COLHDG('Location code')
+     A*** End Add ******* 05/30/18 ***********************************************

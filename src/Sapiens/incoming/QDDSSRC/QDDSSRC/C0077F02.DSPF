@@ -1,0 +1,248 @@
+     A*%%TS  SD  19961002  163549  FREEMANT    REL-V3R6M0  5716-PW1
+     A*  (C) Copyright Progressive Data Solutions, Inc., 2005
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A          R SCR01
+     A*%%TS  SD  19961002  161022  FREEMANT    REL-V3R6M0  5716-PW1
+     A                                      KEEP
+     A                                      ASSUME
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A            HREC          10A  H
+     A            HFLD          10A  H
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10   O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR01'
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A***
+     A  03                              4  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A  05                              4  2'CANCELLATION PENDING'
+     A                                      DSPATR(RI)
+     A  06                              4  2'REINSTATEMENT PENDING'
+     A                                      DSPATR(RI)
+     A                                  5  2'Policy   :'
+     A            SCPOL#    R        O  5 13REFFLD(POL#)
+     A                                      TEXT('POLICY NUMBER')
+     A                                  5 29'Claim #:'
+     A            SCCLM#    R        O  5 38REFFLD(CLM#)
+     A                                      TEXT('FULL CLAIM NUMBER')
+     A                                  5 55'Claimant Id:'
+     A            SCCLID    R     A  O  5 68REFFLD(CLID)
+     A                                      TEXT('CLAIMANT ID')
+     A                                  6  2'Name     :'
+     A            SCFIN     R        O  6 13REFFLD(DS40)
+     A                                      TEXT('DESCRIPTION')
+     A                                  6 55'Agent Code :'
+     A            SCAGT#    R     A  O  6 68REFFLD(AGT#)
+     A                                      TEXT('AGENT NUMBER')
+     A                                  7  2'Loss Date:'
+     A            SCLSDT    R        O  7 13REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A                                      TEXT('Date of Loss')
+     A                                  9  2'Claimant Name:'
+     A            SCCNAM    R        B  9 17REFFLD(NAME)
+     A                                      TEXT('NAME')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A  71                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 10  2'Address  . . :'
+     A            SCCADR    R        B 10 17REFFLD(ADR1)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                      TEXT('ADDRESS LINE 1')
+     A                                 11  2'City/St/Zip  :'
+     A            SCCCTY    R        B 11 17REFFLD(CTY)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                      TEXT('CITY')
+     A            SCCST     R        B 11 45REFFLD(ST)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A  72                                  ERRMSGID(CCR0505 *LIBL/CMESGG)
+     A                                      TEXT('STATE')
+     A            SCCZP1    R        B 11 51REFFLD(ZIP1)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      TEXT('ZIP 1')
+     A                                 11 57'-'
+     A            SCCZP2    R        B 11 59REFFLD(ZIP2)
+     A N09                                  DSPATR(UL)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      TEXT('ZIP 2')
+     A                                 12  2'Phone  . . . :'
+     A                                 12 17'('
+     A            SCCARA    R        B 12 19REFFLD(AREA)
+     A                                      EDTCDE(4)
+     A                                      TEXT('AREA CODE')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A                                 12 23')'
+     A            SCCPHN    R        B 12 26REFFLD(PHN#)
+     A                                      EDTWRD('   -    ')
+     A                                      TEXT('PHONE NUMBER')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A                                 12 40'SS# or FEIN:'
+     A            SCFEIN    R        B 12 53REFFLD(SS#)
+     A                                      TEXT('SOCIAL SECURITY NUMBER')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A                                 13  2'Date of Birth:'
+     A            SCCDOB    R     Y  B 13 17REFFLD(DT8)
+     A                                      TEXT('DATE')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A  73                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                 13 40'Sex  . . . :'
+     A            SCCSEX    R     A  B 13 53REFFLD(FLAG)
+     A                                      TEXT('FLAG')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A  29                                  ERRMSGID(CCR0643 *LIBL/CMESGG)
+     A                                 15  2'Employer Name:'
+     A            SCENAM    R     A  B 15 17REFFLD(NAME)
+     A                                      TEXT('NAME')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A                                 16  2'Address  . . :'
+     A            SCEAD1    R        B 16 17REFFLD(ADR1)
+     A                                      TEXT('ADDRESS LINE 1')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A                                 17  2'City/St/Zip  :'
+     A            SCECTY    R     A  B 17 17REFFLD(CTY)
+     A                                      TEXT('CITY')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A            SCEST     R     A  B 17 45REFFLD(ST)
+     A                                      TEXT('STATE')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A            SCEZP1    R     Y  B 17 50REFFLD(ZIP1)
+     A                                      EDTCDE(4)
+     A                                      TEXT('ZIP 1')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A                                 17 56'-'
+     A            SCEZP2    R     Y  B 17 58REFFLD(ZIP2)
+     A                                      EDTCDE(4)
+     A                                      TEXT('ZIP 2')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A                                 18  2'Phone  . . . :'
+     A                                 18 17'('
+     A            SCEARA    R     Y  B 18 19REFFLD(AREA)
+     A                                      EDTCDE(4)
+     A                                      TEXT('AREA CODE')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A                                 18 23')'
+     A            SCEPHN    R     Y  B 18 26REFFLD(PHN#)
+     A                                      EDTWRD('   -    ')
+     A                                      TEXT('PHONE NUMBER')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A                                 19  2'Injury/Damage:'
+     A            SCINDS    R        B 20  2REFFLD(DESC)
+     A                                      TEXT('DESCRIPTION')
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A*
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A*%%TS  SD  19961002  163549  FREEMANT    REL-V3R6M0  5716-PW1
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10   O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR02'
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R SCR03
+     A*%%TS  SD  19961002  163549  FREEMANT    REL-V3R6M0  5716-PW1
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10   O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR03'
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A***
+     A          R WDW01
+     A                                      WINDOW(7 13 10 54)
+     A                                      SETOF(90)
+     A                                      SETOF(71)
+     A                                      SETOF(72)
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A            HREC          10A  H
+     A            HFLD          10A  H
+     A                                  1 50'WDW01'
+     A                                  4 13'Claim number:'
+     A            SCCLM1    R     A  O  4 28REFFLD(CLM#)
+     A                                      TEXT('FULL CLAIM NUMBER')
+     A                                  6 13'Claimant ID :'
+     A            SCCLI1    R     A  B  6 28REFFLD(CLID)
+     A                                      TEXT('CLAIMANT ID')
+     A  71                                  ERRMSGID(CCR0963 *LIBL/CMESGG)
+     A  72                                  ERRMSGID(CCR0964 *LIBL/CMESGG)
+     A                                      DSPATR(UL)
+     A***************                   9 11'F3=Exit   F10=Search   F12=Cancel'
+     A                                  9 13'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)

@@ -1,0 +1,234 @@
+     A*****************************************************************
+     A** (C) COPYRIGHT FISERV INSURANCE SOLUTIONS, INC., 2006
+     A*****************************************************************
+     A** WC MANAGED CARE - TIME/MATERIALS DETAIL CHARGE FILE
+     A****************************************************************
+     A**  IMPORTANT NOTE:
+     A**   CHANGES TO THIS FILE MAY REQUIRE CHANGES TO THE FOLLOWING:
+     A**
+     A**          NXTMP
+     A****************************************************************
+     A** REVISIONS:
+     A*
+     A*  08/04/06 C:62 PROJECT: 139MEM
+     A*                ADD BILLING FLAG.
+     A*
+     A*  02/17/05 C:62 PROJECT: PRMGT
+     A*                PUT IN COMMENTS FOR TM10A3-5
+     A*
+     A*  05/07/03 C:62 PROJECT: SY081
+     A*                PUT IN COMMENT & VALID VALUES FOR TMFLG5-7
+     A*
+     A*  02/24/00 C:53 PROJECT: PR004
+     A*                PUT IN COMMENT & VALID VALUES FOR TMFLG4
+     A*                & TM10A2
+     A*
+     A*  10/25/99 C:62 PROJECT:MC216
+     A*                PUT IN COMMENT OF VALID VALUES FOR ATTYP1.
+     A*
+     A*  09/30/99 C:31  Project: MC176
+     A*                 V4: CM Nurse Unbilled Time
+     A*                 1. Add TMSYS
+     A*
+     A*  01/14/99  C:62  PROJECT: MC152
+     A*                  ADDED RECON NUMBER.
+     A*
+     A*  12/31/98  C:94  PROJECT: MC152
+     A*                  EXPAND INV# FROM 5 TO 9
+     A*
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PTM01                     TEXT('T/M DETAIL CHARGE FILE')
+     A            TMCO#     R               REFFLD(CO#)
+     A            TMSUB#    R               REFFLD(SUB#)
+     A            TMFND     R               REFFLD(FND)
+     A            TMFYR     R               REFFLD(FYR)
+     A            TMCASE    R               REFFLD(CASE)
+     A            TMEOB#    R               REFFLD(EOB#)
+     A            TMSTAF    R               REFFLD(DS3)
+     A                                      COLHDG('INTERVIEW' 'STAFF' 'CODE')
+     A            TMSVDT    R               REFFLD(DT)
+     A                                      COLHDG('SERVICE' 'DATE')
+     A            TMACT     R               REFFLD(STAF)
+     A                                      COLHDG('ACTIVITY' 'CODE')
+     A            TMMVFL    R               REFFLD(FLAG)
+     A                                      COLHDG('MEDICAL/VOCATIONAL' 'FLAG')
+     A            TMPNFL    R               REFFLD(FLAG)
+     A                                      COLHDG('PROF/NON-PROF' 'FLAG')
+     A            TMHRS     R               REFFLD(A42)
+     A                                      COLHDG('HOURS/TIME')
+     A            TMHRRT    R               REFFLD(HRRT)
+     A                                      COLHDG('HOURLY' 'RATE')
+     A            TMMILE    R               REFFLD(A40)
+     A                                      COLHDG('MILES DRIVEN')
+     A            TMMIRT    R               REFFLD(MIRT)
+     A                                      COLHDG('MILEAGE' 'RATE')
+     A            TMMSCG    R               REFFLD(MSCG)
+     A                                      COLHDG('MISC' 'CHARGE')
+     A            TMDESC    R               REFFLD(DS40)
+     A                                      COLHDG('CHARGE' 'DESC')
+     A*** BEG CHG *** 12/31/98 ****************************************
+     A            TMINV#    R               REFFLD(A90)
+     A**********  TMINV#    R               REFFLD(INV#)
+     A*** END CHG *** 12/31/98 ****************************************
+     A                                      COLHDG('INVOICE #')
+     A            TMSEQ#    R               REFFLD(A50)
+     A                                      COLHDG('DETAIL' 'RCD SEQ#')
+     A            TMHOLD    R               REFFLD(FLAG)
+     A                                      COLHDG('HOLD/RELEASE' 'FLAG' +
+     A                                      'H-HOLD," "-RELEASE')
+     A*           VALID VALUES: FTGTP VIA "MVFL"
+     A*
+     A            TMPCS     R               REFFLD(FLAG)
+     A                                      COLHDG('PAY CONSULTANT' '?')
+     A            TMPRTF    R               REFFLD(FLAG)
+     A                                      COLHDG('PRINTED ON' 'EXPNS RPT' +
+     A                                      'P-PRINTED," "-NOT')
+     A            TMBNON    R               REFFLD(FLAG)
+     A                                      COLHDG('BILLABLE/' +
+     A                                      'NON-BILLABLE')
+     A            TMEXPS    R               REFFLD(FLAG)
+     A                                      COLHDG('EXPENSE Y/N' '?')
+     A            TMFLG1    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED YET FLAG')
+     A*****************                     Clt: 68
+     A*****************                         Used to indicated status of
+     A*****************                         T/M charge when viewed s of
+     A*****************                         from WC-side in VIEW CHECK
+     A*****************                         Valid Values:
+     A*****************                           blank = no change
+     A*****************                           H     = item held for review
+     A*****************                           A     = item adjusted
+     A            TMFLG2    R               REFFLD(FLAG)
+     A                                      COLHDG('HOURLY RATE OVERRIDE')
+     A            TMFLG3    R               REFFLD(FLAG)
+     A                                      COLHDG('MILEAGE RATE' +
+     A                                      'OVERRIDE')
+     A            TMFLG4    R               REFFLD(FLAG)
+     A*** BEG CHG *** 02/24/00 **************************************
+     A************************************  COLHDG('NOT USED YET FLAG')
+     A                                      COLHDG('Spec Proj')
+     A*** CLT099: Valid values:
+     A***         *blank = Not a special project
+     A***              X = Special project
+     A***
+     A*** This field will be populated in the client coding rollover
+     A*** process as each line item's project# is compared against
+     A*** each clients "special projects" file.  This field will print
+     A*** on the trial invoice to remind the accountant to view this
+     A*** line item for special pricing.
+     A***
+     A*** END CHG *** 02/24/00 **************************************
+     A            TMFLG5    R               REFFLD(FLAG)
+     A                                      COLHDG('Flag 5')
+     A*           INHOUSE: Invoice this activity
+     A*
+     A            TMOIDT    R               REFFLD(DT)
+     A                                      COLHDG('ORIGINAL' 'INVOICE'+
+     A                                      'DATE')
+     A            TMTYPC    R               REFFLD(CODE)
+     A                                      COLHDG('TYPE OF' 'CONTACT')
+     A            TMBCH#        11          COLHDG('BATCH NUMBER')
+     A            TMSTAT    R               REFFLD(STAT)
+     A***                                     {D-DELETED(RE-BILL)}
+     A            TMUSER    R               REFFLD(USER)
+     A                                      COLHDG('MAINTENANCE' 'USER')
+     A            TMPGM     R               REFFLD(PGM)
+     A                                      COLHDG('MAINTENANCE' 'PGM')
+     A            TMTIME    R               REFFLD(TIME)
+     A                                      COLHDG('MAINTENANCE' 'TIME')
+     A            TMDT      R               REFFLD(DT)
+     A                                      COLHDG('MAINTENANCE' 'DATE')
+     A            TMIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            TMIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL' 'PGM')
+     A            TMITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL' 'TIME')
+     A            TMIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'DATE')
+     A            TMMSCD    R               REFFLD(DS4)
+     A                                      COLHDG('MED' 'SVC' 'CODE')
+     A            TMMSEQ    R               REFFLD(SEQ#)
+     A                                      COLHDG('MED' 'SVC' 'SEQ#')
+     A            TMFL06    R               REFFLD(FLAG)
+     A                                      COLHDG('Flag 6')
+     A*           INHOUSE: Defer this activity
+     A*
+     A            TMFL07    R               REFFLD(FLAG)
+     A                                      COLHDG('Flag 7')
+     A*           INHOUSE: Recognize Revenue
+     A*
+     A            TMFL08    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            TMFL09    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            TMFL10    R               REFFLD(FLAG)
+     A                                      COLHDG('NOT USED')
+     A            TM10A1    R               REFFLD(DS10)
+     A                                      COLHDG('SUB-SERVICE CODE')
+     A*
+     A* THE SUB-SERVICE CODE WILL BE HELD AT POSITIONS 1-4.
+     A*
+     A            TM10A2    R               REFFLD(DS10)
+     A*** BEG CHG *** 02/24/00 **************************************
+     A************************************  COLHDG('NOT USED')
+     A                                      COLHDG('Project code')
+     A*** END CHG *** 02/24/00 **************************************
+     A            TM10A3    R               REFFLD(DS10)
+     A                                      COLHDG('Client Coding Seq#')
+     A            TM10A4    R               REFFLD(DS10)
+     A                                      COLHDG('Client Coding' +
+     A                                      'Support Remark Code')
+     A            TM10A5    R               REFFLD(DS10)
+     A                                      COLHDG('Client Coding' +
+     A                                      'Support Seq#')
+     A            TM92N1    R               REFFLD(A92)
+     A                                      COLHDG('NOT USED')
+     A**                                    AUDIT/RECON:
+     A**                                      EOMB # THAT ADDT BILL AMOUNT
+     A**                                      IS APPLIED TO
+     A            TM92N2    R               REFFLD(A92)
+     A                                      COLHDG('NOT USED')
+     A***********************               Clt: 68
+     A***********************                 Used to track amount of adjustment
+     A***********************                  (see TMFLG1 info)
+     A            TM92N3    R               REFFLD(A92)
+     A                                      COLHDG('NOT USED')
+     A***********************               Clt: 68
+     A***********************                 Used to track amount of adjustment
+     A***********************                  (see TMFLG1 info)
+     A            TM92N4    R               REFFLD(A92)
+     A                                      COLHDG('NOT USED')
+     A            TM92N5    R               REFFLD(A92)
+     A                                      COLHDG('NOT USED')
+     A            TM60N1    R               REFFLD(A60)
+     A                                      COLHDG('NOT USED')
+     A            TM60N2    R               REFFLD(A60)
+     A                                      COLHDG('NOT USED')
+     A***********************               Clt: 68
+     A***********************                  Used to track date of either
+     A***********************                  Held item or Adjusted item
+     A***********************                  (see TMFLG1 info)
+     A            TM60N3    R               REFFLD(A60)
+     A                                      COLHDG('NOT USED')
+     A***********************               Clt: 68
+     A***********************                  Used to track date of either
+     A***********************                  Held item or Adjusted item
+     A***********************                  (see TMFLG1 info)
+     A            TM60N4    R               REFFLD(A60)
+     A                                      COLHDG('NOT USED')
+     A            TM60N5    R               REFFLD(A60)
+     A                                      COLHDG('NOT USED')
+     A*** BEGIN ADD *** 01/14/99 **************************************
+     A            TMRCN     R               REFFLD(A30)
+     A                                      COLHDG('RECON NUMBER')
+     A*** END   ADD *** 01/14/99 **************************************
+     A*** BEGIN ADD *** 09/30/99 **************************************
+     A            TMSYS     R               REFFLD(FLAG) COLHDG('SYSTEM ID')
+     A***              VALID VALUES: FTGTP VIA "SYS"
+     A*** END ADD *** 09/30/99 ****************************************
+     A*** BEGIN ADD *** 08/04/06 **************************************
+     A            TMBFLG    R               REFFLD(FLAG) COLHDG('BILLING FLAG')
+     A***              VALID VALUES: "Y", "N" AND BLANK
+     A*** END   ADD *** 08/04/06 **************************************

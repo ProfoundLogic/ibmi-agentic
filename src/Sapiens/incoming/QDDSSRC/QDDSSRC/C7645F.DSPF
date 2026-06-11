@@ -1,0 +1,141 @@
+     A*%%TS  SD  19980309  135208  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   LARGE LOSS REPORT PROMPT - DISPLAY                       **
+     A**                                                            **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF01
+     A                                      CF10
+     A                                      CF05
+     A                                      CF13
+     A                                      CF09
+     A          R SCR01
+     A*%%TS  SD  19980309  135208  COLEMANR    REL-V3R7M0  5716-PW1
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      SETOF(30)
+     A                                      SETOF(34)
+     A                                      SETOF(35)
+     A                                      SETOF(36)
+     A                                      SETOF(37)
+     A                                      SETOF(38)
+     A                                      SETOF(71)
+     A                                      SETOF(72)
+     A                                      SETOF(73)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C7645F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  4 10'As Of'
+     A            SCTDT     R        B  4 17REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A  21                                  ERRMSGID(CCR0502 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      TEXT('DATE')
+     A                                      CHECK(RB)
+     A                                  4 29'For Policies Renewing In'
+     A            SCDAY1    R        B  4 54REFFLD(DAYS)
+     A  30                                  ERRMSGID(CCR0836 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                  4 58'To'
+     A            SCDAY2    R        B  4 61REFFLD(DAYS)
+     A                                      OVRDTA
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A  37                                  ERRMSGID(CCR0836 *LIBL/CMESGG)
+     A  38                                  ERRMSGID(CCR0855 *LIBL/CMESGG)
+     A                                  4 65'Days'
+     A                                  6 21'County Code Order ..............:'
+     A            SCBYC     R        B  6 60REFFLD(FLAG)
+     A  26                                  ERRMSGID(CCR0750 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0834 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0765 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                  7 24'Selected County Code ........:'
+     A            SCSCCD    R        B  7 59REFFLD(CODE)
+     A  71                                  DSPATR(PC)
+     A  27                                  ERRMSGID(CCR0660 *LIBL/CMESGG)
+     A  28                                  ERRMSGID(CCR0834 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                  9 21'Agent Order ....................:'
+     A            SCBYA     R        B  9 60REFFLD(FLAG)
+     A  22                                  ERRMSGID(CCR0750 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0834 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0765 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 10 24'Selected Agent ..............:'
+     A            SCSAGT    R        B 10 56REFFLD(AGT#)
+     A  72                                  DSPATR(PC)
+     A  29                                  ERRMSGID(CCR0834 *LIBL/CMESGG)
+     A  34                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A                                 12 21'Section Code ...................:'
+     A            SCCC      R        B 12 59REFFLD(CDE)
+     A  25                                  ERRMSGID(CCR0630 *LIBL/CMESGG)
+     A                                      TEXT('SECTION CODE')
+     A                                 13 63'(Default is all)'
+     A                                 14  7'To Run Report In County Code Order-
+     A                                      ; Enter An "X" On The Appropriate L-
+     A                                      ine.'
+     A                                 15 11'Enter A Selected County Code Or Le-
+     A                                      ave Blank For All County Codes.'
+     A                                 16  7'To Run Report In Agent Order; Ente-
+     A                                      r An "X" On The Appropriate Line.'
+     A                                 17 11'Enter A Selected Agent Or Leave Bl-
+     A                                      ank For All Agents.'
+     A                                 19  7'Enter Loss Ratio And/Or Claim Freq-
+     A                                      uency For Early Warning Report To P-
+     A                                      rint.'
+     A                                 21 10'Loss Ratio %:'
+     A            SCEWLS    R        B 21 24REFFLD(A72)
+     A                                      EDTCDE(4)
+     A                                      CHECK(RB)
+     A  35                                  ERRMSGID(CCR0724 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 21 49'Claim Freq:'
+     A            SCEWCF    R        B 21 61REFFLD(A72)
+     A                                      CHECK(RB)
+     A  36                                  ERRMSGID(CCR0724 *LIBL/CMESGG)
+     A                                      OVRDTA
+     A                                 23  1'F1=Exit'
+     A                                      COLOR(BLU)
+     A                                 23 13'F9=Agent search'
+     A                                      COLOR(BLU)
+     A                                 23 34'F10=Table search'
+     A                                      COLOR(BLU)
+     A                                 23 56'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

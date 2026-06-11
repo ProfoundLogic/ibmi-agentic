@@ -1,0 +1,63 @@
+     A** (C) COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC. 1991, 1994
+     A**
+     A** WORKERS' COMP BSI-17 WORK FILE
+     A*****************************************************************
+     A*  REVISIONS:                                                   *
+     A*                                                               *
+     A*  10/07/03 C:53 PROJECT: 51WFA                                 *
+     A*                ADD FIELD FOR THE STATE RISK ID                *
+     A*                                                               *
+     A*  04/06/94 C:09 PROJECT WC291                                  *
+     A*                ADDED CASE NUMBER (B7CASE) SO THAT ERM-6 PGM   *
+     A*                (W8401R) WILL UNIQUELY LIST EACH CLAIM         *
+     A*                EVEN IF TWO CLAIMS HAVE THE SAME SS# AND       *
+     A*                ACCIDENT DATE.  THIS VALUE WIL BE LOADED       *
+     A*                IN BSI-17 BUILD WORKFILE PGM (W8200R).         *
+     A*                                                               *
+     A*  11/16/95 C:30 Project:  WC385                                *
+     A*                Added 2 fields to handle the NCCI Data         *
+     A*                Reporting changes:  B7PFDT (Policy Effective   *
+     A*                Date) and B7EXCS (Excess Claim Flag)           *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PB701                     TEXT('BSI-17 WORK FILE')
+     A            B7CO#     R               REFFLD(CO#)
+     A            B7FND     R               REFFLD(FND)
+     A            B7FYR     R               REFFLD(FYR)
+     A            B7ACCD    R               REFFLD(DT)
+     A            B7EOPD    R               REFFLD(DT)
+     A            B7EMP#    R               REFFLD(EMP#)
+     A            B7DIV     R               REFFLD(DIV)
+     A            B7SS#     R               REFFLD(SS#)
+     A            B7#CLM         3  0
+     A                                      COLHDG('NUMBER OF CLAIMS')
+     A            B7NCCI    R               REFFLD(CODE)
+     A            B7CLAS    R               REFFLD(CLAS)
+     A            B7REP#         1  0
+     A                                      COLHDG('REPORT #')
+     A            B7STAT         1  0
+     A                                      COLHDG('CLAIM STATUS')
+     A            B7MEDA        11  2
+     A                                      COLHDG('MED PAID')
+     A            B7INDA        11  2
+     A                                      COLHDG('IND PAID')
+     A            B7ALAE        11  2
+     A                                      COLHDG('IND PAID')
+     A            B7CATA         1
+     A                                      COLHDG( 'CATA LOSS')
+     A            B7#PAG         3  0
+     A                                      COLHDG( 'NUM OF LINES')
+     A*** BEGIN ADD *** 04/06/94 ******************************************
+     A            B7CASE    R               REFFLD(CASE)
+     A*** END ADD ***** 04/06/94 ******************************************
+     A*** BEGIN ADD *** 11/16/95 ***
+     A            B7PFDT    R               REFFLD(DT)
+     A                                      COLHDG('Policy' 'Effective' 'Date')
+     A            B7EXCS    R               REFFLD(FLAG)
+     A                                      COLHDG('Excess' 'Claim' 'Flag')
+     A*** END   ADD *** 11/16/95 ***
+     A*** BEG ADD *** 10/07/03 ****************************
+     A            B7SEMP    R               REFFLD(RISK#)
+     A                                      COLHDG('STATE RISK ID')
+     A*** END ADD *** 10/07/03 ****************************

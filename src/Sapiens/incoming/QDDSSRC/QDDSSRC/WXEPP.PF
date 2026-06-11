@@ -1,0 +1,146 @@
+      * (c) 2024 Sapiens. All Rights Reserved.                             *
+     A*
+     A* WORKERS' COMP EMPLOYER PAYROLL WORK FILE
+     A*****************************************************************
+     A* REVISIONS                                                     *
+     A*                                                               *
+     A* 06/20/24 C:65  PROJECT: PHW#115225 (SUNZ)                     *
+     A*                ADD PRORATED FIELDS FOR EXPOSURE AND PREMIUM.  *
+     A*                                                               *
+     A* 06/17/24  C:344 PROJECT: WC2952                               *
+     A*                 Expand rate field from 7.2 to 8.3 zoned.      *
+     A*                                                               *
+     A* 08/16/17 C:65  PROJECT: 150WAO                                *
+     A*                ADD EMPLOYER LINK CODE FOR PAYROLL RECORDS.    *
+     A*                                                               *
+     H* 07/27/17  C:62  Project: 150WAL                               *
+     H*                 Add Territorial Differential Factor           *
+     A*                                                               *
+     H* 11/01/16  C:65  PROJECT: 114WCQ                               *
+     H*                 ADD # OF EMPLOYEES TO FILE.                   *
+     H*                                                               *
+     A* 04/20/09  C:190  Project: WC1473                               *
+     A*                  Conpiled only.                                *
+     A*                                                                *
+     H* 01/22/08  C:65  PROJECT: WC1627                               *
+     H*                 ADD FIELDS FOR NET RATE AND NET PREMIUM.      *
+     H*                                                               *
+     H* 10/12/04 C:09  PROJECT: 132WBI                                *
+     H*                Add EPEXT field so that it can print on the    *
+     H*                CA policy page.                                *
+     A*                                                               *
+     A* 11/14/02 C:65 PROJECT WC1099                                  *
+     A*               ADD STAT CODE FIELD FOR TERRITORY DIFFERENTIAL. *
+     A*                                                               *
+     H* 08/30/01  C:90 PROJECT: WC1052                                *
+     H*                Expand premium fields from 9.2 to 11.2         *
+     H*                                                               *
+     H* 08/15/01  C:90  PROJECT: WC1035                               *
+     H*                 Expand rate field from 5.2 to 7.2             *
+     H*                                                               *
+     A* 01/30/01  C:61  PROJECT 114WAK                                *
+     A*                 Add field for Exposure Link.                  *
+     A*                                                               *
+     A* 07/14/00 C:53 PROJECT: 95WER                                  *
+     A*               ADDED FIELDS FOR NJ WCPOLS                      *
+     A*                                                               *
+     A* 12/03/97 C:65 PROJECT WC702                                   *
+     A*               ADDED PAYROLL STATE TO THE LIST.                *
+     A*                                                               *
+     A* 06/27/94 C:24 PROJECT WC313                                   *
+     A*               PAYROLL SUMMARY WORK FILE TO COMBINE DIVISIONS. *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PEP01                     TEXT('EMPLOYER PAYROLL WORK FILE')
+     A            EPCO#     R               REFFLD(CO#)
+     A            EPFND     R               REFFLD(FND)
+     A            EPFYR     R               REFFLD(FYR)
+     A            EPEMP#    R               REFFLD(EMP#)
+     A            EPCLAS    R               REFFLD(CLAS)
+     A            EPEAPR    R               REFFLD(A112)
+     A                                      COLHDG('EST' 'ANNUAL' 'PAYROLL')
+     A            EPEFDT    R               REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE' 'DATE')
+     A            EPFRAV    R               REFFLD(DT)
+     A                                      COLHDG('ANNV START' 'DATE')
+     A            EPTOAV    R               REFFLD(DT)
+     A                                      COLHDG('ANNV END' 'DATE')
+     A            EPADLD    R               REFFLD(A92)
+     A                                      COLHDG('ADDITIONAL' ' LOAD VALUE')
+      **** BEGIN CHG **** 08/30/01 ************************************
+     A*********** EPEMPR    R               REFFLD(A92)
+     A            EPEMPR    R               REFFLD(A112)
+      **** END   CHG **** 08/30/01 ************************************
+     A                                      COLHDG('EST MAN PREM')
+     A            EPSPEC    R               REFFLD(FLAG)
+     A                                      COLHDG('SPECIAL DES')
+      **** BEGIN CHG **** 06/17/24 ************************************
+      **** BEGIN CHG **** 08/15/01 ************************************
+     A*********** EPARAT    R               REFFLD(PC52)
+     A*********** EPARAT    R               REFFLD(A72)
+      **** END   CHG **** 08/15/01 ************************************
+     A            EPARAT         8S 3
+      **** END   CHG **** 06/17/24 ************************************
+     A                                      COLHDG('ADJUSTED RATE')
+     A            EPDESC    R               REFFLD(DS30)
+     A                                      COLHDG('CLASSIFICATION')
+     A            EPDISC    R               REFFLD(A112)
+     A                                      COLHDG('93 RATE CRED')
+     A            EPPST     R               REFFLD(ST)
+     A                                      COLHDG('STATE')
+      **** BEG ADD **** 07/14/00 ************************************
+     A            EPRTCD    R               REFFLD(DS3)
+     A                                      COLHDG('RATE SET CODE')
+      **** END ADD **** 07/14/00 ************************************
+     A****** BEG ADD ***** 01/30/01 ***********************************
+      *
+     A            EPELCD         5S 0
+     A                                      COLHDG('EXPOSURE' 'LINK')
+      *
+     A****** END ADD ***** 01/30/01 ***********************************
+      **** BEG ADD **** 11/14/02 ************************************
+     A            EPCODE    R               REFFLD(CLAS)
+     A                                      COLHDG('STATISTICAL CODE')
+      **** END ADD **** 11/14/02 ************************************
+     A*** BEG ADD ***** 10/12/04 ***********************************************
+     A            EPEXT     R               REFFLD(CLA2)
+     A                                      COLHDG('CLASS DESC' 'EXTENSION')
+     A*** END ADD ***** 10/12/04 ***********************************************
+     A***** BEGIN ADD *** 01/22/08 *********************************************
+     A            EPENTR         9S 4
+     A                                      COLHDG('ESTIMATED NET RATE')
+     A            EPENTP    R     S         REFFLD(A112)
+     A                                      COLHDG('ESTIMATED NET PREM')
+     A            EPANTR         9S 4
+     A                                      COLHDG('AUDITED NET RATE')
+     A            EPANTP    R     S         REFFLD(A112)
+     A                                      COLHDG('AUDITED NET PREM')
+     A***** END ADD ***** 01/22/08 *********************************************
+     A***** BEGIN ADD *** 11/01/16 *********************************************
+     A            EPECNT         7S 0
+     A                                      COLHDG('# OF EMPLOYEES')
+     A***** END ADD ***** 11/01/16 *********************************************
+     A***** BEGIN ADD *** 11/01/16 *********************************************
+     A            EPTDF          5S 4       COLHDG('Territorial' -
+     A                                      ' Differential Factor')
+     A***** END ADD ***** 11/01/16 *********************************************
+     A*** BEGIN ADD ***  08/16/17  ********************************************
+     A            EPLINK    R               REFFLD(DS15)
+     A                                      COLHDG('EMPLOYER LINK CODE')
+     A*** END ADD *****  08/16/17  ********************************************
+     A*** BEGIN ADD ***  06/20/24  ********************************************
+     A            EPPROEXP      11S 0       COLHDG('PRORATED EXPOSURE')
+     A            EPPROPRM      11S 0       COLHDG('PRORATED PREMIUM')
+     A            EPPROADL      11S 0       COLHDG('PRORATED ADDL LOAD')
+     A*** END ADD *****  06/20/24  ********************************************
+     A          K EPCO#
+     A          K EPFND
+     A          K EPFYR
+     A          K EPEMP#
+     A          K EPEFDT
+     A          K EPCLAS
+     A          K EPSPEC
+     A          K EPFRAV
+     A          K EPTOAV
+     A          K EPARAT

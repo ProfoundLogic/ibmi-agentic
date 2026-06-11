@@ -1,0 +1,478 @@
+      * (c) 2014 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*                                                               *
+     A*  FEE SCHEDULE DETAIL CHARGE WORKFILE FILE                     *
+     A**********************************************************************
+     A*                                                               *
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A*   06/03/19 C:212  Project: NY046                              *
+     A*                   Add field CAAddOn                           *
+     A*                                                               *
+     A*   04/25/18 C:180  Project: 114MJS                             *
+     A*                   Increase size of certain fields.            *
+     A*                                                               *
+     A*   06/02/17 C:180  Project:FL096 Florida 2017 Physicians FS    *
+     A*                   Added field : CApayMRA - Pay MRA indicator. *
+     A*                                                               *
+     A*   05/30/16 C:309  Project:FS497 (OPPS status indicator Update)*
+     A*                   Added new field                             *
+     A*                   "CAAPCSI - OPPS APC Status Indicator"       *
+     A*                                                               *
+     A*   06/25/14 C:280 PROJECT GA034                                *
+     A*                 Add New field CAAPC                           *
+     A*                                                               *
+     A*   02/06/09 C:079 Project: TX043                               *
+     A*                  Added new field CATOS                        *
+     A*                                                               *
+     A*   11/14/08 C:212 Project: TX043                               *
+     A*                  Added new field CAASPI                       *
+     A*                                                               *
+     A*   04/07/08 C:198 Project: TX039                               *
+     A*                  Added field to store the DRG payment type   *
+     A*                                                               *
+     A*   04/03/08 C:198 Project: TX039                               *
+     A*                  Added CAAPSI and CAIMST.                     *
+     A*                                                               *
+     A*   11/06/07 C:198 Project: FS308                               *
+     A*                  Added lowest quartile/51+ miles              *
+     A*                                                               *
+     A*   07/03/05 C:79 Project: TN002                                *
+     A*                 Add billed 'Stop loss reached'                *
+     A*                 Add pay PT/OT fields                          *
+     A*                                                               *
+     A*   04/26/05 C:79 Project: MI001                                *
+     A*                 Add billed "Minor procedure" field            *
+     A*                                                               *
+     A*   12/07/04 C:79 Support: 44872                                *
+     A*                 Add billed Conversion factor                  *
+     A*                                                               *
+     A*   09/26/04 C:79 Project:TX027                                 *
+     A*                 Add billed HPSA eligibility field             *
+     A*                                                               *
+     A*   09/25/03 C:79 Project:TX020                                 *
+     A*                 Add fields for rural/urban zip area and mod   *
+     A*                 indicators                                    *
+     A*                                                               *
+     A*   04/07/03 C:79 PROJ:PA020                                    *
+     A*                 Add field for P/T Per Visit Rates             *
+     A*                                                               *
+     A*   10/17/02 C:79 PROJ:FS239                                    *
+     A*                 Add field for Pharmacy Avg Wholesale Price    *
+     A*                                                               *
+     A*   10/04/02 C:79 PROJ:CA001                                    *
+     A*                 Add field for billed Cascading                *
+     A*                                                               *
+     A*   11/29/01 C:79 PROJ:GA015G                                   *
+     A*                 Add field for billed DRG calc exempt.         *
+     A*                                                               *
+     A*   07/20/01 C:79 PROJ:114MCG                                   *
+     A*                 Add field to hold PA hospital amounts         *
+     A*                                                               *
+     A*   04/08/00 C:79 Support:MC095/22094                           *
+     A*                 Add billed from MRI/CAT field                 *
+     A*                                                               *
+     A*   02/17/00 C:79 PROJ:NE007                                    *
+     A*                 Add bundled code flag                         *
+     A*                                                               *
+     A*   12/02/99 C:79 PROJ:48MDA                                    *
+     A*                 Add Lenght of stay fields                     *
+     A*                                                               *
+     A*   11/04/99 C:79 PROJ:KS012                                    *
+     A*                 Add Peer Group fields                         *
+     A*                                                               *
+     A*   09/29/99 C:79 PROJ:AL036                                    *
+     A*                 Add drug type field either generic or Brand   *
+     A*                                                               *
+     A*   08/09/99 C:79 PROJ:FL019                                    *
+     A*                 Add 4 additional modifier fields              *
+     A*                                                               *
+     A*   07/01/99 C:79 PROJ:KY011                                    *
+     A*                 Add field to hold NDC for pharmacy            *
+     A*                                                               *
+     A*   06/15/99 C:79 PROJ:MS007                                    *
+     A*                 Add field to hold Place of Service            *
+     A*                                                               *
+     A*   12/16/98 C:79 PROJ:MS006                                    *
+     A*                 Add field to hold ASC Facility Fee            *
+     A*                                                               *
+     A*   06/01/98 C:79 SUPP:MC095 SEQ:11636                          *
+     A*                                                               *
+     A**********************************************************************
+     A**
+     A                                      REF(FSREFP)
+     A          R PCA01                     TEXT('CASE DETAIL FILE')
+     A            CACO#     R               REFFLD(CO#)
+     A            CAFND     R               REFFLD(FND)
+     A            CAFYR     R               REFFLD(FYR)
+     A            CACASE    R               REFFLD(CASE)
+     A            CACSCD    R               REFFLD(CSCD)
+     A            CAFDAT    R               REFFLD(DT)
+     A                                      COLHDG('FROM SERV' 'DATE')
+     A            CATDAT    R               REFFLD(DT)
+     A                                      COLHDG('TO SERV' 'DATE')
+     A            CARDAT    R               REFFLD(DT)
+     A                                      COLHDG('DATE RECIEVED')
+     A            CAIPOP    R               REFFLD(FLAG)
+     A                                      COLHDG('IN/OUT PATIENT' 'FLAG')
+     A            CAFEIN    R               REFFLD(FEIN)
+     A                                      COLHDG('PROVIDERS' 'FEIN')
+     A            CAMOD     R               REFFLD(MOD)
+     A                                      COLHDG('PROVIDERS' 'MODIFIER')
+     A            CAPRTY    R               REFFLD(FLAG)
+     A                                      COLHDG('PROVIDER' 'TYPE')
+     A            CATRCD    R               REFFLD(CODE)
+     A                                      COLHDG('PAYMENT' 'CODE')
+     A            CASVCD    R               REFFLD(SVCD)
+     A            CAPMOD    R               REFFLD(PMOD)
+     A            CACPT4    R               REFFLD(CPT4)
+     A            CAICD9    R               REFFLD(ICD9)
+     A            CAANMN    R               REFFLD(A52)
+     A                                      COLHDG('ANESTHISIA' 'UNITS')
+     A            CAUNTS    R               REFFLD(A52)
+     A                                      COLHDG('UNITS OF' 'THE CHARGES')
+     A            CATOTC    R               REFFLD(A92)
+     A                                      COLHDG('TOTAL' 'CHARGES')
+     A            CATOTA    R               REFFLD(A92)
+     A                                      COLHDG('TOTAL' 'ALLOWED')
+     A            CATOTD    R               REFFLD(A92)
+     A                                      COLHDG('TOTAL' 'DIS-ALLOWED')
+     A            CAEOMB    R               REFFLD(SPEC)
+     A                                      COLHDG('EOMB' 'CODE')
+     A            CATOTP    R               REFFLD(A92)
+     A                                      COLHDG('TOTAL' 'PAID')
+     A            CADSEQ    R               REFFLD(SEQ#)
+     A                                      COLHDG('DETAIL' 'SEQUENCE #')
+     A            CADELF    R               REFFLD(FLAG)
+     A                                      COLHDG('DELETE' 'FLAG')
+     A            CAFLAG    R               REFFLD(FLAG)
+     A                                      COLHDG('DISP' 'FLAG' 'P=PND')
+     A            CACHK#    R               REFFLD(CHK#)
+     A                                      COLHDG('CHECK # IF' 'CHK WRITTEN')
+     A            CAEOB#    R               REFFLD(EOB#)
+     A                                      COLHDG('EOMB' 'NUMBER')
+     A            CAPART    R               REFFLD(CODE)
+     A                                      COLHDG('PART' 'CODE')
+     A            CAP1      R               REFFLD(CODE) TEXT('PAY CODE 1')
+     A                                      COLHDG('BR-2' 'CODE')
+     A            CASS#     R               REFFLD(SS#)
+     A            CAACDT    R               REFFLD(DT)
+     A                                      COLHDG('ACCIDENT' 'DATE')
+     A            CASTAT    R               REFFLD(STAT)
+     A            CAUSER    R               REFFLD(USER)
+     A            CAPGM     R               REFFLD(PGM)
+     A            CATIME    R               REFFLD(TIME)
+     A            CADT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            CAIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            CAIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'ENTRY' 'DATE')
+     A            CADXR     R               REFFLD(DXR)
+     A                                      COLHDG('DIAG' 'REF#')
+     A            CADCS#    R               REFFLD(SEQ#) COLHDG('DIAG.' +
+     A                                      'CODE SEQ#')
+     A            CALTR#    R               REFFLD(FEIN) COLHDG('LETTER' +
+     A                                      'NUMBER')
+     A            CARCFL    R               REFFLD(FLAG) COLHDG('REASONABLE' +
+     A                                      'AND CUSTOMARY' 'Y/blank')
+     A            CASUB#    R               REFFLD(SUB#) COLHDG('SUBSCRIBER')
+     A            CAOTHR    R               REFFLD(A92)
+     A                                      COLHDG('OTHER' 'REDUCTIONS' +
+     A                                      'AMOUNT')
+     A            CANDIS    R               REFFLD(A92)
+     A                                      COLHDG('NETWORK' 'DISCOUNT' +
+     A                                      'REDUCTION')
+     A            CARDTP    R               REFFLD(CODE) COLHDG('OTHER' +
+     A                                      'REDUCTIONS' 'TYPE')
+     A            CABRSV    R               REFFLD(SVCD) COLHDG('BEST +
+     A                                      REFLECTS' 'SRV CODE')
+     A            CABRPM    R               REFFLD(PMOD) COLHDG('BEST +
+     A                                      REFLECTS' 'PROC. MODIFER')
+     A            CABRPC    R               REFFLD(CPT4) COLHDG('BEST +
+     A                                      REFLECTS' 'PROC. CODE(CPT4)')
+     A            CABRAM    R               REFFLD(A52)  COLHDG('BEST +
+     A                                      REFLECTS' 'ANEST. MINS')
+     A            CABRUN    R               REFFLD(A52) COLHDG('BEST +
+     A                                      REFLECTS' 'UNITS OF CHGS')
+     A            CABRTC    R               REFFLD(A92) COLHDG('BEST +
+     A                                      REFLECTS' 'CHG AMOUNT')
+     A            CAZIPA    R               REFFLD(ZIPA) COLHDG('GEO ZIP')
+     A            CAAST     R               REFFLD(ST) COLHDG('ADJUDICATION-
+     A                                       STATE')
+     A            CADIFF    R               REFFLD(A92) COLHDG('FSMRA/' +
+     A                                      'PAYMENT' 'DIFFERENCE')
+     A            CABRPT    R               REFFLD(CODE) COLHDG('BEST +
+     A                                      REFLECTS' 'PART CODE')
+     A            CADAFL    R               REFFLD(FLAG) COLHDG('DISALLOWED' +
+     A                                      'FLAG')
+     A            CAMRA     R               REFFLD(A92) COLHDG('CODE MRA')
+     A            CABREC    R               REFFLD(SPEC) COLHDG('BEST +
+     A                                      REFLECTS' 'EOMB CODE')
+     A            CABRP     R               REFFLD(A52) COLHDG('BEST +
+     A                                      REFLECTS' 'PERCENTAGE')
+     A            CATYPE    R               REFFLD(FLAG) COLHDG('CODE' +
+     A                                      'TYPE')
+     A            CAINVL    R               REFFLD(FLAG) COLHDG('INVALID CODE')
+     A            CAAMT     R               REFFLD(A92) COLHDG('CHARG/MRA LOW')
+     A            CATECH    R               REFFLD(A92) COLHDG('TECH AMT')
+     A            CAPROF    R               REFFLD(A92) COLHDG('PROF AMT')
+     A            CAANAM    R               REFFLD(A92) COLHDG('ANES A MT')
+     A            CAANES    R               REFFLD(FLAG) COLHDG('ANES FLAG')
+     A            CAFOLU    R               REFFLD(DYS) COLHDG('FOLLOW UP DAYS')
+     A            CASURG    R               REFFLD(FLAG) COLHDG('SURG FLAG')
+     A            CASUPP    R               REFFLD(FLAG) COLHDG('SUPPLIES')
+     A            CAASC     R               REFFLD(A92) COLHDG('ASC  A MT')
+     A            CARPT     R               REFFLD(FLAG) COLHDG('BY REPROT FLG')
+     A            CABAST    R               REFFLD(FLAG) COLHDG('BILL AST PROC')
+     A            CASEPP    R               REFFLD(FLAG) COLHDG('SEPERATE PROC')
+     A            CASPCD         3A
+     A                                      COLHDG('SPECIALTY CODE')
+     A            CAPOS     R               REFFLD(FLAG)
+     A                                      COLHDG('PLACE OF SERVICE')
+     A            CAPRT     R               REFFLD(FLAG)
+     A                                      COLHDG('BODY PART')
+     A            CAMD50         3P 2
+     A                                      COLHDG('MODIFIER 50')
+     A            CAMD51         3P 2
+     A                                      COLHDG('MODIFIER 51')
+     A            CAMD54         3P 2
+     A                                      COLHDG('MODIFIER 54')
+     A            CAMD55         3P 2
+     A                                      COLHDG('MODIFIER 55')
+     A            CAMD56         3P 2
+     A                                      COLHDG('MODIFIER 56')
+     A            CAMD62         3P 2
+     A                                      COLHDG('MODIFIER 62')
+     A            CAMD66         3P 2
+     A                                      COLHDG('MODIFIER 66')
+     A            CAMD80         3P 2
+     A                                      COLHDG('MODIFIER 80')
+     A            CAMD81         3P 2
+     A                                      COLHDG('MODIFIER 81')
+     A            CAMD82         3P 2
+     A                                      COLHDG('MODIFIER 82')
+     A            CAHTOS         3A
+     A                                      COLHDG('HOS TOS')
+     A            CANCT     R               REFFLD(FLAG)
+     A                                      COLHDG('NO CUT')
+     A            CACHI     R               REFFLD(A92)
+     A                                      COLHDG('CHIROPRACTIC')
+     A            CAOPT     R               REFFLD(A92)
+     A                                      COLHDG('OPT')
+     A            CAPCF     R               REFFLD(FLAG)
+     A                                      COLHDG('PROF COMP FLAG')
+     A            CAAMB     R               REFFLD(FLAG)
+     A                                      COLHDG('AMPERSAND FLAG')
+     A            CATCF     R               REFFLD(FLAG)
+     A                                      COLHDG('TECH COMP FLAG')
+     A            CARUDT    R               REFFLD(DT7)
+     A                                      COLHDG('ADJ EFFECT DATE')
+     A            CASYS     R               REFFLD(FLAG)
+     A                                      COLHDG('SYSTEM TYPE')
+      *** BEG ADD 06/01/98 ********************************************
+     A            CAFSR     R               REFFLD(FLAG)
+     A                                      COLHDG('FEE SCHED. REIM.')
+      *** END ADD 06/01/98 ********************************************
+      *** BEG ADD 12/16/98 ********************************************
+     A            CAFACF    R               REFFLD(A92) COLHDG('FACILITY FEE')
+      *** END ADD 12/16/98 ********************************************
+      *** BEG ADD 06/15/99 ********************************************
+     A            CAPLAC         3A
+     A                                      COLHDG('PLACE OF SERVICE')
+      *** END ADD 06/15/99 ********************************************
+      *** BEG ADD 07/01/99 ********************************************
+     A            CANDC         11A
+     A                                      COLHDG('NATIONAL DRUG CODE')
+      *** END ADD 07/01/99 ********************************************
+      *** BEG ADD 08/09/99 ********************************************
+     A            CAMOD1    R               REFFLD(PMOD)
+     A            CAMOD2    R               REFFLD(PMOD)
+     A            CAMOD3    R               REFFLD(PMOD)
+     A            CAMOD4    R               REFFLD(PMOD)
+      *** END ADD 08/09/99 ********************************************
+      *** BEG ADD 08/09/99 ********************************************
+     A            CAPTYP         2A
+     A                                      COLHDG('TYPE OF DRUG'      )
+      *** END ADD 08/09/99 ********************************************
+      *** BEG ADD 11/04/99 ********************************************
+     A            CAPGRP         5A
+     A                                      COLHDG('PEER GROUP'        )
+     A            CALTRM    R               REFFLD(A92) COLHDG('LOW TRIM VALUE')
+     A            CAHTRM    R               REFFLD(A92)
+     A                                      COLHDG('HIGH TRIM VALUE')
+      *** END ADD 11/04/99 ********************************************
+      *** BEG ADD 12/02/99 ********************************************
+     A            CALSTY    R               REFFLD(A52) COLHDG('Length of stay')
+      *** END ADD 12/02/99 ********************************************
+      *** BEG ADD 02/17/00 ********************************************
+     A            CABUND    R               REFFLD(FLAG) COLHDG('Bundled code')
+      *** END ADD 02/17/00 ********************************************
+      *** BEG ADD 04/08/00 ********************************************
+     A            CABMRI    R               REFFLD(FLAG)
+     A                                      COLHDG('Billed' 'MRI/CT')
+      *** END ADD 04/08/00 ********************************************
+     A*** BEG ADD *** 07/20/01 ****************************************
+     A            CASCAM    R               REFFLD(A92)
+     A                                      COLHDG('Service' 'Code' 'Amount')
+     A            CACORF    R               REFFLD(A92)
+     A                                      COLHDG('CORF' 'Amount')
+     A            CAHHLI    R               REFFLD(A92)
+     A                                      COLHDG('Home' 'Health' 'Inpat')
+     A            CAHHLO    R               REFFLD(A92)
+     A                                      COLHDG('Home' 'Health' 'Outpat')
+     A            CASNFI    R               REFFLD(A92)
+     A                                      COLHDG('Skilled' 'Nurse' 'Inpat')
+     A            CASNFO    R               REFFLD(A92)
+     A                                      COLHDG('Skilled' 'Nurse' 'Outpat')
+     A            CADRG     R               REFFLD(A92)
+     A                                      COLHDG('DRG' 'Amount')
+     A            CAFEMA    R               REFFLD(FLAG)
+     A                                      COLHDG('DRG#' 'No Match')
+     A            CAPOMA    R               REFFLD(FLAG)
+     A                                      COLHDG('Pros' 'Pmt' 'No Match')
+     A            CAMEMA    R               REFFLD(FLAG)
+     A                                      COLHDG('Med#' 'No Match')
+     A            CASCMA    R               REFFLD(FLAG)
+     A                                      COLHDG('Serv' 'Code' 'No Match')
+     A            CAMRMA    R               REFFLD(FLAG)
+     A                                      COLHDG('Med#' 'RCC' 'No Match')
+     A            CADRMA    R               REFFLD(FLAG)
+     A                                      COLHDG('DRG#' 'RCC' 'No Match')
+     A            CASVAL    R               REFFLD(FLAG)
+     A                                      COLHDG('Serv' 'Code has' 'Value')
+     A            CAPHOP    R               REFFLD(A92)
+     A                                      COLHDG('Pharm' 'Outpat')
+     A            CAPHIP    R               REFFLD(A92)
+     A                                      COLHDG('Pharm' 'Inpat')
+     A*** The following field is no longer used and has been replaced
+     A*** with CAOCCR 9.2
+     A            CAORCC         9P 6
+     A                                      COLHDG('Outp' 'RCC')
+     A            CAOPRC         7P 6
+     A                                      COLHDG('Outp' 'Phar RCC')
+     A            CAIPRC         7P 6
+     A                                      COLHDG('Inp' 'Phar RCC')
+     A*** END ADD *** 07/20/01 ****************************************
+     A*** BEG ADD *** 11/29/01 ****************************************
+     A            CABDEX    R               REFFLD(FLAG)
+     A                                      COLHDG('DRG' 'Exempt')
+     A*** END ADD *** 11/29/01 ****************************************
+     A*** BEG ADD *** 07/20/01 ****************************************
+     A            CAOCCR         9S 2
+     A                                      COLHDG('Outp' 'RCC')
+     A*** END ADD *** 07/20/01 ****************************************
+     A*** BEG ADD *** 10/04/02 ****************************************
+     A            CABCAS    R               REFFLD(FLAG)
+     A                                      COLHDG('Billed' 'Cascading')
+     A*** END ADD *** 10/04/02 ****************************************
+     A*** BEG ADD *** 10/17/02 ****************************************
+     A*** BEG CHG *** 04/25/18 ****************************************
+     A***         CAAWP         10S 5
+     A***                                   COLHDG('AWP * UNITS')
+     A            CAAWP         11S 5       COLHDG('AWP * UNITS')
+     A
+     A*** END CHG *** 04/25/18 ****************************************
+     A*** END ADD *** 10/17/02 ****************************************
+     A*** BEG ADD *** 04/07/03 ****************************************
+     A            CAPTPV         6S 2
+     A                                      COLHDG('P/T PER VISIT')
+     A*** END ADD *** 04/07/03 ****************************************
+     A* BEG ADD *** 09/25/03 ******************************************
+     A            CAAREA    R               REFFLD(FLAG)
+     A                                      COLHDG('AREA' 'RURAL, ETC')
+     A            CAPCIN    R               REFFLD(FLAG)
+     A                                      COLHDG('PC/TC' 'MOD IND')
+     A            CA50IN    R               REFFLD(FLAG)
+     A                                      COLHDG('BILAT SURG' 'IND')
+     A            CA51IN    R               REFFLD(FLAG)
+     A                                      COLHDG('MULTI SURG' 'IND')
+     A            CA62IN    R               REFFLD(FLAG)
+     A                                      COLHDG('CO SURG' 'IND')
+     A            CA66IN    R               REFFLD(FLAG)
+     A                                      COLHDG('TEAM SURG' 'IND')
+     A            CA80IN    R               REFFLD(FLAG)
+     A                                      COLHDG('ASST SURG' 'IND')
+     A            CAENBA    R               REFFLD(CPT4)
+     A                                      COLHDG('ENDOSCOPIC' 'BASE')
+     A* END ADD *** 09/25/03 ******************************************
+     A* BEG ADD *** 09/25/04 ******************************************
+     A            CABFHE    R               REFFLD(FLAG)
+     A                                      COLHDG('HPSA' 'ELIGIBLE')
+     A* END ADD *** 09/25/04 ******************************************
+     A*** BEG ADD *** 12/07/04 ****************************************
+     A            CACONV         9S 2
+     A                                      COLHDG('CONV FACTOR')
+     A*** END ADD *** 12/07/04 ****************************************
+     A*** BEG ADD *** 04/26/05 ****************************************
+     A            CABMIN    R               REFFLD(FLAG)
+     A                                      COLHDG('MINOR' 'PROC')
+     A*** END ADD *** 04/26/05 ****************************************
+     A*** BEG ADD *** 07/03/05 ****************************************
+     A            CASLOS    R               REFFLD(FLAG)
+     A                                      COLHDG('STOP' 'LOSS')
+     A            CAPPT1         9S 2
+     A                                      COLHDG('PT/OT' 'IND' '1ST 6')
+     A            CAPPT2         9S 2
+     A                                      COLHDG('PT/OT' 'IND' '7-12')
+     A            CAPPT3         9S 2
+     A                                      COLHDG('PT/OT' 'IND' 'OVER 12')
+     A            CAPPT4         9S 2
+     A                                      COLHDG('PT/OT' 'PHY' '1ST 6')
+     A            CAPPT5         9S 2
+     A                                      COLHDG('PT/OT' 'PHY' '7-12')
+     A            CAPPT6         9S 2
+     A                                      COLHDG('PT/OT' 'PHY' 'OVER 12')
+     A*** END ADD *** 07/03/05 ****************************************
+     A*** Beg Add *** 11/06/07 ****************************************
+     A            CALQ51         9S 2
+     A                                      COLHDG('Lowest quartile/51+' +
+     A                                      ' miles')
+     A*** End Add *** 11/06/07 ****************************************
+     A*** Beg Add *** 04/03/08 ****************************************
+     A            CAAPSI         1A
+     A                                      COLHDG('APC Payment Status' +
+     A                                      ' Indicator')
+     A            CAIMST         1A
+     A                                      COLHDG('Implant Status')
+     A*** End Add *** 04/03/08 ****************************************
+     A*** Beg Add *** 04/07/08 ****************************************
+     A            CATDRG         1A
+     A                                      COLHDG('TYPE OF DRG PAYMENT')
+     A*** End Add *** 04/07/08 ****************************************
+     A*** Beg Add *** 11/14/08 ****************************************
+     A            CAASPI         2A
+     A                                      COLHDG('ASC PAYMENT' 'INDICATOR')
+     A*** End Add *** 11/14/08 ****************************************
+     A*** Beg Add *** 02/06/09 ****************************************
+     A            CATOS     R               REFFLD(DS2)
+     A                                      COLHDG('TYPE' 'OF SERVICE')
+     A*** End Add *** 02/06/09 ****************************************
+     A*
+     A*** BEG ADD *** 06/25/14 ****************************************
+     A*
+     A            CAAPC     R               REFFLD(A40)
+     A                                      COLHDG('OPPS APC')
+     A*
+     A*** END ADD *** 06/25/14 ****************************************
+     A*
+     A****** Beg Add *** 05/30/16 **********************************************
+     A            CAAPCSI   R
+     A                                      REFFLD(DS2)
+     A                                      COLHDG('OPPS APC Sts Ind')
+     A****** End Add *** 05/30/16 **********************************************
+     A****** Beg Add *** 06/02/17 **********************************************
+     A            CAPAYMRA  R               REFFLD(FLAG)
+     A                                      COLHDG('PAY MRA' 'INDICATOR')
+     A****** End Add *** 06/02/17 **********************************************
+     A****** Beg Add *** 06/03/19 **********************************************
+     A            CAADDON   R               REFFLD(FLAG)
+     A                                      COLHDG('Add-On Code' 'Flag')
+     A****** End Add *** 06/03/19 **********************************************
+     A*
+     A          K CACO#
+     A          K CASUB#
+     A          K CAFND
+     A          K CAFYR
+     A          K CACASE
+     A          K CAAMT                     DESCEND

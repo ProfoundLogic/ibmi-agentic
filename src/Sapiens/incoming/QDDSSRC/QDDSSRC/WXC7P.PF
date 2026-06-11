@@ -1,0 +1,175 @@
+     A* (c) 2016 StoneRiver, Inc. All rights Reserved.                *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                 *
+     A*                                                               *
+     A*****************************************************************
+     A* SCRIPTURA DATA WORK FILE FOR CANCELLATIONS/REINSTATEMENTS     *
+     A*****************************************************************
+     A*                                                               *
+     A*  PROJECT:  SY371        PROGRAMMER:  C:65                     *
+     A*  CREATED:  10/05/16                                           *
+     A*  DESCRIPTION:  THIS IS THE WORK FILE TO HOLD THE DATA FOR     *
+     A*                CANCELLATIONS AND REINSTATEMENTS.              *
+     A*                                                               *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     H*                                                               *
+     H* 09/16/19 C:300 Support: 83101                                 *
+     H*                Cancellation Scriptura Form Change Needed      *
+     H*                Add new field - Week ending date (C7WEDT)      *
+     A*                                                               *
+     A* 03/17/17 C:65  PROJECT: SY371                                 *
+     A*                ADD FORMATTED NAME/ADDRESS FIELDS.             *
+     A*                                                               *
+     A* 01/12/17 C:65  PROJECT: SY371                                 *
+     A*                ADD CANCELLATION ISSUE DATE AND REINSTATEMENT  *
+     A*                REASON CODE/DESCRIPTION.                       *
+     A*                                                               *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PC701                     TEXT('Cancel/Reinst Trans file')
+     A*
+     A            C7XML         60A         COLHDG('XML FILE NAME')
+     A*
+     A            C7CO#     R     S         REFFLD(CO#)
+     A            C7FND     R     S         REFFLD(FND)
+     A            C7EMP#    R     S         REFFLD(EMP#)
+     A            C7DIV     R     S         REFFLD(DIV)
+     A            C7FYR     R     S         REFFLD(FYR)
+     A            C7UNID    R     S         REFFLD(A120)
+     A                                      COLHDG('UNIQUE' 'IDENTIFIER')
+     A*
+     A            C7CARR    R     S         REFFLD(CLAS)
+     A                                      COLHDG('NCCI' 'CARRIER#')
+     A            C7GFIN         9S 0       COLHDG('GROUPS TAX ID')
+     A            C7GSI#         7          COLHDG('GROUP SELF' 'INSURED #')
+     A            C7POL#        18A         COLHDG('POLICY/FILE #')
+     A            C7CAP#        25          COLHDG('CARRIER POLICY #')
+     A            C7OPOL        25          COLHDG('ORIGINAL POLICY' 'NUMBER')
+     A            C7OPED         8S 0       COLHDG('ORIGINAL POLICY' +
+     A                                      'EFFECTIVE DATE')
+     A            C7LSID    R               REFFLD(FLAG)
+     A                                      COLHDG('Employer Leasing ID')
+     A*
+     A            C7CORR    R               REFFLD(FLAG)
+     A                                      TEXT('CANCL OR REIN? "C" OR +
+     A                                      "R"?')
+     A            C7TORE         1S 0       COLHDG('TYPE OF' 'REINSTAT')
+     A            C7NRNW    R               REFFLD(FLAG)
+     A                                      COLHDG('NON-RENEWAL FLAG')
+     A            C7FLAT    R               REFFLD(FLAG)
+     A                                      COLHDG('CANCLD FLAT?')
+     A            C7PROR    R               REFFLD(FLAG)
+     A                                      COLHDG('CANCLD PRO RATA?')
+     A            C7SHRT    R               REFFLD(FLAG)
+     A                                      COLHDG('CNCLD SHORT RATE?')
+     A            C7CFFL    R               REFFLD(FLAG)
+     A                                      COLHDG('CONFIRM OF CX FLAG')
+     A            C7ERR     R               REFFLD(FLAG)
+     A                                      COLHDG('CANCELLATION' 'IN ERROR')
+     A*
+     A            C7ISUD         8S 0       COLHDG('ISSUE DATE (MDCY)')
+     A            C7PFRD         8S 0       COLHDG('POL FRM DATE (MDCY)')
+     A            C7PTOD         8S 0       COLHDG('POL TO DATE (MDCY)')
+     A            C7CAND         8S 0       COLHDG('CANCEL DATE (MDCY)')
+     A            C7MLDT         8S 0       COLHDG('CNCL/REIN MAILED DT')
+     A            C7EFDT         8S 0       COLHDG('CNCL/REIN EFF DT')
+     A            C7PCXD         8S 0       COLHDG('PRIOR CANCEL DATE')
+     A*
+     A            C7CNC#         3S 0       COLHDG('CANCELLATION' 'COUNT')
+     A            C7RPMY         6S 0       COLHDG('MISSING RPT MMCCYY')
+     A*
+     A            C7CRSN    R               REFFLD(CODE)
+     A                                      COLHDG('NCCI CANCEL' 'REASON')
+     A            C7RESN    R               REFFLD(DS60)
+     A                                      COLHDG('NCCI CANCEL' 'REASON DESC')
+     A            C7CXRN    R               REFFLD(CODE)
+     A                                      COLHDG('USER CANCEL REASON')
+     A            C7DESC    R               REFFLD(DS60)
+     A                                      COLHDG('USER DEFINED CX DESC')
+     A*
+     A            C7COM1    R               REFFLD(DS60)
+     A                                      COLHDG('COMMENT 1')
+     A            C7COM2    R               REFFLD(DS60)
+     A                                      COLHDG('COMMENT 2')
+     A*
+     A            C7AMTD    R     S         REFFLD(A92)
+     A                                      COLHDG('AMOUNT' 'DUE')
+     A            C7RFEE    R     S         REFFLD(A72)
+     A                                      COLHDG('REINSTATEMENT FEE')
+     A            C7RFDS    R               REFFLD(DS40)
+     A                                      COLHDG('REINSTATEMENT FEE' 'DESC')
+     A            C7TDUE        11S 2
+     A                                      COLHDG('Total Amount Due')
+     A*
+     A            C7CEMN    R               REFFLD(DS10)
+     A                                      COLHDG('CERTIFIED MAIL #')
+     A            C7OCR         41A         COLHDG('OCR Information')
+     A*
+     A            C7STAT    R               REFFLD(STAT)
+     A            C7USER    R               REFFLD(USER)
+     A            C7PGM     R               REFFLD(PGM)
+     A            C7TIME    R     S         REFFLD(TIME)
+     A            C7DT      R     S         REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A*
+     A            C7CM01        60A         COLHDG('COMMENT 1')
+     A            C7CM02        60A         COLHDG('COMMENT 2')
+     A            C7CM03        60A         COLHDG('COMMENT 3')
+     A            C7CM04        60A         COLHDG('COMMENT 4')
+     A            C7CM05        60A         COLHDG('COMMENT 5')
+     A            C7CM06        60A         COLHDG('COMMENT 6')
+     A            C7CM07        60A         COLHDG('COMMENT 7')
+     A            C7CM08        60A         COLHDG('COMMENT 8')
+     A            C7CM09        60A         COLHDG('COMMENT 9')
+     A            C7CM10        60A         COLHDG('COMMENT 10')
+     A            C7CM11        60A         COLHDG('COMMENT 11')
+     A            C7CM12        60A         COLHDG('COMMENT 12')
+     A            C7CM13        60A         COLHDG('COMMENT 13')
+     A            C7CM14        60A         COLHDG('COMMENT 14')
+     A            C7C01B        60A         COLHDG('COMMENT 1 B')
+     A            C7C02B        60A         COLHDG('COMMENT 2 B')
+     A            C7C03B        60A         COLHDG('COMMENT 3 B')
+     A            C7C04B        60A         COLHDG('COMMENT 4 B')
+     A            C7C05B        60A         COLHDG('COMMENT 5 B')
+     A            C7C06B        60A         COLHDG('COMMENT 6 B')
+     A            C7C07B        60A         COLHDG('COMMENT 7 B')
+     A            C7C08B        60A         COLHDG('COMMENT 8 B')
+     A            C7C09B        60A         COLHDG('COMMENT 9 B')
+     A            C7C10B        60A         COLHDG('COMMENT 10 B')
+     A            C7C11B        60A         COLHDG('COMMENT 11 B')
+     A            C7C12B        60A         COLHDG('COMMENT 12 B')
+     A            C7C13B        60A         COLHDG('COMMENT 13 B')
+     A            C7C14B        60A         COLHDG('COMMENT 14 B')
+     A*** BEGIN ADD ***  01/12/17  ******************************************
+     A            C7CISD         8S 0       COLHDG('CX ISSUE DATE (MDCY)')
+     A            C7RECD    R               REFFLD(CODE)
+     A                                      COLHDG('REIN REASON CODE')
+     A            C7REDS    R               REFFLD(DS60)
+     A                                      COLHDG('REIN REASON DESC')
+     A*** END ADD *****  01/12/17  ******************************************
+      **** BEGIN ADD **** 03/17/17 ************************************
+     A            C7FORNAM1    120A
+     A                                      COLHDG('FORMATTED NAME #1')
+     A            C7FORNAM2    120A
+     A                                      COLHDG('FORMATTED NAME #2')
+     A            C7FORNAM3    120A
+     A                                      COLHDG('FORMATTED NAME #3')
+     A            C7FORNAM4    120A
+     A                                      COLHDG('FORMATTED NAME #4')
+     A*
+     A            C7FORADR1 R               REFFLD(DS40)
+     A                                      COLHDG('FORMATTED ADDR #1')
+     A            C7FORADR2 R               REFFLD(DS40)
+     A                                      COLHDG('FORMATTED ADDR #2')
+     A            C7FORADR3 R               REFFLD(DS40)
+     A                                      COLHDG('FORMATTED ADDR #3')
+      **** END ADD ****** 03/17/17 ************************************
+      **** BEGIN ADD **** 03/28/17 ************************************
+     A            C7FEIN         9A
+     A                                      COLHDG('POLICY/PEO FEIN #')
+      **** END ADD ****** 03/28/17 ************************************
+      **** BEGIN ADD **** 09/16/19 ************************************
+     A            C7WEDT         8S 0
+     A                                      COLHDG('WEEK ENDING DATE')
+      **** END   ADD **** 09/16/19 ************************************

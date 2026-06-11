@@ -1,0 +1,87 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   CLAIM TRANSACTION MAINTENANCE DISPLAY                    **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A*
+     A*  02/08/05 C:53  Project: PC011
+     A*                 Code for CLM# incoming from C0071R
+     A*                 Use *IN15
+     A*
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT(UL)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF05
+     A                                      CF07
+     A                                      CF10
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(23)
+     A                                      SETOF(24)
+     A                                      SETOF(25)
+     A                                      SETOF(26)
+     A                                      SETOF(27)
+     A                                      SETOF(28)
+     A                                      SETOF(29)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A            Q1PGM         10   O  2  2
+     A***********                       2  2'C0410F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR01'
+     A                                  9 27'Claim number  . :'
+     A            SCCLM#    R        B  9 46REFFLD(CLM#)
+     A  20                                  ERRMSGID(CCR0675 *LIBL/CMESGG)
+     A  29                                  ERRMSGID(CCR0882 *LIBL/CMESGG)
+     A  27                                  DSPATR(PC)
+     A  15                                  DSPATR(PR)
+     A                                 12 27'Section code  . :'
+     A            SCSECT    R        B 12 46REFFLD(CODE)
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A  23                                  ERRMSGID(CCR0690 *LIBL/CMESGG)
+     A  28                                  ERRMSGID(CCR0510 *LIBL/CMESGG)
+     A  26                                  DSPATR(PC)
+     A                                 15 27'Transaction code:'
+     A            SCTRCD    R        B 15 46REFFLD(CDE)
+     A  22                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A  24                                  ERRMSGID(CCR0524 *LIBL/CMESGG)
+     A  25                                  DSPATR(PC)
+     A                                      TEXT('Transaction code')
+     A            SCDE60    R        O 21  5REFFLD(DESC)
+     A                                      DSPATR(HI)
+     A                                      TEXT('MESSAGE')
+     A                                 23  5'F3=Exit      '
+     A                                      COLOR(BLU)
+     A N15                             23 23'F5=Claim # search'
+     A                                      COLOR(BLU)
+     A                                 23 45'F7=Claim section code search'
+     A                                      COLOR(BLU)
+     A                                 24 23'F10=Table search'
+     A                                      COLOR(BLU)
+     A                                 24 45'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

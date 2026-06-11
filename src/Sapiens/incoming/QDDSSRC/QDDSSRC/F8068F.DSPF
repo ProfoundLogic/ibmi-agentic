@@ -1,0 +1,163 @@
+     A*****************************************************************
+     A* (c) 2011 StoneRiver, Inc. All rights Reserved.               **
+     A* StoneRiver is a trademark of StoneRiver, Inc.                **
+     A*****************************************************************
+     A**   WITH SIS BILL EXPORT TRANSACTION HISTORY                  **
+     A**                                                             **
+     A**   PROGRAMMER: C:277                                         **
+     A**   CREATED:    12/02/11  PROJECT: 114MCV                     **
+     A*****************************************************************
+     A** REVISIONS:                                                  **
+     A*                                                              **
+     A*                                                              **
+     A*****************************************************************
+     A*
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/FSREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      PAGEDOWN(01)
+     A                                      PAGEUP(02)
+     A          R SCR01S                    SFL
+     A*
+     A  08                                  SFLNXTCHG
+     A            SCDBRR         9S 0H
+     A            SCMBR         10A  H
+     A            SCEFDT    R        H      REFFLD(DT8)
+     A            SCPRTM    R        H      REFFLD(TIME)
+     A            SC#PRC    R        H      REFFLD(A90)
+     A            SCDATA        70A  O 10  7
+     A          R SCR01C                    SFLCTL(SCR01S)
+     A                                      CF03
+     A                                      CF05
+     A                                      CF06
+     A                                      CF11
+     A                                      CF12
+     A                                      CF17
+     A                                      CF23
+     A                                      CF24
+     A                                      OVERLAY
+     A  04                                  SFLDSP
+     A N03                                  SFLDSPCTL
+     A  03                                  SFLCLR
+     A  95                                  SFLEND(*MORE)
+     A  92                                  SFLMSGID(CPD6A81 *LIBL/QCPFMSG)
+     A  93                                  SFLMSGID(CPD6A7C *LIBL/QCPFMSG)
+     A                                      SFLSIZ(0013)
+     A                                      SFLPAG(0012)
+     A                                      SFLMODE(&SFLMOD)
+     A            SFLMOD         1   H
+     A            SCRRN1         4S 0H      SFLRCDNBR(CURSOR)
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A  91                                  ERRMSGID(CPF5203 *LIBL/QCPFMSG)
+     A  94                                  ERRMSGID(CPF5204 *LIBL/QCPFMSG)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10   O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR01'
+     A                                  4  2'Position to . . .'
+     A                                  4 21'Member name:'
+     A  21        SCPST1        10   I  4 35
+     A N06                                  DSPATR(PC)
+     A                                  8 28'---- Processed -----'
+     A                                      DSPATR(HI)
+     A                                  8 58'Number of'
+     A                                      DSPATR(HI)
+     A  22        SCPST2         1   H
+     A  23        SCPST3         1   H
+     A  24        SCPST4         1   H
+     A  25        SCPST5         1   H
+     A  26        SCPST6         1   H
+     A  27        SCPST7         1   H
+     A  28        SCPST8         1   H
+     A  29        SCPST9         1   H
+     A            SCOPL1        76      7  4
+     A                                      COLOR(BLU)
+     A            SCOPL2        76   H
+     A            SCHDL1        78      9  2
+     A                                      DSPATR(HI)
+     A          R SCR01
+     A                                      OVERLAY
+     A            SCFKL1        78A  O 23  2COLOR(BLU)
+     A            SCFKL2        78A  H
+     A          R SCR02S                    SFL
+     A*
+     A                                      SFLNXTCHG
+     A            SCSF1R         4S 0H
+     A            SCDBRR         9S 0H
+     A            SCSEL          2A  O  8  2TEXT('Selection Field')
+     A            SCDATA        70   O  8  7
+     A          R SCR02C                    SFLCTL(SCR02S)
+     A*
+     A                                      CF12
+     A                                      OVERLAY
+     A  14                                  SFLDSP
+     A N13                                  SFLDSPCTL
+     A  13                                  SFLCLR
+     A N15                                  SFLEND(*MORE)
+     A                                      SFLSIZ(0015)
+     A                                      SFLPAG(0014)
+     A            SCRRN2         4S 0H      SFLRCDNBR
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10   O  2  2
+     A            SCPRD2    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR02'
+     A                                  4  2'Press Enter to confirm your choice-
+     A                                      s for 4=Delete.'
+     A                                      COLOR(BLU)
+     A                                  5  2'Press F12 to return to change your-
+     A                                       choices.'
+     A                                      COLOR(BLU)
+     A            SCHDL1        78      7  2
+     A                                      DSPATR(HI)
+     A          R SCR02
+     A*
+     A                                 23  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R SCR03
+     A*
+     A                                      CF12
+     A                                      WINDOW(3 4 10 70)
+     A                                  1  2USER
+     A            SCPRD3    R        O  1 16REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 66'SCR03'
+     A                                  3  2'Type choices, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  5  4'HCPCS  . . . . . . . . . . '
+     A            SSHCPC    R        B  5 32REFFLD(DS5)
+     A                                      DSPATR(UL)
+     A                                  6  4'Effective Date . . . . . .'
+     A            SSEFDT    R        B  6 32REFFLD(DT8)
+     A  57                                  ERRMSGID(MCR0500 *LIBL/FSMESG)
+     A                                      DSPATR(UL)
+     A                                  7  4'Status . . . . . . . . . .'
+     A            SSSTAT    R        B  7 32REFFLD(STAT)
+     A  58                                  ERRMSGID(MC40001 *LIBL/FSMESG)
+     A                                      DSPATR(UL)
+     A                                  7 36'A=Active'
+     A                                      COLOR(BLU)
+     A                                  8 36'I=Inactive'
+     A                                      COLOR(BLU)
+     A                                  9  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R MSGSFL                    SFL
+     A                                      SFLMSGRCD(24)
+     A            MSGKEY                    SFLMSGKEY
+     A            Q1PGM                     SFLPGMQ
+     A          R MSGSFLC                   SFLCTL(MSGSFL)
+     A                                      SFLSIZ(5) SFLPAG(1)
+     A N10                                  SFLEND
+     A                                      SFLDSP
+     A                                      SFLDSPCTL
+     A                                      SFLINZ
+     A            Q1PGM                     SFLPGMQ

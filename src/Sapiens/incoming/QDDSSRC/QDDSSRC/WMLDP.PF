@@ -1,0 +1,197 @@
+      * (c) 2024 Sapiens. All Rights Reserved.                             *
+     A*****************************************************************
+     A*  WORKERS' COMP LARGE DEDUCTIBLE DISCOUNT MASTER FILE          *
+     A*****************************************************************
+     A*                                                               *
+     A*  DESC:     THIS FILE CONTAINS A RECORD FOR EACH POLICY        *
+     A*            WRITTEN AS A LARGE DEDUCTIBLE POLICY, TO CONTAIN   *
+     A*            THE DETAILS OF THE LARGE DEDUCTIBLE PLAN.  THERE   *
+     A*            ARE A SET OF FIELDS FOR 1ST AND 2ND DEDUCTIBLE.    *
+     A*                                                               *
+     A*  PROJECT:  WC1838            PROGRAMMER:  C:65                *
+     A*  CREATED:  11/30/09                                           *
+     A*                                                               *
+     A*****************************************************************
+     A* Revisions:                                                    *
+     A*                                                               *
+     A* 11/26/24 C:291 Peoject: 148WFA                                *
+     A*                Add Mega Deductible Threshold.                 *
+     A*                                                               *
+     A* 09/02/20 C:180 PROJECT: WC2733                                *
+     A*                ADD INCLUDE MEDICAL OR INDEMNITY CLAIMS FLAG   *
+     A*                                                               *
+     A* 09/15/17 C:180 PROJECT: 150WBL                                *
+     A*                ADD VARIABLE AGGREGATE AMOUNT INDICATOR.       *
+     A*                                                               *
+     A*  08/10/17 C:180 Project 150WAV - Add Deductible Aggregate %.  *
+     A*                                                               *
+     A*  05/16/12 C:255 Project SY275 Priss#13.                       *
+     A*                 Files were not present in V12 Production. Che-*
+     A*                 cked out in V12 and promoted. (No changes).   *
+     A*                                                               *
+     A*  01/28/11 C:190 Project: WC1954                               *
+     A*                 Added field to contain state for setting up   *
+     A*                 default values.                               *
+     A*                                                               *
+     A*  02/05/10 C:65  Project: 25WRB                                *
+     A*                 Added 'CLAIM ALLOWANCE AMOUNT'                *
+     A*                                                               *
+     A*  01/14/10 C:191 Project: 25WRC                                *
+     A*                 Added 'Claim Liability Rate'                  *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PLD01                     TEXT('LARGE DED DISCOUNT FILE')
+     A            LDCO#     R     S         REFFLD(CO#)
+     A            LDFND     R     S         REFFLD(FND)
+     A            LDEMP#    R     S         REFFLD(EMP#)
+     A            LDDIV     R     S         REFFLD(DIV)
+     A            LDFYR     R     S         REFFLD(FYR)
+     A*
+     A            LDEFD1    R     S         REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE' 'DATE' '#1')
+     A            LDEXP1    R     S         REFFLD(DT)
+     A                                      COLHDG('EXPIRATION' 'DATE' '#1')
+     A            LDDES1    R               REFFLD(NAME)
+     A                                      COLHDG('DESCRIPTION' '#1')
+     A            LDPCT1        12S 9       COLHDG('DISCOUNT PERCENTAGE' '#1')
+     A            LDTYP1    R               REFFLD(FLAG)
+     A                                      COLHDG('GROSS/NET' 'TYPE' '#1')
+     A            LDAMP1    R     S         REFFLD(A90)
+     A                                      COLHDG('AMT PER' 'OCCUR/CLAIM' '#1')
+     A            LDAMG1    R     S         REFFLD(A90)
+     A                                      COLHDG('AMOUNT' 'AGGREGATE' '#1')
+     A            LDPLN1    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC' 'PLAN/TYPE' '#1')
+     A            LDVRB1    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM/OCCUR' 'VERBIAGE' +
+     A                                             '#1')
+     A            LDOCV1    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM/OCCUR' 'VERBIAGE' +
+     A                                             'FOR OCCUP DIS #1')
+     A            LDTOT1    R               REFFLD(FLAG)
+     A                                      COLHDG('USE TOTAL INCURRED' '#1')
+     A            LDCLS1    R     S         REFFLD(CLAS)
+     A                                      COLHDG('STAT CLASS' 'CODE' '#1')
+     A            LDPLV1    R               REFFLD(FLAG)
+     A                                      COLHDG('APPLIED TO' 'PREMIUM LEVEL'+
+     A                                             '#1')
+     A            LDALA1    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE ALLOCATED'  'LOSS'+
+     A                                             'ADJUSTMENT' 'FLAG #1')
+     A            LDRNW1    R               REFFLD(FLAG)
+     A                                      COLHDG('AUTO RENEW' '#1')
+     A            LDR101    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 1' '#1')
+     A            LDR102    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 2' '#1')
+     A            LDR103    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 3' '#1')
+     A            LDR104    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 4' '#1')
+     A            LDR105    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 5' '#1')
+     A            LDR106    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 6' '#1')
+     A            LDR107    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 7' '#1')
+     A            LDR108    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 8' '#1')
+     A            LDR109    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 9' '#1')
+     A            LDR110    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 10' '#1')
+     A*
+     A            LDEFD2    R     S         REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE' 'DATE' '#2')
+     A            LDEXP2    R     S         REFFLD(DT)
+     A                                      COLHDG('EXPIRATION' 'DATE' '#2')
+     A            LDDES2    R               REFFLD(NAME)
+     A                                      COLHDG('DESCRIPTION' '#2')
+     A            LDPCT2        12S 9       COLHDG('DISCOUNT PERCENTAGE' '#2')
+     A            LDTYP2    R               REFFLD(FLAG)
+     A                                      COLHDG('GROSS/NET' 'TYPE' '#2')
+     A            LDAMP2    R     S         REFFLD(A90)
+     A                                      COLHDG('AMT PER' 'OCCUR/CLAIM' '#2')
+     A            LDAMG2    R     S         REFFLD(A90)
+     A                                      COLHDG('AMOUNT' 'AGGREGATE' '#2')
+     A            LDPLN2    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC' 'PLAN/TYPE' '#2')
+     A            LDVRB2    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM/OCCUR' 'VERBIAGE' +
+     A                                             '#2')
+     A            LDOCV2    R               REFFLD(FLAG)
+     A                                      COLHDG('CLAIM/OCCUR' 'VERBIAGE' +
+     A                                             'FOR OCCUP DIS #2')
+     A            LDTOT2    R               REFFLD(FLAG)
+     A                                      COLHDG('USE TOTAL INCURRED' '#2')
+     A            LDCLS2    R     S         REFFLD(CLAS)
+     A                                      COLHDG('STAT CLASS' 'CODE' '#2')
+     A            LDPLV2    R               REFFLD(FLAG)
+     A                                      COLHDG('APPLIED TO' 'PREMIUM LEVEL'+
+     A                                             '#2')
+     A            LDALA2    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE ALLOCATED'  'LOSS'+
+     A                                             'ADJUSTMENT' 'FLAG #2')
+     A            LDRNW2    R               REFFLD(FLAG)
+     A                                      COLHDG('AUTO RENEW' '#2')
+     A            LDR201    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 1' '#2')
+     A            LDR202    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 2' '#2')
+     A            LDR203    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 3' '#2')
+     A            LDR204    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 4' '#2')
+     A            LDR205    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 5' '#2')
+     A            LDR206    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 6' '#2')
+     A            LDR207    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 7' '#2')
+     A            LDR208    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 8' '#2')
+     A            LDR209    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 9' '#2')
+     A            LDR210    R               REFFLD(CODE)
+     A                                      COLHDG('DEDUC RESERVE 10' '#2')
+     A*
+     A            LDUSER    R               REFFLD(USER)
+     A            LDPGM     R               REFFLD(PGM)
+     A            LDTIME    R     S         REFFLD(TIME)
+     A            LDDT      R     S         REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            LDIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL USER')
+     A            LDIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL PGM')
+     A            LDITIM    R     S         REFFLD(TIME)
+     A                                      COLHDG('INITIAL TIME')
+     A            LDIDT     R     S         REFFLD(DT)
+     A                                      COLHDG('INITIAL DATE')
+     A            LDLIRT        10S 9       COLHDG('LIABILITY RATE')
+     A*** BEGIN ADD ***  02/05/10  *********************************************
+     A            LDCLAL    R     S         REFFLD(A90)
+     A                                      COLHDG('CLAIMS ALLOWANCE' 'AMOUNT')
+     A*** END ADD *****  02/05/10  *********************************************
+     A*** BEGIN ADD ***  01/28/11  *********************************************
+     A            LDST      R               REFFLD(ST)
+     A            LDEFDT    R     S         REFFLD(DT)
+     A                                      COLHDG('EFFECTIVE' 'DATE')
+     A*** END   ADD ***  01/28/11  *********************************************
+     A*** BEGIN ADD ***  08/10/17  *********************************************
+     A            LDADP1        12S 9       COLHDG('Deductible1' 'Aggregate %')
+     A            LDADP2        12S 9       COLHDG('Deductible2' 'Aggregate %')
+     A*** END   ADD ***  08/10/17  *********************************************
+     A*** BEGIN ADD ***  09/15/17  *********************************************
+     A            LDVARA1        1A         COLHDG('Ded 1 Variable' 'Aggregate')
+     A            LDVARA2        1A         COLHDG('Ded 1 Variable' 'Aggregate')
+     A*** END   ADD ***  09/15/17  *********************************************
+      *** BEG ADD *** 09/02/20 ***********************************
+     A            LDINCMDIN R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE' 'MED/INDENMITY')
+      *** END ADD *** 09/02/20 ***********************************
+      *** Beg Add ***** 11/26/24 **************************************
+     A            LDMEGAT       11S 0       COLHDG('Mega Deductible' +
+     A                                      'Threshold')
+      *** End Add ***** 11/26/24 **************************************

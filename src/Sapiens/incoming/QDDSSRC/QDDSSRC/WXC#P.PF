@@ -1,0 +1,330 @@
+     A*copyright('(c) 2013 StoneRiver, Inc. All rights reserved. -
+     A*StoneRiver is a trademark of StoneRiver, Inc.')
+     A*
+     A*  NCCI REPORTING - WCPOLS - CANCELLATION/REINSTATEMENT TRANS FILE
+     A*****************************************************************
+     A* REVISIONS                                                     *
+     A*                                                               *
+     A* 06/21/12  C:282  PROJECT: WC2086                              *
+     A*                  Add field Reinstatement Reason               *
+     A*                  Code.                                        *
+     A*
+     A* 04/06/11 C:235 Project: 114WYM
+     A*                OCR for Cancellation/ Audit Bills
+     A*                                                               *
+     A* 11/03/06 C:136 SUPPORT: WA071 55489 (71WHE)                   *
+     A*                ADD GROUP SELF INSURED #                       *
+     A*                                                               *
+     A* 01/09/06  C:168  PROJECT: 129WNI                              *
+     A*                  Added the following fields                   *
+     A*                  - Agent mailing address                      *
+     A*                  - Agent mailing city/state/zip               *
+     A*                  - Employer contact #1                        *
+      *
+      * 05/14/04  C:65  PROJECT: WC1202
+      *                 ADD FIELDS FOR EXTENDED EMPLOYER NAMES.         to
+     A*                                                               *
+     A* 12/23/03  C:61   PROJECT: 91WLA                               *
+     A*                  Add field for "Total Amount Due".            *
+     A*                                                               *
+     A* 02/11/03  C:61   PROJECT: WC1109                              *
+     A*                  Add field for State Unemployment number.     *
+     A*                                                               *
+     A* 08/13/02  C:61   PROJECT: 126WAK                              *
+     A*                  Add fields for week start date and           *
+     A*                  week ending date.                            *
+     A*                                                               *
+     A* 01/16/02  C:61  PROJECT 81WTN                                 *
+     A*                 Add new fields (New policy number, New name). *
+     A*                                                               *
+     A* 08/30/01  C:61   PROJECT: 102BY                               *
+     A*                  Add new field:                               *
+     A*                    CRLSID - Employer Leasing ID.              *
+     A*                                                               *
+     A* 07/05/01  C:135  Project: 107BL #27181                        *
+     A*                  Change Policy Termination/Canecellation/     *
+     A*                  Reinstatement Notice to print the primary    *
+     A*                  agent's name labeled Sub Producer.           *
+     A*                  Added CRSOUT for secondary agent--CRAOUT     *
+     A*                  had been being used for the secondary agent  *
+     A*                  field.                                       *
+     A*                                                               *
+     A* 06/13/01  C:61   PROJECT: WC1038                              *
+     A*                  Add new field:                               *
+     A*                    CRSEQ# - Sequence number.                  *
+     A*                                                               *
+     A* 08/22/00  C:61   PROJECT: 96WDE                               *
+     A*                  Add new field:                               *
+     A*                    CRFORM - Special reason code embedded in   *
+     A*                             form number.                      *
+     A*                                                               *
+     A* 08/04/00  C:61   PROJECT: WC1002                              *
+     A*                  Add new field:                               *
+     A*                    CRLAPS - Laps in coverage.                 *
+     A*                                                               *
+     A* 06/12/00  C:61   PROJECT: WC984                               *
+     A*                  Add new fields:                              *
+     A*                    CROPOL - Original Policy Number            *
+     A*                    CROPED - Original Policy Effective Date    *
+     A*                    CRPCXD - Prior Cancellation Date           *
+     A*                    CRGFIN - Group FEIN                        *
+     A*                                                               *
+     A* 12/13/99  C:61   PROJECT: 48WTM                               *
+     A*                  Add field for user defined cancellation      *
+     A*                  reason description.                          *
+     A*                                                               *
+     A* 01/13/99  C:87   PROJECT: 96WBO                               *
+     A*                  Add 5 more comment fields.  Add 14 comment   *
+     A*                  fields of 50 characters to correspond to the *
+     A*                  60 char comment fields.                      *
+     A*                                                               *
+     A* 11/16/98  C:87   PROJECT: 96WAV                               *
+     A*                  Add nine comment fields for special verbiage.*
+     A*                                                               *
+     A* 11/12/98  C:98   PROJECT: 102AA                               *
+     A*                  ADDED FIELD FOR CANCELLATION DATE ON NCCI    *
+     A*                  FORM                                         *
+     A*                                                               *
+     A* 10/12/98  C:35   PROJECT: WC839                               *
+     A*                  ADDED FIELD FOR CANCELLATION ISSUE DATE.     *
+     A*                                                               *
+     A* 09/13/98  C:35   PROJECT: WC839                               *
+     A*                  ADD FIELDS FOR GROUP ADDRESS AND PHONE #.    *
+     A*                                                               *
+     A* 06/25/94 C:02 PROJECT XXXXX                                   *
+     A*               NEW TRANSACTION FILE FOR NCCI REPORTING.        *
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PCR01                     TEXT('CANCEL/REINST TRANS FILE')
+     A            CRCO#     R               REFFLD(CO#)
+     A            CRFND     R               REFFLD(FND)
+     A            CREMP#    R               REFFLD(EMP#)
+     A            CRFYR     R               REFFLD(FYR)
+     A            CRUNID    R               REFFLD(A120)
+     A                                      COLHDG('UNIQUE' 'IDENTIFIER')
+     A            CRCORR    R               REFFLD(FLAG)
+     A                                      TEXT('CANCL OR REIN? "C" OR +
+     A                                      "R"?')
+     A            CRFLAT    R               REFFLD(FLAG)
+     A                                      COLHDG('CANCLD FLAT?')
+     A            CRPROR    R               REFFLD(FLAG)
+     A                                      COLHDG('CANCLD PRO RATA?')
+     A            CRSHRT    R               REFFLD(FLAG)
+     A                                      COLHDG('CNCLD SHORT RATE?')
+     A            CRENAM    R   90          REFFLD(DS00)
+     A                                      TEXT('EMPLOYER NAME')
+     A            CREADR    R   90          REFFLD(DS00)
+     A                                      TEXT('EMPLOYER NAME')
+      *
+     A            CRMLDT    R               REFFLD(DT)
+     A                                      COLHDG('CNCL/REIN MAILED DT')
+      *
+     A            CREFDT    R               REFFLD(DT)
+     A                                      COLHDG('CNCL/REINS EFF DT')
+      *
+     A            CRSTAT    R               REFFLD(STAT)
+     A            CRUSER    R               REFFLD(USER)
+     A            CRPGM     R               REFFLD(PGM)
+     A            CRTIME    R               REFFLD(TIME)
+     A            CRDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            CRIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            CRIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'ENTRY' 'DATE')
+     A            CRCARR    R               REFFLD(CLAS)
+     A                                      COLHDG('NCCI' 'CARRIER#')
+     A            CRPFDT    R               REFFLD(DT)
+     A                                      COLHDG('POLICY' 'FROM DATE')
+     A            CRCRSN    R               REFFLD(CODE)
+     A                                      COLHDG('CANCEL' 'REASON')
+     A            CRTORE    R    1  0       REFFLD(A20)
+     A                                      COLHDG('TYPE OF' 'REINSTAT')
+     A            CRFNAM    R   60          REFFLD(NAME)
+     A                                      COLHDG('CARRIER NAME')
+     A            CRFEIN    R               REFFLD(FEIN)
+     A                                      COLHDG('EMPLOYERS FED ID')
+     A            CREAD1    R               REFFLD(ADR1)
+     A                                      COLHDG('EMPLOYERS ADDRESS')
+     A            CRECSZ    R               REFFLD(ADR1)
+     A                                      COLHDG('EMPLOYERS CTY/ST/ZIP')
+     A            CRPOL#    R   18A         REFFLD(NAME)
+     A                                      COLHDG('NCCI POLICY #')
+     A            CRPTDT    R               REFFLD(DT)
+     A                                      COLHDG('POL TO DATE')
+     A            CRRESN    R               REFFLD(NAME)
+     A                                      COLHDG('CANCEL REASON DESC.')
+     A            CRISUO    R   90A         REFFLD(NAME)
+     A                                      COLHDG('ISSUING OFFICE')
+     A            CRAOUT    R   60A         REFFLD(NAME)
+     A                                      COLHDG('PRODUCER"S NAME')
+     A            CRISUD         8  0
+     A                                      COLHDG('ISSUE DATE (MDY)')
+     A            CRPFRD         8  0
+     A                                      COLHDG('POL FRM DATE (MDY)')
+     A            CRPTOD         8  0
+     A                                      COLHDG('POL TO DATE (MDY)')
+     A            CRCAND         8  0
+     A                                      COLHDG('CANCEL DATE (MDY)')
+     A            CREDBA    R   90          REFFLD(DS00)
+     A                                      TEXT('EMPLOYER DBA NAME')
+     A            CREAD2    R               REFFLD(ADR1)
+     A                                      COLHDG('EMPLOYERS ADDR 2')
+     A            CRNRNW    R               REFFLD(FLAG)
+     A                                      COLHDG('NON-RENEWAL FLAG')
+     A            CRCOM1    R               REFFLD(DS60)
+     A                                      COLHDG('COMMENT 1')
+     A            CRCOM2    R               REFFLD(DS60)
+     A                                      COLHDG('COMMENT 2')
+     A            CRDOI#         9  0       COLHDG('DEPT OF INS #')
+     A            CRCFFL    R               REFFLD(FLAG)
+     A                                      COLHDG('CONFIRM OF CX FLAG')
+     A            CRCEMN    R               REFFLD(DS10)
+     A                                      COLHDG('CERTIFIED MAIL #')
+     A            CRAGT#    R               REFFLD(AGT#)
+     A                                      COLHDG('AGENT #')
+     A            CRANAM    R               REFFLD(NAME)
+     A                                      COLHDG('AGENT NAME')
+     A            CRAMTD    R               REFFLD(A92)
+     A                                      COLHDG('AMOUNT' 'DUE')
+     A            CRRFEE    R               REFFLD(A72)
+     A                                      COLHDG('REINSTATEMENT FEE')
+     A            CRRFDS    R               REFFLD(DS40)
+     A                                      COLHDG('REINSTATEMENT FEE' 'DESC')
+     A            CRRPMY         6  0
+     A                                      COLHDG('MISSING RPT MMCCYY')
+     A            CRCNC#         3  0
+     A                                      COLHDG('CANCELLATION' 'COUNT')
+     A            CRCAP#    R               REFFLD(DS25)
+     A                                      COLHDG('CARRIER POLICY#')
+     A            CRERR     R               REFFLD(FLAG)
+     A                                      COLHDG('CANCELLATION' 'IN ERROR')
+     A            CRGAD1    R               REFFLD(ADR1)
+     A                                      COLHDG('GROUP ADDRESS' 'LINE 1')
+     A            CRGAD2    R               REFFLD(ADR1)
+     A                                      COLHDG('GROUP ADDRESS' 'LINE 2')
+     A            CRGCSZ    R               REFFLD(ADR1)
+     A                                      COLHDG('GROUP CTY/ST/ZIP')
+     A            CRGPHN        25          COLHDG('GROUP CTY/ST/ZIP')
+     A            CRCISD         8  0
+     A                                      COLHDG('CANCEL' 'ISSUE DATE (MDCY)')
+     A            CRRCNL         8  0
+     A                                      COLHDG('CANCEL' 'EFF DT (MDCY)')
+     A            CRCM01        60A         COLHDG('COMMENT 1')
+     A            CRCM02        60A         COLHDG('COMMENT 2')
+     A            CRCM03        60A         COLHDG('COMMENT 3')
+     A            CRCM04        60A         COLHDG('COMMENT 4')
+     A            CRCM05        60A         COLHDG('COMMENT 5')
+     A            CRCM06        60A         COLHDG('COMMENT 6')
+     A            CRCM07        60A         COLHDG('COMMENT 7')
+     A            CRCM08        60A         COLHDG('COMMENT 8')
+     A            CRCM09        60A         COLHDG('COMMENT 9')
+     A*
+     A            CRJRST    R               REFFLD(ST)
+     A                                      COLHDG('JURISDICTION' 'STATE')
+     A            CRCM10        60A         COLHDG('COMMENT 10')
+     A            CRCM11        60A         COLHDG('COMMENT 11')
+     A            CRCM12        60A         COLHDG('COMMENT 12')
+     A            CRCM13        60A         COLHDG('COMMENT 13')
+     A            CRCM14        60A         COLHDG('COMMENT 14')
+     A            CRC01B        60A         COLHDG('COMMENT 1 B')
+     A            CRC02B        60A         COLHDG('COMMENT 2 B')
+     A            CRC03B        60A         COLHDG('COMMENT 3 B')
+     A            CRC04B        60A         COLHDG('COMMENT 4 B')
+     A            CRC05B        60A         COLHDG('COMMENT 5 B')
+     A            CRC06B        60A         COLHDG('COMMENT 6 B')
+     A            CRC07B        60A         COLHDG('COMMENT 7 B')
+     A            CRC08B        60A         COLHDG('COMMENT 8 B')
+     A            CRC09B        60A         COLHDG('COMMENT 9 B')
+     A            CRC10B        60A         COLHDG('COMMENT 10 B')
+     A            CRC11B        60A         COLHDG('COMMENT 11 B')
+     A            CRC12B        60A         COLHDG('COMMENT 12 B')
+     A            CRC13B        60A         COLHDG('COMMENT 13 B')
+     A            CRC14B        60A         COLHDG('COMMENT 14 B')
+     A            CRCXRN    R               REFFLD(CODE)
+     A                                      COLHDG('USER CANCEL REASON')
+     A            CRDESC    R               REFFLD(DS60)
+     A                                      COLHDG('USER DEFINED CX DESC')
+      *
+     A            CROPOL    R               REFFLD(DS25)
+     A                                      COLHDG('ORIGINAL POLICY' 'NUMBER')
+      *
+     A            CROPED         8S 0
+     A                                      COLHDG('Original Policy' +
+     A                                      'Effective Date')
+      *
+     A            CRPCXD         8S 0
+     A                                      COLHDG('Prior CX Date')
+      *
+     A            CRGFIN         9S 0
+     A                                      COLHDG('GROUPS TAX ID')
+      *
+      *
+     A            CRLAPS    R               REFFLD(FLAG)
+     A                                      COLHDG('LAPSE IN' 'COVERAGE')
+      *
+      *
+     A            CRFORM    R               REFFLD(CODE)
+     A                                      COLHDG('FORM #' 'CX CODE')
+      *
+      *
+     A            CRSEQ#         2P 0
+     A                                      COLHDG('Sequence Number')
+      *
+      *
+     A            CRSOUT    R               REFFLD(NAME)
+     A                                      COLHDG('SECONDARY' 'AGENT')
+      *
+      *
+     A            CRLSID    R               REFFLD(FLAG)
+     A                                      COLHDG('Employer Leasing ID')
+      *
+      *
+     A            CRNPOL        18A         COLHDG('New policy number')
+      *
+      *
+     A            CRNNAM        40A         COLHDG('New name')
+      *
+      *
+     A            CRWSDT    R               REFFLD(DT7S)
+     A                                      COLHDG('Week Starting date')
+      *
+     A            CRWEDT    R               REFFLD(DT7S)
+     A                                      COLHDG('Week Ending date')
+      *
+      *
+     A            CRUE#     R               REFFLD(DS20)
+     A                                      COLHDG('State Unemployment #')
+      *
+      *
+     A            CRTDUE        11S 2
+     A                                      COLHDG('Total Amount Due')
+      *
+      *
+     A            CRNAM1    R               REFFLD(NM50)
+     A                                      COLHDG('EMPLR NAME' ' 1ST PART')
+     A            CRNAM2    R               REFFLD(NM50)
+     A                                      COLHDG('EMPLR NAME' ' 2ND PART')
+      *
+     A            CRFDN1    R               REFFLD(NM50)
+     A                                      COLHDG('EMPLR FED NAME' '1ST PART')
+     A            CRFDN2    R               REFFLD(NM50)
+     A                                      COLHDG('EMPLR FED NAME' '2ND PART')
+      *
+     A            CRAMAD    R               REFFLD(ADR1)
+     A                                      COLHDG('AGENT MAILING' 'ADDRESS')
+     A            CRAMCZ    R               REFFLD(ADR1)
+     A                                      COLHDG('AGENT' 'CITY/STATE/ZIP')
+     A            CRECN1    R               REFFLD(NM60)
+     A                                      COLHDG('EMPLOYER' 'CONTACT 1')
+     A            CRGSI#         7          COLHDG('GROUP SELF' 'INSURED #')
+     A            CROCR         41A         COLHDG('OCR Information')
+     A***  BEG ADD*******  06/21/12  **************************************
+     A            CRRECD    R               REFFLD(CODE)
+     A                                      COLHDG('REINSTATEMENT' +
+     A                                      'REASON CODE')
+     A***  END ADD*******  06/21/12  **************************************
+      ***** BEG ADD ***** 02/10/20 ****************************************
+     A            CRDIV     R               REFFLD(DIV)
+      ***** END ADD ***** 02/10/20 ****************************************

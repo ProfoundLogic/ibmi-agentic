@@ -1,0 +1,148 @@
+      * (c) 2018 StoneRiver, Inc. All rights Reserved.
+      * StoneRiver is a trademark of StoneRiver, Inc.
+     A*****************************************************************
+     A* PAYROLL VENDOR FILE
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 06/08/48 C:136 PROJECT: 150WAQ                                *
+     A*                ADD FLAGS TO GENERATE COLLATERAL A/R AND       *
+     A*                AUTO TRANSFER COLLATERAL A/R BATCH             *
+     A*                                                               *
+     A* 07/21/17 C:136 PROJECT: 150WAN                                *
+     A*               -ADD EMPLOYEE INFO REQUIRED CHECKBOX            *
+     A*               -ADD '# OF DAYS FOR CHECK ISSUANCE'             *
+     A*               -ADD GENERATE PREMIUM NOTICE CHECKBOX           *
+     A*               -ADD FLAG TO AUTO TRANSFER PAYMENTS SEPARATELY  *
+     A*                                                               *
+     A* 06/26/09 C:198 PROJECT: WC1694                                *
+     A*                ADD A FIELD TO CONTROL P TYPE RECORD FOR ALL   *
+     A*                DIVISIONS.                                     *
+     A*                                                               *
+     A* 03/14/06 C:136 PROJECT: WC1320                                *
+     A*                ADD FIELDS FOR CSV ENHANCEMENT                 *
+     A*                                                               *
+     A* 12/15/05 C:65  PROJECT: 139WBT                                *
+     A*                ADD FIELDS FOR ENDORSEMENT AND ADDITIONAL      *
+     A*                LOCATION REPORTING.                            *
+     A*                                                               *
+     A* 10/20/05 C:53 Project: WC1324                                 *
+     A*               Add auto transfer flag                          *
+     A*               Add generate A/R from Payroll Upload            *
+     A*                                                               *
+     A* 04/19/04 C:136 PROJECT: WC1116                                *
+     A*                Add effective and expiration dates to edit     *
+     A*                against when assigning vendor number to policy.*
+     A*                                                               *
+     A*****************************************************************
+     A                                      REF(WREFP)
+     A          R PVP01                     TEXT('PAYROLL VENDOR FILE')
+     A            VPCO#     R               REFFLD(CO#)
+     A            VPVDR#         5P 0       COLHDG('VENDOR #')
+     A            VPNAME    R               REFFLD(NAME)
+     A                                      COLHDG('VENDOR NAME')
+     A            VPADR1    R               REFFLD(ADR1)
+     A                                      COLHDG('ADDRESS LINE ONE')
+     A            VPADR2    R               REFFLD(ADR2)
+     A                                      COLHDG('ADDRESS LINE TWO')
+     A            VPCITY    R               REFFLD(CTY)
+     A                                      COLHDG('VENDOR CITY')
+     A            VPST      R               REFFLD(ST)
+     A                                      COLHDG('VENDOR STATE')
+     A            VPZIP     R               REFFLD(ZIP)
+     A                                      COLHDG('VENDOR ZIP')
+     A            VPIADR        60A         COLHDG('INTERNET ADDRESS')
+     A            VPEMAL        60A         COLHDG('E-MAIL ADDRESS')
+     A            VPPYFR    R               REFFLD(FLAG)
+     A                                      COLHDG('PAYROLL' 'UPLOAD' 'FREQ')
+     A            VPPMFR    R               REFFLD(FLAG)
+     A                                      COLHDG('PREM' 'UPLOAD' 'FREQ')
+     A            VPDNLF    R               REFFLD(FLAG)
+     A                                      COLHDG('VENDOR' 'DOWNLOAD' 'FREQ')
+     A            VPBLND    R               REFFLD(FLAG)
+     A                                      COLHDG('BLEND RATE' 'ON ARD FLAG')
+     A            VPNET     R               REFFLD(FLAG)
+     A                                      COLHDG('NET RATE' 'FLAG')
+     A            VPFTYP    R               REFFLD(FLAG)
+     A                                      COLHDG('FILE TYPE' 'INTERNAL-
+     A                                       TRACKING')
+     A            VPDTYP    R               REFFLD(FLAG)
+     A                                      COLHDG('DATA TYPE' 'INTERNAL-
+     A                                       TRACKING')
+     A            VPDFMT         8A         COLHDG('DATE FORMAT' 'INTERNAL-
+     A                                       TRACKING')
+     A            VPPPCD    R               REFFLD(CODE)
+     A                                      COLHDG('PREMIUM' 'PAYMENT'-
+     A                                      'A/R CODE')
+     A            VPCPCD    R               REFFLD(CODE)
+     A                                      COLHDG('COMMISSION' 'PAYMENT'-
+     A                                      'A/R CODE')
+     A            VPPBCD    R               REFFLD(CODE)
+     A                                      COLHDG('PREMIUM' 'BILLING' 'CODE')
+     A            VPUSER    R               REFFLD(USER)
+     A            VPPGM     R               REFFLD(PGM)
+     A            VPDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            VPTIME    R               REFFLD(TIME)
+     A            VPIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL USER')
+     A            VPIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL PGM')
+     A            VPIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL DATE')
+     A            VPITM     R               REFFLD(TIME)
+     A                                      COLHDG('INITIAL TIME')
+     A            VPREND    R               REFFLD(FLAG)
+     A                                      COLHDG('RESTRICT MULTIPLE' -
+     A                                      'PREMIUM-BEARING' 'ENDORSEMENTS')
+     A            VPEFDT    R               REFFLD(DT)
+     A                                      COLHDG('EFF DATE')
+     A            VPEXDT    R               REFFLD(DT)
+     A                                      COLHDG('EXP DATE')
+     A*** BEG ADD *** 10/20/05 **************************************
+     A            VPAUTR         1A         COLHDG('Auto-transfer (Y/ ')
+     A            VPPYUP         1A         COLHDG('Generate A/R from' +
+     A                                      'Payroll upload (Y/ ')
+     A*** END ADD *** 10/20/05 **************************************
+     A*** BEGIN ADD ***  12/15/05  ************************************
+     A            VPEXNP    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE NON-PREMIUM' +
+     A                                      'BEARING ENDORSEMENTS')
+     A            VPEXAL    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE ADDITIONAL' +
+     A                                      'LOCATIONS/DIVISIONS')
+     A*** END ADD *****  12/15/05  ************************************
+     A*** BEG ADD ***** 03/14/06 ************************************
+     A            VPPMFT    R               REFFLD(FLAG)
+     A                                      COLHDG('PREM UPLOAD' 'FILE TYPE')
+     A            VPPRFT    R               REFFLD(FLAG)
+     A                                      COLHDG('PAYR UPLOAD' 'FILE TYPE')
+     A            VPPEFT    R               REFFLD(FLAG)
+     A                                      COLHDG('POLICY EXPORT' 'FILE TYPE')
+     A*** END ADD ***** 03/14/06 ************************************
+     A*** BEG ADD ***** 06/26/09 ************************************
+     A            VPPTYC    R               REFFLD(FLAG)
+     A                                      COLHDG('P-TYPE CONTROL FLAG' +
+     A                                             ' (Y/ )')
+     A            VPMTHI    R               REFFLD(FLAG)
+     A                                      COLHDG('INCLUDE IN MONTHLY' +
+     A                                             'INTERIM (Y/ )')
+     A*** END ADD ***** 06/26/09 ************************************
+     A*** BEG ADD ***** 07/21/17 ************************************
+     A            VPEMPREQ  R               REFFLD(FLAG)
+     A                                      COLHDG('EMPLOYEE' 'INFO' 'REQUIRED')
+     A            VPGENPRM  R               REFFLD(FLAG)
+     A                                      COLHDG('GENERATE' 'PREMIUM' +
+     A                                      'NOTICE')
+     A            VP#OFDAYS      2S 0
+     A                                      COLHDG('# OF DAYS' 'FOR CHECK' +
+     A                                      'ISSUANCE')
+     A            VPTRANPAY      1A         COLHDG('AUTO-TRANSFER' 'PAYMENTS')
+     A*** END ADD ***** 07/21/17 ************************************
+     A*** Beg Add ***** 06/08/18 ************************************
+     A            VPWRTCOLL      1A         COLHDG('Write Collater A/R')
+     A            VPAUTRCBIL     1A         COLHDG('Auto Transfer' +
+     A                                      'Collateral Bills')
+     A            VPAUTRCPAY     1A         COLHDG('Auto Transfer' +
+     A                                      'Collateral Payments')
+     A*** End Add ***** 06/08/18 ************************************

@@ -1,0 +1,68 @@
+     A*%%TS  SD  19990126  103357  ELANE       REL-V4R2M0  5769-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996 - 1999
+     A****************************************************************
+     A**   1099 WORK FILE & REPORT PROMPT DISPLAY                   **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:
+     A*   01/25/99 C:31  Support: 16177
+     A*                  1099 issue
+     A*                  1. Add laser support
+     A*
+     A*   11/18/96 C:107 *** V2000 ***
+     A*                  1. Version 2 format changes.
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A*%%TS  SD  19990126  103357  ELANE       REL-V4R2M0  5769-PW1
+     A                                      CF13
+     A                                      SETOF(20)
+     A*** BEGIN ADD *** 01/25/99 **************************************
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A*** END ADD *** 01/25/99 ****************************************
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C1099F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 10 28'Reporting Year:'
+     A            SCYR      R        B 10 44REFFLD(YR)
+     A                                      TEXT('CALANDER YEAR FOR 1099S')
+     A  20                                  ERRMSGID(CCR0507 *LIBL/CMESGG)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                      DSPATR(HI)
+     A*** BEGIN ADD *** 01/25/99 **************************************
+     A                                 12 28'Print Option  :'
+     A            SCPOFL    R        B 12 44REFFLD(FLAG)
+     A  21                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0750 *LIBL/CMESGG)
+     A                                      TEXT('PRINT OPTION FLAG')
+     A                                      DSPATR(HI)
+     A                                 12 51'P = Pinfeed forms'
+     A                                 13 51'L = Laser forms(3 copies)'
+     A*** END ADD *** 01/25/99 ****************************************
+     A                                 23  3'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 60'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

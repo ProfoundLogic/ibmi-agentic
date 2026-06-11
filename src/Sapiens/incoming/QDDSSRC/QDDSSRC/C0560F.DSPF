@@ -1,0 +1,138 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   DISPLAY FOR AUTO COVERAGE DETAIL SEARCH                  **
+     A**                                                            **
+     A****************************************************************
+     A**   REVISIONS                                                **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*----------------------------------------------------------------
+     A*    SCR01S - SCREEN 1 SUBFILE RECORD
+     A*----------------------------------------------------------------
+     A          R SCR01S                    SFL
+     A            SCFL01    R        B  9  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A            SCIT01    R        O  9  8REFFLD(ITM#)
+     A                                      EDTCDE(4)
+     A            SCCL01    R        O  9 19REFFLD(CLAS)
+     A            SCTR01    R        O  9 47REFFLD(PRTC)
+     A            SCTD01    R        O  9 31REFFLD(DT8)
+     A                                      EDTWRD('  /  /    ')
+     A            SCEN01    R        O  9 58REFFLD(END#)
+     A                                      EDTCDE(4)
+     A            SCST01    R        O  9 70REFFLD(FLAG)
+     A*----------------------------------------------------------------
+     A*    SCR01C - SCREEN 1 SUBFILE CONTROL RECORD
+     A*----------------------------------------------------------------
+     A          R SCR01C                    SFLCTL(SCR01S)
+     A                                      ROLLUP(18)
+     A                                      SETOF(20)
+     A                                      KEEP
+     A                                      OVERLAY
+     A  90                                  SFLCLR
+     A  91                                  SFLDSP
+     A N90                                  SFLDSPCTL
+     A                                      SFLSIZ(15)
+     A                                      SFLPAG(14)
+     A  99                                  SFLEND(*MORE)
+     A                                      SFLCSRRRN(&SFRRN)
+     A  20                                  SFLMSG('NO RECORDS FOUND')
+     A                                      CSRLOC(SFROW SFCOL)
+     A            SFROW          3S 0H
+     A            SFCOL          3S 0H
+     A            SFRNO          4S 0H
+     A                                      SFLRCDNBR(CURSOR)
+     A            SFRRN          5S 0H
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C0560F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                  3 28'TRANSACTION DETAIL DISPLAY'
+     A                                      DSPATR(HI)
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A  05                              3  2'CANCELLATION PENDING'
+     A                                      DSPATR(RI)
+     A  06                              6  2'REINSTATEMENT PENDING'
+     A                                      DSPATR(RI)
+     A  04                              3 63'POLICY NON-RENEWED'
+     A                                      DSPATR(RI)
+     A                                  4  4'Policy Number:'
+     A            SCPOL#    R        O  4 19REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                      TEXT('POLICY NUMBER')
+     A                                  4 35'Name:'
+     A            SCFIN     R        O  4 41REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  5  4'Section Code:'
+     A            SCCC      R        O  5 19REFFLD(CODE)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COVERAGE CODE')
+     A            SCDESC    R        O  5 24REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                      TEXT('COV CD DESCRIPTION')
+     A                                  6  4'Vehicle Number:'
+     A            SCITM#    R        B  6 21REFFLD(ITM#)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                  6 30'Class:'
+     A            SCCLAS    R        B  6 38REFFLD(CLAS)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                  6 48'Trans Date:'
+     A            SCTRDT    R        B  6 61REFFLD(DT8)
+     A                                      DSPATR(HI)
+     A*                                     DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                  7 46'Trans'
+     A                                  7 32'Trans'
+     A                                  8  8'Veh #'
+     A                                      DSPATR(UL)
+     A                                  8 19' Class'
+     A                                      DSPATR(UL)
+     A                                  8 46'Code'
+     A                                      DSPATR(UL)
+     A                                  8 31'  Date  '
+     A                                      DSPATR(UL)
+     A                                  8 57'End #'
+     A                                      DSPATR(UL)
+     A                                  8 68'Status'
+     A                                      DSPATR(UL)
+     A*----------------------------------------------------------------
+     A*    SCR01R - SCREEN 1 SUBFILE OPTION LINE RECORD
+     A*----------------------------------------------------------------
+     A          R SCR01R
+     A                                      OVERLAY
+     A                                 24  8'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 29'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A*    SCR99  - RESET SCREEN
+     A*----------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

@@ -1,0 +1,462 @@
+     A*
+      * (c) 2024 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A* 06/28/24 C:344 Project: WC2952                                *
+     A*                Increase rate field to zoned 8.3.              *
+     A*                                                               *
+     A* 06/02/15 C:306 Support PHW35123                               *
+     A*                -Owner/Officer text was getting overlapped     *
+     A*                 for Multiple Owner/Officer.                   *
+     A*                                                               *
+     A* 08/22/14 C:180 SUPPORT  WA102 86474                           *
+     A*                Fix class detail spacing                       *
+     A*                                                               *
+     A* 06/16/14 C:136 Project: WC2283                                *
+     A*                Add TN Rate Split format                       *
+     A*                                                               *
+     A* 05/30/14 C:180 SUPPORT  WA099 85353                           *
+     A*                Fix printing of payrolls -  They were not      *
+     A*                printing.                                      *
+     A*                                                               *
+     A* 10/07/13 C:190 Project: 25WSS                                 *
+     A*                Change the program to determine if             *
+     A*                Premium or Contribution should be printed      *
+     A*                based on Group setup.                          *
+     A*                                                               *
+     A* 10/24/13  C:283  Support: WA114 83955                         *
+     A*                 -Class Code Information is not Printing       *
+     A*                  correctly for Split Rated Policies.          *
+     A*                                                               *
+     A* 09/26/13  C:283  Support: WA114 83591                         *
+     A*                 -Owner/Officer text was getting overlapped    *
+     A*                  for Multiple Owner/Officer.                  *
+     A*                                                               *
+     A* 07/03/13  C:190  Project: 147WBR                              *
+     A*                 -Created.                                     *
+     A*                 -RPG pgm is changed to use the printer file   *
+     A*                  instead of the output specs.                 *
+     A*                 -Include a page segment statement to print    *
+     A*                 -the logo.                                    *
+     A*****************************************************************
+     A          R HDLOGO2
+     A        78                            PAGSEG(&F2BLOG &LOGHRZ &LOGVRT)
+     A            F2BLOG         8A  P
+     A            LOGHRZ         5S 3P
+     A            LOGVRT         5S 3P
+     A***QSYSPRT2
+     A          R HEAD2
+     A            X3ONAM        40         1
+     A                                      SKIPB(02)
+     A            XXFNAM        50        32
+     A                                      SPACEA(1)
+     A            X3OAD1        40         1
+     A            XXMAD1        50        32
+     A                                      SPACEA(1)
+     A            X3OAD2        40         1
+     A            XXMAD2        50        32
+     A                                      SPACEA(1)
+     A            X3OCSZ        40         1
+     A            XXFNCS        50        32
+     A                                      SPACEA(1)
+     A            X3OPHN        40         1
+     A                                      SPACEA(1)
+     A                                    31'A U D I T   R E Q U E S '
+     A                                    55'T'
+     A                                      SPACEA(0)
+     A                                    31'A U D I T   R E Q U E S '
+     A                                    55'T'
+     A                                      SPACEA(3)
+     A            XXEMN1        50         4
+     A                                      SPACEA(1)
+     A  53        EMLREP         3        78
+     A  53                                  SPACEA(1)
+     A            XXEMN2        50         4
+     A                                      SPACEA(1)
+     A            XXEMN3        50         4
+     A                                      SPACEA(1)
+     A            XXEMN4        50         4
+     A                                      SPACEA(1)
+     A            XXEMN5        40         4
+     A            PAD1          40        44
+     A                                      SPACEA(1)
+     A            XXEMN6        40         4
+     A            PAD2          40        44
+     A                                      SPACEA(1)
+     A            XXEMN7        40         4
+     A            PAD3          40        44
+     A                                      SPACEA(1)
+     A N65        MAD8          42         4
+     A N65                                  SPACEA(1)
+     A  65        MAD8_1        42        10
+     A  65                                  SPACEB(1)
+     A  65                                  SPACEA(1)
+     A  65        XXCAP1#       37        44
+     A  65                                  SPACEA(1)
+     A  72 65     XXFIL#        37        44
+     A  72 65                               SPACEA(1)
+     A N65                                 4'FEDERAL ID#:'
+     A N65        ZZFEIN         9  0     17EDTCDE(Z)
+     A N65                                43'DIVISION:'
+     A N65        ZZDIV          5  0     76EDTCDE(3)
+     A N65                                  SPACEA(1)
+      ******* BEG CHG *** 10/07/13 ******************************************
+     A***************  65                                 4'EST ANNUAL PREMIUM:'
+     A  65 56                              4'EST ANNUAL PREMIUM:'
+     A  65N56                              4'EST ANNUAL CNTRBTN:'
+      ******* END CHG *** 10/07/13 ******************************************
+     A  65                                  SPACEB(1)
+     A  65        ELANPR        11  2     23EDTCDE(J)
+     A  65                                43'DIVISION:'
+     A  65        ZZDIV1         5  0     76
+     A  65                                  SPACEA(1)
+     A            MAD9          42         4
+     A                                    43'POLICY PERIOD:'
+     A            XXPFDT         8  0     58EDTWRD('  /  /    ')
+     A                                    69'-'
+     A            XXPTDT         8  0     71EDTWRD('  /  /    ')
+     A                                      SPACEA(1)
+     A            MAD10         42         4
+     A N88                                43'ANNIVERSARY RATING DATE:'
+     A N88        XXPRAV         8  0     71EDTWRD('  /  /    ')
+     A  88 99                             43'POLICY CANCELLATION'
+     A  88 99                             63'DATE:'
+     A  88 99     ZZCXDT         8  0     71EDTWRD('  /  /    ')
+     A                                      SPACEA(1)
+     A            XXCAP#        37         4
+     A                                      SPACEA(1)
+     A  72        XXFIL1#       37         4
+     A  72                                  SPACEA(1)
+     A N88 99 72                          43'POLICY CANCELLATION'
+     A N88 99 72                          63'DATE:'
+     A N88 99 72  ZZCXDT1        8  0     71EDTWRD('  /  /    ')
+     A          R HEADD2
+     A                                     4'________________________'
+     A                                    28'________________________'
+     A                                    52'________________________'
+     A                                    74'________'
+     A                                      SPACEA(1)
+     A N71                                42'ESTIMATED'
+     A  71N73                             42'ESTIMATED'
+     A  71 73                             42'SELF  RPT'
+     A                                    53'# OF'
+     A                                    62'AUDITED'
+     A                                    73'PAYROLL'
+     A                                      SPACEA(1)
+     A                                     4'CODE'
+     A                                    12'CLASSIFICATION'
+     A                                    36'RATE'
+     A                                    42'PAYROLL'
+     A                                    53'EMPLYS'
+     A                                    62'PAYROLL'
+     A                                    73'CX DATE'
+     A                                      SPACEA(0)
+     A                                     4'________________________'
+     A                                    28'________________________'
+     A                                    52'________________________'
+     A                                    76'______'
+     A                                      SPACEA(2)
+     A          R XMOD12
+     A N96                                 5'EXPERIENCE MOD'
+     A                                      SPACEB(1)
+     A  96                                 5'MERIT RATING  '
+     A            ELEXM1         5  4     20EDTCDE(2)
+     A            XXEMD1         8  0     26EDTWRD('  /  /    ')
+     A                                      SPACEA(0)
+     A          R XMOD22
+     A N96                                 5'EXPERIENCE MOD'
+     A                                      SPACEB(1)
+     A  96                                 5'MERIT RATING  '
+     A            ELEXM2         5  4     20EDTCDE(2)
+     A            XXEMD2         8  0     26EDTWRD('  /  /    ')
+     A                                      SPACEA(0)
+     A          R XMOD32
+     A N96                                 5'EXPERIENCE MOD'
+     A                                      SPACEB(1)
+     A  96                                 5'MERIT RATING  '
+     A            ELEXM3         5  4     20EDTCDE(2)
+     A            XXEMD3         8  0     26EDTWRD('  /  /    ')
+     A                                      SPACEA(0)
+     A          R POLHD2
+     A                                     4'POLICY START DATE'
+     A                                      SPACEB(1)
+     A            XXPFDT         8  0     26EDTWRD('  /  /    ')
+     A                                      SPACEA(0)
+     A          R ANNHD2
+     A                                     4'ANNIVERSARY RATED'
+     A                                      SPACEB(1)
+     A            XXPRAV         8  0     26EDTWRD('  /  /    ')
+     A                                      SPACEA(0)
+     A          R FLRH2
+     A                                     4'FL RATE CHANGE   '
+     A                                      SPACEB(1)
+     A            XXRTDT         8  0     26EDTWRD('  /  /    ')
+     A                                      SPACEA(0)
+     A          R DERH2
+     A                                     4'DE RATE CHANGE   '
+     A                                      SPACEB(1)
+     A            XXRTDT         8  0     26EDTWRD('  /  /    ')
+     A                                      SPACEA(0)
+     A          R AZRH2
+     A                                     4'AZ RATE CHANGE   '
+     A                                      SPACEB(1)
+     A            XXRTDT         8  0     26EDTWRD('  /  /    ')
+     A                                      SPACEA(0)
+     A          R OKRH2
+     A                                     4'OK RATE CHANGE   '
+     A                                      SPACEB(1)
+     A            XXRTDT         8  0     26EDTWRD('  /  /    ')
+     A                                      SPACEA(0)
+      *** BEG ADD ***** 06/16/14 ***************************************
+     A          R TNRH2
+     A                                     4'TN RATE CHANGE   '
+     A                                      SPACEB(1)
+     A            XXRTDT         8  0     26EDTWRD('  /  /    ')
+     A                                      SPACEA(0)
+      *** END ADD ***** 06/16/14 ***************************************
+     A          R FLRH22
+     A                                     4'FL RATE DECREASE '
+     A                                      SPACEB(1)
+     A            XXRTD2         8  0     26EDTWRD('  /  /    ')
+     A                                      SPACEA(0)
+     A          R DATLI2
+     A                                     4'________________________'
+     A                                    28'________'
+     A                                      SPACEA(2)
+     A          R DETL2
+      *** Beg Add ***** 10/24/13 **********************************************
+     A                                      SPACEB(1)
+      *** End Add ***** 10/24/13 **********************************************
+     A            XXCLAS         5  0      4EDTCDE(Z)
+     A            XXSPEC         1        10
+     A            XXDESC        19        12
+      *** Beg Chg ***** 06/28/24 **********************************************
+     A***         EPARAT         7  2     31EDTCDE(2)
+     A            EPARAT         8S 3     31EDTCDE(2)
+      *** End Chg ***** 06/28/24 **********************************************
+     A            XXAMT          9  0     40EDTCDE(2)
+     A                                    53'______'
+     A                                    61'_________'
+     A                                    72'__________'
+     A                                      SPACEA(2)
+     A N34        XXCADT         8  0     71EDTWRD('  /  /    ')
+     A N34                                  SPACEA(1)
+     A  85                                15'*NO PAYROLL TO REPORT*'
+     A                                      SPACEA(1)
+     A N88N90                             12'('
+     A N88N90N18  XXFRAV         8  0     13EDTCDE(Y)
+     A N88N90 18  XXEPDT         8  0     13EDTCDE(Y)
+     A N88N90                             24'-'
+     A N88N90     XXTOAV         8  0     26EDTCDE(Y)
+     A N88N90                             36')'
+     A  90                                12'('
+     A  90N18     XXFRDP         8  0     13EDTCDE(Y)
+     A  90 18     XXEPDT1        8  0     13EDTCDE(Y)
+     A  90                                24'-'
+     A  90        XXTODP         8  0     26EDTCDE(Y)
+     A  90                                36')'
+      *** Beg Del ***** 10/24/13 **********************************************
+     A***************                       SPACEA(1)
+      *** End Del ***** 10/24/13 **********************************************
+     A          R BOT2
+     A                                     4'________________________'
+     A                                    28'________________________'
+     A                                    52'________________________'
+     A                                    76'______'
+     A                                      SPACEA(2)
+     A N42                                 4'AGENT'
+     A N42        AHAGT#         5  0     10EDTCDE(Z)
+     A N42        QQCOM1        30        51
+     A N42                                  SPACEA(1)
+     A N42        ANAME         40         4
+     A N42        QQCOM2        30        51
+     A N42                                  SPACEA(1)
+     A N42        ZZADR1        40         4
+     A N42        QQCOM3        30        51
+     A N42                                  SPACEA(1)
+     A N42        ZZCSZP        40         4
+     A N42        QQCOM4        30        51
+     A N42                                  SPACEA(1)
+     A N42 76 84  ZZARPH        14         4
+     A N42 76 84  QQCOM5        30        51
+     A N42 76 84                            SPACEA(2)
+     A N42 76N84  ZZARPH1       14         4
+     A N42 76N84                            SPACEA(2)
+     A N42N76 84  QQ1COM5       30        51
+     A N42N76 84                            SPACEA(2)
+     A  29                                 4'INC/'
+     A  29                                 9'OFFICERS'
+     A  29                                35'EFFECTIVE'
+     A  29                                47'EXPIRATION'
+     A  29N42N96                          60'EXPERIENCE MODIFIERS'
+     A  29N42 96                          60'MERIT RATING        '
+      *** Beg Del ***** 09/26/13 **********************************************
+     A**************                        SPACEA(1)
+      *** End Del ***** 09/26/13 **********************************************
+     A  29                                 4'EXC'
+      *** Beg Add ***** 09/26/13 **********************************************
+     A                                      SPACEB(1)
+      *** End Add ***** 09/26/13 **********************************************
+     A  29                                37'DATE'
+     A  29                                50'DATE'
+     A  29N42                             60'& EFFECTIVE DATES'
+      *** Beg Del ***** 09/26/13 **********************************************
+     A**************                        SPACEA(1)
+      *** End Del ***** 09/26/13 **********************************************
+     A          R OWNEX2
+      *** Beg Add ***** 09/26/13 **********************************************
+     A                                      SPACEB(1)
+      *** End Add ***** 09/26/13 **********************************************
+     A            OOEXFL         1         5
+     A            XXNAM         25         9
+     A*                        XEDAT     44 '  /  /    '
+     A            XEDAT6         6  0     35EDTWRD('  /  /  ')
+     A  43        XXDAT6         6  0     48EDTWRD('  /  /  ')
+     A*               N41 35 38ELEXM12   65
+     A*               N41 35 38XXEMD1    77 '  /  /    '
+     A*               N41 36 39ELEXM22   65
+     A*               N41 36 39XXEMD2    77 '  /  /    '
+     A*               N41 37 40ELEXM32   65
+     A*               N41 37 40XXEMD3    77 '  /  /    '
+     A N41 35 38  ELEXM1         5  4     60EDTCDE(2)
+     A N41 35 38  XXEMD4         6  0     68EDTWRD('  /  /  ')
+     A N41 36 39  ELEXM2         5  4     60EDTCDE(2)
+     A N41 36 39  XXEMD5         6  0     68EDTWRD('  /  /  ')
+     A N41 37 40  ELEXM3         5  4     60EDTCDE(2)
+     A N41 37 40  XXEMD6         6  0     68EDTWRD('  /  /  ')
+     A                                      SPACEA(1)
+     A          R OTHPH2
+     A                                     4'________________________'
+     A                                      SPACEB(1)
+     A                                    28'________________________'
+     A                                    52'________________________'
+     A                                    76'______'
+     A                                      SPACEA(2)
+     A                                     4'ADDITIONAL INSUREDS:'
+     A                                      SPACEA(2)
+     A          R OTHPD2
+     A            XXONAM        50         4
+     A                                      SPACEA(1)
+     A  52                                60'Division: '
+     A  52        XXDIV          5  0     76
+     A N52   N28                          61'Ent/Loc: '
+     A N52   N28  XXELID        10        71
+     A          R OTHPD2NM2
+     A            XXONM2        50         4
+     A                                      SPACEA(1)
+     A          R OTHPD2FD
+     A N21        XXOFDNM       50         4
+     A N21                                  SPACEA(1)
+     A          R OTHPD2FD2
+     A N21        XXOFDNM2      50         4
+     A N21                                  SPACEA(1)
+     A          R OTHPD2AD
+     A N21        XXOAD1        40         4
+     A N21                                  SPACEA(1)
+     A  22N25     XXOAD2        40         4
+     A  22N25                               SPACEA(1)
+     A  25N21     XXOCSZ        40         4
+     A  25N21                               SPACEA(1)
+     A          R OTHPD2EX
+     A            XXBLANK        1         4
+     A                                      SPACEA(1)
+     A          R OTHHC2
+     A            XXADDR        40         4
+     A            XXHCNH        11        44
+     A            XXHCN          5  4     55EDTCDE(4)
+     A            XXHCND        19        62
+     A*
+     A                                      SPACEA(1)
+     A          R OTHHC4
+     A                                      SPACEA(1)
+     A          R HEDOF2
+     A                                     9'INC/'
+     A                                    14'OFFICERS'
+     A                                    40'EFFECTIVE'
+     A                                    59'EXPIRATION'
+     A                                      SPACEA(1)
+     A                                     9'EXC'
+     A                                    42'DATE'
+     A                                    62'DATE'
+     A                                      SPACEA(1)
+     A          R ADDOF2
+      *** Beg Add ***** 06/02/15 **********************************************
+     A                                      SPACEB(1)
+      *** End Add ***** 06/02/15 **********************************************
+     A            OOEXFL         1        10
+     A            XXNAM         25        14
+     A            XEDAT          8  0     40EDTWRD('  /  /    ')
+     A  43        XXDAT          8  0     59EDTWRD('  /  /    ')
+     A                                      SPACEA(1)
+     A          R DEWH2
+     A N93                                  SKIPB( 4)
+     A          R DEW2
+     A  66N93                              4'WORKPLACES DESIGNATED'
+     A  66N93                               SPACEB(2)
+     A  66N93                             26'AS EXCLUDED:'
+     A  66N93                               SPACEA(2)
+     A N93        EWWRK1        40         4
+     A N93                                61'Workplace #:'
+     A N93        EWWPL#         5  0     76EDTCDE(4)
+     A N93                                  SPACEA(1)
+     A N93        EWWRK2        40         4
+     A N93                                  SPACEA(1)
+     A N93        EWWRK3        40         4
+     A N93                                  SPACEA(1)
+     A N93        EWWRK4        40         4
+     A N93                                  SPACEA(1)
+     A N93        EWWRK5        40         4
+     A N93                                  SPACEA(2)
+     A          R SIGLI2
+     A                                     3'Signature of Person'
+     A                                      SKIPB(61)
+     A                                    23'Preparing Report:'
+     A                                    41'____________________'
+     A                                    61'____________________'
+     A                                     3'Title:'
+     A                                      SKIPB(62)
+     A                                    10'________________________'
+     A                                    34'________________________'
+     A                                    60'Date:'
+     A                                    66'_______________'
+     A          R PAGLI2
+     A            PAGE#2         4  0     75EDTCDE(Z)
+     A                                      SKIPB(63)
+     A                                    71'PAGE:'
+     A          R BLANK2
+     A                                      SPACEA(1)
+     A          R CLSH2
+     A            COUT1          5  0     22EDTCDE(Z)
+     A                                      SPACEB(2)
+     A            SOUT1          1        28
+     A            COUT2          5  0     35EDTCDE(Z)
+     A            SOUT2          1        41
+     A            COUT3          5  0     48EDTCDE(Z)
+     A            SOUT3          1        54
+     A            COUT4          5  0     61EDTCDE(Z)
+     A            SOUT4          1        67
+     A            COUT5          5  0     74EDTCDE(Z)
+     A            SOUT5          1        80
+     A                                      SPACEA(0)
+     A          R CLSUN2                    SPACEA(1)
+     A N45                                22'_______'
+     A N46                                35'_______'
+     A N47                                48'_______'
+     A N48                                61'_______'
+     A N49                                74'_______'
+     A                                      SPACEA(1)
+     A          R CLSDT2                    SPACEA(1)
+     A            MTHMM          9         4
+     A N45        CAMT1          9  0     17EDTCDE(1 $)
+     A  45        CMIS1          7        22
+     A N46        CAMT2          9  0     30EDTCDE(1 $)
+     A  46        CMIS2          7        35
+     A N47        CAMT3          9  0     43EDTCDE(1 $)
+     A  47        CMIS3          7        48
+     A N48        CAMT4          9  0     56EDTCDE(1 $)
+     A  48        CMIS4          7        61
+     A N49        CAMT5          9  0     69EDTCDE(1 $)
+     A  49        CMIS5          7        74
+     A*** 08/22/14                          SPACEA(1)

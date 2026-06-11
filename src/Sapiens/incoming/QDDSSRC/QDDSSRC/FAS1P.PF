@@ -1,0 +1,113 @@
+     A* (c) 2010 StoneRiver, Inc. All rights Reserved.                     *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*
+     A* - PCS Rx Bill Process File
+     A*
+     A*****************************************************************
+     A* Created on 06/20/2001 by C:62 for Project:114MCI
+     A*****************************************************************
+     A* Purpose: This file will house the payable information data for
+     A*          the associated PCS record.  The file is used to
+     A*          determine payment reimbursement to the claimant and
+     A*          Pennsylvania Employment Benefit Trust Fund (PEBTF).
+     A*          This file determines the amounts to be reimbursed as
+     A*          well as the Fund Indicator for proper reimbursement
+     A*          to PEBTF.  It will be tied to FAS9P record via S1NAME.
+     A*          It will indicate the specific PCS, plus additional
+     A*          fields for use by PDS process.
+     A*****************************************************************
+     A* REVISIONS
+     A*
+     A* 09/14/10   C:227   Project: 114MXD
+     A*                    Changed field size of S1RX# from 8 to 13
+     A*
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PS101                     TEXT('PCS Rx Bill Process File')
+     A            S1CHRG    R     S         REFFLD(A112)
+     A                                      COLHDG('Amount Charge')
+     A            S1RXDT    R     S         REFFLD(DT8)
+     A                                      COLHDG('Rx Date')
+     A            S1CL#          8A
+     A                                      COLHDG('Claim Number')
+     A            S1CLR#    R               REFFLD(DS15)
+     A                                      COLHDG('Claim Ref no.')
+     A*** BEG CHG *** 09/14/10 ****************************************
+     A*********** S1RX#     R               REFFLD(DS8)
+     A            S1RX#     R               REFFLD(DS13)
+     A*** END CHG *** 09/14/10 ****************************************
+     A                                      COLHDG('Rx number')
+     A            S1REF#         2S 0
+     A                                      COLHDG('Reference no.')
+     A            S1MNAM    R               REFFLD(DS40)
+     A                                      COLHDG('Member name')
+     A            S1NDC     R               REFFLD(NDC)
+     A                                      COLHDG('NDC number')
+     A            S1DNAM    R               REFFLD(DS30)
+     A                                      COLHDG('Drug name')
+     A            S1TSS#    R     S         REFFLD(A90)
+     A                                      COLHDG('Tax ID/SSN')
+     A            S1QTY     R     S         REFFLD(A92)
+     A                                      COLHDG('Quantity')
+     A            S1COPY    R     S         REFFLD(A112)
+     A                                      COLHDG('Copay')
+     A            S1FIND    R               REFFLD(FLAG)
+     A                                      COLHDG('Fund Indicator')
+     A            S1ADR1        32A
+     A                                      COLHDG('Street Address')
+     A            S1CTY         23A
+     A                                      COLHDG('City')
+     A            S1ST      R               REFFLD(ST)
+     A                                      COLHDG('State')
+     A            S1ZIP          9A
+     A                                      COLHDG('Zip code')
+     A            S1NAME    R               REFFLD(DS10)
+     A                                      COLHDG('(PDS) Document ID')
+     A            S1TRN#    R               REFFLD(EOB#)
+     A                                      COLHDG('(PDS) Transaction #')
+     A            S1PRFL    R               REFFLD(FLAG)
+     A                                      COLHDG('(PDS) Processed Flag')
+     A*
+     A*                                     *blank = not processed yet
+     A*                                     "D" = Deleted
+     A*                                     "E" = Error
+     A*                                     "Y" = written to WCMC
+     A*
+     A            S1PRDT    R               REFFLD(DT)
+     A                                      COLHDG('(PDS) Process Date')
+     A            S1PRTM    R               REFFLD(TIME)
+     A                                      COLHDG('(PDS) Process Time')
+     A            S1SCL#    R               REFFLD(SCL#)
+     A                                      COLHDG('(PDS) Claim#')
+     A            S1CO#     R               REFFLD(CO#)
+     A                                      COLHDG('(PDS) Company #')
+     A            S1SUB#    R               REFFLD(SUB#)
+     A                                      COLHDG('(PDS) Subscriber #')
+     A            S1FND     R               REFFLD(FND)
+     A                                      COLHDG('(PDS) Group #')
+     A            S1FYR     R               REFFLD(FYR)
+     A                                      COLHDG('(PDS) Year')
+     A            S1CASE    R               REFFLD(CASE)
+     A                                      COLHDG('(PDS) Case #')
+     A            S1SS#     R               REFFLD(SS#)
+     A                                      COLHDG('(PDS) SS#')
+     A            S1ACDT    R               REFFLD(DT)
+     A                                      COLHDG('(PDS) ACDT')
+     A            S1FEIN    R               REFFLD(FEIN)
+     A                                      COLHDG('(PDS) FEIN')
+     A            S1MOD     R               REFFLD(MOD)
+     A                                      COLHDG('(PDS) Provider Mod')
+     A            S1EOB1    R               REFFLD(EOB#)
+     A                                      COLHDG('(PDS) EOMB 1')
+     A            S1EOB2    R               REFFLD(EOB#)
+     A                                      COLHDG('(PDS) EOMB 2')
+     A            S1DLUS    R               REFFLD(USER)
+     A                                      COLHDG('(PDS) Delete User')
+     A            S1DLPG    R               REFFLD(PGM)
+     A                                      COLHDG('(PDS) Delete Pgm')
+     A            S1DLTM    R               REFFLD(TIME)
+     A                                      COLHDG('(PDS) Delete Time')
+     A            S1DLDT    R               REFFLD(DT)
+     A                                      COLHDG('(PDS) Delete Date')
+     A            S1DLRE    R               REFFLD(DS70)
+     A                                      COLHDG('(PDS) Delete Reason')

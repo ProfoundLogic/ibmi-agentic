@@ -1,0 +1,113 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   POLICY FORMS SELECTION DISPLAY                           **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A**                                                            **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*---------------------------------------------------------------
+     A*    SCR01 - SCREEN 1
+     A          R SCR01
+     A                                      CF03
+     A                                      CF05
+     A                                      CF07
+     A                                      CF13
+     A                                      SETOF(21)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C7025F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 11 27'Policy number:'
+     A            SCPOL#    R     A  B 11 42REFFLD(POL#)
+     A*                                     DSPATR(CS)
+     A                                      TEXT('POLICY NUMBER')
+     A                                      OVRDTA
+     A  21                                  ERRMSGID(CCR0535 *LIBL/CMESGG)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 25'F5=Policy search'
+     A                                      COLOR(BLU)
+     A                                 23 51'F7=Named insured search'
+     A                                      COLOR(BLU)
+     A                                 24 51'F13=Change user parameters'
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A*    SCR02S - SCREEN 2 SUBFILE RECORD
+     A          R SCR02S                    SFL
+     A            SHCDE          3   H      TEXT('OPTION CODE')
+     A            SHLIN#    R        H      REFFLD(SEQ#)
+     A            SCDS10        10   O  7  2TEXT('SUBMITTED MESSAGE')
+     A            SCOPT     R        B  7 14REFFLD(FLAG)
+     A                                      DSPATR(UL)
+     A                                      TEXT('OPTION')
+     A  20                                  DSPATR(PC)
+     A  20                                  DSPATR(RI)
+     A            SCDS40    R        O  7 17REFFLD(DS40)
+     A*----------------------------------------------------------------
+     A*    SCR02C - SCREEN 2 SUBFILE CONTROL RECORD
+     A          R SCR02C                    SFLCTL(SCR02S)
+     A                                      SFLSIZ(0014)
+     A                                      SFLPAG(0013)
+     A                                      CF03
+     A                                      CF12
+     A                                      KEEP
+     A                                      OVERLAY
+     A  90                                  SFLCLR
+     A  91                                  SFLDSP
+     A  91                                  SFLDSPCTL
+     A  99                                  SFLEND(*MORE)
+     A  20                                  SFLMSGID(CCR0750 *LIBL/CMESGG)
+     A                                      SFLCSRRRN(&SFRRN)
+     A            SFRNO          4S 0H      SFLRCDNBR(CURSOR)
+     A            SFRRN          5S 0H
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C7025F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A                                  4  2'Policy:'
+     A            SCPOL#    R     A  O  4 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  4 27'Name:'
+     A            SCFIN     R     A  O  4 35REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                  5  2'Agent Code:'
+     A            SCAGT#    R     A  O  5 14REFFLD(AGT#)
+     A*----------------------------------------------------------------
+     A*    SCR02R - SCREEN 2 SUBFILE OPTION LINE RECORD
+     A          R SCR02R
+     A                                      OVERLAY
+     A                                 22  7'Place an "X" next to the DEC Pages-
+     A                                       you wish to run and Press Enter.'
+     A                                 24  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 24 28'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A*---------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

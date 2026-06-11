@@ -1,0 +1,420 @@
+      * (c) 2010 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+
+     A*
+     A* WC WAREHOUSE CLAIM MASTER
+     A****************************************************************
+     A*  CREATED: 03.10.00   C:58     PROJECT: WC924
+     A****************************************************************
+     A*
+     A* ============================================================ *
+     A* NOTICE: All NEW fields must be added before the AS-OF DATE
+     A*         which is the last fields in this file !!!!!!!!!!!
+     A* ============================================================ *
+     A*
+     A* REVISIONS:
+     A*                                                               *
+     A* 05/05/10  C:61   Project: WC1473 PRISS 21                      *
+     A*                  Reverse change made for WC1473.               *
+     A*                                                               *
+     A* 04/20/09  C:190  Project: WC1473                               *
+     A*                  Add field to hold class code extension.       *
+     A*                                                                *
+     A* 07/14/04  C:132  PROJECT: 93DDP                               *
+     A*                  ADD ten new Recovery Amount fields before    *
+     A*                  the AS-OF-DATE field.                        *
+     A*                                                               *
+     A* 11/06/03  C:53   PROJECT: WC909                               *
+     A*                  OUT-OF-COUNTRY CITY/PROVINCE/POSTAL CODE.    *
+     A*
+     A* 05/30/02  C:132 PROJECT WC924
+     A*                - Add Adjuster ID
+     A*                - Add Adjuster Area Code & Phone Number
+     A*                - Add Adjuster FAX Number
+     A*                - Add Adjuster Email Address
+     A*
+     A* 04/10/01  C:03  PROJECT WC924
+     A*                - ADDED FIELD FOR INTERNAL CASE NUMBER
+     A*                   THIS WILL ALLOW FOR THE FACT THAT CMCASE
+     A*                   COULD BE LOADED WITH A CLT'S CLM# (CMACL# OR
+     A*                   CMCVT#) RATHER THAN WMCMP/CMCASE
+     A*
+     A*     ADD field: CLEFDT - Data AS OF date.
+     A* 02/06/01  C:61  PROJECT WC924
+     A*                - Change ClassCode from 4 numeric to 10 text
+     A*                - Add ClassCodeDescription
+     A*                - Change SS# from 10 to 11
+     A*
+     A*     ADD field: CLEFDT - Data AS OF date.
+     A*
+     A****************************************************************
+     A                                      REF(WREFP)
+     A          R PCL01                     TEXT('CLAIM MASTER FILE')
+     A*
+     A*      ==>GRP/EMP#/YR
+     A            CLPONR        25          TEXT('Policy Number')
+     A                                      COLHDG('POLICY NUMBER')
+     A*
+     A****** BEG CHG ***** 04/11/01 **** COMMENT ONLY ****************
+     A* WMCMP==>CMCASE  OR (CMACL# OR CMCVT# - CLT MOD AS NEEDED)
+     A****** END CHG ***** 04/11/01 **** COMMENT ONLY ****************
+     A            CLCASE        25          TEXT('Claim Number')
+     A                                      COLHDG('Claim')
+     A* Lookup WTGTP @ 'JRST +"LC"' ==>GTCF01 1-2
+     A            CLACT          2          TEXT('--             ')
+     A                                      COLHDG('--             ')
+     A* WMCMP==>CMPART
+     A            CLPART         2          TEXT('Body part')
+     A                                      COLHDG('Part')
+     A* WMCMP==>CMCATA??
+     A            CLCATA         2S 0       TEXT('Catastrophe code')
+     A                                      COLHDG('Cat')
+     A* WMCMP==>CMCAUS
+     A            CLCAUS         2          TEXT('Cause code')
+     A                                      COLHDG('Cause')
+     A* WMCMP==>??
+     A****** BEG CHG ***** 02/06/01 **********************************
+     A**********  CLCLAS         4S 0       TEXT('Class code')
+     A            CLCLAS        10          TEXT('Class code')
+     A****** END CHG ***** 02/06/01 **********************************
+     A                                      COLHDG('Class')
+     A****** BEG ADD ***** 02/06/01 **********************************
+      *
+     A            CLCLDS       100          TEXT('Class Code Description')
+     A                                      COLHDG('Class' 'Code'+
+                                            'Description')
+      *
+     A****** END ADD ***** 02/06/01 **********************************
+     A* WMCMP==>CMACDT
+     A            CLACDT        10          TEXT('Accident date')
+     A                                      COLHDG('Accident Dt')
+     A* WMCMP==>CMJRST
+     A            CLJRST         2          TEXT('Jurisdct state')
+     A                                      COLHDG('Jur' 'ST')
+     A* WMCMP==>CMACDS + CMACD2 + CMACD3
+     A            CLACDS       255          TEXT('Accident Description')
+     A                                      COLHDG('Description')
+     A* WMCMP==>CMMCTP
+     A            CLMCTP         2S 0       TEXT('MCO type')
+     A                                      COLHDG('MC Typ')
+     A* WMCMP==>CMNATR
+     A            CLNATR         2          TEXT('Nature of accident')
+     A                                      COLHDG('Natr')
+     A* WMCMP==>CMCOVT
+     A            CLCOVT         2          TEXT('Coverage type')
+     A                                      COLHDG('Cov' 'Typ')
+     A* Lookup WTGTP @ 'JRST +"LC"' ==>GTCF01 3-4
+     A            CLLSCV         2          TEXT('Loss type')
+     A                                      COLHDG('Loss' 'Type')
+     A* WMCMP==>CMLSCV
+     A            CLLSRV         2          TEXT('Recovery type')
+     A                                      COLHDG('Recv' 'Type')
+     A* WMLLP==> LLMTST
+     A            CLLSST         2          TEXT('Settlement type')
+     A                                      COLHDG('Settl' 'Type')
+     A* WMCMP==>CMSTAT
+     A            CLSTAT         1S 0       TEXT('Status')
+     A                                      COLHDG('Stat')
+     A*
+     A* WDPAP==> Sum of Ded Reimbl Medical pmts
+     A            CLDEDR        16S 2       TEXT('Deductible reimbursable')
+     A                                      COLHDG('Dedbl reimbsbl Med')
+     A* WMCMP==>CMARx + CMRRx        ='E' --ALAE
+     A            CLALAE        16S 2       TEXT('Incurred ALAE')
+     A                                      COLHDG('Incurred ALAE')
+     A* WMCMP==> Zeroes                   --ULAE
+     A            CLULAE        16S 2       TEXT('Incurred ULAE')
+     A                                      COLHDG('Inc              ')
+     A* WMCMP==>CMARx + CMRRx        ='C'
+     A            CLRUCO        16S 2       TEXT('Incurred indemnity')
+     A                                      COLHDG('Inc Indemnity')
+     A* WMCMP==>CMARx + CMRRx        ='M'
+     A            CLRUME        16S 2       TEXT('Incurred medical')
+     A                                      COLHDG('Inc Medical')
+     A* WMCMP==>CMNCCI
+     A            CLINJT         2S 0       TEXT('Injury type')
+     A                                      COLHDG('Inj' 'Typ')
+     A* WMLLP==>  LLLUMP
+     A            CLLUSF         1          TEXT('Lump sum Y N')
+     A                                      COLHDG('Lump' 'Sum')
+     A* WMCMP==>CMARxx   ='E'
+     A            CLPDLE        16S 2       TEXT('Paid ALAE')
+     A                                      COLHDG('Paid ALAE')
+     A* WMCMP==> Zeroes                   --ULAE
+     A            CLPDUL        16S 2       TEXT('Paid ULAE')
+     A                                      COLHDG('Paid ULAE')
+     A* WMCMP==>CMARxx   ='C'
+     A            CLPDCO        16S 2       TEXT('Paid indemnity')
+     A                                      COLHDG('Paid Indemnity')
+     A* WMCMP==>CMARxx   ='M'
+     A            CLPDME        16S 2       TEXT('Paid medical')
+     A                                      COLHDG('Paid Medical')
+     A* WMCMP==>CMOFF#
+     A            CLTEPD        10          TEXT('                ')
+     A                                      COLHDG('Tpaid')
+     A* WMCMP=CMVORC
+     A            CLVORC         1          TEXT('Vocational rehab')
+     A                                      COLHDG('Voc' 'Rehab')
+     A* WMCMP==>CMRRx                ='C'
+     A            CLOSCO        16S 2       TEXT('Outstanding indemnity')
+     A                                      COLHDG('Outst Indemnity')
+     A* WMCMP==>CMRRx                ='M'
+     A            CLOSME        16S 2       TEXT('Outstanding medical')
+     A                                      COLHDG('Outst Medical')
+     A* WMCMP==>CMRRx                ='E' --ALAE
+     A            CLOSLE        16S 2       TEXT('Outstanding ALAE')
+     A                                      COLHDG('Outstanding ALAE')
+     A* WMCMP==> Zeroes                   --ULAE
+     A            CLOSUL        16S 2       TEXT('Outstanding ULAE')
+     A                                      COLHDG('Outstanding ULAE')
+     A* WDPAP==> Sum recoveries RETP  ='C'  TYPE = R
+     A            CLRVCO        16S 2       TEXT('Recovered indemnity')
+     A                                      COLHDG('Recv Indemnity')
+     A* WDPAP==> Sum recoveries RETP  ='M'  TYPE = R
+     A            CLRVME        16S 2       TEXT('Recovered medical')
+     A                                      COLHDG('Recvd Medical')
+     A* WDPAP==> Sum recoveries RETP  ='E'  TYPE = R
+     A            CLRVLE        16S 2       TEXT('Recovered ALAE')
+     A                                      COLHDG('Recovd ALAE')
+     A* WMCMP==> Zeroes                   --ULAE
+     A            CLRVUL        16S 2       TEXT('Recovered ULAE')
+     A                                      COLHDG('Recvd ULAE')
+     A* WMCMP==>CMFSN
+     A            CLFSN         25          TEXT('Claimant first name')
+     A                                      COLHDG('Name')
+     A* WMCMP==>CMLSN
+     A            CLLSN         25          TEXT('Claimant last name')
+     A* WMCMP==>CMMID
+     A            CLMID         25          TEXT('Middle initial')
+     A                                      COLHDG('MI')
+     A* WMCDP==>CDADR1
+     A            CLADR1        50          TEXT('Claimant address 1')
+     A                                      COLHDG('Address 1')
+     A* WMCDP==>CDADR2
+     A            CLADR2        50          TEXT('Claimnt address 2')
+     A                                      COLHDG('Address 2')
+     A* WMCDP==>CDCTY
+     A            CLCTY         25          TEXT('Claimnt city')
+     A                                      COLHDG('City')
+     A* WMCDP==>CDST
+     A            CLST           2          TEXT('Claimnt state')
+     A                                      COLHDG('City')
+     A* WMCDP==>CDZIP
+     A            CLZIP         10          TEXT('Claimnt zip code')
+     A                                      COLHDG('Zip code')
+     A* WMCDP==>CDSEX
+     A            CLSEX          1          TEXT('Claimnt gender')
+     A                                      COLHDG('Sex')
+     A* WMCDP==>CDMSTS         Translate to married Y or N
+     A            CLMSTS         1          TEXT('Marital status')
+     A                                      COLHDG('Married')
+     A* WMCMP==>CMSS#
+     A****** BEG CHG ***** 02/06/01 **********************************
+     A*********** CLSS#         10          TEXT('Claimant Soc Secy #')
+     A            CLSS#         11          TEXT('Claimant Soc Secy #')
+     A****** END CHG ***** 02/06/01 **********************************
+     A                                      COLHDG('Soc Sec #')
+     A* WMCDP==>CDDTOB
+     A            CLDTOB        10          TEXT('Claimant date of birth')
+     A                                      COLHDG('Birth Date')
+     A* WMCMP==>CMHIDT
+     A            CLHIDT        10          TEXT('Claimant hire date')
+     A                                      COLHDG('Date Hired')
+     A* WMCMP==>CMDOD
+     A            CLDOD         10          TEXT('Claimant death date')
+     A                                      COLHDG('Date of Death')
+     A****** BEG ADD ***** 05/30/02 **********************************
+     A*      ==>Blanks
+     A            CLEXID        25          TEXT('Adjustor ID')
+     A                                      COLHDG('Adjustor ID')
+     A****** END ADD ***** 05/30/02 **********************************
+     A* WMUPP==>UPUSNM @ CLEX
+     A            CLEXN         25          TEXT('Adjustor name')
+     A                                      COLHDG('Adjustor Name')
+     A*      ==>Blanks
+     A            CLEXA1        50          TEXT('Adjustor address 1')
+     A                                      COLHDG('Adjustor Address ')
+     A*      ==>Blanks
+     A            CLEXA2        50          TEXT('Adjustor address 2')
+     A                                      COLHDG('Adjustor Address ')
+     A*      ==>Blanks
+     A            CLEXCY        25          TEXT('Adjustor city')
+     A                                      COLHDG('Adjustor city ')
+     A*      ==>Blanks
+     A            CLEXST         2          TEXT('Adjustor state')
+     A                                      COLHDG('Adjustor Address ')
+     A*      ==>Blanks
+     A            CLEXZP        10          TEXT('Adjustor zip code')
+     A                                      COLHDG('Adjustor Zip ')
+     A****** BEG ADD ***** 05/30/02 **********************************
+     A* WMCMP/CMXLEX ==> WMUPP/UPPHNA + UPPHN#
+     A            CLEPHN        20          TEXT('Adjustor Phone')
+     A                                      COLHDG('Adjustor' 'Phone')
+     A* WMCMP/CMCLEX ==> WMUPP/UPFAXA + UPFAX#
+     A            CLEFAX        20          TEXT('Adjustor FAX #')
+     A                                      COLHDG('Adjustor' 'FAX #')
+     A* WMCMP/CMCLEX ==> WMUPP/UPMAIL
+     A            CLEMAL        60          TEXT('Adjustor Email')
+     A                                      COLHDG('Adjustor' 'Email')
+     A****** END ADD ***** 05/30/02 **********************************
+     A*
+     A* SMALP==>ALLIC   @ UPUSNM from WMUPP
+     A            CLEXFE        10          TEXT('Adjustor FEIN')
+     A                                      COLHDG('Adjustor FEIN ')
+     A* WMCMP==>CMRCVD
+     A            CLDTRP        10          TEXT('Date reptd admin')
+     A                                      COLHDG('Date Reported')
+     A* WMCMP==>CMDTRP
+     A            CLRPTD        10          TEXT('Date reprtd to emplyr')
+     A                                      COLHDG('Rptd to Emplyr')
+     A* WMCMP==>CMLTFL      translate I, M, R
+     A            CLTYPE        10          TEXT('Claim type')
+     A                                      COLHDG('Claim type')
+     A* WMCMP==>CMOCDS
+     A            CLOCDS        18          TEXT('Occupation description')
+     A                                      COLHDG('Occupation desc')
+     A* WMCHP==>CHEFDT   @ OCST = C
+     A            CLCLDT        10          TEXT('Date closed')
+     A                                      COLHDG('Date Closed')
+     A* WDPAP==>  Add days lost
+     A            CLLOST         4S 0       TEXT('Comp days lost')
+     A                                      COLHDG('Days Lost')
+     A* WMCMP==> Zeroes
+     A            CLCAFE        16S 2       TEXT('Claimant attrny fee')
+     A                                      COLHDG('Clmt Atty Fee')
+     A* WMCMP==> Zeroes
+     A            CLEAFE        16S 2       TEXT('Employer attrny fee')
+     A                                      COLHDG('Emp Atty Fee')
+     A* WMCMP==>CMDEPT
+     A            CLDEPT        10          TEXT('Department')
+     A                                      COLHDG('Department')
+     A*  %%  ==>   ??
+     A            CLDRIN        16S 2       TEXT('Deductbl reimb indemnity')
+     A                                      COLHDG('Reimb Deductble')
+     A* WMCMP==>CMDIV
+     A            CLDIV          5S 0       TEXT('Division')
+     A                                      COLHDG('Division')
+     A* WMCMP==>CMCTG1  @ WMALP
+     A            CLLOC         10          TEXT('Location')
+     A                                      COLHDG('Location')
+     A* WMCMP==>CMCO#
+     A            CLCO#          3S 0       TEXT('Owner code')
+     A                                      COLHDG('Owner')
+     A* WMLLP==> LLLITG
+     A            CLLITF         1          TEXT('Litigation Y N')
+     A                                      COLHDG('Litig')
+     A* WMCMP==>CMCVFL
+     A            CLCVFL         1          TEXT('Controverted')
+     A                                      COLHDG('Cntv')
+     A* WMCMP==>CMSUBR
+     A            CLSUBR         1          TEXT('Subrogated')
+     A                                      COLHDG('Subr')
+     A* WMLLP==>LLFRAU
+     A            CLFRAU         2          TEXT('Fraud flag')
+     A                                      COLHDG('Frd')
+     A* WMCMP==>CMDNY
+     A            CLDNY          1          TEXT('Claim denied')
+     A                                      COLHDG('Denied')
+     A* WAMCP==>MCCLM#
+     A            CLMULT        25          TEXT('Multiple claim number')
+     A                                      COLHDG('Multiple claim #')
+     A* WMCMP==>CMAWW
+     A            CLAWW         10S 2       TEXT('Average weekly wage')
+     A                                      COLHDG('Avg Wkly Wage')
+     A* WMCMP==>CMDTLW      WMWHP latest rec
+     A            CLDTLW        10          TEXT('Date last worked')
+     A                                      COLHDG('Last worked')
+     A*** BEGIN ADD *** 04/03/00 **************************************
+     A* WDPAP==> if PARETP   ='L'   TYPE <> R
+     A            CLPDLG        16S 2       TEXT('Paid Legal')
+     A                                      COLHDG('Paid Legal')
+     A* WMCMP==>CMARx + CMRRx        ='E' --ALAE
+     A            CLINLG        16S 2       TEXT('Incurred Legal')
+     A                                      COLHDG('Incurred Legal')
+     A* WMCMP==>CMRRx                ='E' --ALAE
+     A            CLOSLG        16S 2       TEXT('Outstanding Legal')
+     A                                      COLHDG('Outstanding Legal')
+     A* WDPAP==> if PARETP   ='L'   TYPE = R
+     A            CLRVLG        16S 2       TEXT('Recovered Legal')
+     A                                      COLHDG('Recv Legal')
+     A* WMUPP==>UPUSNM @ CMSUPR
+     A            CLSUN         40          TEXT('Supervisor name')
+     A                                      COLHDG('Supervisor Name')
+     A*** END ADD ***** 04/03/00 **************************************
+     A*** BGN ADD ***** 04/10/01 **************************************
+     A* WMCMP==> CMCASE
+     A            CLICLM        25          TEXT('INTERNAL CLM#')
+     A*** END ADD ***** 04/10/01 **************************************
+     A*** BEG ADD *** 11/06/03 *****************************           *********
+     A            CLCTRY         3A         COLHDG('COUNTRY CODE')
+     A            CLADR3    R               REFFLD(DS40)
+     A                                      COLHDG('CITY/PROV/POSTAL CD')
+     A*** END ADD *** 11/06/03 *****************************           *********
+     A*
+      ***** BEG ADD ***** 07/14/04 ****************************************
+     A* Deductible Recovery ALAE
+     A* WDPAP==>PAAMT where PATYPE='R' and PABR2 = WMFNP/FNEXP1
+     A            CLDREX        16S 2       TEXT('Deductbl reimb ALAE')
+     A                                      COLHDG('Ded Reimb ALAE')
+     A* Deductible Recovery Legal
+     A* WDPAP==>PAAMT where PATYPE='R' and PABR2 = WMFNP/FNLEP1
+     A            CLDRLE        16S 2       TEXT('Deductbl reimp Legal')
+     A                                      COLHDG('Ded Reimb Legal')
+     A* 2nd Injury Recovery Indemnity
+     A* WDPAP==>PAAMT where PATYPE='R' and PABR2 = 'SD' and PARETP='IN'
+     A            CL2IIN        16S 2       TEXT('2nd Injury Reimb Indemnity')
+     A                                      COLHDG('2Inj Reimb Indemnity')
+     A* 2nd Injury Recovery Medical
+     A* WDPAP==>PAAMT where PATYPE='R' and PABR2 = 'SD' and PARETP='ME'
+     A            CL2IME        16S 2       TEXT('2nd Injury Reimb Medical')
+     A                                      COLHDG('2Inj Reimb Medical')
+     A* 2nd Injury Recovery ALAE
+     A* WDPAP==>PAAMT where PATYPE='R' and PABR2 = 'SD' and PARETP='EX'
+     A            CL2IEX        16S 2       TEXT('2nd Injury Reimb ALAE')
+     A                                      COLHDG('2nd Inj Reimb ALAE')
+     A* 2nd Injury Recovery Legal
+     A* WDPAP==>PAAMT where PATYPE='R' and PABR2 = 'SD' and PARETP='LE'
+     A            CL2ILE        16S 2       TEXT('2nd Injury Reimb Legal')
+     A                                      COLHDG('2nd Inj Reimb Legal')
+     A* Subrogated Recovery Indemnity
+     A* WDPAP==>PAAMT where PATYPE='R' and PABR2 = 'TH' and PARETP='IN'
+     A            CLSBIN        16S 2       TEXT('Subrogated Reimb Indemnity')
+     A                                      COLHDG('Subro Reimb Indmnity')
+     A* Subrogated Recovery Medical
+     A* WDPAP==>PAAMT where PATYPE='R' and PABR2 = 'TH' and PARETP='ME'
+     A            CLSBME        16S 2       TEXT('Subrogated Reimb Medical')
+     A                                      COLHDG('Subro Reimb Medical')
+     A* Subrogated Recovery ALAE
+     A* WDPAP==>PAAMT where PATYPE='R' and PABR2 = 'TH' and PARETP='EX'
+     A            CLSBEX        16S 2       TEXT('Subrogated Reimb ALAE')
+     A                                      COLHDG('Subro Reimb ALAE')
+     A* Subrogated Recovery Legal
+     A* WDPAP==>PAAMT where PATYPE='R' and PABR2 = 'TH' and PARETP='LE'
+     A            CLSBLE        16S 2       TEXT('Subrogated Reimb Legal')
+     A                                      COLHDG('Subro Reimb Legal')
+      ***** END ADD ***** 07/14/04 ****************************************
+     A*** Beg Add *** 04/20/09 **************************************  *********
+     A*** Beg del *** 05/05/10 **************************************  *********
+     A******      CLEXT     R               REFFLD(CLA2)
+     A******                                COLHDG('Payroll Class' +
+     A******                                'Extension')
+     A*** end del *** 05/05/10 **************************************  *********
+     A*** End Add *** 04/20/09 **************************************  *********
+      *
+     A* =========================================================== *
+     A* NOTICE: All NEW fields must be added before the AS-OF DATE
+     A*         which is the last fields in this file !!!!!!!!!!!
+     A* ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ==== *
+     A*
+     A*  TIME:  DSDT   (Last Field in this file)
+     A            CLAODT        10          TEXT('Data as of date')
+     A                                      COLHDG('As Of Date')
+     A* =========================================================== *
+     A* ============================================================ *
+     A*
+     A*  NOTE: ANY FIELDS ADDED TO THIS FILE NEED TO BE ADDED IN
+     A*        FRONT OF THE AS OF DATE FIELD AT END OF THE FILE -
+     A*        OR THIS COULD CAUSE RECORDS TO BE MISSED/SKIPPED
+     A*        DURING THE IMPORT PROCESS AFTER THE EXTRACT IS RUN.
+     A*
+     A* ============================================================ *

@@ -1,0 +1,54 @@
+     Hcopyright('(c) 2012 StoneRiver, Inc. All rights reserved. -
+     H StoneRiver is a trademark of StoneRiver, Inc.')
+     H option(*nodebugio:*srcstmt)
+     H dftactgrp(*no) actgrp('QILE')
+     H/define CONVERT
+     H*                                                               *
+     H* API - FA748R - Retrieve Policy State                          *DATA
+     H*******************************************************************
+     H*                                                               * *
+     H*  Called From: IS016R - Image Notes                            * *
+     H*  Calls To:    None                                            * *
+     H*                                                               * *
+     H*******************************************************************
+     H* Created on 07/02/2007 by c:62 for  Project 10MKO              * *
+     H*******************************************************************
+     H* Revisions:                                                    *
+     H*                                                               *
+     H*****************************************************************
+     FFAEOL68   IF   E           K DISK
+
+     C*================================================================
+     C* Parameter lists
+     C*================================================================
+     C     *ENTRY        PLIST
+     C                   PARM                    @@IDOC
+     C                   PARM                    @@POST            4
+     C                   PARM                    @@RTCD            1
+     C*================================================================
+     C* Key lists
+     C*================================================================
+     C*
+     C     EOKY          KLIST
+     C                   KFLD                    @@IDOC
+     C*================================================================
+     C* Like Defines
+     C*================================================================
+     C     *LIKE         DEFINE    EOIDOC        @@IDOC
+     C*================================================================
+     C* Main Processing
+     C*================================================================
+     C*
+     C     EOKY          CHAIN     PEO01                              99
+     C     *IN99         IFEQ      *OFF
+     C     EOPOST        IFNE      *BLANKS
+     C                   MOVEL     EOPOST        @@POST
+     C                   ELSE
+     C                   MOVEL     'None'        @@POST
+     C                   ENDIF
+     C                   ELSE
+     C                   MOVEL     'None'        @@POST
+     C                   MOVEL     '1'           @@RTCD
+     C                   ENDIF
+     C*
+     C                   RETURN

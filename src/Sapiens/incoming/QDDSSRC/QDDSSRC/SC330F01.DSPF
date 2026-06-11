@@ -1,0 +1,409 @@
+     A*****************************************************************
+     A** (C) COPYRIGHT PROGRESSIVE DATA SOLUTIONS, INC., 1998
+     A*****************************************************************
+     A**   WORK WITH KEY DEFINITIONS
+     A**                                                             **
+     A**   PROGRAMMER: C:86                                          **
+     A**   CREATED:   01/19/98      PROJECT: DR052                   **
+     A****************************************************************
+     A** REVISIONS
+     A**  11/09/12 *** C:286 *** 81073 ***
+     A**           1. Correct the spelling of column heading
+     A**
+     A*****************************************************************
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/SCREFP)
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      CF12
+     A*****************************************************************
+     A          R SCR01
+     A                                      KEEP
+     A                                      ASSUME
+     A                                      CF10
+     A                                      VLDCMDKEY(97)
+     A                                      RTNCSRLOC(&HREC &HFLD)
+     A            HREC          10A  H
+     A            HFLD          10A  H
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10A  O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR01'
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A                                 24  2'F3=Exit   F10=Search   F12=Cancel'
+     A                                      COLOR(BLU)
+     A                                  4  4'Program . . :'
+     A            SCPGMN    R        B  4 18REFFLD(PGM)
+     A  79                                  ERRMSGID(SCM0503 *LIBL/SCMESG)
+     A  74                                  ERRMSGID(SC40002 *LIBL/SCMESG)
+     A                                      DSPATR(HI)
+     A  79
+     AO 74                                  DSPATR(PC)
+     A  09                                  DSPATR(PR)
+     A N09                                  DSPATR(UL)
+     A                                  4 65'Status:'
+     A            SCSTAT         1A  O  4 73
+     A  09                                  DSPATR(HI)
+     A                                  5  4'Description :'
+     A            SCDESC    R        B  5 18REFFLD(DS40)
+     A  81                                  ERRMSGID(SCM0503 *LIBL/SCMESG)
+     A                                      DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A  81                                  DSPATR(PC)
+     A N09                                  DSPATR(UL)
+     A                                  7  6'Heading'
+     A                                  7 19'Length'
+     A                                  7 33'Data starts'
+     A                                  7 48'Length of'
+     A**** Begin CHG *** 11/09/12 *** SEQ81073 *************************
+     A****                              7 60'Decimal Postitions'
+     A                                  7 60'Decimal Positions '
+     A**** End   CHG *** 11/09/12 *** SEQ81073 *************************
+     A                                  8  6'for Key'
+     A                                  8 19'of head'
+     A                                  8 33'in position'
+     A                                  8 48'Data field'
+     A                                  8 62' in Data field'
+     A            SCHD01    R        B  9  6REFFLD(PKD01/KDHD01 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A  82                                  ERRMSGID(SCM0509 *LIBL/SCMESG)
+     A                                      CHECK(LC)
+     A                                      DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A  82                                  DSPATR(PC)
+     A            SCHL01    R     Y  B  9 20REFFLD(PKD01/KDHL01 *LIBL/SMKDP)
+     A  83                                  ERRMSGID(SCM0509 *LIBL/SCMESG)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A  83
+     AO 76                                  DSPATR(PC)
+     A                                  9 29'-'
+     A N09                                  DSPATR(HI)
+     A            SCDS01    R     Y  B  9 36REFFLD(PKD01/KDDS01 *LIBL/SMKDP)
+     A  84                                  ERRMSGID(SCM0509 *LIBL/SCMESG)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A  84                                  DSPATR(PC)
+     A            SCDL01    R     Y  B  9 50REFFLD(PKD01/KDDL01 *LIBL/SMKDP)
+     A  85                                  ERRMSGID(SCM0509 *LIBL/SCMESG)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A                                      DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A  85
+     AO 77                                  DSPATR(PC)
+     A            SCDD01    R        B  9 66REFFLD(PKD01/KDDD01 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 10  2'2)'
+     A N09                                  DSPATR(HI)
+     A            SCHD02    R        B 10  6REFFLD(PKD01/KDHD02 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCHL02    R     Y  B 10 20REFFLD(PKD01/KDHL02 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 10 29'-'
+     A N09                                  DSPATR(HI)
+     A            SCDS02    R     Y  B 10 36REFFLD(PKD01/KDDS02 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDL02    R     Y  B 10 50REFFLD(PKD01/KDDL02 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDD02    R        B 10 66REFFLD(PKD01/KDDD02 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 11  2'3)'
+     A N09                                  DSPATR(HI)
+     A            SCHD03    R        B 11  6REFFLD(PKD01/KDHD03 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCHL03    R     Y  B 11 20REFFLD(PKD01/KDHL03 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 11 29'-'
+     A N09                                  DSPATR(HI)
+     A            SCDS03    R     Y  B 11 36REFFLD(PKD01/KDDS03 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDL03    R     Y  B 11 50REFFLD(PKD01/KDDL03 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDD03    R        B 11 66REFFLD(PKD01/KDDD03 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 12  2'4)'
+     A N09                                  DSPATR(HI)
+     A            SCHD04    R        B 12  6REFFLD(PKD01/KDHD04 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCHL04    R     Y  B 12 20REFFLD(PKD01/KDHL04 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 12 29'-'
+     A N09                                  DSPATR(HI)
+     A            SCDS04    R     Y  B 12 36REFFLD(PKD01/KDDS04 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDL04    R     Y  B 12 50REFFLD(PKD01/KDDL04 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDD04    R        B 12 66REFFLD(PKD01/KDDD04 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 13  2'5)'
+     A N09                                  DSPATR(HI)
+     A            SCHD05    R        B 13  6REFFLD(PKD01/KDHD05 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCHL05    R     Y  B 13 20REFFLD(PKD01/KDHL05 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 13 29'-'
+     A N09                                  DSPATR(HI)
+     A            SCDS05    R     Y  B 13 36REFFLD(PKD01/KDDS05 *LIBL/SMKDP)
+     A  25                                  ERRMSGID(SCM0541 *LIBL/SCMESG)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDL05    R     Y  B 13 50REFFLD(PKD01/KDDL05 *LIBL/SMKDP)
+     A  24                                  ERRMSGID(SCM0542 *LIBL/SCMESG)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDD05    R        B 13 66REFFLD(PKD01/KDDD05 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 14  2'6)'
+     A N09                                  DSPATR(HI)
+     A            SCHD06    R        B 14  6REFFLD(PKD01/KDHD06 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCHL06    R     Y  B 14 20REFFLD(PKD01/KDHL06 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A                                 14 29'-'
+     A N09                                  DSPATR(HI)
+     A            SCDS06    R     Y  B 14 36REFFLD(PKD01/KDDS06 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDL06    R     Y  B 14 50REFFLD(PKD01/KDDL06 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDD06    R        B 14 66REFFLD(PKD01/KDDD06 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 15  2'7)'
+     A N09                                  DSPATR(HI)
+     A            SCHD07    R        B 15  6REFFLD(PKD01/KDHD07 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCHL07    R     Y  B 15 20REFFLD(PKD01/KDHL07 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 15 29'-'
+     A N09                                  DSPATR(HI)
+     A            SCDS07    R     Y  B 15 36REFFLD(PKD01/KDDS07 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDL07    R     Y  B 15 50REFFLD(PKD01/KDDL07 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDD07    R        B 15 66REFFLD(PKD01/KDDD07 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 16  2'8)'
+     A N09                                  DSPATR(HI)
+     A            SCHD08    R        B 16  6REFFLD(PKD01/KDHD08 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(LC)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCHL08    R     Y  B 16 20REFFLD(PKD01/KDHL08 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 16 29'-'
+     A N09                                  DSPATR(HI)
+     A            SCDS08    R     Y  B 16 36REFFLD(PKD01/KDDS08 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDL08    R     Y  B 16 50REFFLD(PKD01/KDDL08 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A            SCDD08    R        B 16 66REFFLD(PKD01/KDDD08 *LIBL/SMKDP)
+     A N09                                  DSPATR(UL)
+     A                                      CHECK(RB)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A                                 18  4'Total:'
+     A                                 20  4'Key type  . . . . . . . :'
+     A                                 21  4'Key conversion program  :'
+     A                                 22  4'Product database file   :'
+     A                                 23  4'Product database library:'
+     A            SCKYTP         2A  B 20 30
+     A  86                                  ERRMSGID(SCM0503 *LIBL/SCMESG)
+     A  09                                  DSPATR(PR)
+     A  86                                  DSPATR(PC)
+     A                                      DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A            SCCVTP         8A  B 21 30
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A            SCPGDS        40A  O 21 39
+     A  09                                  DSPATR(HI)
+     A            SCFIL          8A  B 22 30
+     A  78                                  ERRMSGID(SC40006 *LIBL/SCMESG)
+     A  78                                  DSPATR(PC)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A            SCLIB         10A  B 23 30
+     A  80                                  ERRMSGID(SC40006 *LIBL/SCMESG)
+     A  80                                  DSPATR(PC)
+     A  09                                  DSPATR(PR)
+     A  09                                  DSPATR(HI)
+     A N09                                  DSPATR(UL)
+     A            SCTPDS        40A  O 20 39
+     A  09                                  DSPATR(HI)
+     A                                  9  2'1)'
+     A N09                                  DSPATR(HI)
+     A            SCHLTL         5A  O 18 20
+     A  76                                  DSPATR(RI)
+     A  09                                  DSPATR(HI)
+     A            SCDLTL         5A  O 18 50
+     A  09                                  DSPATR(HI)
+     A  77                                  DSPATR(RI)
+     A                                 18 56'(not to exceed 40)'
+     A                                 18 26'(not to exceed 32)'
+     A*****************************************************************
+     A          R SCR02
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10   O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR02'
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A*****************************************************************
+     A          R SCR03
+     A                                  1  2USER
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            Q1PGM         10   O  2  2
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  2 76'SCR03'
+     A            SCMODE    R        O  3 71REFFLD(PGM)
+     A                                      DSPATR(HI)
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)

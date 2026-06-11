@@ -1,0 +1,179 @@
+     A*****************************************************************
+     A*  (C) Copyright Progressive Data Solutions Inc., 1998          *
+     A**                                                              *
+     A** WCMC EOMB Phys/HCFA Bill Detail Transaction File             *
+     A*****************************************************************
+     A*  Created by: C:05    Project: MC152    Date: 01/28/98         *
+     A*  NOTE:  See EXCEL spreadsheet FDDHP.XLS to review information *
+     A*         regarding conversion from old database file(s)        *
+     A*****************************************************************
+     A*  REVISIONS:                                                   *
+     A*                                                               *
+     A*   09/01/16 C:212 Project: FL091 Phase 2                       *
+     A*                  Add New fields. Change desc on some          *
+     A*
+     A*   07/14/11 C:251 Project: TX070
+     A*                  Added Rendering Physician state license
+     A*
+     A*   05/23/07 C:062 Project: MC295
+     A*                  Add Rendering NPI#
+     A*
+     A*   03/14/07 C:182 Project: FL067
+     A*                  Added Fields for Billed Modifier 1 2 3 4.
+     A*                         
+     A*   10/25/05 C:163 Project: 136MBR
+     A*                  Managed Care/Prov Bill Interface Process
+     A*
+     A*   10/31/05 C:163 PROJECT: FL056
+     A*                  FL EDI SCREEN CHANGES
+     A*
+     A*   06/14/99 C:53 PROJECT: MC152
+     A*                 ADD FIELD(S)
+     A*
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PDH01                     TEXT('EOMB PHYS/HCFA DETAIL FILE')
+     A            DHCO#     R               REFFLD(CO#)
+     A                                      COLHDG('COMPANY#')
+     A            DHSUB#    R               REFFLD(SUB#)
+     A                                      COLHDG('SUBSCRIBER')
+     A            DHFND     R               REFFLD(FND)
+     A                                      COLHDG('GROUP')
+     A            DHFYR     R               REFFLD(FYR)
+     A                                      COLHDG('YEAR')
+     A            DHCASE    R               REFFLD(CASE)
+     A                                      COLHDG('CASE#')
+     A            DHSS#     R               REFFLD(SS#)
+     A                                      COLHDG('SOC SEC#')
+     A            DHACDT    R               REFFLD(DT)
+     A                                      COLHDG('ACC DATE')
+     A            DHEOB#    R               REFFLD(EOB#)
+     A                                      COLHDG('EOMB#')
+     A            DHDSEQ    R               REFFLD(SEQ#)
+     A                                      COLHDG('DTL' 'SEQ#')
+     A            DHPOS     R               REFFLD(POS)
+     A                                      COLHDG('PLC' 'OF' 'SVC')
+     A            DHTOS     R               REFFLD(TOS)
+     A                                      COLHDG('TYP' 'OF' 'SVC')
+     A            DHPRCD    R               REFFLD(CPT4)
+     A                                      COLHDG('PROC' 'CODE')
+     A            DHPRDS    R               REFFLD(DS25)
+     A                                      COLHDG('PROC' 'DESC')
+     A            DHMOD1    R               REFFLD(PMOD)
+     A                                      COLHDG('PROC' 'CODE' 'MOD1')
+     A            DHMOD2    R               REFFLD(PMOD)
+     A                                      COLHDG('PROC' 'CODE' 'MOD2')
+     A            DHMOD3    R               REFFLD(PMOD)
+     A                                      COLHDG('PROC' 'CODE' 'MOD3')
+     A            DHMOD4    R               REFFLD(PMOD)
+     A                                      COLHDG('PROC' 'CODE' 'MOD4')
+     A***** Beg Chg *** 09/01/16 **************************************
+     A****        DHDXR1    R               REFFLD(FLAG)
+     A****                                  COLHDG('DIAG' 'CODE' 'XREF1')
+     A****        DHDXR2    R               REFFLD(FLAG)
+     A****                                  COLHDG('DIAG' 'CODE' 'XREF2')
+     A****        DHDXR3    R               REFFLD(FLAG)
+     A****                                  COLHDG('DIAG' 'CODE' 'XREF3')
+     A****        DHDXR4    R               REFFLD(FLAG)
+     A****                                  COLHDG('DIAG' 'CODE' 'XREF4')
+     A**
+     A            DHDXR1    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF A')
+     A            DHDXR2    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF B')
+     A            DHDXR3    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF C')
+     A            DHDXR4    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF D')
+     A***** End Chg *** 09/01/16 **************************************
+     A            DHUNTS    R               REFFLD(A52)
+     A                                      COLHDG('UNITS')
+     A            DHAREA    R               REFFLD(CODE)
+     A                                      COLHDG('BODY' 'AREA')
+     A            DHPPLN    R               REFFLD(CODE)
+     A                                      COLHDG('PAY' 'PLAN')
+     A********************  Valid values: based on FTGTP via 'xxPP'
+     A            DHSTAT    R               REFFLD(STAT)
+     A                                      COLHDG('STATUS')
+     A            DHUSER    R               REFFLD(USER)
+     A                                      COLHDG('MAINT USER')
+     A            DHPGM     R               REFFLD(PGM)
+     A                                      COLHDG('MAINT PGM')
+     A            DHTIME    R               REFFLD(TIME)
+     A                                      COLHDG('MAINT TIME')
+     A            DHDT      R               REFFLD(DT)
+     A                                      COLHDG('MAINT DATE')
+     A            DHIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INIT USER')
+     A            DHIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INIT PGM')
+     A            DHITIM    R               REFFLD(TIME)
+     A                                      COLHDG('INIT TIME')
+     A            DHIDT     R               REFFLD(DT)
+     A                                      COLHDG('INIT DATE')
+     A            DHRCFL    R               REFFLD(FLAG) COLHDG('RESONABLE' +
+     A                                      'AND CUSTOMARY')
+     A*                                R = RESONABLE AND CUSTOMARY
+     A*                                P = PROCEDURE CODE
+     A*** BEG ADD *** 06/14/99 ************************
+     A            DHBPRC    R               REFFLD(DS5)
+     A                                      COLHDG('BILLED PROC CODE')
+     A            DHBPRD    R               REFFLD(DS25)
+     A                                      COLHDG('BILLED PROC DESC')
+     A*** END ADD *** 06/14/99 ************************
+     A*** BEG ADD *** 10/31/05 ************************
+     A            DHNDC     R               REFFLD(NDC)
+     A                                      COLHDG('NATIONAL' 'DRUG' 'CODE')
+     A            DHNDCD    R               REFFLD(DS25)
+     A                                      COLHDG('NDC' 'DESCRIPITON')
+     A*** END ADD *** 10/31/05 ************************
+     A*** BEG ADD *** 10/25/05 ************************
+     A            DHBLFC    R               REFFLD(FLAG)
+     A                                      COLHDG('DME Bill' 'Freq' 'Code')
+     A            DHDUCD    R               REFFLD(DS2)
+     A                                      COLHDG('Days/Units' 'Code')
+     A*** END ADD *** 10/25/05 ************************
+     A*** BEG ADD ***** 03/14/07 **********************
+     A            DHBMD1    R               REFFLD(DS2)
+     A                                      COLHDG('BILLED MODIFIER1')
+     A            DHBMD2    R               REFFLD(DS2)
+     A                                      COLHDG('BILLED MODIFIER2')
+     A            DHBMD3    R               REFFLD(DS2)
+     A                                      COLHDG('BILLED MODIFIER3')
+     A            DHBMD4    R               REFFLD(DS2)
+     A                                      COLHDG('BILLED MODIFIER4')
+     A*** END ADD ***** 03/14/07 **********************
+     A*** BEGIN ADD *** 05/23/07 **************************************
+     A            DHNPIR    R               REFFLD(DS15)
+     A                                      COLHDG('Rendering Provider' +
+     A                                      'NPI#')
+     A*** END   ADD *** 05/23/07 **************************************
+     A*** BEG ADD *** 07/14/11 ******************************************
+     A            DHRNLC    R               REFFLD(DS15)
+     A                                      COLHDG('RENDERING PHYSICIAN' +
+     A                                      'STATE LICENSE NUMBER')
+     A*** END ADD *** 07/14/11 ******************************************
+     A***** Beg Add *** 09/01/16 **************************************
+     A**
+     A            DHDXRE    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF E')
+     A            DHDXRF    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF F')
+     A            DHDXRG    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF G')
+     A            DHDXRH    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF H')
+     A            DHDXRI    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF I')
+     A            DHDXRJ    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF J')
+     A            DHDXRK    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF K')
+     A            DHDXRL    R               REFFLD(FLAG)
+     A                                      COLHDG('DIAG' 'CODE' 'XREF L')
+     A            DHNDC2    R               REFFLD(NDC)
+     A                                      COLHDG('NDC Number Secondary')
+     A            DHDESC2   R               REFFLD(DS25)
+     A                                      COLHDG('NDC Number Secondary' +
+     A                                      'Description')
+     A***** End Add *** 09/01/16 **************************************

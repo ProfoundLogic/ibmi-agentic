@@ -1,0 +1,1 @@
+     Hbnddir('IFSTOOL/TEMPLATE2':'QC2LE':'QUSAPIBD')

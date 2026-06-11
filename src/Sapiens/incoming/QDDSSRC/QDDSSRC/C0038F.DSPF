@@ -1,0 +1,102 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   PURGE INACTIVE RECORDS DISPLAY                           **
+     A**                                                            **
+     A**   PROGRAMMER: C:31                                         **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A*---------------------------------------------------------------
+     A          R SCR01
+     A*
+     A                                      CF05
+     A                                      CF06
+     A                                      CF07
+     A                                      CF08
+     A                                      CF09
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(31)
+     A                                      SETOF(32)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0038F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A            SCFL01    R        B  7 24REFFLD(FLAG)
+     A                                      DSPATR(UL)
+     A  21                                  ERRMSGID(CCR0750 *LIBL/CMESGG)
+     A  21                                  DSPATR(PC)
+     A  21                                  DSPATR(RI)
+     A                                      OVRDTA
+     A                                  7 27'Agent Producer File'
+     A                                  8 27'Agent Number:'
+     A            SCFEIN    R        B  8 41REFFLD(FEIN)
+     A*                                     DSPATR(CS)
+     A                                      TEXT('AGENT FEIN')
+     A                                      OVRDTA
+     A  31                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A  31                                  DSPATR(PC)
+     A  31                                  DSPATR(RI)
+     A                                  8 52'Mod:'
+     A            SCMOD     R        B  8 57REFFLD(MOD)
+     A*                                     DSPATR(CS)
+     A                                      TEXT('AGENT MOD')
+     A                                      OVRDTA
+     A  31                                  DSPATR(PC)
+     A  31                                  DSPATR(RI)
+     A            SCFL02    R        B 10 24REFFLD(FLAG)
+     A                                      DSPATR(UL)
+     A  22                                  ERRMSGID(CCR0750 *LIBL/CMESGG)
+     A  22                                  DSPATR(PC)
+     A  22                                  DSPATR(RI)
+     A                                      OVRDTA
+     A                                 10 27'Auto Coverage File/Vehicle Schedul-
+     A                                      e File'
+     A                                 11 27'Policy number:'
+     A            SCPOL#    R     A  B 11 42REFFLD(POL#)
+     A*                                     DSPATR(CS)
+     A                                      TEXT('POLICY NUMBER')
+     A                                      OVRDTA
+     A  32                                  ERRMSGID(CCR0535 *LIBL/CMESGG)
+     A  32                                  DSPATR(PC)
+     A  32                                  DSPATR(RI)
+     A                                 18  8'Place an "X" next to the files you-
+     A                                       wish to purge and press ENTER'
+     A            SCMESG    R        O 20 16REFFLD(DS50)
+     A                                      COLOR(WHT)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 29'F5=Policy number search'
+     A                                      COLOR(BLU)
+     A                                 23 56'F6=Policy insured search'
+     A                                      COLOR(BLU)
+     A                                 24  2'F7=Agent number search'
+     A                                      COLOR(BLU)
+     A                                 24 29'F8=Agent alpha search'
+     A                                      COLOR(BLU)
+     A                                 24 56'F9=Agent code search'
+     A                                      COLOR(BLU)
+     A*----------------------------------------------------------------
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

@@ -1,0 +1,155 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   RESERVE HISTORY F&F/B&T SEARCH DISPLAY                   **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF12
+     A                                      SETOF(20)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0904F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A            SCERR     R        B  3 50REFFLD(USER)
+     A                                      DSPATR(PR)
+     A                                      DSPATR(ND)
+     A  20                                  ERRMSGID(CCR0600 *LIBL/CMESGG)
+     A                                  4  2'Policy:'
+     A            SCPOL#    R        O  4 11REFFLD(POL#)
+     A                                      DSPATR(HI)
+     A                                  4 27'Name:'
+     A            SCFIN     R        O  4 35REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                  5  2'Claim #:'
+     A            SCCLM#    R        O  5 11REFFLD(CLM#)
+     A                                      DSPATR(HI)
+     A                                  5 27'Claimant Id:'
+     A            SCCLID    R        O  5 40REFFLD(CLID)
+     A                                      DSPATR(HI)
+     A            SCCLNM    R        O  5 48REFFLD(NM30)
+     A                                      DSPATR(HI)
+     A                                  6  2'Section Code:'
+     A            SCCC      R        O  6 17REFFLD(CDE)
+     A                                      DSPATR(HI)
+     A            SCCCNM    R        O  6 22REFFLD(DS40)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  7  2'Location:'
+     A            SCLOC#    R        O  7 12REFFLD(LOC#)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  7 17'Building:'
+     A            SCPRM#    R        O  7 27REFFLD(PRM#)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  7 32'Form:'
+     A            SCFRM     R        O  7 38REFFLD(FRM)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  7 42'Rate:'
+     A            SCRTGP    R        O  7 48REFFLD(RTGP)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  7 52'Class:'
+     A            SCCLAS    R        O  7 59REFFLD(CLAS)
+     A                                      DSPATR(HI)
+     A                                  7 67'Agent:'
+     A            SCAGT#    R        O  7 74REFFLD(AGT#)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                 10 31'Rsv cd'
+     A                                      DSPATR(UL)
+     A                                 10 39'Typ'
+     A                                      DSPATR(UL)
+     A                                 10 44'Reserve changes'
+     A                                      DSPATR(UL)
+     A                                 11  2'Effective date:'
+     A            SCEFD1    R        O 11 18REFFLD(DT8)
+     A                                      TEXT('Effective date 1')
+     A                                      EDTWRD('  /  /    ')
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A            SCRT01    R        O 11 33REFFLD(CODE)
+     A                                      TEXT('Reserve type code 1')
+     A                                      OVRDTA
+     A            SCTP01    R        O 11 40REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCRR01    R        O 11 45REFFLD(A92)
+     A                                      TEXT('Set-up reserve 1')
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRT02    R        O 12 33REFFLD(CODE)
+     A                                      TEXT('Reserve type code 2')
+     A                                      OVRDTA
+     A            SCTP02    R        O 12 40REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCRR02    R        O 12 45REFFLD(A92)
+     A                                      TEXT('Set-up reserve 2')
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRT03    R        O 13 33REFFLD(CODE)
+     A                                      TEXT('Reserve type code 3')
+     A                                      OVRDTA
+     A            SCTP03    R        O 13 40REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCRR03    R        O 13 45REFFLD(A92)
+     A                                      TEXT('Set-up reserve 3')
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRT04    R        O 14 33REFFLD(CODE)
+     A                                      TEXT('Reserve type code 4')
+     A                                      OVRDTA
+     A            SCTP04    R        O 14 40REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCRR04    R        O 14 45REFFLD(A92)
+     A                                      TEXT('Set-up reserve 4')
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCRT05    R        O 15 33REFFLD(CODE)
+     A                                      TEXT('Reserve type code 5')
+     A                                      OVRDTA
+     A            SCTP05    R        O 15 40REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCRR05    R        O 15 45REFFLD(A92)
+     A                                      TEXT('Set-up reserve 5')
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A                                 19  2'Explanation:'
+     A            SCEXPL    R        O 19 15REFFLD(NM60)
+     A                                      TEXT('Explanation')
+     A                                      OVRDTA
+     A                                      DSPATR(HI)
+     A                                 23  8'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 29'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A            SCUP           9A  O 23 52OVRDTA
+     A            SCDOWN         9A  O 23 64OVRDTA
+     A  03                              3  2'POLICY CANCELLED'
+     A                                      DSPATR(RI)
+     A          R SCR99
+     A            SCFL01    R        O  1  2REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      TEXT('DUMMY FIELD')

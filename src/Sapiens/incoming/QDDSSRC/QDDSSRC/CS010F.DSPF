@@ -1,0 +1,389 @@
+     A*%%TS  SD  19971117  082853  QUINTONL    REL-V3R7M0  5716-PW1
+     A***************************************************************
+     A*  (C) Copyright Progressive Data Solutions Inc., 1996
+     A***************************************************************
+     A*  REVISIONS:
+     A*  11/11/97  C:86   PROJECT#: CS010
+     A*                FOR SCREEN 3
+     A*         1.  EXPAND ACCIDENT DATE FIELD TO 8.0N
+     A*         2.  REMOVE INJTYP AND DAYLST HEADINGS AND FIELDS
+     A*         3.  REMOVE USE OF HIDDEN FIELDS SUB BATCH & DELETE CODE
+     A*         4.  ADD BODY PART HEADING AND FIELD AND HIDDEN FIELD
+     A*             DEATH DATE
+     A*                FOR SCREEN 4
+     A*         1.  EXPAND ACCIDENT DATE FIELD TO 8.0N
+     A*         2.  REMOVE INJTYP AND DAYLST HEADINGS AND FIELDS
+     A*         3.  ADD BODY PART HEADING AND FIELD
+     A*  08/09/94  C:26   PROJECT#: CS004
+     A*         1.  Chg F5. Add F6 Alpha Search. Tie to WCMS
+     A*         2.  Add standard screen headings
+     A***************************************************************
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CSREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A                                      CF03
+     A          R SCR01
+     A*%%TS  SD  19971117  082853  QUINTONL    REL-V3R7M0  5716-PW1
+     A                                      CHGINPDFT
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      SETOF(24)
+     A                                      CF05
+     A                                      CF06
+     A                                      CF07
+     A  23                                  CF23
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            SCFILE    R        O  2  2REFFLD(FLE)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A            SCRECF    R        O  2 71REFFLD(RECF)
+     A                                  8 18'Client #:'
+     A            SCCLT#    R        B  8 29REFFLD(CLT#)
+     A                                      TEXT('Client Number')
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A                                      EDTCDE(4)
+     A  20                                  ERRMSGID(CSM0503 *LIBL/CSMESG)
+     A  21                                  ERRMSGID(CSM0505 *LIBL/CSMESG)
+     A                                      CHECK(RB)
+     A            SCNAME        40A  O  8 37TEXT('Client Name')
+     A                                 11 18'Search Type:'
+     A            SCMTF     R        B 11 32REFFLD(FLAG)
+     A                                      TEXT('Mail or Phone Search')
+     A  24                                  DSPATR(PC)
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A  22                                  ERRMSGID(CSM0506 *LIBL/CSMESG)
+     A                                 11 39'M = Mail'
+     A                                 12 39'T = Telephone'
+     A                                 13 39'F = Fax'
+     A                                      COLOR(GRN)
+     A                                 22  3'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 22 13'F5=Client# search'
+     A                                      COLOR(BLU)
+     A                                 22 34'F6=Client alpha search'
+     A                                      COLOR(BLU)
+     A                                 22 60'F7=Add a client'
+     A                                      COLOR(BLU)
+     A                                 23 57'F23=Bypass 2nd notice'
+     A                                      COLOR(BLU)
+     A N23                                  DSPATR(ND)
+     A  23                                  DSPATR(RI)
+     A            SCMSG1        60A  O 24  3TEXT('2nd Notice Informational Mess-
+     A                                      age')
+     A N23                                  DSPATR(ND)
+     A  23                                  DSPATR(RI)
+     A            SCLPDT    R        O 24 64REFFLD(DT8)
+     A                                      TEXT('LAST PAID DATE')
+     A N23                                  DSPATR(ND)
+     A  23                                  DSPATR(RI)
+     A                                      EDTWRD('  /  /    ')
+     A          R SCR02
+     A                                      CHGINPDFT
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      CF15
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            SCFILE    R        O  2  2REFFLD(FLE)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A            SCRECF    R        O  2 71REFFLD(RECF)
+     A                                  4  3'Client #:'
+     A            SCCLT#    R        O  4 13REFFLD(CLT#)
+     A                                      TEXT('Client Number')
+     A                                  4 43'M/T/F Search:'
+     A            SCMTF     R        O  4 57REFFLD(FLAG)
+     A                                      TEXT('Mail/Phone Search Flag')
+     A                                  9 27'Soc. Sec. #:'
+     A            SCRSS#    R        B  9 46REFFLD(SS#)
+     A                                      TEXT('Requested Soc Sec #')
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A  20                                  ERRMSGID(CSM0503 *LIBL/CSMESG)
+     A                                 11 27'Last Name:'
+     A            SCRLST    R        B 11 46REFFLD(NM10)
+     A                                      TEXT('Requested Employee Last Name')
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A  21                                  ERRMSGID(CSM0503 *LIBL/CSMESG)
+     A                                 24  5'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 24 60'F15=Search complete'
+     A                                      COLOR(BLU)
+     A            SCCLNM    R        O  4 21REFFLD(NM18)
+     A                                      TEXT('Client Name')
+     A                                 12 27'First Name:'
+     A                                 13 27'MI:'
+     A            SCRFRT    R        B 12 46REFFLD(NM7)
+     A                                      TEXT('Requested Employee First Name-
+     A                                      ')
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            SCRMI     R        B 13 46REFFLD(NM1)
+     A                                      TEXT('Requested Employee Middle Ini-
+     A                                      tial')
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A                                  4 19'-'
+     A*
+     A          R SCR03S                    SFL
+     A*%%TS  SD  19970218  091927  WINNERW     REL-V3R6M0  5716-PW1
+     A            SCSEL3    R        B 10  3REFFLD(FLAG)
+     A                                      TEXT('Option Selection Field')
+     A  20                                  DSPATR(RI)
+     A N21N06N23                            DSPATR(CS)
+     A N21N06N23                            DSPATR(UL)
+     A  21
+     AO 23                                  DSPATR(PR)
+     A  23                                  DSPATR(ND)
+     A            SCSS#     R        O 10  6REFFLD(SS#)
+     A                                      TEXT('Social Security #')
+     A  22                                  DSPATR(HI)
+     A            SCLAST    R        O 10 16REFFLD(NM10)
+     A                                      TEXT('Employee Last Name')
+     A  22                                  DSPATR(HI)
+     A            SCFRST    R        O 10 27REFFLD(NM7)
+     A                                      TEXT('Employee First Name')
+     A  22                                  DSPATR(HI)
+     A            SCMI      R        O 10 35REFFLD(NM1)
+     A                                      TEXT('Employee Middle Initial')
+     A  22                                  DSPATR(HI)
+     A            SCACDT    R        O 10 37REFFLD(DT8)
+     A*******  BEGIN CHANGE ******11/11/97 *************** PART 1 *****
+     A*********                             EDTWRD('  /  /  ')
+     A                                      EDTWRD('  /  /    ')
+     A*******  END   CHANGE ******11/11/97 *************** PART 1 *****
+     A  22                                  DSPATR(HI)
+     A            SCEMP#    R        O 10 48REFFLD(EMP#)
+     A                                      TEXT('EMPLOYER NUMBER')
+     A  22                                  DSPATR(HI)
+     A                                      EDTCDE(Z)
+     A            SCEMNM        14A  O 10 58
+     A  22                                  DSPATR(HI)
+     A                                      TEXT('NAME 10')
+     A******* BEGIN DELETE ******** 11/11/97 *********** PART 2 *****
+     A********    SCITYP    R        O 10 71REFFLD(ITYP)
+     A* 22 ***                              DSPATR(HI)
+     A********                              EDTCDE(Z)
+     A********    SCDLST    R        0 10 73REFFLD(DLST)
+     A* 22 ***                              DSPATR(HI)
+     A********                              EDTCDE(Z)
+     A******* END   DELETE ******** 11/11/97 *********** PART 2 *****
+     A******* BEGIN ADD *********** 11/11/97 *********** PART 4 *****
+     A            SCPART    R        O 10 73REFFLD(CODE)
+     A  22                                  DSPATR(HI)
+     A******* END   ADD *********** 11/11/97 *********** PART 4 *****
+     A            SCDTYP    R        O 10 77REFFLD(DTYP)
+     A  22                                  DSPATR(HI)
+     A                                      EDTCDE(Z)
+     A            SCDIV          3S 0H
+     A            SCCARR         4S 0H
+     A            SCBTDT         8S 0H
+     A            SCSIC          4S 0H
+     A            SCAREA         2S 0H
+     A******* BEGIN ADD *********** 11/11/97 *********** PART 4 *****
+     A            SCDEDT         8S 0H
+     A******* END   ADD *********** 11/11/97 *********** PART 4 *****
+     A******* BEGIN DELETE ******** 11/11/97 *********** PART 3 *****
+     A*********   SCSBBT         2S 0H
+     A*********   SCDLCD         1S 0H
+     A******* END   DELETE ******** 11/11/97 *********** PART 3 *****
+     A            SCEMNC        30A  H
+     A          R SCR03C                    SFLCTL(SCR03S)
+     A*%%TS  SD  19971113  142402  QUINTONL    REL-V3R7M0  5716-PW1
+     A                                      CHGINPDFT
+     A                                      SFLSIZ(0033)
+     A                                      SFLPAG(0013)
+     A                                      TEXT('Subfile Control for CLAIM SCA-
+     A                                      N SEARCH')
+     A                                      SETOF(20)
+     A                                      ROLLUP(18)
+     A                                      CF12
+     A                                      OVERLAY
+     A  01                                  SFLDSP
+     A  01                                  SFLDSPCTL
+     A  02                                  SFLINZ
+     A  03                                  SFLDLT
+     A  04                                  SFLCLR
+     A  05                                  SFLEND
+     A  20                                  SFLMSGID(CSM0507 *LIBL/CSMESG)
+     A  32 18                               SFLMSGID(CPF5203 *LIBL/QCPFMSG)
+     A            #@$3           3S 0H      SFLRCDNBR(CURSOR)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            SCFILE    R        O  2  2REFFLD(FLE)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A            SCRECF    R        O  2 71REFFLD(RECF)
+     A                                  3  2'Client #:'
+     A            SCCLT#    R        O  3 12REFFLD(CLT#)
+     A                                      TEXT('Client Number')
+     A                                  3 41'M/T/F Search:'
+     A            SCMTF     R        O  3 56REFFLD(FLAG)
+     A                                      TEXT('Mail/Phone Search Flag')
+     A                                  4  2'Soc Sec#:'
+     A            SCUSS#    R        B  4 12REFFLD(SS#)
+     A                                      TEXT('User selected Social Security-
+     A                                       #')
+     A                                      DSPATR(CS)
+     A                                      CHECK(RB)
+     A                                      DSPATR(UL)
+     A                                  4 22'Employee Name:'
+     A            SCULST    R        B  4 37REFFLD(NM10)
+     A                                      TEXT('User selected Employee Last N-
+     A                                      ame')
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A                                  6  2'Type option, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  7  4'1=Select item'
+     A                                  8 38'  Acc.'
+     A                                      DSPATR(HI)
+     A                                  9  2'Opt SS#          Employee name    -
+     A                                          Date      Empl#     Emp. Name  -
+     A                                       Prt Typ'
+     A                                      DSPATR(HI)
+     A                                  3 18'-'
+     A            SCCLNM    R        O  3 20REFFLD(NM18)
+     A                                      TEXT('Client Name')
+     A                                  4 58'Employer #:'
+     A            SCUEM#    R        B  4 70REFFLD(EMP#)
+     A                                      TEXT('User Selected Employer Number-
+     A                                      ')
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A                                      EDTCDE(Z)
+     A                                      CHECK(RB)
+     A            SCUFRT    R        B  4 48REFFLD(NM7)
+     A                                      TEXT('User Selected Employee First -
+     A                                      Name')
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A            SCUMI     R        B  4 56REFFLD(NM1)
+     A                                      TEXT('User Selected Employee Middle-
+     A                                       Initial')
+     A                                      DSPATR(CS)
+     A                                      DSPATR(UL)
+     A                                  8 70'  Bdy Dis'
+     A                                      DSPATR(HI)
+     A          R SCR03
+     A                                      OVERLAY
+     A                                 24  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 24 30'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A          R SCR04S                    SFL
+     A*%%TS  SD  19971112  115420  QUINTONL    REL-V3R7M0  5716-PW1
+     A            SCSEL4    R        B 10  3REFFLD(FLAG)
+     A                                      TEXT('Option Selection Field')
+     A N06                                  DSPATR(CS)
+     A N06                                  DSPATR(UL)
+     A  25                                  DSPATR(RI)
+     A            SCSS#     R        O 10  6REFFLD(SS#)
+     A            SCLAST    R        O 10 16REFFLD(NM10)
+     A            SCFRST    R        O 10 27REFFLD(NM7)
+     A            SCMI      R        O 10 35REFFLD(NM1)
+     A            SCACDT    R        O 10 37REFFLD(DT8)
+     A*******  BEGIN CHANGE ******11/11/97 *************** PART 1 *****
+     A*********                             EDTWRD('  /  /  ')
+     A                                      EDTWRD('  /  /    ')
+     A*******  END   CHANGE ******11/11/97 *************** PART 1 *****
+     A            SCEMP#    R        O 10 48REFFLD(EMP#)
+     A                                      EDTCDE(Z)
+     A            SCEMNM        14A  O 10 58
+     A*******  BEGIN DELETE ******11/11/97 *************** PART 2 *****
+     A*********   SCITYP    R        O 10 71REFFLD(ITYP)
+     A*********                             EDTCDE(Z)
+     A*********   SCDLST    R        O 10 73REFFLD(DLST)
+     A*********
+     A*******  END   DELETE ******11/11/97 *************** PART 2 *****
+     A*******  BEGIN ADD *********11/11/97 *************** PART 3 *****
+     A            SCPART    R        O 10 74REFFLD(CODE)
+     A*******  END   ADD *********11/11/97 *************** PART 3 *****
+     A            SCDTYP    R        O 10 78REFFLD(DTYP)
+     A                                      EDTCDE(Z)
+     A*
+     A          R SCR04C                    SFLCTL(SCR04S)
+     A*%%TS  SD  19971113  142402  QUINTONL    REL-V3R7M0  5716-PW1
+     A                                      CHGINPDFT
+     A                                      SFLSIZ(0033)
+     A                                      SFLPAG(0013)
+     A                                      TEXT('Subfile Control for CLAIM SCA-
+     A                                      N SEARCH')
+     A                                      SETOF(20)
+     A                                      ROLLUP(18)
+     A                                      CF05
+     A                                      CF12
+     A                                      OVERLAY
+     A  01                                  SFLDSP
+     A  01                                  SFLDSPCTL
+     A  02                                  SFLINZ
+     A  03                                  SFLDLT
+     A  04                                  SFLCLR
+     A  05                                  SFLEND
+     A  25                                  SFLMSGID(CSM0507 *LIBL/CSMESG)
+     A  32 18                               SFLMSGID(CPF5203 *LIBL/QCPFMSG)
+     A            #@$4           3S 0H      SFLRCDNBR(CURSOR)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A            SCFILE    R        O  2  2REFFLD(FLE)
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A            SCRECF    R        O  2 71REFFLD(RECF)
+     A                                  4  2'Client #:'
+     A            SCCLT#    R        O  4 12REFFLD(CLT#)
+     A                                      TEXT('Client Number')
+     A                                  4 41'M/T/F Search:'
+     A            SCMTF     R        O  4 55REFFLD(FLAG)
+     A                                      TEXT('Mail/Phone Search Flag')
+     A                                  4 61'# of Items:'
+     A            SCITMS    R        O  4 73REFFLD(ITMS)
+     A                                      TEXT('Number of Items')
+     A                                      EDTCDE(Z)
+     A                                  6  2'Type option, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  7  4'4=Delete item'
+     A                                  9  2'Opt    SS#      Employee Name     -
+     A                                          Date      Empl#    Emp. Name   -
+     A                                        Prt Typ'
+     A                                      DSPATR(HI)
+     A                                  4 18'-'
+     A            SCCLNM    R        O  4 20REFFLD(NM18)
+     A                                      TEXT('Client Name')
+     A                                  8 72' Bod Dis'
+     A                                      DSPATR(HI)
+     A                                  8 40'Acc.'
+     A                                      DSPATR(HI)
+     A          R SCR04
+     A                                      OVERLAY
+     A                                 24  2'F3=Exit'
+     A                                      COLOR(BLU)
+     A                                 24 30'F12=Cancel  '
+     A                                      COLOR(BLU)
+     A                                 24 15'F5=Refresh'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

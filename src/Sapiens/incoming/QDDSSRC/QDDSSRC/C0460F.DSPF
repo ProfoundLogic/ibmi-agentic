@@ -1,0 +1,336 @@
+     A*%%TS  SD  19971230  164744  COLEMANR    REL-V3R7M0  5716-PW1
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   AGEN COMMISSION INQUIRY DISPLAY                          **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF12
+     A                                      CF05
+     A                                      CF13
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A                                      SETOF(22)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTWRD('  /  /  ')
+     A                                  2  2'C0460F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 11 34'Agent:'
+     A            SCAGT#    R        B 11 43REFFLD(AGT#)
+     A                                      CHECK(RB)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A                                      TEXT('AGENT NUMBER')
+     A*                                     DSPATR(CS)
+     A  20                                  ERRMSGID(CCR0546 *LIBL/CMESGG)
+     A  21                                  ERRMSGID(CCR0739 *LIBL/CMESGG)
+     A  22                                  ERRMSGID(CCR0636 *LIBL/CMESGG)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 28'F5=Agent search'
+     A                                      COLOR(BLU)
+     A                                 23 56'F13=Change user parms'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A*%%TS  SD  19970723  164954  WINNERW     REL-V3R6M0  5716-PW1
+     A                                      CF12
+     A                                      SETOF(20)
+     A                                      ROLLUP(18)
+     A                                      ROLLDOWN(19)
+     A                                      PUTOVR
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A                                      TEXT('USER')
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C0460F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A                                  4  2'Agent Number:'
+     A            SCAGT#    R        O  4 17REFFLD(AGT#)
+     A                                      DSPATR(HI)
+     A                                      EDTCDE(4)
+     A                                      OVRDTA
+     A            SCNAME    R        O  4 25REFFLD(NAME)
+     A                                      DSPATR(HI)
+     A                                  5  2'Current Balance:'
+     A            SCCRBL    R        O  5 20REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  7  2'Date:'
+     A            SCDT      R        B  7  9REFFLD(DT8)
+     A                                      CHECK(RB)
+     A                                      EDTWRD('  /  /    ')
+     A                                      OVRDTA
+     A                                  8  5'Trans'
+     A                                  8 16'Post'
+     A                                  9  2'   Date   '
+     A                                      DSPATR(UL)
+     A                                  9 13'   Date   '
+     A                                      DSPATR(UL)
+     A                                  9 24'Policy Number'
+     A                                      DSPATR(UL)
+     A                                  9 38'Prd'
+     A                                      DSPATR(UL)
+     A                                  9 42'Cd'
+     A                                      DSPATR(UL)
+     A                                  9 45'T'
+     A                                      DSPATR(UL)
+     A                                  9 47'Description         '
+     A                                      DSPATR(UL)
+     A                                  9 68'      Amount'
+     A                                      DSPATR(UL)
+     A            SCTD01    R        O 11  2REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCTD02    R        O 12  2REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCTD03    R        O 13  2REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCTD04    R        O 14  2REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCTD05    R        O 15  2REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCTD06    R        O 16  2REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCTD07    R        O 17  2REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCTD08    R        O 18  2REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCTD09    R        O 19  2REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCTD10    R        O 20  2REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCTD11    R        O 21  2REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT01    R        O 11 13REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT02    R        O 12 13REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT03    R        O 13 13REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT04    R        O 14 13REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT05    R        O 15 13REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT06    R        O 16 13REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT07    R        O 17 13REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT08    R        O 18 13REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT09    R        O 19 13REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT10    R        O 20 13REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCDT11    R        O 21 13REFFLD(DT8)
+     A                                      OVRDTA
+     A                                      EDTWRD('  /  /    ')
+     A            SCPL01    R        O 11 24REFFLD(POL#)
+     A                                      OVRDTA
+     A            SCPL02    R        O 12 24REFFLD(POL#)
+     A                                      OVRDTA
+     A            SCPL03    R        O 13 24REFFLD(POL#)
+     A                                      OVRDTA
+     A            SCPL04    R        O 14 24REFFLD(POL#)
+     A                                      OVRDTA
+     A            SCPL05    R        O 15 24REFFLD(POL#)
+     A                                      OVRDTA
+     A            SCPL06    R        O 16 24REFFLD(POL#)
+     A                                      OVRDTA
+     A            SCPL07    R        O 17 24REFFLD(POL#)
+     A                                      OVRDTA
+     A            SCPL08    R        O 18 24REFFLD(POL#)
+     A                                      OVRDTA
+     A            SCPL09    R        O 19 24REFFLD(POL#)
+     A                                      OVRDTA
+     A            SCPL10    R        O 20 24REFFLD(POL#)
+     A                                      OVRDTA
+     A            SCPL11    R        O 21 24REFFLD(POL#)
+     A                                      OVRDTA
+     A            SCPR01    R        O 11 38REFFLD(PRO#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR02    R        O 12 38REFFLD(PRO#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR03    R        O 13 38REFFLD(PRO#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR04    R        O 14 38REFFLD(PRO#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR05    R        O 15 38REFFLD(PRO#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR06    R        O 16 38REFFLD(PRO#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR07    R        O 17 38REFFLD(PRO#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR08    R        O 18 38REFFLD(PRO#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR09    R        O 19 38REFFLD(PRO#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR10    R        O 20 38REFFLD(PRO#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCPR11    R        O 21 38REFFLD(PRO#)
+     A                                      OVRDTA
+     A                                      EDTCDE(4)
+     A            SCAR01    R        O 11 42REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCAR02    R        O 12 42REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCAR03    R        O 13 42REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCAR04    R        O 14 42REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCAR05    R        O 15 42REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCAR06    R        O 16 42REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCAR07    R        O 17 42REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCAR08    R        O 18 42REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCAR09    R        O 19 42REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCAR10    R        O 20 42REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCAR11    R        O 21 42REFFLD(CODE)
+     A                                      OVRDTA
+     A            SCTP01    R        O 11 45REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCTP02    R        O 12 45REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCTP03    R        O 13 45REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCTP04    R        O 14 45REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCTP05    R        O 15 45REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCTP06    R        O 16 45REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCTP07    R        O 17 45REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCTP08    R        O 18 45REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCTP09    R        O 19 45REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCTP10    R        O 20 45REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCTP11    R        O 21 45REFFLD(FLAG)
+     A                                      OVRDTA
+     A            SCDS01    R        O 11 47REFFLD(DS20)
+     A                                      OVRDTA
+     A            SCDS02    R        O 12 47REFFLD(DS20)
+     A                                      OVRDTA
+     A            SCDS03    R        O 13 47REFFLD(DS20)
+     A                                      OVRDTA
+     A            SCDS04    R        O 14 47REFFLD(DS20)
+     A                                      OVRDTA
+     A            SCDS05    R        O 15 47REFFLD(DS20)
+     A                                      OVRDTA
+     A            SCDS06    R        O 16 47REFFLD(DS20)
+     A                                      OVRDTA
+     A            SCDS07    R        O 17 47REFFLD(DS20)
+     A                                      OVRDTA
+     A            SCDS08    R        O 18 47REFFLD(DS20)
+     A                                      OVRDTA
+     A            SCDS09    R        O 19 47REFFLD(DS20)
+     A                                      OVRDTA
+     A            SCDS10    R        O 20 47REFFLD(DS20)
+     A                                      OVRDTA
+     A            SCDS11    R        O 21 47REFFLD(DS20)
+     A                                      OVRDTA
+     A            SCAM01    R        O 11 68REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCAM02    R        O 12 68REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCAM03    R        O 13 68REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCAM04    R        O 14 68REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCAM05    R        O 15 68REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCAM06    R        O 16 68REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCAM07    R        O 17 68REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCAM08    R        O 18 68REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCAM09    R        O 19 68REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCAM10    R        O 20 68REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A            SCAM11    R        O 21 68REFFLD(A92)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A                                 23  6'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 28'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A            SCUP           9A  O 23 52OVRDTA
+     A            SCDOWN         9A  O 23 67OVRDTA
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND)
+     A                                      DSPATR(PR)

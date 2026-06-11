@@ -1,0 +1,146 @@
+     A*****************************************************************
+      * (c) 2010 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*****************************************************************
+     A** WORKERS' COMP WCMC CHECK ISSUANCE CONTROL FILE
+     A*****************************************************************
+     A*    PROGRAMMER: C04
+     A*    CREATED:    06/28/95
+     A*    PROJECT#:   25WAR  CHECK PROCESS
+     A*****************************************************************
+     A** REVISIONS:
+     A*
+     A*  07/14/16 C:309 Project: 136MGV
+     A*                 Add new fields to hold CA, QME/AME, PT & DME payment trans and
+     A*                 payment value 1 codes for regular and controverted.
+     A*
+     A*  10/14/10 C:190 Project: WC1953
+     A*                 Add 4 fields to hold CA payment trans and
+     A*                 payment value 1 codes for regular and controverted.
+     A*
+     A*  12/10/99 C:62  Project: 48MDZ
+     A*                 ADD EMPLOYER POLICY CODE FLAG
+     A*
+     A*  08/05/99 C:62  Project: 44MCJ
+     A*                 ADD THREE FIELDS CIBCPC, CIBMIA AND CIRZPC.
+     A*
+     A*  11/04/98 C:31  Project: 48MBV
+     A*                 V4: Auto check issuance
+     A*                 1. Add 4 new fields
+     A*****************************************************************
+     A**
+     A                                      REF(WREFP)
+     A          R PCI01                     TEXT('WCMC CHK ISSUANCE CONTROL')
+     A            CICO#     R               REFFLD(CO#)
+     A                                      TEXT('COMPANY CODE')
+     A            CIFND     R               REFFLD(FND)
+     A            CISYS     R               REFFLD(FLAG)
+     A                                      TEXT('SYSTEM TYPE')
+     A            CIPTYP    R               REFFLD(FLAG)
+     A                                      TEXT('PAYEE TYPE')
+     A            CITRCD    R               REFFLD(CODE)
+     A                                      TEXT('TRANS CODE')
+     A            CITRCV    R               REFFLD(CODE)
+     A                                      TEXT('CONTROVERT TRANS CD')
+     A            CIBR2     R               REFFLD(CODE)
+     A                                      TEXT('PMT VAL 1 CODE')
+     A            CIBR7L    R               REFFLD(CODE)
+     A                                      TEXT('PMT VAL 2 - LT')
+     A            CIBR7N    R               REFFLD(CODE)
+     A                                      TEXT('PMT VAL 2 - NLT')
+     A            CISTS     R               REFFLD(CODE)
+     A                                      TEXT('PEND PMT STS CODE')
+     A            CISTAT    R               REFFLD(STAT)
+     A                                      TEXT('STATUS')
+     A            CIUSER    R               REFFLD(USER)
+     A            CIPGM     R               REFFLD(PGM)
+     A            CITIME    R               REFFLD(TIME)
+     A            CIDT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            CIIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            CIIDT     R               REFFLD(DT)
+     A                                      COLHDG('INITIAL' 'DATE')
+     A            CIFEIN    R               REFFLD(FEIN)
+     A                                      COLHDG('FEDERAL ID#')
+     A            CIMOD     R               REFFLD(MOD)
+     A                                      COLHDG('MODIFIER')
+     A*** BEGIN ADD *** 11/04/98 **************************************
+     A            CIIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('Init' 'Pgm')
+     A            CIITIM    R               REFFLD(TIME)
+     A                                      COLHDG('Init' 'Time')
+     A            CIXBR2    R               REFFLD(CODE)
+     A                                      COLHDG('RX Payment Value 1')
+     A            CIP1CV    R               REFFLD(CODE)
+     A                                      COLHDG('Controvert Paymt' 'Value 1')
+     A*** END ADD *** 11/04/98 ****************************************
+     A*** BEGIN ADD *** 08/05/99 **************************************
+     A            CIBCPC    R               REFFLD(PC52)
+     A                                      COLHDG('BRS Charge %')
+     A            CIBMIA    R               REFFLD(A92)
+     A                                      COLHDG('BRS Minimum' 'invoice amt')
+     A            CIRZPC    R               REFFLD(PC52)
+     A                                      COLHDG('Reduced to zero %')
+     A*** END   ADD *** 08/05/99 **************************************
+     A*** BEGIN ADD *** 12/10/99 **************************************
+     A            CIEPCF    R               REFFLD(FLAG)
+     A                                      COLHDG('Employer policy' +
+     A                                      'code flag')
+     A*  Valid values: 'Y' = ck issuance based on policy code(s)
+     A*                ' ' = no condition on check issuance
+     A*** END   ADD *** 12/10/99 **************************************
+     A*** BEG   ADD *** 10/14/10 **************************************
+     A            CICATR    R               REFFLD(CODE)
+     A                                      COLHDG('CA Trans Code')
+     A            CICATC    R               REFFLD(CODE)
+     A                                      COLHDG('CA Controvert' +
+     A                                      'Trans CD')
+     A            CICAB2    R               REFFLD(CODE)
+     A                                      COLHDG('CA Pmt Val 1 Code')
+     A            CICABC    R               REFFLD(CODE)
+     A                                      COLHDG('CA Controvert Paymt')
+     A*** END   ADD *** 10/14/10 **************************************
+     A***** Beg Add *** 07/14/16 **************************************
+     A            CICTRCD   R               REFFLD(CODE)
+     A                                      COLHDG('CS Trans Code')
+     A            CICTRCDCV R               REFFLD(CODE)
+     A                                      COLHDG('CS Controvert' +
+     A                                      'Trans Code')
+     A            CICPV1    R               REFFLD(CODE)
+     A                                      COLHDG('CS Pmt Val 1 Code')
+     A            CICPV1CV  R               REFFLD(CODE)
+     A                                      COLHDG('CS Controvert Paymt')
+     A*
+     A            CIQTRCD   R               REFFLD(CODE)
+     A                                      COLHDG('QME/AME Trans Code')
+     A            CIQTRCDCV R               REFFLD(CODE)
+     A                                      COLHDG('QME/AME Controvert' +
+     A                                      'Trans Code')
+     A            CIQPV1    R               REFFLD(CODE)
+     A                                      COLHDG('QME/AME Pmt Val 1 ' +
+     A                                      'Code')
+     A            CIQPV1CV  R               REFFLD(CODE)
+     A                                      COLHDG('QME/AME Controvert' +
+     A                                      'Paymt')
+     A*
+     A            CIPTRCD   R               REFFLD(CODE)
+     A                                      COLHDG('PT Trans Code')
+     A            CIPTRCDCV R               REFFLD(CODE)
+     A                                      COLHDG('PT Controvert' +
+     A                                      'Trans Code')
+     A            CIPPV1    R               REFFLD(CODE)
+     A                                      COLHDG('PT Pmt Val 1 Code')
+     A            CIPPV1CV  R               REFFLD(CODE)
+     A                                      COLHDG('PT Controvert Paymt')
+     A*
+     A            CIDTRCD   R               REFFLD(CODE)
+     A                                      COLHDG('DME Trans Code')
+     A            CIDTRCDCV R               REFFLD(CODE)
+     A                                      COLHDG('DME Controvert' +
+     A                                      'Trans Code')
+     A            CIDPV1    R               REFFLD(CODE)
+     A                                      COLHDG('DME Pmt Val 1 Code')
+     A            CIDPV1CV  R               REFFLD(CODE)
+     A                                      COLHDG('DME Controvert Paymt')
+     A***** End Add *** 07/14/16 **************************************

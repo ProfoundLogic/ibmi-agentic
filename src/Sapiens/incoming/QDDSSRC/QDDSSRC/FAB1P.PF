@@ -1,0 +1,116 @@
+     A* (C) Copyright Progressive Data Solutions, Inc., 2003
+     A*
+     A* - EBC Rx Bill Process File
+     A*
+     A*****************************************************************
+     A* Created on 03/03/2003 by C:62 for Project 48MFE
+     A*****************************************************************
+     A* Purpose: This file will house the payable information data for
+     A*          the associated EBC record.
+     A*          It will be tied to FAB9P record via B1NAME.
+     A*          It will indicate the specific EBC, plus additional
+     A*          fields for use by PDS process.
+     A*****************************************************************
+     A* REVISIONS
+     A*
+     A*****************************************************************
+     A                                      REF(FSREFP)
+     A          R PB101                     TEXT('EBC Rx Bill Process File')
+     A            B1XNAM        40A         COLHDG('Pharmacy Name')
+     A            B1XADR        40A         COLHDG('Pharmacy Address')
+     A            B1XCTY        25A         COLHDG('Pharmacy City')
+     A            B1XST          2A         COLHDG('Pharmacy State')
+     A            B1XZIP         9A         COLHDG('Pharmacy Zip')
+     A            B1XPHN        12A         COLHDG('Pharmacy Phone')
+     A            B1XFEI        10A         COLHDG('Pharmacy FEIN')
+     A            B1RX#         13A         COLHDG('Pharmacy Number')
+     A            B1FDAT        10A         COLHDG('Fill Date')
+     A            B1NDC         11A         COLHDG('NDC code')
+     A            B1DNAM        50A         COLHDG('Drug Name')
+     A            B1RCOD         5A         COLHDG('Refill Code')
+     A            B1MQTY        10A         COLHDG('Metric Quantity')
+     A            B1DAYS         5A         COLHDG('Supply Days')
+     A            B1COST        15A         COLHDG('Cost')
+     A            B1ICOS        15A         COLHDG('Ingredient cost')
+     A            B1DFEE        15A         COLHDG('Dispense fee')
+     A            B1COPY        15A         COLHDG('Copay Amount')
+     A            B1SALT        15A         COLHDG('Sales Tax')
+     A            B1BAMT        15A         COLHDG('Bill Amount')
+     A            B1PFSN        15A         COLHDG('Patient FSN')
+     A            B1PLSN        30A         COLHDG('Patient LSN')
+     A            B1PDOB        10A         COLHDG('Patient DOB')
+     A            B1PGEN         5A         COLHDG('Patient Gender')
+     A            B1SSN          9A         COLHDG('Patient SS#')
+     A            B1RELP         2A         COLHDG('Relationship')
+     A            B1GRP          3S 0       COLHDG('Group ID')
+     A            B1PRID        15A         COLHDG('Prescription ID')
+     A            B1CFSN        15A         COLHDG('Cardholder FSN')
+     A            B1CLSN        30A         COLHDG('Cardholder LSN')
+     A            B1CERT        25A         COLHDG('Medical' +
+     A                                      'Certification')
+     A            B1PROD         5A         COLHDG('Product Selection' +
+     A                                      'Code')
+     A            B1DPID         5A         COLHDG('Dependent ID')
+     A            B1PREO         5A         COLHDG('Origin of' +
+     A                                      'prescription')
+     A            B1DTYP         5A         COLHDG('Drug type')
+     A            B1TPA          5A         COLHDG('TPA')
+     A            B1CTYP         5A         COLHDG('Claim Type')
+     A            B1SGRP        20A         COLHDG('Sub group id')
+     A            B1FEES        15A         COLHDG('Fees')
+     A            B1CAPA        15A         COLHDG('Cap amount')
+     A            B1NCPY        15A         COLHDG('Non-copay amount')
+     A            B1PCOD         5A         COLHDG('Pay Code')
+     A            B1FORM         5A         COLHDG('Formulary')
+     A            B1GPI          5A         COLHDG('GPI class')
+     A            B1AHFS         5A         COLHDG('AHFS class')
+     A            B1XTYP         5A         COLHDG('Pharmacy type')
+     A            B1BBAS         5A         COLHDG('Billed basis code')
+     A            B1CHRG        15S 2       COLHDG('Prescribed Amount')
+     A            B1PDAT        10A         COLHDG('Paid date')
+     A            B1PAID        15S 2       COLHDG('TPA Amount')
+     A            B1BENF         5A         COLHDG('Benefit')
+     A            B1DOI         10A         COLHDG('Injury date')
+     A            B1CLM#         7S 0       COLHDG('Claim number')
+     A            B1INVD        10A         COLHDG('Invoice Date')
+     A            B1INV#        20A         COLHDG('Invoice #')
+     A            B1XID         10A         COLHDG('Pharmacy ID')
+     A            B1CNAM        50A         COLHDG('Employer name')
+     A            B1CADR        40A         COLHDG('Employer Address')
+     A            B1CCTY        25A         COLHDG('Employer City')
+     A            B1CST          2A         COLHDG('Employer State')
+     A            B1CZIP         9A         COLHDG('Employer Zip')
+     A            B1DOCN        40A         COLHDG('Physician name')
+     A            B1NAME    R               REFFLD(DS10)
+     A                                      COLHDG('(PDS) Document ID')
+     A            B1TRN#    R               REFFLD(EOB#)
+     A                                      COLHDG('(PDS) Transaction #')
+     A            B1PRFL    R               REFFLD(FLAG)
+     A                                      COLHDG('(PDS) Processed Flag')
+     A*
+     A*                                     *blank = not processed yet
+     A*                                     "E" = Error
+     A*                                     "Y" = written to WCMC
+     A*
+     A            B1ERRR    R               REFFLD(DS70)
+     A                                      COLHDG('(PDS) Error Reason')
+     A            B1PRDT    R               REFFLD(DT)
+     A                                      COLHDG('(PDS) Process Date')
+     A            B1PRTM    R               REFFLD(TIME)
+     A                                      COLHDG('(PDS) Process Time')
+     A            B1CO#     R               REFFLD(CO#)
+     A                                      COLHDG('(PDS) Company #')
+     A            B1SUB#    R               REFFLD(SUB#)
+     A                                      COLHDG('(PDS) Subscriber #')
+     A            B1FND     R               REFFLD(FND)
+     A                                      COLHDG('(PDS) Group #')
+     A            B1FYR     R               REFFLD(FYR)
+     A                                      COLHDG('(PDS) Year')
+     A            B1CASE    R               REFFLD(CASE)
+     A                                      COLHDG('(PDS) Case #')
+     A            B1SS#     R               REFFLD(SS#)
+     A                                      COLHDG('(PDS) SS#')
+     A            B1ACDT    R               REFFLD(DT)
+     A                                      COLHDG('(PDS) ACDT')
+     A            B1EOB#    R               REFFLD(EOB#)
+     A                                      COLHDG('(PDS) EOMB')

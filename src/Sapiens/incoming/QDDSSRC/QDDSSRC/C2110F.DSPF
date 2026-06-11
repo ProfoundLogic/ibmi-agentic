@@ -1,0 +1,83 @@
+     A****************************************************************
+     A** (C) COPYRIGHT INSURANCE INFORMATION SYSTEMS INC., 1996     **
+     A****************************************************************
+     A**   SPECIALITY CODE TABLE MAINTENANCE DISPLAY                **
+     A**                                                            **
+     A****************************************************************
+     A** REVISIONS:                                                 **
+     A**  11/18/96 *** C:107 *** V2000 ***                          **
+     A**           1. Version 2 format changes.                     **
+     A****************************************************************
+     A**
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/CREFP)
+     A                                      CHGINPDFT
+     A                                      MSGLOC(24)
+     A                                      PRINT
+     A                                      CF03
+     A                                      HELP(10)
+     A                                      VLDCMDKEY(11)
+     A          R SCR01
+     A                                      CF05
+     A                                      PUTOVR
+     A                                      SETOF(20)
+     A                                      SETOF(21)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C2110F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR01'
+     A                                 10 31'Specialty Code:'
+     A            SCSPEC    R        B 10 48REFFLD(SPEC)
+     A                                      OVRDTA
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A  21                                  ERRMSGID(CCR0508 *LIBL/CMESGG)
+     A                                      TEXT('SPECIALTY CODE')
+     A*                                     DSPATR(CS)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 35'F5=Search'
+     A                                      COLOR(BLU)
+     A          R SCR02
+     A                                      PUTOVR
+     A                                      CF12
+     A N09N40                               CF20
+     A                                      SETOF(20)
+     A            SCUSER    R        O  1  2REFFLD(USER)
+     A            SCCONM    R        O  1 21REFFLD(NAME)
+     A                                      TEXT('COMPANY NAME')
+     A                                  1 73DATE
+     A                                      EDTCDE(Y)
+     A                                  2  2'C2110F'
+     A            SCPRDS    R        O  2 21REFFLD(NAME)
+     A                                      TEXT('PROGRAM NAME')
+     A                                  2 76'SCR02'
+     A N09        SCMODE    R        O  3 71REFFLD(NM10)
+     A                                      TEXT('ADD/UPDATE MODE')
+     A                                      DSPATR(HI)
+     A                                  5  2'Specialty Code:'
+     A            SCSPEC    R        O  5 18REFFLD(SPEC)
+     A                                      DSPATR(HI)
+     A                                  5 30'Status:'
+     A            SCSTAT    R        O  5 38REFFLD(STAT)
+     A                                      DSPATR(HI)
+     A                                      OVRDTA
+     A                                  8  9'Description:'
+     A            SCDESC    R        B  8 23REFFLD(DS30)
+     A*                                     DSPATR(CS)
+     A  09                                  DSPATR(HI)
+     A  09                                  DSPATR(PR)
+     A  20                                  ERRMSGID(CCR0501 *LIBL/CMESGG)
+     A                                 23  2'F3=Exit      '
+     A                                      COLOR(BLU)
+     A                                 23 23'F12=Cancel     '
+     A                                      COLOR(BLU)
+     A N09N40                          23 59'F20=Change status'
+     A                                      COLOR(BLU)
+     A          R SCR99
+     A            SCERR     R        I  3  3REFFLD(FLAG)
+     A                                      DSPATR(ND PR)

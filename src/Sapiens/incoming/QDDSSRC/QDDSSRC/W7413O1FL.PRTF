@@ -1,0 +1,1016 @@
+      * (c) 2013 StoneRiver, Inc. All rights Reserved.                     *
+      * StoneRiver is a trademark of StoneRiver, Inc.                      *
+     A*****************************************************************
+     A*                                                               *
+     A*   Be sure to check for changes within all W7413O1* PRTF's.    *
+     A*                                                               *
+     A*****************************************************************
+     A* REVISIONS:                                                    *
+     A*                                                               *
+     A*                                                               *
+     A* 10/07/13 C:190 Project: 25WSS                                 *
+     A*                Change the printer file to determine if        *
+     A*                Premium or Contribution should be printed      *
+     A*                based on Group setup.                          *
+     A*
+     A* 10/01/08 C:197 PROJECT WC1701                                 *
+     A*                IN THE RECORD FORMAT FOR 'ITEM1OTH' ADD NEW    *
+     A*                FIELDS FOR 'LEASING ID' AND 'UNEMPLOYMENT ID'. *
+     A*                                                               *
+     A* 09/11/07 C:61  PROJECT 139WIB                                 *
+     A*                New format CONST1NFL for "Additional Named
+     A*                Insured".                                      *
+     A*                                                               *
+     A* 06/22/07 C:61  PROJECT 139WHP                                 *
+     A*                Replace South Carolina address with new        *
+     A*                Florida address.                               *
+     A*                                                               *
+     A*****************************************************************
+      *
+     A                                      REF(WREFP)
+     A*____________________________________________________________________
+     A*
+     A          R NEWEXTFL
+     A                                      ENDPAGE
+     A*____________________________________________________________________
+     A*
+     A          R CONST1FL
+     A                                    10'Item 1'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(7)
+     A                                    20'Extension Schedule'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+      ******* beg chg ***** 09/11/07 **********************************
+     A*******                             10'Schedule of Named Insured-
+     A*******                                and Locations'
+     A                                    10'Schedule of Locations'
+      ******* end chg ***** 09/11/07 **********************************
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+      ******* beg add ***** 09/11/07 **********************************
+     A          R CONST1NFL
+     A                                    10'Item 1'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(7)
+     A                                    20'Extension Schedule'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                    10'Schedule of Named Insured'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+      ******* end add ***** 09/11/07 **********************************
+     A          R CONST1NMFL
+     A                                    10'NAMED INSUREDS:'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                   105'FEIN #:'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A          R CONST1OTFL
+     A                                    10'LOCATIONS:'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                   105'FEIN #:'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A*____________________
+     A*
+     A          R BOXES1FL
+     A                                      LINE( 0.92 0.50 7.50 *HRZ .008)
+     A                                      LINE( 1.20 0.50 7.50 *HRZ .008)
+     A                                      LINE( 9.50 0.50 7.50 *HRZ .008)
+     A*____________________
+     A*
+     A          R ITEM1NMFL
+     A            ADDNAME   R             10REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A            ADDFEIN   R     A      105REFFLD(FEIN)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A*____________________
+     A*
+     A          R ITEM1OTHFL
+     A            ADDNAME   R             10REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A            ADDFEIN   R     A      105REFFLD(FEIN)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A            ADDADR1   R             12REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A            ADDADR2   R             12REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A            ADDADR3   R             12REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+      ****** BEG ADD ***** 10/01/08 ***********************************
+     A            N1LSID         1A       12
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A            N1LSDS    R             12REFFLD(DS40)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A            N1SUE1        20        13
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A            N1SUE2        20        13
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A            N1SUE3        20        13
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+      ****** END ADD ***** 10/01/08 ***********************************
+     A*____________________
+     A*
+     A          R FOOT1FL
+     A            FOOTA     R               REFFLD(DS20)
+     A                                      TEXT('Insured:')
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      POSITION( 9.75 0.75)
+     A            EMPNAME   R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      POSITION( 9.75 2.00)
+     A            FOOTB     R               REFFLD(DS20)
+     A                                      TEXT('Policy Number:')
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      POSITION( 9.90 0.75)
+     A            CURRPOL#      18
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      POSITION( 9.90 2.00)
+     A            FOOTC     R               REFFLD(DS20)
+     A                                      TEXT('Effective Date:')
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      POSITION(10.05 0.75)
+     A            EFFDATE       10
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      POSITION(10.05 2.00)
+     A            FOOTF     R               REFFLD(DS20)
+     A                                      TEXT('WC 99 06 57')
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                      POSITION(10.30 0.75)
+     A*____________________________________________________________________
+     A*
+     A          R CONST3DFL
+     A                                    10'Item 3.D.'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(7)
+     A                                    20'Extension Schedule'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                    10'Schedule of Forms and-
+     A                                       Endorsements'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    10'Form Number:'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    25'Edition:'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                    35'Description:'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEA(1)
+     A*____________________
+     A*
+     A          R BOXES3DFL
+     A                                      LINE( 0.92 0.50 7.50 *HRZ .008)
+     A                                      LINE( 1.20 0.50 7.50 *HRZ .008)
+     A                                      LINE( 9.50 0.50 7.50 *HRZ .008)
+     A*____________________                                            ____
+     A*
+     A          R ITEM3DFL
+     A            ENDFORM       18        10
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A            ENDEDT    R             25REFFLD(DS10)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A            ENDDESC   R             35REFFLD(DS40)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A*____________________
+     A*
+     A          R FOOT3DFL
+     A            FOOTA     R               REFFLD(DS20)
+     A                                      TEXT('Insured:')
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      POSITION( 9.75 0.75)
+     A            EMPNAME   R               REFFLD(DS00)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      POSITION( 9.75 2.00)
+     A            FOOTB     R               REFFLD(DS20)
+     A                                      TEXT('Policy Number:')
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      POSITION( 9.90 0.75)
+     A            CURRPOL#      18
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      POSITION( 9.90 2.00)
+     A            FOOTC     R               REFFLD(DS20)
+     A                                      TEXT('Effective Date:')
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      POSITION(10.05 0.75)
+     A            EFFDATE       10
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      POSITION(10.05 2.00)
+     A            FOOTD     R               REFFLD(DS20)
+     A                                      TEXT('WC 99 06 56')
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                      POSITION(10.30 0.75)
+     A*____________________________________________________________________
+     A*
+     A          R CONST4FL
+     A                                    10'WORKERS COMPENSATION AND-
+     A                                       EMPLOYERS LIABILITY POLICY'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SKIPB(6)
+     A                                    80'POLICY NO.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A            CURRPOL#      18        95
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                    22'EXTENSION OF INFORMATION PAGE'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    80'PAGE NO.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A            PAGE#4         5  0     95EDTCDE(Z)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                    30'ITEM 4. CONTINUED'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    85'Rates Per'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SPACEB(1)
+     A                                    71'Estimated Total'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SPACEB(1)
+     A                                    86'$100 of'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    62'CODE'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SPACEB(1)
+     A                                    74'Annual'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    86'Remun-'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    20'CLASSIFICATION OF OPERATIONS'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SPACEB(1)
+     A                                    63'NO.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    71'Remuneration'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                    86'eration'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                               97'Estimated Annual Premiums'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A*****                                 SPACEA(1)
+     A  57                                97'Estimated Annual Premiums'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SPACEA(1)
+     A N57                                97'Estimated Annual Contributions'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SPACEA(1)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A            PREMFORST R             16REFFLD(DS40)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                      SPACEA(1)
+     A          R ITEM4FL139
+     A            EMPSIC    R             15REFFLD(DS20)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A            EMPNAICS  R             35REFFLD(DS20)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEA(2)
+     A*____________________
+     A*
+     A          R BOXES4FL
+     A* Border
+     A                                      BOX( 0.50 0.50 10.00 8.00 .008)
+     A* Policy No.
+     A                                      LINE( 0.75 6.25 1.50 *HRZ .008)
+     A* Page No.
+     A                                      LINE( 0.90 6.25 1.50 *HRZ .008)
+     A*
+     A                                      LINE( 1.00 0.50 7.50 *HRZ .008)
+     A                                      LINE( 1.50 0.50 7.50 *HRZ .008)
+     A*
+     A                                      LINE( 1.00 3.90 9.00 *VRT .008)
+     A                                      LINE( 1.00 4.50 9.00 *VRT .008)
+     A                                      LINE( 1.00 5.50 9.00 *VRT .008)
+     A                                      LINE( 1.00 6.17 9.00 *VRT .008)
+     A*____________________
+     A*
+     A          R ITEM4AFL
+     A            CLASSDESC R             10REFFLD(DS40)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A            CLASSCODE R             61REFFLD(DS10)
+     A            ANNRENUM  R             70REFFLD(DS15)
+     A            RATEPER100R             83REFFLD(DS10)
+     A            SUBTOMOD  R            106REFFLD(A112)
+     A                                      EDTCDE(K)
+     A*
+     A          R ITEM4CFL
+     A            PREMDESC  R             10REFFLD(DS50)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A            PREMCODE  R             62REFFLD(DS10)
+     A            PREMPER100R             86REFFLD(DS10)
+     A            PREMIUM   R            106REFFLD(A112)
+     A                                      EDTCDE(K)
+     A*
+     A          R ITEM4DFL
+     A            EXPMODDESCR             10REFFLD(DS40)
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(3)
+     A            EXPMOD1   R             10REFFLD(DS40)
+     A                                      SPACEB(1)
+     A            EXPMOD2   R             10REFFLD(DS40)
+     A                                      SPACEB(1)
+     A            EXPMOD3   R             10REFFLD(DS40)
+     A                                      SPACEB(1)
+     A*____________________
+     A*
+     A          R FOOT4FL
+     A            FOOTE     R               REFFLD(DS20)
+     A                                      TEXT('WC 99 06 55')
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                      POSITION(10.30 0.75)
+     A*____________________________________________________________________
+     A*
+     A*____________________                                            ____
+     A*
+     A          R JKT1_139FL
+     A                                    10' '
+     A                                      FNTCHRSET(C0H400B0 T1V10037)
+     A                                      SKIPB(5)
+     A                                    10'WORKERS COMPENSATION AND'
+     A                                      FNTCHRSET(C0H400D0 T1V10037)
+     A                                      SPACEB(2)
+     A                                    10'EMPLOYERS LIABILITY INSURANCE -
+     A                                      POLICY'
+     A                                      FNTCHRSET(C0H400D0 T1V10037)
+     A                                      SPACEB(2)
+     A                                    10' '
+     A                                      FNTCHRSET(C0H400B0 T1V10037)
+     A                                      SKIPB(38)
+     A                                    40'GUARANTEE INSURANCE COMPANY'
+     A                                      FNTCHRSET(C0H400B0 T1V10037)
+     A                                      SPACEB(2)
+     A                                    53'A Stock Company'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+      ****** beg del ***** 06/22/07 ***********************************
+     A**********                          44'FORT MILL, SOUTH CAROLINA'
+     A**********                            FNTCHRSET(C0H400B0 T1V10037)
+     A**********                            SPACEB(2)
+     A**********                          46'1061 521 Corporate Drive, -
+     A**********                            Suite 140'
+     A**********                            FNTCHRSET(C0H20000 T1V10037)
+     A**********                            SPACEB(1)
+     A**********                          48'Fort Mill, South Carolina  -
+      **********                            29715'
+     A**********                            FNTCHRSET(C0H20000 T1V10037)
+     A**********                            SPACEB(1)
+      ****** end del ***** 06/22/07 ***********************************
+      ****** beg add ***** 06/22/07 ***********************************
+     A                                    44'FORT LAUDERDALE, FLORIDA'
+     A                                      FNTCHRSET(C0H400B0 T1V10037)
+     A                                      SPACEB(2)
+     A                                    45'401 E. Las Olas Boulevard, -
+     A                                      Suite 1540'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    48'Fort Lauderdale, Florida  -
+                                            33301'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+      ****** end add ***** 06/22/07 ***********************************
+     A                                    20'THESE POLICY PROVISIONS WITH -
+     A                                      THE INFORMATION PAGE AND -
+     A                                      ENDORSEMENTS,'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SKIPB(70)
+     A                                    25'IF ANY, ISSUED TO FORM A PART -
+     A                                      THEREOF, COMPLETE THIS POLICY.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    60'Page 1 of 3'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                      SKIPB(85)
+     A                                   110'WC 99 06 99'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A*____________________                                            ____
+     A*
+     A          R JKT2_139FL
+     A                                  5 25'WORKERS COMPENSATION AND -
+     A                                      EMPLOYERS LIABILITY INSURANCE -
+     A                                      POLICY'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                  6 55'QUICK REFERENCE'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A*__________                                                      ____
+     A*
+     A                                  9 50'BEGINNING'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 10 50'ON PAGE'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 12 10'INFORMATION PAGE'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 14 10'GENERAL SECTION'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 14 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 15 13'A.  The Policy'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 15 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 16 13'B.  Who Is Insured'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 16 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 17 13'C.  Workers Compensation Law'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 17 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 18 13'D.  State'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 18 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 19 13'E.  Locations'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 19 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 21 10'PART ONE-WORKERS COMPENSATION -
+     A                                      INSURANCE'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 21 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 22 13'A.  How This Insurance Applies'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 22 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 23 13'B.  We Will Pay'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 23 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 24 13'C.  We Will Defend'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 24 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 25 13'D.  We Will Also Pay'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 25 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 26 13'E.  Other Insurance'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 26 57'1'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 27 13'F.  Payments You Must Make'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 27 57'2'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 28 13'G.  Recovery From Others'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 28 57'2'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 29 13'H.  Statutory Provisions'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 29 57'2'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 31 10'PART TWO-EMPLOYERS LIABILIY -
+     A                                      INSURANCE'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 31 57'2'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 32 13'A.  How This Insurance Applies'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 32 57'2'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 33 13'B.  We Will Pay'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 33 57'2'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 34 13'C.  Exclusions'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 34 57'3'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 35 13'D.  We Will Defend'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 35 57'3'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 36 13'E.  We Will Also Pay'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 36 57'3'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 37 13'F.  Other Insurance'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 37 57'4'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 38 13'G.  Limits of Liability'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 38 57'4'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A*__________
+     A*
+     A                                  9110'BEGINNING'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 10110'ON PAGE'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 13 70'PART TWO - EMPLOYERS LIABILITY -
+     A                                      INSURANCE'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 13117'4'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 14 70'(Cont''d.)'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 15 73'H.  Recovery From Others'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 15117'4'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 16 73'I.    Actions Against Us'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 16117'4'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 18 70'PART THREE-OTHER STATES -
+     A                                      INSURANCE'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 18117'4'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 19 73'A.  How This Insurance Applies'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 19117'4'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 20 73'B.  Notice'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 20117'4'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 22 70'PART FOUR-YOUR DUTIES IF -
+     A                                      INJURY OCCURS'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 22117'4'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                            24 70'PART FIVE-PREMIUM'
+     A*****                                 FNTCHRSET(C0H40080 T1V10037)
+     A  57                             24 70'PART FIVE-PREMIUM'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A N57                             24 70'PART FIVE-CONTRIBUTION'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A                                 24117'5'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 25 73'A.  Our Manuals'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 25117'5'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 26 73'B.  Classifications'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 26117'5'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 27 73'C.  Remuneration'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 27117'5'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                            28 73'D.  Premium Payments'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A  57                             28 73'D.  Premium Payments'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A N57                             28 73'D.  Contribution Payments'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A                                 28117'5'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                            29 73'E.  Final Premium'
+     A*****                                 FNTCHRSET(C0H20080 T1V10037)
+     A  57                             29 73'E.  Final Premium'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A N57                             29 73'E.  Final Contribution'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A                                 29117'5'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 30 73'F.  Records'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 30117'5'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 31 73'G.  Audit'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 31117'5'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 33 70'PART SIX-CONDITIONS'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 33117'6'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 34 73'A.  Inspection'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 34117'6'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 35 73'B.  Long Term Policy'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 35117'6'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 36 73'C.  Transfer Of Your Rights -
+     A                                      and Duties'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 36117'6'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 37 73'D.  Cancellation'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 37117'6'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 38 73'E.  Sole Representation'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 38117'6'
+     A*__________
+     A*
+     A                                 65 20'IMPORTANT:'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 65 32'This Quick Reference is'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 65 50'not'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 65 53'part of the Workers Compensa-
+     A                                      tion and Employers Liablity -
+     A                                      Insurance Policy'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 66 32'And does'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 66 40'not'
+     A                                      FNTCHRSET(C0H40080 T1V10037)
+     A                                 66 43'provide coverage.-
+     A                                       Refer to the Workers Compensa-
+     A                                      tion and Employers Liablity -
+     A                                      Insurance'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 67 32'Policy itself for actual -
+     A                                      contractual provisions.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 67 32'Policy itself for actual -
+     A                                      contractual provisions.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 71 45'PLEASE READ THE POLICY -
+     A                                      CAREFULLY.'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                 75 45'Copyright 1991 National -
+     A                                      Council on Compensation -
+     A                                      Insurance'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A*__________
+     A*
+     A                                 85 60'Page 2 of 3'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 85110'WC 99 06 99'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A*____________________                                            ____
+     A*
+     A          R JKT3_139FL
+     A                                 73 13'In Witness Whereof, we have -
+     A                                      caused this policy to be -
+     A                                      executed and attested, and, if -
+     A                                      required by state law, this'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 74 13'policy shall not be valid -
+     A                                      unless countersigned by our -
+     A                                      authorized representative.'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A            SIG1NAME  R          81 13REFFLD(DS60)
+     A                                      FNTCHRSET(C0H20060 T1V10037)
+     A            SIG2NAME  R          81 69REFFLD(DS60)
+     A                                      FNTCHRSET(C0H20060 T1V10037)
+     A                                 85 60'Page 3 of 3'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A                                 85110'WC 99 06 99'
+     A                                      FNTCHRSET(C0H20080 T1V10037)
+     A*____________________                                            ____
+     A*
+     A          R JKT1L139FL
+     A                                      LINE( 8.50 2.75 3.00 *HRZ .008)
+     A                                      LINE( 9.00 2.75 3.00 *HRZ .008)
+     A*____________________                                            ____
+     A*
+     A          R JKT3L139FL
+     A                                      PAGSEG(&SIG1 &SIG1VRT &SIG1HRZ)
+     A                                      PAGSEG(&SIG2 &SIG2VRT &SIG2HRZ)
+     A                                      LINE(10.00 0.75 3.00 *HRZ .008)
+     A                                      LINE(10.00 4.50 3.00 *HRZ .008)
+     A            SIG1           8A  P
+     A            SIG1VRT        5S 3P
+     A            SIG1HRZ        5S 3P
+     A            SIG2           8A  P
+     A            SIG2VRT        5S 3P
+     A            SIG2HRZ        5S 3P
+     A*____________________________________________________________________
+     A*
+     A          R PRV_139
+     A                                    42' '
+     A                                      FNTCHRSET(C0H400B0 T1V10037)
+     A                                      SKIPB(4)
+     A                                    42'GUARANTEE INSURANCE COMPANY'
+     A                                      FNTCHRSET(C0H400B0 T1V10037)
+     A                                      SPACEB(1)
+     A                                    61'Notice'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SKIPB(8)
+     A                                    42'Guarantee Insurance Company-
+     A                                      ''s Privacy Policy'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SKIPB(10)
+     A                                    10'Dear Policyholder:'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SKIPB(13)
+     A                                    10'The nature of our insurance -
+     A                                      business at Guarantee -
+     A                                      Insurance Company requires -
+     A                                      that we gather and maintain a -
+     A                                      variety'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    10'of information about our -
+     A                                      current and potential -
+     A                                      customers and consumers, -
+     A                                      including nonpublic personal -
+     A                                      information about'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'individuals.  We are -
+     A                                      committed to keeping -
+     A                                      confidential and secure any -
+     A                                      such nonpublic personal -
+     A                                      information.  We will'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'disclose nonpublic personal -
+     A                                      information obtained in the -
+     A                                      course of our business only -
+     A                                      as permitted by law.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'Categories of Personal -
+     A                                      Information We May Obtain'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    10'We may obtain nonpublic -
+     A                                      personal information from the -
+     A                                      following sources:'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    12'-'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    15'Application or other -
+     A                                      underwriting forms.'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                    56'These forms provide us with -
+     A                                      information we need as part of -
+     A                                      the'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                    15'underwriting process; this -
+     A                                      can include such nonpublic -
+     A                                      personal information as -
+     A                                      individuals'' names, addresses,'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'social security numbers and -
+     A                                      any other information about -
+     A                                      individuals that we are -
+     A                                      authorized to obtain in order -
+     A                                      to'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'underwrite and administer -
+     A                                      policies.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    12'-'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    15'Information we obtain from -
+     A                                      third parties.'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                    56'The kind of information we -
+     A                                      may gather from third parties -
+     A                                      depends on'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                    15'the type of insurance policy -
+     A                                      or coverage, but may include -
+     A                                      such nonpublic personal -
+     A                                      information as motor vehicle'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'reports, claims reports, -
+     A                                      credit reports, property -
+     A                                      inspection reports, and -
+     A                                      medical records or reports.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    12'-'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    15'Information about -
+     A                                      transactions and experiences -
+     A                                      with us or with our affiliates.'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                    93'We develop and maintain'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+      ****************** Beg Chg ***************** 10/07/13 ***********************
+     A*****                               15'individuals'' personal -
+     A*****                                 information, such as policy -
+     A*****                                 numbers, premium payments and -
+     A*****                                 claims history, obtained on the'
+     A*****                                 FNTCHRSET(C0H20000 T1V10037)
+     A*****                                 SPACEB(1)
+     A  57                                15'individuals'' personal -
+     A                                      information, such as policy -
+     A                                      numbers, premium payments and -
+     A                                      claims history, obtained on the'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A N57                                15'individuals'' personal -
+     A                                      information, such as policy -
+     A                                      numbers, contribution payments and -
+     A                                      claims history, obtained on the'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+      ****************** End Chg ***************** 10/07/13 ***********************
+     A                                    15'basis of Guarantee Insurance -
+     A                                      Company''s or its affiliates -
+     A                                      transactions and experiences.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'How We May Use and Share -
+     A                                      Personal Information'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    10'We may use and share all of -
+     A                                      the information that we obtain -
+     A                                      as described below:'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    12'-'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    15'Within Guarantee Insurance -
+     A                                      Company'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                    15'Within Guarantee Insurance -
+     A                                      Company we only use nonpublic -
+     A                                      personal information received -
+     A                                      to service or maintain'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    15'policies, to effect, process, -
+     A                                      administer or enforce -
+     A                                      requested or authorized -
+     A                                      transactions, or for other -
+     A                                      purposes as'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'permitted by law.  We -
+     A                                      restrict access to nonpublic -
+     A                                      personal information to those -
+     A                                      employees who have a business'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'reason to know that -
+     A                                      information to provide -
+     A                                      products and services.  We -
+     A                                      also maintain physical, -
+     A                                      electronic, and'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'procedural safeguards in -
+     A                                      order to protect against -
+     A                                      unauthorized use or disclosure -
+     A                                      of nonpublic personal'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'information.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    12'-'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    15'With Affiliates and -
+     A                                      Non-Affiliated Third Parties'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                    15'We may disclose information -
+     A                                      about Guarantee Insurance -
+     A                                      Company''s customers and -
+     A                                      consumers to others,'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    15'including our affiliates -
+     A                                      (i.e. companies that are -
+     A                                      related to us by common -
+     A                                      ownership or control), in -
+     A                                      order to offer'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'insurance products or -
+     A                                      services that may be of value.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'We may also disclose -
+     A                                      nonpublic personal information -
+     A                                      without prior permission to -
+     A                                      nonaffiliated third parties -
+     A                                      (i.e.,'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    15'persons or -
+     A                                      companies that are not -
+     A                                      related to us by common -
+     A                                      ownership or control) as -
+     A                                      necessary to effect, process,'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'administer or enforce a -
+     A                                      requested or authorized -
+     A                                      transaction, or for other -
+     A                                      purposes as permitted by law.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'When we provide nonpublic -
+     A                                      personal information to a -
+     A                                      nonaffiliated third party who -
+     A                                      performs services for us, we'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    15'require that provider to -
+     A                                      agree to safeguard any -
+     A                                      nonpublic personal -
+     A                                      information, to use the -
+     A                                      information only for the'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    15'intended purpose, and to -
+     A                                      abide by applicable law.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'Confidentiality of Health -
+     A                                      and Medical Information'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    10'It is often necessary for us -
+     A                                      to obtain personal health -
+     A                                      information in order to -
+     A                                      underwrite and process claims -
+     A                                      for various'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    10'types of insurance coverages. -
+     A                                       We recognize concerns about -
+     A                                      the security of that -
+     A                                      information and want to -
+     A                                      provide'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'assurance that any personal -
+     A                                      health data provided to us or -
+     A                                      that we otherwise obtain will -
+     A                                      be held in strict confidence.  -
+     A                                      We'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'will not disclose or share -
+     A                                      personal medical information -
+     A                                      for marketing or any other -
+     A                                      unauthorized purpose.  We may'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'disclose or share personal -
+     A                                      medical information as -
+     A                                      permitted by law; for -
+     A                                      example, in order to -
+     A                                      underwrite policies or'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'administer policies or -
+     A                                      claims.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'Purpose of and Updates to -
+     A                                      This Notice'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    10'We recognize and respect the -
+     A                                      privacy concerns of our -
+     A                                      potential and current -
+     A                                      customers and consumers.  We -
+     A                                      may amend'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(2)
+     A                                    10'our privacy policy from time -
+     A                                      to time.  We send this notice -
+     A                                      of our privacy policy at this -
+     A                                      time as required for -
+     A                                      informational'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'purposes, and we will update -
+     A                                      and distribute it as required -
+     A                                      by law.'
+     A                                      FNTCHRSET(C0H20000 T1V10037)
+     A                                      SPACEB(1)
+     A                                    10'GIC Privacy Notice'
+     A                                      FNTCHRSET(C0H40000 T1V10037)
+     A                                      SPACEB(5)

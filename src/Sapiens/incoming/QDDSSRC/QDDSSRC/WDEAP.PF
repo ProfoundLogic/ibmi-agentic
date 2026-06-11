@@ -1,0 +1,198 @@
+      * (c) 2024 Sapiens. All Rights Reserved.                             *
+      *****************************************************************
+      * WORKERS' COMP EMPLOYER ACCOUNTS RECEIVABLE BATCH FILE
+      *****************************************************************
+      *  SPECIAL FILE NOTES:                                          *
+      *                                                               *
+      *  When fields/logical are added to this file, the file in      *
+      *   QUOTE must be updated accordingly.                          *
+      *                                                               *
+      *****************************************************************
+      * REVISIONS:                                                    *
+      *                                                               *
+      * 06/24/24 C:300 PROJECT: 146WKR                                *
+      *                COLLATERAL PROCESSING                          *
+      *                                                               *
+      * 06/29/22  C:340 PROJECT: WC2854                               *
+      *                 Invoice Cloud:  Retain Payment Ref#           *
+      *                                                               *
+      * 04/11/22 C:340 Project: WC2663                                *
+      *                Invoice Cloud - Add Invoice Type ID            *
+      *                                                               *
+      * 05/22/20 C:136 Project: 150WEU                                *
+      *                Add transaction ID for A/R Import              *
+      *                                                               *
+      * 06/08/18 C:136 Project: 150WAQ                                *
+      *                Add collateral information                     *
+      *                                                               *
+      *  06/03/15 C:136 PROJECT: MC396                                *
+      *                 ADD EFT FLAG FIELD                            *
+      *                                                               *
+      *  04/21/11 C:190 Project: 114WYI                               *
+      *                 Add Employer EFT Account Type.                *
+      *                                                               *
+      *  03/28/08 C:65 Project: CI019                                 *
+      *                Add ONLINE PROCESSING FLAG.                    *
+      *                                                               *
+      *  10/20/05 C:53 Project: WC1324                                *
+      *                Add auto transfer flag                         *
+      *                                                               *
+      * 04/07/05 C:53  PROJECT: WC1288 (SUMMARIZE S/R)                *
+      *                ADD FIELD TO TRACK WHICH DIVISION              *
+      *                S/R WAS REPORTED TO FOR CEU.                   *
+      *                ** ADDED FOR PEO PROCESSING 6/02/05            *
+      *                                                               *
+      * 09/07/04  C:132  PROJECT: WC1179                              *
+      *                  ADD FIELD FOR AUTO CASH DISSOLVE             *
+      *                                                               *
+      * 11/04/03 C:136 PROJECT: WC1161                                *
+      *                ADD FIELD FOR CATEGORY TYPE.                   *
+      *                                                               *
+      * 09/24/03  C:136  PROJECT: WC1116                              *
+      *                  ADD INITIAL MAINTENANCE FIELDS.              *
+      *                                                               *
+      * 05/29/03  C:35   PROJECT: 81WVC                               *
+      *                  CHANGE FIELD TO PACKED.                      *
+      *                                                               *
+      * 05/12/03  C:132  PROJECT: 81WVC                               *
+      *                  ADD Field for Bank Batch Date                *
+      *                                                               *
+      * 04/15/03  C:142  PROJECT: WC1116, WC1117                      *
+      *                  Add new fields for ACH.                      *
+      *                                                               *
+      * 07/30/02  C:61   PROJECT: 81WUG                               *
+      *                  Add new field for Bank Batch #.              *
+      *                                                               *
+      * 04/25/02  C:35   PROJECT: WC577                               *
+      *                  EXPANDED BATCH AMOUNT AND TRANSFERRED AMOUNT *
+      *                  FROM 9.2 TO 11.2.                            *
+      *                                                               *
+      *****************************************************************
+     A                                      REF(WREFP)
+     A          R PEA01                     TEXT('EMPLOYER A/R BATCH FILE')
+     A            EACO#     R               REFFLD(CO#)
+     A            EABAT#         9P 0       COLHDG('BATCH #')
+      **** BEGIN CHG **** 04/25/02 *********************************************
+     A*********** EABATA    R               REFFLD(A92)
+     A            EABATA    R               REFFLD(A112)
+      **** END   CHG **** 04/25/02 *********************************************
+     A                                      COLHDG('BATCH AMOUNT')
+     A            EAFND     R               REFFLD(FND)
+     A            EAFYR     R               REFFLD(FYR)
+     A            EAEMP#    R               REFFLD(EMP#)
+     A            EADIV     R               REFFLD(DIV)
+     A            EAARCD    R               REFFLD(CODE)
+     A                                      COLHDG('AR TRANS CODE')
+     A            EADESC    R               REFFLD(DS30)
+     A                                      COLHDG('AR CODE' 'DESCRIPTION')
+     A            EAPODT    R               REFFLD(DT)
+     A                                      COLHDG('POSTING DATE')
+     A            EACHK#    R               REFFLD(CHK#)
+     A            EACKAM    R               REFFLD(A92)
+     A                                      COLHDG('CHECK AMOUNT')
+     A            EAAMT     R               REFFLD(A92)
+     A                                      COLHDG('POSTED AMOUNT')
+     A            EASYCD    R               REFFLD(CODE)
+     A                                      COLHDG('SYSTEM TYPE CODE')
+     A            EATFAP    R               REFFLD(FLAG)
+     A                                      COLHDG('TRANSFER' 'APPROVED (Y/N)')
+     A            EATFFL    R               REFFLD(FLAG)
+     A                                      COLHDG('TRANSFER' 'FLAG (Y/N)')
+     A            EATFDT    R               REFFLD(DT)
+     A                                      COLHDG('TRANSFER DATE')
+      **** BEGIN CHG **** 04/25/02 *********************************************
+     A*********** EATFAM    R               REFFLD(A92)
+     A            EATFAM    R               REFFLD(A112)
+      **** END   CHG **** 04/25/02 *********************************************
+     A                                      COLHDG('AMOUNT TRANSFERRED')
+     A            EASTAT    R               REFFLD(STAT)
+     A                                      COLHDG('"T"=TRANSFERRED,' '" " OW')
+     A            EAUSER    R               REFFLD(USER)
+     A            EAPGM     R               REFFLD(PGM)
+     A            EATIME    R               REFFLD(TIME)
+     A            EADT      R               REFFLD(DT)
+     A                                      COLHDG('DATE' 'MAINTAINED')
+     A            EAINV#    R               REFFLD(A100)
+     A                                      COLHDG('INVOICE NUMBER')
+     A            EATRDT    R               REFFLD(DT)
+     A                                      COLHDG('TRANSACTION DATE')
+     A            EALATE    R               REFFLD(FLAG)
+     A                                      COLHDG('LATE PAYMENT' 'FLAG (Y/ )')
+      ****** beg add ***** 07/30/02 ***********************************
+      *
+     A            EABB#     R               REFFLD(DS15)
+     A                                      COLHDG('BANK BATCH #')
+      ****** end add ***** 07/30/02 ***********************************
+      ****** beg add ***** 04/15/03 ***********************************
+      *
+     A            EAACHF         1A         COLHDG('ACH BATCH FLAG')
+     A            EAACHD         7S 0       COLHDG('ACH TRANSMITTAL DATE')
+     A            EAACHT         6S 0       COLHDG('ACH TRANSMITTAL TIME')
+     A            EAACHU        10A         COLHDG('ACH TRANSMITTAL USER')
+      ****** end add ***** 04/15/03 ***********************************
+      **** BEGIN ADD **** 05/12/03 *********************************************
+      **** BEGIN CHG **** 05/29/03 *********************************************
+     A*********** EABBDT    R               REFFLD(DT7S)
+     A            EABBDT    R               REFFLD(DT7)
+      **** END   CHG **** 05/29/03 *********************************************
+     A                                      COLHDG('Bank Batch Date')
+      ****** END ADD **** 05/12/03 *********************************************
+      *** BEG ADD ***** 09/24/03 ***********************************************
+     A            EAIUSR    R               REFFLD(USER)
+     A                                      COLHDG('INITIAL' 'USER')
+     A            EAIPGM    R               REFFLD(PGM)
+     A                                      COLHDG('INITIAL' 'PROGRAM')
+     A            EAIDT          7S
+     A                                      COLHDG('INITIAL' 'DATE')
+      *** END ADD ***** 09/24/03 ***********************************************
+      *** BEG ADD ***** 11/04/03 ***********************************************
+     A            EACTYP    R               REFFLD(FLAG)
+     A                                      COLHDG('A/R CATEGORY')
+      *** END ADD ***** 11/04/03 ***********************************************
+      ***** BEG ADD ***** 09/07/04 *********************************************
+     A            EACASH    R               REFFLD(FLAG)
+     A                                      TEXT('Auto Cash Dissolve Flag')
+     A                                      COLHDG('AUTO CASH' 'DISSOLVE')
+      ***** END ADD ***** 09/07/04 *********************************************
+      *** BEG ADD ***** 04/07/05 ***********************************************
+     A            EARDIV    R     S         REFFLD(DIV)
+     A                                      COLHDG('S/R' 'REP' 'DIV')
+      *** END ADD ***** 04/07/05 ***********************************************
+     A*** BEG ADD *** 10/20/05 **************************************
+     A            EAAUTR         1A         COLHDG('Auto-transfer flag')
+     A*** END ADD *** 10/20/05 **************************************
+     A*** BEG ADD *** 10/20/05 **************************************
+     A            EAONLI         1A         COLHDG('ONLINE PROCESSING')
+     A*** END ADD *** 10/20/05 **************************************
+     A*** BEG ADD *** 04/21/11 **************************************
+     A            EAEATP         2A         COLHDG('Emp EFT Ac/Type ')
+     A*** END ADD *** 04/21/11 **************************************
+     A*** BEG ADD ***** 06/03/15 ************************************
+     A            EAFL01         1A         COLHDG('EFT' 'FLAG')
+     A*** END ADD ***** 06/03/15 ************************************
+     A***  Begin Add  ***  06/08/18  *********************************
+     A            EACOLEFDT R     S         REFFLD(DT)
+     A                                      COLHDG('COLLATERAL' 'EFF DATE')
+     A            EACOLEXDT R     S         REFFLD(DT)
+     A                                      COLHDG('COLLATERAL' 'EXP DATE')
+     A            EACOLPERC R     S         REFFLD(PC52)
+     A                                      COLHDG('COLLATERAL %')
+     A            EACOLLFLG R               REFFLD(FLAG)
+     A                                      COLHDG('COLLATERAL' 'BATCH FLAG')
+     A            EASRRPTDT R     S         REFFLD(DT)
+     A                                      COLHDG('PAYROLL' 'RPT DATE')
+     A            EASRMANPR R     S         REFFLD(A112)
+     A                                      COLHDG('MANUAL PREMIUM')
+     A***  End   Add  ***  06/08/18  *********************************
+      *** Beg Add ***** 05/22/20 ************************************
+     A            EATRANSID     32A         COLHDG('Transaction ID')
+      *** End Add ***** 05/22/20 ************************************
+      *** Beg Add ***** 04/11/22 ************************************
+     A            EAINVTYPID    15S         COLHDG('Invoice Type ID')
+      *** End Add ***** 04/11/22 ************************************
+      *** Beg Add ***** 06/29/22 ************************************
+     A            EAREF#        40A         COLHDG('Reference #')
+      *** End Add ***** 06/29/22 ************************************
+      *** BEG ADD *** 06/24/24 ******************************
+     A            EABAT2         9S 0       COLHDG('LINKED A/R BATCH #')
+      *** END ADD *** 06/24/24 ******************************

@@ -1,0 +1,355 @@
+     A**** ======================================================= ***
+     A* (c) 2010 StoneRiver, Inc. All rights Reserved.               *
+     A* StoneRiver is a trademark of StoneRiver, Inc.                *
+     A*                                                              *
+     A*     MEDICARE QUERY RESPONSE DATA STRUCTURE                   *
+     A*                                                              *
+     A*     DESC:  THIS FLAT FILE CONTAINS THE LAYOUT OF THE CLAIMS  *
+     A*            DETAIL RECORD FOR MEDICARE QUERY.                 *
+     A*                                                              *
+     A*    08/14/09  C:232  PROJECT: WC1819 Phase 5.                 *
+     A*                                                              *
+     H****************************************************************
+     H*  SPECIAL FILE NOTES:                                         *
+     H*                                                              *
+     H*  USE THIS "FILE" AS AN EXTERNAL DATA STRUCTURE DESCRIPTION   *
+     H*  WHEN CREATING THE MEDICARE REPORTING FILE                   *
+     H*                                                              *
+     H****************************************************************
+     A* REVISIONS:                                                   *
+     A*                                                              *
+     A* 12/16/21 C:053 SUPPORT: 99985                                *
+     A*                Correct format                                *
+     A*                                                              *
+     A* 10/11/21 C:298 Project: WC2822                               *
+     A*                CMS Response File Format Change               *
+     A*                                                              *
+     A* 05/18/10 C:198 Project: WC1879                               *
+     A*                -Added 2 fields DCN1 and DCN2 each of len 30  *
+     A*                -Added a filler QRFIL2 of length 124          *
+     A*                                                              *
+     A****************************************************************
+     A*  Medicare Query Header External Data Structure
+     A                                      REF(SREFP)
+     A          R PQR                       TEXT('Medicare Query Header ext DS')
+     A            QRHIC#    R               REFFLD(DS12)
+     A                                      COLHDG('Medicare HICN')
+     A            QRLSN     R               REFFLD(DS6)
+     A                                      COLHDG('Last Name')
+     A            QRFSN     R               REFFLD(FLAG)
+     A                                      COLHDG('First Initial')
+     A            QRDTOB    R               REFFLD(DT8)
+     A                                      COLHDG('Date of Birth')
+     A            QRSEX     R               REFFLD(FLAG)
+     A                                      COLHDG('Sex')
+     A            QRSS#     R               REFFLD(DS9)
+     A                                      COLHDG('SSN#')
+     A            QRFILL        62A         COLHDG('Filler')
+     A            QRCODE    R               REFFLD(CDE)
+     A                                      COLHDG('Disposition Code')
+     A            QRDCN#    R               REFFLD(DS15)
+     A                                      COLHDG('CMS Doc. Control No.')
+     A*** Beg Add *** 05/18/10 ***************************************
+     A            QRDCN1        30A
+     A                                      COLHDG('Primary Identifier')
+     A            QRDCN2        30A
+     A                                      COLHDG('Secondary Identifier')
+     A*** Beg Del *** 12/16/21 ***************************************
+     A*****       QRFIL2       124A
+     A*****                                 COLHDG('Filler')
+     A*** End Del *** 12/16/21 ***************************************
+     A*** End Add *** 05/18/10 ***************************************
+      ***** Beg Add ***** 10/11/21 ***********************************
+     A            QRMRPAEFD      8S 0       COLHDG('MRMP Part A Eff Dt')
+     A            QRMRPATRD      8S 0       COLHDG('MRMP Part A Term Dt')
+     A            QRMRPBEFD      8S 0       COLHDG('MRMP Part B Eff Dt')
+     A            QRMRPBTRD      8S 0       COLHDG('MRMP Part B Term Dt')
+     A            QRMRPCPC#      5A         COLHDG('MRMP Part C plan' -
+     A                                      'contract #')
+     A            QRMRPCPED      8S 0       COLHDG('MRMP Part C Enr Dt')
+     A            QRMRPCPTD      8S 0       COLHDG('MRMP Part C Term Dt')
+     A            QRMRPCPCN     50A         COLHDG('MRMP Part C plan' -
+     A                                      'contract name')
+     A            QRMRPCBP#      3A         COLHDG('MRMP Part C PBP#')
+     A            QRMRPCAD1     55A         COLHDG('MRMP Part C add 1')
+     A            QRMRPCAD2     55A         COLHDG('MRMP Part C add 2')
+     A            QRMRPCCTY     30A         COLHDG('MRMP Part C city')
+     A            QRMRPCST       2A         COLHDG('MRMP Part C state')
+     A            QRMRPCZIP      9A         COLHDG('MRMP Part C zip')
+     A            QRPPCPC#       5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            QRPPCPED       8S 0       COLHDG('PMP Part C Enr Dt')
+     A            QRPPCPTD       8S 0       COLHDG('PMP Part C Term Dt')
+     A            QRPPCPCN      50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            QRPPCBP#       3A         COLHDG('PMP Part C PBP#')
+     A            QRPPCAD1      55A         COLHDG('PMP Part C add 1')
+     A            QRPPCAD2      55A         COLHDG('PMP Part C add 2')
+     A            QRPPCCTY      30A         COLHDG('PMP Part C city')
+     A            QRPPCST        2A         COLHDG('PMP Part C state')
+     A            QRPPCZIP       9A         COLHDG('PMP Part C zip')
+     A            QRPPCPC#1      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            QRPPCPED1      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            QRPPCPTD1      8S 0       COLHDG('PMP Part C Term Dt')
+     A            QRPPCPCN1     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            QRPPCBP#1      3A         COLHDG('PMP Part C PBP#')
+     A            QRPPCAD11     55A         COLHDG('PMP Part C add 1')
+     A            QRPPCAD21     55A         COLHDG('PMP Part C add 2')
+     A            QRPPCCTY1     30A         COLHDG('PMP Part C city')
+     A            QRPPCST1       2A         COLHDG('PMP Part C state')
+     A            QRPPCZIP1      9A         COLHDG('PMP Part C zip')
+     A            QRPPCPC#2      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            QRPPCPED2      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            QRPPCPTD2      8S 0       COLHDG('PMP Part C Term Dt')
+     A            QRPPCPCN2     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            QRPPCBP#2      3A         COLHDG('PMP Part C PBP#')
+     A            QRPPCAD12     55A         COLHDG('PMP Part C add 1')
+     A            QRPPCAD22     55A         COLHDG('PMP Part C add 2')
+     A            QRPPCCTY2     30A         COLHDG('PMP Part C city')
+     A            QRPPCST2       2A         COLHDG('PMP Part C state')
+     A            QRPPCZIP2      9A         COLHDG('PMP Part C zip')
+     A            QRPPCPC#3      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            QRPPCPED3      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            QRPPCPTD3      8S 0       COLHDG('PMP Part C Term Dt')
+     A            QRPPCPCN3     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            QRPPCBP#3      3A         COLHDG('PMP Part C PBP#')
+     A            QRPPCAD13     55A         COLHDG('PMP Part C add 1')
+     A            QRPPCAD23     55A         COLHDG('PMP Part C add 2')
+     A            QRPPCCTY3     30A         COLHDG('PMP Part C city')
+     A            QRPPCST3       2A         COLHDG('PMP Part C state')
+     A            QRPPCZIP3      9A         COLHDG('PMP Part C zip')
+     A            QRPPCPC#4      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            QRPPCPED4      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            QRPPCPTD4      8S 0       COLHDG('PMP Part C Term Dt')
+     A            QRPPCPCN4     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            QRPPCBP#4      3A         COLHDG('PMP Part C PBP#')
+     A            QRPPCAD14     55A         COLHDG('PMP Part C add 1')
+     A            QRPPCAD24     55A         COLHDG('PMP Part C add 2')
+     A            QRPPCCTY4     30A         COLHDG('PMP Part C city')
+     A            QRPPCST4       2A         COLHDG('PMP Part C state')
+     A            QRPPCZIP4      9A         COLHDG('PMP Part C zip')
+     A            QRPPCPC#5      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            QRPPCPED5      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            QRPPCPTD5      8S 0       COLHDG('PMP Part C Term Dt')
+     A            QRPPCPCN5     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            QRPPCBP#5      3A         COLHDG('PMP Part C PBP#')
+     A            QRPPCAD15     55A         COLHDG('PMP Part C add 1')
+     A            QRPPCAD25     55A         COLHDG('PMP Part C add 2')
+     A            QRPPCCTY5     30A         COLHDG('PMP Part C city')
+     A            QRPPCST5       2A         COLHDG('PMP Part C state')
+     A            QRPPCZIP5      9A         COLHDG('PMP Part C zip')
+     A            QRPPCPC#6      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            QRPPCPED6      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            QRPPCPTD6      8S 0       COLHDG('PMP Part C Term Dt')
+     A            QRPPCPCN6     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            QRPPCBP#6      3A         COLHDG('PMP Part C PBP#')
+     A            QRPPCAD16     55A         COLHDG('PMP Part C add 1')
+     A            QRPPCAD26     55A         COLHDG('PMP Part C add 2')
+     A            QRPPCCTY6     30A         COLHDG('PMP Part C city')
+     A            QRPPCST6       2A         COLHDG('PMP Part C state')
+     A            QRPPCZIP6      9A         COLHDG('PMP Part C zip')
+     A            QRPPCPC#7      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            QRPPCPED7      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            QRPPCPTD7      8S 0       COLHDG('PMP Part C Term Dt')
+     A            QRPPCPCN7     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            QRPPCBP#7      3A         COLHDG('PMP Part C PBP#')
+     A            QRPPCAD17     55A         COLHDG('PMP Part C add 1')
+     A            QRPPCAD27     55A         COLHDG('PMP Part C add 2')
+     A            QRPPCCTY7     30A         COLHDG('PMP Part C city')
+     A            QRPPCST7       2A         COLHDG('PMP Part C state')
+     A            QRPPCZIP7      9A         COLHDG('PMP Part C zip')
+     A            QRPPCPC#8      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            QRPPCPED8      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            QRPPCPTD8      8S 0       COLHDG('PMP Part C Term Dt')
+     A            QRPPCPCN8     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            QRPPCBP#8      3A         COLHDG('PMP Part C PBP#')
+     A            QRPPCAD18     55A         COLHDG('PMP Part C add 1')
+     A            QRPPCAD28     55A         COLHDG('PMP Part C add 2')
+     A            QRPPCCTY8     30A         COLHDG('PMP Part C city')
+     A            QRPPCST8       2A         COLHDG('PMP Part C state')
+     A            QRPPCZIP8      9A         COLHDG('PMP Part C zip')
+     A            QRPPCPC#9      5A         COLHDG('PMP Part C plan' -
+     A                                      'contract #')
+     A            QRPPCPED9      8S 0       COLHDG('PMP Part C Enr Dt')
+     A            QRPPCPTD9      8S 0       COLHDG('PMP Part C Term Dt')
+     A            QRPPCPCN9     50A         COLHDG('PMP Part C plan' -
+     A                                      'contract name')
+     A            QRPPCBP#9      3A         COLHDG('PMP Part C PBP#')
+     A            QRPPCAD19     55A         COLHDG('PMP Part C add 1')
+     A            QRPPCAD29     55A         COLHDG('PMP Part C add 2')
+     A            QRPPCCTY9     30A         COLHDG('PMP Part C city')
+     A            QRPPCST9       2A         COLHDG('PMP Part C state')
+     A            QRPPCZIP9      9A         COLHDG('PMP Part C zip')
+     A            QRMRPDPC#      5A         COLHDG('MRMP Part D plan' -
+     A                                      'contract #')
+     A            QRMRPDPED      8S 0       COLHDG('MRMP Part D Enr Dt')
+     A            QRMRPDPTD      8S 0       COLHDG('MRMP Part D Term Dt')
+     A            QRMRPDPCN     50A         COLHDG('MRMP Part D plan' -
+     A                                      'contract name')
+     A            QRMRPDBP#      3A         COLHDG('MRMP Part D PBP#')
+     A            QRMRPDAD1     55A         COLHDG('MRMP Part D add 1')
+     A            QRMRPDAD2     55A         COLHDG('MRMP Part D add 2')
+     A            QRMRPDCTY     30A         COLHDG('MRMP Part D city')
+     A            QRMRPDST       2A         COLHDG('MRMP Part D state')
+     A            QRMRPDZIP      9A         COLHDG('MRMP Part D zip')
+     A            QRPPDPC#1      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPED1      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTD1      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCN1     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#1      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD11     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD21     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTY1     30A         COLHDG('PMP Part D city')
+     A            QRPPDST1       2A         COLHDG('PMP Part D state')
+     A            QRPPDZIP1      9A         COLHDG('PMP Part D zip')
+     A            QRPPDPC#2      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPED2      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTD2      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCN2     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#2      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD12     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD22     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTY2     30A         COLHDG('PMP Part D city')
+     A            QRPPDST2       2A         COLHDG('PMP Part D state')
+     A            QRPPDZIP2      9A         COLHDG('PMP Part D zip')
+     A            QRPPDPC#3      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPED3      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTD3      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCN3     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#3      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD13     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD23     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTY3     30A         COLHDG('PMP Part D city')
+     A            QRPPDST3       2A         COLHDG('PMP Part D state')
+     A            QRPPDZIP3      9A         COLHDG('PMP Part D zip')
+     A            QRPPDPC#4      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPED4      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTD4      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCN4     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#4      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD14     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD24     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTY4     30A         COLHDG('PMP Part D city')
+     A            QRPPDST4       2A         COLHDG('PMP Part D state')
+     A            QRPPDZIP4      9A         COLHDG('PMP Part D zip')
+     A            QRPPDPC#5      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPED5      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTD5      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCN5     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#5      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD15     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD25     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTY5     30A         COLHDG('PMP Part D city')
+     A            QRPPDST55      2A         COLHDG('PMP Part D state')
+     A            QRPPDZIP5      9A         COLHDG('PMP Part D zip')
+     A            QRPPDPC#6      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPED6      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTD6      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCN6     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#6      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD16     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD26     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTY6     30A         COLHDG('PMP Part D city')
+     A            QRPPDST6       2A         COLHDG('PMP Part D state')
+     A            QRPPDZIP6      9A         COLHDG('PMP Part D zip')
+     A            QRPPDPC#7      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPED7      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTD7      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCN7     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#7      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD17     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD27     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTY7     30A         COLHDG('PMP Part D city')
+     A            QRPPDST7       2A         COLHDG('PMP Part D state')
+     A            QRPPDZIP7      9A         COLHDG('PMP Part D zip')
+     A            QRPPDPC#8      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPED8      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTD8      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCN8     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#8      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD18     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD28     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTY8     30A         COLHDG('PMP Part D city')
+     A            QRPPDST8       2A         COLHDG('PMP Part D state')
+     A            QRPPDZIP8      9A         COLHDG('PMP Part D zip')
+     A            QRPPDPC#9      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPED9      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTD9      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCN9     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#9      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD19     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD29     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTY9     30A         COLHDG('PMP Part D city')
+     A            QRPPDST9       2A         COLHDG('PMP Part D state')
+     A            QRPPDZIP9      9A         COLHDG('PMP Part D zip')
+     A            QRPPDPC#A      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPEDA      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTDA      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCNA     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#A      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD1A     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD2A     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTYA     30A         COLHDG('PMP Part D city')
+     A            QRPPDSTA       2A         COLHDG('PMP Part D state')
+     A            QRPPDZIPA      9A         COLHDG('PMP Part D zip')
+     A            QRPPDPC#B      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPEDB      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTDB      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCNB     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#B      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD1B     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD2B     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTYB     30A         COLHDG('PMP Part D city')
+     A            QRPPDSTB       2A         COLHDG('PMP Part D state')
+     A            QRPPDZIPB      9A         COLHDG('PMP Part D zip')
+      ***** End Add ***** 10/11/21 ***********************************
+     A            QRPPDPC#C      5A         COLHDG('PMP Part D plan' -
+     A                                      'contract #')
+     A            QRPPDPEDC      8S 0       COLHDG('PMP Part D Enr Dt')
+     A            QRPPDPTDC      8S 0       COLHDG('PMP Part D Term Dt')
+     A            QRPPDPCNC     50A         COLHDG('PMP Part D plan' -
+     A                                      'contract name')
+     A            QRPPDBP#C      3A         COLHDG('PMP Part D PBP#')
+     A            QRPPDAD1C     55A         COLHDG('PMP Part D add 1')
+     A            QRPPDAD2C     55A         COLHDG('PMP Part D add 2')
+     A            QRPPDCTYC     30A         COLHDG('PMP Part D city')
+     A            QRPPDSTC       2A         COLHDG('PMP Part D state')
+     A            QRPPDZIPC      9A         COLHDG('PMP Part D zip')
