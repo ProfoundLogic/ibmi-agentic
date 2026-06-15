@@ -1,0 +1,183 @@
+     A*%%TS  SD  20190822  102537  BEARL       REL-V7R3M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3 +
+     A                                             27 132 *DS4)
+     A                                      REF(*LIBL/HYPSGLD)
+     A                                      PRINT
+     A                                      VLDCMDKEY(25 'Any Cmd Key')
+     A                                      CA12(12 'Cancel')
+     A          R SFL01                     SFL
+     A*%%TS  SD  20190822  102537  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Main subfile')
+     A  28                                  SFLNXTCHG
+     A            S1OPT          2A  B 12  2TEXT('Option')
+     A  41                                  DSPATR(RI)
+     A  41                                  DSPATR(PC)
+     A            S1LOT#    R        O 12  7REFFLD(LDLOT#)
+     A            S1QSTC    R    9 00O 12 23REFFLD(LDQSTC)
+     A                                      EDTCDE(J)
+     A            S1SSCC    R        O 12 36REFFLD(LDSSCC)
+     A          R SFLCTL01                  SFLCTL(SFL01)
+     A*%%TS  SD  20190822  102537  BEARL       REL-V7R3M0  5770-WDS
+     A                                      SFLSIZ(0012)
+     A                                      SFLPAG(0010)
+     A                                      TEXT('Main subfile')
+     A                                      DSPMOD(*DS3)
+     A                                      PAGEUP(92 'Page Up')
+     A                                      PAGEDOWN(91 'Page Down')
+     A                                      HOME(94 'Home')
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A  06                                  CF06(06 'Create new HYPSGLD record')
+     A                                      CF17(17 'Top')
+     A                                      CF18(18 'Bottom')
+     A                                      CF20(20 'Subset')
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  27                                  SFLDSP
+     A N26                                  SFLDSPCTL
+     A  26                                  SFLCLR
+     A N94        S@RCNO         4S 0H      SFLRCDNBR(CURSOR)
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            C1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            C1HDG1        40A  O  1 21TEXT('Heading line 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 73TIME
+     A                                  2  2USER
+     A            P@JOBN        10A  O  2 71TEXT('Job name')
+     A                                  4  2'Group:'
+     A                                      DSPATR(HI)
+     A            C1GRP#    R    9A  O  4  9REFFLD(GDGRP# HYPSGDT)
+     A                                  4 22'Ship-to:'
+     A                                      DSPATR(HI)
+     A            C1SHTO    R   43A  O  4 31REFFLD(GDSHTO HYPSGDT)
+     A                                  5  2'Order:'
+     A                                      DSPATR(HI)
+     A            C1ORD#    R    8A  O  5  9REFFLD(GDORD# HYPSGDT)
+     A                                  5 22'Item:'
+     A                                      DSPATR(HI)
+     A            C1ITEM    R   47A  O  5 28REFFLD(GDITEM HYPSGDT)
+     A                                  6  2'Ship qty:'
+     A                                      DSPATR(HI)
+     A            C1QSTC    R    7A  O  6 12REFFLD(GDQSTC HYPSGDT)
+     A                                  6 22'Pick location:'
+     A                                      DSPATR(HI)
+     A            C1PLOC    R        O  6 37REFFLD(GDPLOC HYPSGDT)
+     A                                  6 58'Detail Sequence:'
+     A                                      DSPATR(HI)
+     A            C1RSEQ    R    5A  O  6 75REFFLD(GDRSEQ HYPSGDT)
+     A                                  8  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A            C1OPTS1       76A  O  9  4COLOR(BLU)
+     A                                 10 30'Ship     SSCC'
+     A                                      DSPATR(HI)
+     A                                 11  2'Opt  Lot Number             Qty   -
+     A                                        Serial#'
+     A                                      DSPATR(HI)
+     A          R SFLNOR01
+     A*%%TS  SD  20190821  181629  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Main subfile - no rcds found')
+     A                                      DSPMOD(*DS3)
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                 15  8'(No Shipment Lot Records to Displa-
+     A                                      y)'
+     A                                      COLOR(BLU)
+     A          R SFLCMD01
+     A*%%TS  SD  20111202  135105  BEARL       REL-V6R1M0  5761-WDS
+     A                                      TEXT('Main subfile')
+     A                                      DSPMOD(*DS3)
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A            S@MORE         7A  O 22 74DSPATR(HI)
+     A                                      OVRDTA
+     A            F1FKEYS       78   O 23  2COLOR(BLU)
+     A                                      OVRDTA
+     A          R DSPFMT3A
+     A*%%TS  SD  20190822  102537  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Display lot record')
+     A                                      DSPMOD(*DS3)
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                      CA03(03 'Exit')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F3HDG1        40A  O  1 21DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 73TIME
+     A                                  2  2USER
+     A                                  2 27'Display Shipment Lot Record'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 71TEXT('Job name')
+     A                                  6  8'Shipment group number  . . . :'
+     A            F3GRP#    R    9A  O  6 41REFFLD(GDGRP# HYPSGDT)
+     A                                      OVRDTA
+     A                                  7  8'Ship-to  . . . . . . . . . . :'
+     A            F3SHTO    R   40A  O  7 41REFFLD(GDSHTO HYPSGDT)
+     A                                      OVRDTA
+     A                                  8  8'Turnaround number  . . . . . :'
+     A            F3TURN    R    9A  O  8 41REFFLD(GDTURN HYPSGDT)
+     A                                      OVRDTA
+     A                                  9  8'Detail sequence  . . . . . . :'
+     A            F3TSEQ    R    9A  O  9 41REFFLD(GDTSEQ HYPSGDT)
+     A                                      OVRDTA
+     A                                 10  8'Order number . . . . . . . . :'
+     A            F3ORD#    R    8A  O 10 41REFFLD(GDORD# HYPSGDT)
+     A                                      OVRDTA
+     A                                 11  8'Item number  . . . . . . . . :'
+     A            F3ITEM    R        O 11 41REFFLD(GDITEM HYPSGDT)
+     A                                      OVRDTA
+     A                                 12  8'Item description . . . . . . :'
+     A            F3IMDS    R        O 12 41REFFLD(GDIMDS HYPSGDT)
+     A                                      OVRDTA
+     A                                 13  8'Quantity shipped . . . . . . :'
+     A            F3QSTC    R   12A  O 13 41REFFLD(GDQSTC HYPSGDT)
+     A                                      OVRDTA
+     A                                 14  8'Pick location  . . . . . . . :'
+     A            F3PLOC    R        O 14 41REFFLD(GDPLOC HYPSGDT)
+     A                                      OVRDTA
+     A                                 15  8'Shipping Lane  . . . . . . . :'
+     A            F3LANE    R    2A  O 15 41REFFLD(GDDVRT HYPSGDT)
+     A                                      OVRDTA
+     A                                 16  8'Lot number . . . . . . . . . :'
+     A            F3LOT#    R        O 16 41REFFLD(LDLOT#)
+     A                                      OVRDTA
+     A                                 17  8'Lot quantity . . . . . . . . :'
+     A            F3LOTQ    R   12A  O 17 41REFFLD(LDQSTC)
+     A                                      OVRDTA
+     A                                 18  8'GS1-128 SSCC serial number . :'
+     A            F3SSCC    R    9A  O 18 41REFFLD(LDSSCC)
+     A                                      OVRDTA
+     A                                 21  2'Press Enter to continue.'
+     A                                      COLOR(BLU)
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R DSPBLANK
+     A*%%TS  SD  19920217  162710  BEARL       REL-V2R1M0  5738-PW1
+     A                                      DSPMOD(*DS3)
+     A                                      ASSUME
+     A                                  1  2' '
+     A          R MSF01                     SFL
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLMSGRCD(24)
+     A                                      TEXT('Subfile Message Record')
+     A            S@MSKY                    SFLMSGKEY
+     A            S@PGMQ                    SFLPGMQ
+     A          R MSFCTL01                  SFLCTL(MSF01)
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLSIZ(0005)
+     A                                      SFLPAG(0001)
+     A                                      TEXT('Subfile Message Control Recor-
+     A                                      d')
+     A                                      DSPMOD(*DS3)
+     A  93                                  PUTOVR
+     A                                      SFLDSP
+     A                                      SFLINZ
+     A N39                                  SFLEND
+     A            S@PGMQ                    SFLPGMQ

@@ -1,0 +1,6 @@
+-- HYLTEMP2 - Temp work file (minimal skeleton)
+CREATE TABLE HYLTEMP2 (
+  T2KEY    CHAR(20)      NOT NULL DEFAULT '',
+  T2DATA   CHAR(132)     NOT NULL DEFAULT '',
+  PRIMARY KEY (T2KEY)
+) RCDFMT HYRTEMP2;

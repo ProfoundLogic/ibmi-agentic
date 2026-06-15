@@ -1,0 +1,19 @@
+             PGM
+             /* Menu wrapper for HYR0606 -- Shipment Lot Inquiry.        */
+             /* HYR0606's PI uses zoned-decimal parameters (9S 0, 3S 0,  */
+             /* 5S 0); CL has no native zoned, so we declare CHAR        */
+             /* variables whose EBCDIC representation IS the zoned       */
+             /* encoding of the desired value.                           */
+
+             DCL        VAR(&PGMMODE)  TYPE(*CHAR) LEN(1) VALUE('2')
+             DCL        VAR(&SHIPGRP)  TYPE(*CHAR) LEN(9) VALUE('000001001')
+             DCL        VAR(&TURN)     TYPE(*CHAR) LEN(9) VALUE('000000001')
+             DCL        VAR(&TSEQ)     TYPE(*CHAR) LEN(3) VALUE('001')
+             DCL        VAR(&RSEQ)     TYPE(*CHAR) LEN(5) VALUE('00001')
+             DCL        VAR(&RTNCODE)  TYPE(*CHAR) LEN(2) VALUE('  ')
+
+             CALL       PGM(HYR0606) PARM(&PGMMODE &SHIPGRP &TURN +
+                                          &TSEQ &RSEQ &RTNCODE)
+
+             RETURN
+             ENDPGM

@@ -1,0 +1,8 @@
+-- Auto-split from hornady_externals.table.sql
+CREATE TABLE HDSHPV (
+  SVSVDS   CHAR(30)      NOT NULL DEFAULT '',
+  SVSVSV   CHAR(2)       NOT NULL DEFAULT '',
+  SVDESC   CHAR(30)      NOT NULL DEFAULT '',
+  SVSTS    CHAR(1)       NOT NULL DEFAULT '',
+  PRIMARY KEY (SVSVDS, SVSVSV)
+) RCDFMT HDRSHPV;

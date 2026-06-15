@@ -4,11 +4,10 @@ dcl-f hyrstubd workstn;
 
 pgmname = 'HYR0138';
 title   = 'Pallet Contents Entry / Maintenance';
-line1   = 'Interactive screen to edit pallet contents:  manage';
-line2   = 'SSCC numbers, drop-ship overrides, and master pack';
-line3   = 'codes.  Normally launched through the HYC0138 CL';
-line4   = 'wrapper which sets activation group HDSCTL.';
+line1   = 'BLOCKED: HYD0138.DSPF (18 record formats) is not in the';
+line2   = 'HornadyDemo package.  Tables + LFs + service-program stubs';
+line3   = 'are built and ready -- only the display file is missing.';
+line4   = 'See task summary for the recommended next steps.';
 
 exfmt stub;
-
 *inlr = *on;

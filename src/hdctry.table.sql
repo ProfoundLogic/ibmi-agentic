@@ -1,0 +1,7 @@
+-- HDCTRY - Country master (minimal skeleton)
+CREATE TABLE HDCTRY (
+  CTCNTRY  CHAR(3)       NOT NULL DEFAULT '',
+  CTNAME   CHAR(30)      NOT NULL DEFAULT '',
+  CTSTS    CHAR(1)       NOT NULL DEFAULT '',
+  PRIMARY KEY (CTCNTRY)
+) RCDFMT HDRCTRY;

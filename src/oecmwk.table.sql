@@ -1,0 +1,8 @@
+-- Auto-split from hornady_externals.table.sql
+CREATE TABLE OECMWK (
+  O4OCTL   CHAR(8)       NOT NULL DEFAULT '',
+  O4SEQ    DECIMAL(5,0)  NOT NULL DEFAULT 0,
+  O4CTYP   CHAR(8)       NOT NULL DEFAULT '',
+  O4CMNT   CHAR(60)      NOT NULL DEFAULT '',
+  PRIMARY KEY (O4OCTL, O4SEQ)
+) RCDFMT OECMWKR;
