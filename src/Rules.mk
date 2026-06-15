@@ -59,3 +59,23 @@ wrkcust1eo.file: wrkcust1eo.json
 # EJS RPGOA Programs
 wrkcusteo.pgm: wrkcusteo.rpgle custr_pr.rpgle wrkcusteo.file custr.srvpgm | cust.bnddir
 wrkcust1eo.pgm: wrkcust1eo.rpgle custr_pr.rpgle wrkcust1eo.file custr.srvpgm | cust.bnddir
+
+# ----------------------------------------------------------------------------
+# Hornady Shipping POC
+# ----------------------------------------------------------------------------
+# Shared stub display file used by every Hornady program stub.
+hyrstubd.file: hyrstubd.dspf
+
+# Hornady submenu (DSPF + MSGF -> *MENU).  The DSPF object must share the
+# menu's name so CRTMNU TYPE(*DSPF) can find the record format by default.
+hornady.file: hornady.dspf
+hornady.msgf: hornady.msgf
+hornady.menu: hornady.file hornady.msgf
+
+# Hornady stub programs -- each launched from a Hornady-menu option.
+hyr0600.pgm: hyr0600.rpgle hyrstubd.file
+hyr0138.pgm: hyr0138.rpgle hyrstubd.file
+hyr0606.pgm: hyr0606.rpgle hyrstubd.file
+pickbatr.pgm: pickbatr.rpgle hyrstubd.file
+pickerr.pgm: pickerr.rpgle hyrstubd.file
+hyr6080.pgm: hyr6080.rpgle hyrstubd.file
