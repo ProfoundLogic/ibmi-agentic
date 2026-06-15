@@ -1,0 +1,376 @@
+     A*%%TS  SD  20230320  130352  GHOPWOOD    REL-V7R3M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3                  -
+     A                                             27 132 *DS4)
+     A                                      REF(*LIBL/HYPSGDT)
+     A                                      PRINT
+     A                                      VLDCMDKEY(25 'Any Cmd Key')
+     A                                      CA12(12 'Cancel')
+     A          R DSPFMT2A
+     A*%%TS  SD  20230320  130352  GHOPWOOD    REL-V7R3M0  5770-WDS
+     A                                      TEXT('Change shipment group detail')
+     A                                      DSPMOD(*DS3)
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 72TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A                                  2 30'Change Shipment Detail'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 70TEXT('Job name')
+     A                                  4  2'Type changes, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  6  8'Shipment group number  . . . :'
+     A            F2GRP#X   R    9A  O  6 41REFFLD(GDGRP#)
+     A                                      OVRDTA
+     A                                  7  8'Ship-to  . . . . . . . . . . :'
+     A            F2SHTOX   R   35A  O  7 41REFFLD(GDSHTO)
+     A                                      OVRDTA
+     A                                  8  8'Turnaround sequence  . . . . :'
+     A            F2TURNX   R   13A  O  8 41REFFLD(GDTURN)
+     A                                      OVRDTA
+     A                                  9  8'Order number . . . . . . . . :'
+     A            F2ORD#X   R    8A  O  9 41REFFLD(GDORD#)
+     A                                      OVRDTA
+     A                                 10  8'Purchase order number  . . . :'
+     A            F2PO#     R        O 10 41REFFLD(GDPO#)
+     A                                 11  8'Item number  . . . . . . . . :'
+     A            F2ITEM    R        O 11 41REFFLD(GDITEM)
+     A                                      OVRDTA
+     A                                 12  8'Item description . . . . . . :'
+     A            F2IMDS    R        O 12 41REFFLD(GDIMDS)
+     A                                      OVRDTA
+     A                                 13  8'Quantity open  . . . . . . . :'
+     A            F2QOPN    R    9 00O 13 41REFFLD(GDQOPN)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 14  8'Orig Quantity on pick ticket :'
+     A            F2QOPKO   R    9 00O 14 41REFFLD(GDQOPK)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 15  8'Quantity on pick ticket  . . :'
+     A            F2QOPK    R    9 00B 15 41REFFLD(GDQOPK)
+     A                                      EDTCDE(J)
+     A  41                                  DSPATR(PC)
+     A  41N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 16  8'Quantity shipped . . . . . . :'
+     A            F2QSTC    R    9 00O 16 41REFFLD(GDQSTC)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 17  8'Accepts pallet labels  . . . :'
+     A            F2PLBL    R    3A  O 17 41REFFLD(GDPLBL)
+     A                                      OVRDTA
+     A                                 18  8'Allow mixed-P.O. pallets . . :'
+     A            F2MXPO    R    3A  O 18 41REFFLD(GDMXPO)
+     A                                      OVRDTA
+     A                                 19  8'Allow mixed-lot cartons  . . :'
+     A            F2MXLT    R    3A  O 19 41REFFLD(GDMXLT)
+     A                                      OVRDTA
+     A                                 20  8'GS1-128 SSCC serial number . :'
+     A            F2SSCCX   R    9A  O 20 41REFFLD(GDSSCC)
+     A                                      OVRDTA
+     A                                 21  8'Tote ID  . . . . . . . . . . :'
+     A            F2TOTE    R        O 21 41REFFLD(GDTOTE)
+     A                                      OVRDTA
+     A                                 22  8'Status . . . . . . . . . . . :'
+     A            F2STS         39A  O 22 41TEXT('Status')
+     A                                      OVRDTA
+     A                                 23  2'F3=Exit   F5=Refresh   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R DSPFMT3A
+     A*%%TS  SD  20230320  124848  GHOPWOOD    REL-V7R3M0  5770-WDS
+     A                                      TEXT('Display shipment group detail-
+     A                                      ')
+     A                                      DSPMOD(*DS3)
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                      CA03(03 'Exit')
+     A                                      CF07(07 'Display view 2')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 72TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A                                  2 27'Display Turnaround Sequence'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 70TEXT('Job name')
+     A                                  4  8'Shipment group number  . . . :'
+     A            F3GRP#X   R    9A  O  4 41REFFLD(GDGRP#)
+     A                                      OVRDTA
+     A                                  5  8'Ship-to  . . . . . . . . . . :'
+     A            F3SHTOX   R   35A  O  5 41REFFLD(GDSHTO)
+     A                                      OVRDTA
+     A                                  6  8'Turnaround sequence  . . . . :'
+     A            F3TURNX   R   13A  O  6 41REFFLD(GDTURN)
+     A                                      OVRDTA
+     A                                  7  8'Order number . . . . . . . . :'
+     A            F3ORD#X   R    8A  O  7 41REFFLD(GDORD#)
+     A                                      OVRDTA
+     A                                  8  8'Purchase order number  . . . :'
+     A            F3PO#     R        O  8 41REFFLD(GDPO#)
+     A                                  9  8'Item number  . . . . . . . . :'
+     A            F3ITEM    R        O  9 41REFFLD(GDITEM)
+     A                                      OVRDTA
+     A                                 10  8'Item description . . . . . . :'
+     A            F3IMDS    R        O 10 41REFFLD(GDIMDS)
+     A                                      OVRDTA
+     A                                 11  8'Quantity open  . . . . . . . :'
+     A            F3QOPN    R    9 00O 11 41REFFLD(GDQOPN)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 12  8'Orig Quantity on pick ticket :'
+     A            F3QOPKO   R    9 00O 12 41REFFLD(GDQOPK)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 13  8'Quantity on pick ticket  . . :'
+     A            F3QOPK    R    9 00O 13 41REFFLD(GDQOPK)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 14  8'Quantity shipped . . . . . . :'
+     A            F3QSTC    R    9 00O 14 41REFFLD(GDQSTC)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 15  8'Accepts pallet labels  . . . :'
+     A            F3PLBL    R    3A  O 15 41REFFLD(GDPLBL)
+     A                                      OVRDTA
+     A                                 16  8'Allow mixed-P.O. pallets . . :'
+     A            F3MXPO    R    3A  O 16 41REFFLD(GDMXPO)
+     A                                      OVRDTA
+     A                                 17  8'Allow mixed-lot cartons  . . :'
+     A            F3MXLT    R    3A  O 17 41REFFLD(GDMXLT)
+     A                                      OVRDTA
+     A                                 18  8'GS1-128 SSCC serial number . :'
+     A            F3SSCCX   R    9A  O 18 41REFFLD(GDSSCC)
+     A                                      OVRDTA
+     A                                 19  8'Tote ID  . . . . . . . . . . :'
+     A            F3TOTE    R        O 19 41REFFLD(GDTOTE)
+     A                                      OVRDTA
+     A                                 20  8'Status . . . . . . . . . . . :'
+     A            F3STS         39A  O 20 41TEXT('Status')
+     A                                      OVRDTA
+     A                                 21  2'Press Enter to continue.'
+     A                                      COLOR(BLU)
+     A                                 23  2'F3=Exit   F7=View 2   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R DSPFMT3B
+     A*%%TS  SD  20220903  105258  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Display shipment group detail-
+     A                                      ')
+     A                                      DSPMOD(*DS3)
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                      CA03(03 'Exit')
+     A                                      CF07(07 'Display view 1')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 72TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A                                  2 27'Display Turnaround Sequence'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 70TEXT('Job name')
+     A                                  4  8'Shipment group number  . . . :'
+     A            F3GRP#X   R    9A  O  4 41REFFLD(GDGRP#)
+     A                                      OVRDTA
+     A                                  5  8'Ship-to  . . . . . . . . . . :'
+     A            F3SHTOX   R   35A  O  5 41REFFLD(GDSHTO)
+     A                                      OVRDTA
+     A                                  6  8'Turnaround sequence  . . . . :'
+     A            F3TURNX   R   13A  O  6 41REFFLD(GDTURN)
+     A                                      OVRDTA
+     A                                  7  8'Order number . . . . . . . . :'
+     A            F3ORD#X   R    8A  O  7 41REFFLD(GDORD#)
+     A                                      OVRDTA
+     A                                  8  8'Purchase order number  . . . :'
+     A            F3PO#     R        O  8 41REFFLD(GDPO#)
+     A                                  9  8'Item number  . . . . . . . . :'
+     A            F3ITEM    R        O  9 41REFFLD(GDITEM)
+     A                                      OVRDTA
+     A                                 10  8'Item description . . . . . . :'
+     A            F3IMDS    R        O 10 41REFFLD(GDIMDS)
+     A                                      OVRDTA
+     A                                 11  8'Pick mode  . . . . . . . . . :'
+     A            F3CNVY    R   20A  O 11 41REFFLD(GDCNVY)
+     A                                 12  8'Small parcel pick type . . . :'
+     A            F3SPPK    R   10A  O 12 41REFFLD(GDSPPK)
+     A                                 13  8'P&A next scan  . . . . . . . :'
+     A            F3PANS    R    4A  O 13 41REFFLD(GDPANS)
+     A                                 14  8'Pick override priority . . . :'
+     A            F3PIKO    R    5A  O 14 41REFFLD(GDPIKO)
+     A                                 15  8'Pick prerequisite priority . :'
+     A            F3POPP    R    5A  O 15 41REFFLD(GDPOPP)
+     A                                 21  2'Press Enter to continue.'
+     A                                      COLOR(BLU)
+     A                                 23  2'F3=Exit   F7=View 1   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R DSPFMT4A
+     A*%%TS  SD  20180620  110039  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Subset prompt')
+     A                                      DSPMOD(*DS3)
+     A  40                                  ALARM
+     A                                      CA05(05 'Refresh')
+     A                                      CA14(14 'Reset')
+     A                                      RTNCSRLOC(&S@IRCD &S@IFLD)
+     A            S@IRCD        10A  H      TEXT('Input (cursor-position) recor-
+     A                                      d name')
+     A            S@IFLD        10A  H      TEXT('Input (cursor-position) field-
+     A                                       name')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 64DATE
+     A                                      EDTCDE(Y)
+     A                                  1 73TIME
+     A                                  2  2USER
+     A                                  2 34'Subset Prompt'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 71TEXT('Job name')
+     A                                  4  2'Type changes, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  6  8'Order number . . . . . . . . .'
+     A            F4ORD#    R        B  6 41REFFLD(GDORD#)
+     A                                      EDTCDE(Z)
+     A  41                                  DSPATR(PC)
+     A  41N89                               DSPATR(RI)
+     A                                  7  8'Purchase order number  . . . .'
+     A            F4PO#     R        B  7 41REFFLD(GDPO#)
+     A  42                                  DSPATR(PC)
+     A  42N89                               DSPATR(RI)
+     A                                  8  8'Item number  . . . . . . . . .'
+     A            F4ITEM    R        B  8 41REFFLD(GDITEM)
+     A  43                                  DSPATR(PC)
+     A  43N89                               DSPATR(RI)
+     A                                  9  8'Pick mode  . . . . . . . . . .'
+     A            F4CNVY    R        B  9 41REFFLD(GDCNVY)
+     A  44                                  DSPATR(PC)
+     A  44N89                               DSPATR(RI)
+     A                                  9 44'C, T, P'
+     C                                      COLOR(BLU)
+     A                                 10  8'Tote ID  . . . . . . . . . . .'
+     A            F4TOTE    R        B 10 41REFFLD(GDTOTE)
+     A  45                                  DSPATR(PC)
+     A  45N89                               DSPATR(RI)
+     A                                 11  8'Status . . . . . . . . . . . .'
+     A            F4STS          2Y 0B 11 41TEXT('Status')
+     A                                      SNGCHCFLD((*NUMROW 6) (*GUTTER 4))
+     A                                      CHOICE(1 '>a) Not yet picked')
+     A                                      CHOICE(2 '>b) Not yet shipped')
+     A                                      CHOICE(4 '>c) Lot numbers not yet c-
+     A                                      ollected')
+     A                                      CHOICE(5 '>d) Labels not yet printe-
+     A                                      d')
+     A                                      CHOICE(6 '>e) Not yet palletized')
+     A                                      CHOICE(7 '>f) All of the above')
+     A                                 23  2'F5=Refresh   F12=Cancel   F14=Rese-
+     A                                      t'
+     A                                      COLOR(BLU)
+     A          R DSPFMT4B
+     A*%%TS  SD  20180620  110039  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Subset prompt')
+     A                                      DSPMOD(*DS3)
+     A  40                                  ALARM
+     A                                      CA05(05 'Refresh')
+     A                                      CA14(14 'Reset')
+     A                                      RTNCSRLOC(&S@IRCD &S@IFLD)
+     A            S@IRCD        10A  H      TEXT('Input (cursor-position) recor-
+     A                                      d name')
+     A            S@IFLD        10A  H      TEXT('Input (cursor-position) field-
+     A                                       name')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 64DATE
+     A                                      EDTCDE(Y)
+     A                                  1 73TIME
+     A                                  2  2USER
+     A                                  2 34'Subset Prompt'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 71TEXT('Job name')
+     A                                  4  2'Type changes, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  6  8'Order number . . . . . . . . .'
+     A            F4ORD#    R        B  6 41REFFLD(GDORD#)
+     A                                      EDTCDE(Z)
+     A  41                                  DSPATR(PC)
+     A  41N89                               DSPATR(RI)
+     A                                  7  8'Purchase order number  . . . .'
+     A            F4PO#     R        B  7 41REFFLD(GDPO#)
+     A  42                                  DSPATR(PC)
+     A  42N89                               DSPATR(RI)
+     A                                  8  8'Item number  . . . . . . . . .'
+     A            F4ITEM    R        B  8 41REFFLD(GDITEM)
+     A  43                                  DSPATR(PC)
+     A  43N89                               DSPATR(RI)
+     A                                  9  8'Pick mode  . . . . . . . . . .'
+     A            F4CNVY    R        B  9 41REFFLD(GDCNVY)
+     A  44                                  DSPATR(PC)
+     A  44N89                               DSPATR(RI)
+     A                                  9 44'C, T, P'
+     C                                      COLOR(BLU)
+     A                                 10  8'Tote ID  . . . . . . . . . . .'
+     A            F4TOTE    R        B 10 41REFFLD(GDTOTE)
+     A  45                                  DSPATR(PC)
+     A  45N89                               DSPATR(RI)
+     A                                 11  8'Status . . . . . . . . . . . .'
+     A            F4STS          2Y 0B 11 41TEXT('Status')
+     A                                      SNGCHCFLD((*NUMROW 7) (*GUTTER 4))
+     A                                      CHOICE(1 '>a) Not yet picked')
+     A                                      CHOICE(2 '>b) Not yet shipped')
+     A                                      CHOICE(3 '>c) Tote not yet verified-
+     A                                      ')
+     A                                      CHOICE(4 '>d) Lot numbers not yet c-
+     A                                      ollected')
+     A                                      CHOICE(5 '>e) Labels not yet printe-
+     A                                      d')
+     A                                      CHOICE(6 '>f) Not yet palletized')
+     A                                      CHOICE(7 '>g) All of the above')
+     A                                 23  2'F5=Refresh   F12=Cancel   F14=Rese-
+     A                                      t'
+     A                                      COLOR(BLU)
+     A          R DSPBLANKB
+     A*%%TS  SD  19920217  162710  BEARL       REL-V2R1M0  5738-PW1
+     A                                      DSPMOD(*DS3)
+     A                                      ASSUME
+     A                                  1  2' '
+     A          R MSF01B                    SFL
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLMSGRCD(24)
+     A                                      TEXT('Subfile Message Record')
+     A            S@MSKY                    SFLMSGKEY
+     A            S@PGMQ                    SFLPGMQ
+     A          R MSFCTL01B                 SFLCTL(MSF01B)
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLSIZ(0005)
+     A                                      SFLPAG(0001)
+     A                                      TEXT('Subfile Message Control Recor-
+     A                                      d')
+     A                                      DSPMOD(*DS3)
+     A  93                                  PUTOVR
+     A                                      SFLDSP
+     A                                      SFLINZ
+     A N39                                  SFLEND
+     A            S@PGMQ                    SFLPGMQ

@@ -1,0 +1,47 @@
+     /************************************************************************************/
+     /* APPLICATION: Shipping                                                            */
+     /*       TITLE: Pallet Contents Entry/Maintenance                                   */
+     /*          BY: William Earl (MCA)                                                  */
+     /*        DATE: December 2010                                                       */
+     /*                                                                                  */
+     /*  Note:  Use the following parameters when creating this program (CRTBNDCL):      */
+     /*           DFTACTGRP(*NO) ACTGRP(HDSCTL) USRPRF(*OWNER)                           */
+     /*                                                                                  */
+     /*   REV DATE   BY   CHANGE                                                         */
+     /*  ----------  ---  ------------------------------------------------------------   */
+     /*  05/21/2026  DJT  Renae name change from rwaltemath to rhornady.                 */
+     /*                                                                                  */
+     /************************************************************************************/
+             PGM        PARM(&PGMMODE)
+
+             DCL        VAR(&PGMMODE) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&USER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DATABASEID) TYPE(*CHAR) LEN(2)
+
+             COPYRIGHT  TEXT('(C) Copyright Midrange Computer +
+                          Associates, Inc., 2010')
+
+             RTVJOBA    USER(&USER)
+/*           IF         COND(&USER *NE 'BEARL' *AND &USER *NE +
+                          'JMESSING' *AND &USER *NE 'RSEKORA' *AND +
+                          &USER *NE 'NEMERY' *AND &USER *NE +
+                          'RHORNADY' *AND &USER *NE 'TEST') THEN(DO)     */
+/*             SNDPGMMSG  MSGID(ERR9999) MSGF(GUPMSGF) MSGDTA('Program +
+                            is in development and is available only +
+                            in the TEST environment.') TOPGMQ(*PRV) +
+                            MSGTYPE(*ESCAPE)                               */
+/*           ENDDO                                                         */
+             RTVDTAARA  DTAARA(DATABASEID) RTNVAR(&DATABASEID)
+/*           IF         COND(&DATABASEID *NE 'XX') THEN(DO)               */
+/*             SNDPGMMSG  MSGID(ERR9999) MSGF(GUPMSGF) MSGDTA('Program +
+                            is in development and is available only +
+                            in the TEST environment.') TOPGMQ(*PRV) +
+                            MSGTYPE(*ESCAPE)                              */
+/*           ENDDO                                                        */
+
+             CALL       PGM(HYR0138) PARM(&PGMMODE)
+
+             RCLACTGRP  ACTGRP(HDSOPT)
+             MONMSG     MSGID(CPF1654)
+
+ EOP:        ENDPGM

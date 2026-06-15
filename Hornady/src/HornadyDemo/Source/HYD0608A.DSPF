@@ -1,0 +1,581 @@
+     A*%%TS  SD  20220224  094302  BEARL       REL-V7R3M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(27 132 *DS4)
+     A                                      REF(*LIBL/HYPSGDT)
+     A                                      PRINT
+     A                                      VLDCMDKEY(25 'Any Cmd Key')
+     A                                      CA12(12 'Cancel')
+     A          R SFL01A                    SFL
+     A*%%TS  SD  20220207  171150  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Main subfile')
+     A                                      INDTXT(61 'Item number and descript-
+     A                                      ion COLOR(YLW)')
+     A  28                                  SFLNXTCHG
+     A            S1GRP#    R        H      REFFLD(GDGRP#)
+     A            S1BLTO    R        H      REFFLD(GDBLTO)
+     A            S1SHTO    R        H      REFFLD(GDSHTO)
+     A            S1DSHP    R        H      REFFLD(GDDSHP)
+     A            S1SHTOX       43A  H      TEXT('Ship-to# and name')
+     A            S1RSEQ    R        H      REFFLD(GDRSEQ)
+     A            S1OCTL    R        H      REFFLD(GDOCTL)
+     A            S1BLN#    R        H      REFFLD(GDBLN#)
+     A            S1ITEM    R        H      REFFLD(GDITEM)
+     A            S1QOPN    R        H      REFFLD(GDQOPN)
+     A            S1QOPK    R        H      REFFLD(GDQOPK)
+     A            S1QSTC    R        H      REFFLD(GDQSTC)
+     A            S1QSTCT   R        H      REFFLD(TDQSTCB HYPSGTD)
+     A            S1QSCN    R        H      REFFLD(TSQSCN HYPSGTS)
+     A            S1SSCCBC  R        H      REFFLD(GDSSCCBC)
+     A            S1SSCC    R        H      REFFLD(GDSSCC)
+     A            S1PO#     R        H      REFFLD(GDPO#)
+     A            S1CNVY    R        H      REFFLD(GDCNVY)
+     A            S1IN61         1N  H      TEXT('*IN61 value')
+     A            S1OPT          2A  B 13  2TEXT('Option')
+     A  41                                  DSPATR(RI)
+     A  41                                  DSPATR(PC)
+     A            S1TURN    R        O 13  7REFFLD(GDTURN)
+     A            S1TSEQ    R        O 13 17REFFLD(GDTSEQ)
+     A                                      EDTCDE(Z)
+     A            S1ORD#    R        O 13 21REFFLD(GDORD#)
+     A                                      EDTCDE(Z)
+     A            S1ORL#    R        O 13 30REFFLD(GDORL#)
+     A                                      EDTCDE(Z)
+     A            S1ITEMX   R   11A  O 13 35REFFLD(GDITEM)
+     A  61                                  COLOR(YLW)
+     A            S1IMDS    R        O 13 47REFFLD(GDIMDS)
+     A  61                                  COLOR(YLW)
+     A            S1QOPKX   R    8 00O 13 78REFFLD(GDQOPK)
+     A                                      EDTCDE(J)
+     A            S1QSTCX   R    8 00O 13 90REFFLD(GDQSTC)
+     A                                      EDTCDE(J)
+     A            S1QSCNX   R    8 00O 13102REFFLD(TSQSCN HYPSGTS)
+     A                                      EDTCDE(J)
+     A            S1MXLT    R        O 13115REFFLD(GDMXLT)
+     A            S1TVSTS       13A  O 13119TEXT('Verify status')
+     A  42                                  DSPATR(HI)
+     A
+     A*** *Blanks (nothing verified yet for this HYPSGDT.GDRSEQ)
+     A*** Prtl verify
+     A*** Verified
+     A          R SFLCTL01A                 SFLCTL(SFL01A)
+     A*%%TS  SD  20220224  093358  BEARL       REL-V7R3M0  5770-WDS
+     A                                      SFLSIZ(0012)
+     A                                      SFLPAG(0012)
+     A                                      TEXT('Main subfile control')
+     A                                      BLINK
+     A                                      PAGEUP(92 'Page Up')
+     A                                      PAGEDOWN(91 'Page Down')
+     A                                      HOME(94 'Home')
+     A                                      CA05(05 'Refresh')
+     A N81                                  CF08(08 'Mixed label')
+     A N81                                  CF09(09 'Partial label')
+     A  11                                  CF11(11 'Complete tote-verify')
+     A N81                                  CF15(15 'Change qty default')
+     A N81                                  CF17(17 'Top')
+     A N81                                  CF18(18 'Bottom')
+     A  19                                  CF19(19 'Not-done / All toggle')
+     A                                      INDTXT(81 'Protect item, allow lot')
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  27                                  SFLDSP
+     A N26                                  SFLDSPCTL
+     A  26                                  SFLCLR
+     A                                      RTNCSRLOC(&S@IRCD &S@IFLD)
+     A N94        S@RCNO         4S 0H      SFLRCDNBR(CURSOR)
+     A            S@IRCD        10A  H      TEXT('Input (cursor-position) recor-
+     A                                      d name')
+     A            S@IFLD        10A  H      TEXT('Input (cursor-position) field-
+     A                                       name')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            C1ENV          6A  O  1 15TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            C1HDG1        40A  O  1 47DSPATR(HI)
+     A****                              1 54'Shipment Detail Processing'
+     A                                  1114DATE
+     A                                      EDTCDE(Y)
+     A                                  1124TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A            C1ENAM        30A  O  2 15TEXT('Employee name')
+     A                                      DSPATR(HI)
+     A            C1HDG2        40A  O  2 47DSPATR(HI)
+     A****                              2 60'Tote Verify'
+     A            P@JOBN        10A  O  2122TEXT('Job name')
+     A                                  4  2'Group:'
+     A                                      DSPATR(HI)
+     A            C1GRP#         9A  O  4  9
+     A                                  4 20'Ship-to:'
+     A                                      DSPATR(HI)
+     A            C1SHTO        43A  O  4 29TEXT('Ship-to# and name')
+     A                                  4 74'Tote:'
+     A                                      DSPATR(HI)
+     A            C1TOTE    R        O  4 80REFFLD(GDTOTE HYPSGDT)
+     A                                  6  2'Ship Qty . . . . . . . . . . .'
+     A            C1QSTC         9Y 0B  6 35TEXT('Ship qty')
+     A                                      EDTCDE(J)
+     A                                      CHECK(RB)
+     A  81                                  DSPATR(PR)
+     A  71                                  DSPATR(RI)
+     A  71                                  DSPATR(PC)
+     A                                  6 51'(F15 to change default)'
+     A                                      COLOR(BLU)
+     A  81                                  DSPATR(ND)
+     A                                  7  2'Item no. or UPC  . . . . . . .'
+     A            C1SCAN        15A  B  7 35TEXT('Scanned UPC or item no.')
+     A N81                                  DSPATR(PC)
+     A  72                                  DSPATR(RI)
+     A                                      CHECK(ER)
+     A  81                                  DSPATR(PR)
+     A                                  8  2'Item number  . . . . . . . . .'
+     A N81                                  DSPATR(ND)
+     A            C1ITEM        15A  O  8 35TEXT('Item no.')
+     A N81                                  DSPATR(ND)
+     A                                  9  2'Lot number . . . . . . . . . .'
+     A N81                                  DSPATR(ND)
+     A            C1LOT         15A  B  9 35TEXT('Lot no.')
+     A  81                                  DSPATR(PC)
+     A  73                                  DSPATR(RI)
+     A                                      CHECK(ER)
+     A                                      CHECK(RB)
+     A N81                                  DSPATR(ND)
+     A N81                                  DSPATR(PR)
+     A                                 10  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A  81                                  DSPATR(ND)
+     A                                 10114'Alw'
+     A                                      DSPATR(HI)
+     A                                 11  5'1=Select   2=Change   5=Display   -
+     A                                      12=Label   -
+     A                                      16=Lot inquiry   29=Delete label'
+     A                                      COLOR(BLU)
+     A  81                                  DSPATR(ND)
+     A                                 11 81'Qty On'
+     A                                      DSPATR(HI)
+     A                                 11 95'Qty'
+     A                                      DSPATR(HI)
+     A                                 11107'Qty'
+     A                                      DSPATR(HI)
+     A                                 11114'Mixd'
+     A                                      DSPATR(HI)
+     A                                 11119'Verify'
+     A                                      DSPATR(HI)
+     A                                 12  2'Opt'
+     A                                      DSPATR(HI)
+     A                                 12 11'Turn#'
+     A                                      DSPATR(HI)
+     A                                 12 17'Seq'
+     A                                      DSPATR(HI)
+     A                                 12 22'Order#'
+     A                                      DSPATR(HI)
+     A                                 12 30'Line'
+     A                                      DSPATR(HI)
+     A                                 12 35'Item#'
+     A                                      DSPATR(HI)
+     A                                 12 47'Description'
+     A                                      DSPATR(HI)
+     A                                 12 80'Pick Tkt'
+     A                                      DSPATR(HI)
+     A                                 12 93'Shipped'
+     A                                      DSPATR(HI)
+     A                                 12105'Scanned'
+     A                                      DSPATR(HI)
+     A                                 12114'Lots'
+     A                                      DSPATR(HI)
+     A                                 12119'Status'
+     A                                      DSPATR(HI)
+     A          R SFL01B                    SFL
+     A*%%TS  SD  20220207  171150  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Main subfile')
+     A                                      INDTXT(61 'Item number and descript-
+     A                                      ion COLOR(YLW)')
+     A  28                                  SFLNXTCHG
+     A            S1GRP#    R        H      REFFLD(GDGRP#)
+     A            S1BLTO    R        H      REFFLD(GDBLTO)
+     A            S1SHTO    R        H      REFFLD(GDSHTO)
+     A            S1DSHP    R        H      REFFLD(GDDSHP)
+     A            S1SHTOX       43A  H      TEXT('Ship-to# and name')
+     A            S1RSEQ    R        H      REFFLD(GDRSEQ)
+     A            S1OCTL    R        H      REFFLD(GDOCTL)
+     A            S1BLN#    R        H      REFFLD(GDBLN#)
+     A            S1ITEM    R        H      REFFLD(GDITEM)
+     A            S1QOPN    R        H      REFFLD(GDQOPN)
+     A            S1QOPK    R        H      REFFLD(GDQOPK)
+     A            S1QSTC    R        H      REFFLD(GDQSTC)
+     A            S1QSTCT   R        H      REFFLD(TDQSTCB HYPSGTD)
+     A            S1QSCN    R        H      REFFLD(TSQSCN HYPSGTS)
+     A            S1SSCCBC  R        H      REFFLD(GDSSCCBC)
+     A            S1SSCC    R        H      REFFLD(GDSSCC)
+     A            S1PO#     R        H      REFFLD(GDPO#)
+     A            S1CNVY    R        H      REFFLD(GDCNVY)
+     A            S1IN61         1N  H      TEXT('*IN61 value')
+     A            S1OPT          2A  B 13  2TEXT('Option')
+     A  41                                  DSPATR(RI)
+     A  41                                  DSPATR(PC)
+     A            S1TURN    R        O 13  7REFFLD(GDTURN)
+     A            S1TSEQ    R        O 13 17REFFLD(GDTSEQ)
+     A                                      EDTCDE(Z)
+     A            S1ORD#    R        O 13 21REFFLD(GDORD#)
+     A                                      EDTCDE(Z)
+     A            S1ORL#    R        O 13 30REFFLD(GDORL#)
+     A                                      EDTCDE(Z)
+     A            S1ITEMX   R   11A  O 13 35REFFLD(GDITEM)
+     A  61                                  COLOR(YLW)
+     A            S1IMDS    R        O 13 47REFFLD(GDIMDS)
+     A  61                                  COLOR(YLW)
+     A            S1QOPKX   R    8 00O 13 78REFFLD(GDQOPK)
+     A                                      EDTCDE(J)
+     A            S1QSTCX   R    8 00O 13 90REFFLD(GDQSTC)
+     A                                      EDTCDE(J)
+     A            S1QSCNX   R    8 00O 13102REFFLD(TSQSCN HYPSGTS)
+     A                                      EDTCDE(J)
+     A            S1MXLT    R        O 13115REFFLD(GDMXLT)
+     A            S1TVSTS       13A  O 13119TEXT('Verify status')
+     A  42                                  DSPATR(HI)
+     A
+     A*** *Blanks (nothing verified yet for this HYPSGDT.GDRSEQ)
+     A*** Prtl verify
+     A*** Verified
+     A          R SFLCTL01B                 SFLCTL(SFL01B)
+     A*%%TS  SD  20220224  093358  BEARL       REL-V7R3M0  5770-WDS
+     A                                      SFLSIZ(0012)
+     A                                      SFLPAG(0012)
+     A                                      TEXT('Main subfile control')
+     A                                      BLINK
+     A                                      PAGEUP(92 'Page Up')
+     A                                      PAGEDOWN(91 'Page Down')
+     A                                      HOME(94 'Home')
+     A                                      CA05(05 'Refresh')
+     A N81                                  CF08(08 'Mixed label')
+     A N81                                  CF09(09 'Partial label')
+     A  11                                  CF11(11 'Complete tote-verify')
+     A N81                                  CF15(15 'Change qty default')
+     A N81                                  CF17(17 'Top')
+     A N81                                  CF18(18 'Bottom')
+     A  19                                  CF19(19 'Not-done / All toggle')
+     A                                      INDTXT(81 'Protect item, allow lot')
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  27                                  SFLDSP
+     A N26                                  SFLDSPCTL
+     A  26                                  SFLCLR
+     A                                      RTNCSRLOC(&S@IRCD &S@IFLD)
+     A N94        S@RCNO         4S 0H      SFLRCDNBR(CURSOR)
+     A            S@IRCD        10A  H      TEXT('Input (cursor-position) recor-
+     A                                      d name')
+     A            S@IFLD        10A  H      TEXT('Input (cursor-position) field-
+     A                                       name')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            C1ENV          6A  O  1 15TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            C1HDG1        40A  O  1 47DSPATR(HI)
+     A****                              1 54'Shipment Detail Processing'
+     A                                  1114DATE
+     A                                      EDTCDE(Y)
+     A                                  1124TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A            C1ENAM        30A  O  2 15TEXT('Employee name')
+     A                                      DSPATR(HI)
+     A            C1HDG2        40A  O  2 47DSPATR(HI)
+     A****                              2 60'Tote Verify'
+     A            P@JOBN        10A  O  2122TEXT('Job name')
+     A                                  4  2'Tote:'
+     A                                      DSPATR(HI)
+     A            C1TOTE    R        O  4  8REFFLD(GDTOTE HYPSGDT)
+     A                                  4 20'Customer count:'
+     A                                      DSPATR(HI)
+     A            C1CUCT         3A     4 36TEXT('Customer count')
+     A                                  4 41'Order count:'
+     A                                      DSPATR(HI)
+     A            C1ORCT         3A     4 54TEXT('Order count')
+     A                                  6  2'Ship Qty . . . . . . . . . . .'
+     A            C1QSTC         9Y 0B  6 35TEXT('Ship qty')
+     A                                      EDTCDE(J)
+     A                                      CHECK(RB)
+     A  81                                  DSPATR(PR)
+     A  71                                  DSPATR(RI)
+     A  71                                  DSPATR(PC)
+     A                                  6 51'(F15 to change default)'
+     A                                      COLOR(BLU)
+     A  81                                  DSPATR(ND)
+     A                                  7  2'Item no. or UPC  . . . . . . .'
+     A            C1SCAN        15A  B  7 35TEXT('Scanned UPC or item no.')
+     A N81                                  DSPATR(PC)
+     A  72                                  DSPATR(RI)
+     A                                      CHECK(ER)
+     A  81                                  DSPATR(PR)
+     A                                  8  2'Item number  . . . . . . . . .'
+     A N81                                  DSPATR(ND)
+     A            C1ITEM        15A  O  8 35TEXT('Item no.')
+     A N81                                  DSPATR(ND)
+     A                                  9  2'Lot number . . . . . . . . . .'
+     A N81                                  DSPATR(ND)
+     A            C1LOT         15A  B  9 35TEXT('Lot no.')
+     A  81                                  DSPATR(PC)
+     A  73                                  DSPATR(RI)
+     A                                      CHECK(ER)
+     A                                      CHECK(RB)
+     A N81                                  DSPATR(ND)
+     A N81                                  DSPATR(PR)
+     A                                 10  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A  81                                  DSPATR(ND)
+     A                                 10114'Alw'
+     A                                      DSPATR(HI)
+     A                                 11  5'1=Select   2=Change   5=Display   -
+     A                                      12=Label   -
+     A                                      16=Lot inquiry   29=Delete label'
+     A                                      COLOR(BLU)
+     A  81                                  DSPATR(ND)
+     A                                 11 81'Qty On'
+     A                                      DSPATR(HI)
+     A                                 11 95'Qty'
+     A                                      DSPATR(HI)
+     A                                 11107'Qty'
+     A                                      DSPATR(HI)
+     A                                 11114'Mixd'
+     A                                      DSPATR(HI)
+     A                                 11119'Verify'
+     A                                      DSPATR(HI)
+     A                                 12  2'Opt'
+     A                                      DSPATR(HI)
+     A                                 12 11'Turn#'
+     A                                      DSPATR(HI)
+     A                                 12 17'Seq'
+     A                                      DSPATR(HI)
+     A                                 12 22'Order#'
+     A                                      DSPATR(HI)
+     A                                 12 30'Line'
+     A                                      DSPATR(HI)
+     A                                 12 35'Item#'
+     A                                      DSPATR(HI)
+     A                                 12 47'Description'
+     A                                      DSPATR(HI)
+     A                                 12 80'Pick Tkt'
+     A                                      DSPATR(HI)
+     A                                 12 93'Shipped'
+     A                                      DSPATR(HI)
+     A                                 12105'Scanned'
+     A                                      DSPATR(HI)
+     A                                 12114'Lots'
+     A                                      DSPATR(HI)
+     A                                 12119'Status'
+     A                                      DSPATR(HI)
+     A          R SFLNOR01
+     A*%%TS  SD  20200831  074748  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Main subfile - no rcds found')
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                 15  8'(No Tote Detail to Display)'
+     A                                      COLOR(BLU)
+     A          R SFLCMD01
+     A*%%TS  SD  20180619  164000  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Main subfile - function key t-
+     A                                      ext')
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A            S@MORE         7A  O 25125DSPATR(HI)
+     A                                      OVRDTA
+     A****                             26  2'F5=Refresh   F8=Mixed Lbl   -
+     A****                                  F9=Partial Lbl F12=Cancel   -
+     A****                                  F17=Top   F18=Bottom'
+     A****                                  COLOR(BLU)
+     A            C1FKY1       130A  O 26  2COLOR(BLU)
+     A                                      OVRDTA
+     A          R SFL02A                    SFL
+     A*%%TS  SD  20180620  104604  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('"Select" subfile')
+     A                                      INDTXT(61 'Item number and +
+     A                                      description COLOR(YLW)')
+     A                                      SFLNXTCHG
+     A            S1GRP#    R        H      REFFLD(GDGRP#)
+     A            S1BLTO    R        H      REFFLD(GDBLTO)
+     A            S1SHTO    R        H      REFFLD(GDSHTO)
+     A            S1DSHP    R        H      REFFLD(GDDSHP)
+     A            S1SHTOX       43A  H      TEXT('Ship-to# and name')
+     A            S1RSEQ    R        H      REFFLD(GDRSEQ)
+     A            S1OCTL    R        H      REFFLD(GDOCTL)
+     A            S1BLN#    R        H      REFFLD(GDBLN#)
+     A            S1ITEM    R        H      REFFLD(GDITEM)
+     A            S1QOPN    R        H      REFFLD(GDQOPN)
+     A            S1QOPK    R        H      REFFLD(GDQOPK)
+     A            S1QSTC    R        H      REFFLD(GDQSTC)
+     A            S1QSTCT   R        H      REFFLD(TDQSTCB HYPSGTD)
+     A            S1QSCN    R        H      REFFLD(TSQSCN HYPSGTS)
+     A            S1SSCCBC  R        H      REFFLD(GDSSCCBC)
+     A            S1SSCC    R        H      REFFLD(GDSSCC)
+     A            S1PO#     R        H      REFFLD(GDPO#)
+     A            S1CNVY    R        H      REFFLD(GDCNVY)
+     A            S1IN61         1N  H      TEXT('*IN61 value')
+     A            S1OPT          2A  O 11  2TEXT('Option')
+     A            S1TURN    R        O 11  7REFFLD(GDTURN)
+     A            S1TSEQ    R        O 11 17REFFLD(GDTSEQ)
+     A                                      EDTCDE(Z)
+     A            S1ORD#    R        O 11 21REFFLD(GDORD#)
+     A                                      EDTCDE(Z)
+     A            S1ORL#    R        O 11 30REFFLD(GDORL#)
+     A                                      EDTCDE(Z)
+     A            S1ITEMX   R   11A  O 11 35REFFLD(GDITEM)
+     A  61                                  COLOR(YLW)
+     A            S1IMDS    R        O 11 47REFFLD(GDIMDS)
+     A  61                                  COLOR(YLW)
+     A            S1QOPKX   R    8 00O 11 78REFFLD(GDQOPK)
+     A                                      EDTCDE(J)
+     A            S1QSTCX   R    8 00O 11 90REFFLD(GDQSTC)
+     A                                      EDTCDE(J)
+     A            S1QSCNX   R    8 00O 11102REFFLD(TSQSCN HYPSGTS)
+     A                                      EDTCDE(J)
+     A            S1MXLT    R        O 11115REFFLD(GDMXLT)
+     A            S1TVSTS       13A  O 11119TEXT('Verify status')
+     A  42                                  DSPATR(HI)
+     A          R SFLCTL02A                 SFLCTL(SFL02A)
+     A*%%TS  SD  20220224  094302  BEARL       REL-V7R3M0  5770-WDS
+     A                                      SFLSIZ(0014)
+     A                                      SFLPAG(0014)
+     A                                      TEXT('"Select" subfile control')
+     A                                      BLINK
+     A                                      OVERLAY
+     A N29                                  SFLDSP
+     A N29                                  SFLDSPCTL
+     A  29                                  SFLCLR
+     A N39                                  SFLEND
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            C1ENV          6A  O  1 15TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            C1HDG1        40A  O  1 47DSPATR(HI)
+     A****                              1 54'Shipment Detail Processing'
+     A                                  1114DATE
+     A                                      EDTCDE(Y)
+     A                                  1124TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A            C1ENAM        30A  O  2 15TEXT('Employee name')
+     A                                      DSPATR(HI)
+     A            C2HDG2        40A  O  2 47DSPATR(HI)
+     A****                              2 50'Mixed Label Selection Confirmation'
+     A****                              2 49'Partial Label Selection +
+     A****                                  Confirmation'
+     A            P@JOBN        10A  O  2122TEXT('Job name')
+     A                                  4  2'Group:'
+     A                                      DSPATR(HI)
+     A            C1GRP#         9A  O  4  9
+     A                                  4 20'Ship-to:'
+     A                                      DSPATR(HI)
+     A            C1SHTO        43A  O  4 29TEXT('Ship-to# and name')
+     A                                  4 74'Tote:'
+     A                                      DSPATR(HI)
+     A            C1TOTE    R        O  4 80REFFLD(GDTOTE HYPSGDT)
+     A                                  6  2'Press Enter to confirm your choice-
+     A                                      s for 1=Select.'
+     A                                      COLOR(BLU)
+     A                                  7  2'Press F12 to return to change your-
+     A                                       choices.'
+     A                                      COLOR(BLU)
+     A                                  8114'Alw'
+     A                                      DSPATR(HI)
+     A                                  9 81'Qty On'
+     A                                      DSPATR(HI)
+     A                                  9 95'Qty'
+     A                                      DSPATR(HI)
+     A                                  9107'Qty'
+     A                                      DSPATR(HI)
+     A                                  9114'Mixd'
+     A                                      DSPATR(HI)
+     A                                  9119'Verify'
+     A                                      DSPATR(HI)
+     A                                 10  2'Opt'
+     A                                      DSPATR(HI)
+     A                                 10 11'Turn#'
+     A                                      DSPATR(HI)
+     A                                 10 17'Seq'
+     A                                      DSPATR(HI)
+     A                                 10 22'Order#'
+     A                                      DSPATR(HI)
+     A                                 10 30'Line'
+     A                                      DSPATR(HI)
+     A                                 10 35'Item#'
+     A                                      DSPATR(HI)
+     A                                 10 47'Description'
+     A                                      DSPATR(HI)
+     A                                 10 80'Pick Tkt'
+     A                                      DSPATR(HI)
+     A                                 10 93'Shipped'
+     A                                      DSPATR(HI)
+     A                                 10105'Scanned'
+     A                                      DSPATR(HI)
+     A                                 10114'Lots'
+     A                                      DSPATR(HI)
+     A                                 10119'Status'
+     A                                      DSPATR(HI)
+     A          R SFLCMD02
+     A*%%TS  SD  20180619  164000  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Main subfile - function key t-
+     A                                      ext')
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A            S@MORE         7A  O 25125DSPATR(HI)
+     A                                      OVRDTA
+     A                                 26  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R WINDOW01
+     A*%%TS  SD  20220207  173431  BEARL       REL-V7R3M0  5770-WDS
+     A                                      WINDOW(9 27 9 52)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR RI)-
+     A                                       (*CHAR '        '))
+     A                                      CF11(11 'Continue')
+     A                                      ALARM
+     A                                  2 17'* * * WARNING * * *'
+     A                                      DSPATR(BL)
+     A                                  4  2'Not all items that are supposed to-
+     A                                       be in the'
+     A                                  5  2'tote have been scanned.  If everyt-
+     A                                      hing has been'
+     A                                  6  2'scanned, press F11 to continue.'
+     A                                  8  2'F11=Continue   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R WINDOW02
+     A*%%TS  SD  20220207  173431  BEARL       REL-V7R3M0  5770-WDS
+     A                                      WINDOW(9 27 13 55)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR RI)-
+     A                                       (*CHAR '        '))
+     A                                      ALARM
+     A                                  2 19'* * * WARNING * * *'
+     A                                      DSPATR(BL)
+     A            W2LINE1       53A  O  4  2TEXT('Window 2 line 1')
+     A            W2LINE2       53A  O  5  2TEXT('Window 2 line 2')
+     A            W2LINE3       53A  O  6  2TEXT('Window 2 line 3')
+     A            W2LINE4       53A  O  7  2TEXT('Window 2 line 4')
+     A****                              4  2'Items have been verified for the -
+     A****                                  current tote.  These'
+     A****                              5  2'verifications will be lost if the -
+     A****                                  requested cancel is'
+     A****                              6  2'performed.  Also, any labels gener-
+     A****                                  ated in the current'
+     A****                              7  2'Tote Verify session will be lost (-
+     A****                                  and not be valid).'
+     A                                  9  2'Key a "Y" to cancel the current To-
+     A                                      te Verify session,'
+     A                                      COLOR(BLU)
+     A                                 10  2'or an "N" to continue in Tote Veri-
+     A                                      fy.'
+     A                                      COLOR(BLU)
+     A                                 12  2'Process cancel request? . . .'
+     A            W2DOIT         1A  B 12 34TEXT('Cancel TV session "Y"')
+     A          R DSPBLANKA
+     A*%%TS  SD  19920217  162710  BEARL       REL-V2R1M0  5738-PW1
+     A                                      ASSUME
+     A                                  1  2' '
+     A          R MSF01A                    SFL
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLMSGRCD(27)
+     A                                      TEXT('Subfile Message Record')
+     A            S@MSKY                    SFLMSGKEY
+     A            S@PGMQ                    SFLPGMQ
+     A          R MSFCTL01A                 SFLCTL(MSF01A)
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLSIZ(0005)
+     A                                      SFLPAG(0001)
+     A                                      TEXT('Subfile Message Control Recor-
+     A                                      d')
+     A  93                                  PUTOVR
+     A                                      SFLDSP
+     A                                      SFLINZ
+     A N39                                  SFLEND
+     A            S@PGMQ                    SFLPGMQ

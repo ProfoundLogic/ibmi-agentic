@@ -1,0 +1,211 @@
+/**************************************************************************/
+/* APPLICATION: Shipping                                                  */
+/*       TITLE: Shipping Pallet Content Report                            */
+/*          BY: William Earl (MCA)                                        */
+/*        DATE: December 2010                                             */
+/*                                                                        */
+/*  Note:  Use the following parameters when creating this                */
+/*         program (CRTBNDCL):                                            */
+/*           DFTACTGRP(*NO) ACTGRP(HDSOPT) USRPRF(*OWNER)                 */
+/*                                                                        */
+/*   REV DATE   BY   CHANGE                                               */
+/*  ----------  ---  ---------------------------------------------------  */
+/*  10/31/2014  MCA  Add option to create a .csv file.                    */
+/*  10/15/2015  MCA  Add option to show purchase order on report.         */
+/*  01/24/2020  RJS  Per Bill expire spooled report after 1 day           */
+/*  04/17/2020  MCA  Add item number type parameter.                      */
+/*  03/28/2022  MCA  Increase QSYSPRT2 file size from 128 to 132, to      */
+/*                   allow room for Net Weight and Net NEQ columns.       */
+/*  04/22/2022  MCA  NEQ summary.                                         */
+/*                                                                        */
+/**************************************************************************/
+             PGM        PARM(&PALLET# &BOL# &SHIPTO# &INCLINVCD +
+                          &SHOWPO +
+                          &ITEM#TYPE +
+                          &CRTNEQSUMM +
+                          &CRTSPLF &CSVDOCID +
+                          &OUTQ &DRAWER &COPIES &HOLDSPLF &SUBMIT)
+
+             DCL        VAR(&PALLET#) TYPE(*DEC) LEN(9 0)
+             DCL        VAR(&BOL#) TYPE(*DEC) LEN(8 0)
+             DCL        VAR(&SHIPTO#) TYPE(*DEC) LEN(7 0)
+             DCL        VAR(&INCLINVCD) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&SHOWPO) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&ITEM#TYPE) TYPE(*CHAR) LEN(5)
+             DCL        VAR(&CRTNEQSUMM) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&CRTSPLF) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&CSVDOCID) TYPE(*CHAR) LEN(40)
+             DCL        VAR(&OUTQ) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&DRAWER) TYPE(*DEC) LEN(3 0)
+             DCL        VAR(&COPIES) TYPE(*DEC) LEN(3 0)
+             DCL        VAR(&HOLDSPLF) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&SUBMIT) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&PALLET#X) TYPE(*CHAR) LEN(9)
+             DCL        VAR(&BOL#X) TYPE(*CHAR) LEN(8)
+             DCL        VAR(&SHIPTO#X) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&INCLINVCDX) TYPE(*LGL)
+             DCL        VAR(&SHOWPOX) TYPE(*LGL)
+             DCL        VAR(&CRTNEQSUMX) TYPE(*LGL)
+             DCL        VAR(&FILEPFX) TYPE(*CHAR) LEN(13) +
+                          VALUE('Pallet Report')
+             DCL        VAR(&FILE) TYPE(*CHAR) LEN(44)
+             DCL        VAR(&PATH) TYPE(*CHAR) LEN(19) +
+                          VALUE('/QNTC/HMCFS1/USERS/')
+             DCL        VAR(&DOCID) TYPE(*CHAR) LEN(74)
+             DCL        VAR(&USER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&JOBTYPE) TYPE(*CHAR) LEN(1)
+             DCL        VAR(&RSNM0100) TYPE(*CHAR) LEN(36)
+
+             COPYRIGHT  TEXT('(C) Copyright Midrange Computer +
+                          Associates, Inc, 2010')
+
+             MONMSG     MSGID(CPF0000) EXEC(GOTO CMDLBL(ERROR))
+
+             IF         COND(&SUBMIT *EQ '*YES') THEN(DO)
+               IF         COND(&PALLET# = -1) THEN(CHGVAR +
+                            VAR(&PALLET#X) VALUE('*ALL'))
+               ELSE       CMD(CHGVAR VAR(&PALLET#X) VALUE(&PALLET#))
+               IF         COND(&BOL# *EQ -1) THEN(CHGVAR VAR(&BOL#X) +
+                            VALUE('*ALL'))
+               ELSE       CMD(CHGVAR VAR(&BOL#X) VALUE(&BOL#))
+               IF         COND(&SHIPTO# = -1) THEN(CHGVAR +
+                            VAR(&SHIPTO#X) VALUE('*ALL'))
+               ELSE       CMD(CHGVAR VAR(&SHIPTO#X) VALUE(&SHIPTO#))
+               SBMJOB     CMD(HYK3512 PALLET(&PALLET#X) BOL(&BOL#X) +
+                            CUST(&SHIPTO#X) INCLINVCD(&INCLINVCD) +
+                            SHOWPO(&SHOWPO) +
+                            ITEMTYPE(&ITEM#TYPE) +
+                            CRTNEQSUMM(&CRTNEQSUMM) +
+                            CRTRPT(&CRTSPLF) CSVDOCID(&CSVDOCID) +
+                            OUTQ(&OUTQ) DRAWER(&DRAWER) +
+                            COPIES(&COPIES) HOLD(&HOLDSPLF) +
+                            SUBMIT(*NO)) JOB(PALLETRPT) INLLIBL(*CURRENT)
+               CALL       PGM(QMHMOVPM) PARM('    ' '*COMP     ' +
+                            X'00000001' '*PGMBDY   ' X'00000001' +
+                            X'00000000')
+               GOTO       CMDLBL(EOP)
+             ENDDO
+
+             RTVJOBA    USER(&USER) TYPE(&JOBTYPE)
+
+ /* Determine .csv file name.                                           */
+
+             IF         COND(&CSVDOCID *EQ '*NONE') THEN(DO)
+               CHGVAR     VAR(&DOCID) VALUE('*NONE')
+               GOTO       CMDLBL(SKIPCSV)
+             ENDDO
+
+             IF         COND(&CSVDOCID *EQ '*DFT') THEN(DO)
+               CHGVAR     VAR(&FILE) VALUE(&FILEPFX *CAT '.csv')
+             ENDDO
+             ELSE       CMD(DO)
+               CHGVAR     VAR(&FILE) VALUE(&CSVDOCID *TCAT '.csv')
+             ENDDO
+             CHGVAR     VAR(&DOCID) VALUE(&PATH *CAT &USER *TCAT '/' +
+                          *CAT &FILE)
+
+             RMVLNK     OBJLNK(&DOCID)
+             MONMSG     MSGID(CPFA0A9)
+             MONMSG     MSGID(CPFA0D4) EXEC(SNDPGMMSG MSGID(CPF9898) +
+                          MSGF(QCPFMSG) MSGDTA('Either the document +
+                          or its path is locked, so the document +
+                          cannot be deleted') TOPGMQ(*PRV) +
+                          MSGTYPE(*ESCAPE))
+
+ SKIPCSV:
+
+ /* Override print file attributes.                                     */
+
+             IF         COND(&CRTSPLF *NE '*YES') THEN(GOTO +
+                          CMDLBL(SKIPSPLF))
+
+             IF         COND(&OUTQ *EQ 'PRT01') THEN(DO)
+              IF         COND(&SHOWPO *NE '*YES') THEN(DO)
+             OVRPRTF    FILE(QSYSPRT) PAGESIZE(68 128) LPI(8) +
+                          CPI(12) OVRFLW(58) OUTQ(&OUTQ) +
+                          FORMTYPE(SSTD) COPIES(&COPIES) +
+                          HOLD(&HOLDSPLF) SPLFNAME(HYR3512PF) +
+                          EXPDATE(*DAYS) DAYS(1)
+              ENDDO
+              ELSE       CMD(DO)
+             OVRPRTF    FILE(QSYSPRT2) TOFILE(QSYSPRT) PAGESIZE(68 +
+                          132) LPI(8) CPI(12) OVRFLW(58) +
+                          OUTQ(&OUTQ) FORMTYPE(SSTD) +
+                          COPIES(&COPIES) HOLD(&HOLDSPLF) +
+                          SPLFNAME(HYR3512PF) EXPDATE(*DAYS) DAYS(1)
+              ENDDO
+             ENDDO
+             ELSE       CMD(DO)
+               IF         COND(&DRAWER *EQ 3) THEN(DO)
+                IF         COND(&SHOWPO *NE '*YES') THEN(DO)
+             OVRPRTF    FILE(QSYSPRT) PAGESIZE(88 96) LPI(8) CPI(12) +
+                          OVRFLW(80) DRAWER(3) PAGRTT(0) +
+                          OUTQ(&OUTQ) FORMTYPE(1NRW) +
+                          COPIES(&COPIES) HOLD(&HOLDSPLF) +
+                          SPLFNAME(HYR3512PF) EXPDATE(*DAYS) DAYS(1)
+                ENDDO
+                ELSE       CMD(DO)
+             OVRPRTF    FILE(QSYSPRT2) TOFILE(QSYSPRT) PAGESIZE(68 +
+                          132) LPI(8) CPI(12) OVRFLW(62) DRAWER(3) +
+                          PAGRTT(90) OUTQ(&OUTQ) FORMTYPE(1NRW) +
+                          COPIES(&COPIES) HOLD(&HOLDSPLF) +
+                          SPLFNAME(HYR3512PF) EXPDATE(*DAYS) DAYS(1)
+                ENDDO
+               ENDDO
+               ELSE       CMD(DO)
+                IF         COND(&SHOWPO *NE '*YES') THEN(DO)
+             OVRPRTF    FILE(QSYSPRT) PAGESIZE(88 96) LPI(8) CPI(12) +
+                          OVRFLW(80) DRAWER(&DRAWER) PAGRTT(0) +
+                          OUTQ(&OUTQ) FORMTYPE(1NRW) +
+                          COPIES(&COPIES) HOLD(&HOLDSPLF) +
+                          SPLFNAME(HYR3512PF) EXPDATE(*DAYS) DAYS(1)
+                ENDDO
+                ELSE       CMD(DO)
+             OVRPRTF    FILE(QSYSPRT2) TOFILE(QSYSPRT) PAGESIZE(68 +
+                          132) LPI(8) CPI(12) OVRFLW(62) +
+                          DRAWER(&DRAWER) PAGRTT(90) OUTQ(&OUTQ) +
+                          FORMTYPE(1NRW) COPIES(&COPIES) +
+                          HOLD(&HOLDSPLF) SPLFNAME(HYR3512PF) +
+                          EXPDATE(*DAYS) DAYS(1)
+                ENDDO
+               ENDDO
+             ENDDO
+
+ SKIPSPLF:
+
+             IF         COND(&INCLINVCD *EQ '*YES') THEN(CHGVAR +
+                          VAR(&INCLINVCDX) VALUE('1'))
+             ELSE       CMD(CHGVAR VAR(&INCLINVCDX) VALUE('0'))
+
+             IF         COND(&SHOWPO *EQ '*YES') THEN(CHGVAR +
+                          VAR(&SHOWPOX) VALUE('1'))
+             ELSE       CMD(CHGVAR VAR(&SHOWPOX) VALUE('0'))
+
+             IF         COND(&CRTNEQSUMM *EQ '*YES') THEN(CHGVAR +
+                          VAR(&CRTNEQSUMX) VALUE('1'))
+             ELSE       CMD(CHGVAR VAR(&CRTNEQSUMX) VALUE('0'))
+
+             CALL       PGM(HYR3512) PARM(&PALLET# &BOL# &SHIPTO# +
+                          &INCLINVCDX &SHOWPOX &ITEM#TYPE &CRTNEQSUMX +
+                          &CRTSPLF &DOCID)
+
+             DLTOVR     FILE(*ALL)
+
+             SNDPGMMSG  MSG('Pallet report has been generated.') +
+                          TOPGMQ(*PRV) MSGTYPE(*COMP)
+
+             GOTO       CMDLBL(EOP)
+
+ ERROR:      CALL       PGM(QMHMOVPM) PARM('    ' '*DIAG     ' +
+                          X'00000001' '*         ' X'00000001' +
+                          X'00000000')
+             CHGVAR     VAR(%SST(&RSNM0100 1 4)) VALUE(X'00000001')  /* To call stack counter */
+             CHGVAR     VAR(%SST(&RSNM0100 5 10)) VALUE('*NONE')     /* To call stk entry qual mod*/
+             CHGVAR     VAR(%SST(&RSNM0100 15 10)) VALUE('*NONE')    /* To call stk entry qual pgm*/
+             CHGVAR     VAR(%SST(&RSNM0100 25 4)) VALUE(X'00000007') /* Length of to call stk ei */
+             CHGVAR     VAR(%SST(&RSNM0100 29 8)) VALUE('*CTLBDY')   /* To call stack entry ident */
+             CALL       PGM(QMHRSNEM) PARM('    ' X'00000000' +
+                          &RSNM0100 X'00000024' 'RSNM0100' +
+                          '*               ' X'00000000')
+
+ EOP:        ENDPGM

@@ -1,0 +1,604 @@
+     A*%%TS  SD  20180914  093556  BEARL       REL-V7R3M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      REF(*LIBL/HYPSGCU)
+     A                                      PRINT
+     A                                      VLDCMDKEY(25 'Any Cmd Key')
+     A                                      CA12(12 'Cancel')
+     A          R DSPFMT2A
+     A*%%TS  SD  20180620  095311  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Change shipment group')
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                      CA03(03 'Exit')
+     A                                      CF04(04 'Prompt')
+     A                                      INDTXT(82 'Protect freight amount')
+     A                                      INDTXT(83 'Protect special charge -
+     A                                      amount')
+     A                                      RTNCSRLOC(&S@IRCD &S@IFLD)
+     A            S@IRCD        10A  H      TEXT('Input (cursor-position) recor-
+     A                                      d name')
+     A            S@IFLD        10A  H      TEXT('Input (cursor-position) field-
+     A                                       name')
+     A            F2FRZN    R        H      REFFLD(GCFRZN)
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 72TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A                                  2 33'Change Shipment'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 70TEXT('Job name')
+     A                                  4  2'Type changes, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  6  8'Shipment group number  . . . :'
+     A            F2GRP#X   R    9A  O  6 41REFFLD(GCGRP#)
+     A                                      OVRDTA
+     A                                  7  8'Priority . . . . . . . . . . :'
+     A            F2CPTYX   R    3A  O  7 41REFFLD(GCCPTY)
+     A                                      OVRDTA
+     A                                  8  8'Bill-to customer . . . . . . :'
+     A            F2BLTOX   R   35A  O  8 41REFFLD(GCBLTO)
+     A                                      OVRDTA
+     A                                  9  8'Ship-to customer . . . . . . :'
+     A            F2SHTOX   R   35A  O  9 41REFFLD(GCSHTO)
+     A                                      OVRDTA
+     A                                 10  8'Drop ship  . . . . . . . . . :'
+     A            F2DSHPX   R   39A  O 10 41REFFLD(GCDSHP)
+     A                                      OVRDTA
+     A                                 11  8'Ship-to zip code . . . . . . :'
+     A            F2STZP    R        O 11 41REFFLD(GCSTZP)
+     A                                      OVRDTA
+     A                                 12  8'Shipment type  . . . . . . . :'
+     A            F2STYP    R   10A  O 12 41REFFLD(GCSTYP)
+     A                                      OVRDTA
+     A                                 13  8'Ship via . . . . . . . . . . .'
+     A            F2SHPV    R        B 13 41REFFLD(GCSHPV)
+     A  41                                  DSPATR(PC)
+     A  41N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 13 44'+'
+     A            F2SVDS    R        O 13 46REFFLD(GCSVDS)
+     A                                      OVRDTA
+     A                                 14  8'PRO number . . . . . . . . . :'
+     A            F2PRO#    R        B 14 41REFFLD(GCPRO#)
+     A  45                                  DSPATR(PC)
+     A  45N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 15  8'Freight terms  . . . . . . . :'
+     A            F2FTRM    R        O 15 41REFFLD(GCFTRM)
+     A                                      OVRDTA
+     A                                 16  8'Freight charge . . . . . . . .'
+     A            F2FRTA    R     Y  B 16 41REFFLD(GCFRTA)
+     A                                      EDTCDE(J)
+     A                                      CHGINPDFT
+     A N82                                  DSPATR(UL)
+     A  82                                  DSPATR(PR)
+     A  42N82                               DSPATR(PC)
+     A  42N82N89                            DSPATR(RI)
+     A                                      OVRDTA
+     A                                 17  8'Special charge . . . . . . . .'
+     A            F2CHGA    R     Y  B 17 41REFFLD(GCCHGA)
+     A                                      EDTCDE(J)
+     A                                      CHGINPDFT
+     A N83                                  DSPATR(UL)
+     A  83                                  DSPATR(PR)
+     A  43N83                               DSPATR(PC)
+     A  43N83N89                            DSPATR(RI)
+     A                                      OVRDTA
+     A****                             17  8'Freight zone . . . . . . . . :'
+     A****        F2FRZN    R        O 17 41REFFLD(GCFRZN)
+     A****                                  OVRDTA
+     A                                 18  8'Item count . . . . . . . . . :'
+     A            F2ITCT    R        O 18 41REFFLD(GCITCT)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 19  8'Total weight . . . . . . . . :'
+     A            F2SHWT    R        O 19 41REFFLD(GCSHWT)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 20  8'Created timestamp  . . . . . :'
+     A            F2TSTP1   R        O 20 41REFFLD(GCTSTP1)
+     A                                      OVRDTA
+     A                                 21  8'Shipment completed timestamp :'
+     A            F2TSTP2   R   26A  O 21 41REFFLD(GCTSTP2)
+     A                                      OVRDTA
+     A                                 23  2'F3=Exit   F4=Prompt   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R DSPFMT3A
+     A*%%TS  SD  20180620  095311  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Display shipment group')
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                      CA03(03 'Exit')
+     A                                      CF07(07 'Display view 2')
+     A            F3FRZN    R        H      REFFLD(GCFRZN)
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 72TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A                                  2 33'Display Shipment'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 70TEXT('Job name')
+     A                                  4  8'Shipment group number  . . . :'
+     A            F3GRP#X   R    9A  O  4 41REFFLD(GCGRP#)
+     A                                      OVRDTA
+     A                                  5  8'Priority . . . . . . . . . . :'
+     A            F3CPTYX   R    3A  O  5 41REFFLD(GCCPTY)
+     A                                      OVRDTA
+     A                                  6  8'Bill-to customer . . . . . . :'
+     A            F3BLTOX   R   35A  O  6 41REFFLD(GCBLTO)
+     A                                      OVRDTA
+     A                                  7  8'Ship-to customer . . . . . . :'
+     A            F3SHTOX   R   35A  O  7 41REFFLD(GCSHTO)
+     A                                      OVRDTA
+     A                                  8  8'Drop ship  . . . . . . . . . :'
+     A            F3DSHPX   R   39A  O  8 41REFFLD(GCDSHP)
+     A                                      OVRDTA
+     A                                  9  8'Ship-to zip code . . . . . . :'
+     A            F3STZP    R        O  9 41REFFLD(GCSTZP)
+     A                                      OVRDTA
+     A                                 10  8'Shipment type  . . . . . . . :'
+     A            F3STYP    R   10A  O 10 41REFFLD(GCSTYP)
+     A                                      OVRDTA
+     A                                 11  8'Ship via . . . . . . . . . . :'
+     A            F3SHPV    R        O 11 41REFFLD(GCSHPV)
+     A                                      OVRDTA
+     A            F3SVDS    R        O 11 45REFFLD(GCSVDS)
+     A                                      OVRDTA
+     A                                 12  8'PRO number . . . . . . . . . :'
+     A            F3PRO#    R        O 12 41REFFLD(GCPRO#)
+     A                                      OVRDTA
+     A                                 13  8'Freight terms  . . . . . . . :'
+     A            F3FTRM    R        O 13 41REFFLD(GCFTRM)
+     A                                      OVRDTA
+     A                                 14  8'Freight charge . . . . . . . :'
+     A            F3FRTA    R        O 14 41REFFLD(GCFRTA)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 15  8'Special charge . . . . . . . :'
+     A            F3CHGA    R        O 15 41REFFLD(GCCHGA)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A****                             15  8'Freight zone . . . . . . . . :'
+     A****        F3FRZN    R        O 15 41REFFLD(GCFRZN)
+     A****                                  OVRDTA
+     A                                 16  8'Item count . . . . . . . . . :'
+     A            F3ITCT    R        O 16 41REFFLD(GCITCT)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 17  8'Total weight . . . . . . . . :'
+     A            F3SHWT    R        O 17 41REFFLD(GCSHWT)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 18  8'Created timestamp  . . . . . :'
+     A            F3TSTP1   R        O 18 41REFFLD(GCTSTP1)
+     A                                      OVRDTA
+     A                                 19  8'Shipment completed timestamp :'
+     A            F3TSTP2   R   26A  O 19 41REFFLD(GCTSTP2)
+     A                                      OVRDTA
+     A                                 21  2'Press Enter to continue.'
+     A                                      COLOR(BLU)
+     A                                 23  2'F3=Exit   F7=View 2   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R DSPFMT3B
+     A*%%TS  SD  20220902  124102  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Display shipment group')
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                      CA03(03 'Exit')
+     A                                      CF07(07 'Display view 1')
+     A            F3FRZN    R        H      REFFLD(GCFRZN)
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 72TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A                                  2 33'Display Shipment'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 70TEXT('Job name')
+     A                                  4  8'Shipment group number  . . . :'
+     A            F3GRP#X   R    9A  O  4 41REFFLD(GCGRP#)
+     A                                      OVRDTA
+     A                                  5  8'Priority . . . . . . . . . . :'
+     A            F3CPTYX   R    3A  O  5 41REFFLD(GCCPTY)
+     A                                      OVRDTA
+     A                                  6  8'Bill-to customer . . . . . . :'
+     A            F3BLTOX   R   35A  O  6 41REFFLD(GCBLTO)
+     A                                      OVRDTA
+     A                                  7  8'Ship-to customer . . . . . . :'
+     A            F3SHTOX   R   35A  O  7 41REFFLD(GCSHTO)
+     A                                      OVRDTA
+     A                                  8  8'Drop ship  . . . . . . . . . :'
+     A            F3DSHPX   R   39A  O  8 41REFFLD(GCDSHP)
+     A                                      OVRDTA
+     A                                  9  8'Small parcel pick  . . . . . :'
+     A            F3SPPK    R    3A  O  9 41REFFLD(GCSPPK HYPSGCU)
+     A                                 10  8'P&A next scan  . . . . . . . :'
+     A            F3PANS    R    3A  O 10 41REFFLD(GCPANS HYPSGCU)
+     A                                 11  8'Pick priority override . . . :'
+     A            F3PIKO    R    3A  O 11 41REFFLD(GCPIKO HYPSGCU)
+     A                                 18  8'Created timestamp  . . . . . :'
+     A            F3TSTP1   R        O 18 41REFFLD(GCTSTP1)
+     A                                      OVRDTA
+     A                                 19  8'Shipment completed timestamp :'
+     A            F3TSTP2   R   26A  O 19 41REFFLD(GCTSTP2)
+     A                                      OVRDTA
+     A                                 21  2'Press Enter to continue.'
+     A                                      COLOR(BLU)
+     A                                 23  2'F3=Exit   F7=View 1   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R DSPFMT4A
+     A*%%TS  SD  20140128  140705  MHAJNY      REL-V7R1M0  5770-WDS
+     A                                      TEXT('Subset prompt')
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                      CF04(04 'Prompt')
+     A                                      CA05(05 'Refresh')
+     A                                      CA14(14 'Reset')
+     A                                      RTNCSRLOC(&S@IRCD &S@IFLD)
+     A            S@IRCD        10A  H      TEXT('Input (cursor-position) recor-
+     A                                      d name')
+     A            S@IFLD        10A  H      TEXT('Input (cursor-position) field-
+     A                                       name')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 64DATE
+     A                                      EDTCDE(Y)
+     A                                  1 73TIME
+     A                                  2  2USER
+     A                                  2 34'Subset Prompt'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 71TEXT('Job name')
+     A                                  4  2'Type changes, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  6  8'Bill-to number . . . . . . . .'
+     A            F4BLTO    R        B  6 41REFFLD(GCBLTO)
+     A  41                                  DSPATR(PC)
+     A  41N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                  6 49'+'
+     A                                  7  8'Ship-to number . . . . . . . .'
+     A            F4SHTO    R        B  7 41REFFLD(GCSHTO)
+     A  42                                  DSPATR(PC)
+     A  42N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                  7 49'+'
+     A                                  8  8'Ship via code  . . . . . . . .'
+     A            F4SHPV    R        B  8 41REFFLD(GCSHPV)
+     A  43                                  DSPATR(PC)
+     A  43N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                  8 44'+'
+     A                                  9  8'Shipping lane  . . . . . . . .'
+     A            F4DVRT         3Y 0B  9 41TEXT('Shipping lane')
+     A                                      EDTCDE(Z)
+     A  44                                  DSPATR(PC)
+     A  44N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                  9 51'999=Digi Pick'
+     A                                      COLOR(BLU)
+     A                                 10  8'Includes pallet pick . . . . .'
+     A            F4IPPK         1A  B 10 41TEXT('Includes pallet pick')
+     A  45                                  DSPATR(PC)
+     A  45N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 10 51'Y=Yes'
+     A                                      COLOR(BLU)
+     A                                 11  8'Includes tote pick . . . . . .'
+     A            F4ITPK         1A  B 11 41TEXT('Includes tote pick')
+     A  50                                  DSPATR(PC)
+     A  50N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 11 51'Y=Yes'
+     A                                      COLOR(BLU)
+     A                                 12  8'Includes small-parcel pick . .'
+     A            F4ISPP         1A  B 12 41TEXT('Includes small-parcel pick')
+     A  51                                  DSPATR(PC)
+     A  51N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 12 51'Y=Yes'
+     A                                      COLOR(BLU)
+     A                                 13  8'Includes pick pty override . .'
+     A            F4IPPO         1A  B 13 41TEXT('Includes pick pty override')
+     A  52                                  DSPATR(PC)
+     A  52N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 13 51'Y=Yes'
+     A                                      COLOR(BLU)
+     A                                 14  8'Includes item number . . . . .'
+     A            F4ITEM        15A  B 14 41TEXT('Includes item number')
+     A  46                                  DSPATR(PC)
+     A  46N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 15  8'Includes order number  . . . .'
+     A            F4ORD#         8Y 0B 15 41TEXT('Includes order number')
+     A                                      EDTCDE(Z)
+     A  47                                  DSPATR(PC)
+     A  47N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 16  8'Includes P.O. number . . . . .'
+     A            F4PO#         22A  B 16 41TEXT('Includes P.O. number')
+     A  48                                  DSPATR(PC)
+     A  48N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 17  8'DC location  . . . . . . . . .'
+     A            F4DCLOC        4A  B 17 41TEXT('DC location')
+     A  49                                  DSPATR(PC)
+     A  49N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 17 51'WEST, ALDA, GI'
+     A                                      COLOR(BLU)
+     A                                 23  2'F4=Prompt   F5=Refresh   F12=Cance-
+     A                                      l   F14=Reset'
+     A                                      COLOR(BLU)
+     A          R DSPFMT5A
+     A*%%TS  SD  20180914  093556  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Complete shipment')
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                      CA03(03 'Exit')
+     A                                      CF04(04 'Prompt')
+     A                                      CF11(11 'Complete shipment')
+     A                                      CF20(20 'Complete shipment + hold f-
+     A                                      or BOL combine')
+     A  81                                  CF21(21 'Complete shipment - skip -
+     A                                      ShipSelect')
+     A                                      INDTXT(81 'ShipSelect available')
+     A                                      INDTXT(82 'Protect freight amount')
+     A                                      INDTXT(83 'Protect special charge -
+     A                                      amount')
+     A                                      RTNCSRLOC(&S@IRCD &S@IFLD)
+     A            S@IRCD        10A  H      TEXT('Input (cursor-position) recor-
+     A                                      d name')
+     A            S@IFLD        10A  H      TEXT('Input (cursor-position) field-
+     A                                       name')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 72TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A                                  2 32'Complete Shipment'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 70TEXT('Job name')
+     A                                  4  2'Press F11 to complete shipment.'
+     A                                      COLOR(BLU)
+     A                                  6  8'Shipment group number  . . . :'
+     A            F5GRP#X   R    9A  O  6 41REFFLD(GCGRP#)
+     A                                      OVRDTA
+     A                                  7  8'Priority . . . . . . . . . . :'
+     A            F5CPTYX   R    3A  O  7 41REFFLD(GCCPTY)
+     A                                      OVRDTA
+     A                                  8  8'Bill-to customer . . . . . . :'
+     A            F5BLTOX   R   35A  O  8 41REFFLD(GCBLTO)
+     A                                      OVRDTA
+     A                                  9  8'Ship-to customer . . . . . . :'
+     A            F5SHTOX   R   35A  O  9 41REFFLD(GCSHTO)
+     A                                      OVRDTA
+     A                                 10  8'Drop ship  . . . . . . . . . :'
+     A            F5DSHPX   R   39A  O 10 41REFFLD(GCDSHP)
+     A                                      OVRDTA
+     A                                 11  8'Ship-to zip code . . . . . . :'
+     A            F5STZP    R        O 11 41REFFLD(GCSTZP)
+     A                                      OVRDTA
+     A                                 12  8'Ship via . . . . . . . . . . .'
+     A            F5SHPV    R        B 12 41REFFLD(GCSHPV)
+     A  41                                  DSPATR(PC)
+     A  41N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 12 44'+'
+     A            F5SVDS    R        O 12 46REFFLD(GCSVDS)
+     A                                      OVRDTA
+     A                                 13  8'Freight terms  . . . . . . . :'
+     A            F5FTRM    R        O 13 41REFFLD(GCFTRM)
+     A                                      OVRDTA
+     A                                 14  8'Freight charge . . . . . . . .'
+     A            F5FRTA    R     Y  B 14 41REFFLD(GCFRTA)
+     A                                      EDTCDE(J)
+     A                                      CHGINPDFT
+     A N82                                  DSPATR(UL)
+     A  82                                  DSPATR(PR)
+     A  42N82                               DSPATR(PC)
+     A  42N82N89                            DSPATR(RI)
+     A                                      OVRDTA
+     A                                 15  8'Special charge . . . . . . . .'
+     A            F5CHGA    R     Y  B 15 41REFFLD(GCCHGA)
+     A                                      EDTCDE(J)
+     A                                      CHGINPDFT
+     A N83                                  DSPATR(UL)
+     A  83                                  DSPATR(PR)
+     A  43N83                               DSPATR(PC)
+     A  43N83N89                            DSPATR(RI)
+     A                                      OVRDTA
+     A                                 16  8'Freight zone . . . . . . . . :'
+     A            F5FRZN    R        O 16 41REFFLD(GCFRZN)
+     A                                      OVRDTA
+     A                                 17  8'Item count . . . . . . . . . :'
+     A            F5ITCT    R        O 17 41REFFLD(GCITCT)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 18  8'Total weight . . . . . . . . :'
+     A            F5SHWT    R        O 18 41REFFLD(GCSHWT)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 19  8'Pallet count . . . . . . . . .'
+     A            F5PLTS         5Y 0B 19 41TEXT('Shipment pallet count')
+     A                                      EDTCDE(J)
+     A  44                                  DSPATR(PC)
+     A  44N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 20  8'Tracking number  . . . . . . .'
+     A            F5TRK#        30A  B 20 41TEXT('Tracking number')
+     A  45                                  DSPATR(PC)
+     A  45N89                               DSPATR(RI)
+     A                                      OVRDTA
+     A                                 22  2'F3=Exit   F4=Prompt   F11=Complete-
+     A                                       shipment   F12=Cancel'
+     A                                      COLOR(BLU)
+     A  81                             23  2'F20=Complete - Hold for B-
+     A                                      OL combination   F21=Complete - -
+     A                                      Skip ShipSelect'
+     A                                      COLOR(BLU)
+     A N81                             23  2'F20=Complete - Hold for B-
+     A                                      OL combination'
+     A                                      COLOR(BLU)
+     A          R DSPFMT6A
+     A*%%TS  SD  20180619  145405  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Place shipment on intransit h-
+     A                                      old')
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                      CA03(03 'Exit')
+     A                                      CF11(11 'Place shipment on intransi-
+     A                                      t hold')
+     A  21                                  CF21(21 'F11 and Ignore not fully +
+     A                                      palletized')
+     A            F6FRZN    R        H      REFFLD(GCFRZN)
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            F1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            F1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 72TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A                                  2 25'Place Shipment On Intransit Hold'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 70TEXT('Job name')
+     A                                  4  8'Shipment group number  . . . :'
+     A            F6GRP#X   R    9A  O  4 41REFFLD(GCGRP#)
+     A                                      OVRDTA
+     A                                  5  8'Priority . . . . . . . . . . :'
+     A            F6CPTYX   R    3A  O  5 41REFFLD(GCCPTY)
+     A                                      OVRDTA
+     A                                  6  8'Bill-to customer . . . . . . :'
+     A            F6BLTOX   R   35A  O  6 41REFFLD(GCBLTO)
+     A                                      OVRDTA
+     A                                  7  8'Ship-to customer . . . . . . :'
+     A            F6SHTOX   R   35A  O  7 41REFFLD(GCSHTO)
+     A                                      OVRDTA
+     A                                  8  8'Drop ship  . . . . . . . . . :'
+     A            F6DSHPX   R   39A  O  8 41REFFLD(GCDSHP)
+     A                                      OVRDTA
+     A                                  9  8'Ship-to zip code . . . . . . :'
+     A            F6STZP    R        O  9 41REFFLD(GCSTZP)
+     A                                      OVRDTA
+     A                                 10  8'Ship via . . . . . . . . . . :'
+     A            F6SHPV    R        O 10 41REFFLD(GCSHPV)
+     A                                      OVRDTA
+     A            F6SVDS    R        O 10 45REFFLD(GCSVDS)
+     A                                      OVRDTA
+     A                                 11  8'PRO number . . . . . . . . . :'
+     A            F6PRO#    R        O 11 41REFFLD(GCPRO#)
+     A                                      OVRDTA
+     A****                             11  8'Freight zone . . . . . . . . :'
+     A****        F6FRZN    R        O 11 41REFFLD(GCFRZN)
+     A****                                  OVRDTA
+     A                                 12  8'Item count . . . . . . . . . :'
+     A            F6ITCT    R        O 12 41REFFLD(GCITCT)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 13  8'Total weight . . . . . . . . :'
+     A            F6SHWT    R        O 13 41REFFLD(GCSHWT)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 14  8'Created timestamp  . . . . . :'
+     A            F6TSTP1   R        O 14 41REFFLD(GCTSTP1)
+     A                                      OVRDTA
+     A                                 15  8'Shipment completed timestamp :'
+     A            F6TSTP2   R   26A  O 15 41REFFLD(GCTSTP2)
+     A                                      OVRDTA
+     A                                 21  2'Press F11 to place shipment on int-
+     A                                      ransit hold.'
+     A                                      COLOR(BLU)
+     A                                 23  2'F3=Exit   F11=Intransit hold   F12-
+     A                                      =Cancel'
+     A                                      COLOR(BLU)
+     A          R WINDOW03B
+     A*%%TS  SD  20181010  174159  BEARL       REL-V7R3M0  5770-WDS
+     A  90                                  ALARM
+     A                                      WINDOW(9 26 8 50)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR RI)-
+     A                                       (*CHAR '        '))
+     A                                  2 15'Employee Number Prompt'
+     A                                      DSPATR(HI)
+     A                                  4  2'Scan or enter employee no.'
+     A            W3EMPL         5Y 0B  4 31TEXT('Employee number')
+     A                                      EDTCDE(Z)
+     A                                      CHECK(ER)
+     A  41                                  DSPATR(PC)
+     A  41N89                               DSPATR(RI)
+     A  90        W3MSG         48A  O  6  2TEXT('User message')
+     A                                      DSPATR(RI)
+     A                                  7  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R WINDOW05B
+     A*%%TS  SD  19981216  093928  BEARL       REL-V4R2M0  5769-PW1
+     A                                      TEXT('Generic window')
+     A                                      WINDOW(8 24 13 50)
+     A                                      WDWBORDER((*COLOR BLU))
+     A                                      BLINK
+     A  11                                  CF11(11 'Continue')
+     A                                      ALARM
+     A            W5HDG1        48A  O  1  2TEXT('Window heading')
+     A                                      DSPATR(HI)
+     A            W5TEXT1       48A  O  3  2TEXT('Text line 1')
+     A            W5TEXT2       48A  O  4  2TEXT('Text line 2')
+     A            W5TEXT3       48A  O  5  2TEXT('Text line 3')
+     A            W5TEXT4       48A  O  6  2TEXT('Text line 4')
+     A            W5TEXT5       48A  O  7  2TEXT('Text line 5')
+     A            W5TEXT6       48A  O  8  2TEXT('Text line 6')
+     A            W5TEXT7       48A  O  9  2TEXT('Text line 7')
+     A                                 11  2'Continue?  . . . . . . . . . . . +
+     A                                      . .'
+     A            W5CONT         1A  B 11 41TEXT('Continue (Y)')
+     A            W5FKEY        48A  O 12  2TEXT('Window function keys')
+     A                                      COLOR(BLU)
+     A          R DSPBLANKB
+     A*%%TS  SD  19920217  162710  BEARL       REL-V2R1M0  5738-PW1
+     A                                      ASSUME
+     A                                  1  2' '
+     A          R MSF01B                    SFL
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLMSGRCD(24)
+     A                                      TEXT('Subfile Message Record')
+     A            S@MSKY                    SFLMSGKEY
+     A            S@PGMQ                    SFLPGMQ
+     A          R MSFCTL01B                 SFLCTL(MSF01B)
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLSIZ(0005)
+     A                                      SFLPAG(0001)
+     A                                      TEXT('Subfile Message Control Recor-
+     A                                      d')
+     A  93                                  PUTOVR
+     A                                      SFLDSP
+     A                                      SFLINZ
+     A N39                                  SFLEND
+     A            S@PGMQ                    SFLPGMQ

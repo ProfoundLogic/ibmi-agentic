@@ -1,0 +1,282 @@
+     A*%%TS  SD  20230317  070346  GHOPWOOD    REL-V7R3M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(24 80 *DS3                  -
+     A                                             27 132 *DS4)
+     A                                      PRINT
+     A                                      VLDCMDKEY(25 'Any Cmd Key')
+     A                                      CA12(12 'Cancel')
+     A          R SFL01                     SFL
+     A*%%TS  SD  20180621  110430  BEARL       REL-V3R7M0  5716-PW1
+     A                                      TEXT('Manual ship')
+     A  29                                  SFLNXTCHG
+     A            S1SELC         1A  B 15  3
+     A  41                                  DSPATR(PC)
+     A  42                                  DSPATR(RI)
+     A            S1LOT     R        O 15  8REFFLD(ISLOT HDITSL)
+     A            S1LOT2    R        H      REFFLD(ISLOT HDITSL)
+     A            S1SLOC        17A  O 15 24TEXT('Stock location')
+     A            S1AVAL    R   -5 -4O 15 42REFFLD(ISQOH HDITSL)
+     A                                      EDTCDE(J)
+     A          R SFLCTL01                  SFLCTL(SFL01)
+     A*%%TS  SD  20180621  145104  BEARL       REL-V7R3M0  5770-WDS
+     A                                      SFLSIZ(0015)
+     A                                      SFLPAG(0008)
+     A                                      TEXT('Manual ship')
+     A                                      DSPMOD(*DS3)
+     A  40                                  ALARM
+     A                                      BLINK
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A  26                                  SFLDSP
+     A  27                                  SFLDSPCTL
+     A  28                                  SFLCLR
+     A  30                                  SFLEND
+     A                                      CA03(03 'Exit')
+     A                                      INDTXT(81 '*ON-Allow lot number +
+     A                                       entry')
+     A  99        C1RESET       78   M      TEXT('Press the Reset key to contin-
+     A                                      ue.')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            C1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            C1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 72TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A                                  2 35'Manual Ship'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 70TEXT('Job name')
+     A                                  4  2'Type or scan quantity and item.'
+     A                                      COLOR(BLU)
+     A                                  6  8'Shipment group number  . . . :'
+     A            C1GRP#X   R    9A  O  6 41REFFLD(GCGRP# HYPSGCU)
+     A                                      OVRDTA
+     A                                  7  8'Ship-to  . . . . . . . . . . :'
+     A            C1SHTOX   R   39A  O  7 41REFFLD(GCSHTO HYPSGCU)
+     A                                      OVRDTA
+     A                                  8  8'Order number . . . . . . . . :'
+     A            C1ORD#X   R    8A  O  8 41REFFLD(GDORD# HYPSGDT)
+     A                                      OVRDTA
+     A                                  9  8'Item number  . . . . . . . . :'
+     A            C1ITEM    R        O  9 41REFFLD(ODITEM OEORDT)
+     A                                      OVRDTA
+     A****                             10  8'Picked from location . . . . :'
+     A            C1SLOCH       30A  O 10  8TEXT('Stock location heading')
+     A                                      OVRDTA
+     A            C1SLOC        17A  O 10 41TEXT('Stock location')
+     A                                      OVRDTA
+     A                                 11  8'Ship qty . . . . . . . . . . .'
+     A            C1QSTC    R    9 -4B 11 41REFFLD(ODQSTC OEORDT)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A  61                                  DSPATR(RI)
+     A  61                                  DSPATR(PC)
+     A                                 12  8'Lot number . . . . . . . . . .'
+     A N81                                  DSPATR(ND)
+     A            C1LOT     R        B 12 41REFFLD(SQLOTN HDSHQT)
+     A N81                                  DSPATR(ND)
+     A N81                                  DSPATR(PR)
+     A  63                                  DSPATR(RI)
+     A  64                                  DSPATR(PC)
+     A                                      OVRDTA
+     A                                      CHECK(ER)
+     A                                 13  2'                                  -
+     A                                                                         -
+     A                                               '
+     A                                      DSPATR(UL)
+     A                                      DSPATR(HI)
+     A N26                                  DSPATR(ND)
+     A                                      OVRATR
+     A                                 14  2' X    Lot Number      Location    -
+     A                                             Qty Avail                   -
+     A                                               '
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A N26                                  DSPATR(ND)
+     A                                      OVRATR
+     A          R SFLCMD01
+     A*%%TS  SD  20180620  095311  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Manual ship')
+     A                                      DSPMOD(*DS3)
+     A  40                                  ALARM
+     A                                      LOCK
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R SFL02                     SFL
+     A*%%TS  SD  20180621  132308  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Lot entry')
+     A  29                                  SFLNXTCHG
+     A            S1SELC         1A  B 16  3
+     A  41                                  DSPATR(PC)
+     A  42                                  DSPATR(RI)
+     A            S2LOT     R        O 16  8REFFLD(ISLOT HDITSL)
+     A            S2LOT2    R        H      REFFLD(ISLOT HDITSL)
+     A            S2SLOC        17A  O 16 24TEXT('Stock location')
+     A            S2AVAL    R   -5 -4O 16 42REFFLD(ISQOH HDITSL)
+     A                                      EDTCDE(J)
+     A          R SFLCTL02                  SFLCTL(SFL02)
+     A*%%TS  SD  20180621  132308  BEARL       REL-V7R3M0  5770-WDS
+     A                                      SFLSIZ(0015)
+     A                                      SFLPAG(0007)
+     A                                      TEXT('Lot entry')
+     A                                      DSPMOD(*DS3)
+     A  40                                  ALARM
+     A                                      BLINK
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A  26                                  SFLDSP
+     A  27                                  SFLDSPCTL
+     A  28                                  SFLCLR
+     A  30                                  SFLEND
+     A                                      CA03(03 'Exit')
+     A  99        C1RESET       78   M      TEXT('Press the Reset key to contin-
+     A                                      ue.')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            C1ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            C1HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 72TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A                                  2 36'Lot Entry'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 70TEXT('Job name')
+     A                                  4  2'Type or scan lot number and quanti-
+     A                                      ty.'
+     A                                      COLOR(BLU)
+     A                                  6  8'Shipment group number  . . . :'
+     A            C2GRP#X   R    9A  O  6 41REFFLD(GCGRP# HYPSGCU)
+     A                                      OVRDTA
+     A                                  7  8'Ship-to  . . . . . . . . . . :'
+     A            C2SHTOX   R   39A  O  7 41REFFLD(GCSHTO HYPSGCU)
+     A                                      OVRDTA
+     A                                  8  8'Order number . . . . . . . . :'
+     A            C2ORD#X   R    8A  O  8 41REFFLD(GDORD# HYPSGDT)
+     A                                      OVRDTA
+     A                                  9  8'Item number  . . . . . . . . :'
+     A            C2ITEM    R        O  9 41REFFLD(ODITEM OEORDT)
+     A                                      OVRDTA
+     A****                             10  8'Picked from location . . . . :'
+     A            C2SLOCH       30A  O 10  8TEXT('Stock location heading')
+     A                                      OVRDTA
+     A            C2SLOC        17A  O 10 41TEXT('Stock location')
+     A                                      OVRDTA
+     A                                 11  8'Shipped qty  . . . . . . . . :'
+     A            C2QSTC    R    9 -4O 11 41REFFLD(ODQSTC OEORDT)
+     A                                      EDTCDE(J)
+     A                                      OVRDTA
+     A                                 12  8'Lot qty  . . . . . . . . . . .'
+     A            C2LQTY    R    9 -4B 12 41REFFLD(SQLQTY HDSHQT)
+     A                                      EDTCDE(K)
+     A                                      OVRDTA
+     A  61                                  DSPATR(RI)
+     A  61                                  DSPATR(PC)
+     A                                 13  8'Lot number . . . . . . . . . .'
+     A            C2LOT     R        B 13 41REFFLD(SQLOTN HDSHQT)
+     A                                      DSPATR(PC)
+     A  63                                  DSPATR(RI)
+     A                                      OVRDTA
+     A                                      CHECK(ER)
+     A                                 14  2'                                  -
+     A                                                                         -
+     A                                               '
+     A                                      DSPATR(UL)
+     A                                      DSPATR(HI)
+     A N26                                  DSPATR(ND)
+     A                                      OVRATR
+     A                                 15  2' X    Lot Number      Location    -
+     A                                             Qty Avail                   -
+     A                                               '
+     A                                      DSPATR(HI)
+     A                                      DSPATR(UL)
+     A N26                                  DSPATR(ND)
+     A                                      OVRATR
+     A          R SFLCMD02
+     A*%%TS  SD  20180621  132308  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Lot entry')
+     A                                      DSPMOD(*DS3)
+     A  40                                  ALARM
+     A                                      LOCK
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                 23  2'F3=Exit   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R DSPBLANKB
+     A*%%TS  SD  19920217  162710  BEARL       REL-V2R1M0  5738-PW1
+     A                                      DSPMOD(*DS3)
+     A                                      ASSUME
+     A                                  1  2' '
+     A          R MSF01A                    SFL
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLMSGRCD(24)
+     A                                      TEXT('Subfile Message Record')
+     A            S@MSKY                    SFLMSGKEY
+     A            S@PGMQ                    SFLPGMQ
+     A          R MSFCTL01A                 SFLCTL(MSF01A)
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLSIZ(0005)
+     A                                      SFLPAG(0001)
+     A                                      TEXT('Subfile Message Control Recor-
+     A                                      d')
+     A                                      DSPMOD(*DS3)
+     A  93                                  PUTOVR
+     A                                      SFLDSP
+     A                                      SFLINZ
+     A N39                                  SFLEND
+     A            S@PGMQ                    SFLPGMQ
+     A          R SCRN3
+     A*%%TS  SD  20221222  090009  GHOPWOOD    REL-V7R3M0  5770-WDS
+     A                                      TEXT('Scan Shipments')
+     A                                      DSPMOD(*DS3)
+     A                                      CA03(03 'Exit')
+     A                                      CA11(11 'Back')
+     A                                      CF15(15 'Change Default')
+     A                                      OVERLAY
+     A  40                                  ALARM
+     A                                      CLRL(21)
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            C3ENV          6A  O  1 13TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            C3HDG1        40A  O  1 21TEXT('Heading 1')
+     A                                      DSPATR(HI)
+     A                                  1 63DATE
+     A                                      EDTCDE(Y)
+     A                                  1 72TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A                                  2 35'Manual Ship'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2 70TEXT('Job name')
+     A                                  4  2'Type or scan quantity and item.'
+     A                                      COLOR(BLU)
+     A                                  6  5'Shipment group number  . . . :'
+     A            C3GRP#X   R    9A  O  6 38REFFLD(GCGRP# HYPSGCU)
+     A                                  7  5'Ship-to  . . . . . . . . . . :'
+     A            C3SHTOX   R   39A  O  7 38REFFLD(GCSHTO HYPSGCU)
+     A                                  9  5'Ship qty . . . . . . . . . . :'
+     A            C3QSTC    R    9 -4B  9 38REFFLD(ODQSTC OEORDT)
+     A  61                                  DSPATR(RI)
+     A  61                                  DSPATR(PC)
+     A                                 10  5'Item no. or UPC  . . . . . . :'
+     A            C3SCAN    R        B 10 38REFFLD(ODITEM OEORDT)
+     A                                      CHECK(ER)
+     A  62                                  DSPATR(RI)
+     A N61                                  DSPATR(PC)
+     A                                 11  5'Item Description . . . . . . :'
+     A            C3ITMD        39   O 11 38
+     A                                  9 52'(F15 to change default)'
+     A                                      COLOR(BLU)
+     A          R SCRN3CMD
+     A*%%TS  SD  20230317  070346  GHOPWOOD    REL-V7R3M0  5770-WDS
+     A                                      TEXT('Scan Shipments')
+     A                                      DSPMOD(*DS3)
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                 23  2'F3=Exit   F11=Back to Detail   F12-
+     A                                      =Cancel'
+     A                                      COLOR(BLU)

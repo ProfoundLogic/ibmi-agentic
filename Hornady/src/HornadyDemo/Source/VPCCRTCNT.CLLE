@@ -1,0 +1,71 @@
+/*****************************************************************/
+/** Author:  Kevin Blackmon                                     **/
+/** Company: Varsity Logistics, Inc.                            **/
+/** Date:    June 04, 2024                                      **/
+/** Purpose: Call The ShipSelect Interface after overriding the **/
+/** Purpose: Package Unit file                                  **/
+/*****************************************************************/
+/** Modification Log:                                           **/
+/** Mod#   Name         Date     Purpose                        **/
+/**                                                             **/
+/*****************************************************************/
+             PGM        PARM(&COMPANY &VARORDER &STATE &POSTALCODE +
+                          &COUNTRY &SHIPVIA &RTNCODE &PALLETCNT)
+
+             DCL        VAR(&COMPANY) TYPE(*CHAR) LEN(4)
+             DCL        VAR(&VARORDER) TYPE(*CHAR) LEN(20)
+             DCL        VAR(&STATE) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&POSTALCODE) TYPE(*CHAR) LEN(13)
+             DCL        VAR(&COUNTRY) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&SHIPVIA) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&RTNCODE) TYPE(*CHAR) LEN(2)
+             DCL        VAR(&PALLETCNT) TYPE(*DEC) LEN(4 0)
+             DCL        VAR(&WKLIB) TYPE(*CHAR) LEN(10)
+
+             RTVOBJD OBJ(PKGUNT) OBJTYPE(*FILE) RTNLIB(&WKLIB)
+
+             CRTDUPOBJ  OBJ(PKGUNT) FROMLIB(&WKLIB) OBJTYPE(*FILE) +
+                          TOLIB(QTEMP) DATA(*YES) FILEID(*YES)
+             MONMSG     MSGID(CPF0000)
+
+             CRTDUPOBJ  OBJ(PKGUNTL1) FROMLIB(&WKLIB) OBJTYPE(*FILE) +
+                          TOLIB(QTEMP) DATA(*YES) FILEID(*YES)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(PKGUNT) TOFILE(QTEMP/PKGUNT) +
+                          SECURE(*YES) OVRSCOPE(*JOB) SHARE(*YES) +
+                          OPNSCOPE(*JOB)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(PKGUNTL1) TOFILE(QTEMP/PKGUNTL1) +
+                          SECURE(*YES) OVRSCOPE(*JOB) SHARE(*YES) +
+                          OPNSCOPE(*JOB)
+             MONMSG     MSGID(CPF0000)
+
+             RTVOBJD OBJ(VPCNTR) OBJTYPE(*FILE) RTNLIB(&WKLIB)
+
+             CRTDUPOBJ  OBJ(VPCNTR) FROMLIB(&WKLIB) OBJTYPE(*FILE) +
+                          TOLIB(QTEMP) DATA(*YES) FILEID(*YES)
+             MONMSG     MSGID(CPF0000)
+
+             OVRDBF     FILE(VPCNTR) TOFILE(QTEMP/VPCNTR) +
+                          SECURE(*YES) OVRSCOPE(*JOB) SHARE(*YES) +
+                          OPNSCOPE(*JOB)
+             MONMSG     MSGID(CPF0000)
+
+             CALL       PGM(VPRCRTCNT) PARM((&COMPANY) (&VARORDER) +
+                          (&STATE) (&POSTALCODE) (&COUNTRY) +
+                          (&SHIPVIA) (&RTNCODE) (&PALLETCNT))
+
+             DLTOVR     FILE(PKGUNTL1) LVL(*JOB)
+             DLTOVR     FILE(PKGUNT) LVL(*JOB)
+             DLTOVR     FILE(VPCNTR) LVL(*JOB)
+
+             DLTF       FILE(QTEMP/PKGUNTL1)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/PKGUNT)
+             MONMSG     MSGID(CPF0000)
+             DLTF       FILE(QTEMP/VPCNTR)
+             MONMSG     MSGID(CPF0000)
+
+             ENDPGM

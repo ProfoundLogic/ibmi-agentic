@@ -1,0 +1,474 @@
+     A*%%TS  SD  20220901  111243  BEARL       REL-V7R3M0  5770-WDS
+     A*%%EC
+     A                                      DSPSIZ(27 132 *DS4)
+     A                                      REF(*LIBL/HYPSGCU)
+     A                                      PRINT
+     A                                      VLDCMDKEY(25 'Any Cmd Key')
+     A                                      CA12(12 'Cancel')
+     A          R SFL01A                    SFL
+     A*%%TS  SD  20180619  125412  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Main subfile')
+     A  28                                  SFLNXTCHG
+     A            S1BTNM    R        H      REFFLD(GCBTNM)
+     A            S1DSHP    R        H      REFFLD(GCDSHP)
+     A            S1STNM    R        H      REFFLD(GCSTNM)
+     A            S1STZP    R        H      REFFLD(GCSTZP)
+     A            S1SVDS    R        H      REFFLD(GCSVDS)
+     A            S1FRZN    R        H      REFFLD(GCFRZN)
+     A            S1TSTP2   R        H      REFFLD(GCTSTP2)
+     A            S1OPT          2A  B 11  2TEXT('Option')
+     A  41                                  DSPATR(RI)
+     A  41                                  DSPATR(PC)
+     A            S1GRP#    R        O 11  7REFFLD(GCGRP#)
+     A            S1CPTY    R        O 11 17REFFLD(GCCPTY)
+     A                                      EDTCDE(Z)
+     A            S1BLTO    R        O 11 21REFFLD(GCBLTO)
+     A            S1SHTO    R        O 11 29REFFLD(GCSHTO)
+     A                                      EDTCDE(Z)
+     A            S1STNMX   R   27A  O 11 37REFFLD(GCSTNM)
+     A            S1SHPV    R        O 11 65REFFLD(GCSHPV)
+     A            S1LANE        10A  O 11 70TEXT('Packing Lane(s)')
+     A            S1ITCT    R        O 11 81REFFLD(GCITCT)
+     A                                      EDTCDE(J)
+     A            S1SHWT    R        O 11 89REFFLD(GCSHWT)
+     A                                      EDTCDE(J)
+     A            S1TSTP1   R        O 11 97REFFLD(GCTSTP1)
+     A            S1COMP         1A  O 11125TEXT('Completed - Y,b')
+     A            S1CMTS         1A  O 11130TEXT('Comments available - Y,b')
+     A                                      DSPATR(HI)
+     A          R SFLCTL01A                 SFLCTL(SFL01A)
+     A*%%TS  SD  20180620  090640  BEARL       REL-V7R3M0  5770-WDS
+     A                                      SFLSIZ(0014)
+     A                                      SFLPAG(0014)
+     A                                      TEXT('Main subfile control')
+     A                                      BLINK
+     A                                      PAGEUP(92 'Page Up')
+     A                                      PAGEDOWN(91 'Page Down')
+     A                                      HOME(94 'Home')
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A  07                                  CF07(07 'Include/exclude completed')
+     A                                      CF08(08 'Find shipment')
+     A  09                                  CF09(09 'Tote verify')
+     A                                      CF11(11 'Change view (to/from Histo-
+     A                                      ry)')
+     A                                      CF17(17 'Top')
+     A                                      CF18(18 'Bottom')
+     A                                      CF20(20 'Change subset filter')
+     A  22                                  CF22(22 'Change employee number')
+     A  24                                  CF24(24 'More keys')
+     A  40                                  ALARM
+     A                                      OVERLAY
+     A  27                                  SFLDSP
+     A N26                                  SFLDSPCTL
+     A  26                                  SFLCLR
+     A                                      RTNCSRLOC(&S@IRCD &S@IFLD)
+     A N94        S@RCNO         4S 0H      SFLRCDNBR(CURSOR)
+     A            S@IRCD        10A  H      TEXT('Input (cursor-position) recor-
+     A                                      d name')
+     A            S@IFLD        10A  H      TEXT('Input (cursor-position) field-
+     A                                       name')
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            C1ENV          6A  O  1 15TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A            C1SSTX         8A  O  1 24TEXT('Subset text')
+     A            C1HDG1        40A  O  1 47DSPATR(HI)
+     A****                              1 58'Shipment Processing'
+     A****                              1 56'Shipment Inquiry'
+     A                                  1114DATE
+     A                                      EDTCDE(Y)
+     A                                  1124TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A            C1ENAM        30A  O  2 15TEXT('Employee name')
+     A                                      DSPATR(HI)
+     A            C1HDG2        40A  O  2 47DSPATR(HI)
+     A            P@JOBN        10A  O  2122TEXT('Job name')
+     A                                  4  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A            C1OPTS       128A     5  4TEXT('Available options text')
+     A                                      COLOR(BLU)
+     A****                              5  4'2=Change   4=Delete   5=Display   -
+     A****                                  8=Detail   15=Palletize   17=Comple-
+     A****                                  te   18=Intransit hold'
+     A****                                  COLOR(BLU)
+     A                                  7  2'Position to . . .'
+     A                                      COLOR(BLU)
+     A            C1GRP#    R        B  8  7REFFLD(GCGRP#)
+     A  49                                  DSPATR(PC)
+     A            C1BLTO    R        B  8 21REFFLD(GCBLTO)
+     A            C1SHTO    R        B  8 29REFFLD(GCSHTO)
+     A            C1STNM    R        B  8 37REFFLD(GCSTNM)
+     A                                  9 22'BillTo'
+     A                                      DSPATR(HI)
+     A                                  9 30'ShipTo'
+     A                                      DSPATR(HI)
+     A                                  9 64'Ship'
+     A                                      DSPATR(HI)
+     A                                  9 70'Packing'
+     A                                      DSPATR(HI)
+     A                                  9 82'Item'
+     A                                      DSPATR(HI)
+     A                                  9 90'Total'
+     A                                      DSPATR(HI)
+     A                                 10  2'Opt'
+     A                                      DSPATR(HI)
+     A                                 10  7'Shipment#'
+     A                                      DSPATR(HI)
+     A                                 10 17'Pty'
+     A                                      DSPATR(HI)
+     A                                 10 22'Cust#'
+     A                                      DSPATR(HI)
+     A                                 10 30'Cust#'
+     A                                      DSPATR(HI)
+     A                                 10 37'Name'
+     A                                      DSPATR(HI)
+     A                                 10 64'Via'
+     A                                      DSPATR(HI)
+     A                                 10 70'Lane'
+     A                                      DSPATR(HI)
+     A                                 10 82'Count'
+     A                                      DSPATR(HI)
+     A                                 10 91'Wgt'
+     A                                      DSPATR(HI)
+     A                                 10 97'Create Timestamp'
+     A                                      DSPATR(HI)
+     A                                 10124'Comp'
+     A                                      DSPATR(HI)
+     A          R SFLNOR01
+     A*%%TS  SD  20100818  091206  BEARL       REL-V6R1M0  5761-WDS
+     A                                      TEXT('Main subfile - no rcds found')
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                 15  8'(No Shipment Groups to Display)'
+     A                                      COLOR(BLU)
+     A          R SFLCMD01
+     A*%%TS  SD  20100817  163746  BEARL       REL-V6R1M0  5761-WDS
+     A                                      TEXT('Main subfile - function key t-
+     A                                      ext')
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A            S@MORE         7A  O 25125DSPATR(HI)
+     A                                      OVRDTA
+     A****                             26  2'F3=Exit   F5=Refresh   F7=Include +
+     A****                                  completed   F11=History   +
+     A****                                  F12=Cancel   F17=Top   +
+     A****                                  F18=Bottom   F20=Subset'
+     A****                                  COLOR(BLU)
+     A            C1FKY1       130A  O 26  2COLOR(BLU)
+     A                                      OVRDTA
+     A          R SFL02A                    SFL
+     A*%%TS  SD  20140128  134255  MHAJNY      REL-V7R1M0  5770-WDS
+     A                                      TEXT('"Delete" subfile')
+     A                                      SFLNXTCHG
+     A            S1BTNM    R        H      REFFLD(GCBTNM)
+     A            S1DSHP    R        H      REFFLD(GCDSHP)
+     A            S1STNM    R        H      REFFLD(GCSTNM)
+     A            S1STZP    R        H      REFFLD(GCSTZP)
+     A            S1SVDS    R        H      REFFLD(GCSVDS)
+     A            S1FRZN    R        H      REFFLD(GCFRZN)
+     A            S1TSTP2   R        H      REFFLD(GCTSTP2)
+     A            S1OPT          2A  O  9  2TEXT('Option')
+     A            S1GRP#    R        O  9  7REFFLD(GCGRP#)
+     A            S1CPTY    R        O  9 17REFFLD(GCCPTY)
+     A                                      EDTCDE(Z)
+     A            S1BLTO    R        O  9 21REFFLD(GCBLTO)
+     A            S1SHTO    R        O  9 29REFFLD(GCSHTO)
+     A                                      EDTCDE(Z)
+     A            S1STNMX   R   27A  O  9 37REFFLD(GCSTNM)
+     A            S1SHPV    R        O  9 65REFFLD(GCSHPV)
+     A            S1LANE        10A  O  9 70TEXT('Packing Lane(s)')
+     A            S1ITCT    R        O  9 81REFFLD(GCITCT)
+     A                                      EDTCDE(J)
+     A            S1SHWT    R        O  9 89REFFLD(GCSHWT)
+     A                                      EDTCDE(J)
+     A            S1TSTP1   R        O  9 97REFFLD(GCTSTP1)
+     A            S1COMP         1A  O  9125TEXT('Completed - Y,b')
+     A            S1CMTS         1A  O  9130TEXT('Comments available - Y,b')
+     A                                      DSPATR(HI)
+     A          R SFLCTL02A                 SFLCTL(SFL02A)
+     A*%%TS  SD  20140128  134255  MHAJNY      REL-V7R1M0  5770-WDS
+     A                                      SFLSIZ(0014)
+     A                                      SFLPAG(0014)
+     A                                      TEXT('"Delete" subfile control')
+     A                                      BLINK
+     A                                      OVERLAY
+     A N29                                  SFLDSP
+     A N29                                  SFLDSPCTL
+     A  29                                  SFLCLR
+     A N39                                  SFLEND
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            C1ENV          6A  O  1 15TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A                                  1 58'Shipment Processing'
+     A                                      DSPATR(HI)
+     A                                  1114DATE
+     A                                      EDTCDE(Y)
+     A                                  1124TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A            C1ENAM        30A  O  2 15TEXT('Employee name')
+     A                                      DSPATR(HI)
+     A                                  2 50'Shipment Group Delete Confirmation'
+     A                                      DSPATR(HI)
+     A            P@JOBN        10A  O  2122TEXT('Job name')
+     A                                  4  2'Press Enter to confirm your choice-
+     A                                      s for 4=Delete.'
+     A                                      COLOR(BLU)
+     A                                  5  2'Press F12 to return to change your-
+     A                                       choices.'
+     A                                      COLOR(BLU)
+     A                                  7 22'BillTo'
+     A                                      DSPATR(HI)
+     A                                  7 30'ShipTo'
+     A                                      DSPATR(HI)
+     A                                  7 64'Ship'
+     A                                      DSPATR(HI)
+     A                                  7 70'Packing'
+     A                                      DSPATR(HI)
+     A                                  7 82'Item'
+     A                                      DSPATR(HI)
+     A                                  7 90'Total'
+     A                                      DSPATR(HI)
+     A                                  8  2'Opt'
+     A                                      DSPATR(HI)
+     A                                  8  7'Shipment#'
+     A                                      DSPATR(HI)
+     A                                  8 17'Pty'
+     A                                      DSPATR(HI)
+     A                                  8 22'Cust#'
+     A                                      DSPATR(HI)
+     A                                  8 30'Cust#'
+     A                                      DSPATR(HI)
+     A                                  8 37'Name'
+     A                                      DSPATR(HI)
+     A                                  8 64'Via'
+     A                                      DSPATR(HI)
+     A                                  8 70'Lane'
+     A                                      DSPATR(HI)
+     A                                  8 82'Count'
+     A                                      DSPATR(HI)
+     A                                  8 91'Wgt'
+     A                                      DSPATR(HI)
+     A                                  8 97'Create Timestamp'
+     A                                      DSPATR(HI)
+     A                                  8124'Comp'
+     A                                      DSPATR(HI)
+     A          R SFLCMD02
+     A*%%TS  SD  20100818  090618  BEARL       REL-V6R1M0  5761-WDS
+     A                                      TEXT('Main subfile - function key t-
+     A                                      ext')
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A            S@MORE         7A  O 25125DSPATR(HI)
+     A                                      OVRDTA
+     A                                 26  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R SFL03A                    SFL
+     A*%%TS  SD  20220901  111243  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Shipment selection subfile')
+     A                                      SFLNXTCHG
+     A            S1BTNM    R        H      REFFLD(GCBTNM)
+     A            S1DSHP    R        H      REFFLD(GCDSHP)
+     A            S1STNM    R        H      REFFLD(GCSTNM)
+     A            S1STZP    R        H      REFFLD(GCSTZP)
+     A            S1SVDS    R        H      REFFLD(GCSVDS)
+     A            S1FRZN    R        H      REFFLD(GCFRZN)
+     A            S1TSTP2   R        H      REFFLD(GCTSTP2)
+     A            S1OPT          2A  B  9  2TEXT('Option')
+     A  41                                  DSPATR(RI)
+     A  41                                  DSPATR(PC)
+     A            S1GRP#    R        O  9  7REFFLD(GCGRP#)
+     A            S1CPTY    R        O  9 17REFFLD(GCCPTY)
+     A                                      EDTCDE(Z)
+     A            S1BLTO    R        O  9 21REFFLD(GCBLTO)
+     A            S1SHTO    R        O  9 29REFFLD(GCSHTO)
+     A                                      EDTCDE(Z)
+     A            S1STNMX   R   27A  O  9 37REFFLD(GCSTNM)
+     A            S1SHPV    R        O  9 65REFFLD(GCSHPV)
+     A            S1LANE        10A  O  9 70TEXT('Packing Lane(s)')
+     A            S1ITCT    R        O  9 81REFFLD(GCITCT)
+     A                                      EDTCDE(J)
+     A            S1SHWT    R        O  9 89REFFLD(GCSHWT)
+     A                                      EDTCDE(J)
+     A            S1TSTP1   R        O  9 97REFFLD(GCTSTP1)
+     A            S1COMP         1A  O  9125TEXT('Completed - Y,b')
+     A          R SFLCTL03A                 SFLCTL(SFL03A)
+     A*%%TS  SD  20220901  111243  BEARL       REL-V7R3M0  5770-WDS
+     A                                      SFLSIZ(0032)
+     A                                      SFLPAG(0016)
+     A                                      TEXT('Shipment selection subfile +
+     A                                      control')
+     A                                      BLINK
+     A                                      OVERLAY
+     A N29                                  SFLDSP
+     A N29                                  SFLDSPCTL
+     A  29                                  SFLCLR
+     A N39                                  SFLEND
+     A  40                                  ALARM
+     A            P@PGNM        10A  O  1  2TEXT('Program name')
+     A            C1ENV          6A  O  1 15TEXT('Environment (*blank, "*TEST*"-
+     A                                      )')
+     A                                  1 58'Shipment Processing'
+     A                                      DSPATR(HI)
+     A                                  1114DATE
+     A                                      EDTCDE(Y)
+     A                                  1124TIME
+     A            P@USER        10A  O  2  2TEXT('User ID')
+     A            C1ENAM        30A  O  2 15TEXT('Employee name')
+     A                                      DSPATR(HI)
+     A            C1HDG3        40A  O  2 47TEXT('Shipment selection heading')
+     A                                      DSPATR(HI)
+     A****                              2 47'Shipment Group Selection - Tote TL-
+     A****                                  99001'
+     A            P@JOBN        10A  O  2122TEXT('Job name')
+     A                                  4  2'Type options, press Enter.'
+     A                                      COLOR(BLU)
+     A                                  5  4'1=Select'
+     A                                      COLOR(BLU)
+     A                                  7 22'BillTo'
+     A                                      DSPATR(HI)
+     A                                  7 30'ShipTo'
+     A                                      DSPATR(HI)
+     A                                  7 64'Ship'
+     A                                      DSPATR(HI)
+     A                                  7 70'Packing'
+     A                                      DSPATR(HI)
+     A                                  7 82'Item'
+     A                                      DSPATR(HI)
+     A                                  7 90'Total'
+     A                                      DSPATR(HI)
+     A                                  8  2'Opt'
+     A                                      DSPATR(HI)
+     A                                  8  7'Shipment#'
+     A                                      DSPATR(HI)
+     A                                  8 17'Pty'
+     A                                      DSPATR(HI)
+     A                                  8 22'Cust#'
+     A                                      DSPATR(HI)
+     A                                  8 30'Cust#'
+     A                                      DSPATR(HI)
+     A                                  8 37'Name'
+     A                                      DSPATR(HI)
+     A                                  8 64'Via'
+     A                                      DSPATR(HI)
+     A                                  8 70'Lane'
+     A                                      DSPATR(HI)
+     A                                  8 82'Count'
+     A                                      DSPATR(HI)
+     A                                  8 91'Wgt'
+     A                                      DSPATR(HI)
+     A                                  8 97'Create Timestamp'
+     A                                      DSPATR(HI)
+     A                                  8124'Comp'
+     A                                      DSPATR(HI)
+     A          R SFLCMD03
+     A*%%TS  SD  20220901  111243  BEARL       REL-V7R3M0  5770-WDS
+     A                                      TEXT('Shipment selection subfile +
+     A                                      function key text')
+     A                                      OVERLAY
+     A  93                                  PUTOVR
+     A                                 26  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R WINDOW01
+     A*%%TS  SD  20180619  091309  BEARL       REL-V7R3M0  5770-WDS
+     A                                      WINDOW(9 27 12 52)
+     A  90                                  ALARM
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR RI)-
+     A                                       (*CHAR '        '))
+     A                                  2 17'History View Prompt'
+     A                                      DSPATR(HI)
+     A                                  4  2'History view . . . . . . .'
+     A            W1HIST         2Y 0B  4 31TEXT('History view selection')
+     A                                      SNGCHCFLD((*NUMROW 3) (*GUTTER 4))
+     A                                      CHOICE(1 '>a) Yesterday')
+     A                                      CHOICE(2 '>b) Last 7 days')
+     A                                      CHOICE(3 '>c) Date range')
+     A  41                                  DSPATR(PC)
+     A  41N89                               DSPATR(RI)
+     A                                  8  2'History date range . . . .'
+     A            W1FRDT1        6Y00B  8 31TEXT('From date')
+     A                                      EDTWRD('  /  /  ')
+     A  42                                  DSPATR(PC)
+     A  42N89                               DSPATR(RI)
+     A                                  8 40'to'
+     A            W1TODT2        6Y00B  8 43TEXT('Thru date')
+     A                                      EDTWRD('  /  /  ')
+     A  43                                  DSPATR(PC)
+     A  43N89                               DSPATR(RI)
+     A  90        W1MSG         50A  O 10  2TEXT('User message')
+     A                                      DSPATR(RI)
+     A                                 11  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R WINDOW02
+     A*%%TS  SD  20181010  174159  BEARL       REL-V7R3M0  5770-WDS
+     A  90                                  ALARM
+     A                                      WINDOW(9 27 8 52)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR RI)-
+     A                                       (*CHAR '        '))
+     A                                  2 17'Find Shipment Prompt'
+     A                                      DSPATR(HI)
+     A                                  4  2'Scan or enter barcode  . .'
+     A            W2SCAN        20A  B  4 31TEXT('Carton or tote barcode')
+     A                                      CHECK(ER)
+     A  41                                  DSPATR(PC)
+     A  41N89                               DSPATR(RI)
+     A  90        W2MSG         50A  O  6  2TEXT('User message')
+     A                                      DSPATR(RI)
+     A                                  7  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R WINDOW03
+     A*%%TS  SD  20181010  174159  BEARL       REL-V7R3M0  5770-WDS
+     A  90                                  ALARM
+     A                                      WINDOW(9 68 8 50)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR RI)-
+     A                                       (*CHAR '        '))
+     A                                  2 15'Employee Number Prompt'
+     A                                      DSPATR(HI)
+     A                                  4  2'Scan or enter employee no.'
+     A            W3EMPL         5Y 0B  4 31TEXT('Employee number')
+     A                                      EDTCDE(Z)
+     A                                      CHECK(ER)
+     A  41                                  DSPATR(PC)
+     A  41N89                               DSPATR(RI)
+     A  90        W3MSG         48A  O  6  2TEXT('User message')
+     A                                      DSPATR(RI)
+     A                                  7  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R WINDOW04
+     A*%%TS  SD  20181010  174159  BEARL       REL-V7R3M0  5770-WDS
+     A  90                                  ALARM
+     A                                      WINDOW(9 37 8 42)
+     A                                      WDWBORDER((*COLOR BLU) (*DSPATR RI)-
+     A                                       (*CHAR '        '))
+     A                                  2 13'Tote Verify Prompt'
+     A                                      DSPATR(HI)
+     A                                  4  2'Scan or enter tote ID  . .'
+     A            W4SCAN        10A  B  4 31TEXT('Tote ID')
+     A                                      CHECK(ER)
+     A  41                                  DSPATR(PC)
+     A  41N89                               DSPATR(RI)
+     A  90        W4MSG         40A  O  6  2TEXT('User message')
+     A                                      DSPATR(RI)
+     A                                  7  2'F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R DSPBLANKA
+     A*%%TS  SD  19920217  162710  BEARL       REL-V2R1M0  5738-PW1
+     A                                      KEEP
+     A                                      ASSUME
+     A                                  1  2' '
+     A          R MSF01A                    SFL
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLMSGRCD(27)
+     A                                      TEXT('Subfile Message Record')
+     A            S@MSKY                    SFLMSGKEY
+     A            S@PGMQ                    SFLPGMQ
+     A          R MSFCTL01A                 SFLCTL(MSF01A)
+     A*%%TS  SD  19911216  121343  BEARL       REL-V2R1M0  5738-PW1
+     A                                      SFLSIZ(0005)
+     A                                      SFLPAG(0001)
+     A                                      TEXT('Subfile Message Control Recor-
+     A                                      d')
+     A  93                                  PUTOVR
+     A                                      SFLDSP
+     A                                      SFLINZ
+     A N39                                  SFLEND
+     A            S@PGMQ                    SFLPGMQ
