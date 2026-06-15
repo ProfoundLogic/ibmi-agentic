@@ -14,10 +14,14 @@ This folder documents the IBM i source delivered in `HornadyDemo.zip` and extrac
 | File | Purpose |
 |---|---|
 | `README.md` | This overview |
+| **`rebuild-guide.md`** | **Start here if you're rebuilding the POC in a fresh environment.** Full end-to-end recipe: codermake, IBM i one-time setup, data load, smoke test, schema lessons, calling-convention gotchas. |
+| `sample-data.sql` | Idempotent seed-data script for HYR0600 (option 1) and HYR0606 (option 3) |
+| `hyr0600-gap-analysis.md` | What it took to get HYR0600 to compile + what's still missing |
 | `source-inventory.md` | Full file-by-file inventory grouped by type and prefix |
 | `data-model.md` | Database objects — PF/LF/TABLE/VIEW/INDEX — with entity-relationship diagram |
 | `program-architecture.md` | RPG/CL program catalog with call-chain and dependency diagrams |
 | `display-files.md` | DSPF catalog with record formats and UI generation |
+| `ddl/` | Original DDL drafts (before promotion to `src/`). Historical reference; the live schemas now live in `ibmi-agentic/src/*.table.sql`. |
 
 ## About the source encoding
 
