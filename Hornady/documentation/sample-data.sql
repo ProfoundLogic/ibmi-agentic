@@ -31,17 +31,18 @@ INSERT INTO HREMPL (EMEMPL, EMFNAM, EMLNAM, EMDEPT, EMSTS) VALUES
 -- 2. Customers (HDCUST) -- referenced by HYPSGCU.GCBLTO / .GCSHTO / .GCDSHP.
 --    8 customers covering different states + ship-via mixes.
 ------------------------------------------------------------------------------
-DELETE FROM HDCUST WHERE CUCUST BETWEEN 1000000 AND 1000999;
+-- HDCUST schema corrected to CM-prefix (was CU-prefix); see hdcust.table.sql.
+DELETE FROM HDCUST WHERE CMCUST BETWEEN 1000000 AND 1000999;
 
-INSERT INTO HDCUST (CUCUST, CUNAME, CUADR1, CUADR2, CUCITY, CUSTAT, CUZIP, CUCNTRY, CUPHONE, CUSHPV, CUSTS) VALUES
-  (1000100, 'ACME Sporting Goods',        '123 Main Street',     '',                  'Boise',         'ID', '837020000', 'USA', '208-555-0100', 'UP', 'A'),
-  (1000200, 'Global Outdoor Retail',      '4500 Pine Avenue',    'Suite 201',         'Denver',        'CO', '802120000', 'USA', '303-555-0200', 'FX', 'A'),
-  (1000300, 'Mountain View Outfitters',   '88 Ridge Road',       '',                  'Bozeman',       'MT', '597150000', 'USA', '406-555-0300', 'UP', 'A'),
-  (1000400, 'Sportsman Wholesale Inc.',   '1200 Industrial Way', '',                  'Houston',       'TX', '770100000', 'USA', '713-555-0400', 'YR', 'A'),
-  (1000500, 'Northeast Hunting Supplies', '55 Commerce Blvd',    'Bldg C',            'Albany',        'NY', '122050000', 'USA', '518-555-0500', 'FX', 'A'),
-  (1000600, 'Pacific Coast Firearms',     '900 Harbor Dr',       '',                  'Tacoma',        'WA', '984020000', 'USA', '253-555-0600', 'UP', 'A'),
-  (1000700, 'Heartland Ammunition Co.',   '300 Kansas Ave',      '',                  'Wichita',       'KS', '672020000', 'USA', '316-555-0700', 'YR', 'A'),
-  (1000800, 'Southern Range Supply',      '77 Magnolia Pkwy',    '',                  'Atlanta',       'GA', '303090000', 'USA', '404-555-0800', 'FX', 'A');
+INSERT INTO HDCUST (CMCUST, CMCNA1, CMALPH, CMCCLS, CMLOC#, CMD01, CMD02, CMCITY, CMSTAT, CMZIP, CMCNTRY, CMSHPV, CMSTS) VALUES
+  (1000100, 'ACME Sporting Goods',        'ACMESPORT',  'RTL', 0, '123 Main Street',     '',                  'Boise',         'ID', '837020000', 'USA', 'UP', 'A'),
+  (1000200, 'Global Outdoor Retail',      'GLOBALOUT',  'RTL', 0, '4500 Pine Avenue',    'Suite 201',         'Denver',        'CO', '802120000', 'USA', 'FX', 'A'),
+  (1000300, 'Mountain View Outfitters',   'MOUNTVIEW',  'RTL', 0, '88 Ridge Road',       '',                  'Bozeman',       'MT', '597150000', 'USA', 'UP', 'A'),
+  (1000400, 'Sportsman Wholesale Inc.',   'SPORTSMAN',  'WHL', 0, '1200 Industrial Way', '',                  'Houston',       'TX', '770100000', 'USA', 'YR', 'A'),
+  (1000500, 'Northeast Hunting Supplies', 'NEHUNT',     'RTL', 0, '55 Commerce Blvd',    'Bldg C',            'Albany',        'NY', '122050000', 'USA', 'FX', 'A'),
+  (1000600, 'Pacific Coast Firearms',     'PACCOAST',   'RTL', 0, '900 Harbor Dr',       '',                  'Tacoma',        'WA', '984020000', 'USA', 'UP', 'A'),
+  (1000700, 'Heartland Ammunition Co.',   'HEARTAMM',   'WHL', 0, '300 Kansas Ave',      '',                  'Wichita',       'KS', '672020000', 'USA', 'YR', 'A'),
+  (1000800, 'Southern Range Supply',      'SOUTHRNG',   'RTL', 0, '77 Magnolia Pkwy',    '',                  'Atlanta',       'GA', '303090000', 'USA', 'FX', 'A');
 
 ------------------------------------------------------------------------------
 -- 3. Ship-via codes (HDSHPV and HYPSVCT). HYR0600 references SVSVDS/SVSVSV.
@@ -67,15 +68,18 @@ INSERT INTO HYPSVCT (VTSHPV, VTSVDS, VTSTS) VALUES
 ------------------------------------------------------------------------------
 -- 4. Items (HDIMST) -- minimal item master so detail rows can reference them.
 ------------------------------------------------------------------------------
+-- HDIMST schema corrected per HYR0600 / PICKERR refs (IMIMDS / IMIMWG /
+-- IMUOMS / IMST instead of IMDESC / IMWGT / IMUOM / IMSTS); plus IMPCLS,
+-- IMUDN4.  See hdimst.table.sql.
 DELETE FROM HDIMST WHERE IMITEM LIKE 'DEMO-%';
 
-INSERT INTO HDIMST (IMITEM, IMDESC, IMUOM, IMWGT, IMIMWG, IMSTS) VALUES
-  ('DEMO-9MM-115',  '9mm Luger 115gr FMJ ammunition',   'BX',  0.620, 0.620, 'A'),
-  ('DEMO-9MM-124',  '9mm Luger 124gr FMJ ammunition',   'BX',  0.640, 0.640, 'A'),
-  ('DEMO-45ACP-230','45 ACP 230gr FMJ ammunition',      'BX',  0.840, 0.840, 'A'),
-  ('DEMO-308-150',  '308 Win 150gr SST ammunition',     'BX',  0.910, 0.910, 'A'),
-  ('DEMO-223-55',   '223 Rem 55gr V-Max ammunition',    'BX',  0.420, 0.420, 'A'),
-  ('DEMO-12GA-00',  '12 Gauge 00 Buckshot',             'BX',  1.250, 1.250, 'A');
+INSERT INTO HDIMST (IMITEM, IMIMDS, IMIMWG, IMUOMS, IMPCLS, IMUDN4, IMST) VALUES
+  ('DEMO-9MM-115',  '9mm Luger 115gr FMJ ammunition',   0.620, 'BX', 'AMM', '9mm Luger',     'A'),
+  ('DEMO-9MM-124',  '9mm Luger 124gr FMJ ammunition',   0.640, 'BX', 'AMM', '9mm Luger',     'A'),
+  ('DEMO-45ACP-230','45 ACP 230gr FMJ ammunition',      0.840, 'BX', 'AMM', '45 ACP',        'A'),
+  ('DEMO-308-150',  '308 Win 150gr SST ammunition',     0.910, 'BX', 'AMM', '308 Winchester','A'),
+  ('DEMO-223-55',   '223 Rem 55gr V-Max ammunition',    0.420, 'BX', 'AMM', '223 Remington', 'A'),
+  ('DEMO-12GA-00',  '12 Gauge 00 Buckshot',             1.250, 'BX', 'AMM', '12 Gauge',      'A');
 
 ------------------------------------------------------------------------------
 -- 5. Shipment group headers (HYPSGHD)
@@ -295,15 +299,88 @@ INSERT INTO OEORHD (OEORD#, OETURN, OECUST, OEBLTO, OESHTO, OEDSHP, OESHPV, OEPO
 --  needs HYPSGCU rows to be visible. Add the remaining orders if HYR0602 / HYR0606
 --  needs to read them.)
 
+------------------------------------------------------------------------------
+-- 9. GUPTDAT (lookup) -- 'SHIPUSER' rows let PICKBATR / PICKERR resolve
+--    picker IDs back to full names.  Schema is TD-prefix (see guptdat.table.sql).
+--    HYPTDTA is the same shape; we don't preload it for the dashboards but the
+--    same INSERT pattern applies.
+------------------------------------------------------------------------------
+DELETE FROM GUPTDAT WHERE TDTABL = 'SHIPUSER';
+
+INSERT INTO GUPTDAT (TDTABL, TDKEY1, TDKEY2, TDKEY3, TDDESC, TDVAL, TDCF01, TDDATA, TDDAT, TDWN, TDAT) VALUES
+  ('SHIPUSER', 'PICKER01',  '', '', 'John  Smith',     '12345', 'John',  '', 0, '', ''),
+  ('SHIPUSER', 'PICKER02',  '', '', 'Jane  Doe',       '22001', 'Jane',  '', 0, '', ''),
+  ('SHIPUSER', 'PICKER03',  '', '', 'Bob   Jones',     '30099', 'Bob',   '', 0, '', '');
+
+------------------------------------------------------------------------------
+-- 10. Pick batches (PICKBATHP + PICKBATDP)
+--     Drives the PICKBATR Pick Batch Dashboard (option 4) and the PICKERR
+--     mobile workflow (option 5).  Five batches across the two warehouses,
+--     two distinct pickers, mixed status (O=Open, A=Assigned, P=In-progress,
+--     Z=Complete) so the dashboard filter checkboxes have something to
+--     toggle.  GHDCLOC values WEST and ALDA mirror HYPSGHD seeding above.
+------------------------------------------------------------------------------
+DELETE FROM PICKBATDP WHERE PICKBAT BETWEEN 5001 AND 5099;
+DELETE FROM PICKBATHP WHERE PICKBAT BETWEEN 5001 AND 5099;
+
+INSERT INTO PICKBATHP (PICKBAT, PICKSEQNO, PICKER, PICKINVLOC, PICKSTAT,
+                       PICKNUMITM, PICKNUMPCS, PICKSTART, PICKEND, PICKDUR,
+                       PICKCRTUSR, PICKCRTTZ, PICKCHGUSR, PICKCHGTZ,
+                       PICKCHGJBU, PICKCHGJBN, PICKCHGJB#, PICKTOT) VALUES
+  (5001, 1, 'PICKER01',  'WEST', 'O', 3,  60,
+     '0001-01-01-00.00.00.000000', '0001-01-01-00.00.00.000000', 0,
+     'AIDEMO', '2026-06-15-08.00.00.000000', 'AIDEMO', '2026-06-15-08.00.00.000000',
+     'AIDEMO', 'QPADEV0026', 386001, ''),
+  (5002, 2, 'PICKER01',  'WEST', 'A', 2,  40,
+     '2026-06-15-09.00.00.000000', '0001-01-01-00.00.00.000000', 0,
+     'AIDEMO', '2026-06-15-08.15.00.000000', 'AIDEMO', '2026-06-15-09.00.00.000000',
+     'AIDEMO', 'QPADEV0026', 386002, 'TOTE-001'),
+  (5003, 3, 'PICKER02',  'WEST', 'P', 4,  80,
+     '2026-06-15-09.30.00.000000', '0001-01-01-00.00.00.000000', 0,
+     'AIDEMO', '2026-06-15-08.30.00.000000', 'AIDEMO', '2026-06-15-09.30.00.000000',
+     'AIDEMO', 'QPADEV0029', 386003, 'TOTE-002'),
+  (5004, 4, 'PICKER02',  'ALDA', 'O', 2,  30,
+     '0001-01-01-00.00.00.000000', '0001-01-01-00.00.00.000000', 0,
+     'AIDEMO', '2026-06-15-08.45.00.000000', 'AIDEMO', '2026-06-15-08.45.00.000000',
+     'AIDEMO', 'QPADEV0026', 386004, ''),
+  (5005, 5, 'PICKER03',  'WEST', 'Z', 3,  55,
+     '2026-06-14-10.00.00.000000', '2026-06-14-11.30.00.000000', 5400,
+     'AIDEMO', '2026-06-14-09.55.00.000000', 'AIDEMO', '2026-06-14-11.30.00.000000',
+     'AIDEMO', 'QPADEV0030', 386005, 'TOTE-003');
+
+INSERT INTO PICKBATDP (PICKBAT, PICKSEQ, PICKOVRORD, PICKTURN, PICKORD, PICKORDL,
+                       PICKITEM, PICKITEMUM, PICKITEMCT,
+                       PICKWHS, PICKSTKRM, PICKAISLE, PICKLOC,
+                       PICKITMST, PICKNEED, PICKQTYP) VALUES
+  -- Batch 5001 (Open, 3 items, 60 pieces)
+  (5001, 1, 10, 1, 10000001, 1, 'DEMO-9MM-115',   'BX', '',     1, 'AMM', 'A1-B', '001-01', '', 20.00, 0.00),
+  (5001, 2, 20, 1, 10000002, 1, 'DEMO-9MM-124',   'BX', '',     1, 'AMM', 'A1-B', '002-01', '', 20.00, 0.00),
+  (5001, 3, 30, 1, 10000003, 1, 'DEMO-45ACP-230', 'BX', '',     1, 'AMM', 'A2-A', '001-03', '', 20.00, 0.00),
+  -- Batch 5002 (Assigned, 2 items)
+  (5002, 1, 10, 1, 10000004, 1, 'DEMO-308-150',   'BX', '',     1, 'AMM', 'A3-A', '004-01', '', 25.00, 0.00),
+  (5002, 2, 20, 1, 10000005, 1, 'DEMO-223-55',    'BX', '',     1, 'AMM', 'A3-A', '005-02', '', 15.00, 0.00),
+  -- Batch 5003 (In progress, 4 items, mid-pick)
+  (5003, 1, 10, 1, 10000006, 1, 'DEMO-9MM-115',   'BX', '',     1, 'AMM', 'A1-B', '001-01', 'S', 20.00, 20.00),
+  (5003, 2, 20, 1, 10000007, 1, 'DEMO-12GA-00',   'BX', '',     1, 'AMM', 'B1-A', '001-01', '',  20.00, 0.00),
+  (5003, 3, 30, 1, 10000007, 2, 'DEMO-9MM-124',   'BX', '',     1, 'AMM', 'A1-B', '002-01', '',  20.00, 0.00),
+  (5003, 4, 40, 1, 10000008, 1, 'DEMO-45ACP-230', 'BX', '',     1, 'AMM', 'A2-A', '001-03', '',  20.00, 0.00),
+  -- Batch 5004 (Open, ALDA warehouse)
+  (5004, 1, 10, 2, 10000001, 1, 'DEMO-308-150',   'BX', '',     2, 'AMM', 'A1-A', '001-01', '', 15.00, 0.00),
+  (5004, 2, 20, 2, 10000002, 1, 'DEMO-223-55',    'BX', '',     2, 'AMM', 'A1-A', '002-01', '', 15.00, 0.00),
+  -- Batch 5005 (Complete)
+  (5005, 1, 10, 1, 10000003, 1, 'DEMO-9MM-115',   'BX', '',     1, 'AMM', 'A1-B', '001-01', 'S', 20.00, 20.00),
+  (5005, 2, 20, 1, 10000004, 1, 'DEMO-9MM-124',   'BX', '',     1, 'AMM', 'A1-B', '002-01', 'S', 20.00, 20.00),
+  (5005, 3, 30, 1, 10000005, 1, 'DEMO-45ACP-230', 'BX', '',     1, 'AMM', 'A2-A', '001-03', 'S', 15.00, 15.00);
+
 COMMIT;
 
 ------------------------------------------------------------------------------
 -- Row counts after the inserts:
 --   HREMPL     :  3 employees
---   HDCUST     :  8 customers
+--   HDCUST     :  8 customers     (CM-prefix schema)
 --   HDSHPV     :  5 ship-via codes (4 active + BW inactive)
 --   HYPSVCT    :  5 ship-via codes (parallel to HDSHPV)
---   HDIMST     :  6 demo SKUs
+--   HDIMST     :  6 demo SKUs     (IMxxx schema)
 --   HYPSGHD    : 30 shipment-group headers       <- HYR0600 paging
 --   HYPSGCU    : 30 shipment-group customer rows <- HYR0600 main subfile
 --   HYPSGDT    : 33 detail lines (some shipments have 2)
@@ -312,4 +389,7 @@ COMMIT;
 --                    -- exercises paging in the inquiry subfile (3 pages)
 --                  - 1-2 lots on every other shipment 1002-1030
 --   OEORHD     :  8 sales-order headers
+--   GUPTDAT    :  3 SHIPUSER rows (picker id -> name lookup)
+--   PICKBATHP  :  5 pick batches (mixed status)  <- PICKBATR dashboard
+--   PICKBATDP  : 14 pick-batch detail lines       <- drill-in / mobile picks
 ------------------------------------------------------------------------------

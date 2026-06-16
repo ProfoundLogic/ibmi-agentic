@@ -15,15 +15,17 @@ Target library: **`AITSK00030`** (set via `IBMI_BUILD_LIBRARY`).
 
 | # | Program | What it does | Status |
 |---|---|---|---|
-| **1** | `HYR0600` Shipment Processing | 5250 subfile of open shipments, 14/page | ✅ **Working** — 30 rows paginate cleanly across 3 pages |
+| **1** | `HYR0600` Shipment Processing | 5250 subfile of open shipments, 14/page | ⚠️ Compiles + launches; `HYPTDTA` schema correction (2026-06) cleared the original `SQL0206 (TDTABL)` blocker but the employee prompt loop still needs deeper validation. |
 | 2 | `HYR0138` Pallet Contents Maint. | Pallet content editor | 🚫 Blocked — `HYD0138.DSPF` not in HornadyDemo package |
 | **3** | `HYR0606` Shipment Lot Inquiry | Read-only subfile of lots for one detail line | ✅ **Working** — 15 lots paginate across 3 pages |
-| 4 | `PICKBATR` Pick Batch Dashboard | Profound UI | Stub (DSPF in package; not yet promoted) |
-| 5 | `PICKERR` Picker Workflow | Profound UI mobile | Stub (DSPF in package; not yet promoted) |
+| **4** | `PICKBATR` Pick Batch Dashboard | Profound UI rich DSPF | ⚙️ **Promoted (2026-06)** — full data layer + program compile cleanly; the rich DSPF currently errors at OPEN time with `CPF27AF "Edit mask not valid"` (PUI version skew on `PICKBATD.DSPF`).  Needs PUI-side debugging to render the dashboard widget. |
+| **5** | `PICKERR` Picker Workflow | Profound UI mobile | ✅ **Promoted (2026-06)** — compiles, opens, PUI Login screen renders (LOGINR record format with EMPCODE / EMPNAME / Alda/GI/West buttons / Login / Clear / Exit). |
 | 6 | `HYR6080` Order Status Email | Batch | Stub (no DSPF needed; not yet promoted) |
 
-Options 1 and 3 are the demo path. Options 4–6 are next-step candidates. Option 2
-is blocked on a missing DSPF and shows an explicit blocker message.
+Options 1, 3, and 5 are the demo path.  Option 4 is **promoted** (data layer +
+service program + sibling stubs + DSPF object + program object are all built
+into the task library) but the rich UI doesn't render today.  Option 2 is
+blocked on a missing DSPF and shows an explicit blocker message.
 
 ---
 
@@ -180,6 +182,45 @@ system \"crtdupobj obj(HREMPL)   fromlib(AITSK00030) objtype(*FILE) tolib(HYHDSD
 system \"crtdupobj obj(HREMPL20) fromlib(AITSK00030) objtype(*FILE) tolib(HYHDSDATA)\"
 "'
 ```
+
+### 5.3 GS1 data areas for `PICKERR`
+
+`PICKERR` declares `wk_GS1Comp` / `wk_GS1Comp2` with `DTAARA(GS1COMP)` /
+`DTAARA(GS1COMP2)`.  They hold the 6-digit GS1 company prefix used to parse
+UCC-128 barcodes during scanning.  Without them the program halts on startup
+with `RNQ0401 Data area *LIBL/GS1COMP was not found`.
+
+```bash
+ssh dev '/usr/bin/qsh -c "
+system \"crtdtaara AITSK00030/GS1COMP  type(*char) len(6) value('"'"'054321'"'"')\" 2>&1 | head -1
+system \"crtdtaara AITSK00030/GS1COMP2 type(*char) len(6) value('"'"'054322'"'"')\" 2>&1 | head -1
+"'
+```
+
+The `PICKBATD` data area used by `PICKBATR` (`dcl-s lastUsedBatch packed(11:0)
+DTAARA('PICKBATD')`) does NOT need to be pre-created -- the program creates it
+on first call when needed.
+
+### 5.4 Job-description initial library list
+
+`AIDEMO/AIDEMO`'s `INLLIBL` must put the task library ahead of `AIDEMOBASE`
+and must include `AIPUI53001` (the Genie/PUI Open Access Handler library).
+This is what lets `GO MENU` resolve to the rebuilt `AITSK00030/MENU` and lets
+the `PROFOUNDUI(HANDLER)` reference in `PICKBATR` / `PICKERR` find the
+`GENIE.SRVPGM` HANDLER procedure:
+
+```bash
+ssh dev '/usr/bin/qsh -c "
+system \"CHGJOBD JOBD(AIDEMO/AIDEMO) INLLIBL(AITSK00030 AIPUI53001 AIDEMOBASE QGPL QTEMP DRPUIDEV)\" 2>&1 | head -1
+"'
+```
+
+The `PICKBATR` and `PICKERR` DSPFs have also been patched to use
+`HANDLER('GENIE(HANDLER)')` instead of `'PROFOUNDUI(HANDLER)'`, since this
+environment's Profound UI install lives under `AIPUI53001.LIB` (no
+`PROFOUNDUI.LIB`).  If a future environment uses a different Genie library
+name, update both `src/pickbatr.sqlrpgle` and `src/pickerr.sqlrpgle` and
+rebuild.
 
 Order matters: `HREMPL` (PF) must be duplicated before `HREMPL20` (LF over it).
 
@@ -359,17 +400,95 @@ hyc0606.pgm: hyc0606.clle | hyr0606.pgm        # menu wrapper that supplies 6 ty
 
 The full `hyr0600.pgm` dependency line is long — see `Rules.mk` for the exact list.
 
-### 6.11 Menu stubs (options 2, 4, 5, 6)
+### 6.11 Menu stubs (options 2, 6)
 
 ```makefile
 hyr0138.pgm: hyr0138.rpgle hyrstubd.file
-pickbatr.pgm: pickbatr.rpgle hyrstubd.file
-pickerr.pgm:  pickerr.rpgle  hyrstubd.file
-hyr6080.pgm:  hyr6080.rpgle  hyrstubd.file
+hyr6080.pgm: hyr6080.rpgle hyrstubd.file
 ```
 
-These all bind against the single shared display file `hyrstubd.file`. The
+These bind against the single shared display file `hyrstubd.file`.  The
 RPG stubs are 12 lines each — they set 4 short text strings and `EXFMT stub`.
+Options 4 and 5 (PICKBATR / PICKERR) used to be on the same stub pattern but
+were promoted to the real Profound UI programs in 2026-06 — see §6.12.
+
+### 6.12 Pick-batch data layer + real PICKBATR / PICKERR (2026-06)
+
+```makefile
+# Pick-batch SQL tables (new -- see Hornady/documentation/data-model.md).
+pickbathp.file:  pickbathp.table.sql
+pickbatdp.file:  pickbatdp.table.sql
+pickbatlog.file: pickbatlog.table.sql
+pickbatmp.file:  pickbatmp.table.sql
+pickmbatdp.file: pickmbatdp.table.sql
+oeorhp.file:     oeorhp.table.sql
+oeordp.file:     oeordp.table.sql
+oeordt.file:     oeordt.table.sql
+
+# DDS-keyed PF for non-unique scan history.
+pickbatsp.file:  pickbatsp.pf
+
+# Logical files.
+pickbathl1.file: pickbathl1.lf | pickbathp.file
+pickbathl2.file: pickbathl2.lf | pickbathp.file
+pickbatdl1.file: pickbatdl1.lf | pickbatdp.file
+pickbatdl2.file: pickbatdl2.lf | pickbatdp.file
+oeordp01.file:   oeordp01.lf   | oeordp.file
+hylsgsd1.file:   hylsgsd1.lf   | hypsgsd.file
+
+# Pick-batch service program + bnddir (real source from package).
+pickbatsv.module:  pickbatsv.sqlrpgle pickbatsv_pr.rpgle
+pickbatsv.srvpgm:  pickbatsv.module
+picksvbdir.bnddir: picksvbdir.bnddir | pickbatsv.srvpgm
+
+# PICKERR-specific bnddir (real srvpgms HYR9960/HYR9962 stubbed in /src/).
+hyr9960.module:  hyr9960.rpgle pickerr_pr.rpgle
+hyr9960.srvpgm:  hyr9960.module
+hyr9962.module:  hyr9962.rpgle pickerr_pr.rpgle
+hyr9962.srvpgm:  hyr9962.module
+pickerr.bnddir:  pickerr.bnddir | hyr9960.srvpgm hyr9962.srvpgm
+
+# Sibling-program stubs PICKBATR calls via EXTPGM (real bodies too heavy).
+pickbatdr.pgm:   pickbatdr.rpgle
+pickbatlr2.pgm:  pickbatlr2.rpgle
+
+# PUI Rich Display Files.
+pickbatd.file:   pickbatd.dspf | pickbathp.file pickbatdp.file
+pickerd.file:    pickerd.dspf  | pickbathp.file pickbatdp.file
+
+# Real PICKBATR (replaces the hyrstubd stub).
+pickbatr.pgm: pickbatr.sqlrpgle pickbatsv_pr.rpgle pickbatd.file \
+              picksvbdir.bnddir \
+            | pickbathp.file pickbatdp.file pickbatlog.file pickbatmp.file \
+              pickmbatdp.file pickbathl1.file pickbathl2.file \
+              pickbatdl1.file pickbatdl2.file oeorhp.file oeordp.file \
+              oeordp01.file oeordt.file hylsgsd1.file hdcust.file \
+              hdccmt.file hdimst.file hdiwhs.file guptdat.file hypsgsd.file \
+              pickbatdr.pgm pickbatlr2.pgm
+
+# Real PICKERR (replaces the hyrstubd stub).
+pickerr.pgm: pickerr.sqlrpgle pickerr_pr.rpgle pickerd.file pickerr.bnddir \
+           | pickbathp.file pickbathl1.file pickbathl2.file pickbatdp.file \
+             pickbatsp.file pickbatmp.file oeorhp.file oeordp.file \
+             oeordp01.file hdcust.file hdccmt.file hdimst.file hdiwhs.file \
+             guptdat.file hypsgdt.file pickbatlr2.pgm
+```
+
+Inline `/COPY` replacements (same pattern as `hyr0600_pr.rpgle`):
+
+* `src/pickbatsv_pr.rpgle` — replaces `/COPY QCPYLESRC,PICKBATSVD` in
+  `pickbatr.sqlrpgle` and `pickbatsv.sqlrpgle`.  Declares only
+  `pickbatsv_setDefaultPickOrder` (the one procedure PICKBATR uses).
+* `src/pickerr_pr.rpgle` — replaces `/COPY QPRPSRC,HYR9960` and
+  `/COPY QPRPSRC,HYR9962` in `pickerr.sqlrpgle`.  Declares
+  `BarcodeItem / BarcodeQty / BarcodeItemC / BarcodeQtyC / sd_HYR9960`.
+
+The HYR9960 / HYR9962 implementations in `src/hyr9960.rpgle` /
+`src/hyr9962.rpgle` are **stubs**: they return blank / 0 because the real
+bodies need the `BARDATA` / `BARCUST` tables (in-package PFs we have not
+promoted yet).  Wiring up real barcode parsing means promoting BARDATA /
+BARCUST and replacing those stubs with the real `HYR9960.RPGLE` /
+`HYR9962.RPGLE` from the HornadyDemo package.
 
 ---
 
@@ -550,9 +669,31 @@ Batch / outbound:
 5. **Page Down again** → `LOT240611`, `LOT240612`, `LOT240613`, `Bottom`.
 6. **F3** to exit.
 
-### 11.5 Other options
+### 11.5 Option 5 happy path (PICKERR Picker Workflow)
 
-- Options 2, 4, 5, 6 all land on the shared stub display file (`hyrstubd`).
+1. Pick option 5 from the Hornady submenu.
+2. The PUI mobile-form login screen renders (record format `LOGINR`).  The
+   genie session shows it as a `handler` block in the response JSON, not as
+   a 5250 buffer -- in a real browser the user sees a phone-sized layout
+   with a `Log In` button, an `Employee Number` text field, a `Clear Form`
+   button, and three big warehouse buttons (Alda / GI / West).
+3. Enter a valid employee code (e.g. `12345` -- John Smith from `HREMPL`),
+   pick a warehouse, and tap `Log In`.  Subsequent screens (assigned-batch
+   list / pick-line detail / scan capture) load from the same DSPF.
+
+### 11.6 Option 4 status (PICKBATR Pick Batch Dashboard)
+
+1. Picking option 4 from the Hornady submenu calls `PICKBATR`.
+2. Today the program opens the DSPF and the PUI handler fails with `CPF27AF
+   "Edit mask not valid"` (visible in the job log).  This is a runtime
+   compatibility issue between `PICKBATD.DSPF` and the Profound UI install
+   on the target system -- the program itself compiles cleanly, and all the
+   data layer is in place.  Debugging the exact failing field is left as
+   follow-up work; see §15.
+
+### 11.7 Other options
+
+- Options 2 and 6 still land on the shared stub display file (`hyrstubd`).
   Option 2's stub explicitly says it's blocked on `HYD0138.DSPF`. Press
   **F3/F12/Enter** to return to the Hornady menu.
 - **Option 88** → back to the main menu.
@@ -568,10 +709,15 @@ Batch / outbound:
   include) are in place from the previous turn — just drop the DSPF source
   into `src/hyd0138.dspf`, add a Rules.mk entry, and replace the
   `hyr0138.rpgle` stub with the real `HYR0138.SQLRPGLE`.
-- **Compiling the real `PICKBATR` / `PICKERR`** — these are Profound UI
-  programs. Source and JSON-based DSPF metadata are in the HornadyDemo
-  package; promoting them is a separate task (different toolchain — needs
-  Profound UI deployment of the JSON files into the userdata workspace).
+- **~~Compiling the real `PICKBATR` / `PICKERR`~~** — done in 2026-06.  Both
+  programs now compile cleanly out of `codermake` with the data-layer
+  promotion described in §6.12.  PICKERR's PUI login screen renders end-to-end
+  through the Profound UI runtime; PICKBATR opens and invokes the PUI handler
+  but the dashboard rich UI hits `CPF27AF` at OPEN time (see §15 for the open
+  follow-ups).  The real bodies of `PICKBATDR` and `PICKBATLR2` are still
+  stubs in `src/`, and the barcode utility srvpgms `HYR9960` / `HYR9962` are
+  stub procedures (return blank / 0) -- replacing those with the real
+  package source needs the `BARDATA` / `BARCUST` PFs promoted first.
 - **Compiling the real `HYR6080`** — batch email program. Calls a bunch of
   external email-related EXTPROCs we don't have stubs for. Easy after the
   data-layer pattern is set, but not done.
@@ -651,3 +797,35 @@ Hornady/documentation/sample-data.sql
 ```
 
 That's everything required to reconstruct the working state of options 1 and 3.
+
+Plus the new pick-batch sources added in 2026-06 (see §6.12):
+
+```
+src/pickbatr.sqlrpgle      src/pickbatsv_pr.rpgle    src/pickbatsv.sqlrpgle
+src/pickerr.sqlrpgle       src/pickerr_pr.rpgle      src/pickbatdr.rpgle
+src/pickbatlr2.rpgle       src/hyr9960.rpgle         src/hyr9962.rpgle
+src/pickbatd.dspf          src/pickerd.dspf
+src/picksvbdir.bnddir      src/pickerr.bnddir
+src/pickbathp.table.sql    src/pickbatdp.table.sql
+src/pickbatlog.table.sql   src/pickbatmp.table.sql   src/pickmbatdp.table.sql
+src/pickbatsp.pf
+src/oeorhp.table.sql       src/oeordp.table.sql      src/oeordt.table.sql
+src/pickbathl1.lf          src/pickbathl2.lf
+src/pickbatdl1.lf          src/pickbatdl2.lf
+src/oeordp01.lf            src/hylsgsd1.lf
+```
+
+That reconstructs the working state of options 1, 3, and 5 plus the
+infrastructure for option 4.
+
+---
+
+## 15. Known follow-ups
+
+| Item | Detail |
+|---|---|
+| `PICKBATR` rendering | The compiled program calls the PUI HANDLER but the rich DSPF errors with `CPF27AF "Edit mask not valid"` at file OPEN.  PICKERR (same handler, same compile pipeline) renders fine, so the issue is in `PICKBATD.DSPF` -- most likely a field whose embedded PUI JSON `editMask` is incompatible with the PUI runtime on this system.  Recommended next step: compile a minimal variant of the DSPF with progressively-larger subsets of the original record formats until the failing format is identified. |
+| `HYR0600` employee prompt | Schema corrections (`HYPTDTA` / `GUPTDAT` to TD-prefix; `HDCUST` to CM-prefix) cleared the original `SQL0206 (TDTABL)` blocker.  Employee Number Prompt opens cleanly but the next screen still doesn't paint -- needs another schema-vs-source pass. |
+| `PICKBATDR` / `PICKBATLR2` real bodies | Currently stubs in `src/`.  Real bodies are large (700+ lines each) and touch additional tables (OEORDT, HDDSHP, plus several `HYP*` LFs).  Plug in by copying the real `.SQLRPGLE` source from the HornadyDemo package, adding any missing /COPY shims, and extending the schemas. |
+| `HYR9960` / `HYR9962` real bodies | Currently return blank / 0 -- enough to bind PICKERR but not enough to parse real GS1 barcodes.  Promote `BARDATA.PF` and `BARCUST.PF` from the HornadyDemo package, then drop the real source bodies in to replace `src/hyr9960.rpgle` / `src/hyr9962.rpgle`. |
+| `HANDLER('GENIE(HANDLER)')` hard-coded | The HANDLER reference in `pickbatr.sqlrpgle` / `pickerr.sqlrpgle` is patched from `'PROFOUNDUI(HANDLER)'` (the in-package default) to `'GENIE(HANDLER)'` because this environment's Profound UI install lives under `AIPUI53001.LIB` (no `PROFOUNDUI.LIB`).  If you re-extract from the HornadyDemo zip, re-apply the patch.  Long-term, consider a CL/QSH preprocessor step in `codermake` so the HANDLER library name is environment-configurable. |

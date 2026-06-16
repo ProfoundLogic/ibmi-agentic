@@ -76,8 +76,8 @@ hornady.menu: hornady.file hornady.msgf
 # NOTE: hyr0600.pgm rule below has been retargeted to compile the real source.
 hyr0138.pgm: hyr0138.rpgle hyrstubd.file
 # hyr0606.pgm is now the REAL HYR0606 -- see block at the bottom of this file.
-pickbatr.pgm: pickbatr.rpgle hyrstubd.file
-pickerr.pgm: pickerr.rpgle hyrstubd.file
+# pickbatr.pgm / pickerr.pgm rules are now the REAL programs -- see block
+# at the bottom of this file.  Stub-only rules removed.
 hyr6080.pgm: hyr6080.rpgle hyrstubd.file
 
 # ----------------------------------------------------------------------------
@@ -154,6 +154,29 @@ hylmpcd2.file: hylmpcd2.lf | hypmpcd.file
 hrempl20.file: hrempl20.lf  | hrempl.file
 
 # ----------------------------------------------------------------------------
+# Pick-batch data layer (PICKBATR / PICKERR -- Hornady options 4 and 5).
+# PICKBATHP/DP are promoted 1:1 from HornadyDemo PFs; the rest are stub
+# schemas inferred from program references because no PF source shipped.
+# See Hornady/documentation/data-model.md "Pick batch tables" section.
+# ----------------------------------------------------------------------------
+pickbathp.file:  pickbathp.table.sql
+pickbatdp.file:  pickbatdp.table.sql
+pickbatlog.file: pickbatlog.table.sql
+pickbatmp.file:  pickbatmp.table.sql
+pickmbatdp.file: pickmbatdp.table.sql
+oeorhp.file:     oeorhp.table.sql
+oeordp.file:     oeordp.table.sql
+oeordt.file:     oeordt.table.sql
+
+# LFs over the pick-batch and order tables.
+pickbathl1.file: pickbathl1.lf | pickbathp.file
+pickbathl2.file: pickbathl2.lf | pickbathp.file
+pickbatdl1.file: pickbatdl1.lf | pickbatdp.file
+pickbatdl2.file: pickbatdl2.lf | pickbatdp.file
+oeordp01.file:   oeordp01.lf   | oeordp.file
+hylsgsd1.file:   hylsgsd1.lf   | hypsgsd.file
+
+# ----------------------------------------------------------------------------
 # REAL HYR0606 -- Shipment Lot Inquiry (replaces the previous menu stub)
 # ----------------------------------------------------------------------------
 hyd0606.file: hyd0606.dspf | hypsgld.file hypsgdt.file
@@ -195,3 +218,36 @@ vprbldp.pgm: vprbldp.rpgle
 # earlier stub.  Pulls in all the data layer, display files, sibling
 # program stubs, service program stubs, and the inline-prototype include.
 hyr0600.pgm: hyr0600.sqlrpgle hyr0600_pr.rpgle hyd0600a.file hyd0600b.file hhdcss.srvpgm hhdsvi.srvpgm hoedip.srvpgm hyr0600s.srvpgm hyr0600.bnddir | hypsgcu.file hypsghd.file hypsgdt.file hypsgld.file hypsgtd.file hypsgsd.file hypintr.file hypscwk.file hypsgcv.file hypsgtc.file hypsgts.file hypsscc.file hypstrk.file hypsvct.file hyptdta.file hypidta.file hypmilg.file hyppcls.file hyprclt.file hdcust.file hdccmt.file hddshp.file hdimst.file hdiwhs.file hdshpv.file oeorhd.file oeocmt.file oecmwk.file oedtwk.file oehdwk.file guptdat.file hrempl.file hyw0189.file hyw0610a.file hylsgcu1.file hylsgcu2.file hylsgcu3.file hylsgcu4.file hylsgcu11.file hylsgcu12.file hylsgcu13.file hylsgcu14.file hylsgdt3.file hylsscc8.file hyr0602.pgm hyr0608.pgm hyr0189.pgm hyr0520.pgm hyc0138.pgm vprbldp.pgm
+
+# ----------------------------------------------------------------------------
+# REAL PICKBATR -- Pick Batch Dashboard (Profound UI Rich Display File).
+# Replaces the earlier hyrstubd-based stub.  Uses the pick-batch data layer
+# declared above plus PICKBATSV (service program) and stub sibling programs
+# PICKBATDR / PICKBATLR2 (the real bodies bring in too much absent code).
+# ----------------------------------------------------------------------------
+pickbatsv.module: pickbatsv.sqlrpgle pickbatsv_pr.rpgle
+pickbatsv.srvpgm: pickbatsv.module
+picksvbdir.bnddir: picksvbdir.bnddir | pickbatsv.srvpgm
+
+pickbatd.file:    pickbatd.dspf | pickbathp.file pickbatdp.file
+pickbatdr.pgm:    pickbatdr.rpgle
+pickbatlr2.pgm:   pickbatlr2.rpgle
+
+pickbatr.pgm: pickbatr.sqlrpgle pickbatsv_pr.rpgle pickbatd.file picksvbdir.bnddir | pickbathp.file pickbatdp.file pickbatlog.file pickbatmp.file pickmbatdp.file pickbathl1.file pickbathl2.file pickbatdl1.file pickbatdl2.file oeorhp.file oeordp.file oeordp01.file oeordt.file hylsgsd1.file hdcust.file hdccmt.file hdimst.file hdiwhs.file guptdat.file hypsgsd.file pickbatdr.pgm pickbatlr2.pgm
+
+# ----------------------------------------------------------------------------
+# REAL PICKERR -- Picker Workflow (Profound UI mobile Rich Display File).
+# Replaces the earlier hyrstubd-based stub.  Brings in PICKBATSP (scan
+# history), the PICKERR-specific bnddir, and stubbed HYR9960/HYR9962
+# barcode-utility service programs.
+# ----------------------------------------------------------------------------
+pickbatsp.file:  pickbatsp.pf
+
+hyr9960.module:  hyr9960.rpgle pickerr_pr.rpgle
+hyr9960.srvpgm:  hyr9960.module
+hyr9962.module:  hyr9962.rpgle pickerr_pr.rpgle
+hyr9962.srvpgm:  hyr9962.module
+pickerr.bnddir:  pickerr.bnddir | hyr9960.srvpgm hyr9962.srvpgm
+
+pickerd.file:    pickerd.dspf | pickbathp.file pickbatdp.file
+pickerr.pgm: pickerr.sqlrpgle pickerr_pr.rpgle pickerd.file pickerr.bnddir | pickbathp.file pickbathl1.file pickbathl2.file pickbatdp.file pickbatsp.file pickbatmp.file oeorhp.file oeordp.file oeordp01.file hdcust.file hdccmt.file hdimst.file hdiwhs.file guptdat.file hypsgdt.file pickbatlr2.pgm
