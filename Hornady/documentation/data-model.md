@@ -8,6 +8,14 @@ This package contains 4 physical files, 32 logical files, 2 SQL tables, 2 SQL vi
 > schemas for PICKBATR / PICKERR" near the bottom of this file.  The
 > originally-promoted PF / LF documentation below is unchanged; the SQL-table
 > equivalents now live in `src/*.table.sql` and `src/*.lf`.
+>
+> **Status note:** the data-layer changes documented in this file are all
+> applied and verified on `AITSK00030`.  The PICKERR mobile login (option 5)
+> renders correctly through Profound UI; PICKBATR's dashboard (option 4)
+> still paints a blank screen client-side despite the IBM i side reaching
+> EXFMT cleanly — see `rebuild-guide.md` §15 and §17 for the open
+> follow-ups.  Nothing in this data-model file is currently believed to be
+> the cause; the failure is in the PUI client render, not in the schemas.
 
 ## Physical files included
 

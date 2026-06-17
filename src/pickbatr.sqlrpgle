@@ -91,13 +91,13 @@
 
        Dcl-DS Table_Out LikeDS(Table_In);
 
-       Dcl-DS Ctl_Fields LikeRec(DisplyFile.Ctl:*ALL) ;
-       Dcl-DS Ctl_Fields_Out LikeRec(DisplyFile.Ctl:*OUTPUT) ;
-       Dcl-DS Sfl_In LikeRec(DisplyFile.Sfl:*INPUT) ;
-       Dcl-DS Sfl_Out LikeRec(DisplyFile.Sfl:*OUTPUT) ;
-       Dcl-DS Delete_Fields LikeRec(DisplyFile.Delete:*ALL) ;
-       Dcl-DS Msg_Fields LikeRec(DisplyFile.Message:*All) ;
-       Dcl-DS Batch_Msg_Fields LikeRec(DisplyFile.Batch_Msg:*All) ;
+       Dcl-DS Ctl_Fields LikeRec(DisplyFile.Ctl:*ALL) INZ ;
+       Dcl-DS Ctl_Fields_Out LikeRec(DisplyFile.Ctl:*OUTPUT) INZ ;
+       Dcl-DS Sfl_In LikeRec(DisplyFile.Sfl:*INPUT) INZ ;
+       Dcl-DS Sfl_Out LikeRec(DisplyFile.Sfl:*OUTPUT) INZ ;
+       Dcl-DS Delete_Fields LikeRec(DisplyFile.Delete:*ALL) INZ ;
+       Dcl-DS Msg_Fields LikeRec(DisplyFile.Message:*All) INZ ;
+       Dcl-DS Batch_Msg_Fields LikeRec(DisplyFile.Batch_Msg:*All) INZ ;
        Dcl-DS Assign_Bat_Fields LikeRec(DisplyFile.Assign_Bat:*All) ;
        Dcl-DS Comp_Batch_Fields LikeRec(DisplyFile.Comp_Batch:*All) ;
        Dcl-DS Ship_Via_Fields LikeRec(DisplyFile.Ship_Via:*All) ;

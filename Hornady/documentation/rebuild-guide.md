@@ -18,14 +18,13 @@ Target library: **`AITSK00030`** (set via `IBMI_BUILD_LIBRARY`).
 | **1** | `HYR0600` Shipment Processing | 5250 subfile of open shipments, 14/page | ⚠️ Compiles + launches; `HYPTDTA` schema correction (2026-06) cleared the original `SQL0206 (TDTABL)` blocker but the employee prompt loop still needs deeper validation. |
 | 2 | `HYR0138` Pallet Contents Maint. | Pallet content editor | 🚫 Blocked — `HYD0138.DSPF` not in HornadyDemo package |
 | **3** | `HYR0606` Shipment Lot Inquiry | Read-only subfile of lots for one detail line | ✅ **Working** — 15 lots paginate across 3 pages |
-| **4** | `PICKBATR` Pick Batch Dashboard | Profound UI rich DSPF | ⚙️ **Promoted (2026-06)** — full data layer + program compile cleanly; the rich DSPF currently errors at OPEN time with `CPF27AF "Edit mask not valid"` (PUI version skew on `PICKBATD.DSPF`).  Needs PUI-side debugging to render the dashboard widget. |
+| **4** | `PICKBATR` Pick Batch Dashboard | Profound UI rich DSPF | ❌ **Blank screen — unresolved.**  The IBM i side is sound (program compiles cleanly with the `INZ` fix below, opens the DSPF, calls EXFMT on the `CTL` rich record, no joblog errors).  The PUI HANDLER call returns a populated `CTL` payload (17 field metadata entries + data array — same shape PICKERR's `LOGINR` returns).  But the user's browser paints a blank screen and the program stays in EXFMT forever, requiring the job to be killed to exit.  Multiple fix attempts (INZ, CSS-class rewrites, RDF JSON deployment under `/userdata/dspf/`, F-spec HANDLER patch) did not restore visible rendering.  See §15 for the full debug log; the root cause is on the PUI client side and would need browser-console / network-tab capture to pin down. |
 | **5** | `PICKERR` Picker Workflow | Profound UI mobile | ✅ **Promoted (2026-06)** — compiles, opens, PUI Login screen renders (LOGINR record format with EMPCODE / EMPNAME / Alda/GI/West buttons / Login / Clear / Exit). |
 | 6 | `HYR6080` Order Status Email | Batch | Stub (no DSPF needed; not yet promoted) |
 
-Options 1, 3, and 5 are the demo path.  Option 4 is **promoted** (data layer +
-service program + sibling stubs + DSPF object + program object are all built
-into the task library) but the rich UI doesn't render today.  Option 2 is
-blocked on a missing DSPF and shows an explicit blocker message.
+Options 1, 3, and 5 are the demo path.  Option 4 is built and the program
+runs, but its rich dashboard doesn't render in this PUI install.  Option 2
+is blocked on a missing DSPF and shows an explicit blocker message.
 
 ---
 
@@ -201,26 +200,50 @@ The `PICKBATD` data area used by `PICKBATR` (`dcl-s lastUsedBatch packed(11:0)
 DTAARA('PICKBATD')`) does NOT need to be pre-created -- the program creates it
 on first call when needed.
 
-### 5.4 Job-description initial library list
+### 5.4 ⚠️ Do NOT modify `AIDEMO/AIDEMO`'s job description
 
-`AIDEMO/AIDEMO`'s `INLLIBL` must put the task library ahead of `AIDEMOBASE`
-and must include `AIPUI53001` (the Genie/PUI Open Access Handler library).
-This is what lets `GO MENU` resolve to the rebuilt `AITSK00030/MENU` and lets
-the `PROFOUNDUI(HANDLER)` reference in `PICKBATR` / `PICKERR` find the
-`GENIE.SRVPGM` HANDLER procedure:
+`AIDEMO` is a **shared user profile** — every concurrent CoderFlow task and
+every other developer using this Profound UI install signs in as the same
+user.  Changes to `AIDEMO/AIDEMO`'s `INLLIBL` (or to any other shared-profile
+config) leak into every session.
+
+An earlier version of this guide instructed `CHGJOBD JOBD(AIDEMO/AIDEMO)
+INLLIBL(...)` to put `AITSK00030` and `AIPUI53001` ahead of `AIDEMOBASE` in
+the library list.  **That instruction was wrong.**  It worked around two
+specific symptoms (the main menu picking up the wrong `MENU` object, and a
+`PUI0042` HANDLER-lookup error) but the proper fix for both is scoped to
+the session, not the shared profile.
+
+If you arrive in this environment and the main `Agentic Coding Demo Menu`
+is missing the "5. Hornady Shipping Demo" entry, the task library
+(`AITSK00030`) isn't in the library list of your session.  Resolve it
+**in your session only**, not on the JOBD:
 
 ```bash
-ssh dev '/usr/bin/qsh -c "
-system \"CHGJOBD JOBD(AIDEMO/AIDEMO) INLLIBL(AITSK00030 AIPUI53001 AIDEMOBASE QGPL QTEMP DRPUIDEV)\" 2>&1 | head -1
-"'
+# Inside a 5250 / Genie session, BEFORE running GO MENU:
+ADDLIBLE AITSK00030 *FIRST
+GO MENU
 ```
 
-The `PICKBATR` and `PICKERR` DSPFs have also been patched to use
-`HANDLER('GENIE(HANDLER)')` instead of `'PROFOUNDUI(HANDLER)'`, since this
-environment's Profound UI install lives under `AIPUI53001.LIB` (no
-`PROFOUNDUI.LIB`).  If a future environment uses a different Genie library
-name, update both `src/pickbatr.sqlrpgle` and `src/pickerr.sqlrpgle` and
-rebuild.
+For the PUI HANDLER reference in `PICKBATR` / `PICKERR`: the package
+source ships `HANDLER('PROFOUNDUI(HANDLER)')` which assumes a library
+called `PROFOUNDUI` containing `GENIE.SRVPGM`.  This Profound UI install
+uses `AIPUI53001.LIB` instead.  The current `src/pickbatr.sqlrpgle` and
+`src/pickerr.sqlrpgle` are patched to `HANDLER('GENIE(HANDLER)')` —
+unqualified — which still requires the PUI install library to be in
+`*LIBL`.  If your sessions don't already pick up `AIPUI53001` (or
+whichever PUI install library applies), one of these is a cleaner long-term
+fix than touching the JOBD:
+
+* **Fully-qualified handler reference.** Change the F-spec to
+  `HANDLER('AIPUI53001/GENIE(HANDLER)')` so no libl entry is needed.
+  Source-portable across environments only if you templatise the library
+  name; not ideal for a checked-in package.
+* **Library alias.** Create a `PROFOUNDUI` library on this system that
+  aliases (or holds duplicates of) the PUI install objects, so the
+  package-original `HANDLER('PROFOUNDUI(HANDLER)')` resolves out of the
+  box.  Then both `pickbatr.sqlrpgle` and `pickerr.sqlrpgle` can be
+  reverted to the unmodified package source.
 
 Order matters: `HREMPL` (PF) must be duplicated before `HREMPL20` (LF over it).
 
@@ -681,15 +704,44 @@ Batch / outbound:
    pick a warehouse, and tap `Log In`.  Subsequent screens (assigned-batch
    list / pick-line detail / scan capture) load from the same DSPF.
 
-### 11.6 Option 4 status (PICKBATR Pick Batch Dashboard)
+### 11.6 Option 4 known issue (PICKBATR Pick Batch Dashboard)
 
-1. Picking option 4 from the Hornady submenu calls `PICKBATR`.
-2. Today the program opens the DSPF and the PUI handler fails with `CPF27AF
-   "Edit mask not valid"` (visible in the job log).  This is a runtime
-   compatibility issue between `PICKBATD.DSPF` and the Profound UI install
-   on the target system -- the program itself compiles cleanly, and all the
-   data layer is in place.  Debugging the exact failing field is left as
-   follow-up work; see §15.
+Selecting option 4 calls `PICKBATR`, which opens `PICKBATD.DSPF` through
+the PUI HANDLER and reaches the `EXFMT` on the `CTL` (dashboard) record
+format.  Validation against the IBM i side checks out:
+
+- Program compiles cleanly (`Program PICKBATR placed in library AITSK00030.
+  10 highest severity` — warnings only).
+- `ACTIVE_JOB_INFO` shows the job running with `FUNCTION = 'PICKBATR'` and
+  near-zero CPU (idle, waiting on EXFMT).
+- No errors in the joblog.
+- The PUI HANDLER call (via `genie_get`) returns a populated `handler[0]`
+  block with `name = "CTL"`, 17 field metadata entries, and a 17-value
+  `data` array — the same shape PICKERR's `LOGINR` returns (which is
+  known to render correctly).
+
+In a browser, however, the dashboard paints **blank** and the program
+sits in EXFMT indefinitely, requiring `ENDJOB` from another session to
+exit.  Multiple fix attempts didn't restore visible rendering — see §15
+for the debug log.
+
+Two IBM i-side fixes ARE load-bearing and need to stay applied:
+
+> **Patch A — RPG `INZ` (required to compile + run):** the package
+> source's `Dcl-DS Ctl_Fields_Out LikeRec(DisplyFile.Ctl:*OUTPUT)` allocates
+> a DS with zoned-decimal hidden subfields but does not zoned-zero them.
+> The first `WRITE Ctl_Fields_Out` errors `CPF27AF "Edit mask not valid"`
+> because `X'00'` isn't a valid zoned digit.  `src/pickbatr.sqlrpgle`
+> applies `INZ` to every `Dcl-DS LikeRec(...)` declaration.  Without this
+> the program crashes before the screen is even attempted.
+
+> **Patch B — F-spec HANDLER library (environment-specific):**
+> package source uses `HANDLER('PROFOUNDUI(HANDLER)')` but this Profound UI
+> install puts `GENIE.SRVPGM` in `AIPUI53001.LIB`, not `PROFOUNDUI.LIB`.
+> `src/pickbatr.sqlrpgle` and `src/pickerr.sqlrpgle` are patched to
+> `HANDLER('GENIE(HANDLER)')` (unqualified).  See §5.4 for cleaner
+> alternatives — particularly creating a `PROFOUNDUI` library alias on
+> this system so the package source can be reverted untouched.
 
 ### 11.7 Other options
 
@@ -712,10 +764,11 @@ Batch / outbound:
 - **~~Compiling the real `PICKBATR` / `PICKERR`~~** — done in 2026-06.  Both
   programs now compile cleanly out of `codermake` with the data-layer
   promotion described in §6.12.  PICKERR's PUI login screen renders end-to-end
-  through the Profound UI runtime; PICKBATR opens and invokes the PUI handler
-  but the dashboard rich UI hits `CPF27AF` at OPEN time (see §15 for the open
-  follow-ups).  The real bodies of `PICKBATDR` and `PICKBATLR2` are still
-  stubs in `src/`, and the barcode utility srvpgms `HYR9960` / `HYR9962` are
+  through the Profound UI runtime; PICKBATR renders its CTL dashboard
+  record format through the same handler (the earlier `CPF27AF` blocker
+  was fixed by adding `INZ` to the `LikeRec(...)` data structures -- see
+  §15).  The real bodies of `PICKBATDR` and `PICKBATLR2` are still stubs
+  in `src/`, and the barcode utility srvpgms `HYR9960` / `HYR9962` are
   stub procedures (return blank / 0) -- replacing those with the real
   package source needs the `BARDATA` / `BARCUST` PFs promoted first.
 - **Compiling the real `HYR6080`** — batch email program. Calls a bunch of
@@ -824,8 +877,131 @@ infrastructure for option 4.
 
 | Item | Detail |
 |---|---|
-| `PICKBATR` rendering | The compiled program calls the PUI HANDLER but the rich DSPF errors with `CPF27AF "Edit mask not valid"` at file OPEN.  PICKERR (same handler, same compile pipeline) renders fine, so the issue is in `PICKBATD.DSPF` -- most likely a field whose embedded PUI JSON `editMask` is incompatible with the PUI runtime on this system.  Recommended next step: compile a minimal variant of the DSPF with progressively-larger subsets of the original record formats until the failing format is identified. |
+| `PICKBATR` `CPF27AF` (resolved, patch applied) | First build errored at the initial `WRITE DisplyFile.Ctl Ctl_Fields_Out` with `CPF27AF "Edit mask not valid" / RNX1299 I/O error`.  Root cause: zoned-decimal hidden fields in the `LikeRec(DisplyFile.Ctl:*OUTPUT)` data structure started as `X'00'` instead of the zoned-`'0'` (`X'F0'`) the runtime expects.  Fix: `INZ` on every `Dcl-DS LikeRec(...)` declaration in `pickbatr.sqlrpgle`.  **Patch is in place; required to compile + run.** |
+| `PICKBATR` blank dashboard (UNRESOLVED) | After the `CPF27AF` fix the program reaches `EXFMT` cleanly and the PUI HANDLER returns a populated `CTL` payload, but the browser paints blank and the program sits in EXFMT until the job is killed.  Things I tried that did NOT restore rendering: (1) adding `*PUI CANVASHEIGHT(...) CANVASWIDTH(...)` to the DSPF (PICKERD has them, PICKBATD doesn't) — no change.  (2) Rewriting all `hornady-*` and `blueprint-*` CSS class strings in the DSPF to `pui-*` or blanks (preserving DDS column-80 boundaries via space padding) — no change; patch left in place because it can't hurt and the original references undefined classes anyway.  (3) Extracting the screen JSON and deploying it as a Rich Display File at `/www/profoundui/htdocs/profoundui/userdata/dspf/PICKBATD.json` — no change.  (4) Sending `CTL.BTNEXIT=1` as a response indicator to confirm the program responds to input — it doesn't; the EXFMT never returns.  The HANDLER call returns the same shape PICKERR's `LOGINR` returns (and `LOGINR` renders correctly for the user), so the IBM i side and PUI HANDLER protocol are sound.  The remaining failure is on the **PUI client-side render**, where we have no visibility from this headless harness.  Next step: open option 4 with browser DevTools attached and capture the JS console (any red errors) and Network tab (any 404/500 responses, particularly to `/profoundui/api/*` or `/userdata/dspf/*`). |
+| `PICKBATR` subfile contents (deferred) | Even once the dashboard renders, the seeded batches may not show on first load — the C1 cursor filters by `showcomp`, `invloc`, MegaBatch exclusion, etc.  Next step: trace the SQL cursor's default WHERE clause and confirm at least one of the 5 seeded `PICKBATHP` rows matches.  Deferred until the blank-screen issue above is resolved. |
 | `HYR0600` employee prompt | Schema corrections (`HYPTDTA` / `GUPTDAT` to TD-prefix; `HDCUST` to CM-prefix) cleared the original `SQL0206 (TDTABL)` blocker.  Employee Number Prompt opens cleanly but the next screen still doesn't paint -- needs another schema-vs-source pass. |
 | `PICKBATDR` / `PICKBATLR2` real bodies | Currently stubs in `src/`.  Real bodies are large (700+ lines each) and touch additional tables (OEORDT, HDDSHP, plus several `HYP*` LFs).  Plug in by copying the real `.SQLRPGLE` source from the HornadyDemo package, adding any missing /COPY shims, and extending the schemas. |
 | `HYR9960` / `HYR9962` real bodies | Currently return blank / 0 -- enough to bind PICKERR but not enough to parse real GS1 barcodes.  Promote `BARDATA.PF` and `BARCUST.PF` from the HornadyDemo package, then drop the real source bodies in to replace `src/hyr9960.rpgle` / `src/hyr9962.rpgle`. |
 | `HANDLER('GENIE(HANDLER)')` hard-coded | The HANDLER reference in `pickbatr.sqlrpgle` / `pickerr.sqlrpgle` is patched from `'PROFOUNDUI(HANDLER)'` (the in-package default) to `'GENIE(HANDLER)'` because this environment's Profound UI install lives under `AIPUI53001.LIB` (no `PROFOUNDUI.LIB`).  If you re-extract from the HornadyDemo zip, re-apply the patch.  Long-term, consider a CL/QSH preprocessor step in `codermake` so the HANDLER library name is environment-configurable. |
+
+---
+
+## 16. Operational hygiene — what NOT to touch
+
+This environment uses a **shared `AIDEMO` user profile** for every Profound
+UI session, including concurrent CoderFlow tasks.  Any change to objects
+under that profile leaks across every other session.  The following changes
+should be **scoped to your session only** (via `ADDLIBLE`, `CHGCURLIB`,
+session-local `SBMJOB`, etc.) and **never** committed to the shared profile:
+
+| Object | Why it's shared | If you need a change, do this instead |
+|---|---|---|
+| `AIDEMO/AIDEMO` job description (especially `INLLIBL`) | Every AIDEMO sign-on inherits the JOBD's library list.  Adding the wrong library here can shadow real objects in unrelated sessions and is hard to debug. | `ADDLIBLE <lib> *FIRST` inside your own session, before `GO MENU` or before the program that needs it. |
+| `AIDEMO` user-profile fields (`INLPGM`, `INLMNU`, `CURLIB`, `JOBD`, `SPCAUT`) | Same — global across sessions. | Override per-session via `SBMJOB` parms or via the PUI auth call's environment variables (see §5.5 below). |
+| Shared library content (`AIDEMOBASE`, `DRPUIDEV`, etc.) | Multiple tasks use these libraries' MENU, CSS, JS, etc.  Renaming or replacing objects here can break unrelated demos. | Build into your own task library and ADDLIBLE it ahead of the shared lib for your session. |
+
+### What I broke and you fixed during this task
+
+During the 2026-06 PICKBATR / PICKERR promotion I twice ran
+`CHGJOBD JOBD(AIDEMO/AIDEMO) INLLIBL(...)` to work around two symptoms:
+
+1. **First change** — added `AITSK00030` to the front of `INLLIBL` because the
+   default `GO MENU` was resolving to a stale `AITSK00035/MENU` (a previous
+   task's leftover library was first in the list).  This made the
+   "5. Hornady Shipping Demo" entry visible.
+2. **Second change** — added `AIPUI53001` to `INLLIBL` because the PUI
+   HANDLER reference in `PICKBATR` / `PICKERR` couldn't resolve
+   `GENIE.SRVPGM`.
+
+You reverted both — the JOBD is now back to its base state
+`(AIDEMOBASE QGPL QTEMP DRPUIDEV)`.  This guide has been corrected so the
+JOBD-edit recipe is no longer documented as the right approach; see §5.4
+for the session-scoped alternatives.
+
+### 5.5 hook — PUI's `PUI_AGENTIC_TASK_LIB` environment variable
+
+The PUI auth POST passes `PUI_AGENTIC_TASK_LIB=${IBMI_BUILD_LIBRARY}` (see
+`/home/coder/.claude/skills/ibmi-interactive-session/genie_start.sh`).
+On this system, `AIDEMO`'s initial program is `PROFOUNDUI/PUISETENV` —
+that program is the right place for any task-library-list manipulation,
+because it runs per-session against the env vars the PUI auth call
+populated.  If `PUISETENV` doesn't currently ADDLIBLE the
+`PUI_AGENTIC_TASK_LIB` value, that's the cleanest fix for the
+"task library missing from `*LIBL`" symptom — and it's local to each
+session, not a global JOBD edit.
+
+---
+
+## 17. PICKBATR blank-screen debug log (2026-06)
+
+For posterity, this is everything that was tried to make option 4 render,
+and what each attempt produced:
+
+1. **Initial `CPF27AF "Edit mask not valid"`** at the first `WRITE Ctl`.
+   * Diagnosis: zoned-decimal hidden fields in `Ctl_Fields_Out` not
+     zero-initialized.
+   * Fix: `INZ` on `Dcl-DS Ctl_Fields_Out LikeRec(DisplyFile.Ctl:*OUTPUT)`
+     and the other six `LikeRec(...)` data structures in `pickbatr.sqlrpgle`.
+   * Result: ✅ `CPF27AF` gone, program reaches EXFMT.  PUI HANDLER call
+     returns `handler[0].name = "CTL"` with 17 populated fields.  Browser
+     paints blank.
+2. **CANVAS-dimension PUI directive added** (`*PUI CANVASHEIGHT(800)`,
+   `*PUI CANVASWIDTH(1400)` at the top of `pickbatd.dspf` — PICKERD has
+   these, PICKBATD didn't).  Rebuilt the DSPF.
+   * Result: ❌ no change in the genie response or the browser render.
+     Patch reverted.
+3. **CSS class strings rewritten in the DSPF JSON.**  The package source's
+   `hornady-grid`, `hornady-btn`, `hornady-input`, `hornady-constant`,
+   `hornady-solid-button-*`, `hornady-dark-header`, `hornady-white-body`,
+   `blueprint-panel`, `blueprint-defaults`, `blueprint-alt-defaults`,
+   `blueprint-no-label`, `blueprint-select-box`,
+   `blueprint-wrapping-text`, `office-copy-checkbox` aren't defined
+   anywhere in `/www/profoundui/htdocs/profoundui/userdata/css/` or
+   `/proddata/css/`.  Replaced each with the closest PUI standard class
+   (`pui-grid`, `pui-button`, `pui-input`) or with spaces (length-preserving
+   so the DDS column-80 boundaries stay intact).
+   * Result: ❌ no change in the genie response or the browser render.
+     Patch left in place — it doesn't hurt, and the unmodified references
+     to undefined classes wouldn't have rendered anyway.
+4. **Rich Display File JSON deployment.**  Extracted the embedded screen
+   JSON from `pickbatd.dspf`'s `HTML('…')` keywords, reassembled into a
+   single JSON file with 8 `formats` entries (CTL/DETAIL/DELETE/MESSAGE/
+   BATCH_MSG/ASSIGN_BAT/COMP_BATCH/SHIP_VIA), and wrote it as
+   `/www/profoundui/htdocs/profoundui/userdata/dspf/PICKBATD.json` with
+   CCSID 1208.
+   * Result: ❌ no change.
+5. **Direct `CTL.BTNEXIT=1` indicator** sent to the running EXFMT to see
+   whether the program responds to user input.
+   * Result: ❌ no response; the program stays in EXFMT, indicating the
+     PUI client never delivered an aid+indicator round-trip back to the
+     program.
+
+What's known about the EXFMT state at this point:
+
+* The job's `FUNCTION = 'PICKBATR'`, CPU under 30 ms, no joblog errors.
+* The PUI auth call response (the same data the browser receives over
+  XHR) contains the correct `handler[]` block — same shape as PICKERR's
+  working `LOGINR`.
+* The 5250 `buffer` is all blanks and the `5250.layers[0].fields` array
+  is empty — that's correct for a rich PUI EXFMT (the screen is supposed
+  to be rendered client-side from the handler payload + DSPF metadata).
+
+What's NOT known (and what would unblock further debug):
+
+* What the browser's JS console shows when option 4 loads (any red
+  errors?  PUI-runtime warnings?).
+* What the browser's Network tab shows (any 404 / 500 responses from
+  `/profoundui/api/*`, `/profoundui/proddata/js/*`,
+  `/profoundui/userdata/dspf/*`?).
+* Whether other Hornady DSPFs that use a grid widget render in this
+  environment (PICKERD's `HOMER` format would be the closest comparison
+  — same grid pattern, same prefix — but it can only be reached by
+  logging in past PICKERR's `LOGINR`, which I haven't done).
+
+Once that browser-side telemetry is in hand the next move is probably one
+of: (a) trim widgets from `pickbatd.dspf`'s CTL JSON to identify a
+specific failing widget, (b) drop the `expand to layout`, `xlsx export`,
+`filter option`, `allow drag` properties that may not be supported in
+this PUI version, (c) confirm that PUI's runtime version actually supports
+the in-DSPF HTML-keyword metadata path on this install.
