@@ -1,0 +1,181 @@
+<%
+  function statusKey(s) { return (s || 'x').toString().trim().toLowerCase(); }
+  function dash(v) { return (v && String(v).trim()) ? v : '&mdash;'; }
+  function fmtN(n) { return Number(n || 0).toLocaleString('en-US'); }
+  function fmtW(n) {
+    var v = Number(n || 0);
+    return v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  var hasMsg = typeof msg !== 'undefined' && msg && msg.trim();
+  var mt = (typeof msgtype !== 'undefined' && msgtype) ? msgtype.trim() : 'info';
+  var viewing = (typeof viewgrp !== 'undefined') && Number(viewgrp) > 0;
+  var vsKey = (typeof viewstat !== 'undefined' && viewstat) ? statusKey(viewstat.charAt(0)) : 'x';
+%>
+<div class="hornady-dashboard">
+
+  <div class="hd-topbar">
+    <div class="hd-brand">
+      <img class="hd-logo" src="/profoundui/userdata/ui/hyr0600eo/hornady-logo.png?v=2" alt="Hornady">
+      <div class="hd-titleblock">
+        <div class="hd-eyebrow">Distribution &middot; Shipping POC</div>
+        <h1 class="hd-title">Shipment Processing</h1>
+      </div>
+    </div>
+    <div class="hd-topbar-meta">
+      <span class="hd-meta-label">Build</span>
+      <span class="hd-meta-value">EJS Rich Display</span>
+    </div>
+  </div>
+  <div class="hd-stripe"></div>
+
+  <div class="hd-statgrid">
+    <div class="hd-stat">
+      <div class="hd-stat-label">Total Shipments</div>
+      <div class="hd-stat-value"><%= totships %></div>
+    </div>
+    <div class="hd-stat hd-stat--open">
+      <div class="hd-stat-label">Open</div>
+      <div class="hd-stat-value"><%= openct %></div>
+    </div>
+    <div class="hd-stat hd-stat--done">
+      <div class="hd-stat-label">Completed</div>
+      <div class="hd-stat-value"><%= completed %></div>
+    </div>
+    <div class="hd-stat hd-stat--active">
+      <div class="hd-stat-label">DC: WEST</div>
+      <div class="hd-stat-value"><%= westct %></div>
+    </div>
+    <div class="hd-stat hd-stat--paused">
+      <div class="hd-stat-label">DC: ALDA / GI</div>
+      <div class="hd-stat-value"><%= aldact %> / <%= gict %></div>
+    </div>
+    <div class="hd-stat hd-stat--items">
+      <div class="hd-stat-label">Items / Weight</div>
+      <div class="hd-stat-value"><%= totitems %> <span class="hd-stat-sep">/</span> <%= fmtW(totweight) %></div>
+    </div>
+  </div>
+
+  <div class="hd-toolbar">
+    <div class="hd-filter">
+      <label for="fstatus">Status</label>
+      <select name="fstatus" id="fstatus" class="hd-input">
+        <option value=""  <%= fstatus.trim()==='' ? 'selected' : '' %>>All</option>
+        <option value="O" <%= fstatus.trim()==='O' ? 'selected' : '' %>>Open</option>
+        <option value="C" <%= fstatus.trim()==='C' ? 'selected' : '' %>>Completed</option>
+      </select>
+    </div>
+    <div class="hd-filter">
+      <label for="floc">DC Location</label>
+      <select name="floc" id="floc" class="hd-input">
+        <option value=""     <%= floc.trim()==='' ? 'selected' : '' %>>All</option>
+        <option value="WEST" <%= floc.trim()==='WEST' ? 'selected' : '' %>>WEST</option>
+        <option value="ALDA" <%= floc.trim()==='ALDA' ? 'selected' : '' %>>ALDA</option>
+        <option value="GI"   <%= floc.trim()==='GI'   ? 'selected' : '' %>>GI</option>
+      </select>
+    </div>
+    <div class="hd-filter hd-filter--grow">
+      <label for="ffilter">Group #, customer, ship-via</label>
+      <input type="text" name="ffilter" id="ffilter" value="<%= ffilter %>"
+             class="hd-input" placeholder="e.g. 1003, ACME, UPS">
+    </div>
+    <div class="hd-actions">
+      <button type="button" class="hd-btn hd-btn--primary"
+              onclick="pui.submit({action:'SEARCH'})">Apply Filter</button>
+      <button type="button" class="hd-btn hd-btn--ghost"
+              onclick="pui.submit({action:'CLEAR'})">Clear</button>
+    </div>
+  </div>
+
+  <% if (hasMsg) { %>
+    <div class="hd-message hd-message--<%= mt %>"><%= msg %></div>
+  <% } %>
+
+  <div class="hd-tablewrap">
+    <table class="hd-table">
+      <thead>
+        <tr>
+          <th class="hd-col-actions">Action</th>
+          <th class="hd-col-batch">Group #</th>
+          <th class="hd-col-picker">Ship-To #</th>
+          <th>Customer</th>
+          <th>Ship-Via</th>
+          <th class="hd-col-loc">DC</th>
+          <th class="hd-col-status">Status</th>
+          <th class="hd-col-num">Items</th>
+          <th class="hd-col-num">Weight (lb)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (typeof shipsfl !== 'undefined' && shipsfl && shipsfl.length > 0) { %>
+          <% shipsfl.forEach(function (row) {
+               var s = statusKey(row.sstat);
+          %>
+            <tr>
+              <td class="hd-col-actions">
+                <button type="button" class="hd-iconbtn hd-iconbtn--view"
+                        title="View shipment lines"
+                        onclick="pui.submit({action:'VIEW', selgrp: <%= row.sgrp %>})">
+                  <span class="hd-icon">&#128269;</span>
+                </button>
+              </td>
+              <td class="hd-col-batch hd-mono"><%= row.sgrp %></td>
+              <td class="hd-col-picker hd-mono"><%= row.sshto %></td>
+              <td><%= (row.sname || '').trim() %></td>
+              <td><%= (row.sshvds || '').trim() %> <span class="hd-mono" style="color:var(--hd-slate)">(<%= (row.sshpv || '').trim() %>)</span></td>
+              <td class="hd-col-loc"><%= row.sloc %></td>
+              <td class="hd-col-status"><span class="hd-badge hd-badge--<%= s %>"><%= row.sstatdesc %></span></td>
+              <td class="hd-col-num hd-mono"><%= fmtN(row.sitems) %></td>
+              <td class="hd-col-num hd-mono"><%= fmtW(row.sweight) %></td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr><td colspan="9" class="hd-empty">No shipments to display.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="selgrp" value="0">
+  <input type="hidden" name="viewgrp" value="<%= (typeof viewgrp !== 'undefined') ? viewgrp : 0 %>">
+
+  <div class="hd-footer">
+    <div class="hd-foot-meta">HORNADY MANUFACTURING &middot; Internal Demo &middot; Profound UI EJS</div>
+    <button type="button" class="hd-btn hd-btn--secondary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">Exit (F3)</button>
+  </div>
+
+  <% if (viewing) { %>
+    <div class="hd-modal-backdrop" data-hd-modal="view"
+         onclick="if(event.target===this){pui.submit({action:'CLOSE_VIEW'})}">
+      <div class="hd-modal">
+        <div class="hd-modal-head">
+          <div class="hd-modal-title">
+            Shipment <span class="hd-mono">#<%= viewgrp %></span>
+            &mdash; <%= (viewship || '').trim() %>
+            <span class="hd-badge hd-badge--<%= vsKey %>"><%= viewstat %></span>
+          </div>
+          <button type="button" class="hd-iconbtn hd-iconbtn--close"
+                  onclick="pui.submit({action:'CLOSE_VIEW'})" title="Close">&times;</button>
+        </div>
+        <div class="hd-modal-body">
+          <div class="hd-modal-summary" style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:16px;">
+            <div class="hd-stat"><div class="hd-stat-label">Bill-to</div><div class="hd-stat-value" style="font-size:14px;"><%= (viewbill || '').trim() %></div></div>
+            <div class="hd-stat"><div class="hd-stat-label">Ship-via</div><div class="hd-stat-value" style="font-size:14px;"><%= (viewvia || '').trim() %></div></div>
+            <div class="hd-stat"><div class="hd-stat-label">DC / Zip</div><div class="hd-stat-value" style="font-size:14px;"><%= (viewloc || '').trim() %> / <%= (viewzip || '').trim() %></div></div>
+            <div class="hd-stat"><div class="hd-stat-label">Items / Weight</div><div class="hd-stat-value" style="font-size:14px;"><%= viewitems %> / <%= fmtW(viewweight) %> lb</div></div>
+          </div>
+          <div class="hd-detail-rows"
+               data-rows="<%= (typeof detlines !== 'undefined' ? detlines : '[]') %>">
+            <div class="hd-detail-loading">Loading detail&hellip;</div>
+          </div>
+        </div>
+        <div class="hd-modal-foot">
+          <button type="button" class="hd-btn hd-btn--ghost"
+                  onclick="pui.submit({action:'CLOSE_VIEW'})">Close</button>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+</div>

@@ -235,6 +235,28 @@ pickbatlr2.pgm:   pickbatlr2.rpgle
 
 pickbatr.pgm: pickbatr.sqlrpgle pickbatsv_pr.rpgle pickbatd.file picksvbdir.bnddir | pickbathp.file pickbatdp.file pickbatlog.file pickbatmp.file pickmbatdp.file pickbathl1.file pickbathl2.file pickbatdl1.file pickbatdl2.file oeorhp.file oeordp.file oeordp01.file oeordt.file hylsgsd1.file hdcust.file hdccmt.file hdimst.file hdiwhs.file guptdat.file hypsgsd.file pickbatdr.pgm pickbatlr2.pgm
 
+# Option 14 -- Pick Batch Dashboard (EJS Rich Display clone of PICKBATR).
+pickbateo.file:  pickbateo.json
+pickbateo.pgm:   pickbateo.sqlrpgle pickbateo.file | pickbathp.file
+
+# Option 15 -- Picker Workflow (EJS Rich Display clone of PICKERR).
+# WHLOC provides the row/bay/shelf coordinate per item per DC.
+whloc.file:      whloc.table.sql
+pickereo.file:   pickereo.json
+pickereo.pgm:    pickereo.sqlrpgle pickereo.file | pickbathp.file pickbatdp.file whloc.file
+
+# Option 11 -- Shipment Processing (EJS clone of HYR0600).
+hyr0600eo.file:  hyr0600eo.json
+hyr0600eo.pgm:   hyr0600eo.sqlrpgle hyr0600eo.file | hypsgcu.file hypsghd.file hypsgdt.file
+
+# Option 12 -- Pallet Contents Maintenance (EJS clone of HYR0138).
+hyr0138eo.file:  hyr0138eo.json
+hyr0138eo.pgm:   hyr0138eo.sqlrpgle hyr0138eo.file | hyppllt.file hdcust.file
+
+# Option 13 -- Shipment Lot Inquiry (EJS clone of HYR0606).
+hyr0606eo.file:  hyr0606eo.json
+hyr0606eo.pgm:   hyr0606eo.sqlrpgle hyr0606eo.file | hypsgld.file hypsgcu.file
+
 # ----------------------------------------------------------------------------
 # REAL PICKERR -- Picker Workflow (Profound UI mobile Rich Display File).
 # Replaces the earlier hyrstubd-based stub.  Brings in PICKBATSP (scan

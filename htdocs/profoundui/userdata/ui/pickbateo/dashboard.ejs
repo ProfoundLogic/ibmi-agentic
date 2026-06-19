@@ -1,0 +1,295 @@
+<%
+  // Lightweight helpers used by the template.
+  function statusKey(s) { return (s || 'x').toString().trim().toLowerCase(); }
+  function dash(v) { return (v && String(v).trim()) ? v : '&mdash;'; }
+  var hasMsg = typeof msg !== 'undefined' && msg && msg.trim();
+  var mt = (typeof msgtype !== 'undefined' && msgtype) ? msgtype.trim() : '';
+  var viewing = (typeof viewbatch !== 'undefined') && Number(viewbatch) > 0;
+  var viewingMega = viewing &&
+    (typeof viewismega !== 'undefined') && (viewismega + '').trim() === 'Y';
+%>
+<div class="hornady-dashboard">
+
+  <div class="hd-topbar">
+    <div class="hd-brand">
+      <img class="hd-logo" src="/profoundui/userdata/ui/pickbateo/hornady-logo.png?v=3" alt="Hornady">
+      <div class="hd-titleblock">
+        <div class="hd-eyebrow">Distribution &middot; Shipping POC</div>
+        <h1 class="hd-title">Pick Batch Dashboard</h1>
+      </div>
+    </div>
+    <div class="hd-topbar-meta">
+      <span class="hd-meta-label">Build</span>
+      <span class="hd-meta-value">EJS Rich Display</span>
+    </div>
+  </div>
+
+  <div class="hd-stripe"></div>
+
+  <div class="hd-statgrid">
+    <div class="hd-stat">
+      <div class="hd-stat-label">Total Batches</div>
+      <div class="hd-stat-value"><%= totbatch %></div>
+    </div>
+    <div class="hd-stat hd-stat--open">
+      <div class="hd-stat-label">Open</div>
+      <div class="hd-stat-value"><%= openct %></div>
+    </div>
+    <div class="hd-stat hd-stat--active">
+      <div class="hd-stat-label">Active</div>
+      <div class="hd-stat-value"><%= activect %></div>
+    </div>
+    <div class="hd-stat hd-stat--paused">
+      <div class="hd-stat-label">Paused</div>
+      <div class="hd-stat-value"><%= pausedct %></div>
+    </div>
+    <div class="hd-stat hd-stat--done">
+      <div class="hd-stat-label">Completed</div>
+      <div class="hd-stat-value"><%= donect %></div>
+    </div>
+    <div class="hd-stat hd-stat--mega">
+      <div class="hd-stat-label">Mega Batches</div>
+      <div class="hd-stat-value"><%= megact %></div>
+    </div>
+  </div>
+
+  <div class="hd-toolbar">
+    <div class="hd-filter">
+      <label for="fstatus">Status</label>
+      <select name="fstatus" id="fstatus" class="hd-input">
+        <option value=""  <%= fstatus.trim()==='' ? 'selected' : '' %>>All</option>
+        <option value="O" <%= fstatus.trim()==='O' ? 'selected' : '' %>>Open</option>
+        <option value="A" <%= fstatus.trim()==='A' ? 'selected' : '' %>>Active</option>
+        <option value="P" <%= fstatus.trim()==='P' ? 'selected' : '' %>>Paused</option>
+        <option value="Z" <%= fstatus.trim()==='Z' ? 'selected' : '' %>>Completed</option>
+      </select>
+    </div>
+    <div class="hd-filter">
+      <label for="floc">DC Location</label>
+      <select name="floc" id="floc" class="hd-input">
+        <option value=""     <%= floc.trim()===''     ? 'selected' : '' %>>All</option>
+        <option value="WEST" <%= floc.trim()==='WEST' ? 'selected' : '' %>>WEST</option>
+        <option value="ALDA" <%= floc.trim()==='ALDA' ? 'selected' : '' %>>ALDA</option>
+        <option value="GI"   <%= floc.trim()==='GI'   ? 'selected' : '' %>>GI</option>
+      </select>
+    </div>
+    <div class="hd-filter hd-filter--grow">
+      <label for="ffilter">Picker or Batch #</label>
+      <input type="text" name="ffilter" id="ffilter" value="<%= ffilter %>"
+             class="hd-input" placeholder="e.g. PICKER01 or 5003">
+    </div>
+    <div class="hd-actions">
+      <button type="button" class="hd-btn hd-btn--primary"
+              onclick="pui.submit({action:'SEARCH'})">Apply Filter</button>
+      <button type="button" class="hd-btn hd-btn--ghost"
+              onclick="pui.submit({action:'CLEAR'})">Clear</button>
+    </div>
+  </div>
+
+  <!-- Mega selection action bar: hidden until rows are checked. -->
+  <div class="hd-megabar hd-hidden" id="hd-megabar">
+    <span class="hd-megabar-text"><strong id="hd-megabar-count">0</strong> batches selected</span>
+    <div class="hd-megabar-actions">
+      <button type="button" class="hd-btn hd-btn--ghost hd-btn--small"
+              onclick="HD_clearSelections()">Clear selection</button>
+      <button type="button" class="hd-btn hd-btn--mega"
+              id="hd-megabar-create"
+              onclick="HD_createMega()" disabled>Bundle into Mega Batch</button>
+    </div>
+  </div>
+
+  <% if (hasMsg) { %>
+    <div class="hd-message hd-message--<%= mt || 'info' %>"><%= msg %></div>
+  <% } %>
+
+  <div class="hd-tablewrap">
+    <table class="hd-table">
+      <thead>
+        <tr>
+          <th class="hd-col-check">
+            <input type="checkbox" class="hd-check" id="hd-check-all"
+                   title="Select / deselect all eligible rows">
+          </th>
+          <th class="hd-col-actions">Actions</th>
+          <th class="hd-col-batch">Batch #</th>
+          <th class="hd-col-picker">Picker</th>
+          <th class="hd-col-loc">DC</th>
+          <th class="hd-col-status">Status</th>
+          <th class="hd-col-num">Items</th>
+          <th class="hd-col-num">Pieces</th>
+          <th class="hd-col-time">Started</th>
+          <th class="hd-col-time">Completed</th>
+          <th class="hd-col-num">Duration</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (typeof batsfl !== 'undefined' && batsfl && batsfl.length > 0) { %>
+          <% batsfl.forEach(function(row) {
+               var s      = statusKey(row.sstat);
+               var bat    = row.sbatch;
+               var pic    = (row.spicker || '').trim();
+               var isMega = (row.sismega + '').trim() === 'Y';
+               var canStart    = !isMega && (s === 'o' || s === 'p');
+               var canPause    = !isMega && (s === 'a');
+               var canComplete = !isMega && (s === 'a' || s === 'p');
+               // Megas can't be re-bundled or have their picker reassigned;
+               // they have a dedicated Dissolve action instead.
+          %>
+            <tr class="<%= isMega ? 'is-mega' : '' %>">
+              <td class="hd-col-check">
+                <% if (!isMega) { %>
+                  <input type="checkbox" class="hd-check hd-row-check"
+                         data-batch="<%= bat %>">
+                <% } %>
+              </td>
+              <td class="hd-col-actions">
+                <div class="hd-row-actions">
+                  <button type="button" class="hd-iconbtn hd-iconbtn--view"
+                          title="View detail"
+                          onclick="pui.submit({action:'VIEW', selbatch: <%= bat %>})">
+                    <span class="hd-icon">&#128269;</span>
+                  </button>
+                  <% if (isMega) { %>
+                    <button type="button" class="hd-iconbtn hd-iconbtn--dissolve"
+                            title="Dissolve mega batch (release children)"
+                            onclick="HD_confirmDissolve(<%= bat %>, <%= row.skidct || 0 %>)">
+                      <span class="hd-icon">&#11139;</span>
+                    </button>
+                  <% } else { %>
+                    <button type="button" class="hd-iconbtn hd-iconbtn--assign"
+                            title="Assign picker"
+                            onclick="window.HD_assign && HD_assign(<%= bat %>, '<%= pic %>')">
+                      <span class="hd-icon">&#9999;&#65039;</span>
+                    </button>
+                    <button type="button" class="hd-iconbtn hd-iconbtn--start"
+                            title="<%= canStart ? 'Start / Resume' : 'Not available' %>"
+                            <%= canStart ? '' : 'disabled' %>
+                            onclick="pui.submit({action:'START', selbatch: <%= bat %>})">
+                      <span class="hd-icon">&#9654;</span>
+                    </button>
+                    <button type="button" class="hd-iconbtn hd-iconbtn--pause"
+                            title="<%= canPause ? 'Pause' : 'Not available' %>"
+                            <%= canPause ? '' : 'disabled' %>
+                            onclick="pui.submit({action:'PAUSE', selbatch: <%= bat %>})">
+                      <span class="hd-icon">&#9208;</span>
+                    </button>
+                    <button type="button" class="hd-iconbtn hd-iconbtn--done"
+                            title="<%= canComplete ? 'Mark complete' : 'Not available' %>"
+                            <%= canComplete ? '' : 'disabled' %>
+                            onclick="pui.submit({action:'COMPLETE', selbatch: <%= bat %>})">
+                      <span class="hd-icon">&#10003;</span>
+                    </button>
+                    <button type="button" class="hd-iconbtn hd-iconbtn--delete"
+                            title="Delete batch"
+                            onclick="window.HD_confirmDelete && HD_confirmDelete(<%= bat %>)">
+                      <span class="hd-icon">&#128465;</span>
+                    </button>
+                  <% } %>
+                </div>
+              </td>
+              <td class="hd-col-batch hd-mono">
+                <%= bat %>
+                <% if (isMega) { %>
+                  <span class="hd-badge hd-badge--mega" title="<%= row.skidct %> batches bundled">MEGA &times;<%= row.skidct %></span>
+                <% } %>
+              </td>
+              <td class="hd-col-picker"><%= pic %></td>
+              <td class="hd-col-loc"><%= row.sloc %></td>
+              <td class="hd-col-status"><span class="hd-badge hd-badge--<%= s %>"><%= row.sstatdesc %></span></td>
+              <td class="hd-col-num hd-mono"><%= row.sitems %></td>
+              <td class="hd-col-num hd-mono"><%= row.spieces %></td>
+              <td class="hd-col-time hd-mono"><%- dash(row.sstart) %></td>
+              <td class="hd-col-time hd-mono"><%- dash(row.send) %></td>
+              <td class="hd-col-num hd-mono"><%- (Number(row.sdurmins) > 0) ? (row.sdurmins + ' min') : '&mdash;' %></td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr><td colspan="11" class="hd-empty">No batches to display.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="selbatch" value="0">
+  <input type="hidden" name="selbatches" value="">
+  <input type="hidden" name="newpicker" value="">
+  <input type="hidden" name="viewbatch" value="<%= (typeof viewbatch !== 'undefined') ? viewbatch : 0 %>">
+
+  <div class="hd-footer">
+    <div class="hd-foot-meta">HORNADY MANUFACTURING &middot; Internal Demo &middot; Profound UI EJS</div>
+    <button type="button" class="hd-btn hd-btn--secondary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">Exit (F3)</button>
+  </div>
+
+  <!-- ========== View Detail Modal ========== -->
+  <% if (viewing) { %>
+    <div class="hd-modal-backdrop" data-hd-modal="view"
+         onclick="if(event.target===this){pui.submit({action:'CLOSE_VIEW'})}">
+      <div class="hd-modal">
+        <div class="hd-modal-head">
+          <div class="hd-modal-title">
+            <% if (viewingMega) { %>
+              <span class="hd-badge hd-badge--mega">MEGA</span>
+            <% } %>
+            Batch <span class="hd-mono">#<%= viewbatch %></span>
+            &mdash; <%= (typeof viewpick !== 'undefined' ? viewpick : '').trim() %>
+            <span class="hd-badge hd-badge--<%= statusKey(viewstat.charAt(0)) %>"><%= viewstat %></span>
+          </div>
+          <button type="button" class="hd-iconbtn hd-iconbtn--close"
+                  onclick="pui.submit({action:'CLOSE_VIEW'})"
+                  title="Close">&times;</button>
+        </div>
+        <div class="hd-modal-body">
+          <% if (viewingMega) { %>
+            <h4 class="hd-modal-h4">Constituent batches</h4>
+            <div class="hd-mega-kids"
+                 data-kids="<%= (typeof megakids !== 'undefined' ? megakids : '[]') %>">
+              <div class="hd-detail-loading">Loading kids&hellip;</div>
+            </div>
+            <h4 class="hd-modal-h4">Combined pick lines</h4>
+          <% } %>
+          <div class="hd-detail-rows"
+               data-rows="<%= (typeof detjson !== 'undefined' ? detjson : '[]') %>">
+            <div class="hd-detail-loading">Loading detail&hellip;</div>
+          </div>
+        </div>
+        <div class="hd-modal-foot">
+          <% if (viewingMega) { %>
+            <button type="button" class="hd-btn hd-btn--warn"
+                    onclick="HD_confirmDissolve(<%= viewbatch %>, 0)">Dissolve mega</button>
+          <% } %>
+          <button type="button" class="hd-btn hd-btn--ghost"
+                  onclick="pui.submit({action:'CLOSE_VIEW'})">Close</button>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- ========== Assign Picker Modal (purely client-side until Save) ========== -->
+  <div class="hd-modal-backdrop hd-hidden" id="hd-assign-modal"
+       onclick="if(event.target===this){HD_closeAssign()}">
+    <div class="hd-modal hd-modal--small">
+      <div class="hd-modal-head">
+        <div class="hd-modal-title">Assign Picker</div>
+        <button type="button" class="hd-iconbtn hd-iconbtn--close"
+                onclick="HD_closeAssign()" title="Close">&times;</button>
+      </div>
+      <div class="hd-modal-body">
+        <p class="hd-modal-sub">Reassign batch <span class="hd-mono" id="hd-assign-batch">#</span>.</p>
+        <div class="hd-filter">
+          <label for="hd-assign-picker">Picker code</label>
+          <input type="text" id="hd-assign-picker" class="hd-input"
+                 maxlength="10" placeholder="e.g. PICKER02">
+        </div>
+      </div>
+      <div class="hd-modal-foot">
+        <button type="button" class="hd-btn hd-btn--ghost"
+                onclick="HD_closeAssign()">Cancel</button>
+        <button type="button" class="hd-btn hd-btn--primary"
+                onclick="HD_submitAssign()">Save</button>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,209 @@
+<%
+  function statusKey(s) { return (s || 'x').toString().trim().toLowerCase(); }
+  function dash(v) { return (v && String(v).trim()) ? v : '&mdash;'; }
+  function fmtN(n) { return Number(n || 0).toLocaleString('en-US'); }
+  function fmtF(n) {
+    var v = Number(n || 0);
+    return v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  var hasMsg = typeof msg !== 'undefined' && msg && msg.trim();
+  var mt = (typeof msgtype !== 'undefined' && msgtype) ? msgtype.trim() : 'info';
+%>
+<div class="hornady-dashboard">
+
+  <div class="hd-topbar">
+    <div class="hd-brand">
+      <img class="hd-logo" src="/profoundui/userdata/ui/hyr0138eo/hornady-logo.png?v=1" alt="Hornady">
+      <div class="hd-titleblock">
+        <div class="hd-eyebrow">Distribution &middot; Shipping POC</div>
+        <h1 class="hd-title">Pallet Contents Maintenance</h1>
+      </div>
+    </div>
+    <div class="hd-topbar-meta">
+      <span class="hd-meta-label">Build</span>
+      <span class="hd-meta-value">EJS Rich Display</span>
+    </div>
+  </div>
+  <div class="hd-stripe"></div>
+
+  <div class="hd-statgrid">
+    <div class="hd-stat">
+      <div class="hd-stat-label">Total Pallets</div>
+      <div class="hd-stat-value"><%= totpal %></div>
+    </div>
+    <div class="hd-stat hd-stat--open">
+      <div class="hd-stat-label">Open</div>
+      <div class="hd-stat-value"><%= openct %></div>
+    </div>
+    <div class="hd-stat hd-stat--done">
+      <div class="hd-stat-label">Closed</div>
+      <div class="hd-stat-value"><%= closedct %></div>
+    </div>
+    <div class="hd-stat hd-stat--paused">
+      <div class="hd-stat-label">Hazmat</div>
+      <div class="hd-stat-value"><%= hazct %></div>
+    </div>
+    <div class="hd-stat hd-stat--items" style="grid-column: span 2;">
+      <div class="hd-stat-label">Total Volume</div>
+      <div class="hd-stat-value"><%= fmtF(totvol) %> <span class="hd-stat-sep">ft&sup3;</span></div>
+    </div>
+  </div>
+
+  <div class="hd-toolbar">
+    <div class="hd-filter">
+      <label for="fstatus">Status</label>
+      <select name="fstatus" id="fstatus" class="hd-input">
+        <option value=""  <%= fstatus.trim()==='' ? 'selected' : '' %>>All</option>
+        <option value="O" <%= fstatus.trim()==='O' ? 'selected' : '' %>>Open</option>
+        <option value="C" <%= fstatus.trim()==='C' ? 'selected' : '' %>>Closed</option>
+      </select>
+    </div>
+    <div class="hd-filter hd-filter--grow">
+      <label for="ffilter">Serial #, ship-to #, or customer name</label>
+      <input type="text" name="ffilter" id="ffilter" value="<%= ffilter %>"
+             class="hd-input" placeholder="e.g. 9001, 1000100, ACME">
+    </div>
+    <div class="hd-actions">
+      <button type="button" class="hd-btn hd-btn--primary"
+              onclick="pui.submit({action:'SEARCH'})">Apply Filter</button>
+      <button type="button" class="hd-btn hd-btn--ghost"
+              onclick="pui.submit({action:'CLEAR'})">Clear</button>
+      <button type="button" class="hd-btn hd-btn--success"
+              onclick="HD_openCreate()">+ New Pallet</button>
+    </div>
+  </div>
+
+  <% if (hasMsg) { %>
+    <div class="hd-message hd-message--<%= mt %>"><%= msg %></div>
+  <% } %>
+
+  <div class="hd-tablewrap">
+    <table class="hd-table">
+      <thead>
+        <tr>
+          <th class="hd-col-actions">Actions</th>
+          <th class="hd-col-batch">Serial #</th>
+          <th>Ship-To</th>
+          <th>Customer</th>
+          <th class="hd-col-status">Status</th>
+          <th class="hd-col-status">Hazmat</th>
+          <th class="hd-col-num">L &times; W &times; H</th>
+          <th class="hd-col-num">Volume ft&sup3;</th>
+          <th>BOL #</th>
+          <th class="hd-col-time">Built</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (typeof palsfl !== 'undefined' && palsfl && palsfl.length > 0) { %>
+          <% palsfl.forEach(function (row) {
+               var s   = statusKey(row.pstat);
+               var hz  = (row.phaz || '').trim() === 'Y';
+          %>
+            <tr>
+              <td class="hd-col-actions">
+                <div class="hd-row-actions">
+                  <% if (s === 'o') { %>
+                    <button type="button" class="hd-iconbtn hd-iconbtn--pause"
+                            title="Close pallet"
+                            onclick="pui.submit({action:'CLOSE', selshto:<%= row.pshto %>, selpsrl:<%= row.psrl %>})">
+                      <span class="hd-icon">&#128274;</span>
+                    </button>
+                  <% } else { %>
+                    <button type="button" class="hd-iconbtn hd-iconbtn--start"
+                            title="Reopen pallet"
+                            onclick="pui.submit({action:'REOPEN', selshto:<%= row.pshto %>, selpsrl:<%= row.psrl %>})">
+                      <span class="hd-icon">&#128275;</span>
+                    </button>
+                  <% } %>
+                  <button type="button" class="hd-iconbtn hd-iconbtn--assign"
+                          title="Toggle hazmat flag"
+                          onclick="pui.submit({action:'TOGGLE_HAZ', selshto:<%= row.pshto %>, selpsrl:<%= row.psrl %>})">
+                    <span class="hd-icon">&#9888;&#65039;</span>
+                  </button>
+                  <button type="button" class="hd-iconbtn hd-iconbtn--delete"
+                          title="Delete pallet"
+                          onclick="HD_confirmDelete(<%= row.pshto %>, <%= row.psrl %>)">
+                    <span class="hd-icon">&#128465;</span>
+                  </button>
+                </div>
+              </td>
+              <td class="hd-col-batch hd-mono"><%= row.psrl %></td>
+              <td class="hd-mono"><%= row.pshto %></td>
+              <td><%= (row.pshtonm || '').trim() %></td>
+              <td class="hd-col-status"><span class="hd-badge hd-badge--<%= s %>"><%= row.pstatdsc %></span></td>
+              <td class="hd-col-status">
+                <% if (hz) { %>
+                  <span class="hd-badge hd-badge--o" style="background:var(--hd-brass); border-color:var(--hd-brass);">Hazmat</span>
+                <% } else { %>
+                  <span class="hd-badge hd-badge--x">No</span>
+                <% } %>
+              </td>
+              <td class="hd-col-num hd-mono"><%= fmtF(row.plen) %> &times; <%= fmtF(row.pwid) %> &times; <%= fmtF(row.phgt) %></td>
+              <td class="hd-col-num hd-mono"><%= fmtF(row.pvol) %></td>
+              <td class="hd-mono"><%- (row.pbol && Number(row.pbol) > 0) ? row.pbol : '&mdash;' %></td>
+              <td class="hd-col-time hd-mono"><%- dash(row.ptstp) %></td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr><td colspan="10" class="hd-empty">No pallets to display. Tap <strong>+ New Pallet</strong> to create one.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="selshto" value="0">
+  <input type="hidden" name="selpsrl" value="0">
+  <input type="hidden" name="newshto" value="0">
+  <input type="hidden" name="newlen" value="0">
+  <input type="hidden" name="newwid" value="0">
+  <input type="hidden" name="newhgt" value="0">
+  <input type="hidden" name="newhzlb" value="N">
+
+  <div class="hd-footer">
+    <div class="hd-foot-meta">HORNADY MANUFACTURING &middot; Internal Demo &middot; Profound UI EJS</div>
+    <button type="button" class="hd-btn hd-btn--secondary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">Exit (F3)</button>
+  </div>
+
+  <!-- Create pallet modal -->
+  <div class="hd-modal-backdrop hd-hidden" id="hd-create-modal"
+       onclick="if(event.target===this){HD_closeCreate()}">
+    <div class="hd-modal hd-modal--small">
+      <div class="hd-modal-head">
+        <div class="hd-modal-title">New Pallet</div>
+        <button type="button" class="hd-iconbtn hd-iconbtn--close"
+                onclick="HD_closeCreate()" title="Close">&times;</button>
+      </div>
+      <div class="hd-modal-body">
+        <p class="hd-modal-sub">Pallet serial numbers are auto-assigned in the 9001-9999 range.</p>
+        <div class="hd-filter" style="margin-bottom: 14px;">
+          <label for="hd-create-shto">Ship-to customer #</label>
+          <select id="hd-create-shto" class="hd-input">
+            <option value="1000100">1000100 &mdash; ACME Sporting Goods</option>
+            <option value="1000200">1000200 &mdash; Global Outdoor Retail</option>
+            <option value="1000300">1000300 &mdash; Mountain View Outfitters</option>
+            <option value="1000400">1000400 &mdash; Sportsman Wholesale Inc.</option>
+            <option value="1000500">1000500 &mdash; Northeast Hunting Supplies</option>
+            <option value="1000600">1000600 &mdash; Coast Range Distrib.</option>
+            <option value="1000700">1000700 &mdash; Lone Star Outdoors</option>
+            <option value="1000800">1000800 &mdash; Pacific Crest Sports</option>
+          </select>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom: 14px;">
+          <div class="hd-filter"><label>Length (in)</label><input type="number" id="hd-create-len" class="hd-input" value="48" step="0.5" min="1"></div>
+          <div class="hd-filter"><label>Width (in)</label><input type="number" id="hd-create-wid" class="hd-input" value="40" step="0.5" min="1"></div>
+          <div class="hd-filter"><label>Height (in)</label><input type="number" id="hd-create-hgt" class="hd-input" value="48" step="0.5" min="1"></div>
+        </div>
+        <div class="hd-filter">
+          <label><input type="checkbox" id="hd-create-haz"> Mark as hazmat</label>
+        </div>
+      </div>
+      <div class="hd-modal-foot">
+        <button type="button" class="hd-btn hd-btn--ghost" onclick="HD_closeCreate()">Cancel</button>
+        <button type="button" class="hd-btn hd-btn--primary" onclick="HD_submitCreate()">Create</button>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,286 @@
+<%
+  function statusKey(s) { return (s || 'x').toString().trim().toLowerCase(); }
+  function dash(v) { return (v && String(v).trim()) ? v : '&mdash;'; }
+  var ph = (typeof phase !== 'undefined' ? phase : 'L').trim() || 'L';
+  var hasMsg = typeof msg !== 'undefined' && msg && msg.trim();
+  var mt = (typeof msgtype !== 'undefined' && msgtype) ? msgtype.trim() : 'info';
+  var emp  = (typeof empcode !== 'undefined' ? empcode : '').trim();
+  var name = (typeof empname !== 'undefined' ? empname : '').trim();
+  var wh   = (typeof warehouse !== 'undefined' ? warehouse : '').trim();
+  var detStatKey = (typeof detstat !== 'undefined' && detstat) ? statusKey(detstat.charAt(0)) : 'x';
+%>
+<div class="hornady-picker">
+
+  <!-- ============ Header (always visible) ============ -->
+  <div class="pk-topbar">
+    <div class="pk-brand">
+      <img class="pk-logo" src="/profoundui/userdata/ui/pickereo/hornady-logo.png?v=4" alt="Hornady">
+      <div class="pk-titleblock">
+        <div class="pk-eyebrow">Warehouse &middot; Mobile Pick</div>
+        <h1 class="pk-title">Picker Workflow</h1>
+      </div>
+    </div>
+    <% if (ph !== 'L' && emp) { %>
+      <div class="pk-session">
+        <div class="pk-session-line">
+          <span class="pk-session-label">Picker</span>
+          <span class="pk-session-value"><%= emp %></span>
+        </div>
+        <div class="pk-session-line">
+          <span class="pk-session-label">Name</span>
+          <span class="pk-session-value"><%= name %></span>
+        </div>
+        <div class="pk-session-line">
+          <span class="pk-session-label">DC</span>
+          <span class="pk-session-value"><%= wh || '--' %></span>
+        </div>
+        <button type="button" class="pk-btn pk-btn--ghost pk-btn--small"
+                onclick="pui.submit({action:'LOGOUT'})">Sign out</button>
+      </div>
+    <% } %>
+  </div>
+  <div class="pk-stripe"></div>
+
+  <% if (hasMsg) { %>
+    <div class="pk-message pk-message--<%= mt %>"><%= msg %></div>
+  <% } %>
+
+  <!-- ============ PHASE L: Login ============ -->
+  <% if (ph === 'L') { %>
+    <div class="pk-screen pk-screen--login">
+      <div class="pk-card pk-card--login">
+        <h2 class="pk-h2">Sign in to start picking</h2>
+        <p class="pk-sub">Choose your picker code, pick your DC, and tap <em>Sign In</em>.</p>
+
+        <div class="pk-field">
+          <label for="empcode">Picker code</label>
+          <input type="text" id="empcode" name="empcode" maxlength="10"
+                 class="pk-input pk-input--big" value="<%= emp %>"
+                 placeholder="e.g. PICKER01" autocomplete="off">
+          <div class="pk-quickpick">
+            <button type="button" class="pk-quickbtn"
+                    onclick="HD_setEmp('PICKER01')">PICKER01<small>John Smith</small></button>
+            <button type="button" class="pk-quickbtn"
+                    onclick="HD_setEmp('PICKER02')">PICKER02<small>Jane Doe</small></button>
+            <button type="button" class="pk-quickbtn"
+                    onclick="HD_setEmp('PICKER03')">PICKER03<small>Bob Jones</small></button>
+            <button type="button" class="pk-quickbtn"
+                    onclick="HD_setEmp('PICKER04')">PICKER04<small>Sarah Wilson</small></button>
+            <button type="button" class="pk-quickbtn"
+                    onclick="HD_setEmp('PICKER05')">PICKER05<small>Mike Brown</small></button>
+            <button type="button" class="pk-quickbtn"
+                    onclick="HD_setEmp('PICKER06')">PICKER06<small>Lisa Garcia</small></button>
+            <button type="button" class="pk-quickbtn"
+                    onclick="HD_setEmp('PICKER07')">PICKER07<small>Tom Anderson</small></button>
+            <button type="button" class="pk-quickbtn"
+                    onclick="HD_setEmp('PICKER08')">PICKER08<small>Emily Taylor</small></button>
+          </div>
+        </div>
+
+        <div class="pk-field">
+          <label>Distribution centre</label>
+          <input type="hidden" id="warehouse" name="warehouse" value="<%= wh %>">
+          <div class="pk-wharow">
+            <button type="button" class="pk-whbtn<%= wh==='WEST' ? ' is-active' : '' %>"
+                    data-wh="WEST" onclick="HD_setWh('WEST')">WEST<small>West DC</small></button>
+            <button type="button" class="pk-whbtn<%= wh==='ALDA' ? ' is-active' : '' %>"
+                    data-wh="ALDA" onclick="HD_setWh('ALDA')">ALDA<small>Alda DC</small></button>
+            <button type="button" class="pk-whbtn<%= wh==='GI'   ? ' is-active' : '' %>"
+                    data-wh="GI"   onclick="HD_setWh('GI')">GI<small>Grand Island</small></button>
+          </div>
+        </div>
+
+        <button type="button" class="pk-btn pk-btn--primary pk-btn--block"
+                onclick="HD_submitLogin()">Sign In</button>
+        <button type="button" class="pk-btn pk-btn--secondary pk-btn--block"
+                onclick="pui.submit({action:'EXIT'})">Exit (F3)</button>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- ============ PHASE B: My Batches ============ -->
+  <% if (ph === 'B') { %>
+    <div class="pk-screen pk-screen--batches">
+
+      <div class="pk-stats">
+        <div class="pk-stat">
+          <span class="pk-stat-label">Total</span>
+          <span class="pk-stat-value"><%= mybatches %></span>
+        </div>
+        <div class="pk-stat pk-stat--open">
+          <span class="pk-stat-label">Open</span>
+          <span class="pk-stat-value"><%= myopenct %></span>
+        </div>
+        <div class="pk-stat pk-stat--active">
+          <span class="pk-stat-label">Active</span>
+          <span class="pk-stat-value"><%= myactct %></span>
+        </div>
+        <div class="pk-stat pk-stat--paused">
+          <span class="pk-stat-label">Paused</span>
+          <span class="pk-stat-value"><%= mypauct %></span>
+        </div>
+        <div class="pk-stat pk-stat--done">
+          <span class="pk-stat-label">Done</span>
+          <span class="pk-stat-value"><%= mydonect %></span>
+        </div>
+        <div class="pk-stat pk-stat--items">
+          <span class="pk-stat-label">Items / Pieces</span>
+          <span class="pk-stat-value"><%= mytotitm %> / <%= mytotpcs %></span>
+        </div>
+      </div>
+
+      <h2 class="pk-h2">My batches</h2>
+
+      <% if (typeof batsfl !== 'undefined' && batsfl && batsfl.length > 0) { %>
+        <div class="pk-cards">
+          <% batsfl.forEach(function (row) {
+               var s = statusKey(row.sstat);
+               var picked = Number(row.spicked) || 0;
+               var pieces = Number(row.spieces) || 0;
+               var pct = pieces > 0 ? Math.round((picked / pieces) * 100) : 0;
+               var pctClamp = Math.min(100, Math.max(0, pct));
+          %>
+            <% var isMega = (row.sismega + '').trim() === 'Y'; %>
+            <div class="pk-card pk-card--batch <%= isMega ? 'pk-card--mega' : '' %>">
+              <div class="pk-card-row">
+                <div class="pk-card-id">
+                  <span class="pk-card-batchno">#<%= row.sbatch %></span>
+                  <span class="pk-badge pk-badge--<%= s %>"><%= row.sstatdesc %></span>
+                  <% if (isMega) { %>
+                    <span class="pk-badge pk-badge--mega" title="<%= row.skidct %> batches bundled, <%= row.skidct %> totes">MEGA &times;<%= row.skidct %></span>
+                  <% } %>
+                </div>
+                <div class="pk-card-meta">
+                  <span class="pk-meta-pill"><%= row.sloc || '--' %></span>
+                </div>
+              </div>
+              <div class="pk-card-numbers">
+                <div class="pk-num">
+                  <span class="pk-num-label">Items</span>
+                  <span class="pk-num-value"><%= row.sitems %></span>
+                </div>
+                <div class="pk-num">
+                  <span class="pk-num-label">Pieces</span>
+                  <span class="pk-num-value"><%= row.spieces %></span>
+                </div>
+                <div class="pk-num">
+                  <span class="pk-num-label">Picked</span>
+                  <span class="pk-num-value"><%= picked %></span>
+                </div>
+                <div class="pk-num">
+                  <span class="pk-num-label">Started</span>
+                  <span class="pk-num-value pk-mono"><%- dash(row.sstart) %></span>
+                </div>
+              </div>
+              <div class="pk-progress">
+                <div class="pk-progress-bar" style="width: <%= pctClamp %>%"></div>
+                <span class="pk-progress-text"><%= pctClamp %>% picked</span>
+              </div>
+              <div class="pk-card-actions">
+                <button type="button" class="pk-btn pk-btn--primary"
+                        onclick="pui.submit({action:'OPEN', selbatch: <%= row.sbatch %>})">Open</button>
+                <% if (s === 'o' || s === 'p') { %>
+                  <button type="button" class="pk-btn pk-btn--ghost"
+                          onclick="pui.submit({action:'START', selbatch: <%= row.sbatch %>})">Start</button>
+                <% } %>
+                <% if (s === 'a' || s === 'p') { %>
+                  <button type="button" class="pk-btn pk-btn--success"
+                          onclick="pui.submit({action:'COMPLETE', selbatch: <%= row.sbatch %>})">Complete</button>
+                <% } %>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="pk-card pk-card--empty">
+          <h3>No batches assigned to <%= emp %></h3>
+          <p>Tap Sign Out to log in as another picker.</p>
+        </div>
+      <% } %>
+    </div>
+  <% } %>
+
+  <!-- ============ PHASE D: Batch Detail ============ -->
+  <% if (ph === 'D') { %>
+    <div class="pk-screen pk-screen--detail">
+      <% var detMega = (typeof detismega !== 'undefined') && (detismega + '').trim() === 'Y'; %>
+      <div class="pk-detbar <%= detMega ? 'is-mega' : '' %>">
+        <button type="button" class="pk-btn pk-btn--ghost pk-btn--small"
+                onclick="pui.submit({action:'BACK'})">&larr; Back</button>
+        <div class="pk-detbar-title">
+          <% if (detMega) { %>
+            <span class="pk-badge pk-badge--mega">MEGA &times;<%= detkidct %></span>
+          <% } %>
+          Batch <span class="pk-mono">#<%= detbatch %></span>
+          <span class="pk-badge pk-badge--<%= detStatKey %>"><%= detstat %></span>
+        </div>
+        <div class="pk-detbar-meta">
+          <span class="pk-meta-pill"><%= (typeof detloc!=='undefined'?detloc:'').trim() || '--' %></span>
+          <span class="pk-detbar-counts">
+            <%= detitems %> items / <%= detpieces %> pcs
+            <% if (detMega) { %> &middot; <%= detkidct %> totes<% } %>
+          </span>
+          <button type="button" class="pk-btn pk-btn--ghost pk-btn--small pk-map-btn"
+                  onclick="HD_openMap()">Show Map</button>
+        </div>
+      </div>
+
+      <div class="pk-lines"
+           data-lines="<%= (typeof detlines!=='undefined'?detlines:'[]') %>"
+           data-batch="<%= detbatch %>"
+           data-ismega="<%= detMega ? '1' : '0' %>">
+        <div class="pk-detail-loading">Loading lines&hellip;</div>
+      </div>
+
+      <!-- Warehouse map overlay (rendered client-side from data-lines) -->
+      <div class="pk-map-backdrop pk-hidden" id="pk-map-modal"
+           onclick="if(event.target===this){HD_closeMap()}">
+        <div class="pk-map-card">
+          <div class="pk-map-head">
+            <div class="pk-map-title">
+              Warehouse map &mdash; <%= warehouse %>
+              <span class="pk-map-sub">Batch <%= detbatch %> &middot; <%= detkidct > 0 ? detkidct + ' totes' : 'single' %></span>
+            </div>
+            <div class="pk-map-modeswitch">
+              <button type="button" class="pk-tab is-active" data-mode="route"
+                      onclick="HD_setMapMode('route')">Route</button>
+              <button type="button" class="pk-tab" data-mode="heat"
+                      onclick="HD_setMapMode('heat')">Heatmap</button>
+            </div>
+            <button type="button" class="pk-iconbtn-close"
+                    onclick="HD_closeMap()" title="Close">&times;</button>
+          </div>
+          <div class="pk-map-body" id="pk-map-body">
+            <div class="pk-map-legend">
+              <span class="pk-legend-swatch start"></span>Start (R01/B01 dock)
+              <span class="pk-legend-swatch route"></span>Pick stop
+              <span class="pk-legend-swatch tote1"></span>Tote 1
+              <span class="pk-legend-swatch tote2"></span>Tote 2
+              <span class="pk-legend-swatch tote3"></span>Tote 3
+              <span class="pk-legend-axis">Bay 1 &rarr; 60 (left to right)</span>
+              <span class="pk-legend-axis">6 aisles, each between two racks (R01+R02, R03+R04, &hellip;)</span>
+            </div>
+            <div class="pk-map-canvas" id="pk-map-canvas"></div>
+            <div class="pk-map-foot" id="pk-map-foot"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pk-detail-foot">
+        <button type="button" class="pk-btn pk-btn--success pk-btn--block"
+                onclick="pui.submit({action:'COMPLETE', selbatch: <%= detbatch %>})">
+          Mark batch complete
+        </button>
+      </div>
+    </div>
+  <% } %>
+
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="phase" value="<%= ph %>">
+  <input type="hidden" name="selbatch" value="0">
+  <input type="hidden" name="selchild" value="0">
+  <input type="hidden" name="selseq" value="0">
+  <input type="hidden" name="qty" value="0">
+  <input type="hidden" name="detbatch" value="<%= (typeof detbatch!=='undefined'?detbatch:0) %>">
+
+</div>

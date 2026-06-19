@@ -1,0 +1,113 @@
+<%
+  function fmtN(n) { return Number(n || 0).toLocaleString('en-US'); }
+  function fmtSSCC(n) {
+    var s = String(n || '').replace(/^0+/, '');
+    s = s.padStart(18, '0');
+    return s.replace(/(\d{1})(\d{7})(\d{9})(\d{1})/, '$1 $2 $3 $4');
+  }
+  var hasMsg = typeof msg !== 'undefined' && msg && msg.trim();
+  var mt = (typeof msgtype !== 'undefined' && msgtype) ? msgtype.trim() : 'info';
+%>
+<div class="hornady-dashboard">
+
+  <div class="hd-topbar">
+    <div class="hd-brand">
+      <img class="hd-logo" src="/profoundui/userdata/ui/hyr0606eo/hornady-logo.png?v=1" alt="Hornady">
+      <div class="hd-titleblock">
+        <div class="hd-eyebrow">Distribution &middot; Shipping POC</div>
+        <h1 class="hd-title">Shipment Lot Inquiry</h1>
+      </div>
+    </div>
+    <div class="hd-topbar-meta">
+      <span class="hd-meta-label">Build</span>
+      <span class="hd-meta-value">EJS Rich Display</span>
+    </div>
+  </div>
+  <div class="hd-stripe"></div>
+
+  <div class="hd-statgrid">
+    <div class="hd-stat">
+      <div class="hd-stat-label">Group #</div>
+      <div class="hd-stat-value"><%= fgroup %></div>
+    </div>
+    <div class="hd-stat hd-stat--active">
+      <div class="hd-stat-label">Lots Returned</div>
+      <div class="hd-stat-value"><%= totlots %></div>
+    </div>
+    <div class="hd-stat hd-stat--paused">
+      <div class="hd-stat-label">Distinct Items</div>
+      <div class="hd-stat-value"><%= distct %></div>
+    </div>
+    <div class="hd-stat hd-stat--items">
+      <div class="hd-stat-label">Total Qty Shipped</div>
+      <div class="hd-stat-value"><%= fmtN(totqty) %></div>
+    </div>
+  </div>
+
+  <div class="hd-toolbar">
+    <div class="hd-filter">
+      <label for="fgroup">Shipment group #</label>
+      <input type="number" name="fgroup" id="fgroup" value="<%= fgroup %>"
+             class="hd-input" min="0" step="1" placeholder="e.g. 1001">
+    </div>
+    <div class="hd-filter hd-filter--grow">
+      <label for="fitem">Item code (optional)</label>
+      <input type="text" name="fitem" id="fitem" value="<%= fitem %>"
+             class="hd-input" placeholder="e.g. DEMO-9MM-115" maxlength="15">
+    </div>
+    <div class="hd-actions">
+      <button type="button" class="hd-btn hd-btn--primary"
+              onclick="pui.submit({action:'SEARCH'})">Apply Filter</button>
+      <button type="button" class="hd-btn hd-btn--ghost"
+              onclick="pui.submit({action:'CLEAR'})">Clear</button>
+    </div>
+  </div>
+
+  <% if (hasMsg) { %>
+    <div class="hd-message hd-message--<%= mt %>"><%= msg %></div>
+  <% } %>
+
+  <div class="hd-tablewrap">
+    <table class="hd-table">
+      <thead>
+        <tr>
+          <th class="hd-col-batch">Group #</th>
+          <th>Ship-to name</th>
+          <th class="hd-col-num">Turn</th>
+          <th class="hd-col-num">Seq</th>
+          <th>Item</th>
+          <th>Lot</th>
+          <th class="hd-col-num">Qty</th>
+          <th>SSCC barcode</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (typeof lotsfl !== 'undefined' && lotsfl && lotsfl.length > 0) { %>
+          <% lotsfl.forEach(function (row) { %>
+            <tr>
+              <td class="hd-col-batch hd-mono"><%= row.lgrp %></td>
+              <td><%= (row.lname || '').trim() %></td>
+              <td class="hd-col-num hd-mono"><%= row.lturn %></td>
+              <td class="hd-col-num hd-mono"><%= row.ltseq %></td>
+              <td class="hd-mono"><%= (row.litem || '').trim() %></td>
+              <td class="hd-mono"><strong><%= (row.llot || '').trim() %></strong></td>
+              <td class="hd-col-num hd-mono"><%= fmtN(row.lqty) %></td>
+              <td class="hd-mono" style="letter-spacing: 0.04em; color: var(--hd-slate)"><%= fmtSSCC(row.lsscc) %></td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr><td colspan="8" class="hd-empty">No lots to display. Enter a group # and tap Apply.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <input type="hidden" name="action" value="">
+
+  <div class="hd-footer">
+    <div class="hd-foot-meta">HORNADY MANUFACTURING &middot; Internal Demo &middot; Profound UI EJS</div>
+    <button type="button" class="hd-btn hd-btn--secondary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">Exit (F3)</button>
+  </div>
+
+</div>
