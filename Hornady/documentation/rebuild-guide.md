@@ -11,20 +11,33 @@ Target library: **`AITSK00030`** (set via `IBMI_BUILD_LIBRARY`).
 
 ---
 
-## Status of the six Hornady POC menu options
+## Status of the Hornady POC menu options
+
+The submenu has two columns: **left** = the original 5250 / Profound UI
+Rich options (1–6), **right** = EJS Rich Display clones (11–15).  See
+`ejs-options.md` for a deep dive on options 11–15.
 
 | # | Program | What it does | Status |
 |---|---|---|---|
-| **1** | `HYR0600` Shipment Processing | 5250 subfile of open shipments, 14/page | ⚠️ Compiles + launches; `HYPTDTA` schema correction (2026-06) cleared the original `SQL0206 (TDTABL)` blocker but the employee prompt loop still needs deeper validation. |
-| 2 | `HYR0138` Pallet Contents Maint. | Pallet content editor | 🚫 Blocked — `HYD0138.DSPF` not in HornadyDemo package |
-| **3** | `HYR0606` Shipment Lot Inquiry | Read-only subfile of lots for one detail line | ✅ **Working** — 15 lots paginate across 3 pages |
-| **4** | `PICKBATR` Pick Batch Dashboard | Profound UI rich DSPF | ❌ **Blank screen — unresolved.**  The IBM i side is sound (program compiles cleanly with the `INZ` fix below, opens the DSPF, calls EXFMT on the `CTL` rich record, no joblog errors).  The PUI HANDLER call returns a populated `CTL` payload (17 field metadata entries + data array — same shape PICKERR's `LOGINR` returns).  But the user's browser paints a blank screen and the program stays in EXFMT forever, requiring the job to be killed to exit.  Multiple fix attempts (INZ, CSS-class rewrites, RDF JSON deployment under `/userdata/dspf/`, F-spec HANDLER patch) did not restore visible rendering.  See §15 for the full debug log; the root cause is on the PUI client side and would need browser-console / network-tab capture to pin down. |
-| **5** | `PICKERR` Picker Workflow | Profound UI mobile | ✅ **Promoted (2026-06)** — compiles, opens, PUI Login screen renders (LOGINR record format with EMPCODE / EMPNAME / Alda/GI/West buttons / Login / Clear / Exit). |
+| **1** | `HYR0600` Shipment Processing | 5250 subfile of open shipments, 14/page | ⚠️ Compiles + launches; employee prompt loop still needs deeper validation. **Use option 11 (`HYR0600EO`) for the demo.** |
+| 2 | `HYR0138` Pallet Contents Maint. | Pallet content editor | 🚫 Blocked — `HYD0138.DSPF` not in HornadyDemo package. **Use option 12 (`HYR0138EO`) for the demo.** |
+| **3** | `HYR0606` Shipment Lot Inquiry | Read-only subfile of lots for one detail line | ✅ **Working** — 15 lots paginate across 3 pages.  Option 13 (`HYR0606EO`) is the EJS equivalent. |
+| **4** | `PICKBATR` Pick Batch Dashboard | Profound UI rich DSPF | ❌ **Blank screen — diagnosed.**  Root cause is a **PUI server-side / client-side fix-pack mismatch** (server FP32, client JS FP39); the rich-widget runtime aborts the render with no DOM output.  See §15 for the full diagnosis.  **Use option 14 (`PICKBATEO`) for the demo** — it bypasses the widget runtime via EJS and renders correctly. |
+| **5** | `PICKERR` Picker Workflow | Profound UI mobile | ❌ Same FP32 vs FP39 mismatch as option 4 — login screen renders inconsistently and downstream screens never paint.  **Use option 15 (`PICKEREO`) for the demo.** |
 | 6 | `HYR6080` Order Status Email | Batch | Stub (no DSPF needed; not yet promoted) |
+| **11** | `HYR0600EO` Shipment Processing (EJS) | EJS clone of #1, single-page dashboard over `HYPSGCU` with View modal | ✅ **Working** — sticky-header grid (12 rows visible), filter by status/DC/customer/ship-via |
+| **12** | `HYR0138EO` Pallet Contents Maint. (EJS) | CRUD over `HYPPLLT` | ✅ **Working** — per-row Close / Reopen / Toggle hazmat / Delete + New-pallet modal |
+| **13** | `HYR0606EO` Shipment Lot Inquiry (EJS) | Lot inquiry over `HYPSGLD` | ✅ **Working** — defaults to group 1001 (matches HYC0606 demo path) |
+| **14** | `PICKBATEO` Pick Batch Dashboard (EJS) | EJS clone of #4 with mega-batch support | ✅ **Working** — per-row View/Assign/Start/Pause/Complete/Delete + mega-batch bundling + dissolve |
+| **15** | `PICKEREO` Picker Workflow (EJS) | EJS clone of #5 with mega + tote routing + 3D location map | ✅ **Working** — three-phase mobile workflow with R/B/S coordinate chips + Route / Heatmap warehouse map (`WHLOC` table) + walk-order optimization |
 
-Options 1, 3, and 5 are the demo path.  Option 4 is built and the program
-runs, but its rich dashboard doesn't render in this PUI install.  Option 2
-is blocked on a missing DSPF and shows an explicit blocker message.
+**Demo path:** options **11 → 14 → 15** exercise the most interesting
+flow — bundle 2–3 pick batches into a mega in #14, sign in as a picker
+in #15, see the mega-tote routing in the detail screen, open the
+warehouse map for the optimized walk.
+
+Originals 1–6 are left in place for reference; rebuilding them is part
+of `codermake` and they don't need to be deleted.
 
 ---
 
@@ -41,11 +54,16 @@ ibmi-agentic/
 ├── build/               -- per-object marker files (touched on success)
 ├── tmp/logs/            -- per-object compile listings (where to look first
 │                          when a build fails)
+├── htdocs/              -- EJS template / CSS / JS assets for options 11-15.
+│   └── profoundui/         Pushed manually to the PUI Apache DocumentRoot --
+│       └── userdata/       NOT deployed by codermake.  See ejs-options.md §4.
+│           └── ui/{name}/
 └── Hornady/
     ├── src/HornadyDemo/Source/   -- the original HornadyDemo zip extracted
     │                                and EBCDIC-decoded (read-only reference)
     └── documentation/            -- this folder
         ├── rebuild-guide.md      -- (this file)
+        ├── ejs-options.md        -- operating manual for options 11-15 (EJS)
         ├── README.md             -- top-level project overview
         ├── source-inventory.md   -- per-member catalog
         ├── data-model.md         -- ERD + PF/LF/TABLE/VIEW/INDEX detail
@@ -53,7 +71,11 @@ ibmi-agentic/
         ├── display-files.md
         ├── hyr0600-gap-analysis.md
         ├── ddl/                  -- the original (pre-promotion) DDL drafts
-        └── sample-data.sql       -- the seed-data script (idempotent inserts)
+        ├── sample-data.sql       -- base seed-data script (idempotent)
+        ├── sample-data-more.sql  -- extension: more employees/customers/SKUs/
+        │                            shipments/pick batches
+        └── sample-data-whloc.sql -- 60 rows in WHLOC (item -> row/bay/shelf
+                                     coordinate) for option 15's map view
 ```
 
 `src/` is what `codermake` consumes. `Hornady/src/HornadyDemo/Source/` is the
@@ -590,20 +612,30 @@ to build the zoned string, *not* via `*DEC`.
 
 ## 10. Seed data
 
-Run **`Hornady/documentation/sample-data.sql`** to populate the working tables.
-The script is idempotent (each section deletes its target rows before
-inserting) so it's safe to re-run.
+Three idempotent SQL files in `Hornady/documentation/`.  Each section
+deletes its own target rows before inserting, so all three are safe to
+re-run.  Load them in order:
+
+| File | What it adds | Target row counts |
+|---|---|---|
+| `sample-data.sql`         | Base: 3 employees, 8 customers, 6 SKUs, 30 shipments / 33 lines / 47 lots, 5 pick batches / 14 lines. | See §10.2 |
+| `sample-data-more.sql`    | Extension: +5 employees → 8 total, +12 customers → 20, +14 SKUs → 20, +50 shipments → 80, +25 pick batches → 30, +84 pick lines → 98. | See §10.2 |
+| `sample-data-whloc.sql`   | 60 rows in `WHLOC` — every SKU × every DC mapped to a (row, bay, shelf) coordinate, clustered by category.  **Required for option 15's R/B/S chips and the warehouse map.** | 60 |
 
 ### 10.1 Upload + execute
 
 ```bash
-# Pipe the file to IFS, set its CCSID, then run via RUNSQLSTM SRCSTMF.
 ssh dev '/usr/bin/qsh -c "mkdir -p /tmp/hornady"'
-cat Hornady/documentation/sample-data.sql | ssh dev 'cat > /tmp/hornady/sample.sql'
-ssh dev '/usr/bin/qsh -c "
-setccsid 1208 /tmp/hornady/sample.sql > /dev/null 2>&1
-system \"runsqlstm srcstmf('"'"'/tmp/hornady/sample.sql'"'"') commit(*none) dftrdbcol(AITSK00030) errlvl(40)\"
-"'
+for f in sample-data.sql sample-data-more.sql sample-data-whloc.sql; do
+  cat Hornady/documentation/$f | ssh dev "cat > /tmp/hornady/$f"
+  ssh dev "/usr/bin/qsh -c \"
+    setccsid 1208 /tmp/hornady/$f > /dev/null 2>&1
+    system 'runsqlstm srcstmf(\\\"/tmp/hornady/$f\\\")
+                       commit(*none)
+                       dftrdbcol(AITSK00054)
+                       errlvl(40)'
+  \""
+done
 ```
 
 The `setccsid 1208` is important. Without it, qsh's `cat >` translates the
@@ -611,21 +643,60 @@ incoming UTF-8 through the job's default CCSID and you get a binary-garbled
 file that `RUNSQLSTM` can't parse.
 
 `COMMIT(*NONE)` because the tables don't have journaling. The final
-`COMMIT;` line in the script errors with `SQL7007` — harmless.
+`COMMIT;` line in the original `sample-data.sql` errors with `SQL7007` —
+harmless.
 
-### 10.2 Expected row counts
+### 10.2 Expected row counts (after all three SQL files)
 
-| Table | Rows | Notes |
-|---|---|---|
-| `HREMPL` | 3 | employees 12345 (J Smith), 22001 (J Doe), 30099 (B Jones) |
-| `HDCUST` | 8 | customer numbers 1000100..1000800 |
-| `HDSHPV` / `HYPSVCT` | 5 each | UP, FX, YR active; PU, BW inactive |
-| `HDIMST` | 6 | demo SKUs `DEMO-9MM-115`, etc. |
-| `HYPSGHD` | 30 | shipment headers 1001..1030, `GHDCLOC='WEST'`, `GHSTS='O'` |
-| `HYPSGCU` | 30 | shipment-customer rows — HYR0600's main subfile fodder |
-| `HYPSGDT` | 33 | detail lines |
-| `HYPSGLD` | 47 | 15 on `(1001,1,1,1)` for HYR0606 paging, 1–2 on every other shipment |
-| `OEORHD` | 8 | sales-order headers 10000001..10000008 |
+| Table | After base | After +more | After +whloc | Notes |
+|---|---:|---:|---:|---|
+| `HREMPL`     |  3 |  8 |  8 | employees 12345/22001/30099 + 40001..40005 |
+| `HDCUST`     |  8 | 20 | 20 | customer numbers 1000100..1002000 |
+| `HDSHPV` / `HYPSVCT` |  5 |  5 |  5 | unchanged |
+| `HDIMST`     |  6 | 20 | 20 | 6 original SKUs + 14 across handgun / rifle / shotgun / rimfire / components |
+| `HYPSGHD`    | 30 | 80 | 80 | groups 1001..1030 (base) + 1031..1080 (extension; 30 Open, 20 Completed) |
+| `HYPSGCU`    | 30 | 80 | 80 | one per group |
+| `HYPSGDT`    | 33 | 91 | 91 | detail lines |
+| `HYPSGLD`    | 47 | 77 | 77 | 15 on `(1001,1,1,1)` for HYR0606 paging, +30 on completed shipments |
+| `OEORHD`     |  8 |  8 |  8 | unchanged |
+| `PICKBATHP`  |  5 | 30 | 30 | 25 added: 8 Open / 7 Active / 4 Paused / 11 Completed across WEST(17) / ALDA(7) / GI(6), PICKER01-08 |
+| `PICKBATDP`  | 14 | 98 | 98 | pick lines |
+| `WHLOC`      |  — |  — | 60 | 20 SKUs × 3 DCs, coordinates clustered by category |
+
+### 10.3 Filter rules baked into the seed values
+
+Two non-obvious filter conditions inside `HYR0600` shape the seed values —
+if these aren't right, the main subfile comes up empty:
+
+- `HYPSGCU.GCTSTP2` must be `*Loval` (`0001-01-01-00.00.00.000000`) on rows
+  you want shown. The program treats any non-Loval value as "shipment
+  completed" and excludes it from the "Open Shipments Only" view (the default).
+- `HYPSGHD.GHDCLOC` must be one of `WEST`, `ALDA`, or `GI`. The DC-location
+  filter on the main screen rejects other values. The seed script uses
+  `'WEST'`.
+
+### 10.4 EJS htdocs assets — *not* loaded by `runsqlstm`
+
+The IBM i objects are only half the story for options 11–15.  Each EJS
+option also has files in `htdocs/profoundui/userdata/ui/{name}/` that
+**must be deployed to the PUI Apache instance separately** — codermake
+does **not** push them.  See `ejs-options.md §4` for the procedure; the
+short version is:
+
+```bash
+for d in hyr0600eo hyr0138eo hyr0606eo pickbateo pickereo; do
+  ssh dev "/usr/bin/qsh -c \"mkdir -p /home/drusso/puidist/htdocs/profoundui/userdata/ui/$d\""
+  scp htdocs/profoundui/userdata/ui/$d/* \
+      dev:/home/drusso/puidist/htdocs/profoundui/userdata/ui/$d/
+done
+```
+
+Verify each one is reachable before declaring the rebuild done:
+
+```bash
+curl -sIk "$IBMI_PUI_SERVER/profoundui/userdata/ui/pickereo/picker.js?v=12" | head -1
+# HTTP/1.1 200 OK
+```
 
 ### 10.3 Filter rules baked into the seed values
 
@@ -878,12 +949,14 @@ infrastructure for option 4.
 | Item | Detail |
 |---|---|
 | `PICKBATR` `CPF27AF` (resolved, patch applied) | First build errored at the initial `WRITE DisplyFile.Ctl Ctl_Fields_Out` with `CPF27AF "Edit mask not valid" / RNX1299 I/O error`.  Root cause: zoned-decimal hidden fields in the `LikeRec(DisplyFile.Ctl:*OUTPUT)` data structure started as `X'00'` instead of the zoned-`'0'` (`X'F0'`) the runtime expects.  Fix: `INZ` on every `Dcl-DS LikeRec(...)` declaration in `pickbatr.sqlrpgle`.  **Patch is in place; required to compile + run.** |
-| `PICKBATR` blank dashboard (UNRESOLVED) | After the `CPF27AF` fix the program reaches `EXFMT` cleanly and the PUI HANDLER returns a populated `CTL` payload, but the browser paints blank and the program sits in EXFMT until the job is killed.  Things I tried that did NOT restore rendering: (1) adding `*PUI CANVASHEIGHT(...) CANVASWIDTH(...)` to the DSPF (PICKERD has them, PICKBATD doesn't) — no change.  (2) Rewriting all `hornady-*` and `blueprint-*` CSS class strings in the DSPF to `pui-*` or blanks (preserving DDS column-80 boundaries via space padding) — no change; patch left in place because it can't hurt and the original references undefined classes anyway.  (3) Extracting the screen JSON and deploying it as a Rich Display File at `/www/profoundui/htdocs/profoundui/userdata/dspf/PICKBATD.json` — no change.  (4) Sending `CTL.BTNEXIT=1` as a response indicator to confirm the program responds to input — it doesn't; the EXFMT never returns.  The HANDLER call returns the same shape PICKERR's `LOGINR` returns (and `LOGINR` renders correctly for the user), so the IBM i side and PUI HANDLER protocol are sound.  The remaining failure is on the **PUI client-side render**, where we have no visibility from this headless harness.  Next step: open option 4 with browser DevTools attached and capture the JS console (any red errors) and Network tab (any 404/500 responses, particularly to `/profoundui/api/*` or `/userdata/dspf/*`). |
+| `PICKBATR` blank dashboard (**DIAGNOSED** — server/client fix-pack mismatch) | After the `CPF27AF` fix the program reaches `EXFMT` cleanly and the PUI HANDLER returns a populated `CTL` payload, but the browser paints blank and the program sits in EXFMT until the job is killed.  **Root cause:** browser DevTools console shows `Profound UI server-side (Version 6, Fix Pack 32.0) doesn't match client-side JavaScript (Version 6, Fix Pack 39.0)`.  The PUI rich-widget runtime explicitly checks server-vs-client FP equality and aborts the render when they don't match — leaving the empty container symptom regardless of what we do in the DSPF source.  Options 14 / 15 (`PICKBATEO` / `PICKEREO`) are EJS clones that **bypass the widget-runtime parser entirely** and render correctly on the same install, which is why they're the recommended demo path.  **Fix paths for the originals:** (a) admin upgrade of `AIPUI53001` to FP39 to match the JS, or (b) rollback the JavaScript runtime in `/home/drusso/puidist/htdocs/profoundui/proddata/js/` to FP32 to match the server.  Things tried that did NOT restore rendering (kept here for posterity): `*PUI CANVASHEIGHT/WIDTH`, CSS-class rewrites, deploying the screen JSON to `/userdata/dspf/`, sending `CTL.BTNEXIT=1` as a response indicator — all useless against a hard server/client version check. |
 | `PICKBATR` subfile contents (deferred) | Even once the dashboard renders, the seeded batches may not show on first load — the C1 cursor filters by `showcomp`, `invloc`, MegaBatch exclusion, etc.  Next step: trace the SQL cursor's default WHERE clause and confirm at least one of the 5 seeded `PICKBATHP` rows matches.  Deferred until the blank-screen issue above is resolved. |
 | `HYR0600` employee prompt | Schema corrections (`HYPTDTA` / `GUPTDAT` to TD-prefix; `HDCUST` to CM-prefix) cleared the original `SQL0206 (TDTABL)` blocker.  Employee Number Prompt opens cleanly but the next screen still doesn't paint -- needs another schema-vs-source pass. |
 | `PICKBATDR` / `PICKBATLR2` real bodies | Currently stubs in `src/`.  Real bodies are large (700+ lines each) and touch additional tables (OEORDT, HDDSHP, plus several `HYP*` LFs).  Plug in by copying the real `.SQLRPGLE` source from the HornadyDemo package, adding any missing /COPY shims, and extending the schemas. |
 | `HYR9960` / `HYR9962` real bodies | Currently return blank / 0 -- enough to bind PICKERR but not enough to parse real GS1 barcodes.  Promote `BARDATA.PF` and `BARCUST.PF` from the HornadyDemo package, then drop the real source bodies in to replace `src/hyr9960.rpgle` / `src/hyr9962.rpgle`. |
 | `HANDLER('GENIE(HANDLER)')` hard-coded | The HANDLER reference in `pickbatr.sqlrpgle` / `pickerr.sqlrpgle` is patched from `'PROFOUNDUI(HANDLER)'` (the in-package default) to `'GENIE(HANDLER)'` because this environment's Profound UI install lives under `AIPUI53001.LIB` (no `PROFOUNDUI.LIB`).  If you re-extract from the HornadyDemo zip, re-apply the patch.  Long-term, consider a CL/QSH preprocessor step in `codermake` so the HANDLER library name is environment-configurable. |
+| EJS clones (options 11–15) | New layer added 2026-06 that bypasses the broken FP32-vs-FP39 rich-widget runtime by using EJS templates. **See `ejs-options.md` for the full operating manual** — source files, build flow, htdocs deployment, cache-bust, the `SET OPTION COMMIT=*NONE` requirement for non-journaled mutations, and the per-option feature breakdown (mega-batches in #14, tote routing + warehouse map in #15). |
+| `hyr0138eo.sqlrpgle` missing `SET OPTION COMMIT=*NONE` | The pickbateo / pickereo programs both have the commit-control fix in place; `hyr0138eo` does **not** yet.  Today its CREATE/CLOSE/REOPEN/TOGGLE/DELETE writes work because `HYPPLLT` isn't journaled, but if a journal were ever attached they'd silently roll back on program exit.  Easy fix — see `ejs-options.md §3`. |
 
 ---
 

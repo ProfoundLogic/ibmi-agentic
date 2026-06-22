@@ -15,12 +15,15 @@ This folder documents the IBM i source delivered in `HornadyDemo.zip` and extrac
 |---|---|
 | `README.md` | This overview |
 | **`rebuild-guide.md`** | **Start here if you're rebuilding the POC in a fresh environment.** Full end-to-end recipe: codermake, IBM i one-time setup, data load, smoke test, schema lessons, calling-convention gotchas. |
-| `sample-data.sql` | Idempotent seed-data script for HYR0600 (option 1) and HYR0606 (option 3) |
-| `hyr0600-gap-analysis.md` | What it took to get HYR0600 to compile + what's still missing |
-| `source-inventory.md` | Full file-by-file inventory grouped by type and prefix |
-| `data-model.md` | Database objects — PF/LF/TABLE/VIEW/INDEX — with entity-relationship diagram |
-| `program-architecture.md` | RPG/CL program catalog with call-chain and dependency diagrams |
-| `display-files.md` | DSPF catalog with record formats and UI generation |
+| **`ejs-options.md`** | Operating manual for the EJS Rich Display options (11–15) — source / build / deploy flow, the `SET OPTION COMMIT=*NONE` requirement, the per-option architecture (mega batches in #14, tote routing + 3D warehouse map in #15), and the known generator caveats. |
+| `sample-data.sql` | Base idempotent seed-data script. |
+| `sample-data-more.sql` | Extension seed: +5 employees → 8, +12 customers → 20, +14 SKUs → 20, +50 shipments → 80, +25 pick batches → 30 (mix of statuses / DCs / pickers). |
+| `sample-data-whloc.sql` | 60 rows in `WHLOC` (item → row/bay/shelf coordinate) — required for option 15's R/B/S chips and the warehouse Route/Heatmap map view. |
+| `hyr0600-gap-analysis.md` | What it took to get HYR0600 to compile + what's still missing. |
+| `source-inventory.md` | Full file-by-file inventory grouped by type and prefix. |
+| `data-model.md` | Database objects — PF/LF/TABLE/VIEW/INDEX — with entity-relationship diagram. |
+| `program-architecture.md` | RPG/CL program catalog with call-chain and dependency diagrams. |
+| `display-files.md` | DSPF catalog with record formats and UI generation. |
 | `ddl/` | Original DDL drafts (before promotion to `src/`). Historical reference; the live schemas now live in `ibmi-agentic/src/*.table.sql`. |
 
 ## About the source encoding
@@ -42,4 +45,23 @@ So this zip is a **slice** of a larger application — the parts that touch ship
 
 ## How to read the rest
 
-Start with `program-architecture.md` for the **call graph** — `HYR0614` is the orchestrator that ties most of the shipping subprograms together. Then `data-model.md` for the **files**. `display-files.md` covers the **screens** that drive the interactive flows (`HYR0600`/`HYR0602`/`HYR0608` are the main shipment screens; `PICKBATD`/`PICKERD` are the modern picking dashboards).
+For the **rebuild path**: `rebuild-guide.md` is the entry point — it
+covers codermake, IBM i setup, all three seed-data SQL files, and the
+htdocs deployment step that ships the EJS assets to the PUI server.
+
+For **what to demo**: the right-column EJS options (11–15) are the
+working demo path on this PUI install (the original options 4 / 5 are
+blocked by a server/client fix-pack mismatch — see `rebuild-guide.md
+§15`).  `ejs-options.md` is the operating manual for the EJS layer
+end-to-end: the source/file structure, the cache-bust workflow, the
+mega-batch + tote routing + warehouse map architecture for options 14
+and 15, and the gotchas list (commit control, generator quirks, DSPF
+constant overlap, etc.).
+
+For the **original code**: start with `program-architecture.md` for the
+**call graph** — `HYR0614` is the orchestrator that ties most of the
+shipping subprograms together. Then `data-model.md` for the **files**.
+`display-files.md` covers the **screens** that drive the interactive
+flows (`HYR0600`/`HYR0602`/`HYR0608` are the main shipment screens;
+`PICKBATD`/`PICKERD` are the modern picking dashboards that the EJS
+options replicate).
