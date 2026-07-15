@@ -71,6 +71,20 @@ RPG `dcl-f`) against it — don't guess an abbreviation.
 Related: **`LABEL ON TABLE` text is capped at 50 characters** on DB2 for i;
 longer text raises `SQL0107`. Column labels have the same cap.
 
+**Auto-derived short names for >10-char SQL names are not a simple
+truncation — they can be a sequential counter with no relation to the SQL
+name at all.** Learned in PERP-28: `item_vendor` (11 chars) and
+`item_vendor_price` (18 chars) both share the `ITEM` prefix with the
+already-existing `item`/`item_class`/`item_lot` tables, and DB2 for i's
+abbreviation algorithm produced `ITEM_00001` and `ITEM_00003` (not
+`ITMVND`/`ITMVPRC` or any other intuitive abbreviation) to avoid a
+collision. There is no way to predict this from the SQL name — always
+confirm with `DSPOBJD OBJ(PERPDEMO/*ALL) OBJTYPE(*FILE)` right after the
+build and use the *real* object name in every downstream reference
+(`PERPSJPF` calls, `DSPFD`, RPG `dcl-f`/embedded-SQL is unaffected since it
+resolves by SQL name, but any native/CL-level reference needs the real
+short name).
+
 **Clause order matters.** On DB2 for i, `FOR COLUMN` goes **between the
 column name and the data type**, not after the data type. Placing it after
 `CHAR(...)` / `VARCHAR(...)` triggers the CCSID-modifier grammar (the parser
@@ -143,6 +157,14 @@ it — full stop. RPG programs must handle the resulting SQLSTATE cleanly.
 - Business tables: `PRIMARY KEY (company_code, ...natural_key...)`
 - Reference tables: `PRIMARY KEY (code_type, code_value)` and similar
 - Multi-column PKs are the norm — no surrogate `id INT` columns.
+
+**Partial (filtered) unique indexes work as `.index.sql` on DB2 for i.**
+Confirmed in PERP-28: `CREATE UNIQUE INDEX ... ON tbl (cols) WHERE
+predicate` runs clean through `RUNSQLSTM` and produces a normal `*FILE` LF
+object. Use this for "at most one flagged row per group" constraints
+(e.g. one preferred vendor per item) instead of application-code
+enforcement — DB2 rejects the second `WHERE`-matching row with
+`SQL0803`/`SQLSTATE 23505` just like any other unique-index violation.
 
 ## 7. Journaling — day-one requirement
 
@@ -279,6 +301,15 @@ maintenance programs. These apply to every RPG or SQLRPGLE source under
   and reserve positions in the LDA — every job has an LDA automatically, so
   no runtime `CRTDTAARA` is needed. PERP session state (currently just the
   selected company code at positions 1-3) lives in the LDA.
+- **Program/module/file object names cap at 10 characters — same as
+  journal receivers (§7).** Learned again in PERP-32: naming a smoke-test
+  caller `itmvprcqsmk.sqlrpgle` (11 chars) failed `CRTSQLRPGI` with
+  `CPD0074: Value 'ITMVPRCQSM' for OBJ exceeds 10 characters` — codermake
+  does *not* auto-truncate the source basename to fit. Renamed the file
+  itself to `ivprcqsmk.sqlrpgle` (9 chars). Unlike SQL table/column short
+  names (§2), there is no separate "system name" escape hatch for RPG
+  program objects — the source file basename *is* the object name, so it
+  must fit within 10 chars from the start.
 
 ## 14. DSPF conventions
 

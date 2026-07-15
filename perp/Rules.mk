@@ -103,6 +103,54 @@ wrklotd.file: qddssrc/wrklotd.dspf
 wrklotr.pgm:  qrpglesrc/wrklotr.sqlrpgle qddssrc/wrklotd.dspf | wrklotd.file item_lot.file
 
 
+# --- PERP-28: Vendor, Item-Vendor, Pricing tables --------------------------
+# FK order: vendor (company, perp_user, code_master) before item_vendor
+# (item, vendor) before item_vendor_price (item_vendor, code_master).
+# The partial-unique preferred-vendor index is a separate .index.sql object,
+# a normal (not order-only) prereq of item_vendor so it always rebuilds
+# alongside the table it indexes.
+vendor.file:                   qddlsrc/vendor.table.sql            company.file perp_user.file code_master.file | perpsjpf.pgm
+item_vendor.file:              qddlsrc/item_vendor.table.sql       item.file vendor.file                        | perpsjpf.pgm
+item_vendor_preferred_ak.file: qddlsrc/item_vendor_preferred_ak.index.sql item_vendor.file
+item_vendor_price.file:        qddlsrc/item_vendor_price.table.sql item_vendor.file code_master.file            | perpsjpf.pgm
+
+
+# --- PERP-29: Vendor master maintenance -----------------------------------
+# Scoped by *LDA company (perpselr). Subfile filters by active-only and
+# buyer_code.
+wrkvndd.file: qddssrc/wrkvndd.dspf
+wrkvndr.pgm:  qrpglesrc/wrkvndr.sqlrpgle qddssrc/wrkvndd.dspf | wrkvndd.file vendor.file perp_user.file code_master.file
+
+
+# --- PERP-30: Item-vendor profile maintenance -----------------------------
+# Scoped by *LDA company (perpselr) plus an item OR vendor entered on
+# screen (item wins if both are entered).
+wrkivnd.file: qddssrc/wrkivnd.dspf
+wrkivnr.pgm:  qrpglesrc/wrkivnr.sqlrpgle qddssrc/wrkivnd.dspf | wrkivnd.file item_vendor.file
+
+
+# --- PERP-31: Item-vendor price maintenance (effective-dated) --------------
+# Scoped by *LDA company (perpselr) plus an item AND vendor entered on
+# screen. Read-only history list; F6=Add closes the current row and
+# inserts a new one dated today.
+wrkivpd.file: qddssrc/wrkivpd.dspf
+wrkivpr.pgm:  qrpglesrc/wrkivpr.sqlrpgle qddssrc/wrkivpd.dspf | wrkivpd.file item_vendor_price.file
+
+
+# --- PERP-32: Pricing history query service --------------------------------
+# View joins item_vendor_price + vendor; module/srvpgm/bnddir/prototype
+# follow the docseq (PERP-19) pattern. Smoke-test caller proves binding.
+item_vendor_price_history.file: qddlsrc/item_vendor_price_history.view.sql item_vendor_price.file vendor.file
+itmvprcq.module: qrpglesrc/itmvprcq.sqlrpgle qrpglesrc/itmvprcq_pr.rpgle | item_vendor_price_history.file
+itmvprcq.srvpgm: itmvprcq.module qsrvsrc/itmvprcq.bnd
+# perp.bnddir target already declared above (PERP-19 docseq section);
+# adding a new addbnddire entry there for itmvprcq is enough.
+
+# Smoke-test caller for itmvprcq -- CALL PERPDEMO/IVPRCQSMK PARM('ACM' 'WIDGET1').
+# Named ivprcqsmk, not itmvprcqsmk (11 chars) -- IBM i object names cap at 10.
+ivprcqsmk.pgm: qrpglesrc/ivprcqsmk.sqlrpgle qrpglesrc/itmvprcq_pr.rpgle itmvprcq.srvpgm | perp.bnddir item_vendor_price_history.file
+
+
 # --- PERP main menu (glue for exploratory verification) ------------------
 # Ties the PERP-16/17/18/19/21/22/23/24 programs together into a single
 # 5250 menu: GO PERPDEMO/PERPMNU
@@ -110,7 +158,7 @@ perpmnu.file: qddssrc/perpmnu.dspf
 perpmnu.msgf: perpmnu.msgf
 # .file MUST be a normal prereq (not order-only) or codermake silently drops
 # the CRTMNU recipe. See DDL_STYLE_GUIDE § "codermake menu gotcha".
-perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm wrkcmr.pgm wrkusrr.pgm docseqsmk.pgm wrkuomr.pgm wrkcnvr.pgm wrkiclr.pgm wrkitmr.pgm wrklotr.pgm
+perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm wrkcmr.pgm wrkusrr.pgm docseqsmk.pgm wrkuomr.pgm wrkcnvr.pgm wrkiclr.pgm wrkitmr.pgm wrklotr.pgm wrkvndr.pgm wrkivnr.pgm wrkivpr.pgm ivprcqsmk.pgm
 
 
 # --- CL setup -------------------------------------------------------------
