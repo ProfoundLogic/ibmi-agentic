@@ -46,6 +46,12 @@ item_uom_conversion.file: qddlsrc/item_uom_conversion.table.sql item.file uom.fi
 item_lot.file:            qddlsrc/item_lot.table.sql             item.file             | perpsjpf.pgm
 
 
+# --- PERP-25: 3D Warehouse Map — warehouse_layout table -------------------
+# One row per company; FKs company. Drives coordinate derivation in whcoord
+# (PERP-27) and the maintenance screen in wlmr (PERP-26).
+warehouse_layout.file: qddlsrc/warehouse_layout.table.sql company.file | perpsjpf.pgm
+
+
 # --- PERP-19: Document sequence service ----------------------------------
 # Atomic per-(company, doc_type) sequence allocator. Module + srvpgm + bnddir.
 docseq.module: qrpglesrc/docseq.sqlrpgle qrpglesrc/docseq_pr.rpgle | company_config.file document_sequence.file
@@ -101,6 +107,23 @@ wrkitmr.pgm:  qrpglesrc/wrkitmr.sqlrpgle qddssrc/wrkitmd.dspf | wrkitmd.file ite
 # SUM(item_lot.qty_on_hand) for the scoped item.
 wrklotd.file: qddssrc/wrklotd.dspf
 wrklotr.pgm:  qrpglesrc/wrklotr.sqlrpgle qddssrc/wrklotd.dspf | wrklotd.file item_lot.file
+
+
+# --- PERP-27: Warehouse coordinate query service --------------------------
+# Iterator service program: located items in a company joined with x/y/z
+# coordinates derived from warehouse_layout. Module + srvpgm + bnddir.
+whcoord.module: qrpglesrc/whcoord.sqlrpgle qrpglesrc/whcoord_pr.rpgle | item.file warehouse_layout.file
+whcoord.srvpgm: whcoord.module qsrvsrc/whcoord.bnd
+
+# Smoke-test caller -- CALL PERPDEMO/WHCOORDSMK PARM('ACM').
+whcoordsmk.pgm: qrpglesrc/whcoordsmk.sqlrpgle qrpglesrc/whcoord_pr.rpgle whcoord.srvpgm | perp.bnddir item.file warehouse_layout.file
+
+
+# --- PERP-26: Warehouse layout maintenance --------------------------------
+# Single-record display + edit of warehouse_layout, scoped by *LDA company
+# (perpselr). No subfile list -- one row per company.
+wlmd.file: qddssrc/wlmd.dspf
+wlmr.pgm:  qrpglesrc/wlmr.sqlrpgle qddssrc/wlmd.dspf | wlmd.file warehouse_layout.file
 
 
 # --- PERP-28: Vendor, Item-Vendor, Pricing tables --------------------------
@@ -168,20 +191,20 @@ perpsysm.file: qddssrc/perpsysm.dspf
 perpsysm.msgf: perpsysm.msgf
 perpsysm.menu: perpsysm.msgf perpsysm.file | wrkcmr.pgm wrkusrr.pgm
 
-# PERP-20/21/22/23/24: inventory master data
+# PERP-20/21/22/23/24/26: inventory master data (+ warehouse layout, PERP-4)
 perpinvm.file: qddssrc/perpinvm.dspf
 perpinvm.msgf: perpinvm.msgf
-perpinvm.menu: perpinvm.msgf perpinvm.file | wrkuomr.pgm wrkcnvr.pgm wrkiclr.pgm wrkitmr.pgm wrklotr.pgm
+perpinvm.menu: perpinvm.msgf perpinvm.file | wrkuomr.pgm wrkcnvr.pgm wrkiclr.pgm wrkitmr.pgm wrklotr.pgm wlmr.pgm
 
 # PERP-28/29/30/31: vendor & pricing master data
 perpvndm.file: qddssrc/perpvndm.dspf
 perpvndm.msgf: perpvndm.msgf
 perpvndm.menu: perpvndm.msgf perpvndm.file | wrkvndr.pgm wrkivnr.pgm wrkivpr.pgm
 
-# PERP-19/32: service-program smoke testers
+# PERP-19/27/32: service-program smoke testers
 perpdiag.file: qddssrc/perpdiag.dspf
 perpdiag.msgf: perpdiag.msgf
-perpdiag.menu: perpdiag.msgf perpdiag.file | docseqsmk.pgm ivprcqsmk.pgm
+perpdiag.menu: perpdiag.msgf perpdiag.file | docseqsmk.pgm ivprcqsmk.pgm whcoordsmk.pgm
 
 # Top-level menu. Order-only on perpselr.pgm (called directly) and on the
 # 4 child .menu targets (routed to via GO PERPDEMO/<name>, not CALLed).
