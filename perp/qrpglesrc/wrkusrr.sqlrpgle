@@ -81,18 +81,23 @@ dow not *in03 and not *in12;
     iter;
   endif;
 
-  selRrn = 0;
-  selOpt = ' ';
-  readc usfl;
-  dow not %eof(wrkusrd);
-    if sopt <> '';
-      selRrn = rrn;
-      selOpt = sopt;
-      exsr handleOpt;
-      selRrn = 0;
-    endif;
+  // Guard on numRows: READC against a subfile that was never written to
+  // this cycle (0 rows loaded) raises a "Session or device error"
+  // (CPF5006-class) runtime error instead of just returning *EOF.
+  if numRows > 0;
+    selRrn = 0;
+    selOpt = ' ';
     readc usfl;
-  enddo;
+    dow not %eof(wrkusrd);
+      if sopt <> '';
+        selRrn = rrn;
+        selOpt = sopt;
+        exsr handleOpt;
+        selRrn = 0;
+      endif;
+      readc usfl;
+    enddo;
+  endif;
 enddo;
 
 *inlr = *on;

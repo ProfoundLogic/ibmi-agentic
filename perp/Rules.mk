@@ -36,6 +36,16 @@ company_config.file:    qddlsrc/company_config.table.sql    company.file     | p
 perp_user.file:         qddlsrc/perp_user.table.sql         code_master.file | perpsjpf.pgm
 
 
+# --- PERP-20: Inventory Master tables --------------------------------------
+# Core item master. FK order: uom and item_class (both FK company) before
+# item; item_uom_conversion and item_lot FK item + uom.
+uom.file:                 qddlsrc/uom.table.sql                                       | perpsjpf.pgm
+item_class.file:          qddlsrc/item_class.table.sql          company.file          | perpsjpf.pgm
+item.file:                qddlsrc/item.table.sql                company.file item_class.file uom.file | perpsjpf.pgm
+item_uom_conversion.file: qddlsrc/item_uom_conversion.table.sql item.file uom.file     | perpsjpf.pgm
+item_lot.file:            qddlsrc/item_lot.table.sql             item.file             | perpsjpf.pgm
+
+
 # --- PERP-19: Document sequence service ----------------------------------
 # Atomic per-(company, doc_type) sequence allocator. Module + srvpgm + bnddir.
 docseq.module: qrpglesrc/docseq.sqlrpgle qrpglesrc/docseq_pr.rpgle | company_config.file document_sequence.file
@@ -62,14 +72,45 @@ wrkusrd.file: qddssrc/wrkusrd.dspf
 wrkusrr.pgm:  qrpglesrc/wrkusrr.sqlrpgle qddssrc/wrkusrd.dspf | wrkusrd.file perp_user.file code_master.file
 
 
+# --- PERP-21: UOM & UOM conversion maintenance ----------------------------
+wrkuomd.file: qddssrc/wrkuomd.dspf
+wrkuomr.pgm:  qrpglesrc/wrkuomr.sqlrpgle qddssrc/wrkuomd.dspf | wrkuomd.file uom.file
+
+# Scoped by *LDA company (perpselr) + item number entered on screen.
+wrkcnvd.file: qddssrc/wrkcnvd.dspf
+wrkcnvr.pgm:  qrpglesrc/wrkcnvr.sqlrpgle qddssrc/wrkcnvd.dspf | wrkcnvd.file item_uom_conversion.file
+
+
+# --- PERP-22: Item class maintenance --------------------------------------
+# Scoped by *LDA company (perpselr).
+wrkicld.file: qddssrc/wrkicld.dspf
+wrkiclr.pgm:  qrpglesrc/wrkiclr.sqlrpgle qddssrc/wrkicld.dspf | wrkicld.file item_class.file
+
+
+# --- PERP-23: Item master maintenance --------------------------------------
+# Scoped by *LDA company (perpselr). Option 6 on the subfile calls wrkcnvr
+# pre-scoped to the selected item (dynamic CALL via EXTPGM, not compile-time
+# bound -- wrkcnvr.pgm listed as order-only so build order still makes sense).
+wrkitmd.file: qddssrc/wrkitmd.dspf
+wrkitmr.pgm:  qrpglesrc/wrkitmr.sqlrpgle qddssrc/wrkitmd.dspf | wrkitmd.file item.file wrkcnvr.pgm wrklotr.pgm
+
+
+# --- PERP-24: Item lot maintenance & inquiry --------------------------------
+# Scoped by *LDA company (perpselr) + item number entered on screen, same
+# idiom as wrkcnvr. Discrepancy indicator: item.qty_on_hand vs
+# SUM(item_lot.qty_on_hand) for the scoped item.
+wrklotd.file: qddssrc/wrklotd.dspf
+wrklotr.pgm:  qrpglesrc/wrklotr.sqlrpgle qddssrc/wrklotd.dspf | wrklotd.file item_lot.file
+
+
 # --- PERP main menu (glue for exploratory verification) ------------------
-# Ties the PERP-16/17/18/19 programs together into a single 5250 menu:
-#   GO PERPDEMO/PERPMNU
+# Ties the PERP-16/17/18/19/21/22/23/24 programs together into a single
+# 5250 menu: GO PERPDEMO/PERPMNU
 perpmnu.file: qddssrc/perpmnu.dspf
 perpmnu.msgf: perpmnu.msgf
 # .file MUST be a normal prereq (not order-only) or codermake silently drops
 # the CRTMNU recipe. See DDL_STYLE_GUIDE § "codermake menu gotcha".
-perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm wrkcmr.pgm wrkusrr.pgm docseqsmk.pgm
+perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm wrkcmr.pgm wrkusrr.pgm docseqsmk.pgm wrkuomr.pgm wrkcnvr.pgm wrkiclr.pgm wrkitmr.pgm wrklotr.pgm
 
 
 # --- CL setup -------------------------------------------------------------

@@ -55,6 +55,19 @@ auto-derive, or rename the SQL identifier so it needs a short name (e.g.
 `city` → `city_name FOR COLUMN CITY`, `perp_user` → keep the SQL name and
 accept `PERP_USER` as the system name — RPG programs `dcl-f perp_user`).
 
+**Don't trust the SQL7029 message text as a hint at the real system name.**
+`SQL7029: System name X cannot be specified` echoes back whatever value
+*you* proposed — it is not telling you what DB2 actually auto-derived.
+(Learned in PERP-20: an explicit `FOR SYSTEM NAME ITMCLS` on `item_class`
+raised `SQL7029: System name ITMCLS cannot be specified`, which reads like
+confirmation that `ITMCLS` is correct — it isn't. The real auto-derived
+name, confirmed via `DSPOBJD OBJ(PERPDEMO/*ALL) OBJTYPE(*FILE)`, is
+`ITEM_CLASS` — DB2 only abbreviates when the SQL name exceeds 10 characters,
+and `item_class`/`item_lot` are exactly 10/8.) After hitting this error,
+omit the clause, build, then confirm the real object name with `DSPOBJD`
+before writing anything downstream (Rules.mk targets, `PERPSJPF` calls,
+RPG `dcl-f`) against it — don't guess an abbreviation.
+
 Related: **`LABEL ON TABLE` text is capped at 50 characters** on DB2 for i;
 longer text raises `SQL0107`. Column labels have the same cap.
 
@@ -281,6 +294,46 @@ maintenance programs. These apply to every RPG or SQLRPGLE source under
   F12=Cancel — declared at file level and echoed in the footer line.
 - **Message subfile** (`R xMSGSFL` / `R xMSGCTL`) attached at row 24 on
   every screen; RPG uses `QMHSNDPM` to post messages.
+- **Every numeric field on screen (subfile column or edit-panel field,
+  input or output) gets `EDTCDE(3)`.** Without an edit code, a zoned
+  numeric field displays every leading zero (e.g. `000000001500000` for
+  150.0000), which is unreadable and reads as an error to anyone glancing
+  at the screen. `EDTCDE(3)` zero-suppresses and inserts the decimal
+  point (a no-op if `DEC=0`) while still displaying a literal `0` for a
+  true zero value — critical for balance/quantity fields where "zero" is
+  a meaningful, common state (e.g. a freshly-added item's `qty_on_hand`)
+  that must read as `0`, not blank or a run of zeros.
+  - **Do not use `EDTCDE(Z)`, `EDTCDE(2)`, `EDTCDE(4)`, or any other
+    "blank when zero" code for business quantity/balance fields** — those
+    codes zero-suppress by blanking the field entirely when the value is
+    zero, which is indistinguishable from "no value" and defeats the
+    purpose for anything the user needs to read as an explicit zero.
+    (`Z`/`2`/`4`/`B`/`D`/`K`/`M` blank zero; `1`/`3`/`A`/`C`/`J`/`L` show
+    it as `0` — this module standardizes on `3`, the plainest of the
+    zero-showing codes, since these are quantities/counts, not currency
+    needing comma grouping.)
+  - Adding `EDTCDE(3)` to a `DEC>0` field grows its display width by
+    exactly one column (the decimal point) — leave at least that much
+    headroom between adjacent fields packed onto the same row, or the
+    compile will overlap/truncate.
+- **Never issue `READC` against a subfile that was not written to this
+  cycle.** If the load routine finds 0 rows this pass (e.g. an empty
+  filter result, or the "enter a key value to begin" state before any
+  scoping value has been typed), the subfile-options `READC` loop must
+  be skipped entirely — guard it with `if numRows > 0; ... endif;`.
+  Unconditionally issuing `READC` against a subfile that has never been
+  `WRITE`n this invocation raises a runtime **"Session or device error
+  occurred in file &1"** (CPF5006-class) the instant the user presses
+  Enter on an empty list — it does not just return `*EOF` the way a
+  populated-then-cleared subfile would. Found across every PERP
+  work-with program (`PERPSELR`, `WRKCMR`, `WRKUSRR`, `WRKUOMR`,
+  `WRKCNVR`, `WRKICLR`, `WRKITMR`, `WRKLOTR`) since they all share the
+  same load/fill/read-options skeleton; fixed in all eight at once.
+  Corollary: if a program skips the load routine entirely when its scope
+  key is blank (e.g. `WRKCNVR`/`WRKLOTR` before an item number is
+  entered), explicitly reset the row counter to 0 in that branch too —
+  otherwise a stale nonzero count from a *previous* scope value lets the
+  guard pass even though nothing was loaded this cycle.
 
 ## 15. codermake gotchas
 

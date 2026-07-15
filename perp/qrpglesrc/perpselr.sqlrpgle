@@ -84,20 +84,25 @@ dow not *in03 and not *in12;
     iter;  // refresh
   endif;
 
-  selRrn = 0;
-  readc cosfl;
-  dow not %eof(perpseld);
-    if sopt = '1';
-      if selRrn = 0;
-        selRrn = rrn;
-      else;
-        writeMsg('Only one company may be selected per Enter.');
-      endif;
-    elseif sopt <> '';
-      writeMsg('Option ' + %trim(sopt) + ' is not valid - use 1.');
-    endif;
+  // Guard on numCo: READC against a subfile that was never written to
+  // this cycle (0 rows loaded) raises a "Session or device error"
+  // (CPF5006-class) runtime error instead of just returning *EOF.
+  if numCo > 0;
+    selRrn = 0;
     readc cosfl;
-  enddo;
+    dow not %eof(perpseld);
+      if sopt = '1';
+        if selRrn = 0;
+          selRrn = rrn;
+        else;
+          writeMsg('Only one company may be selected per Enter.');
+        endif;
+      elseif sopt <> '';
+        writeMsg('Option ' + %trim(sopt) + ' is not valid - use 1.');
+      endif;
+      readc cosfl;
+    enddo;
+  endif;
 
   if selRrn > 0 and msgrrn = 0;
     chain selRrn cosfl;

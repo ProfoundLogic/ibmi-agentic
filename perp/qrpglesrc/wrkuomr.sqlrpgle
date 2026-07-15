@@ -1,19 +1,19 @@
 **free
 
 // ---------------------------------------------------------------------
-// Program: wrkcmr  (Work with Code Master)
-// Purpose: DSPF-based CRUD for the code_master table. One screen shows
-//          all system lookups regardless of code_type; a filter field
-//          narrows the subfile to a specific type. Options 2/4/5
-//          change/delete/display; F6 adds. Delete falls through to a
-//          DB2 FK violation (SQL0532/SQL0531) if the code is in use —
-//          RPG surfaces the SQLSTATE cleanly rather than pre-checking.
-// Epic:    PERP-2 (PERP-17)
+// Program: wrkuomr  (Work with Units of Measure)
+// Purpose: DSPF-based CRUD for the uom table. Global (not company-
+//          scoped) master data. Options 2/4/5 change/delete/display;
+//          F6 adds. Delete falls through to a DB2 FK violation
+//          (SQL0532/SQL0531) if the UOM is referenced by item or
+//          item_uom_conversion -- RPG surfaces the SQLSTATE cleanly
+//          rather than pre-checking.
+// Epic:    PERP-3 (PERP-21)
 // ---------------------------------------------------------------------
 
 ctl-opt dftactgrp(*no) actgrp(*new);
 
-dcl-f wrkcmd workstn sfile(cmsfl:rrn) sfile(cmmsgsfl:msgrrn);
+dcl-f wrkuomd workstn sfile(uosfl:rrn) sfile(uomsgsfl:msgrrn);
 
 dcl-pr QMHSNDPM extpgm;
   msgId       char(7)   const;
@@ -31,16 +31,14 @@ dcl-ds statusDS psds qualified;
   programName char(10) pos(334);
 end-ds;
 
-dcl-ds cmRow qualified;
-  ctype       varchar(20);
-  cvalue      varchar(20);
-  cdesc       varchar(60);
-  cshort      varchar(20);
-  csort       int(10);
-  cactive     char(1);
+dcl-ds uomRow qualified;
+  code    varchar(5);
+  desc    varchar(60);
+  cat     varchar(20);
+  active  char(1);
 end-ds;
 
-dcl-ds rows likeds(cmRow) dim(500);
+dcl-ds rows likeds(uomRow) dim(500);
 dcl-s numRows int(10);
 dcl-s i       int(10);
 dcl-s rrn     int(10);
@@ -48,10 +46,6 @@ dcl-s msgrrn  int(10);
 dcl-s msgkey  char(4);
 dcl-s selRrn  int(10);
 dcl-s selOpt  char(1);
-dcl-s filter  varchar(20);
-
-filter = '';
-sftype = '';
 
 dow not *in03 and not *in12;
   exsr clearMsgs;
@@ -59,38 +53,31 @@ dow not *in03 and not *in12;
 
   if numRows = 0;
     *in30 = *off;
-    write cmnone;
+    write uonone;
   else;
     exsr fillSubfile;
     *in30 = *on;
   endif;
 
-  write cmfoot;
+  write uofoot;
   if msgrrn > 0;
     *in40 = *on;
-    write cmmsgctl;
+    write uomsgctl;
   else;
     *in40 = *off;
   endif;
-  exfmt cmctl;
+  exfmt uoctl;
 
   if *in03 or *in12;
     leave;
   endif;
 
   if *in05;
-    filter = sftype;
     iter;
   endif;
 
   if *in06;
     exsr addRow;
-    iter;
-  endif;
-
-  // Refresh filter from screen entry
-  if sftype <> filter;
-    filter = sftype;
     iter;
   endif;
 
@@ -101,15 +88,15 @@ dow not *in03 and not *in12;
   if numRows > 0;
     selRrn = 0;
     selOpt = ' ';
-    readc cmsfl;
-    dow not %eof(wrkcmd);
+    readc uosfl;
+    dow not %eof(wrkuomd);
       if sopt <> '';
         selRrn = rrn;
         selOpt = sopt;
         exsr handleOpt;
         selRrn = 0;
       endif;
-      readc cmsfl;
+      readc uosfl;
     enddo;
   endif;
 
@@ -121,73 +108,49 @@ return;
 // ---------------------------------------------------------------------
 begsr loadRows;
   numRows = 0;
-  if filter = '';
-    exec sql declare c1 cursor for
-      select code_type, code_value, description, short_desc,
-             sort_order, is_active
-        from perpdemo.code_master
-       order by code_type, sort_order, code_value;
-  else;
-    exec sql declare c2 cursor for
-      select code_type, code_value, description, short_desc,
-             sort_order, is_active
-        from perpdemo.code_master
-       where code_type = :filter
-       order by sort_order, code_value;
-  endif;
-
-  if filter = '';
-    exec sql open c1;
-  else;
-    exec sql open c2;
-  endif;
+  exec sql declare c1 cursor for
+    select uom_code, description, uom_category, is_active
+      from perpdemo.uom
+     order by uom_code;
+  exec sql open c1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
     return;
   endif;
 
   dow numRows < %elem(rows);
-    if filter = '';
-      exec sql fetch c1 into :cmRow;
-    else;
-      exec sql fetch c2 into :cmRow;
-    endif;
+    exec sql fetch c1 into :uomRow;
     if sqlcode = 100 or sqlcode < 0;
       leave;
     endif;
     numRows += 1;
-    rows(numRows) = cmRow;
+    rows(numRows) = uomRow;
   enddo;
-
-  if filter = '';
-    exec sql close c1;
-  else;
-    exec sql close c2;
-  endif;
+  exec sql close c1;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr fillSubfile;
   rrn = 0;
   *in31 = *on;
-  write cmctl;
+  write uoctl;
   *in31 = *off;
   for i = 1 to numRows;
     *in50 = *off;
     *in51 = *off;
-    sopt   = '';
-    stype  = rows(i).ctype;
-    svalue = rows(i).cvalue;
-    sdesc  = rows(i).cdesc;
+    sopt  = '';
+    scode = rows(i).code;
+    sdesc = rows(i).desc;
+    scat  = rows(i).cat;
     rrn += 1;
-    write cmsfl;
+    write uosfl;
   endfor;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr handleOpt;
-  chain selRrn cmsfl;
-  if %found(wrkcmd);
+  chain selRrn uosfl;
+  if %found(wrkuomd);
     select;
       when selOpt = '2';
         exsr changeRow;
@@ -204,38 +167,33 @@ endsr;
 // ---------------------------------------------------------------------
 begsr addRow;
   emode   = 'A';
-  etype   = filter;
-  evalue  = '';
+  ecode   = '';
   edesc   = '';
-  eshort  = '';
-  esort   = 0;
+  ecat    = '';
   eactive = 'Y';
   exsr editLoop;
-  if not *in12 and etype <> '' and evalue <> '';
+  if not *in12 and ecode <> '';
     exec sql
-      insert into perpdemo.code_master
-        (code_type, code_value, description, short_desc,
-         sort_order, is_active)
-        values (:etype, :evalue, :edesc, :eshort, :esort, :eactive);
+      insert into perpdemo.uom (uom_code, description, uom_category, is_active)
+        values (:ecode, :edesc, :ecat, :eactive);
     if sqlcode < 0;
       writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
              + ' SQLSTATE=' + sqlstate);
     else;
-      writeMsg('Added ' + %trim(etype) + '/' + %trim(evalue) + '.');
+      writeMsg('Added ' + %trim(ecode) + '.');
     endif;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr changeRow;
-  emode   = 'C';
-  etype   = stype;
-  evalue  = svalue;
+  emode = 'C';
+  ecode = scode;
   exec sql
-    select description, short_desc, sort_order, is_active
-      into :edesc, :eshort, :esort, :eactive
-      from perpdemo.code_master
-     where code_type = :etype and code_value = :evalue;
+    select description, uom_category, is_active
+      into :edesc, :ecat, :eactive
+      from perpdemo.uom
+     where uom_code = :ecode;
   if sqlcode <> 0;
     writeMsg('Row disappeared before change.');
     return;
@@ -243,18 +201,17 @@ begsr changeRow;
   exsr editLoop;
   if not *in12;
     exec sql
-      update perpdemo.code_master
-         set description = :edesc,
-             short_desc  = :eshort,
-             sort_order  = :esort,
-             is_active   = :eactive,
-             updated_at  = current_timestamp,
-             updated_by  = user
-       where code_type = :etype and code_value = :evalue;
+      update perpdemo.uom
+         set description  = :edesc,
+             uom_category = :ecat,
+             is_active    = :eactive,
+             updated_at   = current_timestamp,
+             updated_by   = user
+       where uom_code = :ecode;
     if sqlcode < 0;
       writeMsg('Change failed: SQLCODE=' + %char(sqlcode));
     else;
-      writeMsg('Updated ' + %trim(etype) + '/' + %trim(evalue) + '.');
+      writeMsg('Updated ' + %trim(ecode) + '.');
     endif;
   endif;
 endsr;
@@ -262,38 +219,37 @@ endsr;
 // ---------------------------------------------------------------------
 begsr deleteRow;
   exec sql
-    delete from perpdemo.code_master
-     where code_type = :stype and code_value = :svalue;
+    delete from perpdemo.uom
+     where uom_code = :scode;
   if sqlcode < 0;
     writeMsg('Delete failed (in use?): SQLSTATE=' + sqlstate);
   else;
-    writeMsg('Deleted ' + %trim(stype) + '/' + %trim(svalue) + '.');
+    writeMsg('Deleted ' + %trim(scode) + '.');
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr displayRow;
-  emode   = 'D';
-  etype   = stype;
-  evalue  = svalue;
+  emode = 'D';
+  ecode = scode;
   exec sql
-    select description, short_desc, sort_order, is_active
-      into :edesc, :eshort, :esort, :eactive
-      from perpdemo.code_master
-     where code_type = :etype and code_value = :evalue;
+    select description, uom_category, is_active
+      into :edesc, :ecat, :eactive
+      from perpdemo.uom
+     where uom_code = :ecode;
   exsr editLoop;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr editLoop;
-  exfmt cmedit;
+  exfmt uoedit;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr clearMsgs;
   msgrrn = 0;
   *in41 = *on;
-  write cmmsgctl;
+  write uomsgctl;
   *in41 = *off;
 endsr;
 
@@ -316,5 +272,5 @@ dcl-proc writeMsg;
     x'0000000000000000');
   msgrrn += 1;
   spgmq = statusDS.programName;
-  write cmmsgsfl;
+  write uomsgsfl;
 end-proc;
