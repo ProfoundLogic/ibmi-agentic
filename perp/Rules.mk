@@ -46,6 +46,12 @@ item_uom_conversion.file: qddlsrc/item_uom_conversion.table.sql item.file uom.fi
 item_lot.file:            qddlsrc/item_lot.table.sql             item.file             | perpsjpf.pgm
 
 
+# --- PERP-25: 3D Warehouse Map — warehouse_layout table -------------------
+# One row per company; FKs company. Drives coordinate derivation in whcoord
+# (PERP-27) and the maintenance screen in wlmr (PERP-26).
+warehouse_layout.file: qddlsrc/warehouse_layout.table.sql company.file | perpsjpf.pgm
+
+
 # --- PERP-19: Document sequence service ----------------------------------
 # Atomic per-(company, doc_type) sequence allocator. Module + srvpgm + bnddir.
 docseq.module: qrpglesrc/docseq.sqlrpgle qrpglesrc/docseq_pr.rpgle | company_config.file document_sequence.file
@@ -103,6 +109,23 @@ wrklotd.file: qddssrc/wrklotd.dspf
 wrklotr.pgm:  qrpglesrc/wrklotr.sqlrpgle qddssrc/wrklotd.dspf | wrklotd.file item_lot.file
 
 
+# --- PERP-27: Warehouse coordinate query service --------------------------
+# Iterator service program: located items in a company joined with x/y/z
+# coordinates derived from warehouse_layout. Module + srvpgm + bnddir.
+whcoord.module: qrpglesrc/whcoord.sqlrpgle qrpglesrc/whcoord_pr.rpgle | item.file warehouse_layout.file
+whcoord.srvpgm: whcoord.module qsrvsrc/whcoord.bnd
+
+# Smoke-test caller -- CALL PERPDEMO/WHCOORDSMK PARM('ACM').
+whcoordsmk.pgm: qrpglesrc/whcoordsmk.sqlrpgle qrpglesrc/whcoord_pr.rpgle whcoord.srvpgm | perp.bnddir item.file warehouse_layout.file
+
+
+# --- PERP-26: Warehouse layout maintenance --------------------------------
+# Single-record display + edit of warehouse_layout, scoped by *LDA company
+# (perpselr). No subfile list -- one row per company.
+wlmd.file: qddssrc/wlmd.dspf
+wlmr.pgm:  qrpglesrc/wlmr.sqlrpgle qddssrc/wlmd.dspf | wlmd.file warehouse_layout.file
+
+
 # --- PERP main menu (glue for exploratory verification) ------------------
 # Ties the PERP-16/17/18/19/21/22/23/24 programs together into a single
 # 5250 menu: GO PERPDEMO/PERPMNU
@@ -110,7 +133,7 @@ perpmnu.file: qddssrc/perpmnu.dspf
 perpmnu.msgf: perpmnu.msgf
 # .file MUST be a normal prereq (not order-only) or codermake silently drops
 # the CRTMNU recipe. See DDL_STYLE_GUIDE § "codermake menu gotcha".
-perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm wrkcmr.pgm wrkusrr.pgm docseqsmk.pgm wrkuomr.pgm wrkcnvr.pgm wrkiclr.pgm wrkitmr.pgm wrklotr.pgm
+perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm wrkcmr.pgm wrkusrr.pgm docseqsmk.pgm wrkuomr.pgm wrkcnvr.pgm wrkiclr.pgm wrkitmr.pgm wrklotr.pgm wlmr.pgm whcoordsmk.pgm
 
 
 # --- CL setup -------------------------------------------------------------

@@ -335,6 +335,19 @@ maintenance programs. These apply to every RPG or SQLRPGLE source under
   otherwise a stale nonzero count from a *previous* scope value lets the
   guard pass even though nothing was loaded this cycle.
 
+## 14a. Location codes are alphanumeric, not numeric ordinals
+
+`item.aisle_code` / `bay_code` / `shelf_code` (`PERP-3`/`PERP-20`) are free-text
+`VARCHAR(10)` columns. Real seed data mixes a letter prefix with the ordinal
+(e.g. `'A1'`, `'B2'`, `'S3'` -- confirmed against the `WIDGET1` seed row).
+`CAST(aisle_code AS INTEGER)` rejects that outright with `SQL0420`.
+
+Any service that needs the numeric ordinal out of one of these codes (e.g.
+`whcoord`, `PERP-27`) must parse it in RPG rather than casting the whole
+string in SQL -- pull out the digit characters and convert those
+(`ordinalFromCode()` in `qrpglesrc/whcoord.sqlrpgle` is the reference
+implementation). Don't assume these columns hold pure numeric strings.
+
 ## 15. codermake gotchas
 
 - **`.menu` recipe needs `.file` as a *normal* prerequisite**, not
