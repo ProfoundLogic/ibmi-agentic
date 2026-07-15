@@ -36,6 +36,28 @@ must then reference. That defeats the point of readable names in RPG.
 **Every table** carries an explicit `FOR SYSTEM NAME`. **Every column** carries
 an explicit `FOR COLUMN`. The system name is uppercase and ≤ 10 chars.
 
+**Exception — SQL name is already a valid system name.** DB2 for i rejects
+`FOR SYSTEM NAME X` / `FOR COLUMN X` when the target SQL name is itself a
+valid ≤10-char system name (all-alpha, or underscores allowed). In that case
+providing a redundant *or different* system name raises `SQL7029: System name
+X cannot be specified`. Two situations trigger this:
+
+1. The SQL name is ≤ 10 chars and pure alphanumeric, and you ask for the
+   same value as the auto-derivation — e.g. `CREATE TABLE company FOR SYSTEM
+   NAME COMPANY` or `city FOR COLUMN CITY`.
+2. The SQL name is ≤ 10 chars and *already* a valid system name (underscores
+   allowed), and you ask for a *different* value — e.g. `perp_user FOR
+   SYSTEM NAME PERPUSR`. DB2 has no way to store a second short name here;
+   the SQL name is the short name.
+
+Fix: either omit the `FOR SYSTEM NAME` / `FOR COLUMN` clause and let DB2
+auto-derive, or rename the SQL identifier so it needs a short name (e.g.
+`city` → `city_name FOR COLUMN CITY`, `perp_user` → keep the SQL name and
+accept `PERP_USER` as the system name — RPG programs `dcl-f perp_user`).
+
+Related: **`LABEL ON TABLE` text is capped at 50 characters** on DB2 for i;
+longer text raises `SQL0107`. Column labels have the same cap.
+
 **Clause order matters.** On DB2 for i, `FOR COLUMN` goes **between the
 column name and the data type**, not after the data type. Placing it after
 `CHAR(...)` / `VARCHAR(...)` triggers the CCSID-modifier grammar (the parser
@@ -202,3 +224,102 @@ trigger a rebuild.
 **`qddlsrc/example_reference.table.sql`** in this module demonstrates every
 one of these conventions in a single file. When adding a new table, copy that
 file, rename it, and edit — don't start from scratch.
+
+---
+
+## 13. RPG / SQLRPGLE conventions
+
+Style rules that came out of PERP-19 (docseq service program) and the PERP-2
+maintenance programs. These apply to every RPG or SQLRPGLE source under
+`perp/qrpglesrc/`.
+
+- **Modern `**FREE`**, first column of the file — no leading whitespace on
+  the `**free` directive itself (RPG `RNF0257`/`RNF7503` cascade otherwise).
+- **`ctl-opt dftactgrp(*no) actgrp(*new)`** — real activation-group scoping;
+  no default-actgrp fallback.
+- **No `SET OPTION COMMIT = *NONE`.** Every PERP table is journaled, so RPG
+  runs under real commitment control (`commit(*chg)` — the default of
+  `CRTSQLRPGI`). Callers issue `EXEC SQL COMMIT` / `ROLLBACK`; leaf modules
+  don't.
+- **Schema-qualified table names** in embedded SQL — `perpdemo.company` etc.
+  `CRTSQLRPGI` on this environment does not accept `DFTRDBCOL` via the
+  codermake recipe, and the aitool / SSH invocation paths run outside the
+  PERPDEMO library list. Hard-qualifying keeps every path working.
+- **Host-variable names must not collide with column names.** DB2 for i's
+  SQLRPGLE precompiler raises `SQL0314` ("host variable X not unique")
+  when an unqualified `:name` in a WHERE clause matches a column of the
+  referenced table AND a subprocedure parameter. Prefix parms (`nx_`, `pk_`,
+  `in_`).
+- **Host-variable scope is *module*, not *subprocedure*.** The precompiler
+  does not respect `dcl-proc` scope when collecting host variables — two
+  subprocedures with parameter names in common raise `SQL0314`. Give every
+  subprocedure a distinct prefix.
+- **`FROM FINAL TABLE (…)` supports `INSERT` only on DB2 for i V7R4.**
+  Precompiler rejects `UPDATE`/`DELETE` variants with `SQL0199`. Use
+  `UPDATE` + subsequent `SELECT` inside the same unit-of-work (row lock is
+  held under `commit(*chg)`).
+- **Service programs**: one prototype `.rpgle` per module, referenced via
+  `/copy`; explicit `.bnd` export list in `perp/qsrvsrc/`; binding
+  directory qualifies srvpgm names with `$LIBRARY` so callers do not need
+  PERPDEMO on their library list at activation time.
+- **Data-area handles**: use `dcl-ds NAME dtaara(*lda) len(1024) qualified`
+  and reserve positions in the LDA — every job has an LDA automatically, so
+  no runtime `CRTDTAARA` is needed. PERP session state (currently just the
+  selected company code at positions 1-3) lives in the LDA.
+
+## 14. DSPF conventions
+
+- **`DSPSIZ(24 80 *DS3)`** — 5250 24×80 baseline (not 27×132).
+- **`SFLPAG`** must be conservative enough to fit the display size minus
+  header rows minus footer minus one for the `SFLEND(*MORE)` indicator.
+  `CPD7817` (value on SFLPAG too large) will bite otherwise. `SFLPAG(0007)`
+  is the safe default this module has been using.
+- **Do not repeat file-level command-attention keys on a record**
+  (`CPD7597` "keyword not allowed at both file and record level"). Declare
+  `CA03/CA05/CA06/CA12` once at file level.
+- **Standard F-key legend on every DSPF**: F3=Exit, F5=Refresh, F6=Add,
+  F12=Cancel — declared at file level and echoed in the footer line.
+- **Message subfile** (`R xMSGSFL` / `R xMSGCTL`) attached at row 24 on
+  every screen; RPG uses `QMHSNDPM` to post messages.
+
+## 15. codermake gotchas
+
+- **`.menu` recipe needs `.file` as a *normal* prerequisite**, not
+  order-only. `foo.menu: foo.msgf foo.file` builds; `foo.menu: foo.msgf |
+  foo.file` silently drops the recipe (make says "Nothing to be done" and
+  the menu is never created).
+- **`CRTSQLRPGI` does not accept `DFTRDBCOL` through codermake's compile
+  options** — the recipe hard-codes its flags. Qualify table references
+  in RPG source instead of relying on a runtime library list.
+- **Binding directory sources** should qualify service-program references
+  with `$LIBRARY` (`addbnddire … obj(($LIBRARY/mysrvpgm *srvpgm *immed))`)
+  so activation-time lookup does not depend on the caller's library list.
+- **Menu DSPF record format name must match the menu object name.**
+  `CRTMNU TYPE(*DSPF)` looks for a record format whose name equals the
+  menu name (e.g. menu `PERPMNU` requires `A R PERPMNU` in the DSPF).
+  Wrong name compiles fine but calling `GO PERPMNU` fails at runtime with
+  `Record format for menu definition not found. Problem displaying menu
+  PERPMNU in library PERPDEMO.`
+- **`CRTSRCPF … TEXT(...)` caps at 50 characters** — CPD0074 fires on
+  longer strings. Keep source-PF text descriptions terse.
+
+## 16. Source physical files in PERPDEMO
+
+Every source type used by the module needs a matching source PF on the
+IBM i target. `codermake` copies sources into these files at sync time.
+Create them once when standing up a new task/build library:
+
+```
+CRTSRCPF FILE(PERPDEMO/QDDLSRC)  RCDLEN(112) TEXT('PERP - SQL DDL source')
+CRTSRCPF FILE(PERPDEMO/QDDSSRC)  RCDLEN(112) TEXT('PERP - DDS source')
+CRTSRCPF FILE(PERPDEMO/QRPGLESRC) RCDLEN(112) TEXT('PERP - RPG ILE / SQLRPGLE')
+CRTSRCPF FILE(PERPDEMO/QCLSRC)   RCDLEN(112) TEXT('PERP - CL / CLLE source')
+CRTSRCPF FILE(PERPDEMO/QSRVSRC)  RCDLEN(112) TEXT('PERP - Binder/Service pgm')
+CRTSRCPF FILE(PERPDEMO/QMENUSRC) RCDLEN(112) TEXT('PERP - Menu source')
+CRTSRCPF FILE(PERPDEMO/QCMDSRC)  RCDLEN(112) TEXT('PERP - Command source')
+CRTSRCPF FILE(PERPDEMO/QPNLSRC)  RCDLEN(112) TEXT('PERP - Panel group source')
+CRTSRCPF FILE(PERPDEMO/QSQLSRC)  RCDLEN(112) TEXT('PERP - SQL source')
+```
+
+`QDDLSRC` was missing at PERP-2 initial cutover and was created after
+the fact; keep it as part of the PERPDEMO bootstrap for future clones.

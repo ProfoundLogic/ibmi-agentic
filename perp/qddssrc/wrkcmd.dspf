@@ -1,0 +1,75 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA06(06 'Add')
+     A                                      CA12(12 'Cancel')
+     A          R CMSFL                     SFL
+     A  51                                  SFLNXTCHG
+     A            SOPT           1A  B  8  4
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            STYPE         20A  O  8  9
+     A            SVALUE        20A  O  8 31
+     A            SDESC         30A  O  8 53
+     A          R CMCTL                     SFLCTL(CMSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 30'Work with System Codes'
+     A                                      DSPATR(HI)
+     A                                  2  2'Filter type . . :'
+     A            SFTYPE        20A  B  2 20DSPATR(HI)
+     A                                  4  2'Type option, press Enter.'
+     A                                  5  4'2=Change   4=Delete   5=Displ-
+     A                                      ay'
+     A                                  7  4'Opt'
+     A                                      DSPATR(UL)
+     A                                  7  9'Type'
+     A                                      DSPATR(UL)
+     A                                  7 31'Value'
+     A                                      DSPATR(UL)
+     A                                  7 53'Description'
+     A                                      DSPATR(UL)
+     A          R CMFOOT
+     A                                 23  2'F3=Exit   F5=Refresh   F6=Add-
+     A                                         F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R CMNONE
+     A                                      OVERLAY
+     A                                 10 20'** No code entries match the -
+     A                                      filter **'
+     A          R CMEDIT
+     A                                      OVERLAY
+     A                                  1 30'Edit Code'
+     A                                      DSPATR(HI)
+     A            EMODE          1A  O  2  2
+     A                                  3  2'Type:'
+     A            ETYPE         20A  B  3 10
+     A                                  4  2'Value:'
+     A            EVALUE        20A  B  4 10
+     A                                  5  2'Description:'
+     A            EDESC         60A  B  5 15
+     A                                  6  2'Short:'
+     A            ESHORT        20A  B  6 15
+     A                                  7  2'Sort:'
+     A            ESORT          6Y 0B  7 15EDTCDE(Z)
+     A                                  8  2'Active:'
+     A            EACTIVE        1A  B  8 15
+     A                                 23  2'Enter=Save   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R CMMSGSFL                  SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R CMMSGCTL                  SFLCTL(CMMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)

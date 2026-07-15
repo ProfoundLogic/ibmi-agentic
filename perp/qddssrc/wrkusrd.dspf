@@ -1,0 +1,73 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA06(06 'Add')
+     A                                      CA12(12 'Cancel')
+     A          R USFL                      SFL
+     A  51                                  SFLNXTCHG
+     A            SOPT           1A  B  8  4
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SUCODE        10A  O  8  9
+     A            SUNAME        30A  O  8 21
+     A            SUROLE        20A  O  8 53
+     A            SUACT          1A  O  8 75
+     A          R UCTL                      SFLCTL(USFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 30'Work with PERP Users'
+     A                                      DSPATR(HI)
+     A                                  4  2'Type option, press Enter.'
+     A                                  5  4'2=Change   4=Delete   5=Displ-
+     A                                      ay'
+     A                                  7  4'Opt'
+     A                                      DSPATR(UL)
+     A                                  7  9'User'
+     A                                      DSPATR(UL)
+     A                                  7 21'Display name'
+     A                                      DSPATR(UL)
+     A                                  7 53'Role'
+     A                                      DSPATR(UL)
+     A                                  7 75'Act'
+     A                                      DSPATR(UL)
+     A          R UFOOT
+     A                                 23  2'F3=Exit   F5=Refresh   F6=Add-
+     A                                         F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R UNONE
+     A                                      OVERLAY
+     A                                 10 20'** No users to display **'
+     A          R UEDIT
+     A                                      OVERLAY
+     A                                  1 30'Edit User'
+     A                                      DSPATR(HI)
+     A            EMODE          1A  O  2  2
+     A                                  3  2'User code:'
+     A            EUCODE        10A  B  3 15
+     A                                  4  2'Display name:'
+     A            EUNAME        60A  B  4 17
+     A                                  5  2'Email:'
+     A            EUEMAIL      120A  B  5 15
+     A                                  6  2'Role:'
+     A            EUROLE        20A  B  6 15
+     A                                  7  2'Active:'
+     A            EUACT          1A  B  7 15
+     A                                 23  2'Enter=Save   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R UMSGSFL                   SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R UMSGCTL                   SFLCTL(UMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)
