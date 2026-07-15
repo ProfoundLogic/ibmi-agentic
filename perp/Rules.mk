@@ -151,14 +151,43 @@ itmvprcq.srvpgm: itmvprcq.module qsrvsrc/itmvprcq.bnd
 ivprcqsmk.pgm: qrpglesrc/ivprcqsmk.sqlrpgle qrpglesrc/itmvprcq_pr.rpgle itmvprcq.srvpgm | perp.bnddir item_vendor_price_history.file
 
 
-# --- PERP main menu (glue for exploratory verification) ------------------
-# Ties the PERP-16/17/18/19/21/22/23/24 programs together into a single
-# 5250 menu: GO PERPDEMO/PERPMNU
+# --- PERP menus (glue for exploratory verification) -----------------------
+# GO PERPDEMO/PERPMNU is the single entry point. PERPMNU itself only holds
+# "Select company" + one option per child menu + Sign off -- the child
+# menus group the actual maintenance/diagnostic programs so the top level
+# doesn't grow one line per story as new epics land (PERP-6/7/8
+# Requisitioning/Purchasing/Receiving will each get their own child menu
+# under PERPMNU the same way, instead of more top-level numbers).
+#
+# .file MUST be a normal prereq (not order-only) or codermake silently drops
+# the CRTMNU recipe. See DDL_STYLE_GUIDE § "codermake menu gotcha" -- this
+# bit cfdemo/menu.menu too (fixed there in the same commit as this section).
+
+# PERP-16/17/18: company selector + system maintenance (code_master, users)
+perpsysm.file: qddssrc/perpsysm.dspf
+perpsysm.msgf: perpsysm.msgf
+perpsysm.menu: perpsysm.msgf perpsysm.file | wrkcmr.pgm wrkusrr.pgm
+
+# PERP-20/21/22/23/24: inventory master data
+perpinvm.file: qddssrc/perpinvm.dspf
+perpinvm.msgf: perpinvm.msgf
+perpinvm.menu: perpinvm.msgf perpinvm.file | wrkuomr.pgm wrkcnvr.pgm wrkiclr.pgm wrkitmr.pgm wrklotr.pgm
+
+# PERP-28/29/30/31: vendor & pricing master data
+perpvndm.file: qddssrc/perpvndm.dspf
+perpvndm.msgf: perpvndm.msgf
+perpvndm.menu: perpvndm.msgf perpvndm.file | wrkvndr.pgm wrkivnr.pgm wrkivpr.pgm
+
+# PERP-19/32: service-program smoke testers
+perpdiag.file: qddssrc/perpdiag.dspf
+perpdiag.msgf: perpdiag.msgf
+perpdiag.menu: perpdiag.msgf perpdiag.file | docseqsmk.pgm ivprcqsmk.pgm
+
+# Top-level menu. Order-only on perpselr.pgm (called directly) and on the
+# 4 child .menu targets (routed to via GO PERPDEMO/<name>, not CALLed).
 perpmnu.file: qddssrc/perpmnu.dspf
 perpmnu.msgf: perpmnu.msgf
-# .file MUST be a normal prereq (not order-only) or codermake silently drops
-# the CRTMNU recipe. See DDL_STYLE_GUIDE § "codermake menu gotcha".
-perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm wrkcmr.pgm wrkusrr.pgm docseqsmk.pgm wrkuomr.pgm wrkcnvr.pgm wrkiclr.pgm wrkitmr.pgm wrklotr.pgm wrkvndr.pgm wrkivnr.pgm wrkivpr.pgm ivprcqsmk.pgm
+perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm perpsysm.menu perpinvm.menu perpvndm.menu perpdiag.menu
 
 
 # --- CL setup -------------------------------------------------------------
