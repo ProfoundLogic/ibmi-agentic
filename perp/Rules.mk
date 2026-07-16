@@ -174,6 +174,47 @@ itmvprcq.srvpgm: itmvprcq.module qsrvsrc/itmvprcq.bnd
 ivprcqsmk.pgm: qrpglesrc/ivprcqsmk.sqlrpgle qrpglesrc/itmvprcq_pr.rpgle itmvprcq.srvpgm | perp.bnddir item_vendor_price_history.file
 
 
+# --- PERP-6: Requisitioning — requisition_header / requisition_line -------
+# FK order: requisition_header (company, perp_user, code_master -- all
+# already built in PERP-2) before requisition_line (requisition_header,
+# item, uom).
+requisition_header.file: qddlsrc/requisition_header.table.sql company.file perp_user.file code_master.file | perpsjpf.pgm
+requisition_line.file:   qddlsrc/requisition_line.table.sql   requisition_header.file item.file uom.file    | perpsjpf.pgm
+
+# Requisition entry program (header + line subfile). Calls docseq_next('REQ')
+# for numbering; defaults line UOM from item, est_unit_cost from the
+# preferred vendor's current item_vendor_price row.
+reqentd.file: qddssrc/reqentd.dspf
+reqentr.pgm:  qrpglesrc/reqentr.sqlrpgle qrpglesrc/docseq_pr.rpgle qddssrc/reqentd.dspf | reqentd.file perp.bnddir requisition_header.file requisition_line.file item.file item_vendor.file item_vendor_price.file uom.file perp_user.file
+
+# Requisition approval program (list of SUBMITTED reqs -> detail w/ up to
+# 6 lines as plain fields + confidence badge -> Approve/Reject stamping
+# approved_by/approved_at/approval_source=HUMAN/approval_notes). Detail
+# is a single plain (non-subfile) record in this SAME file/program --
+# two earlier designs (a second SFLCTL subfile in this file; a separate
+# called program with its own device file) both crashed at runtime with
+# "Session or device error" the moment the detail screen was reached,
+# even though both compiled clean and matched seemingly-reasonable RPG
+# patterns. This shape -- one subfile (ASFL) plus plain output/entry
+# fields, all in one program -- is the simplest one that's actually
+# proven not to crash (matches reqentr's own header/line-edit panels).
+reqaprd.file: qddssrc/reqaprd.dspf
+reqaprr.pgm:  qrpglesrc/reqaprr.sqlrpgle qddssrc/reqaprd.dspf | reqaprd.file requisition_header.file requisition_line.file
+
+# CoderFlow auto-approval hook. Skeleton service program: no-op scorer,
+# reads company_config thresholds, auto-approves (status/approved_by=
+# CODERFLOW/approved_at/approval_source_code=CODERFLOW/approval_notes)
+# when both the confidence and total-cost thresholds pass. Module +
+# srvpgm + bnddir + prototype, same pattern as docseq (PERP-19).
+reqauto.module: qrpglesrc/reqauto.sqlrpgle qrpglesrc/reqauto_pr.rpgle | requisition_header.file company_config.file
+reqauto.srvpgm: reqauto.module qsrvsrc/reqauto.bnd
+# perp.bnddir target already declared above (PERP-19 docseq section);
+# adding a new addbnddire entry there for reqauto is enough.
+
+# Smoke-test caller for reqauto -- CALL PERPDEMO/REQAUTOSMK PARM('ACM' '3       ').
+reqautosmk.pgm: qrpglesrc/reqautosmk.sqlrpgle qrpglesrc/reqauto_pr.rpgle reqauto.srvpgm | perp.bnddir requisition_header.file
+
+
 # --- PERP menus (glue for exploratory verification) -----------------------
 # GO PERPDEMO/PERPMNU is the single entry point. PERPMNU itself only holds
 # "Select company" + one option per child menu + Sign off -- the child
@@ -204,13 +245,20 @@ perpvndm.menu: perpvndm.msgf perpvndm.file | wrkvndr.pgm wrkivnr.pgm wrkivpr.pgm
 # PERP-19/27/32: service-program smoke testers
 perpdiag.file: qddssrc/perpdiag.dspf
 perpdiag.msgf: perpdiag.msgf
-perpdiag.menu: perpdiag.msgf perpdiag.file | docseqsmk.pgm ivprcqsmk.pgm whcoordsmk.pgm
+perpdiag.menu: perpdiag.msgf perpdiag.file | docseqsmk.pgm ivprcqsmk.pgm whcoordsmk.pgm reqautosmk.pgm
+
+# PERP-6/7/8: Requisitioning / Purchasing / Receiving each get their own
+# child menu under PERPMNU (see codermake menu note below). PERP-34 adds
+# option 1 (reqentr); PERP-35 adds option 2 (reqaprr) once it lands.
+perpreqm.file: qddssrc/perpreqm.dspf
+perpreqm.msgf: perpreqm.msgf
+perpreqm.menu: perpreqm.msgf perpreqm.file | reqentr.pgm reqaprr.pgm
 
 # Top-level menu. Order-only on perpselr.pgm (called directly) and on the
-# 4 child .menu targets (routed to via GO PERPDEMO/<name>, not CALLed).
+# 5 child .menu targets (routed to via GO PERPDEMO/<name>, not CALLed).
 perpmnu.file: qddssrc/perpmnu.dspf
 perpmnu.msgf: perpmnu.msgf
-perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm perpsysm.menu perpinvm.menu perpvndm.menu perpdiag.menu
+perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm perpsysm.menu perpinvm.menu perpvndm.menu perpdiag.menu perpreqm.menu
 
 
 # --- CL setup -------------------------------------------------------------

@@ -71,6 +71,14 @@ RPG `dcl-f`) against it — don't guess an abbreviation.
 Related: **`LABEL ON TABLE` text is capped at 50 characters** on DB2 for i;
 longer text raises `SQL0107`. Column labels have the same cap.
 
+**A short column name can trip the same rule with a different error.**
+Learned in PERP-33: `notes FOR COLUMN NOTES CLOB(16K)` raises `SQL0612:
+NOTES is a duplicate column name`, not the `SQL7029` shown above for tables
+— same root cause (the SQL name `notes` is already a valid ≤10-char system
+name, so the explicit `FOR COLUMN NOTES` collides with the auto-derivation),
+just a different diagnostic at the column level. Fix is identical: drop the
+redundant `FOR COLUMN` clause and let it auto-derive.
+
 **Auto-derived short names for >10-char SQL names are not a simple
 truncation — they can be a sequential counter with no relation to the SQL
 name at all.** Learned in PERP-28: `item_vendor` (11 chars) and
@@ -190,16 +198,38 @@ immutable — new prices close the current row and insert a new one.
 
 ## 9. Document numbering
 
-Doc numbers are integer sequences per `(company_code, doc_type)` with a
-computed display column for demo aesthetics:
+Doc numbers are integer sequences per `(company_code, doc_type)`:
 
 ```sql
-po_number  FOR COLUMN PONBR  BIGINT      NOT NULL,
-po_display FOR COLUMN PODSPY VARCHAR(20) GENERATED ALWAYS AS
-           (company_code CONCAT '-PO-' CONCAT LPAD(CHAR(po_number), 6, '0'))
+requisition_number FOR COLUMN REQNBR BIGINT NOT NULL,
 ```
 
-A `document_sequence` table holds the high-water mark per company + doc type.
+A `document_sequence` table holds the high-water mark per company + doc type
+(bumped via the `docseq` service program, PERP-19).
+
+**No computed display column.** An earlier draft of this section showed a
+`GENERATED ALWAYS AS (expression)` computed column for demo-friendly display
+numbers (e.g. `ACM-PO-000123`). That pattern **does not build on this
+target** — confirmed in PERP-33. Every variant tried raised a parser error
+pointing at the open paren or the first identifier inside it, with the same
+oddly specific hint list (`Valid tokens: . ACCTNG USERID APPLNAME PROGRAMID
+WRKSTNNAME`) regardless of what the expression contained:
+
+| Attempt | Error |
+|---|---|
+| `company_code CONCAT '-REQ-' CONCAT LPAD(...)` | SQL0199 at the first `CONCAT` |
+| `company_code \|\| '-REQ-' \|\| LPAD(...)` | SQL0104 at the first `\|\|` |
+| `(company_code)` — bare column reference | SQL0104 at the closing `)` |
+| `(UPPER(company_code))` | SQL0104 at `(` after `UPPER` |
+| `(tablename.company_code)` | SQL0104, hinted `QSYS2 SYSIBM` |
+| IBM's own reference example, `bonus DEC(9,2) GENERATED ALWAYS AS (salary * .10)` | SQL0104 at `*` |
+
+`GENERATED ALWAYS AS IDENTITY` (no expression) works fine on this target —
+only the computed-column expression form fails, on every shape tested. If a
+future story needs a demo-friendly display number, build it in RPG/DSPF (or
+a view) instead of a generated column; don't re-attempt this in DDL without
+budgeting time to re-verify it against whatever DB2 for i PTF/config is live
+at the time.
 
 ## 10. Generic lookup — `code_master`
 
@@ -325,6 +355,103 @@ maintenance programs. These apply to every RPG or SQLRPGLE source under
   F12=Cancel — declared at file level and echoed in the footer line.
 - **Message subfile** (`R xMSGSFL` / `R xMSGCTL`) attached at row 24 on
   every screen; RPG uses `QMHSNDPM` to post messages.
+- **`QMHSNDPM`'s message-key output parameter must be the DDS field bound
+  to `SFLMSGKEY`** (e.g. `SMSGKEY`), not a separate RPG variable of your
+  own — even one also named `msgkey`. Found in PERP-34/PERP-35 (`reqentr`/
+  `reqaprr`): a `writeMsg` helper passed its own local `msgkey` to
+  `QMHSNDPM` instead of the DDS field `smsgkey`, so `smsgkey` stayed
+  uninitialized; the subsequent `WRITE` to the message subfile record then
+  crashed at runtime (`CPF9999`-class exception, "The call to <PROC> ended
+  in error") because the device driver couldn't resolve a message using a
+  garbage key. Caught only by a live user hitting the very first
+  `writeMsg` call in a fresh program (the "no company selected" guard) —
+  it reproduces on *every* call, not just that one path, so a single typo
+  here breaks every message the program ever shows. Always pass the
+  record's own `SFLMSGKEY` field, and double-check this any time you
+  copy the `writeMsg`/`clearMsgs` boilerplate into a new program.
+- **The record format shown alongside (or right before) the message
+  subfile must have `OVERLAY`**, or displaying/writing it clears the
+  screen and erases the just-written message subfile before the user
+  ever sees it. Every PERP work-with screen's primary `SFLCTL` format
+  has had `OVERLAY` since PERP-3, but a plain (non-subfile) entry screen
+  — e.g. `reqentd.dspf`'s header-entry format `RHEAD` (PERP-34) — is easy
+  to miss since there's no subfile keyword nearby as a reminder. Give
+  every format that gets `WRITE`/`EXFMT`'d `OVERLAY`, subfile or not.
+- **A second real subfile in `reqaprr`/`reqaprd.dspf` (list `ASFL`/`ASCTL`
+  plus a review-detail `ALSFL`/`ALCTL`) reliably crashed live with
+  "Session or device error occurred in file &1" (`CPF5006`) / an
+  unmonitored `RNX1255` at `EXFMT ALCTL`, on this environment
+  (Profound UI Genie, "classic" skin) — across **four** independent,
+  each-textbook-correct implementations, and the true cause is still
+  not confirmed. Recorded here in full because the investigation
+  produced two plausible-looking "root causes" in a row that both
+  turned out to be wrong once retested live; don't repeat either as a
+  first assumption.
+  1. `ASFL`/`ASCTL` (list) + `ALSFL`/`ALCTL` (detail), format switch
+     issued from inside the driving `READC asfl` loop — crashed.
+  2. Same design, format switch deferred until after the `READC` loop
+     fully drains — crashed identically.
+  3. Detail screen split into a separately called program (`reqapdtl`)
+     with its own device file, the same pattern `wrkitmr` uses calling
+     `wrkcnvr`/`wrklotr` — crashed too, cascading errors across both
+     files. (This attempt did surface one real, unrelated, independently
+     confirmed DDS compile-time bug, kept below: `SFLDSPCTL` combined
+     with a below-anchor input field raises `CPD7812`.)
+  4. Same two-subfile design as #1, this time built carefully against
+     the documented `CPF5006`/`RNX1255` failure mode (see
+     [code400.com](https://code400.com/forum/forum/iseries-programming-languages/rpg-rpgle/7971-session-or-device-error)
+     and [midrangenews.com](http://www.midrangenews.com/view?id=1788):
+     the error fires when `SFLDSP` is on but the subfile has 0 rows from
+     the *device's* perspective, typically because a non-`OVERLAY`
+     `WRITE` in between cleared the screen) — `OVERLAY` added to every
+     format including the `RDFOOT` footer, separate `SFLCLR`/`SFLDSP`
+     indicator pairs per subfile, no `SFLDSPCTL`. This looked like a
+     confirmed fix (compiled clean, matched every documented rule) and
+     was reported as such — but a genuine fresh-session live retest by
+     the user showed the **identical crash at the identical statement**.
+     The "missing `OVERLAY`" theory is therefore wrong, or at least
+     incomplete, as an explanation for this specific crash.
+  Every one of these four is standard, previously-working RPG/DDS —
+  #4 in particular matches the exact pattern every other PERP work-with
+  screen (`PERPSELR`, `WRKCMR`, `WRKITMR`, etc.) already uses safely for
+  a single subfile. The one common thread across every failure is
+  *two subfiles in this one program*; the one design that has ever
+  rendered successfully for the user is `reqaprr`'s current shape:
+  **one real subfile (`ASFL`/`ASCTL`) for the list, and a plain
+  (non-subfile) `RDETAIL` record for the review/approve screen**, with
+  up to `MAXDTLLINES` (6) line-item rows represented as individually
+  named fields (`L1ITEM`/`L1QTY`/`L1UOM`/`L1COST` through `L6...`), each
+  group conditioned on its own indicator (`*in60`-`*in65`) so an unused
+  row is genuinely blank rather than a confusing `0.0000` (do not use
+  indicators as a stand-in for real subfile scrolling in general — this
+  is a workaround for a shape that is known to fail here, not a new
+  default pattern to reach for elsewhere). This is a deliberate
+  deviation from the two-subfile pattern used everywhere else in this
+  module, kept **only** for `reqaprr`, and it caps review detail at 6
+  lines with no scrolling — acceptable for now since requisition line
+  counts are small, but revisit if that stops being true or if the
+  underlying cause is ever identified. **Do not re-attempt a second
+  business subfile in `reqaprr` without an actual interactive retest on
+  this environment proving it renders** — a clean compile and a
+  textbook-correct design have both already failed to predict this.
+- **A `SFLCTL` record's `SFLDSPCTL` keyword combined with an
+  input-capable (`B`) field positioned *below* the subfile's anchor row
+  raises `CPD7812`: "Subfile control record overlaps subfile record"**
+  at DDS compile time — even though the field's row/col is nowhere near
+  the subfile's visible `SFLPAG` rows. Confirmed empirically while
+  building `reqapdtl.dspf` (PERP-35 follow-up): the same field
+  (`ENOTES2`, an entry field at row 15, well below `SFLPAG(0005)`'s
+  visible rows 10-14) compiled clean once `SFLDSPCTL` was removed and
+  the field was repositioned *above* the subfile's anchor row instead.
+  The overlap check appears to reserve rows through `SFLSIZ` (which can
+  be much larger than `SFLPAG`, e.g. `50` vs `5` here), not just the
+  visible page, for any input-capable control-record field, when
+  `SFLDSPCTL` is present. Fix: position input-capable fields on a
+  `SFLCTL` record *above* the subfile's anchor row (matching every
+  other PERP `SFLCTL` record, e.g. `RLCTL` in `reqentd.dspf`, none of
+  which have `SFLDSPCTL` combined with a below-anchor input field), or
+  omit `SFLDSPCTL` if it isn't actually needed (it wasn't, here — the
+  existing `SFLDSP` conditioning indicator already controls visibility).
 - **Every numeric field on screen (subfile column or edit-panel field,
   input or output) gets `EDTCDE(3)`.** Without an edit code, a zoned
   numeric field displays every leading zero (e.g. `000000001500000` for

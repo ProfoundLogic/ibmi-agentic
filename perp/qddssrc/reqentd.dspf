@@ -1,0 +1,108 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA06(06 'Add')
+     A                                      CA08(08 'Submit')
+     A                                      CA12(12 'Cancel')
+     A          R RHEAD
+     A                                      OVERLAY
+     A                                  1 30'Requisition Entry'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            HCOMPDSP       3A  O  2 11
+     A                                  3  2'Requested By:'
+     A            HREQBY        10A  B  3 16
+     A                                  4  2'Need By Date:'
+     A            HNEEDBY         L  B  4 16DATFMT(*ISO)
+     A                                  4 28'(YYYY-MM-DD)'
+     A                                  5  2'Priority:'
+     A            HPRICD        20A  B  5 12
+     A                                  5 34'(LOW/NORMAL/HIGH/CRITICAL)'
+     A                                  6  2'Notes:'
+     A            HNOTES        50A  B  6  9
+     A                                 23  2'F3=Exit  F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R RLSFL                     SFL
+     A  51                                  SFLNXTCHG
+     A            SLOPT          1A  B  9  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SLLINE         3Y 0O  9  5
+     A            SLITEM        25A  O  9 10
+     A            SLQTY         15Y 4O  9 36EDTCDE(3)
+     A            SLUOM          5A  O  9 54
+     A            SLCOST        15Y 4O  9 61EDTCDE(3)
+     A          R RLCTL                     SFLCTL(RLSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 30'Requisition Lines'
+     A                                      DSPATR(HI)
+     A                                  2  2'Req #:'
+     A            DREQNBR       15A  O  2  9
+     A                                  2 40'Requested By:'
+     A            DREQBY        10A  O  2 54
+     A                                  3  2'Need By:'
+     A            DNEEDBY         L  O  3 11DATFMT(*ISO)
+     A                                  3 40'Priority:'
+     A            DPRICD        20A  O  3 50
+     A                                  4  2'Status:'
+     A            DSTATUS       20A  O  4 10
+     A                                  4 40'Total Est Cost:'
+     A            DTOTEST       15Y 2O  4 56EDTCDE(3)
+     A                                  6  2'Type option, press Enter.'
+     A                                  7  4'2=Change  4=Delete'
+     A                                  8  2'Opt'
+     A                                      DSPATR(UL)
+     A                                  8  5'Line'
+     A                                      DSPATR(UL)
+     A                                  8 10'Item'
+     A                                      DSPATR(UL)
+     A                                  8 36'Qty'
+     A                                      DSPATR(UL)
+     A                                  8 54'UOM'
+     A                                      DSPATR(UL)
+     A                                  8 61'Cost'
+     A                                      DSPATR(UL)
+     A          R RLFOOT
+     A                                      OVERLAY
+     A                                 23  2'F3=Exit  F5=Refresh  F6=Add  F8=Su-
+     A                                      bmit  F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R RNOLIN
+     A                                      OVERLAY
+     A                                 11 20'No lines yet. Press F6=Add.'
+     A          R RLEDIT
+     A                                      OVERLAY
+     A                                  1 25'Add/Change Requisition Line'
+     A                                      DSPATR(HI)
+     A                                  2  2'Mode:'
+     A            EMODE          1A  O  2  8
+     A                                  3  2'Item Number:'
+     A            EITEM         25A  B  3 15
+     A                                  4  2'Quantity:'
+     A            EQTY          15Y 4B  4 12EDTCDE(3)
+     A                                  5  2'UOM:'
+     A            EUOM           5A  B  5  7
+     A                                  5 15'(blank = default from item)'
+     A                                  6  2'Est Unit Cost:'
+     A            ECOST         15Y 4B  6 17EDTCDE(3)
+     A                                  6 34'(0 = default from vendor)'
+     A                                 23  2'Enter=Save   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R RMSGSFL                   SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R RMSGCTL                   SFLCTL(RMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)
