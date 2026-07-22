@@ -231,6 +231,17 @@ a view) instead of a generated column; don't re-attempt this in DDL without
 budgeting time to re-verify it against whatever DB2 for i PTF/config is live
 at the time.
 
+**Worked example — PO open_qty via a view (PERP-37).** `po_line` needs a
+per-row `open_qty = ordered_qty - received_qty` for the browse screen and
+receipt allocation. Rather than fight the computed-column parser, the epic
+ships a companion view `po_line_open` (`qddlsrc/po_line_open.view.sql`) that
+`SELECT ordered_qty - received_qty AS open_qty, ordered_qty * unit_price AS
+extended_price ... FROM po_line`. Programs that need the derived columns
+join the view; programs that don't read `po_line` directly. Views are
+`.view.sql` and build as normal `RUNSQLSTM` → `*FILE` LFs (short name auto-
+derives; `po_line_open` came out as `PO_LI00002`, confirmed via `SYSTABLES`
+after build — same auto-derivation rule as tables).
+
 ## 10. Generic lookup — `code_master`
 
 Simple code-and-description lookups (statuses, priorities, roles, approval
@@ -331,6 +342,96 @@ maintenance programs. These apply to every RPG or SQLRPGLE source under
   and reserve positions in the LDA — every job has an LDA automatically, so
   no runtime `CRTDTAARA` is needed. PERP session state (currently just the
   selected company code at positions 1-3) lives in the LDA.
+- **The SQLRPGLE precompiler does not accept `:ds(i).field` as a host
+  variable.** Found in PERP-39 (`poreqr.sqlrpgle`): a WHERE clause of
+  `and rl.requisition_number = :reqs(i).reqnbr` fails with `SQL0312
+  Variable REQS not defined or not usable` and `SQL0104 Token ( not
+  valid`. Same rule applies to nested DS arrays like
+  `:plan(v).lines(L).item`. Fix: copy the array element to a plain
+  scalar host variable (`xReqNbr = reqs(i).reqnbr; ... where
+  ... = :xReqNbr`). This is why `poreqr` has an `x`-prefixed staging
+  block near the top of its declarations.
+- **`dcl-s` inside a `begsr` subroutine is illegal.** Found in the same
+  program: local variables declared with `dcl-s` inside a `begsr` block
+  raise `RNF0724 The statement type is out of sequence for the main
+  procedure`, because `begsr` runs in the main procedure's scope (not
+  its own like `dcl-proc`). Hoist all `dcl-s`/`dcl-ds` to the main
+  declaration section; only executable statements go in a `begsr`.
+- **Free-format RPG allows only one statement per line.** Two statements
+  separated by whitespace on the same line (e.g.
+  `*in60 = *off;  *in61 = *off;`) raise `RNF5508 End of free-format
+  statement is not blank`. Put each on its own line.
+- **`%editc(int : 'X')` returns hex, not decimal.** Every PO number
+  in `pobrwr`'s first live browse rendered as `0000000000` because
+  `bsponbr = %editc(rows(i).ponbr : 'X')` — edit code `'X'` is
+  documented as "hex representation of a zoned decimal", not "plain
+  string". For displaying a numeric doc-number (PO number,
+  requisition number, line number) as a plain string, use `%char()`.
+  Use `%editc` only when you deliberately want an RPG edit-code
+  formatted output (comma grouping, sign, decimal shift, etc.) and
+  never `'X'` for business display.
+
+- **`%subst(varchar : 1 : N)` fails at runtime when `N` exceeds the
+  current data length, not just when it exceeds the declared max.**
+  Found in `pobrwr` after the DATFMT fix landed — `bsstat = %subst(
+  rows(i).stat : 1 : 10)` where `stat` is `VARCHAR(20)` holding
+  `'OPEN'` (4 chars) raised `RNQ0100 Length or start position is out
+  of range for the string operation (C G D F)` at runtime, even
+  though the declared max (20) is well above the requested 10. Same
+  applies to `%subst(vendor_name : 1 : 25)` when the vendor name
+  happens to be shorter than 25.
+
+  **Fix:** just use direct assignment from VARCHAR into a fixed CHAR
+  field. RPG right-pads or truncates automatically — no `%subst` is
+  needed for "fit into the display field". Use `%subst` only when
+  you actually need a middle slice, and even then guard with
+  `%min(%len(...), N)`. Fixed across `pobrwr`, `poreqr`, `poschr`
+  in one pass; captured here so downstream epics don't repeat it.
+
+- **Sentinel/filter Date values in embedded SQL must stay within the
+  job DATFMT range (`*MDY`, 1940-2039, on this env).** The SQL
+  precompiler generates its intermediate host variables (the ones
+  named `SQL_00020`, `SQL_00021`, ... that back every `:var`
+  reference in an EXEC SQL) with `DATFMT(*MDY/)` — the JOB DATFMT,
+  IGNORING `ctl-opt datfmt(*iso)`. Confirmed by inspecting the
+  compile listing after the "fix":
+
+  ```
+  D  SQL_00020            192    199D   DATFMT(*MDY/)   FFRDT
+  D  SQL_00021            200    207D   DATFMT(*MDY/)   FTODT
+  ...
+  SQL_00020 = FFRDT;   //SQL  <-- assigns *ISO FFRDT into *MDY SQL_00020
+  ```
+
+  So even when the RPG Date variable's *storage* format is `*ISO`
+  (thanks to `ctl-opt datfmt(*iso)`), the precompiler-generated host
+  variable it gets assigned to is `*MDY`, and any value outside
+  1940-2039 crashes with `RNQ0114 The year portion of a Date or
+  Timestamp value is not in the correct range (C G D F)`. Found in
+  `pobrwr` (browse-filter from/to sentinels), 2026-07-22, after two
+  earlier fix attempts (adding `:*ISO` to the parse, then
+  `datfmt(*iso)` to `ctl-opt`) both compiled clean but ran the same
+  crash at the exact same statement.
+
+  **What works:**
+  1. Put `datfmt(*iso)` on `ctl-opt` — sets RPG Date variable
+     storage to *ISO (0001-9999); needed for anything that assigns
+     to/from the DSPF's `L DATFMT(*ISO)` fields.
+  2. Parse literals with explicit `%date('yyyy-mm-dd' : *ISO)` so
+     the parse step doesn't use the job DATFMT.
+  3. **Keep any Date value that will be assigned to an SQL host
+     variable within `1940-2039`.** For the pobrwr filter, that
+     meant swapping `0001-01-01` / `9999-12-31` sentinels for
+     `1940-01-01` / `2039-12-31` — still functionally "no filter"
+     for realistic PO dates, but doesn't fail the *MDY range check.
+
+  All three steps are needed; the third is what stopped the runtime
+  crash for good. If you truly need out-of-range Date values in SQL
+  (unlikely in PERP), the only escape is to bypass the host-variable
+  path — use dynamic SQL with the date rendered as a CHAR literal
+  inside the statement text, or move the Date column comparison out
+  of the WHERE clause entirely. `%date()` with no args (returns
+  today) is always safe.
 - **Program/module/file object names cap at 10 characters — same as
   journal receivers (§7).** Learned again in PERP-32: naming a smoke-test
   caller `itmvprcqsmk.sqlrpgle` (11 chars) failed `CRTSQLRPGI` with

@@ -1,0 +1,116 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA06(06 'Add')
+     A                                      CA08(08 'Submit')
+     A                                      CA12(12 'Cancel')
+     A          R PHEAD
+     A                                      OVERLAY
+     A                                  1 30'Purchase Order Entry'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            HCOMPDSP       3A  O  2 11
+     A                                  3  2'Vendor Code:'
+     A            HVNDCD        10A  B  3 15
+     A            HVNDNM        30A  O  3 28
+     A                                  4  2'Buyer:'
+     A            HBUYCD        10A  O  4  9
+     A                                      DSPATR(HI)
+     A                                  4 22'(defaulted from vendor)'
+     A                                  5  2'Order Date:'
+     A            HORDDT          L  B  5 14DATFMT(*ISO)
+     A                                  5 26'(YYYY-MM-DD)'
+     A                                  6  2'Notes:'
+     A            HNOTES        50A  B  6  9
+     A                                 23  2'F3=Exit  F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R PLSFL                     SFL
+     A  51                                  SFLNXTCHG
+     A            SLOPT          1A  B  9  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SLLINE         3Y 0O  9  5
+     A            SLITEM        25A  O  9 10
+     A            SLQTY         15Y 4O  9 36EDTCDE(3)
+     A            SLUOM          5A  O  9 54
+     A            SLPRICE       15Y 4O  9 61EDTCDE(3)
+     A          R PLCTL                     SFLCTL(PLSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 30'Purchase Order Lines'
+     A                                      DSPATR(HI)
+     A                                  2  2'PO #:'
+     A            DPONBR        15A  O  2  8
+     A                                  2 40'Vendor:'
+     A            DVNDCD        10A  O  2 48
+     A            DVNDNM        30A  O  2 59
+     A                                  3  2'Buyer:'
+     A            DBUYCD        10A  O  3  9
+     A                                  3 40'Order Date:'
+     A            DORDDT          L  O  3 52DATFMT(*ISO)
+     A                                  4  2'Status:'
+     A            DSTATUS       20A  O  4 10
+     A                                  4 40'Total Amount:'
+     A            DTOTAMT       15Y 2O  4 54EDTCDE(3)
+     A                                  6  2'Type option, press Enter.'
+     A                                  7  4'2=Change  4=Delete'
+     A                                  8  2'Opt'
+     A                                      DSPATR(UL)
+     A                                  8  5'Line'
+     A                                      DSPATR(UL)
+     A                                  8 10'Item'
+     A                                      DSPATR(UL)
+     A                                  8 36'Ord Qty'
+     A                                      DSPATR(UL)
+     A                                  8 54'UOM'
+     A                                      DSPATR(UL)
+     A                                  8 61'Unit Price'
+     A                                      DSPATR(UL)
+     A          R PLFOOT
+     A                                      OVERLAY
+     A                                 23  2'F3=Exit  F5=Refresh  F6=Add  F8=Su-
+     A                                      bmit  F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R PNOLIN
+     A                                      OVERLAY
+     A                                 11 20'No lines yet. Press F6=Add.'
+     A          R PLEDIT
+     A                                      OVERLAY
+     A                                  1 25'Add/Change PO Line'
+     A                                      DSPATR(HI)
+     A                                  2  2'Mode:'
+     A            EMODE          1A  O  2  8
+     A                                  3  2'Item Number:'
+     A            EITEM         25A  B  3 15
+     A            EITMDSC       40A  O  3 42
+     A                                      DSPATR(HI)
+     A                                  4  2'Quantity:'
+     A            EQTY          15Y 4B  4 12EDTCDE(3)
+     A                                  5  2'UOM:'
+     A            EUOM           5A  B  5  7
+     A                                  5 15'(blank = default from item)'
+     A                                  6  2'Unit Price:'
+     A            EPRICE        15Y 4B  6 14EDTCDE(3)
+     A                                  6 33'(0 = default from vendor)'
+     A                                  7  2'Expected Recv Date:'
+     A            EEXPDT          L  B  7 22DATFMT(*ISO)
+     A                                  7 34'(blank = none)'
+     A                                 23  2'Enter=Save   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R PMSGSFL                   SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R PMSGCTL                   SFLCTL(PMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)

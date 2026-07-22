@@ -215,6 +215,50 @@ reqauto.srvpgm: reqauto.module qsrvsrc/reqauto.bnd
 reqautosmk.pgm: qrpglesrc/reqautosmk.sqlrpgle qrpglesrc/reqauto_pr.rpgle reqauto.srvpgm | perp.bnddir requisition_header.file
 
 
+# --- PERP-7: Purchasing — po_header / po_line / po_line_schedule ---------
+# FK order: po_header (company, vendor, perp_user (buyer), code_master)
+# before po_line (po_header, item, uom, code_master, requisition_line for
+# optional back-link) before po_line_schedule (po_line). The po_line_open
+# view (ordered_qty - received_qty computed via view rather than a stored
+# GENERATED ALWAYS AS column — see DDL_STYLE_GUIDE.md Sec.9) hangs off
+# po_line as a normal (not order-only) prereq so it always rebuilds
+# alongside its base table.
+po_header.file:        qddlsrc/po_header.table.sql       company.file vendor.file perp_user.file code_master.file | perpsjpf.pgm
+po_line.file:          qddlsrc/po_line.table.sql         po_header.file item.file uom.file code_master.file requisition_line.file | perpsjpf.pgm
+po_line_schedule.file: qddlsrc/po_line_schedule.table.sql po_line.file                                                              | perpsjpf.pgm
+po_line_open.file:     qddlsrc/po_line_open.view.sql     po_line.file
+
+# Manual PO entry program (header + line subfile). Calls docseq_next('PO')
+# for numbering; snapshots buyer_code from vendor at header commit;
+# defaults line UOM from item, unit_price from the entered vendor's
+# current item_vendor_price row. Same shape as reqentr (PERP-34).
+poentd.file: qddssrc/poentd.dspf
+poentr.pgm:  qrpglesrc/poentr.sqlrpgle qrpglesrc/docseq_pr.rpgle qddssrc/poentd.dspf | poentd.file perp.bnddir po_header.file po_line.file item.file item_vendor.file item_vendor_price.file uom.file vendor.file perp_user.file
+
+# PO from requisition (consolidate/split). Selects APPROVED requisitions,
+# groups their lines by preferred vendor (one PO per vendor -> splitting),
+# consolidates multiple selected reqs into a single PO per vendor. Each
+# generated po_line carries source_requisition_number +
+# source_requisition_line_number so "converted" status is derivable by
+# joining po_line back to requisition_line's PK. Approved reqs flip to
+# CONVERTED once all their lines have been placed on a PO.
+poreqd.file: qddssrc/poreqd.dspf
+poreqr.pgm:  qrpglesrc/poreqr.sqlrpgle qrpglesrc/docseq_pr.rpgle qddssrc/poreqd.dspf | poreqd.file perp.bnddir po_header.file po_line.file requisition_header.file requisition_line.file item_vendor.file item_vendor_price.file vendor.file
+
+# Blanket PO schedule maintenance. Subfile of po_line_schedule rows for
+# a given (company, po_number, line_number). Add/Change/Delete rows.
+# Warn (not block) when total scheduled_qty exceeds po_line.ordered_qty.
+poschd.file: qddssrc/poschd.dspf
+poschr.pgm:  qrpglesrc/poschr.sqlrpgle qddssrc/poschd.dspf | poschd.file po_line.file po_line_schedule.file
+
+# PO browse & inquiry. Filterable subfile of PO headers (status, vendor,
+# buyer, order-date range); Option 5 drills to detail (header + all
+# lines, joined to po_line_open for open_qty + extended_price); Option 8
+# on a line drills to source requisition (if any) + schedule (if blanket).
+pobrwd.file: qddssrc/pobrwd.dspf
+pobrwr.pgm:  qrpglesrc/pobrwr.sqlrpgle qddssrc/pobrwd.dspf | pobrwd.file po_header.file po_line.file po_line_open.file po_line_schedule.file requisition_line.file vendor.file perp_user.file
+
+
 # --- PERP menus (glue for exploratory verification) -----------------------
 # GO PERPDEMO/PERPMNU is the single entry point. PERPMNU itself only holds
 # "Select company" + one option per child menu + Sign off -- the child
@@ -254,11 +298,18 @@ perpreqm.file: qddssrc/perpreqm.dspf
 perpreqm.msgf: perpreqm.msgf
 perpreqm.menu: perpreqm.msgf perpreqm.file | reqentr.pgm reqaprr.pgm
 
+# PERP-7 Purchasing child menu. Options: 1 manual PO (poentr), 2 PO from
+# requisition (poreqr), 3 blanket schedule (poschr), 4 browse/inquiry
+# (pobrwr).
+perppom.file: qddssrc/perppom.dspf
+perppom.msgf: perppom.msgf
+perppom.menu: perppom.msgf perppom.file | poentr.pgm poreqr.pgm poschr.pgm pobrwr.pgm
+
 # Top-level menu. Order-only on perpselr.pgm (called directly) and on the
-# 5 child .menu targets (routed to via GO PERPDEMO/<name>, not CALLed).
+# 6 child .menu targets (routed to via GO PERPDEMO/<name>, not CALLed).
 perpmnu.file: qddssrc/perpmnu.dspf
 perpmnu.msgf: perpmnu.msgf
-perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm perpsysm.menu perpinvm.menu perpvndm.menu perpdiag.menu perpreqm.menu
+perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm perpsysm.menu perpinvm.menu perpvndm.menu perpdiag.menu perpreqm.menu perppom.menu
 
 
 # --- CL setup -------------------------------------------------------------
