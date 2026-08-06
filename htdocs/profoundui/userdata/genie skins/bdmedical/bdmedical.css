@@ -1,0 +1,1365 @@
+/* ==========================================================================
+   BD Medical - Profound UI Genie skin
+   --------------------------------------------------------------------------
+   Palette, typography and shapes are taken from the live BD design system
+   (CSS custom properties published by www.bd.com, clientlib-base):
+
+     --primary-navy               #060A3D   BD Navy
+     --primary-boosted-bd-blue    #044ED7   BD Boosted Blue
+     --primary-boosted-bd-orange  #FF6E00   BD Boosted Orange
+     --bd-primary-bd-teal         #39BEAB   BD Teal
+     --bd-primary-bd-purple       #5A398D   BD Purple
+     --primary-warm-grey          #D8D8D7
+     --extra-light-grey           #F8F7F7
+     --neutral-dark-grey          #657278
+     --primary-font-family        "FS Albert Pro", "Gill Sans", ...
+
+   FS Albert Pro is a licensed typeface and is NOT redistributed with this
+   skin. The stack below is BD's own published fallback chain, so machines
+   that have FS Albert Pro installed (BD-managed desktops) pick it up, and
+   everyone else lands on the same fallbacks bd.com uses.
+
+   Derived tints/shades (tokens ending -dark / -pale) exist only to keep 5250
+   attribute text legible on white; the brand hues themselves are unmodified.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Terminal typeface - self-hosted so every workstation renders identically.
+   A system-font stack alone lands on whatever each machine happens to have
+   (frequently Courier New), which is exactly the dated look this skin is
+   meant to remove.
+
+   JetBrains Mono, SIL Open Font License 1.1 (fonts/OFL.txt) - redistribution
+   is permitted. Google Fonts' latin subset, variable 100-800 in one 31 KB
+   file, so regular and bold come from the same face and therefore share an
+   advance width (measured: identical, which matters because headings here are
+   700 and a wider bold would break column alignment).
+
+   Advance is 0.6em, i.e. 7.8px at 13px, which the browser rounds to Genie's
+   8px character cell - an exact grid fit. 13px is also the practical ceiling:
+   8 / 0.6 = 13.33px, above which glyphs would outgrow the cell and columns
+   would start colliding.
+
+   The URL is relative on purpose, so the skin folder can be renamed or copied
+   without touching this rule.
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("fonts/JetBrainsMono-latin.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Brand core */
+  --bd-navy:          #060A3D;
+  --bd-navy-deep:     #03061F;
+  --bd-blue:          #044ED7;
+  --bd-blue-pressed:  #05207A;
+  --bd-blue-light:    #1D74FF;
+  --bd-orange:        #FF6E00;
+  --bd-teal:          #39BEAB;
+  --bd-purple:        #5A398D;
+  --bd-magenta:       #8D2A90;
+  --bd-chetwode:      #9199D8;
+
+  /* Derived, accessibility-tuned text shades */
+  --bd-orange-dark:   #D95A00;
+  --bd-teal-dark:     #12796C;
+  --bd-amber-dark:    #8A5A00;
+  --bd-red:           #ED1C24;
+
+  /* Tints */
+  --bd-blue-pale:     #E8EFFD;
+  --bd-blue-tint:     #D3E0FA;
+  --bd-amber:         #FFB500;
+
+  /* Neutrals */
+  --bd-warm-grey:     #D8D8D7;
+  --bd-grey-xlight:   #F8F7F7;
+  --bd-grey-light:    #EFEFEF;
+  --bd-grey-dark:     #657278;
+  --bd-white:         #FFFFFF;
+
+  /* Type */
+  --bd-font: "FS Albert Pro", "Gill Sans", "Gill Sans MT", "Calibri",
+             "Trebuchet MS", -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Fallbacks are ordered by how close they are to JetBrains Mono, so the
+     screen still looks deliberate if the webfont is ever blocked. */
+  --bd-mono: "JetBrains Mono", "IBM Plex Mono", "Cascadia Mono", ui-monospace,
+             "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+
+  /* Shape - bd.com uses 4px on cards/inputs and a full pill on CTAs */
+  --bd-radius:      4px;
+  --bd-radius-pill: 999px;
+  --bd-shadow-sm:   0 1px 2px rgba(6, 10, 61, .08);
+  --bd-shadow-md:   0 6px 20px rgba(6, 10, 61, .12);
+  --bd-shadow-lg:   0 18px 48px rgba(6, 10, 61, .18);
+  --bd-ease:        140ms cubic-bezier(.4, 0, .2, 1);
+}
+
+
+/* ==========================================================================
+   1. Page shell
+   ========================================================================== */
+
+body {
+  margin: 0;
+  text-align: center;
+  vertical-align: middle;
+  background-color: var(--bd-grey-xlight);
+  color: var(--bd-navy);
+  font-family: var(--bd-font);
+  font-size: 14px;
+  overflow: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mainDiv {
+  text-align: center;
+  vertical-align: middle;
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+}
+
+.topDiv {
+  width: 100%;
+  padding: 0px;
+}
+
+.middleDiv {
+  height: 592px;
+  text-align: center;
+  width: 775px;
+  padding: 0px;
+  /* No top margin: the .bd-screenbar strip above provides the gap under the
+     masthead, and it reserves a constant height whether or not the current
+     screen has function keys. */
+  margin-top: 0;
+}
+
+.centered {
+  text-align: -moz-center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* The 5250 stream renders inside this div. Genie positions every field
+   absolutely within it, so its own geometry must stay as-is.
+
+   The auto margins matter: .insideDiv is 675px inside a 775px .middleDiv, and
+   as a plain block it sits flush left, which pushes the whole terminal 50px
+   left of the page centre even though .middleDiv itself is centred. In
+   132-column mode Genie switches this div to position:absolute with an
+   explicit left, and auto margins are simply ignored - so this is safe. */
+.insideDiv {
+  text-align: center;
+  width: 675px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 5250 text is laid out on a fixed character grid (Genie positions each field
+   at column * pui.multX, ~8px). The stock skin only put a monospace font on
+   INPUT fields and left output fields on the proportional body font, which
+   makes wide subfile columns run into each other - a proportional glyph is
+   wider than the 8px cell it was measured for. Setting the whole 5250 area to
+   the same 13px monospace the stock skin already used for inputs keeps every
+   column aligned. 13px monospace is ~7.2-7.8px per character on every common
+   platform, i.e. always narrower than the cell, so it can never overlap.
+
+   Brand typography still owns everything around and on top of the terminal:
+   masthead, footer, sign-on card, function-key bar and window chrome all set
+   their own font-family and therefore win over this inherited value. */
+[id="5250"] {
+  font-family: var(--bd-mono);
+  font-size: 13px;
+  /* Ligatures off, deliberately. JetBrains Mono is a coding face whose full
+     build ligates sequences that appear constantly on 5250 screens - the IBM i
+     command line is literally "===>", and "!=", "->" and "..." turn up in
+     prompts. A ligature draws several characters as one glyph, which would
+     break the fixed character grid the whole layout depends on.
+
+     Measured: this Google Fonts latin subset does not ligate "===>" even with
+     features enabled, so today this is insurance rather than a fix. Keep it -
+     it costs nothing and covers a future font swap or a fuller build. */
+  font-variant-ligatures: none;
+  -webkit-font-feature-settings: "liga" 0, "clig" 0, "calt" 0;
+  font-feature-settings: "liga" 0, "clig" 0, "calt" 0;
+}
+
+.bottomDiv {
+  width: 100%;
+  padding: 0px;
+}
+
+/* Genie's legacy blanket DIV rule. It is load-bearing for 5250 fidelity
+   (single-line fields, stacking above the backdrop) but it also breaks any
+   normal-flow markup - nothing wraps and everything gets a stacking context.
+   Scope it to the 5250 render area so page chrome and the sign-on card can
+   use ordinary layout.
+
+   NOTE: the attribute selector is deliberate. A CSS id selector cannot start
+   with a digit, so "#5250" is invalid and the whole rule would be discarded.
+   [id="5250"] is the valid way to target Genie's container. */
+[id="5250"] div {
+  padding: 1px;
+  z-index: 10;
+  text-align: left;
+  white-space: nowrap;
+}
+
+[id="5250"] img {
+  z-index: 10;
+}
+
+
+/* ==========================================================================
+   2. Header / footer chrome (markup lives in start.html)
+   ========================================================================== */
+
+/* The z-index matters: 5250 fields carry z-index 10-40 and live in the root
+   stacking context (.insideDiv is position:relative with z-index auto, which
+   does not create one). Without a stacking context of its own the masthead -
+   and the Actions menu that drops out of it - would paint underneath them. */
+.bd-header {
+  width: 100%;
+  background: linear-gradient(100deg, var(--bd-navy-deep) 0%, var(--bd-navy) 42%, var(--bd-blue-pressed) 100%);
+  box-shadow: var(--bd-shadow-md);
+  position: relative;
+  z-index: 100;
+}
+
+.bd-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 14px 28px 16px;
+  text-align: left;
+}
+
+.bd-header__logo {
+  height: 42px;
+  width: auto;
+  flex: 0 0 auto;
+  display: block;
+}
+
+.bd-header__divider {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 34px;
+  background: rgba(255, 255, 255, .28);
+}
+
+.bd-header__titles {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.bd-header__title {
+  color: var(--bd-white);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  line-height: 1.2;
+  white-space: normal;
+}
+
+.bd-header__tagline {
+  color: var(--bd-chetwode);
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: .02em;
+  margin-top: 2px;
+  white-space: normal;
+}
+
+.bd-header__meta {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, .82);
+  font-size: 12.5px;
+  text-align: right;
+  white-space: normal;
+}
+
+.bd-header__meta strong {
+  color: var(--bd-white);
+  font-weight: 700;
+}
+
+/* --- Function-key menu ("Actions") ---------------------------------------
+   Populated per screen by bd-brandkit.js. The [hidden] rules must stay more
+   specific than the display rules below them, or the hidden attribute loses
+   to display:flex and the toggle shows on screens with no function keys. */
+
+/* Strip between the masthead and the terminal. Its width matches .insideDiv
+   (the 5250 container itself, 675px) rather than the wider .middleDiv that
+   wraps it, so the button's right edge lines up exactly with the right edge
+   of the screen the user is reading - not 50px past it, and not far away at
+   the edge of a full-width header.
+
+   min-height reserves the row even when the toggle is hidden, so the terminal
+   does not jump vertically between screens that have function keys and
+   screens that do not.
+
+   The stacking context has to clear the 5250 fields' z-index 10-40. */
+.bd-screenbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 60;
+  width: 675px;
+  min-height: 40px;
+  margin: 10px auto 4px;
+}
+
+.bd-menu-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 14px;
+  font-family: var(--bd-font);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bd-white);
+  background: var(--bd-blue);
+  border: 1px solid var(--bd-blue);
+  border-radius: var(--bd-radius-pill);
+  box-shadow: var(--bd-shadow-sm);
+  cursor: pointer;
+  transition: background-color var(--bd-ease), border-color var(--bd-ease);
+}
+
+.bd-menu-toggle:hover {
+  background: var(--bd-blue-pressed);
+  border-color: var(--bd-blue-pressed);
+}
+
+.bd-menu-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(4, 78, 215, .35);
+}
+
+.bd-menu-toggle.is-open {
+  background: var(--bd-orange);
+  border-color: var(--bd-orange);
+}
+
+.bd-menu-toggle__bars {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 16px;
+  height: 12px;
+}
+
+.bd-menu-toggle__bars span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform var(--bd-ease), opacity var(--bd-ease);
+}
+
+/* Morph the three bars into an X while the panel is open. */
+.bd-menu-toggle.is-open .bd-menu-toggle__bars span:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+.bd-menu-toggle.is-open .bd-menu-toggle__bars span:nth-child(2) {
+  opacity: 0;
+}
+.bd-menu-toggle.is-open .bd-menu-toggle__bars span:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
+}
+
+.bd-menu-toggle__count {
+  min-width: 20px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  color: var(--bd-navy);
+  background: var(--bd-white);
+  border-radius: var(--bd-radius-pill);
+}
+
+.bd-menu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1000;
+  min-width: 268px;
+  max-width: 340px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 6px;
+  background: var(--bd-white);
+  border: 1px solid var(--bd-warm-grey);
+  border-radius: var(--bd-radius);
+  box-shadow: var(--bd-shadow-lg);
+  text-align: left;
+  white-space: normal;
+}
+
+.bd-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 10px;
+  font-family: var(--bd-font);
+  font-size: 13.5px;
+  text-align: left;
+  color: var(--bd-navy);
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color var(--bd-ease), color var(--bd-ease);
+}
+
+.bd-menu-item:hover,
+.bd-menu-item:focus-visible {
+  outline: none;
+  background: var(--bd-blue-pale);
+  color: var(--bd-blue-pressed);
+}
+
+.bd-menu-item__key {
+  flex: 0 0 auto;
+  min-width: 42px;
+  padding: 3px 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--bd-blue);
+  background: var(--bd-grey-xlight);
+  border: 1px solid var(--bd-warm-grey);
+  border-radius: 3px;
+}
+
+.bd-menu-item__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.bd-menu-item--enter .bd-menu-item__key {
+  color: var(--bd-white);
+  background: var(--bd-orange);
+  border-color: var(--bd-orange);
+}
+
+.bd-menu-item--exit .bd-menu-item__key {
+  color: var(--bd-grey-dark);
+}
+
+.bd-menu-toggle[hidden],
+.bd-menu-panel[hidden] {
+  display: none;
+}
+
+/* BD's signature orange accent rule under the navy masthead. */
+.bd-header__rule {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--bd-orange) 0%, var(--bd-orange) 22%, var(--bd-blue) 22%, var(--bd-blue-light) 100%);
+}
+
+.bd-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1400px;
+  margin: 18px auto 0;
+  padding: 12px 28px 22px;
+  border-top: 1px solid var(--bd-warm-grey);
+  color: var(--bd-grey-dark);
+  font-size: 11.5px;
+  text-align: left;
+}
+
+.bd-footer a {
+  color: var(--bd-blue);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color var(--bd-ease), border-color var(--bd-ease);
+}
+
+.bd-footer a:hover {
+  color: var(--bd-blue-pressed);
+  border-bottom-color: currentColor;
+  background: none;
+}
+
+
+/* ==========================================================================
+   3. Sign-on card (built at runtime by bd-brandkit.js)
+   ========================================================================== */
+
+.bd-signon-card {
+  position: absolute;
+  font-family: var(--bd-font);
+  background: var(--bd-white);
+  border: 1px solid var(--bd-warm-grey);
+  border-radius: var(--bd-radius);
+  box-shadow: var(--bd-shadow-lg);
+  overflow: hidden;
+  padding: 0;
+  white-space: normal;
+  text-align: left;
+}
+
+/* Left-edge brand stripe: BD orange fading into BD blue. */
+.bd-signon-card:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(180deg, var(--bd-orange) 0%, var(--bd-blue) 100%);
+}
+
+/* Reset the scoped 5250 DIV rule for everything inside the card.
+   Every child rule below is written as ".bd-signon-card .bd-signon-card__x"
+   on purpose: two class selectors outrank the one-class-plus-type selector
+   here, so the children keep their own padding. Written as a bare
+   ".bd-signon-card__x" they would lose to this reset and collapse. */
+.bd-signon-card div {
+  padding: 0;
+  z-index: auto;
+  white-space: normal;
+  text-align: left;
+}
+
+.bd-signon-card .bd-signon-card__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 0 30px;
+}
+
+.bd-signon-card .bd-signon-card__logo {
+  height: 30px;
+  width: auto;
+  z-index: auto;
+}
+
+.bd-signon-card .bd-signon-card__product {
+  color: var(--bd-grey-dark);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.bd-signon-card .bd-signon-card__heading {
+  padding: 14px 24px 0 30px;
+  color: var(--bd-navy);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.bd-signon-card .bd-signon-card__sub {
+  padding: 4px 24px 0 30px;
+  color: var(--bd-grey-dark);
+  font-size: 12.5px;
+}
+
+/* Sign-on field labels (applied via changeElementClass in the brandkit). */
+.BigText {
+  color: var(--bd-navy);
+  font-family: var(--bd-font);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+  width: 100px;
+}
+
+
+/* ==========================================================================
+   4. Inputs
+   ========================================================================== */
+
+INPUT, SELECT, TEXTAREA {
+  font-family: var(--bd-mono);
+  font-size: 13px;
+  /* Restated rather than inherited: form controls are the one place a UA
+     stylesheet is liable to reset font settings. */
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0, "calt" 0;
+  z-index: 20;
+}
+
+/* box-sizing keeps the border inside the width Genie calculated for the
+   field, so adding a border can never widen/shift a 5250 input. */
+.input, INPUT.input {
+  font-family: var(--bd-mono);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--bd-navy);
+  background: var(--bd-white);
+  border: 1px solid var(--bd-warm-grey);
+  border-radius: 3px;
+  box-sizing: border-box;
+  z-index: 20;
+  transition: border-color var(--bd-ease), box-shadow var(--bd-ease), background-color var(--bd-ease);
+}
+
+.focusInp, INPUT.focusInp {
+  font-family: var(--bd-mono);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--bd-navy);
+  background: var(--bd-blue-pale);
+  border: 1px solid var(--bd-blue);
+  border-radius: 3px;
+  box-sizing: border-box;
+  /* box-shadow, not outline/margin - it cannot affect the field's box. */
+  box-shadow: 0 0 0 2px rgba(4, 78, 215, .22);
+  z-index: 20;
+}
+
+INPUT.readOnly {
+  background: transparent;
+  border: 0px;
+  color: var(--bd-navy);
+}
+
+INPUT.empty-text, TEXTAREA.empty-text {
+  color: var(--bd-grey-dark);
+  border: 1px solid var(--bd-warm-grey);
+}
+
+SELECT {
+  font-family: var(--bd-mono);
+  font-size: 13px;
+  color: var(--bd-navy);
+  background: var(--bd-white);
+  border: 1px solid var(--bd-warm-grey);
+  border-radius: 3px;
+  box-sizing: border-box;
+  z-index: 20;
+}
+
+.label {
+  text-align: right;
+  font-weight: 700;
+}
+
+.heading {
+  color: var(--bd-navy);
+  font-family: var(--bd-font);
+  font-weight: 700;
+  font-size: 20px;
+}
+
+
+/* ==========================================================================
+   5. Buttons
+   --------------------------------------------------------------------------
+   Genie positions the auto-generated function-key buttons absolutely, using
+   the column each "Fnn=Text" prompt occupied on the green screen. They do NOT
+   reflow off one another, so making them wider here would make them overlap.
+   Base .button therefore stays compact (it is what window-format buttons keep
+   using); the roomier pill treatment is reserved for the rebuilt bar below,
+   which the brandkit lays out itself.
+   ========================================================================== */
+
+INPUT.button, BUTTON {
+  font-family: var(--bd-font);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--bd-blue);
+  background: var(--bd-white);
+  border: 1px solid var(--bd-blue);
+  border-radius: var(--bd-radius);
+  box-sizing: border-box;
+  cursor: pointer;
+  z-index: 20;
+  transition: background-color var(--bd-ease), color var(--bd-ease), box-shadow var(--bd-ease);
+}
+
+INPUT.button:hover, BUTTON:hover {
+  background: var(--bd-blue);
+  color: var(--bd-white);
+}
+
+INPUT.button:active, BUTTON:active {
+  background: var(--bd-blue-pressed);
+  color: var(--bd-white);
+}
+
+INPUT.button:focus-visible, BUTTON:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(4, 78, 215, .3);
+}
+
+/* The sign-on CTAs - bd.com uses solid/outline pills.
+   These are sized by the browser, not by Genie: bd-brandkit.js clears the
+   inline width Genie writes onto them (see BDGenie.sizeButtonToLabel), so the
+   padding below actually produces a button that fits its label. min-width
+   keeps a short label like "Exit" from collapsing into a stub. */
+INPUT#login_button, INPUT#quit_button {
+  height: 34px;
+  min-width: 88px;
+  font-size: 13.5px;
+  text-align: center;
+  border-radius: var(--bd-radius-pill);
+}
+
+INPUT#login_button {
+  padding: 0 22px;
+  color: var(--bd-white);
+  background: var(--bd-blue);
+  border: 1px solid var(--bd-blue);
+  box-shadow: var(--bd-shadow-sm);
+}
+
+INPUT#login_button:hover {
+  background: var(--bd-blue-pressed);
+  border-color: var(--bd-blue-pressed);
+}
+
+INPUT#quit_button {
+  padding: 0 20px;
+  color: var(--bd-blue);
+  background: transparent;
+  border: 1px solid var(--bd-warm-grey);
+}
+
+INPUT#quit_button:hover {
+  background: var(--bd-grey-light);
+  color: var(--bd-blue-pressed);
+  border-color: var(--bd-grey-dark);
+}
+
+/* Rebuilt function-key bar (bd-brandkit.js). Flex-wrapped, so the buttons
+   can be full pills without ever colliding. */
+.bd-fkey-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 10px;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--bd-warm-grey);
+  white-space: normal;
+  z-index: 25;
+}
+
+.bd-fkey-bar INPUT.bd-fkey {
+  font-family: var(--bd-font);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 7px 14px;
+  color: var(--bd-navy);
+  background: var(--bd-white);
+  border: 1px solid var(--bd-warm-grey);
+  border-radius: var(--bd-radius-pill);
+  box-shadow: var(--bd-shadow-sm);
+  cursor: pointer;
+  transition: background-color var(--bd-ease), color var(--bd-ease),
+              border-color var(--bd-ease), transform var(--bd-ease);
+}
+
+.bd-fkey-bar INPUT.bd-fkey:hover {
+  color: var(--bd-white);
+  background: var(--bd-blue);
+  border-color: var(--bd-blue);
+  transform: translateY(-1px);
+}
+
+.bd-fkey-bar INPUT.bd-fkey:active {
+  background: var(--bd-blue-pressed);
+  border-color: var(--bd-blue-pressed);
+  transform: none;
+}
+
+.bd-fkey-bar INPUT.bd-fkey:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(4, 78, 215, .3);
+}
+
+/* Enter / Continue is the affirmative action - fill it in BD orange. */
+.bd-fkey-bar INPUT.bd-fkey--enter {
+  color: var(--bd-white);
+  background: var(--bd-orange);
+  border-color: var(--bd-orange);
+}
+
+.bd-fkey-bar INPUT.bd-fkey--enter:hover {
+  background: #E06100;
+  border-color: #E06100;
+}
+
+/* F3/F12 back out of a screen - keep them visually separate from the rest. */
+.bd-fkey-bar INPUT.bd-fkey--exit {
+  color: var(--bd-grey-dark);
+}
+
+.bd-fkey-bar INPUT.bd-fkey--exit:hover {
+  color: var(--bd-white);
+  background: var(--bd-grey-dark);
+  border-color: var(--bd-grey-dark);
+}
+
+.hand {
+  cursor: pointer;
+}
+
+
+/* ==========================================================================
+   6. 5250 attribute bytes -> BD palette
+   --------------------------------------------------------------------------
+   Every attribute class from the stock skin is retained (some screen
+   somewhere depends on each of them, including the non-display ones), and the
+   semantic distinction between hues is preserved - green/white/blue/red/
+   turquoise/yellow/pink all still resolve to visibly different colours, just
+   BD ones. Where a brand hue is too light for body text on white, the derived
+   -dark shade is used for the text and the pure brand hue for fills/borders.
+   ========================================================================== */
+
+/* Regular Green - ordinary screen text */
+DIV.A20 {
+  color: var(--bd-navy);
+  font-weight: 600;
+}
+INPUT.A20 {
+  color: var(--bd-blue);
+  font-weight: 600;
+}
+
+.A21 /*Reverse Green*/ {
+  background-color: var(--bd-blue);
+  color: var(--bd-white);
+}
+
+/* White - headings and emphasis */
+.A22 {
+  color: var(--bd-blue);
+  font-weight: 700;
+}
+INPUT.A22 /* White Input Field */ {
+  font-weight: 600;
+  color: var(--bd-navy);
+}
+
+.A23 /*Reverse White*/ {
+  color: var(--bd-white);
+  background-color: var(--bd-navy);
+}
+
+DIV.A24 /*Green Underscore*/ {
+  color: var(--bd-navy);
+  border-bottom: solid 1px var(--bd-warm-grey);
+}
+INPUT.A24 {
+  color: var(--bd-navy);
+}
+
+DIV.A25 /*Green Underscore Reverse*/ {
+  color: var(--bd-white);
+  background-color: var(--bd-blue);
+  border-bottom: solid 1px var(--bd-blue-pressed);
+}
+INPUT.A25 /*Green Underscore Reverse*/ {
+  color: var(--bd-white);
+  background-color: var(--bd-blue);
+}
+
+DIV.A26 /*White Underscore*/ {
+  color: var(--bd-blue);
+  border-bottom: solid 1px var(--bd-blue-tint);
+}
+INPUT.A26 /* White Underscore Input Field */ {
+  font-weight: 600;
+  color: var(--bd-navy);
+}
+
+INPUT.A27 /* Nondisplay Input */ {
+  color: var(--bd-navy);
+}
+DIV.A27 /*Nondisplay Output*/ {
+  visibility: hidden;
+}
+
+.A28 /*Red*/ {
+  color: var(--bd-red);
+  font-weight: 600;
+}
+.A29 /*Reverse Red*/ {
+  color: var(--bd-white);
+  background-color: var(--bd-red);
+}
+
+INPUT.A2A /* Red Blink */ {
+  color: var(--bd-red);
+}
+DIV.A2A /* Red Blink */ {
+  color: var(--bd-red);
+}
+
+DIV.A2C /*Red Underscore*/ {
+  color: var(--bd-red);
+  border-bottom: solid 1px var(--bd-red);
+}
+INPUT.A2C /*Red Underscore*/ {
+  color: var(--bd-red);
+}
+
+DIV.A2D /*Red Underscore Reverse */ {
+  color: var(--bd-white);
+  background-color: var(--bd-red);
+  border-bottom: solid 1px var(--bd-red);
+}
+INPUT.A2D /*Red Underscore Reverse */ {
+  color: var(--bd-white);
+  background-color: var(--bd-red);
+}
+
+INPUT.A2E /* Red Underscore Blink */ {
+  color: var(--bd-red);
+}
+DIV.A2E /* Red Underscore Blink */ {
+  color: var(--bd-red);
+  border-bottom: solid 1px var(--bd-red);
+}
+
+DIV.A2F /*Nondisplay*/ {
+  visibility: hidden;
+}
+
+DIV.A30 /*Turquoise (Column Separators)*/ {
+  color: var(--bd-teal-dark);
+  border-bottom: thin dashed var(--bd-teal);
+}
+INPUT.A30 {
+  color: var(--bd-teal-dark);
+}
+
+.A31 /*Turquoise Reverse*/ {
+  color: var(--bd-white);
+  background-color: var(--bd-teal-dark);
+}
+
+DIV.A32 /*Yellow (Column Separators)*/ {
+  color: var(--bd-amber-dark);
+  border-bottom: thin dashed var(--bd-amber);
+}
+INPUT.A32 {
+  color: var(--bd-amber-dark);
+}
+
+.A33 /*Yellow Reverse*/ {
+  color: var(--bd-navy);
+  background-color: var(--bd-amber);
+}
+
+DIV.A34 /*Turquoise Underscore*/ {
+  color: var(--bd-teal-dark);
+  border-bottom: solid 1px var(--bd-teal);
+}
+INPUT.A34 {
+  color: var(--bd-teal-dark);
+}
+
+DIV.A35 /*Turquoise Underscore Reverse*/ {
+  color: var(--bd-white);
+  background-color: var(--bd-teal-dark);
+  border-bottom: solid 1px var(--bd-teal);
+}
+INPUT.A35 {
+  color: var(--bd-white);
+  background-color: var(--bd-teal-dark);
+}
+
+DIV.A36 /*Yellow Underscore*/ {
+  color: var(--bd-amber-dark);
+  border-bottom: solid 1px var(--bd-amber);
+}
+INPUT.A36 {
+  color: var(--bd-amber-dark);
+}
+
+.A37 /*Nondisplay*/ {
+  color: var(--bd-white);
+  background-color: var(--bd-white);
+}
+
+.A38 /*Pink*/ {
+  color: var(--bd-magenta);
+}
+.A39 /*Pink Reverse*/ {
+  color: var(--bd-white);
+  background-color: var(--bd-magenta);
+}
+
+/* Blue - the stock skin used this as its accent colour, so it maps to the
+   BD accent: Boosted Orange (darkened just enough to read on white).
+   The stock skin also bumped this class to 14px; that is left off here
+   because 14px monospace exceeds the 8px character cell and would make these
+   lines overlap their neighbours. Weight carries the emphasis instead. */
+.A3A /*Blue*/ {
+  color: var(--bd-orange-dark);
+  font-weight: 700;
+}
+.A3B /*Blue Reverse */ {
+  color: var(--bd-white);
+  background-color: var(--bd-orange);
+}
+
+DIV.A3C /*Pink Underscore*/ {
+  color: var(--bd-magenta);
+  border-bottom: solid 1px var(--bd-magenta);
+}
+INPUT.A3C {
+  color: var(--bd-magenta);
+}
+
+DIV.A3D /*Pink Underscore Reverse*/ {
+  color: var(--bd-white);
+  background-color: var(--bd-magenta);
+  border-bottom: solid 1px var(--bd-purple);
+}
+INPUT.A3D {
+  color: var(--bd-white);
+  background-color: var(--bd-magenta);
+}
+
+DIV.A3E /*Blue Underscore*/ {
+  color: var(--bd-orange-dark);
+  border-bottom: solid 1px var(--bd-orange);
+}
+INPUT.A3E {
+  color: var(--bd-orange-dark);
+}
+
+
+/* ==========================================================================
+   7. Hyperlink-rendered fields
+   ========================================================================== */
+
+A {
+  color: var(--bd-blue);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--bd-chetwode);
+  transition: color var(--bd-ease), background-color var(--bd-ease), border-color var(--bd-ease);
+}
+
+A:hover {
+  color: var(--bd-blue-pressed);
+  background-color: var(--bd-blue-pale);
+  border-bottom: 1px solid var(--bd-blue);
+}
+
+.A20 A {
+  color: var(--bd-blue);
+}
+.A22 A /*White*/ {
+  color: var(--bd-blue);
+}
+.A3A A /*Blue*/ {
+  color: var(--bd-orange-dark);
+}
+
+.link1 A {
+  font-family: var(--bd-font);
+  color: var(--bd-teal-dark);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--bd-warm-grey);
+}
+.link1 A:hover {
+  border: 1px solid var(--bd-teal);
+}
+
+.link2 A {
+  font-family: var(--bd-font);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--bd-warm-grey);
+}
+.link2 A:hover {
+  border: 1px solid var(--bd-blue);
+  font-weight: 700;
+  color: var(--bd-white);
+  background-color: var(--bd-blue);
+}
+
+.link3 A {
+  text-decoration: none;
+  border-bottom: 1px dotted var(--bd-warm-grey);
+  color: var(--bd-navy);
+}
+.link3 A:hover {
+  border: 1px solid var(--bd-orange);
+  background-color: #FFF1E5;
+}
+
+.link4 A {
+  text-decoration: none;
+}
+.link4 A:hover {
+  text-decoration: underline;
+}
+
+.link5 A {
+  font-weight: 700;
+  text-decoration: none;
+}
+.link5 A:hover {
+  border-top: 1px dashed var(--bd-blue);
+  border-bottom: 1px dashed var(--bd-blue);
+}
+
+.link6 A {
+  font-family: var(--bd-font);
+  font-size: 14px;
+  color: var(--bd-blue);
+  text-decoration: none;
+}
+.link6 A:hover {
+  font-weight: 700;
+}
+
+
+/* ==========================================================================
+   8. Windows, menus, calendar, autocomplete
+   ========================================================================== */
+
+/* Spaced Window Border */
+DIV.Spaced {
+  background-color: var(--bd-white);
+  border-style: solid;
+  border-color: var(--bd-white);
+  border-top-width: 12px;
+  border-bottom-width: 12px;
+  border-right-width: 8px;
+  border-left-width: 8px;
+  border-radius: var(--bd-radius);
+  box-shadow: var(--bd-shadow-lg);
+  z-index: 30;
+}
+
+/* Default window border */
+DIV.Default {
+  background-color: var(--bd-white);
+  border: 1px solid var(--bd-warm-grey);
+  border-radius: var(--bd-radius);
+  box-shadow: var(--bd-shadow-md);
+  z-index: 30;
+}
+
+.Title {
+  vertical-align: text-top;
+  background-color: var(--bd-white);
+  color: var(--bd-navy);
+  font-family: var(--bd-font);
+  font-weight: 700;
+  z-index: 40;
+}
+
+/* Context Menu on a Subfile right-click */
+#menuDiv {
+  border: 1px solid var(--bd-warm-grey);
+  border-radius: var(--bd-radius);
+  box-shadow: var(--bd-shadow-md);
+}
+.menu {
+  background: var(--bd-navy);
+}
+.menu TR {
+  cursor: pointer;
+}
+.menu TD {
+  font-family: var(--bd-font);
+  font-size: 12px;
+  color: var(--bd-white);
+}
+.menuHover TD {
+  background: var(--bd-blue);
+  color: var(--bd-white);
+}
+
+/* Calendar */
+.calendar {
+  font-family: var(--bd-font);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.brndrow1 {
+  background-color: var(--bd-navy);
+}
+.brndrow1 A {
+  border: 0px;
+  color: var(--bd-white);
+}
+.brndrow1 A:hover {
+  border: 0px;
+  background: transparent;
+  color: var(--bd-orange);
+}
+.brndrow2 {
+  background-color: var(--bd-blue);
+}
+
+/* Autocomplete popup */
+.autocomplete-item {
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--bd-white) var(--bd-white) var(--bd-grey-light);
+  font-size: 11px;
+  font-family: var(--bd-font);
+  color: var(--bd-navy);
+  background-color: var(--bd-white);
+  cursor: pointer;
+  margin: 0px;
+  padding: 5px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+}
+
+.autocomplete-selected {
+  background-color: var(--bd-blue-pale);
+  border: 1px solid var(--bd-blue) !important;
+}
+
+.autocomplete-col {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+
+/* ==========================================================================
+   9. Utilities
+   ========================================================================== */
+
+.hide {
+  visibility: hidden;
+}
+
+.upper {
+  text-transform: uppercase;
+}
+
+.selpen {
+}
+
+
+/* ==========================================================================
+   10. Loading animation
+   --------------------------------------------------------------------------
+   Referenced from custom.js via pui["loading animation"]["css"]. The class
+   name and the @keyframes it uses must both exist or the spinner renders as a
+   static box.
+   ========================================================================== */
+
+.pui-bd-animation {
+  position: absolute;
+  display: block;
+  top: 0px;
+  left: 0px;
+  width: 50px;
+  height: 50px;
+  z-index: 1001;
+}
+
+.pui-bd-animation:before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  border-top-color: #FF6E00;
+  -webkit-animation: pui-spin 1s linear infinite;
+  animation: pui-spin 1s linear infinite;
+}
+
+.pui-bd-animation:after {
+  content: '';
+  position: absolute;
+  top: 11px;
+  left: 11px;
+  right: 11px;
+  bottom: 11px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  border-top-color: #044ED7;
+  -webkit-animation: pui-spin 1.25s linear infinite;
+  animation: pui-spin 1.25s linear infinite;
+}
+
+@-webkit-keyframes pui-spin {
+  0%   { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes pui-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+/* ==========================================================================
+   11. Narrow viewports
+   --------------------------------------------------------------------------
+   The 5250 area itself is a fixed pixel grid and cannot reflow, but the
+   chrome around it can stop crowding on small screens.
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .bd-header__inner {
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    padding: 12px 16px 14px;
+  }
+  .bd-header__divider {
+    display: none;
+  }
+  .bd-header__meta {
+    width: 100%;
+    text-align: left;
+  }
+  /* Below the terminal's own fixed width the page already scrolls sideways,
+     so a right-aligned panel can end up past the right edge of the viewport.
+     Anchor it left and cap it here instead. */
+  .bd-screenbar {
+    justify-content: flex-start;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .bd-menu-panel {
+    left: 16px;
+    right: auto;
+    max-width: calc(100vw - 32px);
+  }
+  .bd-header__logo {
+    height: 34px;
+  }
+  .bd-header__title {
+    font-size: 17px;
+  }
+  .bd-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px 16px 20px;
+  }
+}
