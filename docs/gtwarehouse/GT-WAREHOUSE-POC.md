@@ -1,0 +1,1 @@
+/workspace/workspace/ibmi-agentic/docs/gtwms/docs/GT-WAREHOUSE-POC.md
