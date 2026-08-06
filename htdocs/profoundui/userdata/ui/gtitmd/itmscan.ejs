@@ -1,0 +1,164 @@
+<%
+/* ====================================================================
+ * Item Lookup -- scan or search.
+ *
+ * Same shape as Scan Lab: camera on top, manual entry underneath, and the
+ * whole screen readable with no JavaScript. Results are a subfile rendered
+ * as tappable cards with a thumbnail, because a list of SKUs with no picture
+ * is exactly what this application exists to replace.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'ITEM LOOKUP',
+        lead:'Scan a product, a case code, or type part of a description.',
+        openCamera:'Open camera', closeCamera:'Close camera',
+        manual:'Barcode', search:'Or search by description', go:'Search',
+        decode:'Look up', results:'Results', none:'Nothing found yet',
+        onhand:'on hand', clear:'Clear', back:'Menu',
+        depts:{GROC:'Grocery',CLEA:'Cleaning',HLTH:'Health & Beauty',HOME:'Home',
+               APPL:'Apparel',SEAS:'Seasonal',PETS:'Pet Supplies',TOYS:'Toys'} },
+  FR: { appName:'GT Entrepôt', appSub:'RECHERCHE D’ARTICLE',
+        lead:'Balayez un produit ou un code de caisse, ou saisissez une partie de la description.',
+        openCamera:'Ouvrir la caméra', closeCamera:'Fermer la caméra',
+        manual:'Code à barres', search:'Ou rechercher par description', go:'Rechercher',
+        decode:'Consulter', results:'Résultats', none:'Aucun résultat pour l’instant',
+        onhand:'en stock', clear:'Effacer', back:'Menu',
+        depts:{GROC:'Épicerie',CLEA:'Nettoyage',HLTH:'Santé et beauté',HOME:'Maison',
+               APPL:'Vêtements',SEAS:'Saisonnier',PETS:'Animalerie',TOYS:'Jouets'} }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var num = function (v) {
+  return Number(v || 0).toLocaleString(lang === 'FR' ? 'fr-CA' : 'en-CA',
+                                       { maximumFractionDigits: 0 });
+};
+var IMG = '/profoundui/userdata/ui/gtimg/';
+var rows = (typeof srchsfl !== 'undefined' && srchsfl) ? srchsfl : [];
+%>
+<div class="gt-app gt-scan-screen gt-item-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg"><%= s(msg) %></div>
+    <% } %>
+
+    <p class="gt-scan-lead"><%= T.lead %></p>
+
+    <div class="gt-scan-camera" id="gt-scan-camera">
+      <div class="gt-scan-stage">
+        <video id="gt-scan-video" muted playsinline></video>
+        <div class="gt-scan-frame" id="gt-scan-frame"></div>
+      </div>
+      <div class="gt-scan-status" id="gt-scan-status"></div>
+      <div class="gt-scan-camctl">
+        <button type="button" class="gt-iconbtn gt-iconbtn-go" id="gt-scan-start"
+                title="<%= T.openCamera %>" aria-label="<%= T.openCamera %>">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+            <circle cx="16" cy="18" r="5"/>
+          </svg>
+        </button>
+        <button type="button" class="gt-iconbtn gt-iconbtn-stop" id="gt-scan-stop"
+                title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <g class="gt-icon-cam">
+              <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+              <circle cx="15" cy="18" r="4.6"/>
+            </g>
+            <g class="gt-icon-ban">
+              <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+              <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+              <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+            </g>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="gt-scan-manual">
+      <label for="gt-scan-manual"><%= T.manual %></label>
+      <div class="gt-scan-manual-row">
+        <input type="text" id="gt-scan-manual" name="scanval" value=""
+               autocomplete="off" autocapitalize="off" spellcheck="false">
+        <button type="button" class="gt-btn gt-btn-primary"
+                onclick="pui.submit({action:'SCAN'})"><%= T.decode %></button>
+      </div>
+    </div>
+
+    <div class="gt-scan-manual">
+      <label for="gt-item-search"><%= T.search %></label>
+      <div class="gt-scan-manual-row">
+        <input type="text" id="gt-item-search" name="search"
+               value="<%= s(typeof search !== 'undefined' ? search : '') %>"
+               autocomplete="off" spellcheck="false">
+        <button type="button" class="gt-btn gt-btn-primary"
+                onclick="pui.submit({action:'SEARCH'})"><%= T.go %></button>
+      </div>
+    </div>
+
+    <% if (rows.length > 0) { %>
+      <h2 class="gt-section-title">
+        <%= T.results %> <span class="gt-count"><%= rows.length %></span>
+      </h2>
+      <ul class="gt-item-list">
+        <% rows.forEach(function (row) { %>
+          <li>
+            <button type="button" class="gt-item-row"
+                    onclick="pui.submit({action:'PICK<%= s(row.sseq) %>'})">
+              <span class="gt-item-thumb">
+                <% if (Number(row.simg) > 0) { %>
+                  <img src="<%= IMG %><%= Number(row.simg) %>t.jpg" alt="" loading="lazy">
+                <% } else { %>
+                  <span class="gt-item-noimg">GT</span>
+                <% } %>
+              </span>
+              <span class="gt-item-body">
+                <span class="gt-item-desc"><%= s(row.sdesc) %></span>
+                <span class="gt-item-meta">
+                  <span class="gt-chip"><%= T.depts[s(row.sdept)] || s(row.sdept) %></span>
+                  <span class="gt-mono"><%= s(row.ssku) %></span>
+                </span>
+                <span class="gt-item-oh">
+                  <strong><%= num(row.soh) %></strong> <%= s(row.suom) %> <%= T.onhand %>
+                </span>
+              </span>
+              <span class="gt-item-chev" aria-hidden="true">&rsaquo;</span>
+            </button>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <section class="gt-card gt-scan-empty"><%= T.none %></section>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn" onclick="pui.submit({action:'CLEAR'})"><%= T.clear %></button>
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+  </footer>
+</div>

@@ -1,0 +1,289 @@
+/* ==================================================================
+ * Scan Lab
+ *
+ * Camera stage first, because that is the point of the screen. Everything
+ * below it works with no JavaScript, so the layout must not assume the
+ * video element is ever populated.
+ * ================================================================== */
+
+.gt-scan-lead {
+  margin: 0 0 var(--gt-gap);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--gt-muted);
+  overflow-wrap: anywhere;
+}
+
+/* ---- Camera ---------------------------------------------------- */
+.gt-scan-camera { margin-bottom: var(--gt-gap); }
+
+.gt-scan-stage {
+  position: relative;
+  width: 100%;
+  /* Reserve the space before the stream arrives so the page does not
+   * jump when the camera opens. */
+  aspect-ratio: 4 / 3;
+  background: #111;
+  border-radius: var(--gt-radius);
+  overflow: hidden;
+  display: none;
+}
+.gt-scan-camera.is-live .gt-scan-stage { display: block; }
+
+.gt-scan-stage video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* GT-yellow reticle. Deliberately large -- an operator aiming a phone at a
+ * carton needs a target, not a hairline. */
+.gt-scan-frame {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 22%;
+  bottom: 22%;
+  border: 3px solid var(--gt-yellow);
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+  transition: border-color 120ms ease;
+}
+.gt-scan-frame.is-hit { border-color: var(--gt-good); border-width: 5px; }
+
+.gt-scan-status {
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--gt-muted);
+  min-height: 18px;
+  overflow-wrap: anywhere;
+}
+.gt-scan-status.is-good { color: var(--gt-good); font-weight: 600; }
+.gt-scan-status.is-warn { color: var(--gt-warn); }
+.gt-scan-status.is-bad  { color: var(--gt-bad); font-weight: 600; }
+
+/* ---- Camera toggle ---------------------------------------------
+ * A single circular icon rather than a text button: the camera is the
+ * primary action on this screen and a word-shaped button read as heavy
+ * next to the viewfinder. Exactly one of the two is visible at a time,
+ * selected by .is-live, so the control cannot disagree with the camera.
+ * ---------------------------------------------------------------- */
+.gt-scan-camctl {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 2px;
+}
+
+.gt-iconbtn {
+  /* Comfortably past the 48px minimum -- this is the one control an
+   * operator reaches for while holding a carton. */
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  transition: transform 80ms ease, background-color 120ms ease;
+}
+.gt-iconbtn svg { width: 34px; height: 34px; }
+.gt-iconbtn:active { transform: translateY(1px) scale(0.97); }
+.gt-iconbtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(227, 24, 55, 0.28), 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+/* Closed: GT red, plain camera. */
+.gt-iconbtn-go { background: var(--gt-red); color: #FFFFFF; }
+
+/* Open: neutral plate so the red belongs to the no-entry mark, which is
+ * what the eye should land on. */
+.gt-iconbtn-stop { background: var(--gt-card); border: 2px solid var(--gt-line); }
+.gt-iconbtn-stop .gt-icon-cam { color: var(--gt-ink); stroke: currentColor; }
+.gt-iconbtn-stop .gt-icon-ban { color: var(--gt-red); stroke: currentColor; }
+/* Filled with the button's own background so the badge punches a clean hole
+   in the camera outline rather than sitting on top of it as a tangle. */
+.gt-iconbtn-stop .gt-icon-ban-plate { fill: var(--gt-card); stroke: var(--gt-card); stroke-width: 2; }
+
+/* Exactly one visible, driven by the same class gt-scan.js toggles. */
+.gt-scan-camera:not(.is-live) #gt-scan-stop { display: none; }
+.gt-scan-camera.is-live #gt-scan-start { display: none; }
+
+/* ---- Manual entry ---------------------------------------------- */
+.gt-scan-manual { margin-bottom: var(--gt-gap); }
+.gt-scan-manual label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gt-muted);
+  margin-bottom: 6px;
+}
+.gt-scan-manual-row { display: flex; gap: 8px; }
+.gt-scan-manual-row input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: var(--gt-action);
+  padding: 0 14px;
+  font-size: 16px;   /* 16px stops iOS zooming the page on focus */
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  border: 2px solid var(--gt-line);
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+}
+.gt-scan-manual-row input:focus {
+  outline: none;
+  border-color: var(--gt-red);
+  box-shadow: 0 0 0 3px rgba(227, 24, 55, 0.15);
+}
+.gt-scan-manual-row .gt-btn { flex: 0 0 auto; padding: 0 20px; }
+
+/* ---- Cards and facts ------------------------------------------- */
+.gt-card {
+  background: var(--gt-card);
+  border: 1px solid var(--gt-line);
+  border-radius: var(--gt-radius);
+  padding: 14px;
+  margin-bottom: var(--gt-gap);
+}
+.gt-card-title {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--gt-muted);
+}
+.gt-card-sub {
+  margin: 16px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--gt-muted);
+  border-top: 1px solid var(--gt-line);
+  padding-top: 12px;
+}
+
+.gt-scan-empty { color: var(--gt-muted); font-size: 14px; text-align: center; }
+
+.gt-scan-kind {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* Colour-code the answer. "Not one of ours" is a legitimate result, so it
+ * is neutral grey rather than an error red. */
+.gt-scan-result            { border-left: 5px solid var(--gt-line); }
+.gt-scan-result.is-item    { border-left-color: var(--gt-red); }
+.gt-scan-result.is-loc     { border-left-color: #1D4ED8; }
+.gt-scan-result.is-pallet  { border-left-color: var(--gt-warn); }
+.gt-scan-result.is-rcpt    { border-left-color: var(--gt-good); }
+.gt-scan-result.is-oper    { border-left-color: #6D28D9; }
+.gt-scan-result.is-unknwn  { border-left-color: var(--gt-muted); }
+
+.gt-facts {
+  display: grid;
+  /* minmax(0, ...) so a long payload wraps instead of forcing the grid
+   * wider than the viewport. */
+  grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+  gap: 6px 12px;
+  margin: 0;
+  font-size: 14px;
+}
+.gt-facts dt {
+  color: var(--gt-muted);
+  font-size: 12px;
+  align-self: center;
+  overflow-wrap: anywhere;
+}
+.gt-facts dd { margin: 0; overflow-wrap: anywhere; }
+.gt-facts dd.is-good  { color: var(--gt-good); font-weight: 700; }
+.gt-facts dd.is-muted { color: var(--gt-muted); }
+
+.gt-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+.gt-wrap   { overflow-wrap: anywhere; word-break: break-all; }
+.gt-strong { font-weight: 700; }
+
+/* ---- History --------------------------------------------------- */
+.gt-section-title {
+  margin: 4px 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gt-muted);
+}
+.gt-count {
+  display: inline-block;
+  background: var(--gt-yellow);
+  color: var(--gt-black);
+  border-radius: 999px;
+  padding: 1px 9px;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.gt-scan-history { list-style: none; margin: 0; padding: 0; }
+.gt-scan-hist {
+  background: var(--gt-card);
+  border: 1px solid var(--gt-line);
+  border-left: 4px solid var(--gt-line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  min-width: 0;
+}
+.gt-scan-hist.is-item   { border-left-color: var(--gt-red); }
+.gt-scan-hist.is-loc    { border-left-color: #1D4ED8; }
+.gt-scan-hist.is-pallet { border-left-color: var(--gt-warn); }
+.gt-scan-hist.is-rcpt   { border-left-color: var(--gt-good); }
+.gt-scan-hist.is-oper   { border-left-color: #6D28D9; }
+
+.gt-scan-hist-kind {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.gt-scan-hist-raw {
+  display: block;
+  margin-top: 2px;
+  color: var(--gt-ink);
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+.gt-scan-hist-meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--gt-muted);
+  overflow-wrap: anywhere;
+}
+
+/* ---- Wider screens: camera and results side by side ------------- */
+@media (min-width: 835px) {
+  .gt-scan-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--gt-gap);
+  }
+  .gt-facts { grid-template-columns: minmax(0, 30%) minmax(0, 1fr); }
+  .gt-scan-stage { aspect-ratio: 16 / 9; }
+}
+
+@media (min-width: 1280px) {
+  .gt-scan-lead { font-size: 15px; }
+  .gt-scan-kind { font-size: 24px; }
+  .gt-facts     { font-size: 15px; }
+}

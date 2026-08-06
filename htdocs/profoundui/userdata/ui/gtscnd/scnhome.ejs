@@ -1,0 +1,238 @@
+<%
+/* ====================================================================
+ * Scan Lab -- identify any barcode.
+ *
+ * Fully readable with no JavaScript: the manual keypad, the result card
+ * and the history all render server-side. gt-scan.js only adds the camera.
+ * If it fails to load, the screen degrades to typing a barcode in, which
+ * is exactly what it should do.
+ * ==================================================================== */
+
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: {
+    appName: 'GT Warehouse', appSub: 'SCAN LAB',
+    title: 'Scan Lab',
+    lead: 'Scan anything at all. This screen shows exactly what came back — including barcodes that are not ours.',
+    openCamera: 'Open camera', closeCamera: 'Close camera',
+    manual: 'Or type a barcode', decode: 'Decode',
+    result: 'Result', noResult: 'Nothing scanned yet',
+    kind: 'Resolved as', symbology: 'Symbology', payload: 'Raw payload',
+    length: 'Length', gs1: 'GS1 structured', check: 'Check digit',
+    gs1Fields: 'GS1 application identifiers',
+    sscc: 'SSCC (00)', gtin: 'GTIN (01)', lot: 'Batch / lot (10)',
+    expiry: 'Expiry (17)', count: 'Count (30/37)',
+    matched: 'Database match', sku: 'SKU', location: 'Location',
+    receipt: 'Open receipt', pack: 'Pack qty', level: 'Level',
+    history: 'Recent scans', clear: 'Clear', back: 'Back',
+    yes: 'Yes', no: 'No', valid: 'Valid', notValid: 'Not valid',
+    kinds: {
+      ITEM: 'An item', LOC: 'A location', PALLET: 'A pallet',
+      RCPT: 'A pallet on an open receipt', OPER: 'An operator badge',
+      UNKNWN: 'Not one of ours'
+    },
+    levels: { EA: 'Each', CS: 'Case', PL: 'Pallet' }
+  },
+  FR: {
+    appName: 'GT Entrepôt', appSub: 'LABO DE BALAYAGE',
+    title: 'Labo de balayage',
+    lead: 'Balayez n’importe quoi. Cet écran montre exactement ce qui a été lu — y compris les codes qui ne sont pas les nôtres.',
+    openCamera: 'Ouvrir la caméra', closeCamera: 'Fermer la caméra',
+    manual: 'Ou saisissez un code', decode: 'Décoder',
+    result: 'Résultat', noResult: 'Aucun balayage pour l’instant',
+    kind: 'Identifié comme', symbology: 'Symbologie', payload: 'Données brutes',
+    length: 'Longueur', gs1: 'Structure GS1', check: 'Chiffre de contrôle',
+    gs1Fields: 'Identifiants d’application GS1',
+    sscc: 'SSCC (00)', gtin: 'GTIN (01)', lot: 'Lot (10)',
+    expiry: 'Expiration (17)', count: 'Quantité (30/37)',
+    matched: 'Correspondance', sku: 'UGS', location: 'Emplacement',
+    receipt: 'Réception ouverte', pack: 'Qté par caisse', level: 'Niveau',
+    history: 'Balayages récents', clear: 'Effacer', back: 'Retour',
+    yes: 'Oui', no: 'Non', valid: 'Valide', notValid: 'Non valide',
+    kinds: {
+      ITEM: 'Un article', LOC: 'Un emplacement', PALLET: 'Une palette',
+      RCPT: 'Une palette sur une réception ouverte', OPER: 'Un badge d’opérateur',
+      UNKNWN: 'Pas un des nôtres'
+    },
+    levels: { EA: 'Unité', CS: 'Caisse', PL: 'Palette' }
+  }
+}[lang];
+
+var s = function (v) { return (typeof v === 'undefined' || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var isY = function (v) { return s(v).toUpperCase() === 'Y'; };
+
+var kindCode = s(typeof rkind !== 'undefined' ? rkind : '');
+var showResult = isY(typeof hasres !== 'undefined' ? hasres : 'N');
+var gs1 = isY(typeof risgs1 !== 'undefined' ? risgs1 : 'N');
+
+/* Expiry arrives as YYMMDD from AI 17. Rendering it raw would be a wasted
+ * opportunity -- it is one of the four fields that come from a single beep. */
+var expiryText = '';
+if (has(typeof rexpiry !== 'undefined' ? rexpiry : '')) {
+  var e = s(rexpiry);
+  if (e.length === 6) {
+    expiryText = '20' + e.substr(0, 2) + '-' + e.substr(2, 2) + '-' + e.substr(4, 2);
+  } else {
+    expiryText = e;
+  }
+}
+
+var rows = (typeof scnsfl !== 'undefined' && scnsfl) ? scnsfl : [];
+%>
+<div class="gt-app gt-scan-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg"><%= s(msg) %></div>
+    <% } %>
+
+    <p class="gt-scan-lead"><%= T.lead %></p>
+
+    <!-- ---- Camera ------------------------------------------------ -->
+    <div class="gt-scan-camera" id="gt-scan-camera">
+      <div class="gt-scan-stage">
+        <video id="gt-scan-video" muted playsinline></video>
+        <div class="gt-scan-frame" id="gt-scan-frame"></div>
+      </div>
+      <div class="gt-scan-status" id="gt-scan-status"></div>
+      <%# One circular icon button per state. Both are rendered and CSS shows
+          whichever matches .is-live on the camera wrapper, so the button can
+          never disagree with the actual camera state -- and gt-scan.js keeps
+          its existing two bindings unchanged. %>
+      <div class="gt-scan-camctl">
+        <button type="button" class="gt-iconbtn gt-iconbtn-go" id="gt-scan-start"
+                title="<%= T.openCamera %>" aria-label="<%= T.openCamera %>">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+            <circle cx="16" cy="18" r="5"/>
+          </svg>
+        </button>
+
+        <button type="button" class="gt-iconbtn gt-iconbtn-stop" id="gt-scan-stop"
+                title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <%# The camera must stay READABLE underneath. A full-size no-entry
+                circle covers it completely and the button then just reads
+                "no entry", which says nothing about what is being stopped.
+                So: camera at full size, no-entry as a badge over one corner. %>
+            <g class="gt-icon-cam">
+              <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+              <circle cx="15" cy="18" r="4.6"/>
+            </g>
+            <g class="gt-icon-ban">
+              <%# Knockout ring so the badge reads cleanly against the camera. %>
+              <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+              <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+              <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+            </g>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ---- Manual entry: works with no JavaScript at all ---------- -->
+    <div class="gt-scan-manual">
+      <label for="gt-scan-manual"><%= T.manual %></label>
+      <div class="gt-scan-manual-row">
+        <input type="text" id="gt-scan-manual" name="scanval"
+               value="" autocomplete="off" autocapitalize="off"
+               spellcheck="false" inputmode="text">
+        <button type="button" class="gt-btn gt-btn-primary"
+                onclick="pui.submit({action:'SCAN'})"><%= T.decode %></button>
+      </div>
+    </div>
+
+    <!-- ---- Result card ------------------------------------------- -->
+    <% if (showResult) { %>
+      <section class="gt-card gt-scan-result is-<%= kindCode.toLowerCase() %>">
+        <h2 class="gt-card-title"><%= T.result %></h2>
+
+        <div class="gt-scan-kind"><%= T.kinds[kindCode] || kindCode %></div>
+
+        <dl class="gt-facts">
+          <dt><%= T.symbology %></dt><dd><%= s(rsymb) %></dd>
+          <dt><%= T.payload %></dt><dd class="gt-mono gt-wrap"><%= s(rraw) %></dd>
+          <dt><%= T.length %></dt><dd><%= s(rrawlen) %></dd>
+          <dt><%= T.gs1 %></dt><dd><%= gs1 ? T.yes : T.no %></dd>
+          <dt><%= T.check %></dt>
+          <dd class="<%= isY(rcheck) ? 'is-good' : 'is-muted' %>">
+            <%= isY(rcheck) ? T.valid : T.notValid %>
+          </dd>
+        </dl>
+
+        <% if (gs1) { %>
+          <h3 class="gt-card-sub"><%= T.gs1Fields %></h3>
+          <dl class="gt-facts">
+            <% if (has(rsscc))   { %><dt><%= T.sscc %></dt><dd class="gt-mono"><%= s(rsscc) %></dd><% } %>
+            <% if (has(rgtin))   { %><dt><%= T.gtin %></dt><dd class="gt-mono"><%= s(rgtin) %></dd><% } %>
+            <% if (has(rlot))    { %><dt><%= T.lot %></dt><dd class="gt-mono"><%= s(rlot) %></dd><% } %>
+            <% if (expiryText)   { %><dt><%= T.expiry %></dt><dd class="gt-mono"><%= expiryText %></dd><% } %>
+            <% if (Number(rqty) > 0) { %><dt><%= T.count %></dt><dd><%= s(rqty) %></dd><% } %>
+          </dl>
+        <% } %>
+
+        <% if (has(rsku) || has(rloc) || has(rrcpt) || has(rdesc)) { %>
+          <h3 class="gt-card-sub"><%= T.matched %></h3>
+          <dl class="gt-facts">
+            <% if (has(rdesc)) { %><dt>&nbsp;</dt><dd class="gt-strong gt-wrap"><%= s(rdesc) %></dd><% } %>
+            <% if (has(rsku))  { %><dt><%= T.sku %></dt><dd class="gt-mono"><%= s(rsku) %></dd><% } %>
+            <% if (has(rloc))  { %><dt><%= T.location %></dt><dd class="gt-mono"><%= s(rloc) %></dd><% } %>
+            <% if (has(rrcpt)) { %><dt><%= T.receipt %></dt><dd class="gt-mono"><%= s(rrcpt) %></dd><% } %>
+            <% if (has(rlevel)) { %><dt><%= T.level %></dt><dd><%= T.levels[s(rlevel)] || s(rlevel) %></dd><% } %>
+            <% if (Number(rpack) > 1) { %><dt><%= T.pack %></dt><dd><%= s(rpack) %></dd><% } %>
+          </dl>
+        <% } %>
+      </section>
+    <% } else { %>
+      <section class="gt-card gt-scan-empty"><%= T.noResult %></section>
+    <% } %>
+
+    <!-- ---- History subfile --------------------------------------- -->
+    <% if (rows.length > 0) { %>
+      <h2 class="gt-section-title">
+        <%= T.history %> <span class="gt-count"><%= rows.length %></span>
+      </h2>
+      <ul class="gt-scan-history">
+        <% rows.forEach(function (row) { %>
+          <li class="gt-scan-hist is-<%= s(row.skind).toLowerCase() %>">
+            <span class="gt-scan-hist-kind"><%= T.kinds[s(row.skind)] || s(row.skind) %></span>
+            <span class="gt-scan-hist-raw gt-mono"><%= s(row.sraw) %></span>
+            <span class="gt-scan-hist-meta">
+              <%= s(row.ssymb) %><% if (has(row.sdesc)) { %> &middot; <%= s(row.sdesc) %><% } %>
+            </span>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn" onclick="pui.submit({action:'CLEAR'})"><%= T.clear %></button>
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})"><%= T.back %></button>
+  </footer>
+</div>

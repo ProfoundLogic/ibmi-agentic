@@ -1,0 +1,209 @@
+/* ==================================================================
+ * Item Lookup -- detail.
+ *
+ * The brand showpiece. Imagery large and first; facts as stat tiles and
+ * chips rather than a form, because a wall of label/value pairs is exactly
+ * the green-screen look this application exists to replace.
+ * ================================================================== */
+
+.gt-detl-main { padding-bottom: var(--gt-gap); }
+
+/* ---- Carousel ---------------------------------------------------
+ * The strip is a CSS scroll-snap container, so the swipe is native and
+ * works with no JavaScript. gt-carousel.js only syncs the dots.
+ * ----------------------------------------------------------------- */
+.gt-car {
+  position: relative;
+  border-radius: var(--gt-radius);
+  overflow: hidden;
+  background: var(--gt-line);
+}
+
+.gt-car-strip {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.gt-car-strip::-webkit-scrollbar { display: none; }
+
+.gt-car-slide {
+  position: relative;
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  aspect-ratio: 1 / 1;
+  background: var(--gt-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gt-car-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gt-car-none { color: var(--gt-muted); font-size: 14px; font-weight: 600; }
+
+.gt-car-cap {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, .62));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 26px 12px 26px;
+  overflow-wrap: anywhere;
+}
+
+/* Arrows are for mouse users; on a phone the swipe is the interaction. */
+.gt-car-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px; height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .88);
+  color: var(--gt-ink);
+  font-size: 26px;
+  line-height: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, .25);
+}
+.gt-car-prev { left: 8px; }
+.gt-car-next { right: 8px; }
+.gt-car-nav:disabled { opacity: .35; }
+@media (hover: hover) and (min-width: 835px) {
+  .gt-car-nav { display: inline-flex; }
+}
+
+.gt-car-dots {
+  position: absolute;
+  left: 0; right: 0;
+  /* Above the caption gradient, not on top of the caption text. */
+  bottom: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.gt-car-dot {
+  width: 9px; height: 9px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .55);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .25);
+}
+.gt-car-dot.is-on { background: var(--gt-yellow); width: 22px; border-radius: 999px; }
+
+/* ---- Title and facts -------------------------------------------- */
+.gt-detl-info { padding-top: var(--gt-gap); min-width: 0; }
+
+.gt-detl-title {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 8px;
+  overflow-wrap: anywhere;
+}
+
+.gt-detl-sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--gt-gap);
+  font-size: 12px;
+  color: var(--gt-muted);
+}
+.gt-chip {
+  display: inline-block;
+  background: var(--gt-surface);
+  border: 1px solid var(--gt-line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: 11px;
+}
+.gt-chip-brand { background: var(--gt-yellow); border-color: var(--gt-yellow); color: #000; font-weight: 700; }
+.gt-detl-price { margin-left: auto; font-size: 18px; font-weight: 800; color: var(--gt-red); }
+
+/* Stat tiles. Four numbers is the whole inventory story at a glance. */
+.gt-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: var(--gt-gap);
+}
+.gt-stat {
+  background: var(--gt-card);
+  border: 1px solid var(--gt-line);
+  border-bottom: 3px solid var(--gt-red);
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+.gt-stat-n {
+  display: block;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.gt-stat-l {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--gt-muted);
+  overflow-wrap: anywhere;
+}
+
+/* ---- Location list ---------------------------------------------- */
+.gt-loc-list { list-style: none; margin: 0; padding: 0; }
+.gt-loc-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--gt-card);
+  border: 1px solid var(--gt-line);
+  border-left: 4px solid var(--gt-muted);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  min-width: 0;
+}
+.gt-loc-row.is-pick { border-left-color: var(--gt-red); }
+.gt-loc-row.is-bulk { border-left-color: #1D4ED8; }
+.gt-loc-row.is-stag { border-left-color: var(--gt-warn); }
+.gt-loc-row.is-retn { border-left-color: #6D28D9; }
+.gt-loc-row.is-damg { border-left-color: var(--gt-bad); }
+
+.gt-loc-id { flex: 0 0 auto; font-weight: 700; font-size: 14px; }
+.gt-loc-type { flex: 1 1 auto; min-width: 0; font-size: 12px; overflow-wrap: anywhere; }
+.gt-loc-type small { display: block; color: var(--gt-muted); font-size: 11px; }
+.gt-loc-qty { flex: 0 0 auto; text-align: right; }
+.gt-loc-qty strong { font-size: 16px; font-weight: 800; }
+.gt-loc-qty small { display: block; font-size: 11px; color: var(--gt-warn); }
+
+/* ---- Wider screens ----------------------------------------------
+ * Images left, facts right -- more columns, not wider ones.
+ * ----------------------------------------------------------------- */
+@media (min-width: 835px) {
+  .gt-detl-split {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--gt-pad);
+    align-items: start;
+  }
+  .gt-detl-info { padding-top: 0; }
+  .gt-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .gt-loc-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .gt-loc-row { margin-bottom: 0; }
+}
+
+@media (min-width: 1280px) {
+  .gt-detl-split { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+  .gt-detl-title { font-size: 26px; }
+  .gt-stat-n { font-size: 26px; }
+  .gt-loc-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

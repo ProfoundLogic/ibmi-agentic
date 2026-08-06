@@ -1,0 +1,131 @@
+/* ==================================================================
+ * GT Warehouse Mobile -- main menu tiles
+ *
+ * Responsive rule for this project: wider screens get MORE COLUMNS, never
+ * wider ones. A desktop showing two enormous tiles with acres of whitespace
+ * would fail the requirement just as badly as a phone that overflows.
+ *
+ * Every grid track uses minmax(0, 1fr) so that long French labels wrap
+ * instead of forcing the track wider than the viewport.
+ * ================================================================== */
+
+.gt-menu-heading {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gt-muted);
+  margin: 0 0 var(--gt-gap);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.gt-tiles {
+  display: grid;
+  gap: var(--gt-gap);
+  /* XS -- phone portrait. The S24 Ultra sits here at ~412px. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gt-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+  background: var(--gt-card);
+  border: 1px solid var(--gt-line);
+  border-bottom: 4px solid var(--gt-red);
+  border-radius: var(--gt-radius);
+  padding: 14px;
+  /* Comfortably past the 48px minimum -- these are the primary targets on
+   * the busiest screen in the app, and they get used wearing gloves. */
+  min-height: 132px;
+  min-width: 0;
+}
+
+.gt-tile:active { background: #FFF8DC; transform: translateY(1px); }
+
+.gt-tile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--gt-yellow);
+  color: var(--gt-black);
+  flex: 0 0 auto;
+}
+.gt-tile-icon svg { width: 24px; height: 24px; }
+
+.gt-tile-body { min-width: 0; }
+
+.gt-tile-title {
+  display: block;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.25;
+  /* French runs 15-25% longer than English, so titles must wrap cleanly
+   * rather than truncate -- a truncated task name is unusable. */
+  overflow-wrap: anywhere;
+}
+
+.gt-tile-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--gt-muted);
+  overflow-wrap: anywhere;
+}
+
+.gt-tile-badge {
+  display: inline-block;
+  margin-top: auto;
+  background: var(--gt-surface);
+  border: 1px solid var(--gt-line);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  color: var(--gt-muted);
+}
+.gt-tile-badge strong { color: var(--gt-red); font-size: 13px; }
+
+/* Work-in-progress tiles are marked honestly rather than looking finished. */
+.gt-tile.is-wip { border-bottom-color: var(--gt-line); }
+.gt-tile.is-wip .gt-tile-icon { background: var(--gt-line); color: var(--gt-muted); }
+.gt-tile-wip {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--gt-muted);
+  background: var(--gt-surface);
+  border: 1px solid var(--gt-line);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+/* SM -- phone landscape / small tablet portrait. */
+@media (min-width: 481px) {
+  .gt-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* MD -- tablet. */
+@media (min-width: 835px) {
+  .gt-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .gt-tile  { min-height: 150px; }
+  .gt-menu-heading { font-size: 16px; }
+}
+
+/* LG -- desktop and large displays. More columns, and type scaled up a step
+ * because this is the viewing-distance case. */
+@media (min-width: 1280px) {
+  .gt-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 1400px; }
+  .gt-tile  { min-height: 168px; padding: 18px; }
+  .gt-tile-title { font-size: 17px; }
+  .gt-tile-sub   { font-size: 13px; }
+}

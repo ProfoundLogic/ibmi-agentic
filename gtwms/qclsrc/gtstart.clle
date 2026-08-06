@@ -1,0 +1,23 @@
+/*==================================================================*/
+/*  GTSTART -- entry point for GT Warehouse Mobile.                  */
+/*                                                                   */
+/*  Called from option 4 of the sign-on menu, fully qualified as     */
+/*  TIGERPOC/GTSTART so that it is reachable no matter what is on    */
+/*  the library list at sign-on.                                     */
+/*                                                                   */
+/*  Its only job is to put TIGERPOC on the library list, so that     */
+/*  every program, display file and SQL table after this point       */
+/*  resolves through *LIBL and no application source ever names a    */
+/*  library. Change the library once here to deploy elsewhere.       */
+/*==================================================================*/
+
+             PGM
+
+             ADDLIBLE   LIB(TIGERPOC) POSITION(*FIRST)
+             /* CPF2103 -- already on the library list. Expected on a  */
+             /* second entry within the same session.                  */
+             MONMSG     MSGID(CPF2103)
+
+             CALL       PGM(GTMNUR)
+
+             ENDPGM

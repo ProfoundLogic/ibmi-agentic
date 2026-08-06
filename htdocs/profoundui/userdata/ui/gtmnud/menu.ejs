@@ -1,0 +1,173 @@
+<%
+/* ====================================================================
+ * GT Warehouse Mobile -- main menu
+ *
+ * i18n is resolved HERE, in the template, not by screen JavaScript. Two
+ * reasons: a JS file listed in the "js" array runs before this markup is in
+ * the DOM, and a screen that depends on JS to become readable renders as a
+ * blank white page if that JS fails to load. This screen is fully readable
+ * with no JavaScript at all -- the only script is the inline onclick that
+ * calls pui.submit.
+ *
+ * The language itself comes from RPG (langpref), so the toggle is a server
+ * round trip: RPG flips the operator's preference and the screen re-renders.
+ * ==================================================================== */
+
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: {
+    appName:   'GT Warehouse',
+    appSub:    'WAREHOUSE MOBILE',
+    signedIn:  'Signed in as',
+    choose:    'Choose a task',
+    item:      'Item Lookup',      itemSub:  'Scan a UPC or case code',
+    recv:      'Receiving',        recvSub:  'Scan a pallet label',
+    inv:       'Inventory',        invSub:   'Locations and moves',
+    cnt:       'Cycle Count',      cntSub:   'Blind count a location',
+    scan:      'Scan Lab',         scanSub:  'Identify any barcode',
+    supv:      'Supervisor',       supvSub:  'Progress and alerts',
+    puta:      'Putaway',          putaSub:  'Staging to storage',
+    sett:      'Settings',         settSub:  'Preferences',
+    open:      'open',
+    due:       'due',
+    alerts:    'alerts',
+    items:     'items',
+    soon:      'Coming soon',
+    signOff:   'Sign Off',
+    role:      { OPER: 'Operator', SUPV: 'Supervisor' }
+  },
+  FR: {
+    appName:   'GT Entrepôt',
+    appSub:    'ENTREPÔT MOBILE',
+    signedIn:  'Connecté en tant que',
+    choose:    'Choisissez une tâche',
+    item:      'Recherche d’article', itemSub: 'Balayer un CUP ou un code de caisse',
+    recv:      'Réception',        recvSub:  'Balayer une étiquette de palette',
+    inv:       'Inventaire',       invSub:   'Emplacements et transferts',
+    cnt:       'Dénombrement',     cntSub:   'Dénombrer un emplacement',
+    scan:      'Labo de balayage', scanSub:  'Identifier tout code à barres',
+    supv:      'Superviseur',      supvSub:  'Progression et alertes',
+    puta:      'Rangement',        putaSub:  'De la zone au stockage',
+    sett:      'Paramètres',       settSub:  'Préférences',
+    open:      'ouvertes',
+    due:       'à faire',
+    alerts:    'alertes',
+    items:     'articles',
+    soon:      'Bientôt',
+    signOff:   'Déconnexion',
+    role:      { OPER: 'Opérateur', SUPV: 'Superviseur' }
+  }
+}[lang];
+
+var num = function (v) {
+  var n = Number(v || 0);
+  /* French Canadian uses a space as the thousands separator. */
+  return n.toLocaleString(lang === 'FR' ? 'fr-CA' : 'en-CA');
+};
+
+var roleCode = (typeof operrole !== 'undefined' && operrole)
+             ? operrole.toString().trim() : 'OPER';
+
+/* built:false renders the tile as work-in-progress rather than pretending
+ * it works. Flip these to true as each application lands. */
+var tiles = [
+  { act: 'ITEM', t: T.item, s: T.itemSub, icon: 'search',  built: true,
+    badge: (typeof nitems  !== 'undefined' ? nitems  : 0), badgeLabel: T.items },
+  { act: 'RECV', t: T.recv, s: T.recvSub, icon: 'pallet',  built: false,
+    badge: (typeof nrcpts  !== 'undefined' ? nrcpts  : 0), badgeLabel: T.open },
+  { act: 'INV',  t: T.inv,  s: T.invSub,  icon: 'shelf',   built: false },
+  { act: 'CNT',  t: T.cnt,  s: T.cntSub,  icon: 'check',   built: false,
+    badge: (typeof ncounts !== 'undefined' ? ncounts : 0), badgeLabel: T.due },
+  { act: 'SCAN', t: T.scan, s: T.scanSub, icon: 'barcode', built: true },
+  { act: 'SUPV', t: T.supv, s: T.supvSub, icon: 'chart',   built: false,
+    badge: (typeof nreplen !== 'undefined' ? nreplen : 0), badgeLabel: T.alerts },
+  { act: 'PUTA', t: T.puta, s: T.putaSub, icon: 'box',     built: false },
+  { act: 'SETT', t: T.sett, s: T.settSub, icon: 'gear',    built: false }
+];
+
+var ICONS = {
+  search:  '<circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>',
+  pallet:  '<rect x="2" y="4" width="20" height="10" rx="1"/><line x1="2" y1="19" x2="22" y2="19"/><line x1="6" y1="14" x2="6" y2="19"/><line x1="18" y1="14" x2="18" y2="19"/>',
+  shelf:   '<rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/>',
+  check:   '<polyline points="4,13 9,18 20,6"/><line x1="4" y1="21" x2="20" y2="21"/>',
+  barcode: '<line x1="4" y1="5" x2="4" y2="19"/><line x1="8" y1="5" x2="8" y2="19"/><line x1="11" y1="5" x2="11" y2="19"/><line x1="15" y1="5" x2="15" y2="19"/><line x1="20" y1="5" x2="20" y2="19"/>',
+  chart:   '<line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="12" width="3" height="8"/><rect x="12" y="7" width="3" height="13"/><rect x="17" y="15" width="3" height="5"/>',
+  box:     '<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><line x1="3" y1="8" x2="21" y2="8"/><line x1="12" y1="3" x2="12" y2="21"/>',
+  gear:    '<circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>'
+};
+%>
+<div class="gt-app gt-menu-screen">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <%# Placeholder: the GT logo is a trademark and must not be recreated.
+          Replace this block with the approved reversed lockup artwork. %>
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text">
+        <%= T.appName %>
+        <small><%= T.appSub %></small>
+      </span>
+    </div>
+
+    <div class="gt-header-spacer"></div>
+
+    <div class="gt-operator">
+      <strong><%= (typeof opername !== 'undefined' && opername) ? opername : '' %></strong>
+      <span><%= T.role[roleCode] || roleCode %></span>
+    </div>
+
+    <div class="gt-lang">
+      <button type="button"
+              class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button"
+              class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (typeof msg !== 'undefined' && msg && msg.toString().trim()) { %>
+      <div class="gt-msg"><%= msg %></div>
+    <% } %>
+
+    <h1 class="gt-menu-heading"><%= T.choose %></h1>
+
+    <div class="gt-tiles">
+      <% tiles.forEach(function (tile) { %>
+        <button type="button"
+                class="gt-tile<%= tile.built ? '' : ' is-wip' %>"
+                onclick="pui.submit({action:'<%= tile.act %>'})">
+          <span class="gt-tile-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <%- ICONS[tile.icon] %>
+            </svg>
+          </span>
+          <span class="gt-tile-body">
+            <span class="gt-tile-title"><%= tile.t %></span>
+            <span class="gt-tile-sub"><%= tile.s %></span>
+          </span>
+          <% if (tile.badge !== undefined && Number(tile.badge) > 0) { %>
+            <span class="gt-tile-badge">
+              <strong><%= num(tile.badge) %></strong> <%= tile.badgeLabel %>
+            </span>
+          <% } %>
+          <% if (!tile.built) { %>
+            <span class="gt-tile-wip"><%= T.soon %></span>
+          <% } %>
+        </button>
+      <% }); %>
+    </div>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn gt-btn-primary"
+            data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})"><%= T.signOff %></button>
+  </footer>
+</div>

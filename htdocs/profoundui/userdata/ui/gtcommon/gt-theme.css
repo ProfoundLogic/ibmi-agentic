@@ -1,0 +1,337 @@
+/* ==================================================================
+ * GT Warehouse Mobile -- shared theme
+ *
+ * Brand tokens are from Giant Tiger's Logo Standard Guide 2025. The guide
+ * states the corporate colours cannot be changed, so they are declared once
+ * here and never overridden.
+ *
+ * Everything is scoped to .gt-app. There are deliberately NO html/body rules,
+ * no position:fixed and no 100vh -- these screens render inside Genie, and
+ * anything global fights the surrounding skin.
+ * ================================================================== */
+
+.gt-app {
+  /* ---- Brand (fixed) ---- */
+  --gt-red:        #E31837;   /* PMS 186 C */
+  --gt-yellow:     #FFCD00;   /* PMS 116 C */
+  --gt-black:      #000000;   /* Process Black */
+
+  /* ---- Neutrals (ours to choose) ---- */
+  --gt-surface:    #F7F7F5;
+  --gt-card:       #FFFFFF;
+  --gt-line:       #E4E4E1;
+  --gt-muted:      #6E6E69;
+  --gt-ink:        #2B2B2B;
+
+  /* ---- Semantic ---- */
+  --gt-good:       #127C3B;
+  --gt-warn:       #B45309;
+  --gt-bad:        var(--gt-red);
+
+  /* ---- Metrics. Touch targets are 48px minimum, primary actions 64px. ---- */
+  --gt-tap:        48px;
+  --gt-action:     64px;
+  --gt-radius:     14px;
+  --gt-gap:        12px;
+  --gt-pad:        16px;
+
+  /* Protected space around the logo == the width of the wordmark "N". */
+  --gt-logo-guard: 14px;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  color: var(--gt-ink);
+  background: var(--gt-surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+/* ------------------------------------------------------------------
+ * Genie resets.
+ *
+ * The stock Genie skin applies `div { white-space: nowrap; z-index: 10;
+ * padding: 1px }` globally. All three are actively hostile here: nowrap stops
+ * French text wrapping and makes translated screens overflow, and the z-index
+ * traps dropdowns inside stacking contexts. Reset all three, scoped to us.
+ *
+ * Genie only styles bare `div`, so only `div` needs the full reset. Wrapping
+ * the ancestor in :where() drops this to element-level specificity (0,0,1),
+ * which matters: written as `.gt-app div` it scores (0,1,1) and silently beats
+ * every component class that sets its own padding -- which is exactly how the
+ * header and footer lost theirs the first time round.
+ * ------------------------------------------------------------------ */
+:where(.gt-app) div {
+  white-space: normal;
+  z-index: auto;
+  padding: 0;
+}
+
+/* Wrapping is reset more broadly, since nowrap is what breaks French text. */
+:where(.gt-app) span,
+:where(.gt-app) section,
+:where(.gt-app) header,
+:where(.gt-app) footer,
+:where(.gt-app) main,
+:where(.gt-app) button {
+  white-space: normal;
+}
+
+.gt-app *,
+.gt-app *::before,
+.gt-app *::after { box-sizing: border-box; }
+
+.gt-app button { font: inherit; color: inherit; cursor: pointer; }
+
+/* ------------------------------------------------------------------
+ * Never let a form control fall below 16px.
+ *
+ * iOS zooms the whole page in when a focused input's font-size is under
+ * 16px, and the page then stays zoomed -- which is what makes an otherwise
+ * fine screen feel clunky on a phone. This is the correct fix: it costs
+ * nothing and, unlike user-scalable=0, it does not take pinch-zoom away
+ * from anyone who needs it.
+ *
+ * 16px is a FLOOR, not a style. Anything wanting to look smaller should
+ * change padding or weight, not font-size.
+ * ------------------------------------------------------------------ */
+.gt-app input,
+.gt-app select,
+.gt-app textarea {
+  font-size: max(16px, 1rem);
+}
+
+/* ------------------------------------------------------------------
+ * Header -- black band with the reversed lockup, per the brand guide.
+ * ------------------------------------------------------------------ */
+.gt-header {
+  background: var(--gt-black);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: var(--gt-gap);
+  padding: 10px var(--gt-pad);
+  border-bottom: 4px solid var(--gt-yellow);
+}
+
+/* Placeholder for the official lockup artwork.
+ * The Giant Tiger logo is a registered trademark that must not be recreated,
+ * so this deliberately does NOT redraw the wordmark. Drop the approved
+ * reversed PNG/SVG in here and delete the .gt-logo-mark rule. */
+.gt-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: var(--gt-logo-guard);
+  /* Shrinkable, NOT 0 0 auto. The French app subtitles are far longer than
+     the English ones -- "RECHERCHE D'ARTICLE" against "ITEM LOOKUP" -- and a
+     rigid logo block pushed the whole header past the viewport at 412px
+     while looking fine in English. */
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.gt-logo-mark {
+  background: var(--gt-yellow);
+  color: var(--gt-black);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.5px;
+  padding: 6px 9px;
+  border-radius: 6px;
+  line-height: 1;
+}
+.gt-logo-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.15;
+  letter-spacing: 0.3px;
+}
+.gt-logo-text small {
+  display: block;
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--gt-yellow);
+  letter-spacing: 0.6px;
+}
+
+.gt-header-spacer { flex: 1 1 auto; min-width: 0; }
+
+.gt-operator {
+  text-align: right;
+  font-size: 12px;
+  line-height: 1.3;
+  /* min-content, NOT 0. The greedy spacer beside this block was squeezing it
+     narrower than its longest word, so "James Okonkwo" broke as "Okonkw / o"
+     no matter which overflow-wrap was set -- the wrapping was a symptom, the
+     flex sizing was the cause. The spacer gives the room back. */
+  flex: 0 1 auto;
+  min-width: min-content;
+  overflow-wrap: break-word;
+}
+.gt-operator strong { display: block; font-size: 13px; }
+.gt-operator span   { color: #BDBDB8; }
+
+/* Below 400px there is genuinely not room for the logo, a name and the
+   language toggle at once. The name is the least load-bearing of the three,
+   so it goes rather than being mangled or pushing the toggle off-screen.
+   The S24 Ultra sits at ~412px, so the demo device keeps it. */
+@media (max-width: 399px) {
+  .gt-operator { display: none; }
+}
+
+/* Language toggle -- present on every screen, per the design. */
+.gt-lang {
+  display: flex;
+  border: 1px solid #4A4A46;
+  border-radius: 8px;
+  overflow: hidden;
+  flex: 0 0 auto;
+  min-height: var(--gt-tap);
+}
+.gt-lang button {
+  background: transparent;
+  color: #BDBDB8;
+  border: 0;
+  padding: 0 14px;
+  font-weight: 700;
+  font-size: 13px;
+  min-width: var(--gt-tap);
+}
+.gt-lang button.is-active {
+  background: var(--gt-yellow);
+  color: var(--gt-black);
+}
+
+/* ------------------------------------------------------------------
+ * Content and messages
+ * ------------------------------------------------------------------ */
+.gt-main { flex: 1 1 auto; padding: var(--gt-pad); min-width: 0; }
+
+.gt-msg {
+  background: #FFF8DC;
+  border-left: 5px solid var(--gt-yellow);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: var(--gt-gap);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.gt-msg.is-bad { background: #FDECEE; border-left-color: var(--gt-bad); }
+
+/* ------------------------------------------------------------------
+ * Footer action bar. Bottom-anchored on phones because that is where a
+ * thumb reaches; inline from tablet up.
+ * ------------------------------------------------------------------ */
+.gt-actions {
+  display: flex;
+  gap: var(--gt-gap);
+  padding: var(--gt-pad);
+  background: var(--gt-card);
+  border-top: 1px solid var(--gt-line);
+  /* Respects the iPhone home indicator without using position:fixed. */
+  padding-bottom: calc(var(--gt-pad) + env(safe-area-inset-bottom, 0px));
+}
+.gt-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: var(--gt-action);
+  border: 0;
+  border-radius: var(--gt-radius);
+  font-weight: 700;
+  font-size: 16px;
+  background: var(--gt-line);
+  color: var(--gt-ink);
+}
+.gt-btn-primary { background: var(--gt-red); color: #FFFFFF; }
+.gt-btn:active  { transform: translateY(1px); }
+
+@media (min-width: 835px) {
+  .gt-actions { justify-content: flex-end; }
+  .gt-btn     { flex: 0 0 auto; padding: 0 28px; }
+}
+
+/* ==================================================================
+ * Shared building blocks.
+ *
+ * These were originally written inside the Scan Lab stylesheet and then
+ * copied when Item Lookup reused them -- which is how the detail screen
+ * ended up with unstyled fact lists and oversized headings. They are
+ * shared, so they live here, once.
+ * ================================================================== */
+
+.gt-card {
+  background: var(--gt-card);
+  border: 1px solid var(--gt-line);
+  border-radius: var(--gt-radius);
+  padding: 14px;
+  margin-bottom: var(--gt-gap);
+}
+.gt-card-title,
+.gt-card-sub {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--gt-muted);
+}
+.gt-card-title { margin: 0 0 10px; }
+.gt-card-sub {
+  margin: 16px 0 8px;
+  border-top: 1px solid var(--gt-line);
+  padding-top: 12px;
+}
+
+.gt-section-title {
+  /* Generous top margin: this heading usually follows a fact list or a card
+     and read as glued to it without one. */
+  margin: 20px 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gt-muted);
+}
+.gt-count {
+  display: inline-block;
+  background: var(--gt-yellow);
+  color: var(--gt-black);
+  border-radius: 999px;
+  padding: 1px 9px;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+/* Label / value pairs. minmax(0, ...) so a long barcode wraps rather than
+ * forcing the grid wider than the viewport. */
+.gt-facts {
+  display: grid;
+  grid-template-columns: minmax(0, 40%) minmax(0, 1fr);
+  gap: 6px 12px;
+  margin: 0;
+  font-size: 14px;
+}
+.gt-facts dt {
+  color: var(--gt-muted);
+  font-size: 12px;
+  align-self: center;
+  overflow-wrap: anywhere;
+}
+.gt-facts dd { margin: 0; overflow-wrap: anywhere; }
+.gt-facts dd.is-good  { color: var(--gt-good); font-weight: 700; }
+.gt-facts dd.is-muted { color: var(--gt-muted); }
+
+.gt-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+.gt-wrap   { overflow-wrap: anywhere; word-break: break-all; }
+.gt-strong { font-weight: 700; }
+
+.gt-scan-empty { color: var(--gt-muted); font-size: 14px; text-align: center; }
+
+@media (min-width: 835px) {
+  .gt-facts { grid-template-columns: minmax(0, 30%) minmax(0, 1fr); }
+}

@@ -25,7 +25,9 @@ products2l.file: qddssrc/products2l.lf | productsp.file
 
 # Message file and menu
 menu.msgf: menu.msgf
-menu.menu: menu.msgf | menu.file
+# Both .file and .msgf must be NORMAL prerequisites -- with the .file as
+# order-only the .menu pattern does not match and the recipe is silently dropped.
+menu.menu: menu.file menu.msgf
 
 # Simple program
 hellor.pgm: qrpglesrc/hellor.rpgle qddssrc/hellod.dspf | hellod.file

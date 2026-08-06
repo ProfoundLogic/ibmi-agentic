@@ -1,0 +1,214 @@
+<%
+/* ====================================================================
+ * Item Lookup -- detail.
+ *
+ * The most graphical screen in the application and the one the demo opens
+ * with, so it is treated as the brand showpiece: large imagery first, then
+ * facts as chips and stat tiles rather than a form, then where the stock is.
+ *
+ * The carousel is a CSS scroll-snap strip. It swipes natively with no
+ * JavaScript; gt-carousel.js only syncs the dots. If that file never loads,
+ * the screen still works.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'ITEM LOOKUP',
+        onHand:'On hand', available:'Available', inBulk:'In bulk', locations:'Locations',
+        details:'Product details', sku:'SKU', dept:'Department', uom:'Unit',
+        casePack:'Case pack', weight:'Weight', dims:'Dimensions', retail:'Retail',
+        upc:'Consumer barcode', caseCode:'Case barcode',
+        whereIsIt:'Where is it', noStock:'No stock on hand anywhere',
+        loc:'Location', qty:'Qty', alloc:'Allocated', zone:'Zone',
+        back:'Back to results', menu:'Menu', noImage:'No image',
+        prev:'Previous image', next:'Next image',
+        depts:{GROC:'Grocery',CLEA:'Cleaning',HLTH:'Health & Beauty',HOME:'Home',
+               APPL:'Apparel',SEAS:'Seasonal',PETS:'Pet Supplies',TOYS:'Toys'},
+        types:{PICK:'Pick face',BULK:'Bulk',STAG:'Staging',RETN:'Returns',DAMG:'Damage'} },
+  FR: { appName:'GT Entrepôt', appSub:'RECHERCHE D’ARTICLE',
+        onHand:'En stock', available:'Disponible', inBulk:'En vrac', locations:'Emplacements',
+        details:'Détails du produit', sku:'UGS', dept:'Rayon', uom:'Unité',
+        casePack:'Qté par caisse', weight:'Poids', dims:'Dimensions', retail:'Prix',
+        upc:'Code à barres unitaire', caseCode:'Code à barres de caisse',
+        whereIsIt:'Où est-il', noStock:'Aucun stock nulle part',
+        loc:'Emplacement', qty:'Qté', alloc:'Réservé', zone:'Zone',
+        back:'Retour aux résultats', menu:'Menu', noImage:'Aucune image',
+        prev:'Image précédente', next:'Image suivante',
+        depts:{GROC:'Épicerie',CLEA:'Nettoyage',HLTH:'Santé et beauté',HOME:'Maison',
+               APPL:'Vêtements',SEAS:'Saisonnier',PETS:'Animalerie',TOYS:'Jouets'},
+        types:{PICK:'Emplacement de prélèvement',BULK:'Vrac',STAG:'Zone de transit',
+               RETN:'Retours',DAMG:'Avaries'} }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v, dp) {
+  return Number(v || 0).toLocaleString(loc, { minimumFractionDigits: dp || 0,
+                                              maximumFractionDigits: dp || 0 });
+};
+var money = function (v) {
+  return Number(v || 0).toLocaleString(loc, { style: 'currency', currency: 'CAD' });
+};
+var IMG = '/profoundui/userdata/ui/gtimg/';
+
+/* Only the image slots RPG actually filled. Four fields rather than a
+ * subfile because a carousel is a fixed, small number of images and a
+ * subfile would cost a second record format for no gain. */
+var imgs = [];
+[[typeof dimg1 !== 'undefined' ? dimg1 : 0, typeof dcap1 !== 'undefined' ? dcap1 : ''],
+ [typeof dimg2 !== 'undefined' ? dimg2 : 0, typeof dcap2 !== 'undefined' ? dcap2 : ''],
+ [typeof dimg3 !== 'undefined' ? dimg3 : 0, typeof dcap3 !== 'undefined' ? dcap3 : ''],
+ [typeof dimg4 !== 'undefined' ? dimg4 : 0, typeof dcap4 !== 'undefined' ? dcap4 : '']]
+  .forEach(function (p) { if (Number(p[0]) > 0) imgs.push({ id: Number(p[0]), cap: s(p[1]) }); });
+
+var rows = (typeof locsfl !== 'undefined' && locsfl) ? locsfl : [];
+%>
+<div class="gt-app gt-itemdetl-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main gt-detl-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg"><%= s(msg) %></div>
+    <% } %>
+
+    <div class="gt-detl-split">
+
+      <!-- ---- Carousel: CSS scroll-snap, works with no JS ---------- -->
+      <section class="gt-detl-media">
+        <div class="gt-car">
+          <div class="gt-car-strip">
+            <% if (imgs.length) { %>
+              <% imgs.forEach(function (im) { %>
+                <div class="gt-car-slide">
+                  <img src="<%= IMG %><%= im.id %>.jpg" alt="<%= im.cap %>" loading="lazy">
+                  <% if (im.cap) { %><span class="gt-car-cap"><%= im.cap %></span><% } %>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <div class="gt-car-slide"><span class="gt-car-none"><%= T.noImage %></span></div>
+            <% } %>
+          </div>
+
+          <% if (imgs.length > 1) { %>
+            <button type="button" class="gt-car-nav gt-car-prev"
+                    aria-label="<%= T.prev %>">&lsaquo;</button>
+            <button type="button" class="gt-car-nav gt-car-next"
+                    aria-label="<%= T.next %>">&rsaquo;</button>
+            <div class="gt-car-dots">
+              <% imgs.forEach(function (im, i) { %>
+                <button type="button" class="gt-car-dot<%= i === 0 ? ' is-on' : '' %>"
+                        aria-label="<%= i + 1 %>"></button>
+              <% }); %>
+            </div>
+          <% } %>
+        </div>
+      </section>
+
+      <!-- ---- Facts ------------------------------------------------ -->
+      <section class="gt-detl-info">
+        <h1 class="gt-detl-title"><%= s(typeof ddesc !== 'undefined' ? ddesc : '') %></h1>
+        <div class="gt-detl-sub">
+          <span class="gt-chip gt-chip-brand">
+            <%= T.depts[s(typeof ddept !== 'undefined' ? ddept : '')] || s(ddept) %>
+          </span>
+          <span class="gt-mono"><%= s(typeof dsku !== 'undefined' ? dsku : '') %></span>
+          <span class="gt-detl-price"><%= money(typeof dretail !== 'undefined' ? dretail : 0) %></span>
+        </div>
+
+        <div class="gt-stats">
+          <div class="gt-stat">
+            <span class="gt-stat-n"><%= num(typeof dtotoh !== 'undefined' ? dtotoh : 0) %></span>
+            <span class="gt-stat-l"><%= T.onHand %></span>
+          </div>
+          <div class="gt-stat">
+            <span class="gt-stat-n"><%= num(typeof dtotav !== 'undefined' ? dtotav : 0) %></span>
+            <span class="gt-stat-l"><%= T.available %></span>
+          </div>
+          <div class="gt-stat">
+            <span class="gt-stat-n"><%= num(typeof dbulk !== 'undefined' ? dbulk : 0) %></span>
+            <span class="gt-stat-l"><%= T.inBulk %></span>
+          </div>
+          <div class="gt-stat">
+            <span class="gt-stat-n"><%= num(typeof dnlocs !== 'undefined' ? dnlocs : 0) %></span>
+            <span class="gt-stat-l"><%= T.locations %></span>
+          </div>
+        </div>
+
+        <h2 class="gt-card-sub"><%= T.details %></h2>
+        <dl class="gt-facts">
+          <dt><%= T.uom %></dt><dd><%= s(typeof duom !== 'undefined' ? duom : '') %></dd>
+          <dt><%= T.casePack %></dt><dd><%= num(typeof dcasepk !== 'undefined' ? dcasepk : 0) %></dd>
+          <dt><%= T.weight %></dt>
+          <dd><%= num(typeof dweight !== 'undefined' ? dweight : 0, 3) %> kg</dd>
+          <dt><%= T.dims %></dt>
+          <dd><%= num(typeof dlen !== 'undefined' ? dlen : 0, 1) %> &times;
+              <%= num(typeof dwid !== 'undefined' ? dwid : 0, 1) %> &times;
+              <%= num(typeof dhgt !== 'undefined' ? dhgt : 0, 1) %> cm</dd>
+          <% if (has(typeof dupc !== 'undefined' ? dupc : '')) { %>
+            <dt><%= T.upc %></dt><dd class="gt-mono"><%= s(dupc) %></dd>
+          <% } %>
+          <% if (has(typeof dcase !== 'undefined' ? dcase : '')) { %>
+            <dt><%= T.caseCode %></dt><dd class="gt-mono"><%= s(dcase) %></dd>
+          <% } %>
+        </dl>
+      </section>
+    </div>
+
+    <!-- ---- Where is it ------------------------------------------- -->
+    <h2 class="gt-section-title">
+      <%= T.whereIsIt %> <span class="gt-count"><%= rows.length %></span>
+    </h2>
+
+    <% if (rows.length > 0) { %>
+      <ul class="gt-loc-list">
+        <% rows.forEach(function (row) { %>
+          <li class="gt-loc-row is-<%= s(row.ltype).toLowerCase() %>">
+            <span class="gt-loc-id gt-mono"><%= s(row.lloc) %></span>
+            <span class="gt-loc-type">
+              <%= T.types[s(row.ltype)] || s(row.ltype) %>
+              <small><%= T.zone %> <%= s(row.lzone) %></small>
+            </span>
+            <span class="gt-loc-qty">
+              <strong><%= num(row.lqty) %></strong>
+              <% if (Number(row.lalloc) > 0) { %>
+                <small><%= num(row.lalloc) %> <%= T.alloc %></small>
+              <% } %>
+            </span>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <section class="gt-card gt-scan-empty"><%= T.noStock %></section>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <%# Two ways out, both visible. Previously this screen offered only one
+      button labelled "Scan another", and because two formats rendered at once
+      it covered the search screen underneath -- so nothing but F3 worked. %>
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'BACK'})">&lsaquo; <%= T.back %></button>
+    <button type="button" class="gt-btn" data-fkey="F12"
+            onclick="pui.submit({action:'MENU'})"><%= T.menu %></button>
+  </footer>
+</div>
