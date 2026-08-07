@@ -66,7 +66,7 @@ const SCREENS = [
     pattern: 'gtitdd/itmdetl.ejs',
     tpl: 'gtitdd/itmdetl.ejs',
     css: ['gtcommon/gt-theme.css', 'gtitdd/itmdetl.css'],
-    js: ['gtcommon/gt-carousel.js'],
+    js: ['gtcommon/gt-carousel.js', 'gtcommon/gt-photo.js'],
     root: '.gt-itemdetl-screen',
   },
   {

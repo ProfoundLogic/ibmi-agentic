@@ -119,19 +119,69 @@ for (const SKIN of SKINS) {
   }
 
   /* Screen JS is snapshotted too, and going stale there is just as silent as
-   * a stale template -- the camera would simply stop working. */
-  const srcJs = fs.readFileSync(path.join(UI, 'gtcommon', 'gt-scan.js'), 'utf8');
-  const jsOk = await page.evaluate((expected) => {
+   * a stale template -- the camera or the scanner would simply stop working
+   * while the screen still looked perfectly fine.
+   *
+   * Each entry's snapshot is the concatenation of its js[] files in order, so
+   * the expected text is built the same way the generator builds it. */
+  var JS_SNAPSHOTS = [
+    { match: 'scnhome', files: ['gt-scan.js'] },
+    { match: 'itmdetl', files: ['gt-carousel.js', 'gt-photo.js'] },
+  ];
+
+  for (const snap of JS_SNAPSHOTS) {
+    const expected = snap.files
+      .map((f) => fs.readFileSync(path.join(UI, 'gtcommon', f), 'utf8'))
+      .join('\n;\n');
+    const jsOk = await page.evaluate(function (a) {
+      var e = (window.__gtwmsEntries || []).filter(function (x) {
+        return x.pattern.indexOf(a.match) !== -1;
+      })[0];
+      if (!e || !e.jsB64) return 'no js snapshot';
+      var bin = atob(e.jsB64);
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder('utf-8').decode(bytes) === a.expected ? true : 'mismatch';
+    }, { match: snap.match, expected: expected });
+    check(snap.match + ' js snapshot matches ' + snap.files.join(' + '),
+          jsOk === true, jsOk === true ? '' : String(jsOk));
+  }
+
+  /* The capture path has a hard dependency the shim cannot see: gt-photo.js
+   * must actually define the globals the template's inline onclick handlers
+   * call. A rename on either side is silent -- the button just does nothing.
+   * Run the snapshot and assert the contract. */
+  const photoApi = await page.evaluate(() => {
     var e = (window.__gtwmsEntries || []).filter(function (x) {
-      return x.pattern.indexOf('scnhome') !== -1;
+      return x.pattern.indexOf('itmdetl') !== -1;
     })[0];
     if (!e || !e.jsB64) return 'no js snapshot';
     var bin = atob(e.jsB64);
     var bytes = new Uint8Array(bin.length);
     for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-    return new TextDecoder('utf-8').decode(bytes) === expected ? true : 'mismatch';
-  }, srcJs);
-  check('gt-scan.js snapshot matches source', jsOk === true, jsOk === true ? '' : String(jsOk));
+    try { (new Function(new TextDecoder('utf-8').decode(bytes)))(); }
+    catch (err) { return 'threw: ' + err.message; }
+    if (!window.gtPhoto) return 'gtPhoto not defined';
+    var missing = ['pick', 'chosen', 'use', 'close'].filter(function (fn) {
+      return typeof window.gtPhoto[fn] !== 'function';
+    });
+    return missing.length ? 'missing: ' + missing.join(', ') : true;
+  });
+  check('gtPhoto exposes the handlers the template calls', photoApi === true,
+        photoApi === true ? '' : String(photoApi));
+
+  /* And the other direction: every gtPhoto.<fn> the template invokes from an
+   * inline attribute must exist on that API. */
+  const tplSrc = fs.readFileSync(path.join(UI, 'gtitdd', 'itmdetl.ejs'), 'utf8');
+  const called = [...new Set(
+    [...tplSrc.matchAll(/gtPhoto\.([A-Za-z_$][\w$]*)\s*\(/g)].map((m) => m[1])
+  )];
+  const known = ['pick', 'chosen', 'use', 'close'];
+  const unknownCalls = called.filter((c) => known.indexOf(c) === -1);
+  check('template calls only handlers gt-photo.js defines',
+        called.length > 0 && unknownCalls.length === 0,
+        unknownCalls.length ? 'unknown: ' + unknownCalls.join(', ')
+                            : 'calls: ' + called.join(', '));
 
   /* A non-matching URL must still go to the real network, or we would have
    * broken every other request on the page -- including the other projects'

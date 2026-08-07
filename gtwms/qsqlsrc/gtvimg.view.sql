@@ -1,8 +1,19 @@
 --  GT Warehouse Mobile -- item to image mapping.
 --
---  Imagery is generated per product FAMILY, not per item: 51 families, 102
---  images, shared across 408 item variants. A "1 kg" and a "2 kg" bag of the
---  same rice are the same photograph in any real catalogue too.
+--  An item's imagery comes from TWO places, and this view is what makes them
+--  look like one list to every program that reads it:
+--
+--    C  catalogue -- generated per product FAMILY, not per item: 51 families,
+--       102 images, shared across 408 item variants. A "1 kg" and a "2 kg" bag
+--       of the same rice are the same photograph in any real catalogue too.
+--
+--    P  photo     -- taken on the device by an operator standing in front of
+--       the actual stock, stored against THAT SKU alone. Damage, a relabelled
+--       carton, a pallet that does not look like the catalogue shot: the
+--       things a stock photograph can never show.
+--
+--  IMG_GROUP orders them, catalogue first, so the carousel still opens on the
+--  clean product shot with the operator's photos appended after it.
 --
 --  The demo-data generator lays items out sequentially, exactly 8 variants per
 --  family, and the SKU carries that sequence: GROC-000001 .. TOYS-000408.
@@ -18,12 +29,32 @@ SELECT i.sku,
        g.seq_no,
        g.caption_en,
        g.caption_fr,
-       g.byte_size
+       g.byte_size,
+       CAST('C' AS CHAR(1)) AS IMG_SOURCE,
+       CAST(0 AS SMALLINT)  AS IMG_GROUP
   FROM GTITEM i
   JOIN GTIMAGE g
     ON g.ref_type = 'ITEM'
    AND g.ref_key  = 'FAM' ||
-       RIGHT(DIGITS(((CAST(SUBSTR(i.sku, 6, 6) AS INTEGER) - 1) / 8) + 1), 4);
+       RIGHT(DIGITS(((CAST(SUBSTR(i.sku, 6, 6) AS INTEGER) - 1) / 8) + 1), 4)
+
+UNION ALL
+
+--  Operator photos key on the SKU itself. A SKU never looks like 'FAMnnnn', so
+--  the two arms cannot claim each other's rows and an item picks up only its
+--  own photographs.
+SELECT i.sku,
+       g.image_id,
+       g.seq_no,
+       g.caption_en,
+       g.caption_fr,
+       g.byte_size,
+       CAST('P' AS CHAR(1)) AS IMG_SOURCE,
+       CAST(1 AS SMALLINT)  AS IMG_GROUP
+  FROM GTITEM i
+  JOIN GTIMAGE g
+    ON g.ref_type = 'ITEM'
+   AND g.ref_key  = i.sku;
 
 --  RIGHT(), not SUBSTR(x, 6, 4): DIGITS() of an INTEGER returns TEN characters,
 --  so the value sits at position 7 and a fixed offset of 6 silently produced

@@ -207,3 +207,153 @@
   .gt-stat-n { font-size: 26px; }
   .gt-loc-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+/* ==================================================================
+ * Camera capture -- operator photographs of the actual stock.
+ *
+ * Everything here is scoped under .gt-itemdetl-screen. Genie owns the page:
+ * no html/body rules, no position:fixed, no 100vh. The overlay is absolutely
+ * positioned inside the screen wrapper instead, which is why the wrapper is
+ * made a positioning context below.
+ * ================================================================== */
+.gt-itemdetl-screen { position: relative; }
+
+/* ---- Camera button on the carousel ------------------------------ */
+.gt-itemdetl-screen .gt-car-add {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, .9);
+  border-radius: 50%;
+  background: var(--gt-red);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .35);
+}
+.gt-itemdetl-screen .gt-car-add:active { transform: scale(.94); }
+.gt-itemdetl-screen .gt-car-add svg { width: 24px; height: 24px; fill: currentColor; }
+.gt-itemdetl-screen .gt-car-add-plus { fill: var(--gt-yellow); }
+
+/* ---- Count + wide-screen button --------------------------------- */
+.gt-itemdetl-screen .gt-car-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.gt-itemdetl-screen .gt-car-count {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gt-muted);
+  overflow-wrap: anywhere;
+}
+/* The round button on the image is the primary control on a phone; the
+ * labelled one only earns its space once there is space. */
+.gt-itemdetl-screen .gt-car-add-wide { display: none; }
+@media (min-width: 640px) {
+  .gt-itemdetl-screen .gt-car-add-wide { display: inline-flex; }
+}
+
+/* ---- "Your photo" badge ----------------------------------------- */
+.gt-itemdetl-screen .gt-car-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--gt-yellow);
+  color: var(--gt-black);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+}
+
+/* The file input must stay in the layout for .click() to work reliably on
+ * mobile Safari, so it is hidden by size rather than by display:none. */
+.gt-itemdetl-screen .gt-photo-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---- Confirmation overlay --------------------------------------- */
+.gt-itemdetl-screen .gt-photo-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, .72);
+  padding: var(--gt-pad);
+  overflow: auto;
+}
+.gt-itemdetl-screen .gt-photo-overlay.is-open {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.gt-itemdetl-screen .gt-photo-panel {
+  width: 100%;
+  max-width: 520px;
+  margin: auto;
+  padding: 14px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .5);
+}
+.gt-itemdetl-screen .gt-photo-title {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 800;
+}
+.gt-itemdetl-screen .gt-photo-hint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--gt-muted);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.gt-itemdetl-screen .gt-photo-stage {
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  background: var(--gt-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.gt-itemdetl-screen .gt-photo-stage img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.gt-itemdetl-screen .gt-photo-status {
+  min-height: 18px;
+  margin: 8px 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gt-muted);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.gt-itemdetl-screen .gt-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.gt-itemdetl-screen .gt-photo-actions .gt-btn { flex: 1 1 auto; }
+.gt-itemdetl-screen .gt-photo-actions .gt-btn:disabled { opacity: .45; }

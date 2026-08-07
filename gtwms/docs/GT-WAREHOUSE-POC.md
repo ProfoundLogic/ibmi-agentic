@@ -1946,3 +1946,146 @@ labelled buttons:
 |--------|---------|
 | Scan / search | `Clear` · `‹ Menu` (F3) |
 | Detail | `‹ Back to results` (F3) · `Menu` (F12) |
+
+---
+
+## 33. Camera capture — operator photographs in the carousel
+
+The catalogue image shows what a product is *supposed* to look like. This adds
+what is *actually* on the pallet: a crushed carton, a relabelled case, a skid
+built wrong, water damage. The operator is already standing in front of it with
+a camera in their hand.
+
+### 33.1 The path a photograph takes
+
+```mermaid
+flowchart LR
+  A["Operator taps<br/>camera button"] --> B["Platform camera app<br/>&lt;input type=file capture&gt;"]
+  B --> C["gt-photo.js<br/>decode + resize ladder"]
+  C --> D["base64 &le; 23,000 chars"]
+  D --> E["IMGDATA<br/>char(24000) on GTITDD"]
+  E --> F["GTITDR<br/>action ADDIMG"]
+  F --> G["GTIMG_ADD"]
+  G --> H["BASE64_DECODE<br/>journaled BLOB in GTIMAGE<br/>ref_key = SKU"]
+  G --> I["GTIMG_PUBLISH<br/>C runtime open/write<br/>to the htdocs cache"]
+  H --> J["GTVITEMIMG<br/>img_source = 'P'"]
+  J --> K["Detail reloads —<br/>photo is in the carousel"]
+  I --> K
+```
+
+The whole thing completes on **one round trip**. The screen is simply re-read
+after the insert, so the new photograph comes back through the same view the
+catalogue imagery does and lands in the next free carousel slot. There is no
+special case in the render path — to the screen it is just another image.
+
+### 33.2 Why the payload rides on a display-file field
+
+There is no upload endpoint, and §29 explains why: every `/cgi-bin` alias on
+this server is hard-wired to a specific library, none can be pointed at
+TIGERPOC, and putting our objects in someone else's library was rejected.
+
+So the photograph travels the only channel that already exists — a field on the
+display file. That is a real constraint with real consequences:
+
+| Constraint | Consequence |
+|---|---|
+| `IMGDATA` is `char(24000)` | JPEG must come in under ~17 KB |
+| Field is EBCDIC-translated | Payload must be base64 (invariant alphabet only) |
+| Field ships back on every write | `IMGDATA` is cleared immediately after the insert |
+
+A display file **does** accept a 24,000-byte field — that was the first thing
+verified, before any other work, because the whole design collapses if it does
+not.
+
+### 33.3 The resize ladder
+
+`gt-photo.js` drops **resolution before quality**, because a slightly soft
+800px photo of a damaged carton is still useful and a 340px one at quality 0.30
+is not. The first rung that fits wins, so a small photo keeps its full quality:
+
+| Rung | Max edge | Quality |
+|---|---|---|
+| 1 | 1024 | 0.72 |
+| 2 | 900 | 0.66 |
+| 3 | 800 | 0.60 |
+| 4 | 700 | 0.52 |
+| 5 | 600 | 0.45 |
+| 6 | 500 | 0.40 |
+| 7 | 420 | 0.35 |
+| 8 | 340 | 0.30 |
+
+Past the last rung it refuses rather than storing mush.
+
+Measured on a 2400×1800, 908 KB source photograph: **rung 5 — 600×450, 12.5 KB,
+17,124 base64 characters**, comfortably inside the field.
+
+### 33.4 `<input type="file" capture>` rather than `getUserMedia`
+
+`gt-scan.js` uses `getUserMedia` because a barcode scanner needs a live frame
+loop. A photograph does not. Handing off to the platform's own camera app buys
+autofocus, exposure, HDR, flash, tap-to-focus and pinch-zoom for free, produces
+a far better picture than a `<video>` frame grab, and degrades to a file picker
+on a laptop with no camera — which is exactly what you want when demoing.
+
+### 33.5 `GTVITEMIMG` now unions two sources
+
+```
+img_source  img_group  ref_key         meaning
+----------  ---------  --------------  ---------------------------------
+C           0          'FAMnnnn'       catalogue, shared across a family
+P           1          the SKU itself  operator photograph of this item
+```
+
+`img_group` orders them, so the carousel still **opens on the clean product
+shot** with the operator's photographs appended. A SKU never looks like
+`FAMnnnn`, so the two arms cannot claim each other's rows.
+
+Carousel capacity is **8 slots** (`fetch first 8 rows only`). With two
+catalogue images that leaves room for six photographs before the oldest stop
+appearing. Raising it is a `MAX_IMGS` constant and eight more field triples —
+deliberately not done until there is a reason.
+
+### 33.6 Things that cost time
+
+**`codermake` passes no `BNDDIR` to `CRTSQLRPGI`.** Adding `gtimg.srvpgm` as a
+Rules.mk prerequisite is *not* enough — that controls build order, not the
+binder's search path. The bind failed with `CPD5D02: Definition not found for
+symbol 'GTIMG_ADD'` even though `DSPSRVPGM` showed the export present. The fix
+is in the source, where the rest of the project already does it:
+
+```rpgle
+ctl-opt bnddir('GTIMG');
+```
+
+**CL does not pad a character literal to the receiver's declared size.** The
+first capture test passed base64 as a `CALL ... PARM('...')` against a
+`char(30000)` parameter. It stored nothing, silently: the program read 30,000
+bytes out of a 4,560-byte buffer, the length guard saw garbage, and
+`GTIMG_ADD` returned 0 with no error anywhere. There is now a staging table,
+`GTIMGSTG`, and `GTIMGTST` takes no parameters at all.
+
+**The imagery targets depended on the wrong thing.** They had `gttables.file`
+as their prerequisite, but `gtseed.table.sql` opens with `DELETE FROM GTIMAGE`.
+On a fresh clone or a fresh container make would load 102 images and then the
+seed would wipe every one of them — invisible on an incremental build, because
+neither target re-runs. Corrected to depend on `gtseed.file`.
+
+**`gtimgspk.file` was a dead Rules.mk target.** Its source was never committed,
+so any build that reached it failed outright with *No rule to make target*.
+Removed.
+
+### 33.7 Verified
+
+| Check | Result |
+|---|---|
+| Display file accepts `char(24000)` | compiles |
+| Real ladder on a 908 KB / 2400×1800 photo | 600×450, 12.5 KB, 17,124 chars |
+| Payload survives the RDF datastream | 17,124 chars arrive intact |
+| `ADDIMG` stores and publishes | `image_id` 206 |
+| Served bytes vs. what the client encoded | **byte-identical**, 12,841 bytes |
+| `GTVITEMIMG` ordering | 2 × `C` (group 0), then `P` (group 1) |
+| Bilingual captions | `Photo d'entrepôt 2026-08-06` / `Warehouse photo …` |
+| Empty payload | rejected with a message, nothing stored |
+| `IMGDATA` after the add | length 0 — not shipped back |
+| Back navigation | still returns to the search results |
+| Shim, both skins | template + `gt-carousel.js` + `gt-photo.js` all current |

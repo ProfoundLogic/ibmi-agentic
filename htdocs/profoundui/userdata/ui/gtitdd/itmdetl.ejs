@@ -23,6 +23,11 @@ var T = {
         loc:'Location', qty:'Qty', alloc:'Allocated', zone:'Zone',
         back:'Back to results', menu:'Menu', noImage:'No image',
         prev:'Previous image', next:'Next image',
+        addPhoto:'Add photo', photoTitle:'Add a photo',
+        usePhoto:'Use this photo', retake:'Retake', cancel:'Cancel',
+        yourPhoto:'Your photo', images:'images', yours:'by you',
+        photoHint:'Photograph the stock as it actually is \u2014 damage, ' +
+                  'labelling, how the skid is built.',
         depts:{GROC:'Grocery',CLEA:'Cleaning',HLTH:'Health & Beauty',HOME:'Home',
                APPL:'Apparel',SEAS:'Seasonal',PETS:'Pet Supplies',TOYS:'Toys'},
         types:{PICK:'Pick face',BULK:'Bulk',STAG:'Staging',RETN:'Returns',DAMG:'Damage'} },
@@ -35,6 +40,11 @@ var T = {
         loc:'Emplacement', qty:'Qté', alloc:'Réservé', zone:'Zone',
         back:'Retour aux résultats', menu:'Menu', noImage:'Aucune image',
         prev:'Image précédente', next:'Image suivante',
+        addPhoto:'Ajouter une photo', photoTitle:'Ajouter une photo',
+        usePhoto:'Utiliser cette photo', retake:'Reprendre', cancel:'Annuler',
+        yourPhoto:'Votre photo', images:'images', yours:'par vous',
+        photoHint:'Photographiez la marchandise telle qu\u2019elle est \u2014 ' +
+                  'avaries, étiquetage, montage de la palette.',
         depts:{GROC:'Épicerie',CLEA:'Nettoyage',HLTH:'Santé et beauté',HOME:'Maison',
                APPL:'Vêtements',SEAS:'Saisonnier',PETS:'Animalerie',TOYS:'Jouets'},
         types:{PICK:'Emplacement de prélèvement',BULK:'Vrac',STAG:'Zone de transit',
@@ -53,15 +63,28 @@ var money = function (v) {
 };
 var IMG = '/profoundui/userdata/ui/gtimg/';
 
-/* Only the image slots RPG actually filled. Four fields rather than a
- * subfile because a carousel is a fixed, small number of images and a
- * subfile would cost a second record format for no gain. */
+/* Only the image slots RPG actually filled. Eight discrete fields rather
+ * than a subfile because a carousel is a fixed, small number of images and
+ * a subfile would cost a second record format for no gain.
+ *
+ * src 'C' is catalogue imagery, 'P' is a photograph an operator took of the
+ * real stock. They are badged differently so nobody mistakes a picture of a
+ * water-damaged carton for what the product is meant to look like. */
 var imgs = [];
-[[typeof dimg1 !== 'undefined' ? dimg1 : 0, typeof dcap1 !== 'undefined' ? dcap1 : ''],
- [typeof dimg2 !== 'undefined' ? dimg2 : 0, typeof dcap2 !== 'undefined' ? dcap2 : ''],
- [typeof dimg3 !== 'undefined' ? dimg3 : 0, typeof dcap3 !== 'undefined' ? dcap3 : ''],
- [typeof dimg4 !== 'undefined' ? dimg4 : 0, typeof dcap4 !== 'undefined' ? dcap4 : '']]
-  .forEach(function (p) { if (Number(p[0]) > 0) imgs.push({ id: Number(p[0]), cap: s(p[1]) }); });
+[[typeof dimg1 !== 'undefined' ? dimg1 : 0, typeof dcap1 !== 'undefined' ? dcap1 : '', typeof dsrc1 !== 'undefined' ? dsrc1 : ''],
+ [typeof dimg2 !== 'undefined' ? dimg2 : 0, typeof dcap2 !== 'undefined' ? dcap2 : '', typeof dsrc2 !== 'undefined' ? dsrc2 : ''],
+ [typeof dimg3 !== 'undefined' ? dimg3 : 0, typeof dcap3 !== 'undefined' ? dcap3 : '', typeof dsrc3 !== 'undefined' ? dsrc3 : ''],
+ [typeof dimg4 !== 'undefined' ? dimg4 : 0, typeof dcap4 !== 'undefined' ? dcap4 : '', typeof dsrc4 !== 'undefined' ? dsrc4 : ''],
+ [typeof dimg5 !== 'undefined' ? dimg5 : 0, typeof dcap5 !== 'undefined' ? dcap5 : '', typeof dsrc5 !== 'undefined' ? dsrc5 : ''],
+ [typeof dimg6 !== 'undefined' ? dimg6 : 0, typeof dcap6 !== 'undefined' ? dcap6 : '', typeof dsrc6 !== 'undefined' ? dsrc6 : ''],
+ [typeof dimg7 !== 'undefined' ? dimg7 : 0, typeof dcap7 !== 'undefined' ? dcap7 : '', typeof dsrc7 !== 'undefined' ? dsrc7 : ''],
+ [typeof dimg8 !== 'undefined' ? dimg8 : 0, typeof dcap8 !== 'undefined' ? dcap8 : '', typeof dsrc8 !== 'undefined' ? dsrc8 : '']]
+  .forEach(function (p) {
+    if (Number(p[0]) > 0) {
+      imgs.push({ id: Number(p[0]), cap: s(p[1]), src: s(p[2]).toUpperCase() });
+    }
+  });
+var nPhotos = imgs.filter(function (im) { return im.src === 'P'; }).length;
 
 var rows = (typeof locsfl !== 'undefined' && locsfl) ? locsfl : [];
 %>
@@ -99,6 +122,9 @@ var rows = (typeof locsfl !== 'undefined' && locsfl) ? locsfl : [];
               <% imgs.forEach(function (im) { %>
                 <div class="gt-car-slide">
                   <img src="<%= IMG %><%= im.id %>.jpg" alt="<%= im.cap %>" loading="lazy">
+                  <% if (im.src === 'P') { %>
+                    <span class="gt-car-badge"><%= T.yourPhoto %></span>
+                  <% } %>
                   <% if (im.cap) { %><span class="gt-car-cap"><%= im.cap %></span><% } %>
                 </div>
               <% }); %>
@@ -119,6 +145,34 @@ var rows = (typeof locsfl !== 'undefined' && locsfl) ? locsfl : [];
               <% }); %>
             </div>
           <% } %>
+
+          <%# Camera button sits ON the carousel, bottom-right, where the
+              thumb already is on a phone. Rendered unconditionally: if
+              gt-photo.js never loads it simply does nothing, rather than the
+              screen depending on JS to draw itself. %>
+          <button type="button" class="gt-car-add" title="<%= T.addPhoto %>"
+                  aria-label="<%= T.addPhoto %>"
+                  onclick="if(window.gtPhoto)gtPhoto.pick()">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 3 7.2 5H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0
+                       2-2V7a2 2 0 0 0-2-2h-3.2L15 3H9Zm3 5.5A4.5 4.5 0 1 1 7.5
+                       13 4.5 4.5 0 0 1 12 8.5Zm0 2A2.5 2.5 0 1 0 14.5 13 2.5
+                       2.5 0 0 0 12 10.5Z"/>
+              <path d="M19.5 2.5v2h2v1.5h-2v2H18v-2h-2V4.5h2v-2Z"
+                    class="gt-car-add-plus"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="gt-car-meta">
+          <span class="gt-car-count">
+            <%= imgs.length %> <%= T.images %><% if (nPhotos > 0) { %>
+              &middot; <%= nPhotos %> <%= T.yours %><% } %>
+          </span>
+          <button type="button" class="gt-btn gt-btn-ghost gt-car-add-wide"
+                  onclick="if(window.gtPhoto)gtPhoto.pick()">
+            <%= T.addPhoto %>
+          </button>
         </div>
       </section>
 
@@ -201,6 +255,34 @@ var rows = (typeof locsfl !== 'undefined' && locsfl) ? locsfl : [];
   </main>
 
   <input type="hidden" name="action" value="">
+  <input type="hidden" name="imgdata" id="gt-photo-data" value="">
+
+  <%# Camera capture. The file input hands off to the platform camera app,
+      which brings autofocus, flash and tap-to-focus with it, and falls back
+      to a file picker on a desktop with no camera. %>
+  <input type="file" id="gt-photo-file" accept="image/*" capture="environment"
+         class="gt-photo-file" onchange="if(window.gtPhoto)gtPhoto.chosen(this)">
+
+  <div class="gt-photo-overlay" id="gt-photo-overlay">
+    <div class="gt-photo-panel">
+      <h2 class="gt-photo-title"><%= T.photoTitle %></h2>
+      <p class="gt-photo-hint"><%= T.photoHint %></p>
+      <div class="gt-photo-stage">
+        <img id="gt-photo-preview" alt="">
+      </div>
+      <div class="gt-photo-status" id="gt-photo-status"></div>
+      <div class="gt-photo-actions">
+        <button type="button" class="gt-btn gt-btn-primary" id="gt-photo-use"
+                disabled onclick="if(window.gtPhoto)gtPhoto.use()">
+          <%= T.usePhoto %>
+        </button>
+        <button type="button" class="gt-btn"
+                onclick="if(window.gtPhoto)gtPhoto.pick()"><%= T.retake %></button>
+        <button type="button" class="gt-btn gt-btn-ghost"
+                onclick="if(window.gtPhoto)gtPhoto.close()"><%= T.cancel %></button>
+      </div>
+    </div>
+  </div>
 
   <%# Two ways out, both visible. Previously this screen offered only one
       button labelled "Scan another", and because two formats rendered at once

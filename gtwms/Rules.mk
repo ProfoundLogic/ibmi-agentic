@@ -98,19 +98,24 @@ gtscnr.pgm:  qrpglesrc/gtscnr.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtscnd.j
 #  htdocs/.../gtimg/ are a GENERATED CACHE, exported from the BLOBs by
 #  tools/export-images.js and safe to delete at any time.
 # ---------------------------------------------------------------------
-gtimgspk.file: qsqlsrc/gtimgspk.table.sql gttables.file
-
 #  Generated product imagery, one target per department. Regenerate with
 #  tools/gen-demo-images.js; the .sql files are committed so the build
 #  never needs node or a browser.
-gtimgappl.file: qsqlsrc/gtimgappl.table.sql gttables.file
-gtimgclea.file: qsqlsrc/gtimgclea.table.sql gttables.file
-gtimggroc.file: qsqlsrc/gtimggroc.table.sql gttables.file
-gtimghlth.file: qsqlsrc/gtimghlth.table.sql gttables.file
-gtimghome.file: qsqlsrc/gtimghome.table.sql gttables.file
-gtimgpets.file: qsqlsrc/gtimgpets.table.sql gttables.file
-gtimgseas.file: qsqlsrc/gtimgseas.table.sql gttables.file
-gtimgtoys.file: qsqlsrc/gtimgtoys.table.sql gttables.file
+#
+#  THESE DEPEND ON gtseed.file, NOT ON gttables.file. gtseed.table.sql opens
+#  with DELETE FROM GTIMAGE, so if the imagery loads first the seed wipes it
+#  and the carousel goes blank on every item. It is invisible on an
+#  incremental build -- the stamps are already current and neither target
+#  re-runs -- and only bites on a fresh clone or a fresh container, which is
+#  exactly when nobody is looking for it.
+gtimgappl.file: qsqlsrc/gtimgappl.table.sql gtseed.file
+gtimgclea.file: qsqlsrc/gtimgclea.table.sql gtseed.file
+gtimggroc.file: qsqlsrc/gtimggroc.table.sql gtseed.file
+gtimghlth.file: qsqlsrc/gtimghlth.table.sql gtseed.file
+gtimghome.file: qsqlsrc/gtimghome.table.sql gtseed.file
+gtimgpets.file: qsqlsrc/gtimgpets.table.sql gtseed.file
+gtimgseas.file: qsqlsrc/gtimgseas.table.sql gtseed.file
+gtimgtoys.file: qsqlsrc/gtimgtoys.table.sql gtseed.file
 
 .PHONY: gtimages
 gtimages: gtimgappl.file gtimgclea.file gtimggroc.file gtimghlth.file gtimghome.file gtimgpets.file gtimgseas.file gtimgtoys.file
@@ -130,6 +135,27 @@ gtvimg.file: qsqlsrc/gtvimg.view.sql gtimgappl.file gtimgclea.file gtimggroc.fil
 #  existing cfdemo screens already use.
 gtitmd.file: qddssrc/gtitmd.json
 gtitdd.file: qddssrc/gtitdd.json
-gtitdr.pgm:  qrpglesrc/gtitdr.sqlrpgle qddssrc/gtitdd.json | gtitdd.file gtvimg.file
+
+#  The detail screen also takes camera photos, so it binds GTIMG. Its display
+#  file carries a char(24000) IMGDATA field -- the payload channel, since no
+#  upload endpoint is reachable from TIGERPOC.
+gtitdr.pgm:  qrpglesrc/gtitdr.sqlrpgle qrpglesrc/gtimg_pr.rpgle qddssrc/gtitdd.json \
+             gtimg.srvpgm | gtitdd.file gtimg.bnddir gtvimg.file
 gtitmr.pgm:  qrpglesrc/gtitmr.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtitmd.json \
              gtbar.srvpgm gtitdr.pgm | gtitmd.file gtbar.bnddir gtvimg.file
+
+# ---------------------------------------------------------------------
+#  GTIMG -- camera capture. Stores the BLOB and writes the servable file
+#  itself, so a photo appears the instant it is taken.
+# ---------------------------------------------------------------------
+gtimg.module: qrpglesrc/gtimg.sqlrpgle qrpglesrc/gtimg_pr.rpgle | gttables.file
+gtimg.srvpgm: gtimg.module qsrvsrc/gtimg.bnd
+gtimg.bnddir: gtimg.bnddir | gtimg.srvpgm
+
+#  Proves decode -> BLOB -> IFS -> HTTP before any screen depends on it.
+#  Test fixtures, not application objects. GTIMGSTG is where the base64 is
+#  staged, because 17,000 characters cannot be typed at a green screen and a
+#  CL literal is not padded to the parameter's declared size.
+gtimgstg.file: qsqlsrc/gtimgstg.table.sql gttables.file
+gtimgtst.pgm:  qrpglesrc/gtimgtst.sqlrpgle qrpglesrc/gtimg_pr.rpgle gtimg.srvpgm \
+               | gtimg.bnddir gtimgstg.file
