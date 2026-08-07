@@ -648,3 +648,62 @@ CRTSRCPF FILE(PERPDEMO/QSQLSRC)  RCDLEN(112) TEXT('PERP - SQL source')
 
 `QDDLSRC` was missing at PERP-2 initial cutover and was created after
 the fact; keep it as part of the PERPDEMO bootstrap for future clones.
+
+## 16a. A message subfile only updates when its SFLCTL record is re-WRITE'n
+
+**Toggling the `*in40`-style RPG indicator that conditions `SFLDSP` has no
+visible effect unless the `SFLCTL` record itself is `WRITE`'n again** --
+changing the RPG variable is not enough; the device only re-evaluates a
+record's conditioning indicators when that specific record is the target
+of a `WRITE`/`EXFMT` operation. Found in `rcventr` (PERP-43): the header
+validation loop and the `receiveLine` edit-panel loop each set `*in40`
+based on `msgrrn` and then `EXFMT`'d a *different* format (`RHEAD` /
+`RLEDIT`) without an explicit `WRITE rmsgctl` first. Confirmed live: an
+invalid-PO-number error never appeared on screen at all, even though
+`writeMsg` had correctly written a row into the message subfile and
+`msgrrn` was correctly nonzero.
+
+Every PERP work-with program's *subfile* loop already gets this right
+(`write rlctl` / `write plctl` / `write bsctl` immediately before the
+`exfmt` of the same cycle) -- the bug only shows up in a program's
+*header entry* or *plain edit-panel* loop, which don't otherwise need to
+re-`WRITE` their own record before `EXFMT` (since `EXFMT` both writes and
+reads that record). The message subfile control record is a second,
+separate record that needs its own explicit `WRITE` every cycle if its
+indicators changed, regardless of what other record is being `EXFMT`'d
+in that same iteration.
+
+**Fix:** any loop that both (a) conditionally shows/hides the message
+subfile via an indicator and (b) `EXFMT`s a record other than the message
+`SFLCTL` itself must `WRITE` the message `SFLCTL` record explicitly,
+every iteration, before that `EXFMT` -- not just toggle the indicator
+variable. `poentr`'s and `reqentr`'s header-entry loops follow the same
+toggle-without-write shape as `rcventr`'s did before this fix and were
+likely never live-tested against a failing header validation (PERP-7's
+own verification notes cite the AIDEMO-menu-no-cmdline block as the
+reason interactive testing was skipped in favor of state-based SQL
+checks) -- worth a live retest and matching fix there if anyone is in
+that code again, but out of scope to change opportunistically here.
+
+## 17. CHECK constraints cannot cross tables
+
+A `CHECK` constraint's expression may only reference columns of the table
+being defined — DB2 for i (like every SQL-standard implementation) has no
+concept of a cross-table `CHECK`. Found in PERP-42: the ticket for
+`po_receipt_line` asked for "if `item.lot_controlled = 'Y'` then
+`lot_number IS NOT NULL`", which reads like an ordinary `CHECK` but
+`item.lot_controlled` lives on a different table than `lot_number`. There
+is no DDL syntax that expresses this — a subquery inside `CHECK` is
+rejected outright, and there's no cross-table trigger-like `CHECK` variant
+on this platform.
+
+**Fix: enforce it in the RPG program that inserts the row, not in DDL.**
+`rcventr` (PERP-43) looks up `item.lot_controlled` before `INSERT`ing into
+`po_receipt_line` and rejects the entry interactively if a lot-controlled
+item has no lot number entered. The column itself stays nullable in DDL
+(`lot_number` on `po_receipt_line`) — the invariant is real and enforced,
+just at the application layer instead of the database layer. This is a
+general rule, not specific to lots/receipts: any "if column A on table X
+then column B on table Y must be Z" business rule in a future PERP story
+needs the same treatment — don't spend time trying to express it as a
+table-level `CONSTRAINT` first.

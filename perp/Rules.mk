@@ -259,6 +259,50 @@ pobrwd.file: qddssrc/pobrwd.dspf
 pobrwr.pgm:  qrpglesrc/pobrwr.sqlrpgle qddssrc/pobrwd.dspf | pobrwd.file po_header.file po_line.file po_line_open.file po_line_schedule.file requisition_line.file vendor.file perp_user.file
 
 
+# --- PERP-8: Receiving & Reconciliation -----------------------------------
+# FK order: po_receipt (company, po_header, perp_user, code_master) before
+# po_receipt_line (po_receipt, po_line, item). reconciliation_log FKs item
+# only (no natural key -- IDENTITY surrogate, see DDL_STYLE_GUIDE.md Sec.5).
+po_receipt.file:      qddlsrc/po_receipt.table.sql      company.file po_header.file perp_user.file code_master.file | perpsjpf.pgm
+po_receipt_line.file: qddlsrc/po_receipt_line.table.sql po_receipt.file po_line.file item.file                       | perpsjpf.pgm
+reconciliation_log.file: qddlsrc/reconciliation_log.table.sql item.file                                              | perpsjpf.pgm
+
+# PO receipt entry program (header + open-lines subfile). Calls
+# docseq_next('RCP') for numbering; header is POSTED immediately (no DRAFT
+# workflow -- adding a receipt line IS the act of receiving). Per-line
+# action is subfile Option 1=Receive (not F6=Add) -- every receipt line
+# originates from an existing open po_line, unlike poentr/reqentr where F6
+# creates a brand-new row from nothing; option-based selection matches
+# poentr's own 2=Change/4=Delete and pobrwr's 5=Detail/9=Schedule idiom for
+# actions against an existing row. Converts vendor UOM -> inventory UOM via
+# item_uom_conversion, upserts item_lot for lot-controlled items, rolls
+# po_line.received_qty/status_code and po_header.status_code forward --
+# the PO-status-transition-from-receipts follow-up PERP-7's recap deferred
+# to this epic.
+rcventd.file: qddssrc/rcventd.dspf
+rcventr.pgm:  qrpglesrc/rcventr.sqlrpgle qrpglesrc/docseq_pr.rpgle qddssrc/rcventd.dspf | rcventd.file perp.bnddir po_receipt.file po_receipt_line.file po_header.file po_line.file item.file item_uom_conversion.file item_lot.file perp_user.file uom.file
+
+# Lot reconciliation service. Module + srvpgm + bnddir, same pattern as
+# docseq/itmvprcq/whcoord/reqauto. Scans lot-controlled items for one
+# company, compares item.qty_on_hand to SUM(item_lot.qty_on_hand), logs
+# and repairs (lot is the source of truth) any drift to reconciliation_log.
+lotrecon.module: qrpglesrc/lotrecon.sqlrpgle qrpglesrc/lotrecon_pr.rpgle | item.file item_lot.file reconciliation_log.file
+lotrecon.srvpgm: lotrecon.module qsrvsrc/lotrecon.bnd
+# perp.bnddir target already declared above (PERP-19 docseq section);
+# adding a new addbnddire entry there for lotrecon is enough.
+
+# Smoke-test caller for lotrecon -- CALL PERPDEMO/LOTRCNSMK PARM('ACM' 'CODERFLOW         ').
+lotrcnsmk.pgm: qrpglesrc/lotrcnsmk.sqlrpgle qrpglesrc/lotrecon_pr.rpgle lotrecon.srvpgm | perp.bnddir item.file item_lot.file reconciliation_log.file
+
+# Reconciliation log browse & inquiry. Filterable subfile (item, reconciled
+# by, date range on run_timestamp); Option 5 drills to a plain-record
+# detail showing before/after values + notes. No F6=Add -- this table is
+# populated exclusively by lotrecon, never by hand (same reasoning pobrwd
+# already applies: browse-only screens in this module omit F6).
+rcnbrwd.file: qddssrc/rcnbrwd.dspf
+rcnbrwr.pgm:  qrpglesrc/rcnbrwr.sqlrpgle qddssrc/rcnbrwd.dspf | rcnbrwd.file reconciliation_log.file item.file
+
+
 # --- PERP menus (glue for exploratory verification) -----------------------
 # GO PERPDEMO/PERPMNU is the single entry point. PERPMNU itself only holds
 # "Select company" + one option per child menu + Sign off -- the child
@@ -289,7 +333,7 @@ perpvndm.menu: perpvndm.msgf perpvndm.file | wrkvndr.pgm wrkivnr.pgm wrkivpr.pgm
 # PERP-19/27/32: service-program smoke testers
 perpdiag.file: qddssrc/perpdiag.dspf
 perpdiag.msgf: perpdiag.msgf
-perpdiag.menu: perpdiag.msgf perpdiag.file | docseqsmk.pgm ivprcqsmk.pgm whcoordsmk.pgm reqautosmk.pgm
+perpdiag.menu: perpdiag.msgf perpdiag.file | docseqsmk.pgm ivprcqsmk.pgm whcoordsmk.pgm reqautosmk.pgm lotrcnsmk.pgm
 
 # PERP-6/7/8: Requisitioning / Purchasing / Receiving each get their own
 # child menu under PERPMNU (see codermake menu note below). PERP-34 adds
@@ -305,11 +349,17 @@ perppom.file: qddssrc/perppom.dspf
 perppom.msgf: perppom.msgf
 perppom.menu: perppom.msgf perppom.file | poentr.pgm poreqr.pgm poschr.pgm pobrwr.pgm
 
+# PERP-8 Receiving child menu. Option 1 (rcventr, PERP-43), option 2
+# (rcnbrwr, reconciliation log browse, PERP-45).
+perprcvm.file: qddssrc/perprcvm.dspf
+perprcvm.msgf: perprcvm.msgf
+perprcvm.menu: perprcvm.msgf perprcvm.file | rcventr.pgm rcnbrwr.pgm
+
 # Top-level menu. Order-only on perpselr.pgm (called directly) and on the
-# 6 child .menu targets (routed to via GO PERPDEMO/<name>, not CALLed).
+# 7 child .menu targets (routed to via GO PERPDEMO/<name>, not CALLed).
 perpmnu.file: qddssrc/perpmnu.dspf
 perpmnu.msgf: perpmnu.msgf
-perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm perpsysm.menu perpinvm.menu perpvndm.menu perpdiag.menu perpreqm.menu perppom.menu
+perpmnu.menu: perpmnu.msgf perpmnu.file | perpselr.pgm perpsysm.menu perpinvm.menu perpvndm.menu perpdiag.menu perpreqm.menu perppom.menu perprcvm.menu
 
 
 # --- CL setup -------------------------------------------------------------

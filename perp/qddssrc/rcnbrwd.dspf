@@ -1,0 +1,92 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA12(12 'Cancel/Back')
+     A          R LSFL                       SFL
+     A  51                                  SFLNXTCHG
+     A            LSOPT          1A  B 11  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            LSID          10Y 0O 11  5EDTCDE(3)
+     A            LSITEM        25A  O 11 17
+     A            LSQBEF        11Y 4O 11 43EDTCDE(3)
+     A            LSQAFT        11Y 4O 11 57EDTCDE(3)
+     A            LSRCNBY       10A  O 11 70
+     A          R LCTL                       SFLCTL(LSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0006)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 22'Reconciliation Log Browse'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            LCOMPDSP       3A  O  2 11
+     A                                  3  2'Filter -- Item:'
+     A            FITEM         25A  B  3 18
+     A                                  3 46'Reconciled By:'
+     A            FRCNBY        18A  B  3 62
+     A                                  4  2'From date:'
+     A            FFRDT           L  B  4 13DATFMT(*ISO)
+     A                                  4 27'To date:'
+     A            FTODT           L  B  4 36DATFMT(*ISO)
+     A                                  4 50'(blank = no filter)'
+     A                                  6  2'Enter=Apply filter'
+     A                                  8  2'Type option, press Enter.'
+     A                                  9  4'5=Detail'
+     A                                 10  2'Opt'
+     A                                      DSPATR(UL)
+     A                                 10  5'ID'
+     A                                      DSPATR(UL)
+     A                                 10 17'Item'
+     A                                      DSPATR(UL)
+     A                                 10 43'Qty Before'
+     A                                      DSPATR(UL)
+     A                                 10 57'Qty After'
+     A                                      DSPATR(UL)
+     A                                 10 70'By'
+     A                                      DSPATR(UL)
+     A          R LFOOT
+     A                                      OVERLAY
+     A                                 23  2'F3=Exit  F5=Refresh  F12=Back'
+     A                                      COLOR(BLU)
+     A          R LNOROWS
+     A                                      OVERLAY
+     A                                 13 15'No reconciliation log entries -
+     A                                       match filter.'
+     A          R LDETAIL
+     A                                      OVERLAY
+     A                                  1 27'Reconciliation Detail'
+     A                                      DSPATR(HI)
+     A                                  2  2'ID:'
+     A            DDID          10Y 0O  2  7EDTCDE(3)
+     A                                  2 20'Item:'
+     A            DDITEM        25A  O  2 26
+     A                                  3  2'Run Timestamp:'
+     A            DDRUNTS       26A  O  3 17
+     A                                  5  2'Qty Before:'
+     A            DDQBEF        11Y 4O  5 14EDTCDE(3)
+     A                                  5 30'Lot Sum Before:'
+     A            DDLSUM        11Y 4O  5 46EDTCDE(3)
+     A                                  6  2'Qty After:'
+     A            DDQAFT        11Y 4O  6 14EDTCDE(3)
+     A                                  7  2'Reconciled By:'
+     A            DDRCNBY       18A  O  7 17
+     A                                  8  2'Notes:'
+     A            DDNOTES       70A  O  8  9
+     A                                 23  2'F5=Refresh  F12=Back'
+     A                                      COLOR(BLU)
+     A          R RMSGSFL                   SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R RMSGCTL                   SFLCTL(RMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)
