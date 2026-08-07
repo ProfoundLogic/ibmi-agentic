@@ -432,6 +432,22 @@ maintenance programs. These apply to every RPG or SQLRPGLE source under
   inside the statement text, or move the Date column comparison out
   of the WHERE clause entirely. `%date()` with no args (returns
   today) is always safe.
+- **A correctly-ranged sentinel default does not protect against a
+  user blanking the field.** Found in `pobrwr` again, 2026-08-07
+  (PERP-89): even with the `1940-2039` sentinel fix above already in
+  place, clearing the From/To date filter field on screen and
+  pressing Enter crashes with the identical `RNQ0114`. Blanking a
+  native DDS `L`-type field does not behave like clearing a character
+  field — it still produces *some* date value that has to pass the
+  *MDY range check, and no PERP program currently guards for it.
+  There is also no equivalent, for a blanked date field, of the
+  character-filter idiom (`:fstat = '' or ...`) that already lets
+  `fvnd`/`fbuy`/etc. mean "no filter" — `loadPOs`-style code applies
+  the date bounds unconditionally. Any optional/filter date field
+  needs to explicitly detect blank input before it reaches an SQL host
+  variable and decide what blank should mean (most likely: reapply
+  the sentinel), rather than assume 5250 will always hand back an
+  in-range value.
 - **Program/module/file object names cap at 10 characters — same as
   journal receivers (§7).** Learned again in PERP-32: naming a smoke-test
   caller `itmvprcqsmk.sqlrpgle` (11 chars) failed `CRTSQLRPGI` with
@@ -454,6 +470,35 @@ maintenance programs. These apply to every RPG or SQLRPGLE source under
   `CA03/CA05/CA06/CA12` once at file level.
 - **Standard F-key legend on every DSPF**: F3=Exit, F5=Refresh, F6=Add,
   F12=Cancel — declared at file level and echoed in the footer line.
+- **F12 means "back one screen in this program's own flow," never "end
+  the program."** Only F3 ends the program and returns to the menu. An
+  edit/add panel's `EXFMT` should `return` from its subroutine on
+  `*in12` (unwinding to redisplay the list/caller) — most PERP
+  programs already get this right for their edit panels (`WRKITMR`,
+  `WRKIVNR`, `WRKCNVR`, etc.). The mistake is at the *list* level:
+  `if *in03 or *in12; leave; endif;` on a top-level list/subfile
+  screen is correct ONLY when that screen is the true entry point of
+  the flow with nothing earlier to go back to (e.g. `PERPSELR`'s
+  company picker, or a program's own header-entry screen). Found live
+  on three programs where a *second* screen in the same flow made
+  this mistake instead — `reqentr`'s Requisition Lines list (PERP-85),
+  `poentr`'s Purchase Order Lines list (PERP-94), and `poschr`'s
+  Schedule list (PERP-95) — each exits straight to the menu on F12
+  from a screen that has an obvious "back" target (the header screen),
+  discarding the user's place even though the parent record is
+  already saved. Audit every `if *in03 or *in12` in a new or changed
+  program and ask: is this genuinely screen #1 of the flow?
+- **After a terminal action (Submit, Approve, Reject), navigate the
+  user somewhere useful — don't leave them staring at the now-locked
+  record.** Two programs `iter`ed back to redisplay the very screen
+  that had just been locked, with no way to start the next document
+  without exiting the whole program (`reqentr`'s F8=Submit, PERP-86;
+  `poentr`'s F8=Submit, PERP-93). Decide, for every finalize action,
+  what screen the user lands on next (a list of similar documents, or
+  a fresh entry screen for the same document type), and carry the
+  confirmation `writeMsg()` forward to whatever screen they land on —
+  see the `clearMsgs()` ordering note above; don't let it get wiped in
+  the transition.
 - **Message subfile** (`R xMSGSFL` / `R xMSGCTL`) attached at row 24 on
   every screen; RPG uses `QMHSNDPM` to post messages.
 - **`QMHSNDPM`'s message-key output parameter must be the DDS field bound
@@ -470,6 +515,23 @@ maintenance programs. These apply to every RPG or SQLRPGLE source under
   here breaks every message the program ever shows. Always pass the
   record's own `SFLMSGKEY` field, and double-check this any time you
   copy the `writeMsg`/`clearMsgs` boilerplate into a new program.
+- **`clearMsgs()` must run *before* an action handler's `writeMsg()`
+  in the same pass, never after.** The standard boilerplate calls
+  `clearMsgs()` once per loop iteration, ahead of that iteration's own
+  `EXFMT`, so a message queued during the *previous* pass survives to
+  be shown on the *next* one. If an F6/F8/etc. handler instead calls
+  `writeMsg()` and then `iter`s straight back to the top of the loop,
+  and `clearMsgs()` sits unconditionally at that same top, it wipes
+  `msgrrn` and clears the message subfile before the next `EXFMT` ever
+  displays the message the handler just queued — confirmation or error
+  text is queued and destroyed in the same pass, and the action looks
+  like it silently did nothing. Found in `wrkivpr` (PERP-74: the
+  F6=Add-with-blank-item warning never reaches the screen) and
+  suspected as a contributing factor in `reqaprr` (PERP-87:
+  Approve/Reject confirmations). `reqentr`'s line-list loop gets this
+  right — `clearMsgs()` sits *between* the F3/F12 check and the F6/F8
+  dispatch, not folded into the very top of the loop after them — use
+  that ordering as the reference shape when copying the boilerplate.
 - **The record format shown alongside (or right before) the message
   subfile must have `OVERLAY`**, or displaying/writing it clears the
   screen and erases the just-written message subfile before the user
@@ -535,6 +597,23 @@ maintenance programs. These apply to every RPG or SQLRPGLE source under
   business subfile in `reqaprr` without an actual interactive retest on
   this environment proving it renders** — a clean compile and a
   textbook-correct design have both already failed to predict this.
+
+  **Addendum, PERP-87 (2026-08-07):** live testing reports F6=Approve,
+  F7=Reject, *and* F12 all appearing to return to the menu instead of
+  back to the `ASFL`/`ASCTL` list, from the current (workaround)
+  `RDETAIL` design described above. Read in isolation, the RPG source
+  for all three (`reqaprr.sqlrpgle`'s `reviewReq` subroutine) looks
+  correct — each just `return`s to the outer loop, which should
+  redisplay the list, not end the program — so if this reproduces, it
+  is likely the *same* unconfirmed device-error class documented
+  above, now apparently reachable on the *return* path out of the
+  plain `RDETAIL` format rather than only on entry into a second
+  subfile. That would mean the current workaround has not fully
+  closed the underlying issue. Needs a live joblog check for an
+  escape message (`RNX1255`/`CPF5006`-class) at the point of return
+  before assuming this needs an RPG logic fix — don't spend a
+  redesign cycle on `reviewReq`'s branching logic until that's ruled
+  out.
 - **A `SFLCTL` record's `SFLDSPCTL` keyword combined with an
   input-capable (`B`) field positioned *below* the subfile's anchor row
   raises `CPD7812`: "Subfile control record overlaps subfile record"**
@@ -575,6 +654,29 @@ maintenance programs. These apply to every RPG or SQLRPGLE source under
     exactly one column (the decimal point) — leave at least that much
     headroom between adjacent fields packed onto the same row, or the
     compile will overlap/truncate.
+  - **That one-column allowance is not the whole story — compute the
+    field's *maximum* rendered width, including comma insertion,
+    before spacing columns.** `EDTCDE(3)` inserts a comma every 3
+    integer digits. A `15Y 4` field (13 integer digits) can render up
+    to 20 characters wide (13 digits + 4 commas + 1 decimal point + 4
+    decimals) — not just "16 digits + 1". Found overlapping in three
+    places once realistic (larger) values were entered: `pobrwd.dspf`'s
+    PO Detail line columns (Ord/Rcv/Open/Price only 9-10 columns
+    apart, PERP-90), `poentd.dspf`'s PO Lines Qty column running into
+    the UOM column (PERP-92), and `poreqd.dspf`'s Est Cost column
+    starting at column 73 with a 20-character max width — 12 columns
+    past the right edge of an 80-column screen, so it silently wraps
+    onto the next physical row (PERP-97, and suspected of breaking F6
+    option detection there since the wrap likely misaligns how the
+    web renderer maps keystrokes back to the right subfile record).
+    Work out the worst-case width for every `Y`-type field's digit
+    count before choosing its column, not just "+1 for the decimal."
+  - **Right-align the column heading over the field, not over its
+    start column.** A numeric field's value is right-justified within
+    its width; a heading positioned at the field's left edge reads as
+    "too far left" once real data appears (PERP-90, PERP-92, and
+    `wrkcnvd.dspf`'s Factor heading). Position heading text so it ends
+    at (or near) the field's rightmost column instead.
 - **Never issue `READC` against a subfile that was not written to this
   cycle.** If the load routine finds 0 rows this pass (e.g. an empty
   filter result, or the "enter a key value to begin" state before any
@@ -707,3 +809,26 @@ general rule, not specific to lots/receipts: any "if column A on table X
 then column B on table Y must be Z" business rule in a future PERP story
 needs the same treatment — don't spend time trying to express it as a
 table-level `CONSTRAINT` first.
+
+## 18. Screen-to-source coverage
+
+Every interactive screen a user can reach should have matching
+`.dspf`/`.sqlrpgle` source in this repo — the repo is the source of
+truth, and live testing/fixes are only possible for what's actually
+checked in here.
+
+**Found a gap, PERP-98 (2026-08-07):** the live "Receipt Entry" screen
+(PO Number, Vendor, PO Status, Receipt Date, Received By, Notes
+fields) has no corresponding source anywhere under `qddssrc/` or
+`qrpglesrc/` in this module — every other screen exercised during
+Phase 2 testing had matching source; this one didn't. Whatever object
+is actually running for it was not built from (or was never checked
+into) this repo.
+
+Before treating any live-reported bug as a source-level fix, confirm
+the screen's source actually exists here first. If it doesn't, that's
+its own finding — flag it rather than guessing at a fix, and don't
+pull the live object's source off the IBM i host to fill the gap (see
+the top-level environment rules); the gap itself needs a decision
+(locate the real source, or write a new one into this repo) before
+code work can start.
