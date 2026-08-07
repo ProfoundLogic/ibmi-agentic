@@ -1,0 +1,124 @@
+/* ==================================================================
+ * Receiving -- home.
+ *
+ * The camera stage, the reticle, the status line, the round icon buttons and
+ * the manual-entry row all come from gt-theme.css, shared with the Scan Lab.
+ * Only the receipt cards are specific to this screen.
+ * ================================================================== */
+
+/* ---- Receipt cards ----------------------------------------------
+ * A card, not a table row. On a phone a receipt is four facts and a progress
+ * bar, and the whole card is the tap target -- a link inside a card is a
+ * miss waiting to happen for someone wearing gloves.
+ * ----------------------------------------------------------------- */
+.gt-rcp-list {
+  list-style: none;
+  margin: 0 0 var(--gt-gap);
+  padding: 0;
+}
+
+.gt-rcp-card {
+  margin-bottom: 8px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+  /* Status as a left edge: readable at arm's length, and it survives being
+   * the only colour cue if the chips wrap away on a narrow phone. */
+  border-left: 5px solid var(--gt-line);
+  overflow: hidden;
+}
+.gt-rcp-card.is-open { border-left-color: var(--gt-muted); }
+.gt-rcp-card.is-part { border-left-color: var(--gt-yellow); }
+.gt-rcp-card.is-post { border-left-color: var(--gt-good); }
+
+/* The button is the card. Reset the control's own chrome and let it lay its
+ * children out; a button with display:grid is still a button. */
+.gt-rcp-hit {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.gt-rcp-hit:active { background: var(--gt-surface); }
+
+.gt-rcp-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.gt-rcp-id {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 17px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.gt-rcp-status {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+
+.gt-rcp-vend {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.gt-rcp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ---- Progress --------------------------------------------------
+ * A bar rather than "12 of 34", because this is read from across a dock
+ * door. The figures stay underneath for anyone who wants them.
+ * ----------------------------------------------------------------- */
+.gt-rcp-prog {
+  display: grid;
+  gap: 4px;
+}
+.gt-rcp-bar {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--gt-line);
+  overflow: hidden;
+}
+.gt-rcp-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gt-red);
+}
+.gt-rcp-card.is-post .gt-rcp-bar > span { background: var(--gt-good); }
+.gt-rcp-figs {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gt-muted);
+}
+
+/* ---- Wider screens ----------------------------------------------
+ * More cards side by side, not wider cards.
+ * ----------------------------------------------------------------- */
+@media (min-width: 835px) {
+  .gt-rcp-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .gt-rcp-card { margin-bottom: 0; }
+}
+
+@media (min-width: 1280px) {
+  .gt-rcp-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

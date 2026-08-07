@@ -28,6 +28,9 @@ end-pr;
 dcl-pr gtitmr extpgm;
 end-pr;
 
+dcl-pr gtrchr extpgm;
+end-pr;
+
 dcl-s done ind inz(*off);
 
 // Until GTSGNR (badge sign-on) lands, the menu runs as a known operator.
@@ -61,6 +64,10 @@ dow not done;
     when action = 'ITEM';
       // Item Lookup. Called, not chained, so exit lands back on the menu.
       gtitmr();
+
+    when action = 'RECV';
+      // Receiving. Scan the pallet label, confirm the lines, post.
+      gtrchr();
 
     when action = 'SCAN';
       // Scan Lab. Called rather than chained so the operator lands back

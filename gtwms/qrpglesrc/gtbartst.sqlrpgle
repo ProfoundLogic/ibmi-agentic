@@ -97,6 +97,12 @@ runCase('Empty scan'               : ''          : 'UNKNWN');
 runCase('AIM prefix stripped'      : ']C1' + %trim(gs1) : 'RCPT');
 runCase('Literal {GS} separator'   : '00' + %trim(sscc) + '01' + %trim(itf14) +
                                      '10' + 'L2026A17' + '{GS}' + '17' + '270131' : 'RCPT');
+// A BARE SSCC-18, no application identifier. Pallet labels are frequently
+// printed this way, and nothing here covered it: the payload was classified
+// SSCC-18 and then resolved as though it were an item barcode, so Receiving's
+// pallet scan found nothing. Only AI 00 inside a GS1-128 had ever populated
+// result.sscc.
+runCase('Bare SSCC-18, no AI'      : %trim(sscc) : 'RCPT');
 
 exec sql commit;
 

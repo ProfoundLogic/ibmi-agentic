@@ -1,0 +1,365 @@
+<%
+/* ====================================================================
+ * Receiving -- the line list.
+ *
+ * The screen that has to be perfect, because subfiles are where mobile RPG
+ * demos usually fall apart.
+ *
+ * SCAN-TO-CONFIRM is the primary interaction: the operator scans each carton
+ * and the matching line ticks up. Every card also carries an inline quantity
+ * box, so adjusting a number down never needs another screen.
+ *
+ * On a phone each line is a card. On a tablet or desktop the identical data
+ * becomes a table -- same record format, more columns, not wider ones.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'RECEIVING',
+        openCamera:'Open camera', closeCamera:'Close camera',
+        manual:'Scan or key a carton barcode', decode:'Go',
+        lines:'lines', confirmed:'confirmed', variances:'variances',
+        photos:'photos', door:'Door', po:'PO', pallet:'Pallet',
+        expected:'Expected', received:'Received', item:'Item', qty:'Qty',
+        status:'Status', apply:'Save quantities', confirmAll:'Confirm all as expected',
+        less:'Less', more:'More', inFull:'In full',
+        post:'Post receipt', posted:'This receipt is posted',
+        back:'Back', menu:'Menu', noLines:'This receipt has no lines',
+        statuses:{OPEN:'Not counted', MTCH:'Matched', SHRT:'Short',
+                  OVER:'Over', DAMG:'Damaged'},
+        hdrStatuses:{OPEN:'Not started', PART:'In progress', POST:'Posted'},
+        postConfirm:'Post this receipt? Stock goes to staging and the receipt closes.' },
+  FR: { appName:'GT Entrepôt', appSub:'RÉCEPTION',
+        openCamera:'Ouvrir la caméra', closeCamera:'Fermer la caméra',
+        manual:'Scannez ou saisissez un code de carton', decode:'Aller',
+        lines:'lignes', confirmed:'confirmées', variances:'écarts',
+        photos:'photos', door:'Porte', po:'BC', pallet:'Palette',
+        expected:'Prévu', received:'Reçu', item:'Article', qty:'Qté',
+        status:'Statut', apply:'Enregistrer les quantités',
+        confirmAll:'Tout confirmer comme prévu',
+        less:'Moins', more:'Plus', inFull:'Au complet',
+        post:'Valider la réception', posted:'Réception validée',
+        back:'Retour', menu:'Menu', noLines:'Cette réception n’a aucune ligne',
+        statuses:{OPEN:'Non comptée', MTCH:'Conforme', SHRT:'Manquant',
+                  OVER:'Excédent', DAMG:'Avarié'},
+        hdrStatuses:{OPEN:'Non commencée', PART:'En cours', POST:'Validée'},
+        postConfirm:'Valider cette réception ? Le stock va en transit et la réception se ferme.' }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v, dp) {
+  return Number(v || 0).toLocaleString(loc, { minimumFractionDigits: dp === undefined ? 0 : dp,
+                                              maximumFractionDigits: dp === undefined ? 0 : dp });
+};
+var IMG = '/profoundui/userdata/ui/gtimg/';
+
+var rows = (typeof linsfl !== 'undefined' && linsfl) ? linsfl : [];
+var isPosted = s(typeof hstat !== 'undefined' ? hstat : '') === 'POST';
+var hit = Number(typeof hitline !== 'undefined' ? hitline : 0);
+
+var nl = Number(typeof nlines !== 'undefined' ? nlines : 0);
+var nd = Number(typeof ndone  !== 'undefined' ? ndone  : 0);
+var progress = nl > 0 ? Math.round((nd / nl) * 100) : 0;
+
+var kind = s(typeof msgkind !== 'undefined' ? msgkind : '').toLowerCase();
+%>
+<div class="gt-app gt-rcvlines-screen" data-gt-lang="<%= lang %>"
+     data-gt-hit="<%= hit %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg<%= kind ? ' is-' + kind : '' %>"><%= s(msg) %></div>
+    <% } %>
+
+    <!-- ---- Receipt identity ------------------------------------- -->
+    <section class="gt-rcv-hdr">
+      <div class="gt-rcv-hdr-top">
+        <span class="gt-rcv-id gt-mono"><%= s(typeof hrcpt !== 'undefined' ? hrcpt : '') %></span>
+        <span class="gt-rcv-state is-<%= s(typeof hstat !== 'undefined' ? hstat : '').toLowerCase() %>">
+          <%= T.hdrStatuses[s(typeof hstat !== 'undefined' ? hstat : '')] || s(hstat) %>
+        </span>
+      </div>
+      <div class="gt-rcv-vend"><%= s(typeof hvend !== 'undefined' ? hvend : '') %></div>
+      <div class="gt-rcv-chips">
+        <% if (has(typeof hpo !== 'undefined' ? hpo : '')) { %>
+          <span class="gt-chip"><%= T.po %> <%= s(hpo) %></span>
+        <% } %>
+        <% if (has(typeof hdoor !== 'undefined' ? hdoor : '')) { %>
+          <span class="gt-chip gt-chip-brand"><%= T.door %> <%= s(hdoor) %></span>
+        <% } %>
+        <% if (has(typeof hsscc !== 'undefined' ? hsscc : '')) { %>
+          <span class="gt-chip gt-mono"><%= T.pallet %> <%= s(hsscc) %></span>
+        <% } %>
+      </div>
+    </section>
+
+    <%# THE PINNED BAND.
+        Progress, the camera and the scan box stay in frame while the lines
+        scroll underneath. Scanning is the primary interaction on this screen
+        and a 27-line receipt is several screens long, so a receiver who has
+        scrolled to line 20 must not have to scroll back up to scan the next
+        carton -- or to see how much of the pallet is done.
+
+        The scan row lives INSIDE .gt-scan-camera on purpose: the shared
+        component hides whichever of its two camera buttons does not match
+        .is-live using descendant selectors, so moving the controls out of it
+        would leave both buttons showing. %>
+    <div class="gt-rcv-top">
+
+    <div class="gt-rcv-sum">
+      <span class="gt-rcv-bar"><span style="width: <%= progress %>%"></span></span>
+      <span class="gt-rcv-figs">
+        <strong><%= num(nd) %>/<%= num(nl) %></strong> <%= T.confirmed %>
+        <% if (Number(typeof nvar !== 'undefined' ? nvar : 0) > 0) { %>
+          &middot; <strong class="is-var"><%= num(nvar) %></strong> <%= T.variances %>
+        <% } %>
+        <% if (Number(typeof nphoto !== 'undefined' ? nphoto : 0) > 0) { %>
+          &middot; <%= num(nphoto) %> <%= T.photos %>
+        <% } %>
+      </span>
+    </div>
+
+    <!-- ---- Scan a carton ---------------------------------------- -->
+    <% if (!isPosted) { %>
+      <div class="gt-scan-camera" id="gt-scan-camera">
+        <div class="gt-scan-stage">
+          <video id="gt-scan-video" muted playsinline></video>
+          <div class="gt-scan-frame" id="gt-scan-frame"></div>
+        </div>
+        <div class="gt-scan-status" id="gt-scan-status"></div>
+
+        <%# Camera button and scan box side by side, so the pinned band costs
+            one row rather than two. %>
+        <div class="gt-rcv-scanrow">
+        <div class="gt-scan-camctl">
+          <button type="button" class="gt-iconbtn gt-iconbtn-go" id="gt-scan-start"
+                  title="<%= T.openCamera %>" aria-label="<%= T.openCamera %>">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+              <circle cx="16" cy="18" r="5"/>
+            </svg>
+          </button>
+          <button type="button" class="gt-iconbtn gt-iconbtn-stop" id="gt-scan-stop"
+                  title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <g class="gt-icon-cam">
+                <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                <circle cx="15" cy="18" r="4.6"/>
+              </g>
+              <g class="gt-icon-ban">
+                <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+                <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+                <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+              </g>
+            </svg>
+          </button>
+        </div>
+
+        <div class="gt-scan-manual">
+          <label for="gt-scan-manual"><%= T.manual %></label>
+          <div class="gt-scan-manual-row">
+            <input type="text" id="gt-scan-manual" name="scanval"
+                   value="" autocomplete="off" autocapitalize="characters"
+                   spellcheck="false" inputmode="text">
+            <button type="button" class="gt-btn gt-btn-primary"
+                    onclick="pui.submit({action:'SCAN'})"><%= T.decode %></button>
+          </div>
+        </div>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="gt-msg is-good"><%= T.posted %></div>
+    <% } %>
+
+    </div><%# end of the pinned band %>
+
+    <!-- ---- The lines -------------------------------------------- -->
+    <% if (rows.length > 0) { %>
+      <%# The table head only exists at table widths; on a phone the cards
+          carry their own labels. Hidden by CSS rather than by a second
+          template, so there is one markup path to get right. %>
+      <div class="gt-lin-head">
+        <span><%= T.item %></span>
+        <span><%= T.expected %></span>
+        <span><%= T.received %></span>
+        <span><%= T.status %></span>
+      </div>
+
+      <ul class="gt-lin-list">
+        <% rows.forEach(function (row) { %>
+          <%
+            var st = s(row.lstat);
+            var isHit = hit > 0 && Number(row.lline) === hit;
+          %>
+          <li class="gt-lin-row is-<%= st.toLowerCase() %><%= isHit ? ' is-hit' : '' %>"
+              id="gt-lin-<%= s(row.lline) %>">
+
+            <span class="gt-lin-img">
+              <% if (Number(row.limg) > 0) { %>
+                <img src="<%= IMG %><%= s(row.limg) %>.jpg" alt="" loading="lazy">
+              <% } else { %>
+                <span class="gt-lin-noimg" aria-hidden="true"></span>
+              <% } %>
+            </span>
+
+            <span class="gt-lin-id">
+              <span class="gt-lin-desc"><%= s(row.ldesc) %></span>
+              <span class="gt-lin-sku gt-mono"><%= s(row.lsku) %></span>
+            </span>
+
+            <span class="gt-lin-exp">
+              <span class="gt-lin-lbl"><%= T.expected %></span>
+              <strong><%= num(row.lexp, 2) %></strong>
+              <small><%= s(row.luom) %></small>
+            </span>
+
+            <span class="gt-lin-rcv">
+              <span class="gt-lin-lbl"><%= T.received %></span>
+              <% if (isPosted) { %>
+                <strong><%= num(row.lrcv, 2) %></strong>
+              <% } else { %>
+                <%
+                  /* The stepper moves by a CASE, not by one: a line expecting
+                     864 eaches is not counted up in single taps. The case pack
+                     comes from the item master via the subfile, so the step is
+                     the real one rather than a number invented here. */
+                  var step = Number(row.lcase || 0) > 1 ? Number(row.lcase) : 1;
+                %>
+                <%# Big − and + either side of the box, with "receive in full"
+                    on the SAME line to their right. The native number-input
+                    spinners are a few pixels tall and unusable with a thumb,
+                    so they are suppressed in CSS and replaced with these.
+                    48px targets: a gloved hand on a dock.
+
+                    One row of four controls, so a card is one line of
+                    quantity work rather than two, and the status chip drops
+                    underneath where it is out of the way. %>
+                <span class="gt-lin-step">
+                  <button type="button" class="gt-step gt-step-down"
+                          title="<%= T.less %> <%= num(step) %>"
+                          aria-label="<%= T.less %> <%= num(step) %>"
+                          onclick="if(window.gtRcvLines)gtRcvLines.step(this,-1)">
+                    &minus;<% if (step > 1) { %><small><%= num(step) %></small><% } %>
+                  </button>
+
+                  <%# name is the subfile field, so RPG reads it back through
+                      READC -- no per-row round trip, and no separate screen
+                      just to change a number. %>
+                  <%# value is deliberately NOT localised. num() renders French
+                      as "24,00", and <input type="number"> silently discards
+                      any value that is not a valid floating-point literal --
+                      so every quantity box on the French screen came up EMPTY,
+                      and pressing Save would have written zeroes. A number
+                      input's value attribute is data, not display. %>
+                  <input type="number" class="gt-lin-qty"
+                         name="lqty" value="<%= Number(row.lrcv || 0).toFixed(2) %>"
+                         inputmode="decimal" step="any" min="0"
+                         data-gt-step="<%= step %>"
+                         data-gt-exp="<%= Number(row.lexp || 0) %>"
+                         data-gt-seq="<%= s(row.lseq) %>"
+                         data-gt-orig="<%= Number(row.lrcv || 0).toFixed(2) %>"
+                         aria-label="<%= T.received %> <%= s(row.lsku) %>">
+
+                  <button type="button" class="gt-step gt-step-up"
+                          title="<%= T.more %> <%= num(step) %>"
+                          aria-label="<%= T.more %> <%= num(step) %>"
+                          onclick="if(window.gtRcvLines)gtRcvLines.step(this,1)">
+                    +<% if (step > 1) { %><small><%= num(step) %></small><% } %>
+                  </button>
+
+                  <%# "Receive in full" for THIS line -- the common case for a
+                      clean line, one tap instead of counting up to 864. The
+                      receipt-level "Confirm all as expected" is still in the
+                      footer for a clean pallet. %>
+                  <button type="button" class="gt-lin-full"
+                          title="<%= T.inFull %> <%= num(row.lexp, 0) %>"
+                          onclick="if(window.gtRcvLines)gtRcvLines.full(this)">
+                    <%# The word only where it fits. Below 835px -- and in
+                        French, where "AU COMPLET" is twice the length of
+                        "IN FULL" -- a tick carries the same meaning in a
+                        quarter of the width, and the number underneath says
+                        what it will set. %>
+                    <span class="gt-lin-full-ck" aria-hidden="true">&#10003;</span>
+                    <span class="gt-lin-full-t"><%= T.inFull %></span>
+                    <span class="gt-lin-full-n"><%= num(row.lexp, 0) %></span>
+                  </button>
+                </span>
+              <% } %>
+            </span>
+
+            <span class="gt-lin-stat">
+              <span class="gt-lin-chip"><%= T.statuses[st] || st %></span>
+              <% if (Number(row.lphoto) > 0) { %>
+                <span class="gt-lin-pho"><%= num(row.lphoto) %></span>
+              <% } %>
+            </span>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <section class="gt-card gt-scan-empty"><%= T.noLines %></section>
+    <% } %>
+
+    <% if (!isPosted && rows.length > 0) { %>
+      <div class="gt-lin-acts">
+        <%# gtRcvLines.save() gathers the changed boxes into the payload
+            above and submits once. The fallback still submits, so the button
+            is never dead -- it simply reports that nothing changed. %>
+        <button type="button" class="gt-btn gt-btn-primary"
+                onclick="if(window.gtRcvLines){gtRcvLines.save()}else{pui.submit({action:'APPLY'})}"><%= T.apply %></button>
+        <button type="button" class="gt-btn"
+                onclick="pui.submit({action:'CONFALL'})"><%= T.confirmAll %></button>
+      </div>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <%# THE EDITS CHANNEL, and why it has to exist.
+      In an EJS Rich Display screen the SUBFILE ROWS ARE RENDERED BY THIS
+      TEMPLATE, not by Profound UI grid widgets. So every quantity box carries
+      the same name="lqty" with no record number attached anywhere, and the
+      runtime -- which derives its {SUBFILE}.rrn marker from its own grid
+      widgets -- has nothing to attach a row to. READC on this subfile can
+      therefore never see a browser edit, however the value was changed.
+
+      Instead the changed rows travel in ONE field as "seq:qty;seq:qty;", the
+      row index encoded exactly as this application already encodes it in the
+      PICKnn action codes. RPG parses it. %>
+  <input type="hidden" name="qtyedits" id="gt-qtyedits" value="">
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+    <% if (!isPosted && rows.length > 0) { %>
+      <%# Posting is irreversible, so it asks. gtRcvLines.post() falls back to
+          confirm() if the screen JS never arrived. %>
+      <button type="button" class="gt-btn gt-btn-post" data-fkey="F6"
+              onclick="if(window.gtRcvLines){gtRcvLines.post()}else if(confirm('<%= T.postConfirm %>')){pui.submit({action:'POST'})}">
+        <%= T.post %>
+      </button>
+    <% } %>
+  </footer>
+</div>

@@ -1199,25 +1199,29 @@ build-configuration change, and build configuration belongs to you rather than t
 
 ### 19.2 The menu shadow, and the trap in it
 
-To add option 4 without writing to the shared base library, we build our **own** `MENU` object into
-`TIGERPOC`, which shadows the base copy provided `TIGERPOC` precedes it on the library list.
+To add option 4 without writing to the shared base library, we build our **own** `MENU` object into a
+library that precedes `AIDEMOBASE` on the library list, where it shadows the base copy. That library
+is the **CoderFlow task library**, not `TIGERPOC` — `PUISETENV` already puts the task library first,
+and `TIGERPOC` only joins the list *after* option 4 is taken. **§25.3 has the verified mechanism and
+the per-task rebuild it requires; read it before touching the menu.**
 
 ```mermaid
 flowchart TD
-    A["Library list<br/>TIGERPOC first"] --> B["MENU resolves to<br/>TIGERPOC/MENU"]
+    A["Library list at sign-on<br/>task library first"] --> B["MENU resolves to<br/>AITSK000nn/MENU"]
     B --> C["Options 1, 2, 3<br/>call wrkcustr etc, unqualified"]
     C --> D["Resolve down the library list<br/>to the existing base programs"]
-    B --> E["Option 4<br/>calls GTSGNR in TIGERPOC"]
-    E --> F["Mobile application<br/>EJS from here on"]
+    B --> E["Option 4<br/>CALL TIGERPOC/GTSTART<br/>fully qualified"]
+    E --> G["GTSTART: ADDLIBLE TIGERPOC *FIRST"]
+    G --> F["GTMNUR — mobile application<br/>EJS from here on"]
 ```
 
 **The trap.** The existing menu's `Rules.mk` sits in a project whose other targets include data files
-such as `custp.file`. Building those into a fresh `TIGERPOC` would create **empty** copies that shadow
-the populated base data and break options 1–3. So:
+such as `custp.file`. Building those into a library that shadows `AIDEMOBASE` would create **empty**
+copies that hide the populated base data and break options 1–3. So:
 
-- Build **only** `menu.file`, `menu.msgf` and `menu.menu` from the existing project into `TIGERPOC`,
-  plus everything under `gtwms/`.
-- **Never** build the existing data files into `TIGERPOC`.
+- Build **only** `menu.file`, `menu.msgf` and `menu.menu` from the existing project into the task
+  library, plus everything under `gtwms/` into `TIGERPOC`.
+- **Never** build the existing data files into either library.
 - Name specific `codermake` targets. Never run a bare full build, which would pull in every module.
 
 There is also a known quirk in the menu build rule: the `.menu` pattern only matches when both the
@@ -1528,19 +1532,55 @@ The good news is that the initial menu resolves through `*LIBL`, so the shadowin
 plan in §19.2 works exactly as designed — a `MENU` object in a library ahead of
 `AIDEMOBASE` is what the operator sees.
 
-The catch is that `TIGERPOC` is not on that list, and the only mechanism that
-puts it there for interactive sessions is:
+`TIGERPOC` is not on that list. The obvious lever is the job description:
 
 ```
 CHGJOBD JOBD(AIDEMO/AIDEMO) INLLIBL(TIGERPOC AIDEMOBASE QGPL QTEMP DRPUIDEV)
 ```
 
-`AIDEMO` is a **shared** profile, so this affects every new AIDEMO interactive
-session, not just ours. It is additive, reversible with one command, and our
-`MENU` will be a strict superset of the existing one (options 1–3 unchanged,
-option 4 added), so the blast radius is small — but it is a shared-environment
-change and is called out here rather than made silently. Existing sessions are
-unaffected; only new ones pick up the change.
+**That route is closed, and not by policy — by authority:**
+
+```
+CPD1602: Not authorized to job description AIDEMO in library AIDEMO.
+CPF1625: Job description AIDEMO in library AIDEMO not changed.
+```
+
+`aidemo` cannot change its own job description. Which is just as well, since
+`AIDEMO` is a shared profile. The working answer needs **no environment change at
+all**, because `PUISETENV` already puts the **CoderFlow task library**
+(`AITSK000nn`) ahead of `AIDEMOBASE` on the interactive library list:
+
+| Step | Where it lives |
+|------|----------------|
+| Sign-on resolves the initial menu via `*LIBL/MENU` | — |
+| Shadowed `MENU` — display file, message file, menu | **the task library**, `IBMI_BUILD_LIBRARY` |
+| Option 4 runs `CALL TIGERPOC/GTSTART` — **fully qualified** | `menu.msgf`, so no LIBL dependency |
+| `GTSTART` does `ADDLIBLE TIGERPOC *FIRST`, then `CALL GTMNUR` | everything downstream resolves via `*LIBL` |
+
+Every persistent application object stays in `TIGERPOC`. Nothing shared is
+touched, and no `CHGJOBD`, `CHGUSRPRF` or `CHGCURLIB` is needed.
+
+> ### The one per-task chore this creates
+>
+> The task library **changes with every CoderFlow task** — `AITSK00071`,
+> `AITSK00072`, and so on — and the old one is not on the new session's library
+> list. So the `MENU` shadow has to be **rebuilt into the current task library at
+> the start of any task that needs to reach the app from the menu**:
+>
+> ```bash
+> rm -f build/menu.file build/menu.msgf build/menu.menu   # stamps are not keyed by library
+> codermake menu.menu                                     # default IBMI_BUILD_LIBRARY = task library
+> ```
+>
+> The `rm` is not optional. codermake's stamps record *that* a target was built,
+> not *which library* it went to, so a stamp left over from the previous task
+> makes `menu.menu` look current and the build silently does nothing — leaving
+> option 4 missing with no error to explain it.
+>
+> **Do not build the shadow into `TIGERPOC`.** `TIGERPOC` is not on the library
+> list at sign-on time — `GTSTART` only adds it *after* option 4 is taken — so a
+> `MENU` there is never found, and it also creates a duplicate that makes a later
+> session think the shadow is present when it isn't.
 
 ### 25.4 Next
 
@@ -2019,13 +2059,64 @@ Past the last rung it refuses rather than storing mush.
 Measured on a 2400×1800, 908 KB source photograph: **rung 5 — 600×450, 12.5 KB,
 17,124 base64 characters**, comfortably inside the field.
 
-### 33.4 `<input type="file" capture>` rather than `getUserMedia`
+### 33.4 `getUserMedia` with a file-input fallback — revised
 
-`gt-scan.js` uses `getUserMedia` because a barcode scanner needs a live frame
-loop. A photograph does not. Handing off to the platform's own camera app buys
-autofocus, exposure, HDR, flash, tap-to-focus and pinch-zoom for free, produces
-a far better picture than a `<video>` frame grab, and degrades to a file picker
-on a laptop with no camera — which is exactly what you want when demoing.
+This started as `<input type="file" capture>`, on the reasoning that handing off
+to the platform camera app buys autofocus, exposure, HDR, flash, tap-to-focus
+and pinch-zoom for free and degrades to a file picker on a laptop.
+
+**Reversed after testing on the device.** Those are real gains, but they are
+bought with the one thing that matters on a warehouse floor: on Android the
+operator got an intermediate *camera or gallery?* chooser, and on a desktop a
+plain file dialog. Neither is "press the button, take the picture" while
+standing in front of a crushed carton.
+
+So the camera button now opens a **live `getUserMedia` stream inside the panel**
+with an explicit shutter — the same path `gt-scan.js` uses, and the same
+camera-with-a-no-entry-badge icon to close it, so the gesture reads identically
+on both screens. The `<input type="file">` is still present and still wired, but
+it is reached **only** when `getUserMedia` is refused: no camera on the machine,
+or a non-secure origin. Nothing ever opens a file dialog on its own; the
+fallback surfaces a *Choose a file* button and says why.
+
+One shrink ladder serves both paths, so the `char(24000)` guarantee holds
+however the photograph arrived. The camera is released the instant the shutter
+fires — leaving it streaming behind a still costs battery and leaves the
+recording indicator lit for nothing.
+
+**`getUserMedia` needs a secure origin.** It works here because Genie is served
+over HTTPS. If that ever changes, every device silently lands on the fallback
+and the status line explains it rather than failing blank.
+
+### 33.4a The camera button lives on the image, at every width
+
+It overlays the **bottom-left** corner of the carousel at `z-index: 21`. Three
+things had to be got right, and two of them had been wrong:
+
+- **Left, not right.** The right edge is where the *next* arrow sits; on a
+  narrow phone the two overlapped.
+- **It must never be hidden by a breakpoint.** There used to be a second,
+  labelled *Add photo* button below the carousel that appeared at 640px, and
+  the round one on the image was the only control below that. A breakpoint was
+  deciding whether an operator could add a photo at all. The labelled duplicate
+  is gone; there is now exactly one camera button, present at every width.
+- **The carousel arrows persist too.** They were gated behind
+  `(hover: hover) and (min-width: 835px)` on the reasoning that a phone swipes
+  instead. Wrong in practice: the swipe is not discoverable, and a gloved hand
+  is worse at it than at a 44px target. Swipe still works; the arrows are now
+  additive, and 38px on a narrow phone.
+
+**State a `z-index` above 10 explicitly for anything sitting on the image.** The
+stock Genie skin applies `div { z-index: 10 }` to bare divs, and although
+`gt-theme.css` resets it, both selectors score (0,0,1) — so which wins depends
+on the order the skin happens to load its stylesheets. The carousel slides are
+bare divs. A button at `z-index: 3` is a button that may or may not be clickable
+depending on the skin, which is not a thing to leave to chance.
+
+`gtwms/tools/preflight-item.js` now hit-tests `.gt-car-add`, `.gt-car-prev` and
+`.gt-car-next` at 360/412/1280 in both languages — it taps each centre point and
+fails if the element is missing, zero-sized, or if something else answers the
+tap. A visible-but-covered button photographs perfectly and does nothing.
 
 ### 33.5 `GTVITEMIMG` now unions two sources
 
@@ -2089,3 +2180,284 @@ Removed.
 | `IMGDATA` after the add | length 0 — not shipped back |
 | Back navigation | still returns to the search results |
 | Shim, both skins | template + `gt-carousel.js` + `gt-photo.js` all current |
+
+Then again after the switch to a live camera, driven headlessly against a
+synthetic Chromium camera by `gtwms/tools/test-photo-capture.js` — which serves
+and executes the **real** `gt-photo.js`, not a copy of its logic:
+
+| Check | Result |
+|---|---|
+| Camera button position | bottom-left of the carousel, `x=27` at 412px |
+| Button opens a live camera | `is-live`, 1920×1080, streaming |
+| **A file chooser is never raised** | confirmed on open, on retake, throughout |
+| Shutter produces a still | `data:image/jpeg`, 1024×576 |
+| Payload vs. `IMGDATA` char(24000) | 9,404 base64 chars, inside the 23,000 cap |
+| Camera released after capture | `srcObject` cleared |
+| Retake returns to live | `is-live` again, still no file dialog |
+| Close-camera | panel closed, tracks stopped |
+| No camera present | falls back, *Choose a file* offered, **no dialog opened unasked** |
+| Controls hit-tested at 360/412/1280, EN and FR | camera button and both arrows answer their own taps |
+
+That last row is the one that matters for the regression: the check taps each
+control's centre point, so it fails on a hidden control *and* on a covered one.
+Verified to fail correctly by re-introducing both old faults — the 835px arrow
+gate, and a slide painted over the button.
+
+---
+
+## 34. Build log — Receiving (menu tile 2)
+
+The flagship application, and the one the customer described first: *"scan
+something on the pallet coming in, show all the items in that receipt for us to
+confirm numbers or adjust numbers down."*
+
+### 34.1 What was built
+
+| Object | Role |
+|---|---|
+| `GTVRCVLIN` | one row per receipt line, ready to render — description in both languages, and the line's catalogue thumbnail, so the subfile needs no per-row query |
+| `GTVRCVOPEN` | receipts a receiver can work on; excludes posted ones in the view, so the list and its count cannot disagree |
+| `GTRCHD` / `GTRCHR` | `rcvhome` — scan the pallet label, or tap a receipt |
+| `GTRCLD` / `GTRCLR` | `rcvlines` — scan-to-confirm, inline quantity adjust, post |
+| `gt-rcvlines.js` | scroll-to-the-scanned-line, beep and haptic, post confirmation |
+
+Three ways into a receipt, in the order a receiver would try them: scan the
+pallet label, key the receipt or PO when the label has peeled off, or tap a card.
+
+**A case barcode means a case.** A scanned ITF-14 increments by the item's case
+pack; a GS1-128 carrying AI 30/37 increments by the quantity it states; an each
+increments by one. Verified live: one scan of `10614141003799` moved line 1 from
+0 to 12, not to 1. This is the difference between a receiver trusting the app and
+quietly counting on paper alongside it.
+
+### 34.2 Posting is one unit of work
+
+Movement rows, the balance upsert into staging, untouched lines, the header and
+the pallet — all inside one commit boundary, with every statement checked and a
+`ROLLBACK` on any failure. The balance upsert is an `UPDATE` then an `INSERT`
+rather than a `MERGE`, and in that order: insert first and the update
+double-counts.
+
+Verified against the database rather than the screen — three independently
+computed totals agreeing is the check that matters:
+
+| Check | Result |
+|---|---|
+| `GTMOVEMENT` rows for the receipt | 15, one per line |
+| `GTINVBAL` rows at `STAGE01` | 15 |
+| sum received = sum moved = sum on hand | **3788.00 = 3788.00 = 3788.00** |
+| Header | `POST`, `received_by` `GT001` |
+| Pallet | `RECV` at `STAGE01` |
+| Open-receipt count | 8 → 7 |
+| Reopening a posted receipt | read-only, scan refused with a message |
+
+### 34.3 Four findings
+
+**`CPF5021` on the first run — the subfile CLEAR writes the RECORD FORMAT, not
+the subfile record.** Writing the subfile with the RRN still 0 produces
+"incorrect relative record number", which arrives as an *inquiry message on the
+operator's screen*. It compiles perfectly.
+
+**Ordering the line list by status was wrong in the hand.** `GTVRCVLIN` offers a
+`sort_group` — untouched first, then variances — and it reads well on paper. In
+use, every scan moved the line that had just been scanned somewhere else, so the
+flash-and-scroll landed on a row that had jumped. Scan-to-confirm needs a list
+that holds still: `ORDER BY line_no`, always. The view keeps `sort_group` for a
+future review toggle.
+
+**A gap in `GTBAR` only appeared when Receiving became its first new caller.**
+`result.sscc` was populated solely from AI 00 inside a GS1-128, so a *bare*
+18-digit pallet label — which is how they are frequently printed — was
+classified `SSCC-18` and then resolved as though it were an item barcode. It
+found nothing, and the screen said "no receipt found for …". Fixed in the
+service program with a unit-test case (now 12, all passing), not worked around
+in the caller.
+
+**Every primary button in the application had near-black text on GT red.**
+`.gt-app button { color: inherit }` scores (0,1,1) and beat
+`.gt-btn-primary { color: #FFFFFF }` at (0,1,0) — the same specificity trap that
+cost the header its padding in §31.3, but this time it had been shipping
+unnoticed because it looks plausible in a screenshot. Found by asserting
+`getComputedStyle().color` rather than by looking. Fixed with `:where()`, which
+repairs every screen at once.
+
+### 34.4 Not built yet, deliberately
+
+`rcvdetl` — the per-line drill-down with the reason-code picker and damage
+photographs — and `rcvconf`, the summary-and-signature screen. Both are additive:
+the flow is complete and postable without them. The reason-code table
+(`GTREASON`, bilingual, with `photo_required`) and the capture pipeline
+(`GTIMG`, `ref_type` `RCPT`/`DMG`) are already in place for them.
+
+Overage handling is also deferred: a carton scanned that is not on the receipt
+currently reports so plainly rather than offering to add it as an overage.
+
+### 34.5 The quantity stepper — the spinners had to go
+
+The inline quantity box shipped as a plain `<input type="number">`, and on a
+phone that means the browser's own spinner arrows: a few pixels tall, stacked on
+top of each other in the corner of the field. Unusable with a thumb, never mind a
+gloved one.
+
+Replaced with a **48px `−` to the left of the box and a 48px `+` to the right**,
+the native spinners suppressed in CSS, plus a per-line **"In full n"** that jumps
+straight to the expected quantity — one tap for a clean line instead of stepping
+up to 864. The receipt-level *Confirm all as expected* stays in the footer for a
+whole clean pallet.
+
+**The step is the item's case pack**, carried down in a new `LCASE` subfile
+field, and shown on the button when it is not 1. Stepping by one would be as
+unusable as the arrows on a line expecting 864 eaches, and inventing a step in
+the template would have been a number with no meaning — cartons arrive in cases.
+
+All three controls act on the box **client-side**; nothing round-trips.
+Forty-eight cases must not be forty-eight submits, so the operator adjusts freely
+and *Save quantities* commits the lot through the same `READC` the typed path
+already used. With the screen JS absent the buttons do nothing and the box is
+still a number field that can be typed into — the screen stays usable, which is
+the rule for anything delivered through the shim.
+
+`tools/test-rcv-stepper.js` clicks all of it against the real `gt-rcvlines.js`:
+step sizes come from the case pack (24/12/1), minus stops at zero, **plus is
+deliberately not clamped at expected** because an overage is a real thing a
+receiver must be able to record, "in full" lands on the expected quantity, a
+posted receipt renders none of the controls, and nine taps produce **zero**
+submits.
+
+The pre-flight also gained a **touch-target assertion** — under 44px fails. It
+caught my own *In full* button at 40px. A control can be visible, hit-testable
+and still too small to hit; that is precisely what the spinners were, and
+"present and correct" was never the same as usable.
+
+### 34.6 One level of controls, and two bugs French found
+
+*"Move the in full button up and to the right on the same level. Move the status
+bar down to make some room. Space everything aesthetically."*
+
+`In full` was a full-width block underneath the stepper, which cost every card a
+line, and in the table layout the status chip had a column of its own beside the
+controls — which is what kept the quantity column too narrow to hold them on one
+row. Both moved: **the four controls now sit on one level** (`−`, box, `+`,
+`in full`) and **the status chip drops underneath them**, in the same column. The
+wide layout went from five columns to four and the fourth heading was dropped, the
+chip labelling itself.
+
+Spacing: card padding and row gaps evened to 12/10px so the card reads as three
+bands — identity, quantity, status — and the shared camera block, whose reserved
+space is orphaned on this screen because its stage stays hidden, was tightened
+from a 38px/14px gap to a symmetric 12px/12px. Overridden for this screen, not
+copied.
+
+**Two real bugs surfaced, both only in French, both invisible in English.**
+
+**Every quantity box on the French screen was empty.** The `value` attribute was
+being rendered through the localising `num()` helper, so French produced `24,00`
+— and an `<input type="number">` *silently discards* a value that is not a valid
+floating-point literal. The box came up blank with no error anywhere, and pressing
+*Save quantities* would have written zeroes across the receipt. A number input's
+`value` is data, not display. Every live test until now had been in English.
+
+**And the box had been squeezed to 40px.** With `AU COMPLET` — twice the length
+of `IN FULL` — beside it at 360px, `minmax(48px, 1fr)` collapsed and the value
+had nowhere to render. The floor is now 72px, the three buttons drop to 44px
+below 420px, and the word is replaced by a **tick** under 835px, which carries
+the same meaning in a quarter of the width.
+
+Both had passed every check I had, because an overflow test bounded on the
+viewport sees nothing wrong: the control never crossed the edge, it just had no
+room inside. The pre-flight now also asserts a minimum control width, that
+`scrollWidth` does not exceed `clientWidth` on the control itself, and that the
+quantity box's value **survives the browser** — verified to fail by
+re-introducing the 48px floor.
+
+### 34.7 Save did nothing, and the header never moved
+
+Two bugs from the same report, one of them a design error rather than a slip.
+
+**`READC` cannot see a browser edit in an EJS screen.** Change a quantity, press
+*Save quantities*, and the screen answered *"No quantities were changed"* every
+time — for a typed value, a stepper tap and *in full* alike.
+
+The cause is structural. In an EJS Rich Display screen **the subfile rows are
+rendered by the template**, not by Profound UI grid widgets. So all 27 quantity
+boxes carry the same `name="lqty"` with no record number attached anywhere, and
+the runtime derives its `{SUBFILE}.rrn` changed-record marker from its own grid
+widgets — of which there are none here. `READC` had nothing to return.
+
+**And it had passed a live test**, because that test POSTed
+`LINSFL.LQTY.2=92.00&LINSFL.rrn=2` by hand — supplying the row index the browser
+has no way to know. Driving the datastream directly is not a test of the screen;
+it only proved the RPG half. The lesson is sharper than the bug: a verification
+that stands in for the client can confirm something the client can never do.
+
+**The fix follows the grain the application already has.** The changed rows now
+travel in one `QTYEDITS char(1024)` field as `"seq:qty;seq:qty;"`, the row index
+encoded exactly as `PICKnn` encodes it and as `IMGDATA` carries a photograph. The
+client sends only boxes that differ from a `data-gt-orig` attribute, so a save
+with nothing changed is still free and `updated_by` is still not stamped across
+untouched lines.
+
+The parser then produced `RNX0100` on the first live run — a **trailing
+separator** leaves the scan position on the final character, and advancing past
+it is out of range. Like `CPF5021` before it, that arrives as an inquiry message
+on the operator's screen, not as an error the program can report. Numeric
+conversion is wrapped in `monitor` for the same reason: `%dec` of a malformed
+token is `RNX0105`, and one bad token must not discard the operator's other
+edits.
+
+Exercised live against the real program: a trailing separator, no trailing
+separator, an empty payload, `banana;xx:yy;4:116.00;` (garbage skipped, the valid
+entry still applied), an index out of range, and a negative value (clamped to
+zero by RPG as well as by the client). No crash in any of them.
+
+**The receipt header never left `OPEN`.** It read "Not started" on the screen and
+in the open-receipt list however many lines had been confirmed, because only the
+final post ever wrote `receipt_status` — nothing lifted it to `PART`. Now done
+whenever a line is written, inside the same commit boundary as the line, so the
+header and the detail move together or not at all.
+
+`tools/test-rcv-stepper.js` grew seven assertions on the payload: that it carries
+the row index, that a box returned to its original drops out, that an empty box
+is skipped rather than sent as a zero, and that *Save* submits once with the
+payload on both the action and the hidden field. It also had to be corrected to
+click `.gt-lin-acts .gt-btn-primary` — `.gt-btn-primary` alone matched the scan
+row's *Go* button, so the test had been clicking the wrong control.
+
+### 34.8 The scan controls are pinned
+
+A 27-line receipt is several screens long, and scanning is the primary
+interaction — so a receiver working at line 20 was having to scroll back to the
+top to scan the next carton. Progress, the camera button and the scan box now sit
+in one **sticky band at the top of the scroll**, with the lines passing
+underneath.
+
+The band costs 135px on a 412px phone, which took some arranging:
+
+- **The camera button and the scan box share a row.** Stacked they were two rows
+  of pinned height; side by side the band pays for one.
+- **The progress bar and its figures went from two lines to one.** Every pixel a
+  pinned band takes is a pixel of the list the operator cannot see.
+- **The scan row lives inside `.gt-scan-camera`.** The shared camera component
+  hides whichever of its two buttons does not match `.is-live` using *descendant*
+  selectors, so moving the controls out of that element would have left both the
+  open and close buttons showing at once.
+- The receipt identity card deliberately scrolls away. The receipt number is
+  worth a glance, not permanent real estate.
+
+**`position: sticky` fails silently, so it is asserted by scrolling.** One
+ancestor with `overflow` other than `visible` and it does not stick at all — no
+warning, no console message, and it looks perfectly fine until someone scrolls.
+`test-rcv-stepper.js` now scrolls the page for real and checks that the camera
+button and the scan box are still in the viewport, that the band sits at `top: 0`,
+that nothing is drawn over it, and that `elementFromPoint` just below its edge
+finds a **line card** — proving the rows pass under rather than over.
+
+Verified to fail correctly in both ways it can break: with `position: static`
+(controls at `-43px`, off screen) and with an `overflow: hidden` ancestor, which
+produces exactly the same failure and is the one that would otherwise be
+impossible to spot.
+
+Two things a pinned band needs beyond the sticky itself, both learned here: an
+**opaque background**, or the cards show through as they pass beneath; and a
+**z-index above whatever the rows claim** — the cards use 20–21 to beat Genie's
+`div { z-index: 10 }`, so the band takes 30.

@@ -48,15 +48,31 @@
   color: #fff;
   font-size: 12px;
   font-weight: 600;
-  padding: 26px 12px 26px;
+  /* Left padding clears the camera button that overlays this corner --
+   * without it the first word of every caption sits under the button. */
+  padding: 26px 12px 26px 66px;
   overflow-wrap: anywhere;
 }
 
-/* Arrows are for mouse users; on a phone the swipe is the interaction. */
+/* Arrows persist at EVERY width, including the narrowest phone.
+ *
+ * They used to be gated behind `(hover: hover) and (min-width: 835px)` on the
+ * reasoning that a phone swipes instead. That reasoning was wrong in practice:
+ * the swipe is not discoverable, a gloved hand on a warehouse floor is worse at
+ * it than at a 44px target, and narrowing the window made the controls vanish
+ * with no replacement. Swipe still works; the arrows are now additive.
+ *
+ * z-index has to clear 10. The stock Genie skin sets `div { z-index: 10 }` on
+ * bare divs, and while gt-theme.css resets that, both selectors score (0,0,1)
+ * so the winner is decided by which stylesheet the skin happens to load last.
+ * The slides are bare divs, so anything meant to sit ON the image states a
+ * z-index above 10 explicitly rather than trusting that cascade.
+ * ----------------------------------------------------------------- */
 .gt-car-nav {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  z-index: 20;
   width: 44px; height: 44px;
   border: 0;
   border-radius: 50%;
@@ -64,7 +80,7 @@
   color: var(--gt-ink);
   font-size: 26px;
   line-height: 1;
-  display: none;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 1px 5px rgba(0, 0, 0, .25);
@@ -72,15 +88,22 @@
 .gt-car-prev { left: 8px; }
 .gt-car-next { right: 8px; }
 .gt-car-nav:disabled { opacity: .35; }
-@media (hover: hover) and (min-width: 835px) {
-  .gt-car-nav { display: inline-flex; }
+
+/* Tighter on a narrow phone so the arrows frame the image instead of
+ * crowding it -- but still a 38px target, comfortably tappable. */
+@media (max-width: 480px) {
+  .gt-car-nav { width: 38px; height: 38px; font-size: 22px; }
+  .gt-car-prev { left: 6px; }
+  .gt-car-next { right: 6px; }
 }
 
 .gt-car-dots {
   position: absolute;
-  left: 0; right: 0;
+  /* Clear of the camera button in the bottom-left corner. */
+  left: 64px; right: 12px;
   /* Above the caption gradient, not on top of the caption text. */
   bottom: 8px;
+  z-index: 20;
   display: flex;
   justify-content: center;
   gap: 8px;
@@ -218,12 +241,20 @@
  * ================================================================== */
 .gt-itemdetl-screen { position: relative; }
 
-/* ---- Camera button on the carousel ------------------------------ */
+/* ---- Camera button on the carousel ------------------------------
+ * Bottom-LEFT corner, overlaying the image. Left rather than right because
+ * the right edge is where the "next" arrow lives, and the two would sit on
+ * top of each other on a narrow phone.
+ *
+ * z-index 21 puts it above the slides, the caption, the dots and the arrows.
+ * See the note on .gt-car-nav for why a number above 10 is stated explicitly
+ * instead of relying on the Genie reset.
+ * ----------------------------------------------------------------- */
 .gt-itemdetl-screen .gt-car-add {
   position: absolute;
-  right: 10px;
+  left: 10px;
   bottom: 10px;
-  z-index: 3;
+  z-index: 21;
   width: 46px;
   height: 46px;
   padding: 0;
@@ -240,7 +271,7 @@
 .gt-itemdetl-screen .gt-car-add svg { width: 24px; height: 24px; fill: currentColor; }
 .gt-itemdetl-screen .gt-car-add-plus { fill: var(--gt-yellow); }
 
-/* ---- Count + wide-screen button --------------------------------- */
+/* ---- Image count ------------------------------------------------- */
 .gt-itemdetl-screen .gt-car-meta {
   display: flex;
   align-items: center;
@@ -255,12 +286,11 @@
   color: var(--gt-muted);
   overflow-wrap: anywhere;
 }
-/* The round button on the image is the primary control on a phone; the
- * labelled one only earns its space once there is space. */
-.gt-itemdetl-screen .gt-car-add-wide { display: none; }
-@media (min-width: 640px) {
-  .gt-itemdetl-screen .gt-car-add-wide { display: inline-flex; }
-}
+/* The labelled "Add photo" button that used to sit here appeared only at
+ * 640px and up. Below that it vanished, which on a phone left the round
+ * button on the image as the sole control -- so a breakpoint decided whether
+ * an operator could add a photo at all. Removed: there is now exactly one
+ * camera button and it is present at every width. */
 
 /* ---- "Your photo" badge ----------------------------------------- */
 .gt-itemdetl-screen .gt-car-badge {
@@ -327,6 +357,7 @@
   overflow-wrap: anywhere;
 }
 .gt-itemdetl-screen .gt-photo-stage {
+  position: relative;
   aspect-ratio: 4 / 3;
   border-radius: 8px;
   background: var(--gt-surface);
@@ -341,6 +372,81 @@
   object-fit: contain;
   display: block;
 }
+
+/* ---- Live camera in the stage -----------------------------------
+ * Three mutually exclusive states, driven by the overlay's class so that the
+ * markup, the controls and the actual camera can never disagree:
+ *
+ *   (no class)  starting up -- neither video nor still
+ *   .is-live    streaming: video + shutter + close
+ *   .is-shot    captured:  still + Use / Retake
+ * ----------------------------------------------------------------- */
+.gt-itemdetl-screen .gt-photo-stage video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+  background: #000;
+}
+.gt-itemdetl-screen .gt-photo-overlay.is-live .gt-photo-stage video { display: block; }
+
+/* The still and the live view never show at once. */
+.gt-itemdetl-screen .gt-photo-stage img { display: none; }
+.gt-itemdetl-screen .gt-photo-overlay.is-shot .gt-photo-stage img { display: block; }
+
+/* Camera controls float over the video, thumb-height at the bottom. */
+.gt-itemdetl-screen .gt-photo-camctl {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 10px;
+  z-index: 21;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+.gt-itemdetl-screen .gt-photo-overlay.is-live .gt-photo-camctl { display: flex; }
+
+.gt-itemdetl-screen .gt-photo-shutter,
+.gt-itemdetl-screen .gt-photo-stop {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .45);
+}
+.gt-itemdetl-screen .gt-photo-shutter svg,
+.gt-itemdetl-screen .gt-photo-stop svg { width: 30px; height: 30px; }
+.gt-itemdetl-screen .gt-photo-shutter:active,
+.gt-itemdetl-screen .gt-photo-stop:active { transform: translateY(1px) scale(.97); }
+
+.gt-itemdetl-screen .gt-photo-shutter {
+  border: 3px solid rgba(255, 255, 255, .92);
+  background: var(--gt-red);
+  color: #fff;
+}
+/* Same camera-with-a-no-entry-badge as the scan screen. */
+.gt-itemdetl-screen .gt-photo-stop {
+  border: 2px solid var(--gt-line);
+  background: var(--gt-card);
+}
+.gt-itemdetl-screen .gt-photo-stop .gt-icon-cam { color: var(--gt-ink); stroke: currentColor; }
+.gt-itemdetl-screen .gt-photo-stop .gt-icon-ban { color: var(--gt-red); stroke: currentColor; }
+.gt-itemdetl-screen .gt-photo-stop .gt-icon-ban-plate {
+  fill: var(--gt-card);
+  stroke: var(--gt-card);
+  stroke-width: 2;
+}
+
+/* Use and Retake are meaningless until there is a still to act on, and the
+ * file fallback is meaningless unless the live camera was refused. */
+.gt-itemdetl-screen .gt-photo-retake { display: none; }
+.gt-itemdetl-screen .gt-photo-overlay.is-shot .gt-photo-retake { display: inline-flex; }
+.gt-itemdetl-screen .gt-photo-choose { display: none; }
+.gt-itemdetl-screen .gt-photo-overlay.is-fallback .gt-photo-choose { display: inline-flex; }
 .gt-itemdetl-screen .gt-photo-status {
   min-height: 18px;
   margin: 8px 0;

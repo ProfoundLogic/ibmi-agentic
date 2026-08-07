@@ -129,6 +129,15 @@ dcl-proc gtbar_parse export;
   else;
     result.checkOk = gtbar_checkOk(work);
     result.symbology = guessSymbology(work);
+
+    // A BARE SSCC-18. Only AI 00 inside a GS1-128 was populating result.sscc,
+    // so a plain 18-digit pallet label was classified SSCC-18 and then
+    // resolved as if it were an item barcode -- which found nothing. Pallet
+    // labels are frequently printed as a plain SSCC with no application
+    // identifier, and Receiving is the first caller to scan one.
+    if result.symbology = 'SSCC-18';
+      result.sscc = work;
+    endif;
   endif;
 
   // ---- Stage 3: resolve against the database -------------------------

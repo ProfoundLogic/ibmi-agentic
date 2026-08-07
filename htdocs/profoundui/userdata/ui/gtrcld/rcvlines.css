@@ -1,0 +1,516 @@
+/* ==================================================================
+ * Receiving -- the line list.
+ *
+ * One markup path, two layouts. On a phone each line is a card with its own
+ * labels; from 835px the identical markup becomes a table and the labels are
+ * hidden, because the column head says it once instead of once per row.
+ *
+ * The camera, reticle, status line, icon buttons and manual-entry row all
+ * come from gt-theme.css, shared with the Scan Lab and Receiving home.
+ * ================================================================== */
+
+/* ---- Receipt identity ------------------------------------------- */
+.gt-rcv-hdr {
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+}
+.gt-rcv-hdr-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.gt-rcv-id {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 17px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.gt-rcv-state {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+.gt-rcv-state.is-post { color: var(--gt-good); }
+.gt-rcv-vend {
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.gt-rcv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+/* ---- The pinned band -------------------------------------------
+ * Progress, the camera and the scan box stay in frame; the lines scroll
+ * underneath. Scanning is the primary interaction and a 27-line receipt is
+ * several screens long, so a receiver working at line 20 must not scroll back
+ * up to scan the next carton.
+ *
+ * THREE things this needs, and it is broken without any one of them:
+ *   - an OPAQUE background, or the cards show through as they pass beneath;
+ *   - a z-index above 20, since the cards' own chips and controls claim 20-21
+ *     to beat Genie's `div { z-index: 10 }`;
+ *   - no ancestor with `overflow` other than visible, or sticky silently does
+ *     nothing at all. Asserted by scrolling in test-rcv-stepper.js rather than
+ *     assumed, because there is no warning when it fails.
+ *
+ * The negative margins let the band's background run to the edge of the
+ * screen while its contents stay on the page's gutter.
+ * ----------------------------------------------------------------- */
+.gt-rcv-top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  margin: 0 calc(-1 * var(--gt-pad)) 10px;
+  padding: 8px var(--gt-pad) 10px;
+  background: var(--gt-surface);
+  box-shadow: 0 4px 10px -6px rgba(0, 0, 0, .45);
+}
+
+/* ---- Progress, inside the band ---------------------------------- */
+.gt-rcv-sum {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  margin-bottom: 8px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+}
+/* One line rather than two: the band is pinned, so every pixel it takes is a
+ * pixel of the list the operator cannot see. */
+.gt-rcv-sum .gt-rcv-bar { flex: 1 1 auto; min-width: 60px; }
+.gt-rcv-sum .gt-rcv-figs { flex: 0 0 auto; }
+
+/* ---- Camera button and scan box on one row ---------------------- */
+.gt-rcv-scanrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+.gt-rcvlines-screen .gt-rcv-scanrow .gt-scan-camctl { margin: 0; }
+.gt-rcvlines-screen .gt-rcv-scanrow .gt-scan-manual { margin-bottom: 0; }
+/* The label is the only thing in the band that can be trimmed without losing
+ * a control, so it is trimmed. */
+.gt-rcvlines-screen .gt-rcv-scanrow .gt-scan-manual label {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+.gt-rcv-bar {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--gt-line);
+  overflow: hidden;
+}
+.gt-rcv-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gt-red);
+}
+.gt-rcv-figs {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gt-muted);
+}
+.gt-rcv-figs strong { color: var(--gt-ink); }
+.gt-rcv-figs strong.is-var { color: var(--gt-warn); }
+
+/* ---- Camera block, tightened for THIS screen -------------------
+ * The shared camera component reserves room above its controls and a line for
+ * its status text. On the Scan Lab that space sits under a visible viewfinder
+ * and is right. Here the camera is a secondary way to enter a carton -- the
+ * stage is hidden until it is opened -- so the reserve is orphaned and left
+ * ~50px of dead band between the summary bar and the scan row.
+ *
+ * Overridden, not copied: the component still owns how it looks, this only
+ * says how much air it gets on this screen.
+ * ----------------------------------------------------------------- */
+.gt-rcvlines-screen .gt-scan-camera { margin-bottom: 0; }
+.gt-rcvlines-screen .gt-scan-camera:not(.is-live) .gt-scan-camctl { margin-top: 0; }
+/* Collapsed while empty; it grows again the moment the camera has something
+ * to say, so no message is ever hidden by this. */
+.gt-rcvlines-screen .gt-scan-status:empty { min-height: 0; margin: 0; }
+
+/* ---- The lines --------------------------------------------------
+ * Phone: a card per line. The thumbnail is 64px because a receiver
+ * recognises the product before they read the SKU.
+ * ----------------------------------------------------------------- */
+.gt-lin-head { display: none; }
+
+.gt-lin-list {
+  list-style: none;
+  margin: 0 0 var(--gt-gap);
+  padding: 0;
+}
+
+.gt-lin-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-areas:
+    "img  id"
+    "exp  rcv"
+    "stat stat";
+  /* 10px row gap rather than 6: with the controls now on one line the card is
+   * shorter, and the three bands (identity, quantity, status) read as bands
+   * instead of running together. */
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+  border-left: 5px solid var(--gt-line);
+}
+
+/* Status as the card's left edge. Colour is never the only cue -- the chip
+ * below spells it out -- but it is the one readable at arm's length. */
+.gt-lin-row.is-open { border-left-color: var(--gt-line); }
+.gt-lin-row.is-mtch { border-left-color: var(--gt-good); }
+.gt-lin-row.is-shrt { border-left-color: var(--gt-warn); }
+.gt-lin-row.is-over { border-left-color: var(--gt-red); }
+.gt-lin-row.is-damg { border-left-color: var(--gt-bad); }
+
+/* The line a scan just landed on. Flashes once so a receiver working by feel
+ * sees which row moved without hunting for it. */
+.gt-lin-row.is-hit {
+  animation: gt-lin-flash 1.1s ease-out 1;
+}
+@keyframes gt-lin-flash {
+  0%   { background: var(--gt-yellow); }
+  100% { background: var(--gt-card); }
+}
+
+.gt-lin-img { grid-area: img; }
+.gt-lin-img img,
+.gt-lin-noimg {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--gt-line);
+}
+
+.gt-lin-id {
+  grid-area: id;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.gt-lin-desc {
+  font-size: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.gt-lin-sku {
+  font-size: 12px;
+  color: var(--gt-muted);
+}
+
+.gt-lin-exp { grid-area: exp; }
+.gt-lin-rcv { grid-area: rcv; }
+.gt-lin-exp,
+.gt-lin-rcv {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.gt-lin-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+.gt-lin-exp strong {
+  font-size: 18px;
+  font-weight: 800;
+}
+.gt-lin-exp small {
+  font-size: 11px;
+  color: var(--gt-muted);
+}
+.gt-lin-rcv strong {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* ---- Quantity stepper ------------------------------------------
+ * A native number input's spinner arrows are a few pixels tall and sit
+ * stacked on top of each other -- unusable with a thumb, let alone a gloved
+ * one. They are suppressed here and replaced with a 48px minus to the left of
+ * the box and a 48px plus to the right.
+ *
+ * The step is the item's CASE PACK, sent down in the subfile, because a line
+ * expecting 864 eaches is not counted up one tap at a time.
+ * ----------------------------------------------------------------- */
+.gt-lin-step {
+  display: grid;
+  /* Four controls on ONE level: minus, the box, plus, then "in full". The
+   * box is the flexible one -- the three buttons are fixed touch targets and
+   * must not shrink below them. minmax(48px, ...) on the box keeps it usable
+   * at 360px rather than collapsing to nothing. */
+  /* The box gets a real floor. minmax(48px, ...) was not enough: with the
+   * French "AU COMPLET" beside it at 360px the box collapsed to ~40px and the
+   * value it holds was no longer visible -- a quantity field showing nothing.
+   * 72px fits "999,00". */
+  grid-template-columns: 48px minmax(72px, 1fr) 48px auto;
+  align-items: stretch;
+  gap: 6px;
+}
+
+/* Below 420px the three buttons come down to 44px -- still a proper target,
+ * and it buys the box the width it needs on the narrowest phone. */
+@media (max-width: 420px) {
+  .gt-lin-step { grid-template-columns: 44px minmax(72px, 1fr) 44px auto; gap: 5px; }
+  .gt-step,
+  .gt-lin-qty,
+  .gt-lin-full { min-height: 44px; }
+  .gt-step { font-size: 22px; }
+}
+
+.gt-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0;
+  border: 2px solid var(--gt-line);
+  border-radius: 10px;
+  background: var(--gt-surface);
+  color: var(--gt-ink);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  /* Stops the double-tap-to-zoom delay on a control meant to be tapped
+   * repeatedly, without disabling pinch-zoom on the page. */
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* The step size, when it is not 1. Small, because the sign is the button and
+ * this is only there so nobody has to guess what a tap will do. */
+.gt-step small {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--gt-muted);
+  margin-top: 1px;
+}
+.gt-step:active {
+  background: var(--gt-line);
+  transform: translateY(1px);
+}
+.gt-step-up {
+  border-color: var(--gt-red);
+  background: var(--gt-red);
+  color: #fff;
+}
+.gt-step-up small { color: rgba(255, 255, 255, .82); }
+.gt-step-up:active { background: #c2142e; }
+
+/* The inline quantity box. 16px minimum or iOS zooms the page on focus and
+ * stays zoomed, which is what makes an app feel broken. */
+.gt-lin-qty {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 8px 10px;
+  border: 2px solid var(--gt-line);
+  border-radius: 10px;
+  background: var(--gt-card);
+  color: var(--gt-ink);
+  font-size: max(18px, 1.05rem);
+  font-weight: 800;
+  text-align: center;
+  /* Kill the spinners. `appearance: textfield` covers Firefox; the
+   * ::-webkit- pseudo-elements cover Chrome, Edge and iOS Safari, which is
+   * what the demo device actually runs. */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.gt-lin-qty::-webkit-outer-spin-button,
+.gt-lin-qty::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+.gt-lin-qty:focus {
+  outline: none;
+  border-color: var(--gt-red);
+}
+
+/* ---- Receive this line in full ---------------------------------
+ * One tap for a clean line, instead of stepping up to 864. The
+ * receipt-level "Confirm all as expected" stays in the footer for a whole
+ * clean pallet.
+ * ----------------------------------------------------------------- */
+/* ---- Receive this line in full ---------------------------------
+ * Sits on the same level as the stepper, to its right. It used to be a
+ * full-width block underneath, which cost every card a whole line and pushed
+ * the status chip out to the side where it crowded the controls.
+ *
+ * The label stacks over the number so the control stays narrow enough to
+ * share a 360px row with three 48px buttons.
+ * ----------------------------------------------------------------- */
+.gt-lin-full {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 0;
+  padding: 4px 10px;
+  border: 2px solid var(--gt-good);
+  border-radius: 10px;
+  background: var(--gt-card);
+  color: var(--gt-good);
+  line-height: 1.1;
+  touch-action: manipulation;
+}
+/* The word is for wide screens only; narrow gets the tick. Swapped at the
+ * same 835px breakpoint the table layout uses. */
+.gt-lin-full-t { display: none; }
+.gt-lin-full-ck {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+}
+.gt-lin-full-n {
+  font-size: 15px;
+  font-weight: 800;
+}
+.gt-lin-full:active { background: var(--gt-good); color: #fff; }
+
+.gt-lin-stat {
+  grid-area: stat;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.gt-lin-chip {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--gt-surface);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+.gt-lin-row.is-mtch .gt-lin-chip { background: var(--gt-good); color: #fff; }
+.gt-lin-row.is-shrt .gt-lin-chip { background: var(--gt-yellow); color: var(--gt-black); }
+.gt-lin-row.is-over .gt-lin-chip { background: var(--gt-red); color: #fff; }
+.gt-lin-row.is-damg .gt-lin-chip { background: var(--gt-bad); color: #fff; }
+
+/* Photo count, when a line has any. */
+.gt-lin-pho {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--gt-ink);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* ---- Bulk actions ---------------------------------------------- */
+.gt-lin-acts {
+  display: grid;
+  gap: 8px;
+  margin-bottom: var(--gt-gap);
+}
+
+.gt-btn-post {
+  background: var(--gt-good);
+  color: #fff;
+  font-weight: 800;
+}
+
+/* ---- Table from 835px ------------------------------------------
+ * The same records, laid out as rows. Nothing is re-rendered: the grid
+ * template changes and the per-card labels go away.
+ * ----------------------------------------------------------------- */
+/* ---- Table from 835px ------------------------------------------
+ * Four columns, not five. The status chip used to have a column of its own to
+ * the right of the controls, which left the quantity column too narrow to hold
+ * the stepper and "in full" on one line -- so "in full" sat underneath and
+ * every row carried a wasted line. The chip now sits UNDER the controls, in
+ * the same column, and the quantity column gets the width it needed.
+ * ----------------------------------------------------------------- */
+@media (min-width: 835px) {
+  .gt-lin-head {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) 130px minmax(330px, 0.9fr);
+    gap: 10px 14px;
+    padding: 4px 14px 6px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    color: var(--gt-muted);
+  }
+  /* The head's first column sits under the thumbnail, so its label starts at
+   * the description. One empty cell keeps head and body aligned. */
+  .gt-lin-head > span:first-child { grid-column: 1 / span 2; }
+  /* The chip labels itself, so the fourth heading would only repeat it. */
+  .gt-lin-head > span:last-child { display: none; }
+
+  .gt-lin-row {
+    grid-template-columns: 64px minmax(0, 1fr) 130px minmax(330px, 0.9fr);
+    grid-template-areas:
+      "img id exp rcv"
+      "img id exp stat";
+    gap: 6px 14px;
+    align-items: center;
+    padding: 12px 14px;
+    margin-bottom: 6px;
+  }
+  .gt-lin-lbl { display: none; }
+  /* Room for the word now, so say it. */
+  .gt-lin-full-ck { display: none; }
+  .gt-lin-full-t {
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    white-space: nowrap;
+  }
+  /* Two rows now, so the identity and expected cells span both and stay
+   * centred against the taller quantity block. */
+  .gt-lin-img,
+  .gt-lin-id,
+  .gt-lin-exp { align-self: center; }
+  .gt-lin-stat { justify-content: flex-start; }
+
+  .gt-lin-acts {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+@media (min-width: 1280px) {
+  .gt-lin-head,
+  .gt-lin-row {
+    grid-template-columns: 72px minmax(0, 1fr) 150px minmax(360px, 0.8fr);
+  }
+  .gt-lin-img img,
+  .gt-lin-noimg { width: 72px; height: 72px; }
+}

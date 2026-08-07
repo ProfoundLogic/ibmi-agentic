@@ -1,0 +1,182 @@
+<%
+/* ====================================================================
+ * Receiving -- home.
+ *
+ * A large scan target dominating the upper area, because scanning the pallet
+ * label is what a receiver actually does, with a card list of receipts open
+ * today underneath so a supervisor can tap instead.
+ *
+ * The camera lives in gt-scan.js, shared with the Scan Lab and Item Lookup.
+ * Manual entry is plain markup and needs no JavaScript at all.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'RECEIVING',
+        lead:'Scan the pallet label to open its receipt.',
+        openCamera:'Open camera', closeCamera:'Close camera',
+        manual:'Or key a receipt, PO or SSCC', decode:'Go',
+        openToday:'Receipts open today', none:'Nothing waiting to be received',
+        lines:'lines', done:'confirmed', variance:'variances',
+        door:'Door', po:'PO', expected:'expected', received:'received',
+        statuses:{OPEN:'Not started', PART:'In progress', POST:'Posted'},
+        menu:'Menu', back:'Back to menu' },
+  FR: { appName:'GT Entrepôt', appSub:'RÉCEPTION',
+        lead:'Scannez l’étiquette de la palette pour ouvrir sa réception.',
+        openCamera:'Ouvrir la caméra', closeCamera:'Fermer la caméra',
+        manual:'Ou saisissez une réception, un BC ou un SSCC', decode:'Aller',
+        openToday:'Réceptions ouvertes aujourd’hui',
+        none:'Rien en attente de réception',
+        lines:'lignes', done:'confirmées', variance:'écarts',
+        door:'Porte', po:'BC', expected:'prévu', received:'reçu',
+        statuses:{OPEN:'Non commencée', PART:'En cours', POST:'Validée'},
+        menu:'Menu', back:'Retour au menu' }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v, dp) {
+  return Number(v || 0).toLocaleString(loc, { minimumFractionDigits: dp || 0,
+                                              maximumFractionDigits: dp || 0 });
+};
+
+var rows = (typeof rcpsfl !== 'undefined' && rcpsfl) ? rcpsfl : [];
+
+/* Progress per card. Percentage rather than a fraction because a bar reads
+ * from across a dock door and "12 of 34" does not. */
+var pct = function (row) {
+  var n = Number(row.rlines || 0);
+  return n > 0 ? Math.round((Number(row.rdone || 0) / n) * 100) : 0;
+};
+%>
+<div class="gt-app gt-rcvhome-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg"><%= s(msg) %></div>
+    <% } %>
+
+    <p class="gt-scan-lead"><%= T.lead %></p>
+
+    <!-- ---- Camera: shared component, same as every other scan ---- -->
+    <div class="gt-scan-camera" id="gt-scan-camera">
+      <div class="gt-scan-stage">
+        <video id="gt-scan-video" muted playsinline></video>
+        <div class="gt-scan-frame" id="gt-scan-frame"></div>
+      </div>
+      <div class="gt-scan-status" id="gt-scan-status"></div>
+      <div class="gt-scan-camctl">
+        <button type="button" class="gt-iconbtn gt-iconbtn-go" id="gt-scan-start"
+                title="<%= T.openCamera %>" aria-label="<%= T.openCamera %>">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+            <circle cx="16" cy="18" r="5"/>
+          </svg>
+        </button>
+        <button type="button" class="gt-iconbtn gt-iconbtn-stop" id="gt-scan-stop"
+                title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <g class="gt-icon-cam">
+              <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+              <circle cx="15" cy="18" r="4.6"/>
+            </g>
+            <g class="gt-icon-ban">
+              <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+              <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+              <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+            </g>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ---- Manual entry: works with no JavaScript at all ---------- -->
+    <div class="gt-scan-manual">
+      <label for="gt-scan-manual"><%= T.manual %></label>
+      <div class="gt-scan-manual-row">
+        <input type="text" id="gt-scan-manual" name="scanval"
+               value="" autocomplete="off" autocapitalize="characters"
+               spellcheck="false" inputmode="text">
+        <button type="button" class="gt-btn gt-btn-primary"
+                onclick="pui.submit({action:'SCAN'})"><%= T.decode %></button>
+      </div>
+    </div>
+
+    <!-- ---- Open receipts ----------------------------------------- -->
+    <h2 class="gt-section-title">
+      <%= T.openToday %> <span class="gt-count"><%= rows.length %></span>
+    </h2>
+
+    <% if (rows.length > 0) { %>
+      <ul class="gt-rcp-list">
+        <% rows.forEach(function (row) { %>
+          <li class="gt-rcp-card is-<%= s(row.rstat).toLowerCase() %>">
+            <%# The whole card is the target. A dock worker in gloves gets the
+                entire card, not a link inside it. %>
+            <button type="button" class="gt-rcp-hit"
+                    onclick="pui.submit({action:'PICK<%= s(row.rseq) %>'})">
+              <span class="gt-rcp-top">
+                <span class="gt-rcp-id gt-mono"><%= s(row.rrcpt) %></span>
+                <span class="gt-rcp-status"><%= T.statuses[s(row.rstat)] || s(row.rstat) %></span>
+              </span>
+
+              <span class="gt-rcp-vend"><%= s(row.rvend) %></span>
+
+              <span class="gt-rcp-meta">
+                <% if (has(row.rpo)) { %>
+                  <span class="gt-chip"><%= T.po %> <%= s(row.rpo) %></span>
+                <% } %>
+                <% if (has(row.rdoor)) { %>
+                  <span class="gt-chip gt-chip-brand"><%= T.door %> <%= s(row.rdoor) %></span>
+                <% } %>
+                <% if (Number(row.rvar) > 0) { %>
+                  <span class="gt-chip gt-chip-warn">
+                    <%= num(row.rvar) %> <%= T.variance %>
+                  </span>
+                <% } %>
+              </span>
+
+              <span class="gt-rcp-prog">
+                <span class="gt-rcp-bar"><span style="width: <%= pct(row) %>%"></span></span>
+                <span class="gt-rcp-figs">
+                  <%= num(row.rdone) %>/<%= num(row.rlines) %> <%= T.lines %>
+                  &middot; <%= num(row.rqtyr) %> / <%= num(row.rqtye) %>
+                </span>
+              </span>
+            </button>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <section class="gt-card gt-scan-empty"><%= T.none %></section>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+  </footer>
+</div>

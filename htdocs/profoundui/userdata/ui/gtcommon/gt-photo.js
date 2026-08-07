@@ -19,15 +19,24 @@
  * carton is useful; a 340px one at quality 0.3 is not, so that is the floor
  * and past it we refuse rather than store mush.
  *
- * WHY <input type="file" capture> AND NOT getUserMedia
- * ----------------------------------------------------
- * gt-scan.js uses getUserMedia because a barcode scanner needs a live frame
- * loop. A photograph does not. The file input hands over to the platform's
- * own camera app, which means autofocus, exposure, HDR, the flash, tap to
- * focus, and pinch to zoom -- all of it for free, all of it already familiar,
- * and a much better picture than a <video> frame grab. It also degrades to a
- * file picker on a desktop, which is exactly what you want when demoing from
- * a laptop with no camera.
+ * LIVE CAMERA FIRST, FILE INPUT ONLY AS A FALLBACK
+ * ------------------------------------------------
+ * This used to hand off to <input type="file" capture>, on the reasoning that
+ * the platform camera app brings autofocus, flash and HDR for free. True, but
+ * it buys those at the cost of the thing that matters here: on a phone the
+ * operator got an intermediate "camera or gallery?" chooser, and on a desktop
+ * a plain file dialog -- neither of which is "press the button, take the
+ * picture" while standing in front of a damaged carton.
+ *
+ * So the camera button now opens a live stream in the panel, the same
+ * getUserMedia path gt-scan.js uses, with an explicit shutter. The file input
+ * is still here and still wired, but it is reached ONLY when getUserMedia is
+ * refused -- no camera on the machine, or a non-HTTPS origin, which is what
+ * makes demoing from a laptop possible. Nothing auto-opens a file dialog.
+ *
+ * getUserMedia needs a secure origin. It is available here because Genie is
+ * served over HTTPS; if that ever changes, every device silently lands on the
+ * fallback and the status line says why.
  *
  * NO JAVASCRIPT, NO HARM
  * ----------------------
@@ -67,14 +76,22 @@
           saving: 'Saving…',
           tooBig: 'That photo could not be made small enough to send.',
           notImage: 'That file is not an image.',
-          failed: 'The photo could not be read.' },
+          failed: 'The photo could not be read.',
+          starting: 'Starting camera…',
+          ready: 'Camera ready — press the shutter',
+          noCamera: 'No camera available on this device. Choose a file instead.',
+          camFailed: 'The camera could not be opened. Choose a file instead.' },
     FR: { title: 'Ajouter une photo', use: 'Utiliser cette photo',
           retake: 'Reprendre', cancel: 'Annuler',
           working: 'Préparation de la photo…',
           saving: 'Enregistrement…',
           tooBig: 'Cette photo n’a pas pu être réduite suffisamment.',
           notImage: 'Ce fichier n’est pas une image.',
-          failed: 'La photo n’a pas pu être lue.' }
+          failed: 'La photo n’a pas pu être lue.',
+          starting: 'Démarrage de la caméra…',
+          ready: 'Caméra prête — appuyez sur le déclencheur',
+          noCamera: 'Aucune caméra sur cet appareil. Choisissez un fichier.',
+          camFailed: 'Impossible d’ouvrir la caméra. Choisissez un fichier.' }
   };
 
   function lang() {
@@ -135,12 +152,23 @@
 
   /* ---------------------------------------------------------------- */
   var pending = null;   /* the shrunk photo awaiting confirmation */
+  var stream = null;    /* live MediaStream, when the camera is open */
 
   function overlay() { return document.getElementById('gt-photo-overlay'); }
+  function video() { return document.getElementById('gt-photo-video'); }
 
   function setStatus(text) {
     var el = document.getElementById('gt-photo-status');
     if (el) el.textContent = text || '';
+  }
+
+  /* One place decides which of the three states the panel is in, so the
+   * controls cannot drift out of step with whether the camera is running. */
+  function setState(name) {
+    var o = overlay();
+    if (!o) return;
+    o.classList.remove('is-live', 'is-shot');
+    if (name) o.classList.add(name);
   }
 
   function show() {
@@ -148,17 +176,124 @@
     if (o) o.classList.add('is-open');
   }
 
+  function stopCamera() {
+    if (stream) {
+      stream.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} });
+      stream = null;
+    }
+    var v = video();
+    if (v) { try { v.pause(); } catch (e) {} v.srcObject = null; }
+  }
+
   function close() {
+    stopCamera();
     var o = overlay();
-    if (o) o.classList.remove('is-open');
+    if (o) o.classList.remove('is-open', 'is-live', 'is-shot', 'is-fallback');
     pending = null;
     var prev = document.getElementById('gt-photo-preview');
     if (prev) prev.removeAttribute('src');
+    var useBtn = document.getElementById('gt-photo-use');
+    if (useBtn) useBtn.disabled = true;
     setStatus('');
     var input = document.getElementById('gt-photo-file');
     /* Clearing lets the SAME file be chosen again -- otherwise "retake",
      * then picking the identical shot, fires no change event at all. */
     if (input) input.value = '';
+  }
+
+  /* Drop to the file input. Only ever called after the live camera has been
+   * refused: it surfaces the button and explains why, and does NOT open a
+   * file dialog by itself -- an unexpected file chooser is precisely what
+   * this screen was changed to stop doing. */
+  function fallback(msg) {
+    stopCamera();
+    setState(null);
+    var o = overlay();
+    if (o) o.classList.add('is-fallback');
+    setStatus(msg);
+  }
+
+  function startCamera() {
+    var o = overlay();
+    var v = video();
+    if (!o || !v) return;
+
+    pending = null;
+    var useBtn = document.getElementById('gt-photo-use');
+    if (useBtn) useBtn.disabled = true;
+    setState(null);
+    setStatus(t().starting);
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      fallback(t().noCamera);
+      return;
+    }
+
+    /* Ask for the rear camera and a big frame: this is the master image the
+     * shrink ladder works down from, so detail here is detail in the stored
+     * photo. `ideal` rather than `exact` so a laptop with only a front camera
+     * still gets a stream instead of an OverconstrainedError. */
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 } },
+      audio: false
+    }).then(function (s) {
+      stream = s;
+      v.srcObject = s;
+      v.setAttribute('playsinline', 'true');  /* iOS refuses inline play without it */
+      v.muted = true;
+      return v.play();
+    }).then(function () {
+      setState('is-live');
+      setStatus(t().ready);
+    }).catch(function (err) {
+      fallback(t().camFailed + ' (' + (err && err.name ? err.name : 'error') + ')');
+    });
+  }
+
+  /* Grab the current frame at the sensor's own resolution, then hand it to
+   * the same shrink ladder a chosen file goes through -- one encoder path,
+   * so the size guarantee holds however the photo arrived. */
+  function shoot() {
+    var v = video();
+    if (!v || !v.videoWidth) return;
+
+    var frame = document.createElement('canvas');
+    frame.width = v.videoWidth;
+    frame.height = v.videoHeight;
+    frame.getContext('2d').drawImage(v, 0, 0, frame.width, frame.height);
+
+    /* The camera is released as soon as the shot is taken. Retake restarts
+     * it; leaving it streaming behind a still costs battery and leaves the
+     * recording indicator lit for no reason. */
+    stopCamera();
+    setStatus(t().working);
+
+    var out = shrink(frame);
+    if (!out) { fallback(t().tooBig); return; }
+
+    pending = out;
+    var prev = document.getElementById('gt-photo-preview');
+    if (prev) prev.src = out.dataUrl;
+    setState('is-shot');
+    setStatus(out.w + '×' + out.h + ' · ' +
+              Math.round(out.bytes / 1024 * 10) / 10 + ' KB');
+    var useBtn = document.getElementById('gt-photo-use');
+    if (useBtn) useBtn.disabled = false;
+  }
+
+  /* Open the panel and go straight to a live camera. */
+  function open() {
+    show();
+    var o = overlay();
+    if (o) o.classList.remove('is-fallback');
+    startCamera();
+  }
+
+  /* Retake returns to whichever input actually worked. */
+  function retake() {
+    var o = overlay();
+    if (o && o.classList.contains('is-fallback')) { pick(); return; }
+    startCamera();
   }
 
   function pick() {
@@ -187,6 +322,7 @@
 
       pending = out;
       if (prev) prev.src = out.dataUrl;
+      setState('is-shot');
       setStatus(out.w + '×' + out.h + ' · ' +
                 Math.round(out.bytes / 1024 * 10) / 10 + ' KB');
       var useBtn = document.getElementById('gt-photo-use');
@@ -217,7 +353,10 @@
 
   window.gtPhoto = {
     __installed: true,
-    pick: pick,
+    open: open,       /* camera button -- live camera */
+    shoot: shoot,     /* shutter */
+    retake: retake,
+    pick: pick,       /* file-input fallback only */
     chosen: chosen,
     use: send,
     close: close

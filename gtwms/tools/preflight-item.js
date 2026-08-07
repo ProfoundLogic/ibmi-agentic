@@ -41,7 +41,15 @@ const SCREENS=[
       {_rrn:1,lseq:1,lloc:'A01011',ltype:'PICK',lzone:'A',lqty:48,lalloc:6},
       {_rrn:2,lseq:2,lloc:'D01011',ltype:'BULK',lzone:'D',lqty:220,lalloc:0},
       {_rrn:3,lseq:3,lloc:'D01024',ltype:'BULK',lzone:'D',lqty:120,lalloc:0},
-      {_rrn:4,lseq:4,lloc:'STAGE01',ltype:'STAG',lzone:'S',lqty:99,lalloc:20}]}) },
+      {_rrn:4,lseq:4,lloc:'STAGE01',ltype:'STAG',lzone:'S',lqty:99,lalloc:20}]}),
+   /* Controls that must be visible AND clickable at EVERY width, checked by
+      hit-testing their centre point. This catches both ways they have gone
+      missing: a breakpoint setting display:none (the camera button and the
+      arrows used to vanish below 640px and 835px), and Genie's
+      `div{z-index:10}` painting a carousel slide over a button that only
+      claimed z-index 3. A visible-but-covered button looks fine in a
+      screenshot and does nothing when tapped, so presence is not enough. */
+   controls:['.gt-car-add','.gt-car-prev','.gt-car-next'] },
 ];
 const CASES=[{lang:'EN',w:412,h:915},{lang:'FR',w:412,h:915},{lang:'FR',w:360,h:800},{lang:'EN',w:1280,h:900}];
 
@@ -72,6 +80,21 @@ const CASES=[{lang:'EN',w:412,h:915},{lang:'FR',w:412,h:915},{lang:'FR',w:360,h:
         return {sw:de.scrollWidth,cw:de.clientWidth,wide:wide.slice(0,3)};});
       const bad=o.sw>o.cw+1; if(bad) fail++;
       console.log('  '+(c.lang+' '+c.w+'px').padEnd(11)+' sw='+o.sw+' cw='+o.cw+' '+(bad?'OVERFLOW -> '+o.wide.join(' | '):'no overflow'));
+
+      /* Persistent controls: present, sized, and actually the element you hit. */
+      const ctl=await page.evaluate((sels)=>sels.map(sel=>{
+        const el=document.querySelector(sel);
+        if(!el) return sel+': MISSING';
+        const r=el.getBoundingClientRect();
+        if(!r.width||!r.height) return sel+': HIDDEN';
+        if(r.bottom<0||r.top>innerHeight) return sel+': OFFSCREEN';
+        const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
+        if(!hit||!(hit===el||el.contains(hit)))
+          return sel+': COVERED by '+(hit&&typeof hit.className==='string'&&hit.className?hit.className:hit?hit.tagName:'nothing');
+        return null;
+      }).filter(Boolean),sc.controls||[]);
+      if(ctl.length){ fail++; console.log('               CONTROLS -> '+ctl.join(' | ')); }
+      else if((sc.controls||[]).length) console.log('               controls ok ('+sc.controls.length+' hit-tested)');
       await page.screenshot({path:'/tmp/ejspre/item-'+sc.name+'-'+c.lang.toLowerCase()+'-'+c.w+'.png',fullPage:true});
       await page.close();
     }

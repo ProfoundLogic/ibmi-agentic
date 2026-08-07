@@ -38,6 +38,25 @@ gtcmtst.pgm: qrpglesrc/gtcmtst.sqlrpgle | gttables.file
 
 # ---------------------------------------------------------------------
 #  Application -- main menu and entry point
+#
+#  HOW THE OPERATOR REACHES THIS APP, and the one chore it costs per task:
+#
+#  Sign-on resolves its initial menu through *LIBL/MENU, and PUISETENV puts the
+#  CoderFlow TASK library ahead of AIDEMOBASE. So the sign-on menu carrying
+#  "4. GT Warehouse Mobile" is a shadow MENU built from ../cfdemo into the TASK
+#  library -- NOT into TIGERPOC, which only joins the library list later, when
+#  GTSTART does its ADDLIBLE. Option 4 runs `call tigerpoc/gtstart`, fully
+#  qualified, so it works whatever the library list holds.
+#
+#  The task library changes every task, so rebuild the shadow each time -- and
+#  delete the stamps first, because codermake stamps record THAT a target was
+#  built, not WHICH library it went to, so a stale stamp makes this a silent
+#  no-op and option 4 just isn't there:
+#
+#      rm -f build/menu.file build/menu.msgf build/menu.menu
+#      codermake menu.menu        # default IBMI_BUILD_LIBRARY = task library
+#
+#  Verify by signing on and reading the menu. See §25.3 of the design doc.
 # ---------------------------------------------------------------------
 gtmnud.file: qddssrc/gtmnud.json
 gtmnur.pgm:  qrpglesrc/gtmnur.sqlrpgle qddssrc/gtmnud.json | gtmnud.file gttables.file
@@ -159,3 +178,24 @@ gtimg.bnddir: gtimg.bnddir | gtimg.srvpgm
 gtimgstg.file: qsqlsrc/gtimgstg.table.sql gttables.file
 gtimgtst.pgm:  qrpglesrc/gtimgtst.sqlrpgle qrpglesrc/gtimg_pr.rpgle gtimg.srvpgm \
                | gtimg.bnddir gtimgstg.file
+
+# ---------------------------------------------------------------------
+#  Receiving -- the flagship application. Four screens, four display files,
+#  four programs, per the one-format-per-display-file rule (design doc §32).
+#
+#  Views first: GTVRCVLIN and GTVRCVOPEN derive everything the screens show,
+#  including the line thumbnail, so the subfile needs no per-row query.
+# ---------------------------------------------------------------------
+gtvrcv.file: qsqlsrc/gtvrcv.view.sql gtvimg.file gtseed.file
+
+gtrchd.file: qddssrc/gtrchd.json
+gtrcld.file: qddssrc/gtrcld.json
+
+#  RCVLINES is the scan-to-confirm subfile; it binds GTBAR to match a scanned
+#  carton against a line on the receipt.
+gtrclr.pgm:  qrpglesrc/gtrclr.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtrcld.json \
+             gtbar.srvpgm | gtrcld.file gtbar.bnddir gtvrcv.file
+
+#  RCVHOME scans the pallet label and calls RCVLINES.
+gtrchr.pgm:  qrpglesrc/gtrchr.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtrchd.json \
+             gtbar.srvpgm gtrclr.pgm | gtrchd.file gtbar.bnddir gtvrcv.file

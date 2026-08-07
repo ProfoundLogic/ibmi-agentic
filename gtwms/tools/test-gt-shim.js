@@ -36,16 +36,16 @@ const CHROME = '/home/coder/.cache/ms-playwright/chromium-1228/chrome-linux64/ch
 
 /* Every screen the shim claims. Each is fetched exactly the way Profound UI
  * would, including cache-busting, and compared against the file on disk. */
-const SCREENS = [
-  { name: 'gtmnud/menu.ejs',    url: '/profoundui/userdata/ui/gtmnud/menu.ejs?v=99',
-    file: ['gtmnud', 'menu.ejs'] },
-  { name: 'gtscnd/scnhome.ejs', url: '/profoundui/userdata/ui/gtscnd/scnhome.ejs?v=99',
-    file: ['gtscnd', 'scnhome.ejs'] },
-  { name: 'gtitmd/itmscan.ejs',  url: '/profoundui/userdata/ui/gtitmd/itmscan.ejs?v=99',
-    file: ['gtitmd', 'itmscan.ejs'] },
-  { name: 'gtitdd/itmdetl.ejs',  url: '/profoundui/userdata/ui/gtitdd/itmdetl.ejs?v=99',
-    file: ['gtitdd', 'itmdetl.ejs'] },
-];
+/* Derived from the generator, never restated here: a hand-kept duplicate of
+ * this list silently stopped covering the Receiving screens the moment they
+ * were added, and the suite still reported all checks passed. */
+const { SCREENS: GEN_SCREENS } = require('./gen-gt-shim.js');
+
+const SCREENS = GEN_SCREENS.map((s) => ({
+  name: s.tpl,
+  url: '/profoundui/userdata/ui/' + s.tpl + '?v=99',
+  file: s.tpl.split('/'),
+}));
 
 function fetchText(url) {
   return new Promise((resolve, reject) => {
@@ -124,10 +124,11 @@ for (const SKIN of SKINS) {
    *
    * Each entry's snapshot is the concatenation of its js[] files in order, so
    * the expected text is built the same way the generator builds it. */
-  var JS_SNAPSHOTS = [
-    { match: 'scnhome', files: ['gt-scan.js'] },
-    { match: 'itmdetl', files: ['gt-carousel.js', 'gt-photo.js'] },
-  ];
+  /* Also derived: every screen the generator gives a js[] to. */
+  var JS_SNAPSHOTS = GEN_SCREENS
+    .filter((sc) => sc.js && sc.js.length)
+    .map((sc) => ({ match: sc.tpl.split('/')[1].replace('.ejs', ''),
+                    files: sc.js.map((f) => f.split('/')[1]) }));
 
   for (const snap of JS_SNAPSHOTS) {
     const expected = snap.files
@@ -150,8 +151,15 @@ for (const SKIN of SKINS) {
   /* The capture path has a hard dependency the shim cannot see: gt-photo.js
    * must actually define the globals the template's inline onclick handlers
    * call. A rename on either side is silent -- the button just does nothing.
-   * Run the snapshot and assert the contract. */
-  const photoApi = await page.evaluate(() => {
+   * Run the snapshot and assert the contract, in both directions, with both
+   * sides read from source. */
+  const tplSrc = fs.readFileSync(path.join(UI, 'gtitdd', 'itmdetl.ejs'), 'utf8');
+  const photoSrc = fs.readFileSync(path.join(UI, 'gtcommon', 'gt-photo.js'), 'utf8');
+  const called = [...new Set(
+    [...tplSrc.matchAll(/gtPhoto\.([A-Za-z_$][\w$]*)\s*\(/g)].map((m) => m[1])
+  )];
+
+  const photoApi = await page.evaluate((wanted) => {
     var e = (window.__gtwmsEntries || []).filter(function (x) {
       return x.pattern.indexOf('itmdetl') !== -1;
     })[0];
@@ -162,26 +170,31 @@ for (const SKIN of SKINS) {
     try { (new Function(new TextDecoder('utf-8').decode(bytes)))(); }
     catch (err) { return 'threw: ' + err.message; }
     if (!window.gtPhoto) return 'gtPhoto not defined';
-    var missing = ['pick', 'chosen', 'use', 'close'].filter(function (fn) {
+    /* Every handler the template's inline attributes call must be a function
+     * on the API. The list comes from the template, passed in below, so this
+     * cannot drift when a handler is added or renamed. */
+    var missing = wanted.filter(function (fn) {
       return typeof window.gtPhoto[fn] !== 'function';
     });
     return missing.length ? 'missing: ' + missing.join(', ') : true;
-  });
+  }, called);
   check('gtPhoto exposes the handlers the template calls', photoApi === true,
-        photoApi === true ? '' : String(photoApi));
+        photoApi === true ? 'calls: ' + called.join(', ') : String(photoApi));
 
-  /* And the other direction: every gtPhoto.<fn> the template invokes from an
-   * inline attribute must exist on that API. */
-  const tplSrc = fs.readFileSync(path.join(UI, 'gtitdd', 'itmdetl.ejs'), 'utf8');
-  const called = [...new Set(
-    [...tplSrc.matchAll(/gtPhoto\.([A-Za-z_$][\w$]*)\s*\(/g)].map((m) => m[1])
-  )];
-  const known = ['pick', 'chosen', 'use', 'close'];
-  const unknownCalls = called.filter((c) => known.indexOf(c) === -1);
+  /* And the other direction: nothing exported that the template never calls,
+   * and nothing called that is not exported. Both lists are derived from the
+   * sources -- hardcoding the handler names here meant that adding `open`,
+   * `shoot` and `retake` failed a check that was only describing a stale
+   * list, which is noise rather than a finding. */
+  const exported = [...new Set(
+    [...(photoSrc.match(/window\.gtPhoto\s*=\s*\{[\s\S]*?\n\s*\};/) || [''])[0]
+      .matchAll(/^\s*([A-Za-z_$][\w$]*)\s*:/gm)].map((m) => m[1])
+  )].filter((n) => n !== '__installed');
+  const unknownCalls = called.filter((c) => exported.indexOf(c) === -1);
   check('template calls only handlers gt-photo.js defines',
-        called.length > 0 && unknownCalls.length === 0,
+        called.length > 0 && exported.length > 0 && unknownCalls.length === 0,
         unknownCalls.length ? 'unknown: ' + unknownCalls.join(', ')
-                            : 'calls: ' + called.join(', '));
+                            : 'exports: ' + exported.join(', '));
 
   /* A non-matching URL must still go to the real network, or we would have
    * broken every other request on the page -- including the other projects'

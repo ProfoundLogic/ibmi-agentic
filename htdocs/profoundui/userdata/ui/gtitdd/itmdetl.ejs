@@ -25,6 +25,7 @@ var T = {
         prev:'Previous image', next:'Next image',
         addPhoto:'Add photo', photoTitle:'Add a photo',
         usePhoto:'Use this photo', retake:'Retake', cancel:'Cancel',
+        takePhoto:'Take photo', closeCamera:'Close camera', chooseFile:'Choose a file',
         yourPhoto:'Your photo', images:'images', yours:'by you',
         photoHint:'Photograph the stock as it actually is \u2014 damage, ' +
                   'labelling, how the skid is built.',
@@ -42,6 +43,8 @@ var T = {
         prev:'Image précédente', next:'Image suivante',
         addPhoto:'Ajouter une photo', photoTitle:'Ajouter une photo',
         usePhoto:'Utiliser cette photo', retake:'Reprendre', cancel:'Annuler',
+        takePhoto:'Prendre la photo', closeCamera:'Fermer la caméra',
+        chooseFile:'Choisir un fichier',
         yourPhoto:'Votre photo', images:'images', yours:'par vous',
         photoHint:'Photographiez la marchandise telle qu\u2019elle est \u2014 ' +
                   'avaries, étiquetage, montage de la palette.',
@@ -146,13 +149,15 @@ var rows = (typeof locsfl !== 'undefined' && locsfl) ? locsfl : [];
             </div>
           <% } %>
 
-          <%# Camera button sits ON the carousel, bottom-right, where the
-              thumb already is on a phone. Rendered unconditionally: if
+          <%# Camera button sits ON the carousel, bottom-left, clear of the
+              centred dots and of the right-hand next arrow. Rendered
+              unconditionally and never hidden by a breakpoint: it is the only
+              way to add a photo, so it has to survive the narrowest phone. If
               gt-photo.js never loads it simply does nothing, rather than the
               screen depending on JS to draw itself. %>
           <button type="button" class="gt-car-add" title="<%= T.addPhoto %>"
                   aria-label="<%= T.addPhoto %>"
-                  onclick="if(window.gtPhoto)gtPhoto.pick()">
+                  onclick="if(window.gtPhoto)gtPhoto.open()">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M9 3 7.2 5H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0
                        2-2V7a2 2 0 0 0-2-2h-3.2L15 3H9Zm3 5.5A4.5 4.5 0 1 1 7.5
@@ -164,15 +169,16 @@ var rows = (typeof locsfl !== 'undefined' && locsfl) ? locsfl : [];
           </button>
         </div>
 
+        <%# The count only. There used to be a second, labelled "Add photo"
+            button here that appeared at 640px and vanished below it -- two
+            controls doing one job, and the one that survived on a phone was
+            the one the operator could not see. Now there is exactly one
+            camera button, on the image, at every width. %>
         <div class="gt-car-meta">
           <span class="gt-car-count">
             <%= imgs.length %> <%= T.images %><% if (nPhotos > 0) { %>
               &middot; <%= nPhotos %> <%= T.yours %><% } %>
           </span>
-          <button type="button" class="gt-btn gt-btn-ghost gt-car-add-wide"
-                  onclick="if(window.gtPhoto)gtPhoto.pick()">
-            <%= T.addPhoto %>
-          </button>
         </div>
       </section>
 
@@ -257,9 +263,17 @@ var rows = (typeof locsfl !== 'undefined' && locsfl) ? locsfl : [];
   <input type="hidden" name="action" value="">
   <input type="hidden" name="imgdata" id="gt-photo-data" value="">
 
-  <%# Camera capture. The file input hands off to the platform camera app,
-      which brings autofocus, flash and tap-to-focus with it, and falls back
-      to a file picker on a desktop with no camera. %>
+  <%# Camera capture. The camera button opens a LIVE camera in the panel
+      below -- the same getUserMedia path the scan screen uses -- rather than
+      handing off to the platform's file picker. On a phone the picker offered
+      a gallery-versus-camera choice nobody wants when they are standing in
+      front of the damaged carton, and on a desktop it was simply a file
+      dialog.
+
+      The file input stays as the FALLBACK ONLY, for when getUserMedia is
+      refused: no camera on the machine, or a non-HTTPS origin. gt-photo.js
+      reaches for it only after the live camera fails, which is also what
+      keeps demoing from a laptop possible. %>
   <input type="file" id="gt-photo-file" accept="image/*" capture="environment"
          class="gt-photo-file" onchange="if(window.gtPhoto)gtPhoto.chosen(this)">
 
@@ -267,17 +281,60 @@ var rows = (typeof locsfl !== 'undefined' && locsfl) ? locsfl : [];
     <div class="gt-photo-panel">
       <h2 class="gt-photo-title"><%= T.photoTitle %></h2>
       <p class="gt-photo-hint"><%= T.photoHint %></p>
-      <div class="gt-photo-stage">
+
+      <%# One stage holding both the live video and the captured still. Which
+          is visible is driven by is-live / is-shot on the overlay, so the
+          controls can never disagree with the actual camera state. %>
+      <div class="gt-photo-stage" id="gt-photo-stage">
+        <video id="gt-photo-video" muted playsinline></video>
         <img id="gt-photo-preview" alt="">
+
+        <div class="gt-photo-camctl">
+          <button type="button" class="gt-photo-shutter" id="gt-photo-shutter"
+                  title="<%= T.takePhoto %>" aria-label="<%= T.takePhoto %>"
+                  onclick="if(window.gtPhoto)gtPhoto.shoot()">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true">
+              <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+              <circle cx="16" cy="18" r="5"/>
+            </svg>
+          </button>
+
+          <%# Same camera-plus-no-entry badge as the scan screen, so "close the
+              camera" reads identically on both. The camera stays readable at
+              full size; the ban is a badge over one corner. %>
+          <button type="button" class="gt-photo-stop" id="gt-photo-stop"
+                  title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>"
+                  onclick="if(window.gtPhoto)gtPhoto.close()">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true">
+              <g class="gt-icon-cam">
+                <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                <circle cx="15" cy="18" r="4.6"/>
+              </g>
+              <g class="gt-icon-ban">
+                <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+                <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+                <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+              </g>
+            </svg>
+          </button>
+        </div>
       </div>
+
       <div class="gt-photo-status" id="gt-photo-status"></div>
       <div class="gt-photo-actions">
         <button type="button" class="gt-btn gt-btn-primary" id="gt-photo-use"
                 disabled onclick="if(window.gtPhoto)gtPhoto.use()">
           <%= T.usePhoto %>
         </button>
-        <button type="button" class="gt-btn"
-                onclick="if(window.gtPhoto)gtPhoto.pick()"><%= T.retake %></button>
+        <button type="button" class="gt-btn gt-photo-retake" id="gt-photo-retake"
+                onclick="if(window.gtPhoto)gtPhoto.retake()"><%= T.retake %></button>
+        <%# Only shown once the live camera has been refused. %>
+        <button type="button" class="gt-btn gt-photo-choose" id="gt-photo-choose"
+                onclick="if(window.gtPhoto)gtPhoto.pick()"><%= T.chooseFile %></button>
         <button type="button" class="gt-btn gt-btn-ghost"
                 onclick="if(window.gtPhoto)gtPhoto.close()"><%= T.cancel %></button>
       </div>

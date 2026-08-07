@@ -82,7 +82,13 @@
 .gt-app *::before,
 .gt-app *::after { box-sizing: border-box; }
 
-.gt-app button { font: inherit; color: inherit; cursor: pointer; }
+/* :where() for the same reason as the div reset above, and it matters more
+ * here. Written as `.gt-app button` this scores (0,1,1) and beats every
+ * component class that sets its own colour -- so `color: inherit` won over
+ * `.gt-btn-primary { color: #FFFFFF }` (0,1,0) and every primary button in the
+ * application rendered near-black text on GT red. At (0,0,1) the reset still
+ * normalises a bare <button> while any class wins. */
+:where(.gt-app) button { font: inherit; color: inherit; cursor: pointer; }
 
 /* ------------------------------------------------------------------
  * Never let a form control fall below 16px.
@@ -343,3 +349,112 @@
 @media (min-width: 835px) {
   .gt-facts { grid-template-columns: minmax(0, 30%) minmax(0, 1fr); }
 }
+
+
+/* ==================================================================
+ * The scan camera -- shared by every screen that accepts a barcode.
+ *
+ * Moved here from scnhome.css when Receiving became the second consumer.
+ * gt-scan.js drives it by toggling .is-live on .gt-scan-camera, so the
+ * markup, the CSS and the actual camera state cannot drift apart.
+ *
+ * A screen wanting a different camera SIZE should override
+ * .gt-scan-stage's aspect-ratio locally rather than copying this block.
+ * ================================================================== */
+
+.gt-scan-camera { margin-bottom: var(--gt-gap); }
+
+.gt-scan-stage {
+  position: relative;
+  width: 100%;
+  /* Reserve the space before the stream arrives so the page does not
+   * jump when the camera opens. */
+  aspect-ratio: 4 / 3;
+  background: #111;
+  border-radius: var(--gt-radius);
+  overflow: hidden;
+  display: none;
+}
+.gt-scan-camera.is-live .gt-scan-stage { display: block; }
+
+.gt-scan-stage video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* GT-yellow reticle. Deliberately large -- an operator aiming a phone at a
+ * carton needs a target, not a hairline. */
+.gt-scan-frame {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 22%;
+  bottom: 22%;
+  border: 3px solid var(--gt-yellow);
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+  transition: border-color 120ms ease;
+}
+.gt-scan-frame.is-hit { border-color: var(--gt-good); border-width: 5px; }
+
+.gt-scan-status {
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--gt-muted);
+  min-height: 18px;
+  overflow-wrap: anywhere;
+}
+.gt-scan-status.is-good { color: var(--gt-good); font-weight: 600; }
+.gt-scan-status.is-warn { color: var(--gt-warn); }
+.gt-scan-status.is-bad  { color: var(--gt-bad); font-weight: 600; }
+
+/* ---- Camera toggle ---------------------------------------------
+ * A single circular icon rather than a text button: the camera is the
+ * primary action on this screen and a word-shaped button read as heavy
+ * next to the viewfinder. Exactly one of the two is visible at a time,
+ * selected by .is-live, so the control cannot disagree with the camera.
+ * ---------------------------------------------------------------- */
+.gt-scan-camctl {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 2px;
+}
+
+.gt-iconbtn {
+  /* Comfortably past the 48px minimum -- this is the one control an
+   * operator reaches for while holding a carton. */
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  transition: transform 80ms ease, background-color 120ms ease;
+}
+.gt-iconbtn svg { width: 34px; height: 34px; }
+.gt-iconbtn:active { transform: translateY(1px) scale(0.97); }
+.gt-iconbtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(227, 24, 55, 0.28), 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+/* Closed: GT red, plain camera. */
+.gt-iconbtn-go { background: var(--gt-red); color: #FFFFFF; }
+
+/* Open: neutral plate so the red belongs to the no-entry mark, which is
+ * what the eye should land on. */
+.gt-iconbtn-stop { background: var(--gt-card); border: 2px solid var(--gt-line); }
+.gt-iconbtn-stop .gt-icon-cam { color: var(--gt-ink); stroke: currentColor; }
+.gt-iconbtn-stop .gt-icon-ban { color: var(--gt-red); stroke: currentColor; }
+/* Filled with the button's own background so the badge punches a clean hole
+   in the camera outline rather than sitting on top of it as a tangle. */
+.gt-iconbtn-stop .gt-icon-ban-plate { fill: var(--gt-card); stroke: var(--gt-card); stroke-width: 2; }
+
+/* Exactly one visible, driven by the same class gt-scan.js toggles. */
+.gt-scan-camera:not(.is-live) #gt-scan-stop { display: none; }
+.gt-scan-camera.is-live #gt-scan-start { display: none; }
