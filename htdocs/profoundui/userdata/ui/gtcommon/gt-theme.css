@@ -48,6 +48,99 @@
   box-sizing: border-box;
 }
 
+/* ==================================================================
+ * SCROLLING, inside Genie. Measured against the DEPLOYED skins, not guessed.
+ *
+ * THE TWO SKINS ARE NOT THE SAME SHAPE, and that is the whole reason this
+ * section is careful. Deployed markup, verbatim:
+ *
+ *   pls        body(fixed) > .pls-scroll-bar-wrap(fixed) > .pls-scroll-box
+ *                > #main.genie-main(100vh, grid) > #contain.genie-container
+ *                  (position: fixed; height: 100%; NO top) > #5250 > .gt-app
+ *
+ *   Classic    body > #5250 > .gt-app          <- that is the entire page
+ *
+ * On pls every ancestor is pinned, so nothing scrolls unless we make it, and the
+ * container hangs below the viewport. On Classic the document scrolls normally and
+ * one finger works, because there is nothing pinned at all.
+ *
+ * So the app shell is applied ONLY where the skin pins the container -- keyed on
+ * `.genie-container` as an ancestor. On Classic none of it matches and the stock
+ * document scroll is left alone. Applying it there took away the document scroll,
+ * put the only scroller inside .gt-main, and made an Android device need a pinch
+ * and two fingers to move anything.
+ *
+ * THE pls FAULTS, all three measured on an 834x1194 iPad:
+ *
+ * 1. NOTHING SCROLLS. `.genie-container` is given `overflow: auto` only inside
+ *    `@supports (-moz-appearance: none)` -- Firefox-only in intent, but Chromium
+ *    honours it because it aliases -moz-appearance, so a Chromium harness scrolls
+ *    and the fault is invisible. Suppress that one rule and the exit button sits
+ *    482px below the fold with nothing moving. `body` is `position: fixed` on
+ *    mobile too, so there is no document scroll to fall back on.
+ *
+ * 2. THE CONTAINER HANGS 38px LOW. `#contain` is `position: fixed` with no `top`,
+ *    so it lands at its static position -- and the skin's markup is indented,
+ *    which puts a whitespace-only text node inside `.pls-scroll-bar-wrap` and
+ *    another inside `.pls-scroll-box`. Two line boxes, 38px. (Not the logo
+ *    banner, which measures 0px -- that was the first guess and it was wrong.)
+ *
+ * 3. IT IS SIZED TO THE WRONG VIEWPORT. `height: 100%` on a fixed element
+ *    resolves against the LAYOUT viewport, and on iOS that is the LARGE viewport
+ *    -- the size the page would be with the browser's toolbars hidden. The
+ *    container's bottom therefore sits BEHIND the toolbar, and a footer pinned
+ *    there is invisible. That is how Back-to-menu "disappeared" once it was
+ *    pinned: reachable by the numbers, gone in practice.
+ *
+ * Guarded by test-skin-scroll.js, which renders BOTH skins' real chains against
+ * their real deployed CSS, and runs the webkit-like case as well as Chromium's.
+ * ================================================================== */
+
+/* Fault 2 and 3: anchor it to the viewport, and size it to the viewport that is
+   actually visible. Three declarations, weakest first, so each browser takes the
+   best it has -- 100% for anything ancient, 100dvh for the dynamic viewport
+   (iOS 15.4+), and --gt-vvh measured from visualViewport by the shim, which is
+   the only one that also survives a toolbar overlaying the dvh box. */
+html.gt-screen .genie-container {
+  top: 0;
+  height: 100%;
+  height: 100dvh;
+  height: var(--gt-vvh, 100dvh);
+}
+
+/* Fault 1: stop depending on an ancestor scrolling. Our wrapper becomes an app
+   shell -- header pinned, footer pinned, only the content between them scrolls --
+   so the footer holding Back-to-menu cannot be scrolled away from.
+   ONLY inside .genie-container: see the note above about Classic. */
+html.gt-screen .genie-container .gt-app {
+  height: 100%;
+  overflow: hidden;
+}
+
+html.gt-screen .genie-container .gt-main {
+  flex: 1 1 auto;
+  /* Without min-height:0 a flex item refuses to shrink below its content, so it
+     would grow the shell instead of scrolling inside it. */
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Say explicitly that one finger pans this box. Without it a touch browser can
+     decide the gesture belongs to the page -- and on these skins the page cannot
+     scroll, so the drag does nothing at all. */
+  touch-action: pan-y;
+  /* Stop a flick at the end of the list from scrolling whatever is behind us. */
+  overscroll-behavior: contain;
+}
+
+/* We scroll inside, so the boxes around us must not also scroll -- otherwise a
+   flick moves the wrong one and the header appears to drift. Specificity (0,3,1)
+   beats the skin's `.genie-container` and its @supports override.
+   `div[id="5250"]` is qualified by .genie-container for the same reason as
+   above: on Classic that div IS the page. */
+html.gt-screen .genie-container,
+html.gt-screen .genie-container div[id="5250"] { overflow: hidden; }
+
 /* ------------------------------------------------------------------
  * Genie resets.
  *
@@ -304,6 +397,21 @@
   padding-bottom: calc(var(--gt-pad) + env(safe-area-inset-bottom, 0px));
 }
 .gt-btn {
+  /* CENTRE EXPLICITLY, and do not rely on a button's native centring.
+     A button centres its own label only while its display is block or
+     inline-block. Two of these buttons are revealed with `display: inline-flex`
+     (.gt-photo-retake, .gt-photo-choose), and as flex items that blockifies to
+     `flex` -- a flex container, which by default puts its content at the start
+     and stretches it. So Retake rendered with its label pushed left and stuck to
+     the top of a 64px button while every sibling was centred.
+     Declaring the centring here makes every button identical whatever display
+     value it ends up with. Guarded by test-buttons.js. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 14px;
+
   flex: 1 1 0;
   min-width: 0;
   min-height: var(--gt-action);

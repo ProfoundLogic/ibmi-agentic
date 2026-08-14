@@ -946,18 +946,24 @@ function page(bodyHtml, css) {
     if (before === 'none') ok('it stays out of the way until asked', 'display:none');
     else bad('the diagnostic line is visible when nothing is wrong', 'display=' + before);
 
-    const btns = await pg.$$('#gt-scan-camera .gt-scan-photo');
-    await btns[1].click();
-    await pg.waitForTimeout(150);
-    const shown = await pg.evaluate(() => {
-      const el = document.querySelector('#gt-scan-diag');
-      return { display: getComputedStyle(el).display, text: el.textContent };
+    /* There is no longer a button to tap. The line opens itself on a real failure
+       -- the photo-no-read branch and the 7-second no-read hint both call it -- and
+       the photo case is already covered above. What is left to check here is that
+       the row it lives in has been reduced to the one control the operator needs. */
+    const row = await pg.evaluate(() => {
+      const r = document.querySelector('#gt-scan-extra');
+      const btns = r.querySelectorAll('button');
+      return { buttons: btns.length,
+               label: btns[0] ? btns[0].textContent.trim() : '',
+               justify: getComputedStyle(r).justifyContent,
+               verAlign: getComputedStyle(document.querySelector('#gt-scan-ver')).textAlign };
     });
-    const stamp = scanJs.match(/VERSION = '([0-9a-z]+)'/)[1];
-    if (shown.display !== 'none' && shown.text.indexOf('v' + stamp) === 0)
-      ok('one tap reports the running version', shown.text.slice(0, 60));
-    else
-      bad('the diagnostic line does not name the running version', JSON.stringify(shown));
+    if (row.buttons === 1) ok('the extras row carries one control only', row.label);
+    else bad('the extras row has ' + row.buttons + ' buttons', 'the diagnostics button should be gone');
+    if (row.justify === 'center') ok('  the photo button is centred', 'justify-content:center');
+    else bad('  the photo button is not centred', 'justify-content=' + row.justify);
+    if (row.verAlign === 'center') ok('  the version line agrees with it', 'text-align:center');
+    else bad('  the version line is not centred', 'text-align=' + row.verAlign);
     await pg.close();
   }
 
@@ -1092,10 +1098,14 @@ function page(bodyHtml, css) {
     await pg.close();
   }
 
-  /* ---- the screen channel --------------------------------------------
-     The only channel that has reached us every single round. Two outbound
-     mechanisms failed silently on the iPad; the screen state never has. */
-  console.log('\n=== the diagnostics must travel through the screen ===');
+  /* ---- the shim route -------------------------------------------------
+     The GTDIAG-through-the-screen channel is gone: it existed to get device state
+     out during the iPad hunt, and a "Camera details / send report" button on a
+     customer demo screen reads as debug output. What must NOT be lost with it is
+     the coverage it carried almost by accident -- running this file the way the
+     SHIM runs it, through new Function rather than a <script src>. That is what
+     the device executes, and every other camera test here uses the tag route. */
+  console.log('\n=== the code works when run the way the shim runs it ===');
   {
     const stamp = scanJs.match(/VERSION = '([0-9a-z]+)'/)[1];
     const tpl = 'gtscnd/scnhome.ejs';
@@ -1103,27 +1113,30 @@ function page(bodyHtml, css) {
                                        isMobile: true, hasTouch: true });
     await pg.addInitScript(HARNESS);
     await pg.goto(base + '/e2e/' + tpl, { waitUntil: 'load' });
-    /* Run it the way the SHIM does -- new Function, not a script tag. Every camera
-       test until now used the tag route, which is not what the device runs. */
     await pg.evaluate((src) => { window.__gtVia = 'snapshot'; (new Function(src))(); }, scanJs);
     await pg.waitForTimeout(400);
 
-    const btns = await pg.$$('#gt-scan-camera .gt-scan-photo');
-    await btns[1].click();
-    await pg.waitForTimeout(250);
-    const sub = await pg.evaluate(() => window.__submitted || null);
+    const r = await pg.evaluate(() => {
+      const row = document.querySelector('#gt-scan-extra');
+      const ver = document.querySelector('#gt-scan-ver');
+      return {
+        installed: !!(window.gtScan && typeof gtScan.start === 'function'),
+        start: !!document.querySelector('#gt-scan-start'),
+        photo: !!document.querySelector('#gt-scan-photo-btn'),
+        buttons: row ? row.querySelectorAll('button').length : -1,
+        version: ver ? ver.textContent : '',
+      };
+    });
 
-    if (sub && String(sub.scanval || '').indexOf('GTDIAG v=' + stamp) === 0) {
-      ok('one tap sends the report through the screen', sub.scanval);
+    if (r.installed && r.start && r.photo) {
+      ok('the snapshot route installs and wires the controls', 'start + photo present');
     } else {
-      bad('the report did not reach the screen', JSON.stringify(sub));
+      bad('the snapshot route did not wire the screen', JSON.stringify(r));
     }
-    /* SCANVAL is char(120): a longer payload is silently truncated by the display
-       file, and the error code -- the part worth having -- lives at the end. */
-    if (sub && String(sub.scanval).length <= 118) ok('  it fits SCANVAL char(120)', String(sub.scanval).length + ' chars');
-    else bad('  the report will be truncated', sub ? String(sub.scanval).length + ' chars' : 'none');
-    if (sub && /via=(snap|tag)/.test(sub.scanval)) ok('  it names the delivery route', sub.scanval.match(/via=\w+/)[0]);
-    else bad('  it does not say which route delivered the code', String(sub && sub.scanval));
+    if (r.buttons === 1) ok('  no diagnostics button on a demo screen', '1 control in the row');
+    else bad('  the extras row has ' + r.buttons + ' buttons', 'expected 1');
+    if (r.version === 'v' + stamp) ok('  the version chip names the running build', r.version);
+    else bad('  the version chip is wrong or missing', JSON.stringify(r.version));
 
     await pg.close();
   }

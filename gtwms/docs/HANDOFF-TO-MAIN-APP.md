@@ -109,6 +109,20 @@ IBMI_BUILD_LIBRARY=TIGERPOC codermake <target>
 Never a bare `codermake` with no target from this repo — it builds every other
 project's objects into TIGERPOC too.
 
+### 4b. After rebuilding programs, check the images
+
+Rebuilding programs can re-run the seed (`gtseed.file` is an order-only
+prerequisite), and that drops and recreates GTIMAGE. `image_id` is
+`GENERATED ALWAYS AS IDENTITY`, so the ids move to a new block while the exported
+`.jpg` files keep the old names -- **every image on every screen 404s** and no
+build step reports it.
+
+```bash
+node gtwms/tools/test-images.js          # AFTER the rebuild, always
+node gtwms/tools/export-images.js        # only if the ids 404
+scp /tmp/gtimg-export/*.jpg dev:/home/drusso/puidist/htdocs/profoundui/userdata/ui/gtimg/
+```
+
 ### 5. Deploy the web assets AND re-snapshot every skin
 
 ```bash
@@ -153,6 +167,35 @@ ssh dev "grep -hE 'start\.html|auth/genie' /www/drpuidev/logs/access_log.Q1YYMMD
 The log filename is `access_log.Q1YYMMDD00` — for 2026-08-14, `Q126081400`. It is
 world-readable and records the full query string, which is why option 5 can report
 device state just by fetching a URL.
+
+## The skin owns the scroll
+
+Fixed 2026-08-14, and worth knowing before touching any layout. Every box the skin
+puts around us is pinned: on mobile `body` is `position: fixed`, and
+`.genie-container` is `position: fixed; height: 100%` with `overflow: auto` only
+inside `@supports (-moz-appearance: none)` -- effectively Firefox, though Chromium
+honours it too. So on WebKit **nothing scrolls at all**, and the container also
+hangs 38px below the viewport because it has no `top` and the skin's markup
+indentation leaves two whitespace line boxes above it.
+
+**The two skins are different shapes.** Classic's entire body is
+`<div id="5250">` -- nothing pinned, document scrolls, one finger works. Every shell
+rule is therefore qualified by `.genie-container`, which only the pls-family skins
+have. Unscoped, those rules clipped the Classic page itself and Android needed a
+pinch and two fingers to move anything.
+
+Our screens are therefore an app shell, scoped to `html.gt-screen`: header pinned,
+footer pinned, only `.gt-main` scrolls. Two consequences for new screens:
+
+- **every screen needs `<main class="gt-main">` and `<footer class="gt-actions">`.**
+  Without the main, `.gt-app { overflow: hidden }` clips it with no scrollbar.
+  `test-skin-scroll.js` checks every screen for both.
+- **never add `html`, `body` or `.genie-*` rules unscoped.** The theme has none,
+  and the test fails if any appear.
+
+Run `node gtwms/tools/test-skin-scroll.js` after any layout change. It fetches the
+real deployed skin CSS and tests the webkit-like case, which is the only one that
+reproduces the device.
 
 ## Three invariants not to regress
 

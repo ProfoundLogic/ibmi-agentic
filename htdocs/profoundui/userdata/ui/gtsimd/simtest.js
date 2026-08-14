@@ -32,7 +32,7 @@
 (function () {
   'use strict';
 
-  var VERSION   = '20260811k';
+  var VERSION   = '20260811q';
   var ZXING_SRC = '/profoundui/userdata/ui/gtcommon/gt-zxing.min.js';
   var PROBE_SRC = '/profoundui/userdata/ui/gtcommon/gt-version.js';
 

@@ -57,7 +57,7 @@
      snapshot injected by the Genie shim -- and there is no guarantee which runs
      last. It had no guard at all, so a months-old cached copy arriving second
      silently replaced the current one. */
-  var VERSION = '20260811k';
+  var VERSION = '20260811q';
 
   /* Display-file field is char(24000). Stay clear of the edge: a truncated
    * base64 string decodes to a corrupt JPEG, not to an error. */

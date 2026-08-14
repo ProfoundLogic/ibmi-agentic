@@ -441,6 +441,16 @@ ${entryJs}
       vpOurs = true;
     }
     tag.setAttribute("content", GT_VIEWPORT);
+
+    /* Marks the document while one of our screens is displayed. gt-theme.css
+       hangs its scrolling rules off this, so Genie's own 5250 screens and the
+       other projects sharing this skin are never affected. Set here, with the
+       viewport, because both answer the same question: is a GT screen on. */
+    var root = document.documentElement;
+    if (root && root.className.indexOf("gt-screen") === -1) {
+      root.className = (root.className + " gt-screen").replace(/^ /, "");
+    }
+    syncVisibleHeight();
     vpOn = true;
   }
 
@@ -456,6 +466,11 @@ ${entryJs}
         tag.setAttribute("content", vpPrev);
       }
     }
+    var root = document.documentElement;
+    if (root) {
+      root.className = root.className.replace(/(^|\s)gt-screen(?=\s|$)/g, "").replace(/^\s+/, "");
+      root.style.removeProperty("--gt-vvh");
+    }
     vpOn = false;
   }
 
@@ -463,6 +478,47 @@ ${entryJs}
      render hook: the hook tells us when one of our screens ARRIVES, and nothing
      tells us when it leaves. Polling the DOM covers both directions and cannot
      be wrong about the current state. */
+  /* ------------------------------------------------------------------
+     THE VISIBLE HEIGHT.
+
+     "height: 100%" on a position:fixed element resolves against the LAYOUT
+     viewport, and on iOS that is the LARGE viewport -- the size the page would
+     be with the browser's toolbars hidden. So the bottom of the container sits
+     behind the toolbar, and a footer pinned there is invisible. That is exactly
+     how Back-to-menu "disappeared" after the scroll fix pinned it.
+
+     visualViewport reports what is ACTUALLY visible, so it is published as a
+     custom property and gt-theme.css sizes the container from it.
+
+     IGNORE BIG DROPS. visualViewport also shrinks when the on-screen keyboard
+     opens, by several hundred pixels. Resizing the shell for that would reflow
+     the whole list under the operator's thumb every time they tap a quantity
+     box. A toolbar is worth ~40-120px, a keyboard far more, so anything past
+     the threshold is left alone -- the keyboard covers the footer either way.
+     ------------------------------------------------------------------ */
+  var VVH_MAX_SHRINK = 200;
+
+  function syncVisibleHeight() {
+    var vv = window.visualViewport;
+    var root = document.documentElement;
+    if (!vv || !root) return;
+
+    if (root.className.indexOf("gt-screen") === -1) {
+      root.style.removeProperty("--gt-vvh");
+      return;
+    }
+
+    var layout = window.innerHeight || vv.height;
+    var shrink = layout - vv.height;
+    if (shrink > VVH_MAX_SHRINK) return;          /* keyboard, not toolbar */
+    root.style.setProperty("--gt-vvh", Math.round(vv.height) + "px");
+  }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", syncVisibleHeight);
+    window.visualViewport.addEventListener("scroll", syncVisibleHeight);
+  }
+
   function syncViewport() {
     if (document.querySelector(".gt-app")) applyViewport();
     else restoreViewport();

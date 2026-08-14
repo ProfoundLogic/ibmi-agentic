@@ -52,7 +52,7 @@
      Comparing versions fixes it from the inside: a stale copy that arrives after
      a newer one steps aside, and a newer copy replaces an older one. It is a
      string compare on a YYYYMMDDx stamp, which orders correctly. */
-  var VERSION = '20260811k';
+  var VERSION = '20260811q';
   var prev = window.gtScan;
   if (prev && prev.__installed) {
     if (prev.__version && String(prev.__version) >= VERSION) {
@@ -606,49 +606,6 @@
            (d.lastErr ? ' · ERR ' + d.lastErr : '');
   }
 
-  /* ------------------------------------------------------------------
-     REPORT THROUGH THE SCREEN, because the screen always gets through.
-
-     Two outbound channels have now failed on the device that matters: the access
-     log ping and the version probe both fire correctly in Chromium and produced no
-     request at all from the iPad. Whatever the cause -- WebKit, a content blocker,
-     Private Relay -- I cannot see it from here and cannot fix it blind.
-
-     But ONE channel is proven, every single round: the screen state. The support
-     tooling captures the RDF data on every message, so anything the program puts
-     into a screen field arrives without the operator doing anything beyond using
-     the application.
-
-     So the diagnostics go where they cannot be dropped: submitted as a scan,
-     prefixed GTDIAG. The program does not resolve it -- which is correct, it is not
-     a barcode -- and records it as an unresolved scan, and the raw value comes back
-     in RRAW and in the scan history. It costs one row of demo data and ends the
-     round trip.
-
-     Kept to ~110 characters because SCANVAL is char(120) and a truncated report
-     loses the error, which is the part worth having.
-     ------------------------------------------------------------------ */
-  function compactDiag() {
-    var d = gtScanDiag();
-    return ('GTDIAG v=' + d.version +
-            ' via=' + ((window.__gtVia || 'tag') === 'snapshot' ? 'snap' : 'tag') +
-            ' p=' + (d.path || '-') +
-            ' f=' + (d.zxTries + d.nativeTries) +
-            ' vid=' + d.videoW + 'x' + d.videoH +
-            ' rd=' + d.frameW + 'x' + d.frameH +
-            ' det=' + (d.detectorPresent ? 1 : 0) +
-            ' zx=' + (d.zxLoaded ? 1 : 0) + (d.zxVia ? '/' + d.zxVia.slice(0, 4) : '') +
-            ' ph=' + d.photoTries +
-            ' e=' + ((d.lastErr || '-').replace(/[^A-Za-z0-9:.-]/g, '').slice(0, 18))
-           ).slice(0, 118);
-  }
-
-  function sendDiagToScreen() {
-    if (window.pui && typeof pui.submit === 'function') {
-      pui.submit({ action: 'SCAN', scanval: compactDiag() });
-    }
-  }
-
   function showDiag() {
     var el = $('#gt-scan-diag');
     if (!el) return;
@@ -673,7 +630,8 @@
   /* One stylesheet for the controls this file creates. Scoped to the band so it
      cannot leak into the Genie skin or a screen's own CSS. */
   var EXTRA_CSS =
-    '#gt-scan-camera .gt-scan-extra{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}' +
+    '#gt-scan-camera .gt-scan-extra{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;' +
+      'justify-content:center}' +
     '#gt-scan-camera .gt-scan-photo{min-height:48px;padding:0 14px;border:1px solid #C8C8C4;' +
       'border-radius:10px;background:#fff;color:#2B2B2B;font-size:15px;font-weight:600;' +
       'white-space:normal;cursor:pointer}' +
@@ -682,7 +640,7 @@
       'color:#6E6E69;white-space:normal;word-break:break-word;font-family:"SF Mono",Consolas,monospace}' +
     '#gt-scan-camera .gt-scan-diag.is-open{display:block}' +
     '#gt-scan-camera .gt-scan-ver{flex:0 0 100%;margin-top:4px;font-size:10px;color:#9A9A95;' +
-      'white-space:normal;font-family:"SF Mono",Consolas,monospace}';
+      'white-space:normal;text-align:center;font-family:"SF Mono",Consolas,monospace}';
 
   function injectExtras(band) {
     if (!document.getElementById('gt-scan-extra-css')) {
@@ -718,17 +676,6 @@
     btn.textContent = txt('photoScan');
     btn.addEventListener('click', function () { input.click(); });
 
-    var info = document.createElement('button');
-    info.type = 'button';
-    info.className = 'gt-scan-photo';
-    info.textContent = txt('showDiag');
-    info.addEventListener('click', function () {
-      var el = $('#gt-scan-diag');
-      if (el && el.className.indexOf('is-open') >= 0) { el.className = 'gt-scan-diag'; return; }
-      showDiag();
-      sendDiagToScreen();
-    });
-
     var diagEl = document.createElement('div');
     diagEl.className = 'gt-scan-diag';
     diagEl.id = 'gt-scan-diag';
@@ -750,7 +697,6 @@
        stale one. The chip then reported the version that was no longer running,
        which is the exact confusion it exists to prevent. */
     row.appendChild(btn);
-    row.appendChild(info);
     row.appendChild(input);
     row.appendChild(diagEl);
     row.appendChild(ver);
@@ -868,7 +814,6 @@
         noDetector: 'This browser cannot decode in-camera. Use the keypad below.',
         cameraFailed: 'Camera could not be opened',
         photoScan: 'Scan from a photo',
-        showDiag: 'Camera details / send report',
         readingPhoto: 'Reading the photo…',
         photoNoRead: 'No barcode found in that photo. Fill the frame with the barcode and try again.',
         photoFailed: 'That photo could not be opened',
@@ -883,7 +828,6 @@
         noDetector: 'Ce navigateur ne peut pas décoder. Utilisez le clavier ci-dessous.',
         cameraFailed: 'Impossible d’ouvrir la caméra',
         photoScan: 'Scanner depuis une photo',
-        showDiag: 'Détails caméra / envoyer',
         readingPhoto: 'Lecture de la photo…',
         photoNoRead: 'Aucun code à barres dans cette photo. Remplissez le cadre et réessayez.',
         photoFailed: 'Impossible d’ouvrir cette photo',

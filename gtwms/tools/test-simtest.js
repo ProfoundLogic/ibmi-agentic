@@ -218,7 +218,7 @@ const PUI_STUB = () => {
     const CASES = [
       { name: 'en-360-empty', w: 360, h: 800, d: { lang: 'EN' } },
       { name: 'fr-412-result', w: 412, h: 915, d: { lang: 'FR', val: '061414102377', rows: 6, msg: 'Lu : 061414102377' } },
-      { name: 'en-412-long', w: 412, h: 915, d: { lang: 'EN', val: '00306141410000000013011061414100001910L2026A1717270131', rows: 3, diag: 'v=20260811k dec=inline routes=fetch:ok,tag:no vid=1280x720 crop=1203x324 frames=41 focus=not adjustable' } },
+      { name: 'en-412-long', w: 412, h: 915, d: { lang: 'EN', val: '00306141410000000013011061414100001910L2026A1717270131', rows: 3, diag: 'v=20260811q dec=inline routes=fetch:ok,tag:no vid=1280x720 crop=1203x324 frames=41 focus=not adjustable' } },
       { name: 'en-768-result', w: 768, h: 1024, d: { lang: 'EN', val: '061414102377', rows: 12 } },
       { name: 'en-1280-result', w: 1280, h: 900, d: { lang: 'EN', val: '061414102377', rows: 12 } },
     ];

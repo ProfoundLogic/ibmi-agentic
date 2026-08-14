@@ -752,6 +752,152 @@ fix. It is the downscale into a video frame that closes the quiet zone.
 `gen-demo-sheet.js` now forces `borderwidth: 0` for `itf14`, and `test-camera.js`
 asserts that it still does.
 
+### Rebuilding a PROGRAM can re-seed the database and 404 every image
+
+Bumping the cache stamp meant rebuilding all 17 programs. `gtseed.file`,
+`gtviews.file` and the `gtimg*.file` stamps were rebuilt along with them, because
+they are order-only prerequisites and their stamps were older than the restored
+sources. Re-running the seed **drops and recreates GTIMAGE**, and `image_id` is
+`GENERATED ALWAYS AS IDENTITY` -- so the ids moved from one block to the next
+(305..416 to 417..519) while the exported `.jpg` files on the server kept the old
+names. Every image on every screen 404s, and nothing in the build says so.
+
+`test-images.js` catches it, and did -- but only because it ran AFTER the rebuild.
+So the order matters:
+
+```bash
+IBMI_BUILD_LIBRARY=TIGERPOC codermake <pgm targets>
+node gtwms/tools/test-images.js          # <- AFTER, always
+# if ids 404:
+node gtwms/tools/export-images.js
+scp /tmp/gtimg-export/*.jpg dev:/home/drusso/puidist/htdocs/profoundui/userdata/ui/gtimg/
+```
+
+The exported directory is a CACHE of a journaled BLOB column, not a second source
+of truth, so re-exporting is always safe. Check `ls -la build/ | grep gtseed`
+against the program stamps if you want to know whether it happened.
+
+### A `<button>` only centres its own label while its display is block-ish
+
+Retake was reported as "formatting off". Measured, in the same row:
+
+```
+gt-photo-use     display=block  text left 37, right 37, top 23   centred
+gt-photo-retake  display=flex   text left 28, right 46, top  0   NOT centred
+```
+
+`.gt-photo-retake` and `.gt-photo-choose` are hidden by default and revealed with
+`display: inline-flex`. As flex items that **blockifies to `flex`**, which makes
+the button a flex container -- and a flex container defaults to putting its
+content at the start and stretching it. Native button centring is gone, silently,
+and only for the two buttons a show/hide rule happens to touch.
+
+`.gt-btn` now declares `display: inline-flex; align-items: center;
+justify-content: center; text-align: center` itself, so a button renders the same
+whatever display value a show/hide rule leaves it with. **Never rely on a
+control's native centring in a codebase that toggles `display` to show things.**
+
+`test-buttons.js` measures where each label actually sits, using a Range around
+the text contents -- the button's own box says nothing about it. It covers the
+overlay in all three states it can be shown in, at phone and tablet width, and
+carries a control that puts the old rule back and requires Retake to go
+off-centre again (`dx=-25 dy=-45`).
+
+### THE TWO SKINS ARE NOT THE SAME SHAPE. A fix for one broke the other.
+
+The app-shell fix was measured against `pls` only. On **Classic** the entire body is
+
+```html
+<body><div id="5250"></div></body>
+```
+
+No `.pls-scroll-bar-wrap`, no `.genie-container`, nothing pinned -- the document
+scrolls and one finger works, which is exactly the behaviour to leave alone. The
+shell rules were written unscoped, so `html.gt-screen div[id="5250"] {overflow:
+hidden}` landed on **the page itself**, the document stopped scrolling, and the only
+scroller left was inside `.gt-main`. On Android that presented as: one finger does
+nothing, and you have to fake a pinch-zoom before two fingers pan anything -- the
+signature of a page with nothing scrollable being panned at the visual-viewport
+level.
+
+**The rule: every shell rule is qualified by `.genie-container` as an ancestor.**
+It exists only in the pls-family skins, so Classic matches none of it. Also give
+the scroller `touch-action: pan-y` -- without it a touch browser can decide the
+gesture belongs to the page, and on these skins the page cannot scroll, so the drag
+does nothing.
+
+`test-skin-scroll.js` now builds **both** real chains from both skins' deployed CSS,
+with a control that reproduces the Android symptom when the rules are unscoped, and
+a source check that no `html.gt-screen` rule escapes `.genie-container`. It could
+not have caught this before, because it only knew one skin -- the same shape of
+mistake as the Chromium-only camera tests, and the fourth time in this project that
+a harness has been kinder than the device.
+
+### The SKIN owns the scroll, and no pre-flight was rendering the skin
+
+Scrolling stopped working on the iPad and Back-to-menu could not be reached on
+most screens. Nothing in our CSS was wrong: every box AROUND us is pinned.
+
+```
+body                    position: fixed   (html.pls--mobile only)
+ .pls-scroll-bar-wrap   position: fixed; top: 0
+  #main.genie-main      height: 100vh; display: grid
+   #contain             position: fixed; height: 100%;  NO top
+    #5250               <- our .gt-app renders in here
+```
+
+Two independent faults, both measured on an 834x1194 iPad against the DEPLOYED
+skin CSS:
+
+1. **Nothing scrolls.** `.genie-container` gets `overflow: auto` only inside
+   `@supports (-moz-appearance: none)`. That reads Firefox-only -- but **Chromium
+   honours it too, because it aliases -moz-appearance**, so a Chromium harness
+   scrolls happily and the fault is invisible. With that one rule suppressed the
+   exit button sat 482px below the fold and no box moved. On mobile `body` is
+   `position: fixed` as well, so there is no document scroll to fall back on.
+
+2. **The container hangs 38px below the viewport.** `#contain` is `position:
+   fixed` with **no `top`**, so it lands at its static position -- and the skin's
+   markup is indented, which puts a whitespace-only text node inside
+   `.pls-scroll-bar-wrap` and another inside `.pls-scroll-box`. Two line boxes,
+   38px, and since the container is 100% of the viewport its bottom falls 38px
+   off-screen. The last 22px of the footer was unreachable in every viewport.
+   **The logo banner measures 0px** -- that was the first guess and it was wrong.
+
+**The fix, all scoped to `html.gt-screen`** which the shim sets only while one of
+our screens is displayed, so Genie's 5250 screens and the other projects sharing
+the skin are untouched and no skin file is modified:
+
+```css
+html.gt-screen .genie-container { top: 0; }              /* fault 2 */
+html.gt-screen .gt-app  { height: 100%; overflow: hidden; }
+html.gt-screen .gt-main { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+html.gt-screen .genie-container,
+html.gt-screen div[id="5250"] { overflow: hidden; }
+```
+
+An app shell: header pinned, footer pinned, only the middle scrolls. The footer
+holds Back-to-menu, so it cannot be scrolled away from -- the exit is now reachable
+with **no scrolling at all**, in every viewport, in both modes.
+
+**Why no existing test could have caught this.** Every pre-flight rendered our
+markup into a bare page of its own making, with its own `html,body` reset. The
+fault lives entirely in boxes the pre-flights never created.
+`test-skin-scroll.js` fetches the DEPLOYED skin CSS, rebuilds the real container
+chain, and runs **both** as-is and webkit-like. Same lesson as the camera, third
+time: **a harness that grants a capability the device withholds cannot fail the
+way the device fails.**
+
+Three of its own assertions were wrong before they were right, which is worth
+knowing when writing the next one:
+- an exact-string check on `class="gt-main"` called three screens broken because
+  they legitimately add a modifier (`class="gt-main gt-detl-main"`). Match the
+  class TOKEN.
+- `position: sticky` resolves against the scroller's **padding** box, so the
+  seven screens with a sticky band rest at `mainTop + padding-top`, not `mainTop`.
+- measuring a scroll delta AFTER a reachability probe has already driven every
+  scroller to the bottom always reads zero. Rewind first.
+
 ### Option 4 started working with NO camera code change. Read this before debugging delivery again.
 
 On 2026-08-14 both option 4 and option 5 read barcodes on the iPad. Diffing the
