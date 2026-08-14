@@ -2461,3 +2461,263 @@ Two things a pinned band needs beyond the sticky itself, both learned here: an
 **opaque background**, or the cards show through as they pass beneath; and a
 **z-index above whatever the rows claim** — the cards use 20–21 to beat Genie's
 `div { z-index: 10 }`, so the band takes 30.
+
+---
+
+## 35. Build log — Inventory & Movement (menu tile 3)
+
+The second thing the customer asked for: *"scan a barcode on an inventory
+location, show me the on-hand balance in that location and the available balance
+in bulk inventory, with the option to do an inventory movement."*
+
+### 35.1 What was built
+
+| Object | Role |
+|---|---|
+| `GTVINVLOC` | one row per item in a location — description, thumbnail, on hand, allocated, **available in bulk**, the replenish condition and the suggested quantity |
+| `GTVLOCSUM` | the location header: type, zone, aisle/bay/level, item count, units, percent full. `LEFT JOIN` from `GTLOCATION` so an **empty** location still answers |
+| `GTINHD` / `GTINHR` | `invhome` — one scan box, several meanings, plus the replenishment alert list |
+| `GTINLD` / `GTINLR` | `invloc` — what is in this location, with the Replenish shortcut |
+| `GTIMVD` / `GTIMVR` | `invmove` — FROM locked, TO scanned, quantity capped, reason from `GTREASON`, commit-controlled |
+| `gt-invmove.js` | the quantity stepper, with an **upper** clamp |
+
+**One scan box, several meanings.** A location label, an item barcode and a
+pallet SSCC all go in the same box; `GTBAR` classifies and the program decides
+what it meant. An unrecognised payload is also tried as a literal location id,
+because a hand-keyed `A01041` carries no symbology.
+
+**An item scan does not get its own screen.** It goes to the Item Lookup detail
+that already exists, which shows the carousel, the facts and every location the
+item is in — which is what "where is this item" means. A separate `invitm` would
+have been the same query and the same layout under a different name. On the
+location screen an item scan means something more useful still: *move this one*,
+because the operator is standing at the rack.
+
+**The alert list replaced the sketch's "recent locations."** Recent locations
+tell an operator where they have been; alerts tell them where the work is, they
+are the same 51 the menu badge already counts, and tapping one goes straight to
+the location with the move pre-filled. Actionable beats historical.
+
+### 35.2 The replenishment story, verified end to end
+
+One tap on *Replenish 112* pre-filled the move: FROM `D01032` (the bulk location
+with the **most** available, so one move does as much of the job as possible),
+TO `A01041`, quantity 112, reason `REPL`, destination already confirmed.
+
+| Check | Result |
+|---|---|
+| Bulk `D01032` | 273 → **161** |
+| Pick face `A01041` | 4 → **116** |
+| Units conserved | 277 before, 277 after |
+| `GTMOVEMENT` | one row: `D01032 > A01041`, `REPL`, `GT001`, qty 112 |
+| Location screen after | 116 here, 161 in bulk, no longer flagged |
+| Alert count | **51 → 50** |
+
+That last pair is the loop closing: the alert existed, the operator acted on it in
+two taps, and the alert is gone — from the location screen and from the count on
+the home screen, because `GTVREPLEN` owns the condition and both read it.
+
+**The move is one unit of work** — decrement, increment-or-insert, audit row —
+with validation done *before* the commit boundary opens so a rejected move never
+starts a transaction it has to unwind. The upsert is `UPDATE` then `INSERT` only
+when the update found nothing, the same shape the receipt post uses. The
+quantity is re-read from the database before committing rather than trusted from
+the screen: somebody else may have moved that stock while the screen sat there.
+
+### 35.3 Three findings
+
+**The SQL precompiler will not take an array element as a host variable.**
+`:items(i).sku` produced `SQL0312 "variable ITEMS not defined or not usable"` and
+then `SQL0104` on the subscript. Copy to a scalar first — the same restriction
+that already applied to the subfields of a `likeds()` parameter.
+
+**The manual scan-entry row had never been shared.** When the camera block moved
+to `gt-theme.css`, the manual-entry row underneath it stayed in `scnhome.css` —
+and Receiving and Inventory were both using its class names without loading that
+file. So the scan input on four screens was a bare browser default **25px** tall
+where a 64px one belonged. It had been shipping for days. The pre-flight found it
+the moment a `minTarget` measurement was pointed at it, which is the third time
+the copied-versus-shared mistake has cost time and the reason the playbook rule is
+now stated as *move it, do not copy it, and do not leave it where it was*.
+
+**A bare `border-style` picks up the default medium width.** The destination card
+was outlined on all four sides by accident: `border-left: 5px solid` then
+`border-style: dashed` gave the other three sides `medium`. It happened to look
+right — a field waiting to be filled — so it was kept, but stated explicitly
+rather than left as an accident that the next edit would silently undo.
+
+### 35.4 Demo state
+
+`GROC-000004` really moved: **161 in `D01032`, 116 in `A01041`**, one audit row,
+and 50 alerts rather than 51. That is completed work rather than a mess, and the
+same story is repeatable on the other 50 flagged locations — so it was left as it
+is. Reversing it would have written a second audit row that misrepresented what
+happened, which is the opposite of what an audit trail is for.
+
+---
+
+## 36. Build log — Cycle Count (menu tile 4)
+
+The first Wave 2 application, and the one with the most satisfying demo beat:
+count blind, then reveal.
+
+### 36.1 What was built
+
+| Object | Role |
+|---|---|
+| `GTVCNTLIN` | one row per count line. Carries `qty_expected` **for the review**; the counting screen never selects it |
+| `GTVCNTOPEN` | counts a counter can work on, with progress and variance counts |
+| `GTCNHD` / `GTCNHR` | `cnthome` — the counts to do, or scan a location to start one |
+| `GTCNED` / `GTCNER` | `cntentry` — the **blind** count |
+| `GTCNVD` / `GTCNVR` | `cntvar` — the reveal, the photo rule, and the post |
+| `gt-edits.js` | the changed-row collector, now shared by three screens |
+
+### 36.2 Blind means blind, not hidden
+
+**`GTCNED` has no field for the expected quantity and `GTCNER` does not select
+it.** The value is not in the datastream, not in the DOM, and not available to
+anyone who opens dev tools. Verified from the live screen state — the subfile's
+field list reads:
+
+```
+ESEQ ELINE ESKU EDESC EDEPT EUOM EIMG ECNT EFLAG ECASE EQTY
+```
+
+No expected quantity anywhere in it. That is also **why this is two programs
+rather than one**: the review needs `qty_expected`, so it has its own display
+file that carries it. One screen doing both would have had the number in the
+datastream throughout, and the count would have been blind in name only.
+
+The screen says so out loud, too — an operator who does not know the count is
+blind assumes the app is broken when no expected figure appears.
+
+Two smaller decisions in the same spirit: the counting cards carry **no colour
+that could imply right or wrong** (only counted / not counted), and a
+**deliberate zero is a real count**. "I counted it and there are none" and
+"nobody has been there yet" are different findings, so a line appearing in the
+payload *is* the counted flag, and touching a line marks it counted even when the
+number does not change.
+
+### 36.3 The photo rule is data, not logic
+
+`GTREASON` already carried `photo_required` per reason code. RPG sends the reason
+list as JSON, each entry with its flag, so the screen warns **the moment a reason
+is picked** rather than when the post is refused — and RPG blocks the post
+independently, counting the offending lines. Changing the policy is an `UPDATE`
+on a row, not an edit to a program.
+
+Verified live, in order: expected 22 hidden, counted **18**, reveal showed
+`22 / 18 / −4`; choosing `CVAR` set the blocked count to 1 and the post was
+refused with *"1 line(s) need a photo before posting"*; a photograph through the
+shared capture pipeline (`GTIMAGE` `ref_type` `CNT`, image 208) cleared it; the
+post then succeeded.
+
+### 36.4 The post
+
+| Check | Result |
+|---|---|
+| Balance at `A01061` | 22 → **18** |
+| `GTMOVEMENT` | one `ADJC`, reason `CVAR`, qty 4, from `A01061` |
+| Header | `POST`, approved by `GT001` |
+| `GTIMAGE` `ref_type` `CNT` | 1 |
+
+**A count is authoritative, so the balance is SET to the counted figure rather
+than adjusted by the delta.** What is on the shelf is the truth; adjusting by a
+delta would re-derive the same number from a value the count has just disproved.
+The audit row still records the movement of 4, on the from-side because that is
+the direction the stock went.
+
+### 36.5 Two findings
+
+**Two subfiles in one EJS format do not compile.** `CPD7836` "subfile control
+record not found" and `CPD7835` "subfile record not found", and the display file
+is not created at all — a known limitation of the RDF-to-DDS conversion. The
+reason list became a **JSON string field** the template parses, which for seven
+reference rows costs nothing and avoids a second display file.
+
+**A harness that does not serve a shared file reports the product as broken.**
+Moving receiving's collector into `gt-edits.js` made `test-rcv-stepper.js` fail
+five checks, because the harness served only `gt-rcvlines.js` — the payload came
+back empty and it looked exactly like a regression. The fix was one line in the
+harness; the lesson is to confirm against the deployed shim, which lists the JS
+each screen actually receives, rather than trusting a local harness that may be
+serving less than production does.
+
+### 36.6 Shared, not copied — for the fourth time
+
+Three things moved into `gt-theme.css` or a shared module this round rather than
+being duplicated: the **changed-row collector** (`gt-edits.js`, now used by
+receiving quantities, count quantities and count reasons), the **stepper
+appearance**, and the **camera-capture overlay** (out of `itmdetl.css`, because
+the variance review captures evidence with the identical component). Each move
+was followed by re-running the affected screen's tests, which is the only reason
+they were safe to make at this pace.
+
+---
+
+## 37. Where the work lives — TIGERPOC, and the one thing that cannot be
+
+Raised directly: *work should be done in TIGERPOC and not the temporary AITSK
+library.* Agreed, and it already is — with one exception worth stating precisely
+rather than glossing over.
+
+### 37.1 The application is entirely in TIGERPOC
+
+| Object type | Count |
+|---|---|
+| `*PGM` | 16 |
+| `*FILE` (tables, views, indexes, display files) | 53 |
+| `*SRVPGM` | 2 |
+| `*MODULE` | 2 |
+| `*BNDDIR` | 2 |
+| `*JRN` / `*JRNRCV` | 2 / 2 |
+
+Nothing of the application has ever been built into a task library, and this was
+confirmed the hard way: when the task library changed from `AITSK00072` to
+`AITSK00051` mid-project, every one of those objects was still there and every
+screen still worked. Only the menu launcher had to be rebuilt.
+
+### 37.2 The exception, and why authority decides it
+
+The sign-on library list, measured from a live session rather than inferred:
+
+```
+AITSK000nn (SYS) · PLSYS · QSYS · QSYS2 · QHLPSYS · QUSRSYS
+AIDEMOBASE · QGPL · QTEMP · DRPUIDEV                          (USR)
+```
+
+`TIGERPOC` is not on it, and there is no current library. The initial menu
+resolves through `*LIBL/MENU`, so the `MENU` object has to be in a library that
+*is* on that list. Three ways to change that, and all three are closed:
+
+| Attempt | Result |
+|---|---|
+| `CHGJOBD JOBD(AIDEMO/AIDEMO) INLLIBL(TIGERPOC …)` | **`CPD1602`** — not authorized |
+| `CHGUSRPRF USRPRF(AIDEMO) CURLIB(TIGERPOC)` | **`CPF2292`** — *SECADM required |
+| A `MENU` in `QGPL` | possible, and **worse** — QGPL is shared by every user on the box |
+
+The current library would genuinely solve it: it is searched ahead of the user
+portion, so `CURLIB(TIGERPOC)` alone would make `TIGERPOC/MENU` win. It is one
+command for someone with *SECADM, additive, and reversible. The only name
+`TIGERPOC` shares with `AIDEMOBASE` is `QDDSSRC`, a build staging source file
+nothing opens at runtime, so the blast radius is a single unused object name.
+
+### 37.3 What changed as a result
+
+The launcher is now built into **both** libraries by
+`gtwms/tools/rebuild-menu.sh`:
+
+- **`TIGERPOC`** — its permanent home. It travels with the application, so a save,
+  or a restore onto a box with a normal library list, needs nothing further.
+- **the task library** — the copy sign-on resolves here, and the only reason any
+  per-task step remains.
+
+This **reverses** the note in §25.3 that said not to build the launcher into
+`TIGERPOC`. That advice was right about the symptom — a `TIGERPOC/MENU` is not
+found at sign-on on this box — and wrong about the conclusion, because the object
+still belongs with the application it launches. The earlier worry was a stray
+duplicate confusing a later session; a named script that builds and verifies both
+copies removes that risk more cheaply than leaving the library incomplete.
+
+Verified after the change: option 4 present, opening `GTMENU` from
+`TIGERPOC/GTMNUD` with live badges, signed off cleanly.

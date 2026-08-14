@@ -1,0 +1,238 @@
+<%
+/* ====================================================================
+ * Cycle Count -- BLIND entry.
+ *
+ * THERE IS NO EXPECTED QUANTITY ON THIS SCREEN, and not because it is hidden.
+ * GTCNED has no field to hold it and GTCNER does not select it, so the value is
+ * not in the datastream, not in the DOM and not available to anyone who opens
+ * dev tools. A counter who can see the system's number writes down the system's
+ * number, and the count is then worth nothing.
+ *
+ * Scan an item to tick its line up by a case. Scan something not on the count
+ * and a line is added -- extra stock found is a real finding.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'BLIND COUNT',
+        openCamera:'Open camera', closeCamera:'Close camera',
+        manual:'Scan an item you are counting', decode:'Go',
+        zone:'Zone', lines:'lines', counted:'counted',
+        blind:'Blind count — expected quantities are not shown',
+        count:'Counted', notYet:'Not counted', yes:'Counted',
+        save:'Save counts', review:'Review variances',
+        none:'This count has no lines', back:'Back',
+        less:'Less', more:'More', zero:'Zero',
+        types:{PICK:'Pick face',BULK:'Bulk',STAG:'Staging',RETN:'Returns',DAMG:'Damage hold'} },
+  FR: { appName:'GT Entrepôt', appSub:'DÉNOMBREMENT',
+        openCamera:'Ouvrir la caméra', closeCamera:'Fermer la caméra',
+        manual:'Scannez un article à dénombrer', decode:'Aller',
+        zone:'Zone', lines:'lignes', counted:'dénombrées',
+        blind:'Dénombrement à l’aveugle — les quantités prévues ne sont pas affichées',
+        count:'Dénombré', notYet:'Non dénombré', yes:'Dénombré',
+        save:'Enregistrer', review:'Réviser les écarts',
+        none:'Ce dénombrement n’a aucune ligne', back:'Retour',
+        less:'Moins', more:'Plus', zero:'Zéro',
+        types:{PICK:'Prélèvement',BULK:'Vrac',STAG:'Transit',RETN:'Retours',DAMG:'Avaries'} }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v, dp) {
+  return Number(v || 0).toLocaleString(loc, { minimumFractionDigits: dp === undefined ? 0 : dp,
+                                              maximumFractionDigits: dp === undefined ? 0 : dp });
+};
+var IMG = '/profoundui/userdata/ui/gtimg/';
+
+var rows = (typeof cesfl !== 'undefined' && cesfl) ? cesfl : [];
+var kind = s(typeof msgkind !== 'undefined' ? msgkind : '').toLowerCase();
+var hit  = Number(typeof hitline !== 'undefined' ? hitline : 0);
+var nl = Number(typeof nlines !== 'undefined' ? nlines : 0);
+var nd = Number(typeof ndone  !== 'undefined' ? ndone  : 0);
+var progress = nl > 0 ? Math.round((nd / nl) * 100) : 0;
+%>
+<div class="gt-app gt-cntentry-screen" data-gt-lang="<%= lang %>"
+     data-gt-hit="<%= hit %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg<%= kind ? ' is-' + kind : '' %>"><%= s(msg) %></div>
+    <% } %>
+
+    <section class="gt-ce-hdr">
+      <div class="gt-ce-hdr-top">
+        <span class="gt-ce-loc gt-mono"><%= s(typeof hloc !== 'undefined' ? hloc : '') %></span>
+        <span class="gt-ce-type"><%= T.types[s(typeof htype !== 'undefined' ? htype : '')] || s(htype) %></span>
+      </div>
+      <div class="gt-ce-sub">
+        <span class="gt-mono"><%= s(typeof hcnt !== 'undefined' ? hcnt : '') %></span>
+        &middot; <%= T.zone %> <%= s(typeof hzone !== 'undefined' ? hzone : '') %>
+      </div>
+      <%# Said out loud, because an operator who does not know the count is
+          blind will assume the app is broken when no expected figure appears. %>
+      <div class="gt-ce-blind"><%= T.blind %></div>
+    </section>
+
+    <div class="gt-inv-top">
+      <div class="gt-ce-sum">
+        <span class="gt-ce-bar"><span style="width: <%= progress %>%"></span></span>
+        <span class="gt-ce-figs">
+          <strong><%= num(nd) %>/<%= num(nl) %></strong> <%= T.lines %> <%= T.counted %>
+        </span>
+      </div>
+
+      <div class="gt-scan-camera" id="gt-scan-camera">
+        <div class="gt-scan-stage">
+          <video id="gt-scan-video" muted playsinline></video>
+          <div class="gt-scan-frame" id="gt-scan-frame"></div>
+        </div>
+        <div class="gt-scan-status" id="gt-scan-status"></div>
+
+        <div class="gt-inv-scanrow">
+          <div class="gt-scan-camctl">
+            <button type="button" class="gt-iconbtn gt-iconbtn-go" id="gt-scan-start"
+                    title="<%= T.openCamera %>" aria-label="<%= T.openCamera %>">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                <circle cx="16" cy="18" r="5"/>
+              </svg>
+            </button>
+            <button type="button" class="gt-iconbtn gt-iconbtn-stop" id="gt-scan-stop"
+                    title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <g class="gt-icon-cam">
+                  <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                  <circle cx="15" cy="18" r="4.6"/>
+                </g>
+                <g class="gt-icon-ban">
+                  <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+                  <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+                  <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+                </g>
+              </svg>
+            </button>
+          </div>
+
+          <div class="gt-scan-manual">
+            <label for="gt-scan-manual"><%= T.manual %></label>
+            <div class="gt-scan-manual-row">
+              <input type="text" id="gt-scan-manual" name="scanval"
+                     value="" autocomplete="off" autocapitalize="characters"
+                     spellcheck="false" inputmode="text">
+              <button type="button" class="gt-btn gt-btn-primary"
+                      onclick="pui.submit({action:'SCAN'})"><%= T.decode %></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <% if (rows.length > 0) { %>
+      <ul class="gt-ce-list">
+        <% rows.forEach(function (row) { %>
+          <%
+            var isCounted = s(row.eflag) === 'Y';
+            var isHit = hit > 0 && Number(row.eline) === hit;
+            var step = Number(row.ecase || 0) > 1 ? Number(row.ecase) : 1;
+          %>
+          <li class="gt-ce-row<%= isCounted ? ' is-done' : '' %><%= isHit ? ' is-hit' : '' %>"
+              id="gt-ce-<%= s(row.eline) %>">
+
+            <span class="gt-ce-img">
+              <% if (Number(row.eimg) > 0) { %>
+                <img src="<%= IMG %><%= s(row.eimg) %>.jpg" alt="" loading="lazy">
+              <% } else { %>
+                <span class="gt-ce-noimg" aria-hidden="true"></span>
+              <% } %>
+            </span>
+
+            <span class="gt-ce-id">
+              <span class="gt-ce-desc"><%= s(row.edesc) %></span>
+              <span class="gt-ce-sku gt-mono"><%= s(row.esku) %></span>
+            </span>
+
+            <span class="gt-ce-qty">
+              <span class="gt-ce-lbl"><%= T.count %> &middot; <%= s(row.euom) %></span>
+              <span class="gt-ce-step">
+                <button type="button" class="gt-stepbtn"
+                        title="<%= T.less %> <%= num(step) %>"
+                        aria-label="<%= T.less %> <%= num(step) %>"
+                        onclick="if(window.gtCntEntry)gtCntEntry.step(this,-1)">
+                  &minus;<% if (step > 1) { %><small><%= num(step) %></small><% } %>
+                </button>
+
+                <%# data-gt-force marks a line nobody has counted yet: counting
+                    it and finding exactly what was showing is still a count, so
+                    the collector must send it even though the value matches. %>
+                <input type="number" class="gt-numbox gt-ce-box"
+                       name="eqty" value="<%= Number(row.ecnt || 0).toFixed(2) %>"
+                       inputmode="decimal" step="any" min="0"
+                       data-gt-seq="<%= s(row.eseq) %>"
+                       data-gt-orig="<%= Number(row.ecnt || 0).toFixed(2) %>"
+                       data-gt-step="<%= step %>"
+                       <%= isCounted ? '' : 'data-gt-force="1"' %>
+                       aria-label="<%= T.count %> <%= s(row.esku) %>">
+
+                <button type="button" class="gt-stepbtn gt-stepbtn-up"
+                        title="<%= T.more %> <%= num(step) %>"
+                        aria-label="<%= T.more %> <%= num(step) %>"
+                        onclick="if(window.gtCntEntry)gtCntEntry.step(this,1)">
+                  +<% if (step > 1) { %><small><%= num(step) %></small><% } %>
+                </button>
+
+                <%# A deliberate zero is a real count, and the commonest one on
+                    a location where the stock has already been picked out. %>
+                <button type="button" class="gt-btn gt-ce-zero"
+                        onclick="if(window.gtCntEntry)gtCntEntry.zero(this)"><%= T.zero %></button>
+              </span>
+            </span>
+
+            <span class="gt-ce-state">
+              <span class="gt-ce-chip"><%= isCounted ? T.yes : T.notYet %></span>
+            </span>
+          </li>
+        <% }); %>
+      </ul>
+
+      <div class="gt-ce-acts">
+        <button type="button" class="gt-btn gt-btn-primary"
+                onclick="if(window.gtCntEntry){gtCntEntry.save()}else{pui.submit({action:'APPLY'})}"><%= T.save %></button>
+      </div>
+    <% } else { %>
+      <section class="gt-card gt-scan-empty"><%= T.none %></section>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="cntedits" id="gt-cntedits" value="">
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+    <% if (rows.length > 0) { %>
+      <button type="button" class="gt-btn gt-btn-go" data-fkey="F6"
+              onclick="pui.submit({action:'REVIEW'})"><%= T.review %></button>
+    <% } %>
+  </footer>
+</div>

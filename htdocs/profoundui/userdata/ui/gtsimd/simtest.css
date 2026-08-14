@@ -1,0 +1,266 @@
+/* ====================================================================
+ * Simple camera test.
+ *
+ * Every rule is scoped to .gts-screen inside .gt-app. No html/body rules, no
+ * position:fixed, no 100vh, no global reset -- inside Genie this markup is a
+ * guest in someone else's document and any of those fights the skin. See
+ * ejs-scoped-to-wrapper.
+ *
+ * Layout is one column that widens rather than one that reflows: a warehouse
+ * phone held in one hand and a 13" iPad get the same reading order, which is
+ * the whole point of a screen used to compare two devices.
+ * ==================================================================== */
+
+.gts-screen .gts-title {
+  margin: 4px 0 2px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.gts-screen .gts-lead {
+  margin: 0 0 var(--gt-gap);
+  max-width: 62ch;
+  color: var(--gt-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* ---- Camera ------------------------------------------------------- */
+.gts-screen .gts-cam {
+  margin-bottom: var(--gt-gap);
+}
+
+/* Collapsed until the camera is actually open, so a screen whose JavaScript
+   never arrived shows no dead black rectangle. */
+.gts-screen .gts-stage {
+  display: none;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--gt-radius);
+  background: #000;
+  aspect-ratio: 3 / 4;
+}
+
+.gts-screen.is-live .gts-stage { display: block; }
+
+/* A tall frame suits a phone held upright; on anything wider a barcode is
+   easier to aim at in a landscape window than in a letterbox. */
+@media (min-width: 700px) {
+  .gts-screen .gts-stage { aspect-ratio: 16 / 10; max-height: 62vh; }
+}
+
+.gts-screen .gts-stage video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The reticle is not decoration: simtest.js crops the frame it analyses to
+   roughly this band, so what the operator aims at is what gets decoded. */
+.gts-screen .gts-reticle {
+  position: absolute;
+  left: 3%;
+  right: 3%;
+  top: 27.5%;
+  height: 45%;
+  border: 2px solid var(--gt-yellow);
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+}
+
+.gts-screen .gts-camctl {
+  display: flex;
+  gap: var(--gt-gap);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--gt-gap);
+}
+
+/* The close button replaces the open button in place rather than appearing
+   beside it -- one control, two states, no guessing which one is live. */
+.gts-screen .gts-nostroke { color: #FFFFFF; }
+
+.gts-screen .gts-status {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--gt-card);
+  border: 1px solid var(--gt-line);
+  color: var(--gt-muted);
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.gts-screen .gts-status.is-good { color: var(--gt-good); border-color: #BFE3CD; }
+.gts-screen .gts-status.is-warn { color: var(--gt-warn); border-color: #F0D9A8; }
+.gts-screen .gts-status.is-bad  { color: var(--gt-bad);  border-color: #F3C3CB; }
+
+.gts-screen .gts-photo {
+  display: block;
+  margin: 10px auto 0;
+  width: fit-content;
+  padding: 10px 18px;
+  min-height: var(--gt-tap);
+  border: 1px dashed var(--gt-line);
+  border-radius: 10px;
+  background: var(--gt-card);
+  color: var(--gt-ink);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* The file input has to stay reachable to the accessibility tree, so it is
+   made invisible rather than display:none -- on iOS a display:none input
+   cannot be opened by clicking its label. */
+.gts-screen .gts-photo input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---- The result frame --------------------------------------------- */
+.gts-screen .gts-result {
+  border-left: 4px solid var(--gt-line);
+}
+
+.gts-screen .gts-result.is-hit { border-left-color: var(--gt-good); }
+
+.gts-screen .gts-value {
+  /* The one number the demo is about. It has to be readable at arm's length
+     on a phone and must wrap rather than spill, because a GS1 payload can be
+     40 characters of digits with no natural break. */
+  font-size: clamp(18px, 5.5vw, 30px);
+  font-weight: 700;
+  line-height: 1.25;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+.gts-screen .gts-result.is-empty .gts-value {
+  color: var(--gt-muted);
+  font-weight: 400;
+  font-size: 15px;
+  word-break: normal;
+}
+
+.gts-screen .gts-meta {
+  display: grid;
+  /* minmax(0, ...) or a long value stretches the column past the card and the
+     whole screen scrolls sideways. */
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 0;
+}
+
+.gts-screen .gts-meta dt {
+  margin: 0 0 2px;
+  color: var(--gt-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gts-screen .gts-meta dd { margin: 0; font-size: 15px; font-weight: 600; }
+
+/* ---- Keypad ------------------------------------------------------- */
+.gts-screen .gts-manual { margin: var(--gt-gap) 0; }
+
+.gts-screen .gts-manual label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--gt-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gts-screen .gts-manual-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.gts-screen .gts-manual-row input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: var(--gt-tap);
+  padding: 0 12px;
+  /* 16px or larger, or iOS zooms the whole page in on focus and the operator
+     has to pinch back out after every entry. */
+  font-size: max(16px, 1rem);
+}
+
+.gts-screen .gts-manual-row .gt-btn { flex: 0 0 auto; }
+
+/* ---- History ------------------------------------------------------ */
+.gts-screen .gts-history {
+  list-style: none;
+  margin: 0 0 var(--gt-gap);
+  padding: 0;
+  border: 1px solid var(--gt-line);
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  overflow: hidden;
+}
+
+.gts-screen .gts-hist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  align-items: baseline;
+  padding: 10px 12px;
+  border-top: 1px solid var(--gt-line);
+}
+
+.gts-screen .gts-hist:first-child { border-top: 0; }
+
+.gts-screen .gts-hist-val {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.gts-screen .gts-hist-meta {
+  flex: 0 0 auto;
+  color: var(--gt-muted);
+  font-size: 12px;
+}
+
+/* ---- Diagnostics -------------------------------------------------- */
+.gts-screen .gts-diag { margin-top: var(--gt-gap); }
+
+.gts-screen .gts-diagline {
+  padding: 10px 12px;
+  border: 1px solid var(--gt-line);
+  border-radius: 10px;
+  background: var(--gt-card);
+  color: var(--gt-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  /* The report is one long key=value line. It must wrap: a device report that
+     runs off the right edge is a report nobody can read out. */
+  overflow-wrap: anywhere;
+}
+
+.gts-screen .gts-diagline.is-server {
+  border-left: 3px solid var(--gt-good);
+  color: var(--gt-ink);
+}
+
+.gts-screen .gts-diag-label {
+  margin: var(--gt-gap) 0 6px;
+  color: var(--gt-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gts-screen .gts-diag .gt-btn { margin-top: 10px; }

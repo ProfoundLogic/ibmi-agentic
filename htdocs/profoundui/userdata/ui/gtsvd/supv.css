@@ -1,0 +1,306 @@
+/* ==================================================================
+ * Supervisor View.
+ *
+ * Everything is scoped to .gt-supv-screen. No html/body rules, no
+ * position:fixed, no 100vh: this renders inside a Genie skin that owns the
+ * page, and a global rule here fights the skin on every other screen too.
+ * The Genie div/span resets live once in gt-theme.css.
+ *
+ * Responsive means MORE COLUMNS, not wider ones -- 2 up on a phone, 3 at 640,
+ * 6 at 1280. Every grid track is minmax(0, 1fr): a bare 1fr refuses to shrink
+ * below its content's min-content width, which is how a long vendor name
+ * pushed a card off the right of the screen the first time.
+ * ================================================================== */
+
+/* ---- The six figures ------------------------------------------- */
+.gt-supv-screen .gt-sv-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 var(--gt-gap);
+}
+
+.gt-supv-screen .gt-sv-stat {
+  background: var(--gt-card);
+  border: 1px solid var(--gt-line);
+  border-radius: var(--gt-radius);
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+.gt-supv-screen .gt-sv-stat strong {
+  display: block;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.gt-supv-screen .gt-sv-stat small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+
+/* A figure that means "somebody should do something". The left edge carries it
+ * as well as the colour, because colour alone is no use at arm's length or to
+ * an operator who cannot distinguish it. */
+.gt-supv-screen .gt-sv-stat.is-warn {
+  border-left: 4px solid var(--gt-yellow);
+}
+.gt-supv-screen .gt-sv-stat.is-warn strong { color: var(--gt-bad); }
+
+/* ---- Progress bars --------------------------------------------- */
+.gt-supv-screen .gt-sv-prog { display: grid; gap: 14px; }
+
+.gt-supv-screen .gt-sv-progrow { min-width: 0; }
+
+.gt-supv-screen .gt-sv-proghd,
+.gt-supv-screen .gt-sv-progft {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.gt-supv-screen .gt-sv-proghd {
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.gt-supv-screen .gt-sv-proghd .gt-mono {
+  font-size: 12px;
+  color: var(--gt-muted);
+  font-weight: 600;
+}
+
+.gt-supv-screen .gt-sv-progft {
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--gt-muted);
+}
+
+.gt-supv-screen .gt-sv-varn {
+  font-weight: 800;
+  color: var(--gt-bad);
+}
+
+.gt-supv-screen .gt-sv-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--gt-surface);
+  overflow: hidden;
+}
+.gt-supv-screen .gt-sv-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gt-red);
+}
+
+/* ---- Per-zone strip -------------------------------------------- */
+.gt-supv-screen .gt-sv-zones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: var(--gt-gap);
+}
+
+.gt-supv-screen .gt-sv-zone {
+  background: var(--gt-card);
+  border: 1px solid var(--gt-line);
+  border-left: 4px solid var(--gt-line);
+  border-radius: var(--gt-radius);
+  padding: 9px 11px;
+  min-width: 0;
+}
+.gt-supv-screen .gt-sv-zone.is-warn { border-left-color: var(--gt-yellow); }
+
+.gt-supv-screen .gt-sv-zname {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: var(--gt-muted);
+}
+
+.gt-supv-screen .gt-sv-zfig { display: block; }
+.gt-supv-screen .gt-sv-zfig strong {
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.gt-supv-screen .gt-sv-zfig small {
+  margin-left: 4px;
+  font-size: 11px;
+  color: var(--gt-muted);
+}
+
+.gt-supv-screen .gt-sv-zsub {
+  display: block;
+  font-size: 11px;
+  color: var(--gt-muted);
+}
+
+.gt-supv-screen .gt-sv-zalert {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--gt-yellow);
+  color: var(--gt-black);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* ---- The work queue -------------------------------------------- */
+.gt-supv-screen .gt-sv-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.gt-supv-screen .gt-sv-card { min-width: 0; }
+
+/* The whole card is the button. A gloved hand gets a card, not a link inside
+ * one, so the hit area is the card and nothing inside it is separately
+ * clickable. */
+.gt-supv-screen .gt-sv-hit {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "kind  id    state"
+    "figs  figs  figs";
+  align-items: start;
+  gap: 6px 10px;
+  width: 100%;
+  min-height: var(--gt-tap);
+  padding: 10px 12px;
+  border: 1px solid var(--gt-line);
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.gt-supv-screen .gt-sv-hit:active { background: var(--gt-surface); }
+
+.gt-supv-screen .gt-sv-kind {
+  grid-area: kind;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  background: var(--gt-surface);
+  color: var(--gt-muted);
+}
+/* --gt-action is 64px, a METRIC. `background: var(--gt-action)` is invalid CSS,
+ * silently dropped, and with `color:#fff` on top of it the CNT chip was white
+ * text on a white card -- present in the DOM, invisible on the screen, and
+ * passing every test that only looked for the element. Colour tokens only. */
+.gt-supv-screen .gt-sv-kind.is-recv { background: var(--gt-ink); color: #fff; }
+.gt-supv-screen .gt-sv-kind.is-cnt  { background: var(--gt-good); color: #fff; }
+
+.gt-supv-screen .gt-sv-id { grid-area: id; min-width: 0; }
+.gt-supv-screen .gt-sv-doc  { display: block; font-weight: 800; }
+.gt-supv-screen .gt-sv-where,
+.gt-supv-screen .gt-sv-who {
+  display: block;
+  font-size: 12px;
+  color: var(--gt-muted);
+  /* break-word, not anywhere: a long vendor name should wrap at the space,
+   * not split "Distribution" down the middle. */
+  overflow-wrap: break-word;
+}
+
+.gt-supv-screen .gt-sv-state {
+  grid-area: state;
+  display: grid;
+  justify-items: end;
+  gap: 5px;
+}
+
+.gt-supv-screen .gt-chip {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--gt-surface);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+  white-space: nowrap;
+}
+.gt-supv-screen .gt-chip.is-part { background: var(--gt-yellow); color: var(--gt-black); }
+.gt-supv-screen .gt-chip.is-cntd { background: var(--gt-warn); color: #fff; }
+.gt-supv-screen .gt-chip.is-rvw  { background: var(--gt-bad); color: #fff; }
+.gt-supv-screen .gt-chip.is-post { background: var(--gt-good); color: #fff; }
+
+.gt-supv-screen .gt-sv-minibar {
+  display: block;
+  width: 72px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--gt-surface);
+  overflow: hidden;
+}
+.gt-supv-screen .gt-sv-minibar > span {
+  display: block;
+  height: 100%;
+  background: var(--gt-red);
+}
+
+.gt-supv-screen .gt-sv-figs {
+  grid-area: figs;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  min-width: 0;
+}
+
+.gt-supv-screen .gt-sv-fig { min-width: 0; }
+.gt-supv-screen .gt-sv-fig strong {
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.gt-supv-screen .gt-sv-fig small {
+  margin-left: 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+.gt-supv-screen .gt-sv-fig.is-var strong { color: var(--gt-bad); }
+
+/* ---- Wider screens get more columns, not bigger ones ------------ */
+@media (min-width: 640px) {
+  .gt-supv-screen .gt-sv-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .gt-supv-screen .gt-sv-zones { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .gt-supv-screen .gt-sv-prog  { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 835px) {
+  /* The figures move up onto the card's own row once there is width for them,
+   * so a card is one line per document. */
+  .gt-supv-screen .gt-sv-hit {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-areas: "kind id figs state";
+    align-items: center;
+  }
+}
+
+@media (min-width: 1280px) {
+  .gt-supv-screen .gt-sv-stats { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .gt-supv-screen .gt-sv-zones { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+}

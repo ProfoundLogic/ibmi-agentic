@@ -15,6 +15,15 @@
 
 set -e
 
+#  Standalone assets FIRST. The snapshot written below is verified against LOCAL
+#  source, so this script passes every check while the docroot still serves an old
+#  gt-scan.js -- which is precisely what happened. Set GTWMS_SKIP_ASSETS=1 to
+#  re-shim only.
+if [ "${GTWMS_SKIP_ASSETS:-0}" != 1 ]; then
+  "$(dirname "$0")/deploy-assets.sh" || exit 1
+  echo
+fi
+
 SKINS="$*"
 [ -z "$SKINS" ] && SKINS="pls Classic"
 

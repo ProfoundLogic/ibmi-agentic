@@ -1,0 +1,253 @@
+/* ==================================================================
+ * Cycle Count -- variance review.
+ *
+ * The camera, scan row, icon buttons and stepper controls come from
+ * gt-theme.css. Only the location header and the item cards are specific
+ * to this screen.
+ * ================================================================== */
+
+/* ---- The location header ---------------------------------------- */
+.gt-cv-hdr {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+  /* Location type as the left edge, so a bulk rack and a pick face are
+   * distinguishable before reading a word. */
+  border-left: 5px solid var(--gt-line);
+}
+.gt-cv-hdr.is-pick { border-left-color: var(--gt-red); }
+.gt-cv-hdr.is-bulk { border-left-color: #1F5FA8; }
+.gt-cv-hdr.is-stag { border-left-color: var(--gt-warn); }
+.gt-cv-hdr.is-retn { border-left-color: var(--gt-muted); }
+.gt-cv-hdr.is-damg { border-left-color: var(--gt-bad); }
+
+.gt-cv-hdr-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.gt-cv-loc {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  overflow-wrap: anywhere;
+}
+.gt-cv-type {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+
+.gt-cv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.gt-cv-figs2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gt-muted);
+}
+.gt-cv-figs2 strong {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gt-ink);
+}
+
+/* Capacity. Amber past 90%: a full location is where putaway goes wrong. */
+.gt-cv-cap {
+  display: block;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: var(--gt-line);
+  overflow: hidden;
+}
+.gt-cv-cap > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gt-good);
+}
+.gt-cv-cap.is-tight > span { background: var(--gt-warn); }
+
+/* ---- The pinned scan band --------------------------------------
+ * Same component and same reasoning as the Receiving line list and the
+ * Inventory home screen; see the note in invhome.css.
+ * ----------------------------------------------------------------- */
+.gt-inv-top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  margin: 0 calc(-1 * var(--gt-pad)) 10px;
+  padding: 8px var(--gt-pad) 10px;
+  background: var(--gt-surface);
+  box-shadow: 0 4px 10px -6px rgba(0, 0, 0, .45);
+}
+.gt-cntvar-screen .gt-scan-camera { margin-bottom: 0; }
+.gt-cntvar-screen .gt-scan-camera:not(.is-live) .gt-scan-camctl { margin-top: 0; }
+.gt-cntvar-screen .gt-scan-status:empty { min-height: 0; margin: 0; }
+
+.gt-inv-scanrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+.gt-cntvar-screen .gt-inv-scanrow .gt-scan-camctl { margin: 0; }
+.gt-cntvar-screen .gt-inv-scanrow .gt-scan-manual { margin-bottom: 0; }
+.gt-cntvar-screen .gt-inv-scanrow .gt-scan-manual label {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+
+/* ---- Blind-count notice ----------------------------------------
+ * Said out loud on the screen. An operator who does not know the count is
+ * blind assumes the app is broken when no expected figure appears.
+ * ----------------------------------------------------------------- */
+.gt-cv-sub { margin-top: 4px; font-size: 12px; font-weight: 700; color: var(--gt-muted); }
+.gt-cv-blind {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #FFF8DC;
+  border-left: 4px solid var(--gt-yellow);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--gt-ink);
+}
+
+
+/* ---- The reveal -------------------------------------------------
+ * All three numbers at once: expected, counted, delta. The delta carries the
+ * colour, and the card's left edge repeats it -- colour is never the only cue,
+ * the word under the number says it too.
+ * ----------------------------------------------------------------- */
+.gt-cv-figs { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px;
+              font-size: 12px; font-weight: 700; color: var(--gt-muted); }
+.gt-cv-figs strong { font-size: 16px; font-weight: 800; color: var(--gt-ink); }
+.gt-cv-figs .is-var strong { color: var(--gt-warn); }
+
+.gt-cv-block {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #FDECEF;
+  border-left: 4px solid var(--gt-red);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--gt-red);
+}
+
+.gt-cv-list { list-style: none; margin: 0 0 var(--gt-gap); padding: 0; }
+
+.gt-cv-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 8px 10px;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+  border-left: 5px solid var(--gt-line);
+}
+.gt-cv-row.is-match { border-left-color: var(--gt-good); }
+.gt-cv-row.is-over  { border-left-color: var(--gt-red); }
+.gt-cv-row.is-short { border-left-color: var(--gt-warn); }
+/* Blocked: this line will refuse the post until it has a photograph. */
+.gt-cv-row.is-blocked { box-shadow: 0 0 0 2px var(--gt-red), var(--gt-shadow); }
+
+.gt-cv-img img,
+.gt-cv-noimg {
+  display: block; width: 56px; height: 56px;
+  border-radius: 8px; object-fit: cover; background: var(--gt-line);
+}
+.gt-cv-id { display: grid; gap: 2px; min-width: 0; }
+.gt-cv-desc { font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.gt-cv-sku { font-size: 11px; color: var(--gt-muted); }
+
+.gt-cv-nums {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.gt-cv-num {
+  display: grid; gap: 1px; padding: 8px 6px;
+  border-radius: 10px; background: var(--gt-surface);
+  text-align: center; min-width: 0;
+}
+.gt-cv-num strong { font-size: 18px; font-weight: 800; line-height: 1.1; }
+.gt-cv-num small {
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .2px; color: var(--gt-muted); overflow-wrap: anywhere;
+}
+.gt-cv-row.is-match .gt-cv-num.is-delta strong { color: var(--gt-good); }
+.gt-cv-row.is-over  .gt-cv-num.is-delta strong { color: var(--gt-red); }
+.gt-cv-row.is-short .gt-cv-num.is-delta strong { color: var(--gt-warn); }
+
+.gt-cv-why { grid-column: 1 / -1; display: grid; gap: 4px; }
+.gt-cv-lbl {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .3px; color: var(--gt-muted);
+}
+.gt-cv-select {
+  width: 100%; min-height: 48px; padding: 10px 12px;
+  border: 2px solid var(--gt-line); border-radius: 10px;
+  background: var(--gt-card); color: var(--gt-ink); font-weight: 700;
+}
+.gt-cv-select:focus { outline: none; border-color: var(--gt-red); }
+
+.gt-cv-photo {
+  grid-column: 1 / -1;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+}
+.gt-cv-has {
+  padding: 3px 8px; border-radius: 999px;
+  background: var(--gt-ink); color: #fff;
+  font-size: 11px; font-weight: 800;
+}
+.gt-cv-need {
+  padding: 3px 8px; border-radius: 999px;
+  background: var(--gt-red); color: #fff;
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .3px;
+}
+.gt-cv-cam { flex: 1 1 auto; min-height: 48px; min-width: 0; }
+/* The camera stops being optional once a reason demands evidence. */
+.gt-cv-cam.is-needed {
+  background: var(--gt-red); color: #fff; font-weight: 800;
+}
+.gt-cv-hint {
+  flex: 1 1 100%;
+  font-size: 11px; font-weight: 700; color: var(--gt-red);
+}
+
+.gt-cv-acts { display: grid; gap: 8px; margin-bottom: var(--gt-gap); }
+.gt-btn-go {
+  min-height: var(--gt-action);
+  background: var(--gt-good); color: #fff;
+  font-size: 16px; font-weight: 800;
+}
+.gt-btn-go.is-waiting { opacity: .55; }
+
+@media (min-width: 835px) {
+  .gt-cv-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .gt-cv-row { margin-bottom: 0; }
+}

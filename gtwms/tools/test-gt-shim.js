@@ -127,12 +127,16 @@ for (const SKIN of SKINS) {
   /* Also derived: every screen the generator gives a js[] to. */
   var JS_SNAPSHOTS = GEN_SCREENS
     .filter((sc) => sc.js && sc.js.length)
+    /* Keep the full relative path. Every screen's JavaScript lived in
+       gtcommon/ until the simple camera test, which deliberately carries its
+       own in gtsimd/ -- assuming one directory here read the wrong file and
+       crashed on the first screen that broke the pattern. */
     .map((sc) => ({ match: sc.tpl.split('/')[1].replace('.ejs', ''),
-                    files: sc.js.map((f) => f.split('/')[1]) }));
+                    files: sc.js.slice() }));
 
   for (const snap of JS_SNAPSHOTS) {
     const expected = snap.files
-      .map((f) => fs.readFileSync(path.join(UI, 'gtcommon', f), 'utf8'))
+      .map((f) => fs.readFileSync(path.join(UI, f), 'utf8'))
       .join('\n;\n');
     const jsOk = await page.evaluate(function (a) {
       var e = (window.__gtwmsEntries || []).filter(function (x) {
@@ -144,7 +148,8 @@ for (const SKIN of SKINS) {
       for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
       return new TextDecoder('utf-8').decode(bytes) === a.expected ? true : 'mismatch';
     }, { match: snap.match, expected: expected });
-    check(snap.match + ' js snapshot matches ' + snap.files.join(' + '),
+    check(snap.match + ' js snapshot matches ' +
+            snap.files.map((f) => f.split('/').pop()).join(' + '),
           jsOk === true, jsOk === true ? '' : String(jsOk));
   }
 

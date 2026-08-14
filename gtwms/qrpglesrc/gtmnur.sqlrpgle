@@ -31,6 +31,21 @@ end-pr;
 dcl-pr gtrchr extpgm;
 end-pr;
 
+dcl-pr gtinhr extpgm;
+end-pr;
+
+dcl-pr gtsvr extpgm;
+end-pr;
+
+dcl-pr gtpur extpgm;
+end-pr;
+
+dcl-pr gtstr extpgm;
+end-pr;
+
+dcl-pr gtcnhr extpgm;
+end-pr;
+
 dcl-s done ind inz(*off);
 
 // Until GTSGNR (badge sign-on) lands, the menu runs as a known operator.
@@ -69,10 +84,31 @@ dow not done;
       // Receiving. Scan the pallet label, confirm the lines, post.
       gtrchr();
 
+    when action = 'INV';
+      // Inventory & Movement. One scan box: location, item or pallet.
+      gtinhr();
+
+    when action = 'CNT';
+      // Cycle Count. Blind entry, then the variance reveal.
+      gtcnhr();
+
     when action = 'SCAN';
       // Scan Lab. Called rather than chained so the operator lands back
       // here on exit, which is what a menu should do.
       gtscnr();
+
+    when action = 'SUPV';
+      // Supervisor View. Read-only, but every row drills into the real
+      // screen -- a dashboard nobody can act on is a poster.
+      gtsvr();
+
+    when action = 'PUTA';
+      // Putaway. The other half of Receiving: staged stock into storage.
+      gtpur();
+
+    when action = 'SETT';
+      // Settings. The three preferences that have real columns behind them.
+      gtstr();
 
     when action = *blanks;
       // Enter with no tile pressed -- just redisplay.
@@ -149,6 +185,18 @@ begsr loadCounts;
     select count(*) into :nitems
       from gtitem
      where item_status = 'A';
+
+  //  Units standing in staging, waiting to be put away. The Putaway tile's
+  //  badge, and the number that tells a supervisor the dock is backing up.
+  //  Read from GTVPUTSTG so the tile and the Putaway screen count the same
+  //  thing -- the tile showing 0 while the screen lists work would be worse
+  //  than no badge at all.
+  exec sql
+    select coalesce(sum(qty_staged), 0) into :nstaged
+      from gtvputstg;
+  if sqlcode <> 0;
+    nstaged = 0;
+  endif;
 endsr;
 
 //------------------------------------------------------------------------

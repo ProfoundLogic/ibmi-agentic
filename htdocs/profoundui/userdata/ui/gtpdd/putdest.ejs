@@ -1,0 +1,271 @@
+<%
+/* ====================================================================
+ * Putaway -- confirm the destination and book it.
+ *
+ * THE APPLICATION SUGGESTS, THE OPERATOR DECIDES. The suggestion is filled in
+ * with the reason it was chosen and the room left there, so accepting it is one
+ * tap; the alternatives are shown so it reads as a choice rather than an order;
+ * and any location can be scanned instead.
+ *
+ * The alternatives come out of PALTS, a JSON string, because two subfiles in
+ * one EJS format do not compile.
+ *
+ * Renders with no screen JavaScript beyond the shared scanner. Every control is
+ * an inline onclick calling pui.submit -- a file in the "js" array runs before
+ * this markup exists, so addEventListener would bind to nothing.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'PUTAWAY',
+        staged:'Staged in', avail:'available', dest:'Destination',
+        suggested:'Suggested', overridden:'Scanned', room:'room left',
+        here:'already here', qty:'Quantity to put away', all:'All',
+        useSugg:'Use suggestion', alts:'Other options', pick:'Pick face',
+        bulk:'Bulk', zone:'Zone', none:'No destination chosen',
+        book:'Put away', back:'Back to list',
+        openCamera:'Open camera', closeCamera:'Close camera',
+        manual:'Scan or key a destination location', decode:'Go',
+        booked:'Put away', from:'From', to:'To', was:'was', now:'now',
+        why:{ 1:'Its own pick face', 2:'Bulk it is already in',
+              3:'An empty pick face' },
+        types:{ PICK:'Pick face', BULK:'Bulk', STAG:'Staging',
+                RETN:'Returns', DAMG:'Damage' } },
+  FR: { appName:'GT Entrepôt', appSub:'RANGEMENT',
+        staged:'En zone', avail:'disponible', dest:'Destination',
+        suggested:'Suggéré', overridden:'Scanné', room:'place restante',
+        here:'déjà présent', qty:'Quantité à ranger', all:'Tout',
+        useSugg:'Utiliser la suggestion', alts:'Autres options',
+        pick:'Prélèvement', bulk:'Vrac', zone:'Zone',
+        none:'Aucune destination choisie',
+        book:'Ranger', back:'Retour à la liste',
+        openCamera:'Ouvrir la caméra', closeCamera:'Fermer la caméra',
+        manual:'Scannez ou saisissez un emplacement', decode:'Aller',
+        booked:'Rangé', from:'De', to:'Vers', was:'avant', now:'après',
+        why:{ 1:'Son propre emplacement de prélèvement',
+              2:'Vrac déjà utilisé', 3:'Un emplacement libre' },
+        types:{ PICK:'Prélèvement', BULK:'Vrac', STAG:'Réception',
+                RETN:'Retours', DAMG:'Dommages' } }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v, dp) {
+  return Number(v || 0).toLocaleString(loc, { minimumFractionDigits: dp === undefined ? 0 : dp,
+                                              maximumFractionDigits: dp === undefined ? 0 : dp });
+};
+var n = function (v) { return Number(v || 0); };
+var IMG = '/profoundui/userdata/ui/gtimg/';
+
+var kind = s(typeof msgkind !== 'undefined' ? msgkind : '').toLowerCase();
+var took = s(typeof ptook !== 'undefined' ? ptook : 'N') === 'Y';
+var rank = n(typeof prank !== 'undefined' ? prank : 0);
+var done = s(typeof pdone !== 'undefined' ? pdone : 'N') === 'Y';
+var destSet = has(typeof pto !== 'undefined' ? pto : '');
+
+/* PALTS is bounded to CHAR(512) by the display file. A truncated string would
+ * throw here and take the whole render with it, so a bad parse degrades to no
+ * alternatives rather than to a blank screen. */
+var alts = [];
+try {
+  var raw = s(typeof palts !== 'undefined' ? palts : '');
+  if (raw) alts = JSON.parse(raw);
+  if (!Array.isArray(alts)) alts = [];
+} catch (e) { alts = []; }
+
+/* The quantity input. toFixed rather than the localised value: a French
+ * "24,00" empties a number input silently, which is how the receiving stepper
+ * shipped blank boxes in French for a day. */
+var qtyVal = Number(typeof pqty !== 'undefined' ? pqty : 0);
+if (!isFinite(qtyVal)) qtyVal = 0;
+%>
+<div class="gt-app gt-putdest-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg<%= kind ? ' is-' + kind : '' %>"><%= s(msg) %></div>
+    <% } %>
+
+    <!-- ---- What is being put away --------------------------------- -->
+    <section class="gt-card gt-pd-item">
+      <span class="gt-pd-img">
+        <% if (n(typeof pimg !== 'undefined' ? pimg : 0) > 0) { %>
+          <img src="<%= IMG %><%= s(pimg) %>.jpg" alt="" loading="lazy">
+        <% } else { %>
+          <span class="gt-pd-noimg" aria-hidden="true"></span>
+        <% } %>
+      </span>
+      <span class="gt-pd-id">
+        <span class="gt-pd-desc"><%= s(typeof pdesc !== 'undefined' ? pdesc : '') %></span>
+        <span class="gt-pd-sku gt-mono"><%= s(typeof psku !== 'undefined' ? psku : '') %></span>
+        <% if (has(typeof psscc !== 'undefined' ? psscc : '')) { %>
+          <span class="gt-pd-sscc gt-mono"><%= s(psscc) %></span>
+        <% } %>
+      </span>
+      <span class="gt-pd-avail">
+        <strong><%= num(typeof pavail !== 'undefined' ? pavail : 0) %></strong>
+        <small><%= T.avail %> &middot; <%= s(typeof puom !== 'undefined' ? puom : '') %></small>
+        <small class="gt-mono"><%= T.staged %> <%= s(typeof pfrom !== 'undefined' ? pfrom : '') %></small>
+      </span>
+    </section>
+
+    <!-- ---- The destination --------------------------------------- -->
+    <h2 class="gt-section-title"><%= T.dest %></h2>
+
+    <section class="gt-card gt-pd-dest<%= destSet ? '' : ' is-empty' %>">
+      <% if (destSet) { %>
+        <div class="gt-pd-desthd">
+          <span class="gt-pd-destloc gt-mono"><%= s(pto) %></span>
+          <span class="gt-pd-destbadge<%= took ? ' is-scanned' : '' %>">
+            <%= took ? T.overridden : T.suggested %>
+          </span>
+        </div>
+
+        <div class="gt-pd-destfacts">
+          <span class="gt-pd-fact">
+            <strong><%= T.types[s(typeof ptotyp !== 'undefined' ? ptotyp : '')] ||
+                        s(ptotyp) %></strong>
+            <small><%= T.zone %> <%= s(typeof ptozone !== 'undefined' ? ptozone : '') %></small>
+          </span>
+          <span class="gt-pd-fact">
+            <strong><%= num(typeof ptoroom !== 'undefined' ? ptoroom : 0) %></strong>
+            <small><%= T.room %></small>
+          </span>
+          <span class="gt-pd-fact">
+            <strong><%= num(typeof ptoqty !== 'undefined' ? ptoqty : 0) %></strong>
+            <small><%= T.here %></small>
+          </span>
+        </div>
+
+        <% if (!took && rank > 0 && T.why[rank]) { %>
+          <p class="gt-pd-why"><%= T.why[rank] %></p>
+        <% } %>
+      <% } else { %>
+        <p class="gt-pd-nodest"><%= T.none %></p>
+      <% } %>
+    </section>
+
+    <!-- ---- Quantity ---------------------------------------------- -->
+    <section class="gt-card gt-pd-qty">
+      <label class="gt-pd-qtylabel" for="gt-pd-qty"><%= T.qty %></label>
+      <div class="gt-pd-qtyrow">
+        <input type="number" class="gt-numbox" id="gt-pd-qty" name="pqty"
+               value="<%= qtyVal.toFixed(2) %>" min="0" step="1"
+               inputmode="decimal" autocomplete="off">
+        <button type="button" class="gt-btn gt-btn-ghost"
+                onclick="pui.submit({action:'ALL'})"><%= T.all %></button>
+      </div>
+    </section>
+
+    <!-- ---- Scan a different destination -------------------------- -->
+    <div class="gt-scan-camera" id="gt-scan-camera">
+      <div class="gt-scan-stage">
+        <video id="gt-scan-video" muted playsinline></video>
+        <div class="gt-scan-frame" id="gt-scan-frame"></div>
+      </div>
+      <div class="gt-scan-status" id="gt-scan-status"></div>
+
+      <div class="gt-pd-scanrow">
+        <div class="gt-scan-camctl">
+          <button type="button" class="gt-iconbtn gt-iconbtn-go" id="gt-scan-start"
+                  title="<%= T.openCamera %>" aria-label="<%= T.openCamera %>">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+              <circle cx="16" cy="18" r="5"/>
+            </svg>
+          </button>
+          <button type="button" class="gt-iconbtn gt-iconbtn-stop" id="gt-scan-stop"
+                  title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <g class="gt-icon-cam">
+                <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                <circle cx="15" cy="18" r="4.6"/>
+              </g>
+              <g class="gt-icon-ban">
+                <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+                <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+                <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+              </g>
+            </svg>
+          </button>
+        </div>
+
+        <div class="gt-scan-manual">
+          <label for="gt-scan-manual"><%= T.manual %></label>
+          <div class="gt-scan-manual-row">
+            <input type="text" id="gt-scan-manual" name="scanval"
+                   value="" autocomplete="off" autocapitalize="characters"
+                   spellcheck="false" inputmode="text">
+            <button type="button" class="gt-btn gt-btn-primary"
+                    onclick="pui.submit({action:'SCAN'})"><%= T.decode %></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- The alternatives -------------------------------------- -->
+    <% if (alts.length > 1) { %>
+      <h2 class="gt-section-title"><%= T.alts %></h2>
+      <ul class="gt-pd-alts">
+        <% alts.forEach(function (a) { %>
+          <li class="gt-pd-alt<%= s(a.l) === s(typeof pto !== 'undefined' ? pto : '')
+                                  ? ' is-current' : '' %>">
+            <span class="gt-pd-altloc gt-mono"><%= s(a.l) %></span>
+            <span class="gt-pd-alttyp"><%= T.types[s(a.t)] || s(a.t) %></span>
+            <span class="gt-pd-altroom"><%= num(a.r) %> <%= T.room %></span>
+          </li>
+        <% }); %>
+      </ul>
+      <p class="gt-pd-althint"><%= T.manual %></p>
+    <% } %>
+
+    <!-- ---- What just happened ------------------------------------ -->
+    <% if (done) { %>
+      <section class="gt-card gt-pd-receipt">
+        <h3 class="gt-card-title"><%= T.booked %></h3>
+        <div class="gt-pd-recrow">
+          <span><%= T.from %> <strong class="gt-mono"><%= s(pfrom) %></strong>
+            <%= T.was %> <%= num(typeof pfrombef !== 'undefined' ? pfrombef : 0) %>,
+            <%= T.now %> <%= num(typeof pfromaft !== 'undefined' ? pfromaft : 0) %></span>
+          <span><%= T.to %> <strong class="gt-mono"><%= s(pto) %></strong>
+            <%= T.was %> <%= num(typeof ptobef !== 'undefined' ? ptobef : 0) %>,
+            <%= T.now %> <%= num(typeof ptoaft !== 'undefined' ? ptoaft : 0) %></span>
+        </div>
+      </section>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <footer class="gt-actions gt-pd-actions">
+    <button type="button" class="gt-btn gt-btn-ghost" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+    <% if (took) { %>
+      <button type="button" class="gt-btn gt-btn-ghost"
+              onclick="pui.submit({action:'SUGG'})"><%= T.useSugg %></button>
+    <% } %>
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F6"
+            onclick="pui.submit({action:'BOOK'})"><%= T.book %></button>
+  </footer>
+</div>

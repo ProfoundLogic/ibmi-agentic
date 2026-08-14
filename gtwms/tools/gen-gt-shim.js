@@ -90,8 +90,101 @@ const SCREENS = [
     pattern: 'gtrcld/rcvlines.ejs',
     tpl: 'gtrcld/rcvlines.ejs',
     css: ['gtcommon/gt-theme.css', 'gtrcld/rcvlines.css'],
-    js: ['gtcommon/gt-scan.js', 'gtcommon/gt-rcvlines.js'],
+    js: ['gtcommon/gt-scan.js', 'gtcommon/gt-edits.js', 'gtcommon/gt-rcvlines.js'],
     root: '.gt-rcvlines-screen',
+  },
+  {
+    id: 'gtinhd-invhome',
+    pattern: 'gtinhd/invhome.ejs',
+    tpl: 'gtinhd/invhome.ejs',
+    css: ['gtcommon/gt-theme.css', 'gtinhd/invhome.css'],
+    js: ['gtcommon/gt-scan.js'],
+    root: '.gt-invhome-screen',
+  },
+  {
+    id: 'gtinld-invloc',
+    pattern: 'gtinld/invloc.ejs',
+    tpl: 'gtinld/invloc.ejs',
+    css: ['gtcommon/gt-theme.css', 'gtinld/invloc.css'],
+    js: ['gtcommon/gt-scan.js'],
+    root: '.gt-invloc-screen',
+  },
+  {
+    id: 'gtcnhd-cnthome',
+    pattern: 'gtcnhd/cnthome.ejs',
+    tpl: 'gtcnhd/cnthome.ejs',
+    css: ['gtcommon/gt-theme.css', 'gtcnhd/cnthome.css'],
+    js: ['gtcommon/gt-scan.js'],
+    root: '.gt-cnthome-screen',
+  },
+  {
+    id: 'gtcned-cntentry',
+    pattern: 'gtcned/cntentry.ejs',
+    tpl: 'gtcned/cntentry.ejs',
+    css: ['gtcommon/gt-theme.css', 'gtcned/cntentry.css'],
+    js: ['gtcommon/gt-scan.js', 'gtcommon/gt-edits.js', 'gtcommon/gt-cntentry.js'],
+    root: '.gt-cntentry-screen',
+  },
+  {
+    id: 'gtcnvd-cntvar',
+    pattern: 'gtcnvd/cntvar.ejs',
+    tpl: 'gtcnvd/cntvar.ejs',
+    css: ['gtcommon/gt-theme.css', 'gtcnvd/cntvar.css'],
+    js: ['gtcommon/gt-photo.js', 'gtcommon/gt-edits.js', 'gtcommon/gt-cntvar.js'],
+    root: '.gt-cntvar-screen',
+  },
+  {
+    id: 'gtimvd-invmove',
+    pattern: 'gtimvd/invmove.ejs',
+    tpl: 'gtimvd/invmove.ejs',
+    css: ['gtcommon/gt-theme.css', 'gtimvd/invmove.css'],
+    js: ['gtcommon/gt-scan.js', 'gtcommon/gt-invmove.js'],
+    root: '.gt-invmove-screen',
+  },
+  {
+    /* Supervisor View. No js at all -- it renders and works with zero
+     * JavaScript, like the main menu. */
+    id: 'gtsvd-supv',
+    pattern: 'gtsvd/supv.ejs',
+    tpl: 'gtsvd/supv.ejs',
+    css: ['gtcommon/gt-theme.css', 'gtsvd/supv.css'],
+    root: '.gt-supv-screen',
+  },
+  {
+    id: 'gtpud-puthome',
+    pattern: 'gtpud/puthome.ejs',
+    tpl: 'gtpud/puthome.ejs',
+    css: ['gtcommon/gt-theme.css', 'gtpud/puthome.css'],
+    js: ['gtcommon/gt-scan.js'],
+    root: '.gt-puthome-screen',
+  },
+  {
+    id: 'gtpdd-putdest',
+    pattern: 'gtpdd/putdest.ejs',
+    tpl: 'gtpdd/putdest.ejs',
+    css: ['gtcommon/gt-theme.css', 'gtpdd/putdest.css'],
+    js: ['gtcommon/gt-scan.js'],
+    root: '.gt-putdest-screen',
+  },
+  {
+    /* Settings. No js either: every control is an inline pui.submit. */
+    id: 'gtstd-settings',
+    pattern: 'gtstd/settings.ejs',
+    tpl: 'gtstd/settings.ejs',
+    css: ['gtcommon/gt-theme.css', 'gtstd/settings.css'],
+    root: '.gt-sett-screen',
+  },
+  {
+    /* Simple camera test -- option 5 of the sign-on menu. Deliberately does
+       NOT use gtcommon/gt-scan.js: it exists to isolate the iPad camera
+       problem from the application's own scan stack, so it carries its own
+       client side and shares nothing but the theme. */
+    id: 'gtsimd-simtest',
+    pattern: 'gtsimd/simtest.ejs',
+    tpl: 'gtsimd/simtest.ejs',
+    css: ['gtcommon/gt-theme.css', 'gtsimd/simtest.css'],
+    js: ['gtsimd/simtest.js'],
+    root: '.gts-screen',
   },
 ];
 
@@ -136,6 +229,17 @@ function buildEntries() {
 }
 
 function buildBlock(entries) {
+  /* The decoder is read here rather than passed in: it is not per-screen, it is one
+     global copy for the whole page. 362 KB becomes ~483 KB of base64, which is real
+     but is the only delivery route proven to reach the device -- see the comment on
+     ZXING_B64 in the generated block. */
+  const zxingFile = path.join(UI, 'gtcommon', 'gt-zxing.min.js');
+  if (!fs.existsSync(zxingFile)) {
+    console.error('FATAL: ' + zxingFile + ' is missing -- iOS cannot decode without it');
+    process.exit(1);
+  }
+  const zxingB64 = fs.readFileSync(zxingFile).toString('base64');
+
   const entryJs = entries
     .map(
       (e) =>
@@ -164,6 +268,39 @@ function buildBlock(entries) {
   var ENTRIES = [
 ${entryJs}
   ];
+
+  /* ------------------------------------------------------------------
+     THE DECODER, SHIPPED IN THE PAGE.
+
+     gt-scan.js used to load ZXing by appending <script src=".../gt-zxing.min.js">.
+     On the iPad that request WAS NEVER MADE -- the access log shows exactly one
+     fetch of that file from the device all day, and it came from the standalone
+     self-test page, never from inside Genie. Two other dynamically appended
+     scripts (the version probe and the access-log ping) behaved identically:
+     correct in Chromium, no request whatsoever from the device.
+
+     On iOS there is no BarcodeDetector, so ZXing is the ONLY thing that can read a
+     barcode. No decoder means a camera that opens, shows a live picture and never
+     resolves anything -- which is precisely what was reported, seven times.
+
+     I cannot see why WebKit-inside-Genie drops those requests, and I do not need
+     to: the base64 route in this shim demonstrably reaches the device, because the
+     screen JS it carries is running there. So the decoder travels the same way.
+
+     Decoded LAZILY -- 362 KB of parser is not worth spending on a 5250 screen that
+     will never scan -- and gt-scan.js calls this instead of appending a script.
+     ------------------------------------------------------------------ */
+  var ZXING_B64 = "${zxingB64}";
+
+  window.__gtLoadZxing = function () {
+    if (window.ZXing && window.ZXing.BrowserMultiFormatReader) return true;
+    try {
+      (new Function(b64decode(ZXING_B64)))();
+    } catch (err) {
+      if (window.console) console.error("[GTWMS] inlined decoder failed:", err);
+    }
+    return !!(window.ZXing && window.ZXing.BrowserMultiFormatReader);
+  };
 
   /* The screen-render entry point was renamed between Profound UI builds:
      older genie.js exposes pui.vu, this build exposes pui.QD. Patch whichever
@@ -260,6 +397,80 @@ ${entryJs}
   setTimeout(function () { clearInterval(gtCssInterval); }, 10000);
 
   /* ------------------------------------------------------------------
+     THE VIEWPORT. Without this every screen is laid out at 980px and then
+     scaled down to fit the phone.
+
+     Genie's start.html declares no <meta name="viewport">, and a mobile browser
+     with no viewport meta uses a ~980px LAYOUT viewport and zooms the finished
+     page out to fit the screen. Measured on a Samsung S24 Ultra profile:
+
+       no meta   layout = 980px  ->  the >=835px desktop layout, scaled to ~42%
+       with meta layout = 412px  ->  the phone layout, at full size
+
+     So every media query was reading a desktop width and every screen was a
+     shrunken desktop. Nothing was wrong with the CSS; the page was never told
+     the device existed. This is invisible to a headless test that injects its
+     own viewport meta -- which is exactly what the pre-flights did.
+
+     SCOPED, NOT GLOBAL. start.html is shared with the other projects in this
+     skin and with Genie's own 5250 screens, where a 980px layout scaled to fit
+     is arguably the right answer for a fixed 80-column terminal. So the meta is
+     applied only while one of OUR screens is on the page, and the previous
+     state -- including its absence -- is restored when it leaves.
+     ------------------------------------------------------------------ */
+  var GT_VIEWPORT = "width=device-width, initial-scale=1, viewport-fit=cover";
+  var vpPrev = null;          /* previous content, or null when there was none */
+  var vpOurs = false;         /* did we create the tag ourselves? */
+  var vpOn = false;
+
+  function viewportTag() {
+    return document.querySelector('meta[name="viewport"]');
+  }
+
+  function applyViewport() {
+    if (vpOn) return;
+    var tag = viewportTag();
+    if (tag) {
+      vpPrev = tag.getAttribute("content");
+      vpOurs = false;
+    } else {
+      tag = document.createElement("meta");
+      tag.setAttribute("name", "viewport");
+      (document.head || document.documentElement).appendChild(tag);
+      vpPrev = null;
+      vpOurs = true;
+    }
+    tag.setAttribute("content", GT_VIEWPORT);
+    vpOn = true;
+  }
+
+  function restoreViewport() {
+    if (!vpOn) return;
+    var tag = viewportTag();
+    if (tag) {
+      if (vpOurs) {
+        tag.parentNode.removeChild(tag);
+      } else if (vpPrev === null) {
+        tag.removeAttribute("content");
+      } else {
+        tag.setAttribute("content", vpPrev);
+      }
+    }
+    vpOn = false;
+  }
+
+  /* Driven by whether a .gt-app wrapper is actually in the DOM rather than by a
+     render hook: the hook tells us when one of our screens ARRIVES, and nothing
+     tells us when it leaves. Polling the DOM covers both directions and cannot
+     be wrong about the current state. */
+  function syncViewport() {
+    if (document.querySelector(".gt-app")) applyViewport();
+    else restoreViewport();
+  }
+  syncViewport();
+  setInterval(syncViewport, 300);
+
+  /* ------------------------------------------------------------------
      Screen JS delivery. Each screen's JS guards its own re-entry, so if the
      normal script element DID load, running it again is a no-op.
      ------------------------------------------------------------------ */
@@ -268,6 +479,12 @@ ${entryJs}
     var el = document.querySelector(entry.root);
     if (!el) return false;
     try {
+      /* Mark the delivery route before running it. The snapshot below and the
+         display file's <script src> tag both deliver the same file, and knowing
+         WHICH one is running has been the difference between a real fix and a
+         wasted round: a cached start.html pins the snapshot, and no stamp bump can
+         reach it. gt-scan.js reports this in its access-log ping. */
+      window.__gtVia = 'snapshot';
       (new Function(b64decode(entry.jsB64)))();
     } catch (err) {
       if (window.console) console.error("[GTWMS] screen JS failed:", err);

@@ -1,0 +1,217 @@
+<%
+/* ====================================================================
+ * Settings -- the three preferences this application actually acts on.
+ *
+ * Every control here writes to a real column in GTOPERATOR. There are no
+ * decorative toggles: a switch that stores nothing teaches the operator that
+ * the application lies, which is worse than having no settings screen.
+ *
+ * LANGUAGE APPLIES IMMEDIATELY, because it is both a setting on this screen and
+ * the language the screen is drawn in -- the operator has to see the result of
+ * the choice they just made to know they picked the right one.
+ *
+ * LARGE TOUCH PREVIEWS ITSELF. The class goes on this screen's wrapper as soon
+ * as it is chosen, so the operator feels the difference before saving rather
+ * than reading a description of it.
+ *
+ * Renders with NO JavaScript at all. The zone buttons and toggles are inline
+ * onclick calls to pui.submit carrying the field value, so the round trip is
+ * the mechanism -- nothing depends on a script that might not arrive.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'SETTINGS',
+        who:'Signed in', operId:'Operator', badge:'Badge', role:'Role',
+        prefs:'Preferences',
+        language:'Language', languageSub:'Applies to every screen',
+        zone:'Default zone', zoneSub:'The area you normally work in',
+        zoneAny:'All zones', locsIn:'locations',
+        touch:'Large touch targets',
+        touchSub:'Bigger buttons and boxes for a gloved hand',
+        on:'On', off:'Off',
+        about:'About', lib:'Library', items:'Items', imgs:'Images',
+        locs:'Locations', moves:'Movements booked',
+        unsaved:'Unsaved changes',
+        save:'Save', discard:'Discard', back:'Back to menu',
+        roles:{ OPER:'Operator', SUPV:'Supervisor' } },
+  FR: { appName:'GT Entrepôt', appSub:'PARAMÈTRES',
+        who:'Connecté', operId:'Opérateur', badge:'Badge', role:'Rôle',
+        prefs:'Préférences',
+        language:'Langue', languageSub:'S’applique à tous les écrans',
+        zone:'Zone par défaut', zoneSub:'Le secteur où vous travaillez',
+        zoneAny:'Toutes les zones', locsIn:'emplacements',
+        touch:'Grandes cibles tactiles',
+        touchSub:'Boutons et champs plus grands pour une main gantée',
+        on:'Activé', off:'Désactivé',
+        about:'À propos', lib:'Bibliothèque', items:'Articles', imgs:'Images',
+        locs:'Emplacements', moves:'Transferts enregistrés',
+        unsaved:'Modifications non enregistrées',
+        save:'Enregistrer', discard:'Annuler', back:'Retour au menu',
+        roles:{ OPER:'Opérateur', SUPV:'Superviseur' } }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v) { return Number(v || 0).toLocaleString(loc); };
+
+var kind   = s(typeof msgkind !== 'undefined' ? msgkind : '').toLowerCase();
+var curZone = s(typeof szone !== 'undefined' ? szone : '');
+var touchOn = s(typeof stouch !== 'undefined' ? stouch : 'N') === 'Y';
+var dirty   = s(typeof sdirty !== 'undefined' ? sdirty : 'N') === 'Y';
+var role    = s(typeof srole !== 'undefined' ? srole : 'OPER');
+
+/* SZONES is bounded to CHAR(512) by the display file. A truncated string would
+ * throw here and take the whole render with it, so a bad parse degrades to no
+ * zone buttons rather than to a blank screen. */
+var zones = [];
+try {
+  var raw = s(typeof szones !== 'undefined' ? szones : '');
+  if (raw) zones = JSON.parse(raw);
+  if (!Array.isArray(zones)) zones = [];
+} catch (e) { zones = []; }
+%>
+<div class="gt-app gt-sett-screen<%= touchOn ? ' gt-large-touch' : '' %>"
+     data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg<%= kind ? ' is-' + kind : '' %>"><%= s(msg) %></div>
+    <% } %>
+
+    <% if (dirty) { %>
+      <div class="gt-msg is-warn"><%= T.unsaved %></div>
+    <% } %>
+
+    <!-- ---- Who is signed in (read-only) --------------------------- -->
+    <h2 class="gt-section-title"><%= T.who %></h2>
+    <section class="gt-card gt-st-who">
+      <span class="gt-st-fact">
+        <small><%= T.operId %></small>
+        <strong class="gt-mono"><%= s(typeof soperid !== 'undefined' ? soperid : '') %></strong>
+      </span>
+      <span class="gt-st-fact">
+        <small><%= T.role %></small>
+        <strong><%= T.roles[role] || role %></strong>
+      </span>
+      <span class="gt-st-fact">
+        <small><%= T.badge %></small>
+        <strong class="gt-mono"><%= s(typeof sbadge !== 'undefined' ? sbadge : '') %></strong>
+      </span>
+    </section>
+
+    <!-- ---- Preferences ------------------------------------------- -->
+    <h2 class="gt-section-title"><%= T.prefs %></h2>
+
+    <%# Language. Submitting the action applies AND saves it, because the
+        screen has to be redrawn in the new language to show the result. %>
+    <section class="gt-card gt-st-row">
+      <div class="gt-st-label">
+        <strong><%= T.language %></strong>
+        <small><%= T.languageSub %></small>
+      </div>
+      <div class="gt-st-choice">
+        <button type="button"
+                class="gt-st-opt<%= lang === 'EN' ? ' is-on' : '' %>"
+                onclick="pui.submit({action:'LANGEN'})">English</button>
+        <button type="button"
+                class="gt-st-opt<%= lang === 'FR' ? ' is-on' : '' %>"
+                onclick="pui.submit({action:'LANGFR'})">Français</button>
+      </div>
+    </section>
+
+    <%# Default zone. The list is read from GTLOCATION, so a zone added to the
+        warehouse appears here with no code change. %>
+    <section class="gt-card gt-st-row">
+      <div class="gt-st-label">
+        <strong><%= T.zone %></strong>
+        <small><%= T.zoneSub %></small>
+      </div>
+      <div class="gt-st-zones">
+        <button type="button"
+                class="gt-st-opt<%= curZone === '' ? ' is-on' : '' %>"
+                onclick="pui.submit({action:'TOUCH', szone:''})"><%= T.zoneAny %></button>
+        <% zones.forEach(function (z) { %>
+          <button type="button"
+                  class="gt-st-opt<%= curZone === s(z.z) ? ' is-on' : '' %>"
+                  onclick="pui.submit({action:'TOUCH', szone:'<%= s(z.z) %>'})">
+            <span class="gt-st-optz"><%= s(z.z) %></span>
+            <span class="gt-st-optn"><%= num(z.n) %> <%= T.locsIn %></span>
+          </button>
+        <% }); %>
+      </div>
+    </section>
+
+    <%# Large touch. Previews on this screen the moment it is chosen. %>
+    <section class="gt-card gt-st-row">
+      <div class="gt-st-label">
+        <strong><%= T.touch %></strong>
+        <small><%= T.touchSub %></small>
+      </div>
+      <div class="gt-st-choice">
+        <button type="button"
+                class="gt-st-opt<%= touchOn ? ' is-on' : '' %>"
+                onclick="pui.submit({action:'TOUCH', stouch:'Y'})"><%= T.on %></button>
+        <button type="button"
+                class="gt-st-opt<%= touchOn ? '' : ' is-on' %>"
+                onclick="pui.submit({action:'TOUCH', stouch:'N'})"><%= T.off %></button>
+      </div>
+    </section>
+
+    <!-- ---- About: real figures, not a version string ------------- -->
+    <h2 class="gt-section-title"><%= T.about %></h2>
+    <section class="gt-card gt-st-about">
+      <span class="gt-st-fact">
+        <small><%= T.lib %></small>
+        <strong class="gt-mono"><%= s(typeof sapplib !== 'undefined' ? sapplib : '') %></strong>
+      </span>
+      <span class="gt-st-fact">
+        <small><%= T.items %></small>
+        <strong><%= num(typeof sitems !== 'undefined' ? sitems : 0) %></strong>
+      </span>
+      <span class="gt-st-fact">
+        <small><%= T.imgs %></small>
+        <strong><%= num(typeof simgs !== 'undefined' ? simgs : 0) %></strong>
+      </span>
+      <span class="gt-st-fact">
+        <small><%= T.locs %></small>
+        <strong><%= num(typeof slocs !== 'undefined' ? slocs : 0) %></strong>
+      </span>
+      <span class="gt-st-fact">
+        <small><%= T.moves %></small>
+        <strong><%= num(typeof smoves !== 'undefined' ? smoves : 0) %></strong>
+      </span>
+    </section>
+  </main>
+
+  <%# The current values travel back on every submit, so a zone chosen before a
+      large-touch tap is not lost between round trips. %>
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="szone" value="<%= curZone %>">
+  <input type="hidden" name="stouch" value="<%= touchOn ? 'Y' : 'N' %>">
+  <input type="hidden" name="slang" value="<%= lang %>">
+
+  <footer class="gt-actions gt-st-actions">
+    <button type="button" class="gt-btn gt-btn-ghost" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+    <% if (dirty) { %>
+      <button type="button" class="gt-btn gt-btn-ghost" data-fkey="F12"
+              onclick="pui.submit({action:'RESET'})"><%= T.discard %></button>
+    <% } %>
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F6"
+            onclick="pui.submit({action:'SAVE'})"><%= T.save %></button>
+  </footer>
+</div>

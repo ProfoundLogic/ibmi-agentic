@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GT camera self-test</title>
+<!--
+  GT Warehouse Mobile -- camera self-test.
+
+  Open this URL on the device that is failing:
+      /profoundui/userdata/ui/gtcommon/gt-camtest.html
+
+  Standalone on purpose: no Genie, no Profound UI, no display file, no shim. If
+  scanning works HERE but not in the app, the fault is in the app's plumbing. If
+  it fails here too, the fault is the device, the browser or the barcode -- and
+  the readout below says which.
+
+  It exists because the same symptom was reported four times and diagnosed from a
+  description each time. One screenshot of this page settles it.
+-->
+<style>
+  :root { --ok:#127C3B; --bad:#DA291C; --warn:#B45309; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.4 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+         background:#F7F7F5; color:#2B2B2B; padding:12px; }
+  h1 { font-size:17px; margin:0 0 2px; }
+  p.sub { margin:0 0 12px; color:#6E6E69; font-size:12px; }
+  button { min-height:52px; padding:0 16px; border:0; border-radius:12px;
+           background:#DA291C; color:#fff; font-size:16px; font-weight:700;
+           width:100%; margin-bottom:8px; }
+  button.alt { background:#2B2B2B; }
+  #stage { position:relative; background:#000; border-radius:12px; overflow:hidden;
+           margin-bottom:10px; }
+  video { width:100%; display:block; max-height:46vh; object-fit:cover; }
+  #hit { font-size:22px; font-weight:800; color:#fff; background:var(--ok);
+         padding:10px 12px; border-radius:10px; margin-bottom:10px;
+         display:none; word-break:break-all; }
+  table { width:100%; border-collapse:collapse; background:#fff; border-radius:10px;
+          overflow:hidden; }
+  td { padding:6px 9px; border-bottom:1px solid #eee; vertical-align:top;
+       font-size:12.5px; }
+  td.k { color:#6E6E69; width:44%; }
+  td.v { font-family:"SF Mono",Consolas,monospace; word-break:break-all; }
+  .y { color:var(--ok); font-weight:700; }
+  .n { color:var(--bad); font-weight:700; }
+  .w { color:var(--warn); font-weight:700; }
+  textarea { width:100%; height:150px; font-family:"SF Mono",Consolas,monospace;
+             font-size:11px; margin-top:8px; }
+</style>
+</head>
+<body>
+
+<h1>GT camera self-test</h1>
+<p class="sub">Nothing here touches the application. Tap <b>Start camera</b>, point at
+any barcode, then send a screenshot — or tap <b>Copy report</b> and paste it.<br>
+<b>The application now reports on itself:</b> the scan band has a <b>Camera details</b>
+button, which is usually the faster answer. This page stays useful as a second
+opinion — it decodes the FULL frame through the library's own convenience path,
+while the app crops to the reticle and runs three binarizers, so a difference
+between the two is itself informative.</p>
+
+<button id="go">Start camera</button>
+<button id="stop" class="alt">Stop</button>
+
+<div id="hit"></div>
+<div id="stage"><video id="v" muted playsinline></video></div>
+
+<table id="t"></table>
+
+<button id="copy" class="alt" style="margin-top:10px">Copy report</button>
+<textarea id="out" readonly></textarea>
+
+<script>
+/* ------------------------------------------------------------------
+   Everything is reported, including the failures. A field that says
+   "unknown" is a fact too.
+   ------------------------------------------------------------------ */
+var ZXING_SRC = 'gt-zxing.min.js';       /* same directory -- no absolute path,
+                                            so this page works from any docroot */
+var d = {
+  page: '20260811k',
+  ua: navigator.userAgent,
+  secureContext: (typeof isSecureContext !== 'undefined') ? isSecureContext : 'unknown',
+  origin: location.origin,
+  mediaDevices: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+  detectorPresent: (typeof window.BarcodeDetector !== 'undefined'),
+  detectorFormats: 'not asked',
+  detectorCtor: 'not tried',
+  cameraLabel: '', trackSettings: '',
+  videoW: 0, videoH: 0, readyState: 0,
+  nativeTries: 0, nativeErrs: 0, lastNativeErr: '',
+  zxLoaded: false, zxErr: '', zxTries: 0,
+  decoded: '', decodedBy: '', notes: []
+};
+
+var video = document.getElementById('v');
+var stream = null, running = false, raf = 0, zx = null;
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function mark(v) {
+  if (v === true) return '<span class="y">yes</span>';
+  if (v === false) return '<span class="n">NO</span>';
+  return esc(v);
+}
+function render() {
+  var rows = [
+    ['self-test version', d.page],
+    ['secure context (HTTPS)', d.secureContext],
+    ['origin', d.origin],
+    ['getUserMedia available', d.mediaDevices],
+    ['BarcodeDetector present', d.detectorPresent],
+    ['BarcodeDetector constructor', d.detectorCtor],
+    ['formats it supports', Array.isArray(d.detectorFormats)
+        ? (d.detectorFormats.length ? d.detectorFormats.join(', ')
+                                    : '<span class="n">NONE</span>')
+        : d.detectorFormats],
+    ['camera', d.cameraLabel || '(not started)'],
+    ['stream settings', d.trackSettings || '-'],
+    ['video size', d.videoW + ' x ' + d.videoH +
+        (d.videoW ? '' : ' <span class="n">&lt;- no picture to decode</span>')],
+    ['video readyState', d.readyState],
+    ['native decode attempts', d.nativeTries],
+    ['native decode errors', d.nativeErrs + (d.lastNativeErr ? ' (' + esc(d.lastNativeErr) + ')' : '')],
+    ['ZXing fallback loaded', d.zxLoaded === true ? true : (d.zxErr ? d.zxErr : d.zxLoaded)],
+    ['ZXing frames examined', d.zxTries],
+    ['DECODED', d.decoded ? '<span class="y">' + esc(d.decoded) + '</span> (' + d.decodedBy + ')' : '(nothing yet)'],
+    ['user agent', d.ua]
+  ];
+  document.getElementById('t').innerHTML = rows.map(function (r) {
+    return '<tr><td class="k">' + r[0] + '</td><td class="v">' +
+           (typeof r[1] === 'boolean' ? mark(r[1]) : r[1]) + '</td></tr>';
+  }).join('');
+  document.getElementById('out').value = JSON.stringify(d, null, 1);
+}
+
+function hit(code, by) {
+  d.decoded = code; d.decodedBy = by;
+  var el = document.getElementById('hit');
+  el.style.display = 'block';
+  el.textContent = by + ': ' + code;
+  try { if (navigator.vibrate) navigator.vibrate(60); } catch (e) {}
+  render();
+}
+
+/* ---- wait for a picture, the thing the app was not doing ---------- */
+function whenReady(cb, tries) {
+  tries = tries || 0;
+  d.videoW = video.videoWidth || 0;
+  d.videoH = video.videoHeight || 0;
+  d.readyState = video.readyState;
+  render();
+  if (d.videoW > 0 && d.videoH > 0 && video.readyState >= 2) return cb(true);
+  if (tries > 60) return cb(false);
+  setTimeout(function () { whenReady(cb, tries + 1); }, 100);
+}
+
+function loadZxing(cb) {
+  if (window.ZXing && window.ZXing.BrowserMultiFormatReader) return cb(true);
+  var el = document.createElement('script');
+  el.src = ZXING_SRC;
+  el.onload = function () { cb(!!(window.ZXing && window.ZXing.BrowserMultiFormatReader)); };
+  el.onerror = function () { d.zxErr = 'script failed to load from ' + ZXING_SRC; cb(false); };
+  document.head.appendChild(el);
+}
+
+/* Both decoders run TOGETHER here on purpose: this page is diagnosing, not
+   economising, and knowing that one works while the other does not is the whole
+   point. */
+function startNative() {
+  if (!d.detectorPresent) return;
+  var det = null;
+  try {
+    det = new window.BarcodeDetector({ formats: ['upc_a','upc_e','ean_13','ean_8',
+      'itf','code_128','code_39','codabar','qr_code','data_matrix','pdf417','aztec'] });
+    d.detectorCtor = 'ok (with formats)';
+  } catch (e1) {
+    try { det = new window.BarcodeDetector(); d.detectorCtor = 'ok (default formats)'; }
+    catch (e2) { d.detectorCtor = 'THREW: ' + (e2.name || e2.message); render(); return; }
+  }
+  var tick = function () {
+    if (!running || !det) return;
+    d.nativeTries++;
+    det.detect(video).then(function (codes) {
+      if (codes && codes.length) { hit(codes[0].rawValue, 'native BarcodeDetector'); return; }
+      if (d.nativeTries % 10 === 0) render();
+      raf = requestAnimationFrame(tick);
+    }).catch(function (e) {
+      d.nativeErrs++;
+      d.lastNativeErr = e && (e.name || e.message) ? (e.name || e.message) : 'rejected';
+      render();
+      raf = requestAnimationFrame(tick);
+    });
+  };
+  raf = requestAnimationFrame(tick);
+}
+
+function startZxing() {
+  loadZxing(function (ok) {
+    d.zxLoaded = ok;
+    render();
+    if (!ok) return;
+    try {
+      var hints = new Map();
+      hints.set(window.ZXing.DecodeHintType.TRY_HARDER, true);
+      zx = new window.ZXing.BrowserMultiFormatReader(hints, 200);
+
+      /* Our own frame loop, NOT decodeFromVideoElementContinuously(). That helper
+         waits for a 'playing' event which never fires again on an element that is
+         already playing -- so it loaded and never decoded a frame. This page
+         reported exactly that from the device: zxLoaded yes, callbacks 0. The
+         count below now means frames actually examined. */
+      var tick = function () {
+        if (!running || !zx) return;
+        if (!video.videoWidth) { setTimeout(tick, 200); return; }
+        d.zxTries++;
+        try {
+          var r = zx.decode(video);          /* decode() retries a failed frame
+                                               with a second binarizer; the
+                                               lower-level pair does not, and
+                                               measurably misses frames it reads */
+          if (r) {
+            var t = null;
+            try { t = r.getText(); } catch (e) { t = r.text; }
+            if (t) { hit(t, 'ZXing'); return; }
+          }
+        } catch (e) {
+          var n = (e && (e.name || (e.constructor && e.constructor.name))) || '';
+          /* Minified builds rename NotFoundException, so match loosely and record
+             anything that is not simply "no barcode in this frame". */
+          if (n && n.length > 2 && n.indexOf('NotFound') < 0 &&
+              n.indexOf('Checksum') < 0 && n.indexOf('Format') < 0) {
+            d.zxErr = 'decode threw: ' + n;
+          }
+        }
+        if (d.zxTries % 10 === 0) render();
+        setTimeout(tick, 120);
+      };
+      tick();
+    } catch (e) {
+      d.zxErr = 'reader failed: ' + (e && (e.name || e.message));
+      render();
+    }
+  });
+}
+
+document.getElementById('go').onclick = function () {
+  d.notes = [];
+  if (!d.mediaDevices) { d.notes.push('no getUserMedia -- not a secure context?'); render(); return; }
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 } }, audio: false
+  }).then(function (s) {
+    stream = s;
+    var t = s.getVideoTracks()[0];
+    if (t) {
+      d.cameraLabel = t.label || '(unnamed)';
+      try { d.trackSettings = JSON.stringify(t.getSettings()); } catch (e) {}
+    }
+    video.srcObject = s;
+    video.setAttribute('playsinline', 'true');
+    return video.play();
+  }).then(function () {
+    running = true;
+    whenReady(function (hasPicture) {
+      if (!hasPicture) { d.notes.push('video never reported dimensions'); render(); return; }
+      if (d.detectorPresent && window.BarcodeDetector.getSupportedFormats) {
+        window.BarcodeDetector.getSupportedFormats().then(function (f) {
+          d.detectorFormats = f || [];
+          render();
+          startNative();
+        }).catch(function () { d.detectorFormats = 'getSupportedFormats failed'; startNative(); });
+      } else {
+        startNative();
+      }
+      startZxing();
+    });
+  }).catch(function (e) {
+    d.notes.push('getUserMedia failed: ' + (e && (e.name || e.message)));
+    render();
+  });
+};
+
+document.getElementById('stop').onclick = function () {
+  running = false;
+  if (raf) cancelAnimationFrame(raf);
+  if (zx) { try { zx.reset(); } catch (e) {} zx = null; }
+  if (stream) { stream.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} }); stream = null; }
+  render();
+};
+
+document.getElementById('copy').onclick = function () {
+  var ta = document.getElementById('out');
+  ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  if (navigator.clipboard) { try { navigator.clipboard.writeText(ta.value); } catch (e) {} }
+};
+
+render();
+</script>
+</body>
+</html>

@@ -59,7 +59,13 @@ gtcmtst.pgm: qrpglesrc/gtcmtst.sqlrpgle | gttables.file
 #  Verify by signing on and reading the menu. See §25.3 of the design doc.
 # ---------------------------------------------------------------------
 gtmnud.file: qddssrc/gtmnud.json
-gtmnur.pgm:  qrpglesrc/gtmnur.sqlrpgle qddssrc/gtmnud.json | gtmnud.file gttables.file
+#  gtvput.file is here because the Putaway badge reads GTVPUTSTG, and the SQL
+#  precompiler resolves every table and view at COMPILE time -- a missing view
+#  is SQL0204 on the menu, not a runtime surprise. The called applications are
+#  deliberately NOT prerequisites: they are dynamic extpgm calls with no
+#  binding, so the menu compiles before any of them exist.
+gtmnur.pgm:  qrpglesrc/gtmnur.sqlrpgle qddssrc/gtmnud.json \
+             | gtmnud.file gttables.file gtvput.file
 gtstart.pgm: qclsrc/gtstart.clle | gtmnur.pgm
 
 #  ---------------------------------------------------------------------
@@ -199,3 +205,133 @@ gtrclr.pgm:  qrpglesrc/gtrclr.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtrcld.j
 #  RCVHOME scans the pallet label and calls RCVLINES.
 gtrchr.pgm:  qrpglesrc/gtrchr.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtrchd.json \
              gtbar.srvpgm gtrclr.pgm | gtrchd.file gtbar.bnddir gtvrcv.file
+
+# ---------------------------------------------------------------------
+#  Inventory & Movement -- menu tile 3.
+#
+#  Views first: GTVINVLOC and GTVLOCSUM derive the bulk-versus-pick-face
+#  numbers and the replenish condition once, so the location screen, the
+#  suggestion and the move screen cannot disagree.
+# ---------------------------------------------------------------------
+gtvinv.file: qsqlsrc/gtvinv.view.sql gtvimg.file gtseed.file
+
+gtinhd.file: qddssrc/gtinhd.json
+gtinld.file: qddssrc/gtinld.json
+gtimvd.file: qddssrc/gtimvd.json
+
+#  The move screen posts the transaction, so it is built first and called by
+#  the location screen.
+gtimvr.pgm:  qrpglesrc/gtimvr.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtimvd.json \
+             gtbar.srvpgm | gtimvd.file gtbar.bnddir gtvinv.file
+
+gtinlr.pgm:  qrpglesrc/gtinlr.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtinld.json \
+             gtbar.srvpgm gtimvr.pgm | gtinld.file gtbar.bnddir gtvinv.file
+
+#  INVHOME classifies one scan into a location, an item or a pallet. An item
+#  goes to the Item Lookup detail screen that already exists rather than to a
+#  second screen showing the same thing.
+gtinhr.pgm:  qrpglesrc/gtinhr.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtinhd.json \
+             gtbar.srvpgm gtinlr.pgm gtitdr.pgm | gtinhd.file gtbar.bnddir gtvinv.file
+
+# ---------------------------------------------------------------------
+#  Cycle Count -- menu tile 4.
+#
+#  BLIND counting: GTVCNTLIN carries qty_expected for the variance review, and
+#  the counting display file has no field to hold it, so the expected quantity
+#  never reaches the browser at all.
+# ---------------------------------------------------------------------
+gtvcnt.file: qsqlsrc/gtvcnt.view.sql gtvimg.file gtseed.file
+
+gtcnhd.file: qddssrc/gtcnhd.json
+gtcned.file: qddssrc/gtcned.json
+gtcnvd.file: qddssrc/gtcnvd.json
+
+#  The variance review posts the adjustment, so it builds first. It binds GTIMG
+#  because a variance past the threshold requires a photograph.
+gtcnvr.pgm:  qrpglesrc/gtcnvr.sqlrpgle qrpglesrc/gtimg_pr.rpgle qddssrc/gtcnvd.json \
+             gtimg.srvpgm | gtcnvd.file gtimg.bnddir gtvcnt.file
+
+gtcner.pgm:  qrpglesrc/gtcner.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtcned.json \
+             gtbar.srvpgm gtcnvr.pgm | gtcned.file gtbar.bnddir gtvcnt.file
+
+gtcnhr.pgm:  qrpglesrc/gtcnhr.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtcnhd.json \
+             gtbar.srvpgm gtcner.pgm | gtcnhd.file gtbar.bnddir gtvcnt.file
+
+# ---------------------------------------------------------------------
+#  Supervisor View -- menu tile 6.
+#
+#  Read-only, and it deliberately adds NO view of its own: every figure comes
+#  from GTVRCPPRG, GTVCNTVAR, GTVREPLEN and GTVPUTSTG, which the operator
+#  screens already read. A supervisor and an operator being shown different
+#  numbers for the same work is the one failure a dashboard cannot survive.
+#
+#  It CALLS GTRCLR and GTCNVR, so both are normal prerequisites -- a tapped row
+#  opens the real screen rather than a read-only copy of it. gtvput.file is
+#  ordered before it because the staged-units figure reads GTVPUTSTG.
+# ---------------------------------------------------------------------
+gtsvd.file: qddssrc/gtsvd.json
+
+gtsvr.pgm:  qrpglesrc/gtsvr.sqlrpgle qddssrc/gtsvd.json \
+            gtrclr.pgm gtcnvr.pgm | gtsvd.file gtvput.file gtvrcv.file gtvcnt.file
+
+# ---------------------------------------------------------------------
+#  Putaway -- menu tile 7.
+#
+#  The other half of Receiving: gtrclr posts accepted stock into STAGE01 and
+#  parks the pallet there, and until it is put away it cannot be picked.
+#
+#  GTVPUTSTG (what is staged) and GTVPUTSUG (where it could go, ranked) are the
+#  shared derivation, so the destination the work list offers and the one the
+#  confirm screen offers are the same answer. Built before either program.
+# ---------------------------------------------------------------------
+gtvput.file: qsqlsrc/gtvput.view.sql gtvimg.file gtseed.file
+
+gtpud.file: qddssrc/gtpud.json
+gtpdd.file: qddssrc/gtpdd.json
+
+#  The confirm screen books the transaction, so it is built first and called by
+#  the work list -- callee before caller, the same order the receiving and
+#  counting chains use.
+gtpdr.pgm:  qrpglesrc/gtpdr.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtpdd.json \
+            gtbar.srvpgm | gtpdd.file gtbar.bnddir gtvput.file
+
+gtpur.pgm:  qrpglesrc/gtpur.sqlrpgle qrpglesrc/gtbar_pr.rpgle qddssrc/gtpud.json \
+            gtbar.srvpgm gtpdr.pgm | gtpud.file gtbar.bnddir gtvput.file
+
+# ---------------------------------------------------------------------
+#  Settings -- menu tile 8.
+#
+#  No new table and no new view: lang_pref, default_zone and large_touch have
+#  been columns on GTOPERATOR since the first build, and this screen edits
+#  exactly those three. A settings screen with controls that store nothing is
+#  worse than no settings screen.
+#
+#  No GTBAR either -- nothing here is scanned.
+# ---------------------------------------------------------------------
+gtstd.file: qddssrc/gtstd.json
+
+gtstr.pgm:  qrpglesrc/gtstr.sqlrpgle qddssrc/gtstd.json | gtstd.file gtseed.file
+
+# ---------------------------------------------------------------------
+#  Simple camera test -- option 5 of the SIGN-ON menu, not a menu tile.
+#
+#  Reached from outside the application on purpose. It exists to isolate the
+#  iPad camera problem from everything the application does, so it must not
+#  depend on any of it:
+#
+#    - no gttables.file, no gtseed.file, no view -- it holds its history in
+#      the program and touches no database at all, so there is nothing here
+#      to journal and no commitment control to get wrong
+#    - no gtbar.srvpgm and no binding directory -- it reports the payload
+#      exactly as the device read it, with no parsing in the way
+#    - .rpgle, not .sqlrpgle: with no embedded SQL, CRTBNDRPG is the whole
+#      build and the SQL precompiler is one more thing that cannot go wrong
+#
+#  That short prerequisite list is the point. Delete these two rules once the
+#  iPad question is closed -- nothing in the application depends on them.
+# ---------------------------------------------------------------------
+gtsimd.file: qddssrc/gtsimd.json
+
+gtsimr.pgm:  qrpglesrc/gtsimr.rpgle qddssrc/gtsimd.json | gtsimd.file
+
+gtsimst.pgm: qclsrc/gtsimst.clle | gtsimr.pgm

@@ -52,6 +52,13 @@
 (function () {
   'use strict';
 
+  /* See the long note in gt-scan.js. This file is delivered TWICE -- as a
+     cache-stamped <script src> listed in the display file, and as a fresh
+     snapshot injected by the Genie shim -- and there is no guarantee which runs
+     last. It had no guard at all, so a months-old cached copy arriving second
+     silently replaced the current one. */
+  var VERSION = '20260811k';
+
   /* Display-file field is char(24000). Stay clear of the edge: a truncated
    * base64 string decodes to a corrupt JPEG, not to an error. */
   var MAX_B64 = 23000;
@@ -171,9 +178,68 @@
     if (name) o.classList.add(name);
   }
 
+  /* ------------------------------------------------------------------
+     PIN THE OVERLAY TO THE VIEWPORT.
+
+     The CSS is `position: absolute; inset: 0`, which covers the nearest
+     POSITIONED ANCESTOR -- and on the Cycle Count variance screen that ancestor
+     is a 26-row page several thousand pixels tall. The panel is centred in it
+     with `margin: auto`, so the camera opened literally halfway down the
+     document and the operator had to scroll to find it.
+
+     `position: fixed` is the obvious answer and is not available here: Genie
+     owns the page and a fixed element anchors to whatever transformed or
+     positioned container the skin has wrapped us in, which differs between
+     skins. So the viewport rectangle is computed instead, from the overlay's own
+     offsetParent, which is correct whatever Genie does:
+
+         parent.getBoundingClientRect().top  is the parent's offset from the
+         viewport, so -that puts our top edge exactly at the viewport's top.
+
+     With no positioned ancestor the offsetParent is <body> and its rect.top is
+     -scrollY, so this reduces to "top = current scroll position" -- the same
+     answer by the same arithmetic.
+     ------------------------------------------------------------------ */
+  function pinToViewport(o) {
+    if (!o) return;
+    var pTop = 0, pLeft = 0;
+    var parent = o.offsetParent;
+    if (parent && parent.getBoundingClientRect) {
+      var r = parent.getBoundingClientRect();
+      pTop = r.top;
+      pLeft = r.left;
+    }
+    /* right/bottom are cleared because `inset: 0` set them, and they would
+       fight an explicit width/height. */
+    o.style.top = (-pTop) + 'px';
+    o.style.left = (-pLeft) + 'px';
+    o.style.right = 'auto';
+    o.style.bottom = 'auto';
+    o.style.width = (window.innerWidth || 0) + 'px';
+    o.style.height = (window.innerHeight || 0) + 'px';
+  }
+
+  /* Kept while the overlay is open: a phone can still scroll behind a
+     backdrop, and the camera drifting off screen is the bug all over again. */
+  function onViewportChange() {
+    var o = overlay();
+    if (o && o.classList.contains('is-open')) pinToViewport(o);
+  }
+
   function show() {
     var o = overlay();
-    if (o) o.classList.add('is-open');
+    if (!o) return;
+    o.classList.add('is-open');
+    pinToViewport(o);
+    window.addEventListener('scroll', onViewportChange, true);
+    window.addEventListener('resize', onViewportChange);
+    window.addEventListener('orientationchange', onViewportChange);
+  }
+
+  function unpin() {
+    window.removeEventListener('scroll', onViewportChange, true);
+    window.removeEventListener('resize', onViewportChange);
+    window.removeEventListener('orientationchange', onViewportChange);
   }
 
   function stopCamera() {
@@ -187,8 +253,19 @@
 
   function close() {
     stopCamera();
+    unpin();
     var o = overlay();
-    if (o) o.classList.remove('is-open', 'is-live', 'is-shot', 'is-fallback');
+    if (o) {
+      o.classList.remove('is-open', 'is-live', 'is-shot', 'is-fallback');
+      /* Hand the geometry back to the stylesheet, so a closed overlay carries
+         no stale inline pixels into the next screen. */
+      o.style.top = '';
+      o.style.left = '';
+      o.style.right = '';
+      o.style.bottom = '';
+      o.style.width = '';
+      o.style.height = '';
+    }
     pending = null;
     var prev = document.getElementById('gt-photo-preview');
     if (prev) prev.removeAttribute('src');
@@ -351,8 +428,15 @@
     }
   }
 
+  var prevPhoto = window.gtPhoto;
+  if (prevPhoto && prevPhoto.__installed && prevPhoto.__version &&
+      String(prevPhoto.__version) > VERSION) {
+    return;                     /* a newer copy is already in charge */
+  }
+
   window.gtPhoto = {
     __installed: true,
+    __version: VERSION,
     open: open,       /* camera button -- live camera */
     shoot: shoot,     /* shutter */
     retake: retake,

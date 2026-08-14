@@ -1,0 +1,213 @@
+<%
+/* ====================================================================
+ * Putaway -- the staging queue.
+ *
+ * ONE SCAN BOX, SEVERAL MEANINGS: a pallet SSCC, an item barcode or a staging
+ * location all go in the same box and RPG decides what it was.
+ *
+ * Each card shows what is staged AND where the application thinks it should
+ * go, with the reason. Tapping the card opens the confirm screen with that
+ * destination already filled in, so the common case is two taps: card, book.
+ *
+ * The pinned band keeps the camera and the scan box in frame while the queue
+ * scrolls underneath -- a dock queue is several screens long and the operator
+ * is scanning the whole time.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'PUTAWAY',
+        lead:'Scan a pallet or an item in staging.',
+        openCamera:'Open camera', closeCamera:'Close camera',
+        manual:'Scan or key a pallet or item', decode:'Go',
+        queue:'Waiting to be put away', none:'Nothing is staged. The dock is clear.',
+        staged:'Staged', goesTo:'Suggested', room:'room', noSugg:'No location suggested',
+        cases:'per case', units:'units', lines:'lines',
+        why:{ 1:'Its pick face', 2:'Bulk it is already in', 3:'Empty pick face' },
+        back:'Back to menu', showing:'showing', of:'of' },
+  FR: { appName:'GT Entrepôt', appSub:'RANGEMENT',
+        lead:'Scannez une palette ou un article en zone de réception.',
+        openCamera:'Ouvrir la caméra', closeCamera:'Fermer la caméra',
+        manual:'Scannez ou saisissez une palette ou un article', decode:'Aller',
+        queue:'À ranger', none:'Rien en zone de réception. Le quai est à jour.',
+        staged:'En zone', goesTo:'Suggéré', room:'place', noSugg:'Aucun emplacement suggéré',
+        cases:'par caisse', units:'unités', lines:'lignes',
+        why:{ 1:'Son emplacement de prélèvement', 2:'Vrac déjà utilisé',
+              3:'Emplacement de prélèvement libre' },
+        back:'Retour au menu', showing:'affichés', of:'sur' }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v, dp) {
+  return Number(v || 0).toLocaleString(loc, { minimumFractionDigits: dp === undefined ? 0 : dp,
+                                              maximumFractionDigits: dp === undefined ? 0 : dp });
+};
+var n = function (v) { return Number(v || 0); };
+var IMG = '/profoundui/userdata/ui/gtimg/';
+
+var rows = (typeof stgsfl !== 'undefined' && stgsfl) ? stgsfl : [];
+var kind = s(typeof msgkind !== 'undefined' ? msgkind : '').toLowerCase();
+var hit  = n(typeof hitline !== 'undefined' ? hitline : 0);
+var totalRows = n(typeof nrows !== 'undefined' ? nrows : rows.length);
+%>
+<div class="gt-app gt-puthome-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg<%= kind ? ' is-' + kind : '' %>"><%= s(msg) %></div>
+    <% } %>
+
+    <%# Pinned: the queue runs to 40 cards and the operator scans throughout. %>
+    <div class="gt-put-top">
+      <div class="gt-put-tot">
+        <span><strong><%= num(totalRows) %></strong> <%= T.lines %></span>
+        <span><strong><%= num(typeof nunits !== 'undefined' ? nunits : 0) %></strong>
+          <%= T.units %></span>
+      </div>
+
+      <p class="gt-scan-lead"><%= T.lead %></p>
+
+      <div class="gt-scan-camera" id="gt-scan-camera">
+        <div class="gt-scan-stage">
+          <video id="gt-scan-video" muted playsinline></video>
+          <div class="gt-scan-frame" id="gt-scan-frame"></div>
+        </div>
+        <div class="gt-scan-status" id="gt-scan-status"></div>
+
+        <div class="gt-put-scanrow">
+          <div class="gt-scan-camctl">
+            <button type="button" class="gt-iconbtn gt-iconbtn-go" id="gt-scan-start"
+                    title="<%= T.openCamera %>" aria-label="<%= T.openCamera %>">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                <circle cx="16" cy="18" r="5"/>
+              </svg>
+            </button>
+            <button type="button" class="gt-iconbtn gt-iconbtn-stop" id="gt-scan-stop"
+                    title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <g class="gt-icon-cam">
+                  <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                  <circle cx="15" cy="18" r="4.6"/>
+                </g>
+                <g class="gt-icon-ban">
+                  <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+                  <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+                  <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+                </g>
+              </svg>
+            </button>
+          </div>
+
+          <div class="gt-scan-manual">
+            <label for="gt-scan-manual"><%= T.manual %></label>
+            <div class="gt-scan-manual-row">
+              <input type="text" id="gt-scan-manual" name="scanval"
+                     value="" autocomplete="off" autocapitalize="characters"
+                     spellcheck="false" inputmode="text">
+              <button type="button" class="gt-btn gt-btn-primary"
+                      onclick="pui.submit({action:'SCAN'})"><%= T.decode %></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="gt-section-title">
+      <%= T.queue %> <span class="gt-count"><%= num(totalRows) %></span>
+    </h2>
+
+    <% if (rows.length > 0) { %>
+      <ul class="gt-put-list">
+        <% rows.forEach(function (row) { %>
+          <%
+            var rank = n(row.ssugrnk);
+            var hasSugg = has(row.ssugg);
+          %>
+          <li class="gt-put-card<%= n(row.sseq) === hit ? ' is-hit' : '' %>">
+            <%# The whole card is the target. A gloved hand gets the card. %>
+            <button type="button" class="gt-put-hit"
+                    onclick="pui.submit({action:'PICK<%= s(row.sseq) %>'})">
+              <span class="gt-put-img">
+                <% if (n(row.simg) > 0) { %>
+                  <img src="<%= IMG %><%= s(row.simg) %>.jpg" alt="" loading="lazy">
+                <% } else { %>
+                  <span class="gt-put-noimg" aria-hidden="true"></span>
+                <% } %>
+              </span>
+
+              <span class="gt-put-id">
+                <span class="gt-put-desc"><%= s(row.sdesc) %></span>
+                <span class="gt-put-sku gt-mono"><%= s(row.ssku) %></span>
+                <% if (has(row.ssscc)) { %>
+                  <span class="gt-put-sscc gt-mono"><%= s(row.ssscc) %></span>
+                <% } %>
+              </span>
+
+              <span class="gt-put-qty">
+                <strong><%= num(row.sqty) %></strong>
+                <small><%= T.staged %> &middot; <%= s(row.suom) %></small>
+                <% if (n(row.scase) > 0) { %>
+                  <small><%= num(row.scase) %> <%= T.cases %></small>
+                <% } %>
+              </span>
+
+              <span class="gt-put-route">
+                <span class="gt-put-from gt-mono"><%= s(row.sloc) %></span>
+                <span class="gt-put-arrow" aria-hidden="true">&rarr;</span>
+                <% if (hasSugg) { %>
+                  <span class="gt-put-to">
+                    <span class="gt-put-toloc gt-mono"><%= s(row.ssugg) %></span>
+                    <span class="gt-put-why">
+                      <%= T.why[rank] || T.goesTo %>
+                      &middot; <%= num(row.ssugrm) %> <%= T.room %>
+                    </span>
+                  </span>
+                <% } else { %>
+                  <span class="gt-put-to is-none"><%= T.noSugg %></span>
+                <% } %>
+              </span>
+            </button>
+          </li>
+        <% }); %>
+      </ul>
+
+      <% if (totalRows > rows.length) { %>
+        <p class="gt-put-more">
+          <%= T.showing %> <%= num(rows.length) %> <%= T.of %> <%= num(totalRows) %>
+        </p>
+      <% } %>
+    <% } else { %>
+      <section class="gt-card gt-scan-empty"><%= T.none %></section>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+  </footer>
+</div>

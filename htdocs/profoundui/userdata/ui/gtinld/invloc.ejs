@@ -1,0 +1,243 @@
+<%
+/* ====================================================================
+ * Inventory -- what is in this location.
+ *
+ * THE TWO NUMBERS ARE THE POINT: what is in the location you are standing in
+ * front of, and what is available in bulk racking elsewhere. A receiver or a
+ * picker can answer "do I need to fetch more?" without leaving the aisle.
+ *
+ * A pick face holds one SKU; a bulk location holds up to 26. The same markup
+ * has to read well as a one-row list and as a twenty-six-row one.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'INVENTORY',
+        openCamera:'Open camera', closeCamera:'Close camera',
+        manual:'Scan another location, or an item here', decode:'Go',
+        zone:'Zone', aisle:'Aisle', bay:'Bay', level:'Level',
+        items:'items', units:'units', full:'full', capacity:'Capacity',
+        empty:'This location is empty',
+        here:'Here', bulk:'In bulk', allocated:'Allocated', available:'Available',
+        move:'Move', replenish:'Replenish', pull:'pull',
+        inactive:'Inactive location',
+        types:{PICK:'Pick face',BULK:'Bulk',STAG:'Staging',RETN:'Returns',DAMG:'Damage hold'},
+        back:'Back' },
+  FR: { appName:'GT Entrepôt', appSub:'INVENTAIRE',
+        openCamera:'Ouvrir la caméra', closeCamera:'Fermer la caméra',
+        manual:'Scannez un autre emplacement, ou un article d’ici', decode:'Aller',
+        zone:'Zone', aisle:'Allée', bay:'Travée', level:'Niveau',
+        items:'articles', units:'unités', full:'occupé', capacity:'Capacité',
+        empty:'Cet emplacement est vide',
+        here:'Ici', bulk:'En vrac', allocated:'Réservé', available:'Disponible',
+        move:'Déplacer', replenish:'Réappro.', pull:'à tirer',
+        inactive:'Emplacement inactif',
+        types:{PICK:'Prélèvement',BULK:'Vrac',STAG:'Transit',RETN:'Retours',DAMG:'Avaries'},
+        back:'Retour' }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v, dp) {
+  return Number(v || 0).toLocaleString(loc, { minimumFractionDigits: dp === undefined ? 0 : dp,
+                                              maximumFractionDigits: dp === undefined ? 0 : dp });
+};
+var IMG = '/profoundui/userdata/ui/gtimg/';
+
+var rows = (typeof itmsfl !== 'undefined' && itmsfl) ? itmsfl : [];
+var pct  = Number(typeof hpct !== 'undefined' ? hpct : 0);
+var kind = s(typeof msgkind !== 'undefined' ? msgkind : '').toLowerCase();
+var ltype = s(typeof htype !== 'undefined' ? htype : '');
+%>
+<div class="gt-app gt-invloc-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg<%= kind ? ' is-' + kind : '' %>"><%= s(msg) %></div>
+    <% } %>
+
+    <!-- ---- The location ----------------------------------------- -->
+    <section class="gt-loc-hdr is-<%= ltype.toLowerCase() %>">
+      <div class="gt-loc-hdr-top">
+        <span class="gt-loc-id gt-mono"><%= s(typeof hloc !== 'undefined' ? hloc : '') %></span>
+        <span class="gt-loc-type"><%= T.types[ltype] || ltype %></span>
+      </div>
+
+      <div class="gt-loc-chips">
+        <% if (has(typeof hzone !== 'undefined' ? hzone : '')) { %>
+          <span class="gt-chip gt-chip-brand"><%= T.zone %> <%= s(hzone) %></span>
+        <% } %>
+        <% if (has(typeof haisle !== 'undefined' ? haisle : '')) { %>
+          <span class="gt-chip"><%= T.aisle %> <%= s(haisle) %></span>
+        <% } %>
+        <% if (has(typeof hbay !== 'undefined' ? hbay : '')) { %>
+          <span class="gt-chip"><%= T.bay %> <%= s(hbay) %></span>
+        <% } %>
+        <% if (has(typeof hlevel !== 'undefined' ? hlevel : '')) { %>
+          <span class="gt-chip"><%= T.level %> <%= s(hlevel) %></span>
+        <% } %>
+        <% if (s(typeof hactive !== 'undefined' ? hactive : 'Y') !== 'Y') { %>
+          <span class="gt-chip gt-chip-warn"><%= T.inactive %></span>
+        <% } %>
+      </div>
+
+      <div class="gt-loc-figs">
+        <span><strong><%= num(typeof hitems !== 'undefined' ? hitems : 0) %></strong>
+              <%= T.items %></span>
+        <span><strong><%= num(typeof hqty !== 'undefined' ? hqty : 0) %></strong>
+              <%= T.units %></span>
+        <% if (Number(typeof hcap !== 'undefined' ? hcap : 0) > 0) { %>
+          <span><strong><%= num(pct) %>%</strong> <%= T.full %></span>
+        <% } %>
+      </div>
+
+      <% if (Number(typeof hcap !== 'undefined' ? hcap : 0) > 0) { %>
+        <%# Capacity. Amber past 90% because a full location is where putaway
+            goes wrong. GTVLOCSUM caps the value at 100 so the fill can never
+            render past its own track. %>
+        <span class="gt-loc-bar<%= pct >= 90 ? ' is-tight' : '' %>"
+              title="<%= T.capacity %>">
+          <span style="width: <%= pct %>%"></span>
+        </span>
+      <% } %>
+    </section>
+
+    <%# Pinned: a bulk location runs to 26 items and the scan box is how the
+        operator moves on to the next rack. %>
+    <div class="gt-inv-top">
+      <div class="gt-scan-camera" id="gt-scan-camera">
+        <div class="gt-scan-stage">
+          <video id="gt-scan-video" muted playsinline></video>
+          <div class="gt-scan-frame" id="gt-scan-frame"></div>
+        </div>
+        <div class="gt-scan-status" id="gt-scan-status"></div>
+
+        <div class="gt-inv-scanrow">
+          <div class="gt-scan-camctl">
+            <button type="button" class="gt-iconbtn gt-iconbtn-go" id="gt-scan-start"
+                    title="<%= T.openCamera %>" aria-label="<%= T.openCamera %>">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                <circle cx="16" cy="18" r="5"/>
+              </svg>
+            </button>
+            <button type="button" class="gt-iconbtn gt-iconbtn-stop" id="gt-scan-stop"
+                    title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <g class="gt-icon-cam">
+                  <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                  <circle cx="15" cy="18" r="4.6"/>
+                </g>
+                <g class="gt-icon-ban">
+                  <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+                  <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+                  <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+                </g>
+              </svg>
+            </button>
+          </div>
+
+          <div class="gt-scan-manual">
+            <label for="gt-scan-manual"><%= T.manual %></label>
+            <div class="gt-scan-manual-row">
+              <input type="text" id="gt-scan-manual" name="scanval"
+                     value="" autocomplete="off" autocapitalize="characters"
+                     spellcheck="false" inputmode="text">
+              <button type="button" class="gt-btn gt-btn-primary"
+                      onclick="pui.submit({action:'SCAN'})"><%= T.decode %></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- What is in it ---------------------------------------- -->
+    <% if (rows.length > 0) { %>
+      <ul class="gt-ilc-list">
+        <% rows.forEach(function (row) { %>
+          <% var needs = s(row.irepl) === 'Y'; %>
+          <li class="gt-ilc-row<%= needs ? ' is-low' : '' %>">
+
+            <span class="gt-ilc-img">
+              <% if (Number(row.iimg) > 0) { %>
+                <img src="<%= IMG %><%= s(row.iimg) %>.jpg" alt="" loading="lazy">
+              <% } else { %>
+                <span class="gt-ilc-noimg" aria-hidden="true"></span>
+              <% } %>
+            </span>
+
+            <span class="gt-ilc-id">
+              <span class="gt-ilc-desc"><%= s(row.idesc) %></span>
+              <span class="gt-ilc-sku gt-mono"><%= s(row.isku) %></span>
+            </span>
+
+            <%# The two numbers, side by side. This is the screen's whole
+                reason to exist, so they are the biggest thing on the card. %>
+            <span class="gt-ilc-nums">
+              <span class="gt-ilc-num is-here">
+                <strong><%= num(row.ioh, 2) %></strong>
+                <small><%= T.here %> &middot; <%= s(row.iuom) %></small>
+              </span>
+              <span class="gt-ilc-num">
+                <strong><%= num(row.ibulk, 2) %></strong>
+                <small><%= T.bulk %></small>
+              </span>
+            </span>
+
+            <% if (Number(row.ialloc) > 0) { %>
+              <span class="gt-ilc-alloc">
+                <%= T.allocated %> <%= num(row.ialloc, 2) %>
+                &middot; <%= T.available %> <%= num(row.iavail, 2) %>
+              </span>
+            <% } %>
+
+            <span class="gt-ilc-acts">
+              <% if (needs) { %>
+                <%# The value story in one tap: bulk as FROM, here as TO, the
+                    suggested quantity already filled in. %>
+                <button type="button" class="gt-btn gt-btn-primary gt-ilc-repl"
+                        onclick="pui.submit({action:'REPL<%= s(row.iseq) %>'})">
+                  <%= T.replenish %> <%= num(row.isugg) %>
+                </button>
+              <% } %>
+              <button type="button" class="gt-btn gt-ilc-move"
+                      onclick="pui.submit({action:'MOVE<%= s(row.iseq) %>'})">
+                <%= T.move %>
+              </button>
+            </span>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <section class="gt-card gt-scan-empty"><%= T.empty %></section>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+  </footer>
+</div>

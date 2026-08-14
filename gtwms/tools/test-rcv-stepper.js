@@ -57,13 +57,18 @@ function serve(html) {
   const files = {
     '/gt-theme.css': [path.join(UI, 'gtcommon/gt-theme.css'), 'text/css'],
     '/rcvlines.css': [path.join(UI, 'gtrcld/rcvlines.css'), 'text/css'],
+    /* gt-edits.js holds the shared collector and MUST be served before
+       gt-rcvlines.js -- without it the payload is empty and the failure looks
+       exactly like a product bug. */
+    '/gt-edits.js': [path.join(UI, 'gtcommon/gt-edits.js'), 'text/javascript'],
     '/gt-rcvlines.js': [path.join(UI, 'gtcommon/gt-rcvlines.js'), 'text/javascript']
   };
   /* Genie's hostile globals first, exactly as the skin applies them. */
   const page = '<!doctype html><meta charset="utf-8">' +
     '<style>html,body{margin:0;padding:0}div{white-space:nowrap;z-index:10;padding:1px}</style>' +
     '<link rel="stylesheet" href="/gt-theme.css"><link rel="stylesheet" href="/rcvlines.css">' +
-    html + '<script src="/gt-rcvlines.js"></script>';
+    html + '<script src="/gt-edits.js"></script>' +
+           '<script src="/gt-rcvlines.js"></script>';
 
   const server = http.createServer((req, res) => {
     const url = req.url.split('?')[0];

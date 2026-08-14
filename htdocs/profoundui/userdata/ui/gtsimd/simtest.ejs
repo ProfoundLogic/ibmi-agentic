@@ -1,0 +1,207 @@
+<%
+/* ====================================================================
+ * Simple camera test -- the smallest screen that can still fail the way
+ * the iPad fails.
+ *
+ * It deliberately shares NOTHING with the scan stack the rest of the
+ * application uses: no gt-scan.js, no GTBAR, no images, no navigation.
+ * Its own simtest.js is the entire client side.
+ *
+ * Renders completely with NO JavaScript. The keypad, the result frame and
+ * the history are all server-rendered, so if simtest.js never arrives the
+ * screen still proves the RPG round trip -- which is exactly the fact we
+ * need to separate "the browser cannot decode" from "the plumbing is
+ * broken". See ejs-screen-must-render-without-js.
+ * ==================================================================== */
+
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: {
+    appName: 'GT Warehouse', appSub: 'CAMERA TEST',
+    title: 'Simple camera test',
+    lead: 'Open the camera and point it at any barcode. Whatever it reads is sent to the RPG program and comes back in the frame below.',
+    openCamera: 'Open camera', closeCamera: 'Close camera',
+    photo: 'Take a photo instead',
+    noJs: 'Camera not available — the screen JavaScript has not loaded. Type a value in below.',
+    result: 'Barcode value', noResult: 'Nothing read yet',
+    symbology: 'Symbology', length: 'Length', at: 'Read at',
+    manual: 'Or type a value', send: 'Send',
+    history: 'Read this session', clear: 'Clear', back: 'Back to menu',
+    details: 'Camera details', sendDetails: 'Send details to the server',
+    fromServer: 'Last details recorded by RPG'
+  },
+  FR: {
+    appName: 'GT Entrepôt', appSub: 'TEST DE CAMÉRA',
+    title: 'Test simple de caméra',
+    lead: 'Ouvrez la caméra et visez n’importe quel code à barres. Ce qui est lu est envoyé au programme RPG et revient dans le cadre ci-dessous.',
+    openCamera: 'Ouvrir la caméra', closeCamera: 'Fermer la caméra',
+    photo: 'Prendre une photo à la place',
+    noJs: 'Caméra indisponible — le JavaScript de l’écran n’est pas chargé. Saisissez une valeur ci-dessous.',
+    result: 'Valeur du code', noResult: 'Aucune lecture pour l’instant',
+    symbology: 'Symbologie', length: 'Longueur', at: 'Lu à',
+    manual: 'Ou saisissez une valeur', send: 'Envoyer',
+    history: 'Lectures de cette session', clear: 'Effacer', back: 'Retour au menu',
+    details: 'Détails de la caméra', sendDetails: 'Envoyer les détails au serveur',
+    fromServer: 'Derniers détails enregistrés par RPG'
+  }
+}[lang];
+
+var s   = function (v) { return (typeof v === 'undefined' || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+
+var val  = s(typeof lastval  !== 'undefined' ? lastval  : '');
+var symb = s(typeof lastsymb !== 'undefined' ? lastsymb : '');
+var dg   = s(typeof diag     !== 'undefined' ? diag     : '');
+var rows = (typeof simsfl !== 'undefined' && simsfl) ? simsfl : [];
+%>
+<div class="gt-app gts-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <%# Placeholder: the GT logo is a trademark and must not be recreated. %>
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text">
+        <%= T.appName %>
+        <small><%= T.appSub %></small>
+      </span>
+    </div>
+
+    <div class="gt-header-spacer"></div>
+
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg"><%= s(msg) %></div>
+    <% } %>
+
+    <h1 class="gts-title"><%= T.title %></h1>
+    <p class="gts-lead"><%= T.lead %></p>
+
+    <!-- ---- Camera ------------------------------------------------------
+         The stage stays collapsed until simtest.js opens the camera, so a
+         screen with no working JavaScript shows no dead black rectangle. -->
+    <section class="gts-cam" id="gts-cam">
+      <div class="gts-stage" id="gts-stage">
+        <video id="gts-video" muted playsinline></video>
+        <div class="gts-reticle" aria-hidden="true"></div>
+      </div>
+
+      <div class="gts-camctl">
+        <button type="button" class="gt-iconbtn gt-iconbtn-go" id="gts-open"
+                title="<%= T.openCamera %>" aria-label="<%= T.openCamera %>"
+                onclick="if (window.gtsOpen) window.gtsOpen()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.2l1.1-1.8A1 1 0 0 1 8.7 4.7h6.6a1 1 0 0 1 .9.5L17.3 7h2.2A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/>
+            <circle cx="12" cy="13" r="3.6"/>
+          </svg>
+        </button>
+
+        <button type="button" class="gt-iconbtn gt-iconbtn-stop" id="gts-close" hidden
+                title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>"
+                onclick="if (window.gtsClose) window.gtsClose()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.2l1.1-1.8A1 1 0 0 1 8.7 4.7h6.6a1 1 0 0 1 .9.5L17.3 7h2.2A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/>
+            <circle cx="12" cy="13" r="3.6"/>
+            <circle cx="12" cy="12" r="10.4" stroke-width="2.2" class="gts-nostroke"/>
+            <line x1="5" y1="19" x2="19" y2="5" stroke-width="2.2" class="gts-nostroke"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="gts-status" id="gts-status"><%= T.noJs %></div>
+
+      <%# A still photo is a genuinely different mechanism: the native camera
+          app focuses, exposes and shoots at full resolution, where a
+          getUserMedia stream on iOS may never focus at all. Hidden until
+          simtest.js is running, because without it the file dialog leads
+          nowhere. %>
+      <label class="gts-photo" id="gts-photowrap" hidden>
+        <span><%= T.photo %></span>
+        <input type="file" accept="image/*" capture="environment" id="gts-photo"
+               onchange="if (window.gtsPhoto) window.gtsPhoto(this)">
+      </label>
+    </section>
+
+    <!-- ---- The frame below: whatever RPG sent back ------------------- -->
+    <section class="gt-card gts-result <%= val ? 'is-hit' : 'is-empty' %>">
+      <h2 class="gt-card-title"><%= T.result %></h2>
+
+      <div class="gts-value gt-mono"><%= val ? val : T.noResult %></div>
+
+      <% if (val) { %>
+        <dl class="gts-meta">
+          <div><dt><%= T.symbology %></dt><dd><%= symb ? symb : '—' %></dd></div>
+          <div><dt><%= T.length %></dt>
+               <dd><%= Number(typeof lastlen !== 'undefined' ? lastlen : 0) %></dd></div>
+          <div><dt><%= T.at %></dt>
+               <dd><%= has(typeof lasttime !== 'undefined' ? lasttime : '') ? s(lasttime) : '—' %></dd></div>
+        </dl>
+      <% } %>
+    </section>
+
+    <!-- ---- Keypad. The round trip without the camera in the way. ----- -->
+    <div class="gts-manual">
+      <label for="gts-manual"><%= T.manual %></label>
+      <div class="gts-manual-row">
+        <input type="text" id="gts-manual" name="scanval" value=""
+               inputmode="text" autocomplete="off" autocapitalize="off"
+               spellcheck="false">
+        <button type="button" class="gt-btn gt-btn-primary"
+                onclick="pui.submit({action:'SCAN'})"><%= T.send %></button>
+      </div>
+    </div>
+
+    <!-- ---- Everything read this session ------------------------------ -->
+    <% if (rows.length > 0) { %>
+      <h2 class="gt-section-title">
+        <%= T.history %> <span class="gt-count"><%= rows.length %></span>
+      </h2>
+      <ul class="gts-history">
+        <% rows.forEach(function (row) { %>
+          <li class="gts-hist">
+            <span class="gts-hist-val gt-mono"><%= s(row.sval) %></span>
+            <span class="gts-hist-meta"><%= s(row.ssymb) %> &middot; <%= s(row.stime) %></span>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+
+    <!-- ---- Diagnostics ----------------------------------------------
+         The live line is filled in by simtest.js. The button pushes it into
+         the DIAG field, which puts it in the screen data -- the one channel
+         that has reached us from the device every time. -->
+    <section class="gts-diag">
+      <h2 class="gt-section-title"><%= T.details %></h2>
+      <div class="gts-diagline gt-mono" id="gts-diagline">—</div>
+      <button type="button" class="gt-btn gt-btn-ghost" id="gts-diagbtn"
+              onclick="if (window.gtsSendDiag) window.gtsSendDiag()">
+        <%= T.sendDetails %>
+      </button>
+      <% if (dg) { %>
+        <p class="gts-diag-label"><%= T.fromServer %></p>
+        <div class="gts-diagline is-server gt-mono"><%= dg %></div>
+      <% } %>
+    </section>
+  </main>
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn" onclick="pui.submit({action:'CLEAR'})"><%= T.clear %></button>
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})"><%= T.back %></button>
+  </footer>
+
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="lastsymb" value="<%= symb %>">
+  <input type="hidden" name="diag" value="<%= dg %>">
+</div>

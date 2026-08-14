@@ -127,6 +127,18 @@ function serve(html) {
           !!addBox && addBox.x < 60,
           addBox ? 'x=' + Math.round(addBox.x) + ' y=' + Math.round(addBox.y) : 'not found');
 
+    /* SCROLL TO THE BOTTOM FIRST.
+     *
+     * The overlay is position:absolute, so its containing block is the whole
+     * document. Opening it from the top of a short page cannot see the bug the
+     * operator hit on Cycle Count: the panel is centred in an overlay as tall as
+     * the page, so it lands halfway down the DOCUMENT rather than in the
+     * viewport. Item Detail shares the same overlay, so it must be checked here
+     * too. */
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(120);
+    const scrolledTo = await page.evaluate(() => Math.round(window.scrollY));
+
     await page.click('.gt-car-add');
     let live = true;
     try {
@@ -134,6 +146,21 @@ function serve(html) {
     } catch (e) { live = false; }
     check('camera button opens a LIVE camera', live,
           live ? await page.locator('#gt-photo-status').textContent() : 'never went live');
+    /* Present is not the same as findable. */
+    const inView = await page.evaluate(() => {
+      const panel = document.querySelector('.gt-photo-panel');
+      if (!panel) return { err: 'no .gt-photo-panel' };
+      const r = panel.getBoundingClientRect();
+      return { top: Math.round(r.top), bottom: Math.round(r.bottom),
+               vh: window.innerHeight };
+    });
+    check('camera opens IN VIEW, not down the page',
+          !inView.err && inView.bottom > 0 && inView.top < inView.vh &&
+          inView.top > -5,
+          inView.err ||
+            ('scrolled ' + scrolledTo + 'px, panel top=' + inView.top +
+             ' bottom=' + inView.bottom + ' viewport=' + inView.vh));
+
     check('no file chooser was raised', !chooserFired,
           chooserFired ? 'a file dialog opened' : '');
 
@@ -224,6 +251,18 @@ function serve(html) {
       catch (e) { delete navigator.mediaDevices; }
     });
     await page.goto(base, { waitUntil: 'load' });
+    /* SCROLL TO THE BOTTOM FIRST.
+     *
+     * The overlay is position:absolute, so its containing block is the whole
+     * document. Opening it from the top of a short page cannot see the bug the
+     * operator hit on Cycle Count: the panel is centred in an overlay as tall as
+     * the page, so it lands halfway down the DOCUMENT rather than in the
+     * viewport. Item Detail shares the same overlay, so it must be checked here
+     * too. */
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(120);
+    const scrolledTo = await page.evaluate(() => Math.round(window.scrollY));
+
     await page.click('.gt-car-add');
     await page.waitForSelector('.gt-photo-overlay.is-open.is-fallback', { timeout: 8000 })
       .catch(() => {});

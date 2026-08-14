@@ -1,0 +1,271 @@
+<%
+/* ====================================================================
+ * Cycle Count -- variance review and post.
+ *
+ * THE REVEAL. This is the first screen in the count that has seen an expected
+ * quantity, and it shows all three numbers at once: expected, counted, delta.
+ *
+ * THE PHOTO RULE IS DATA, NOT LOGIC. GTREASON carries photo_required per reason
+ * code and RPG sends the list in `reasons` as JSON, so this screen knows which
+ * reasons demand evidence and can say so the moment one is picked -- before the
+ * operator presses post and gets refused.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'VARIANCE REVIEW',
+        zone:'Zone', expected:'Expected', counted:'Counted', delta:'Delta',
+        lines:'lines', variances:'variances', photos:'photos',
+        reason:'Reason', addPhoto:'Add photo', photoNeeded:'Photo required',
+        photoOn:'photo', photosOn:'photos',
+        saveReasons:'Save reasons', post:'Post count',
+        blocked:'line(s) need a photo before posting',
+        none:'Nothing counted yet', match:'Matches', over:'Over', short:'Short',
+        posted:'This count is posted', back:'Back',
+        photoTitle:'Photograph the variance', usePhoto:'Use this photo',
+        retake:'Retake', cancel:'Cancel', chooseFile:'Choose a file',
+        takePhoto:'Take photo', closeCamera:'Close camera',
+        photoHint:'Photograph the shelf as you found it — the evidence for this variance.',
+        types:{PICK:'Pick face',BULK:'Bulk',STAG:'Staging',RETN:'Returns',DAMG:'Damage hold'} },
+  FR: { appName:'GT Entrepôt', appSub:'RÉVISION DES ÉCARTS',
+        zone:'Zone', expected:'Prévu', counted:'Dénombré', delta:'Écart',
+        lines:'lignes', variances:'écarts', photos:'photos',
+        reason:'Motif', addPhoto:'Ajouter une photo', photoNeeded:'Photo requise',
+        photoOn:'photo', photosOn:'photos',
+        saveReasons:'Enregistrer les motifs', post:'Valider le dénombrement',
+        blocked:'ligne(s) exigent une photo avant validation',
+        none:'Rien de dénombré', match:'Conforme', over:'Excédent', short:'Manquant',
+        posted:'Dénombrement validé', back:'Retour',
+        photoTitle:'Photographier l’écart', usePhoto:'Utiliser cette photo',
+        retake:'Reprendre', cancel:'Annuler', chooseFile:'Choisir un fichier',
+        takePhoto:'Prendre la photo', closeCamera:'Fermer la caméra',
+        photoHint:'Photographiez l’étagère telle que trouvée — la preuve de cet écart.',
+        types:{PICK:'Prélèvement',BULK:'Vrac',STAG:'Transit',RETN:'Retours',DAMG:'Avaries'} }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v, dp) {
+  return Number(v || 0).toLocaleString(loc, { minimumFractionDigits: dp === undefined ? 0 : dp,
+                                              maximumFractionDigits: dp === undefined ? 0 : dp });
+};
+var IMG = '/profoundui/userdata/ui/gtimg/';
+
+var rows = (typeof vasfl !== 'undefined' && vasfl) ? vasfl : [];
+var kind = s(typeof msgkind !== 'undefined' ? msgkind : '').toLowerCase();
+var isPosted = s(typeof hstat !== 'undefined' ? hstat : '') === 'POST';
+var blocked  = Number(typeof nblock !== 'undefined' ? nblock : 0);
+
+/* The reason list arrives as JSON in one field rather than as a second
+   subfile: two subfiles in one EJS format compile to malformed DDS here. */
+var reasonList = [];
+try { reasonList = JSON.parse(s(typeof reasons !== 'undefined' ? reasons : '[]')); }
+catch (e) { reasonList = []; }
+%>
+<div class="gt-app gt-cntvar-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg<%= kind ? ' is-' + kind : '' %>"><%= s(msg) %></div>
+    <% } %>
+
+    <section class="gt-cv-hdr">
+      <div class="gt-cv-hdr-top">
+        <span class="gt-cv-loc gt-mono"><%= s(typeof hloc !== 'undefined' ? hloc : '') %></span>
+        <span class="gt-cv-type"><%= T.types[s(typeof htype !== 'undefined' ? htype : '')] || s(htype) %></span>
+      </div>
+      <div class="gt-cv-sub">
+        <span class="gt-mono"><%= s(typeof hcnt !== 'undefined' ? hcnt : '') %></span>
+        &middot; <%= T.zone %> <%= s(typeof hzone !== 'undefined' ? hzone : '') %>
+      </div>
+      <div class="gt-cv-figs">
+        <span><strong><%= num(typeof nlines !== 'undefined' ? nlines : 0) %></strong> <%= T.lines %></span>
+        <span class="<%= Number(typeof nvar !== 'undefined' ? nvar : 0) > 0 ? 'is-var' : '' %>">
+          <strong><%= num(typeof nvar !== 'undefined' ? nvar : 0) %></strong> <%= T.variances %>
+        </span>
+        <span><strong><%= num(typeof nphoto !== 'undefined' ? nphoto : 0) %></strong> <%= T.photos %></span>
+      </div>
+      <% if (blocked > 0) { %>
+        <div class="gt-cv-block"><%= num(blocked) %> <%= T.blocked %></div>
+      <% } %>
+    </section>
+
+    <% if (isPosted) { %>
+      <div class="gt-msg is-good"><%= T.posted %></div>
+    <% } %>
+
+    <% if (rows.length > 0) { %>
+      <ul class="gt-cv-list">
+        <% rows.forEach(function (row) { %>
+          <%
+            var d = Number(row.vvar || 0);
+            var cls = d === 0 ? 'is-match' : (d > 0 ? 'is-over' : 'is-short');
+            var needs = s(row.vneed) === 'Y' && Number(row.vphoto) === 0;
+          %>
+          <li class="gt-cv-row <%= cls %><%= needs ? ' is-blocked' : '' %>">
+
+            <span class="gt-cv-img">
+              <% if (Number(row.vimg) > 0) { %>
+                <img src="<%= IMG %><%= s(row.vimg) %>.jpg" alt="" loading="lazy">
+              <% } else { %>
+                <span class="gt-cv-noimg" aria-hidden="true"></span>
+              <% } %>
+            </span>
+
+            <span class="gt-cv-id">
+              <span class="gt-cv-desc"><%= s(row.vdesc) %></span>
+              <span class="gt-cv-sku gt-mono"><%= s(row.vsku) %></span>
+            </span>
+
+            <%# THE REVEAL: all three numbers at once. %>
+            <span class="gt-cv-nums">
+              <span class="gt-cv-num">
+                <strong><%= num(row.vexp, 2) %></strong>
+                <small><%= T.expected %></small>
+              </span>
+              <span class="gt-cv-num">
+                <strong><%= num(row.vcnt, 2) %></strong>
+                <small><%= T.counted %></small>
+              </span>
+              <span class="gt-cv-num is-delta">
+                <strong><%= d > 0 ? '+' : '' %><%= num(d, 2) %></strong>
+                <small><%= d === 0 ? T.match : (d > 0 ? T.over : T.short) %></small>
+              </span>
+            </span>
+
+            <% if (!isPosted && d !== 0) { %>
+              <span class="gt-cv-why">
+                <label class="gt-cv-lbl" for="gt-cv-r<%= s(row.vseq) %>"><%= T.reason %></label>
+                <%# The reason list carries its photo flag, so the screen can
+                    warn the moment a reason is picked rather than at post. %>
+                <select id="gt-cv-r<%= s(row.vseq) %>" class="gt-cv-select"
+                        data-gt-seq="<%= s(row.vseq) %>"
+                        data-gt-orig="<%= s(row.vreason) %>"
+                        onchange="if(window.gtCntVar)gtCntVar.reasonChanged(this)">
+                  <option value=""<%= s(row.vreason) === '' ? ' selected' : '' %>>&mdash;</option>
+                  <% reasonList.forEach(function (rn) { %>
+                    <option value="<%= rn.c %>" data-gt-photo="<%= rn.p %>"
+                            <%= s(row.vreason) === rn.c ? ' selected' : '' %>><%= rn.d %></option>
+                  <% }); %>
+                </select>
+              </span>
+
+              <span class="gt-cv-photo">
+                <% if (Number(row.vphoto) > 0) { %>
+                  <span class="gt-cv-has">
+                    <%= num(row.vphoto) %>
+                    <%= Number(row.vphoto) === 1 ? T.photoOn : T.photosOn %>
+                  </span>
+                <% } %>
+                <% if (needs) { %>
+                  <span class="gt-cv-need"><%= T.photoNeeded %></span>
+                <% } %>
+                <button type="button" class="gt-btn gt-cv-cam<%= needs ? ' is-needed' : '' %>"
+                        onclick="if(window.gtCntVar)gtCntVar.photo(<%= s(row.vline) %>)">
+                  <%= T.addPhoto %>
+                </button>
+              </span>
+            <% } %>
+          </li>
+        <% }); %>
+      </ul>
+
+      <% if (!isPosted) { %>
+        <div class="gt-cv-acts">
+          <button type="button" class="gt-btn gt-btn-primary"
+                  onclick="if(window.gtCntVar){gtCntVar.save()}else{pui.submit({action:'APPLY'})}"><%= T.saveReasons %></button>
+        </div>
+      <% } %>
+    <% } else { %>
+      <section class="gt-card gt-scan-empty"><%= T.none %></section>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="vedits" id="gt-vedits" value="">
+  <input type="hidden" name="imgline" id="gt-imgline" value="0">
+  <input type="hidden" name="imgdata" id="gt-photo-data" value="">
+
+  <%# The camera overlay is gt-photo.js, the same component the item carousel
+      uses. Its file input is the fallback for a machine with no camera. %>
+  <input type="file" id="gt-photo-file" accept="image/*" capture="environment"
+         class="gt-photo-file" onchange="if(window.gtPhoto)gtPhoto.chosen(this)">
+
+  <div class="gt-photo-overlay" id="gt-photo-overlay">
+    <div class="gt-photo-panel">
+      <h2 class="gt-photo-title"><%= T.photoTitle %></h2>
+      <p class="gt-photo-hint"><%= T.photoHint %></p>
+      <div class="gt-photo-stage" id="gt-photo-stage">
+        <video id="gt-photo-video" muted playsinline></video>
+        <img id="gt-photo-preview" alt="">
+        <div class="gt-photo-camctl">
+          <button type="button" class="gt-photo-shutter" id="gt-photo-shutter"
+                  title="<%= T.takePhoto %>" aria-label="<%= T.takePhoto %>"
+                  onclick="if(window.gtPhoto)gtPhoto.shoot()">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+              <circle cx="16" cy="18" r="5"/>
+            </svg>
+          </button>
+          <button type="button" class="gt-photo-stop" id="gt-photo-stop"
+                  title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>"
+                  onclick="if(window.gtPhoto)gtPhoto.close()">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <g class="gt-icon-cam">
+                <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                <circle cx="15" cy="18" r="4.6"/>
+              </g>
+              <g class="gt-icon-ban">
+                <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+                <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+                <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+              </g>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="gt-photo-status" id="gt-photo-status"></div>
+      <div class="gt-photo-actions">
+        <button type="button" class="gt-btn gt-btn-primary" id="gt-photo-use"
+                disabled onclick="if(window.gtPhoto)gtPhoto.use()"><%= T.usePhoto %></button>
+        <button type="button" class="gt-btn gt-photo-retake" id="gt-photo-retake"
+                onclick="if(window.gtPhoto)gtPhoto.retake()"><%= T.retake %></button>
+        <button type="button" class="gt-btn gt-photo-choose" id="gt-photo-choose"
+                onclick="if(window.gtPhoto)gtPhoto.pick()"><%= T.chooseFile %></button>
+        <button type="button" class="gt-btn gt-btn-ghost"
+                onclick="if(window.gtPhoto)gtPhoto.close()"><%= T.cancel %></button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+    <% if (!isPosted && rows.length > 0) { %>
+      <button type="button" class="gt-btn gt-btn-go<%= blocked > 0 ? ' is-waiting' : '' %>"
+              data-fkey="F6"
+              onclick="if(window.gtCntVar){gtCntVar.post()}else{pui.submit({action:'POST'})}"><%= T.post %></button>
+    <% } %>
+  </footer>
+</div>

@@ -1,0 +1,205 @@
+/* ==================================================================
+ * Cycle Count -- home.
+ *
+ * The camera, reticle, status line, icon buttons and manual-entry row come
+ * from gt-theme.css, shared with the Scan Lab and both Receiving screens.
+ * Only the pinned band and the alert cards are specific to this screen.
+ * ================================================================== */
+
+/* ---- The pinned scan band ---------------------------------------
+ * Same reasoning as the Receiving line list: the alert list is 40 cards long
+ * and the scan box is the point of the screen, so it stays in frame with the
+ * cards scrolling underneath.
+ *
+ * Needs an opaque background, and a z-index above whatever the cards claim --
+ * see the note in rcvlines.css. Sticky also fails SILENTLY if any ancestor
+ * has overflow other than visible, so it is asserted by scrolling in
+ * preflight-inv.js rather than assumed.
+ * ----------------------------------------------------------------- */
+.gt-inv-top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  margin: 0 calc(-1 * var(--gt-pad)) 10px;
+  padding: 8px var(--gt-pad) 10px;
+  background: var(--gt-surface);
+  box-shadow: 0 4px 10px -6px rgba(0, 0, 0, .45);
+}
+.gt-cnthome-screen .gt-scan-lead { margin: 0 0 8px; }
+.gt-cnthome-screen .gt-scan-camera { margin-bottom: 0; }
+.gt-cnthome-screen .gt-scan-camera:not(.is-live) .gt-scan-camctl { margin-top: 0; }
+.gt-cnthome-screen .gt-scan-status:empty { min-height: 0; margin: 0; }
+
+/* Camera button and scan box on one row, so the pinned band costs one row. */
+.gt-inv-scanrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+.gt-cnthome-screen .gt-inv-scanrow .gt-scan-camctl { margin: 0; }
+.gt-cnthome-screen .gt-inv-scanrow .gt-scan-manual { margin-bottom: 0; }
+.gt-cnthome-screen .gt-inv-scanrow .gt-scan-manual label {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+/* ---- Count cards ------------------------------------------------
+ * One card per outstanding count: where, which count, who has it, and how far
+ * through it is. Status as the left edge so a half-finished count is
+ * recognisable before reading a word.
+ * ----------------------------------------------------------------- */
+.gt-cnt-list {
+  list-style: none;
+  margin: 0 0 var(--gt-gap);
+  padding: 0;
+}
+
+.gt-cnt-card {
+  margin-bottom: 10px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+  /* Amber edge: this is a warning, not an error. Readable at arm's length,
+   * and never the only cue -- the figures say it too. */
+  border-left: 5px solid var(--gt-line);
+  overflow: hidden;
+}
+
+.gt-cnt-hit {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.gt-cnt-hit:active { background: var(--gt-surface); }
+
+.gt-cnt-img img,
+.gt-cnt-noimg {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--gt-line);
+}
+
+.gt-cnt-id {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.gt-cnt-loc {
+  font-size: 17px;
+  font-weight: 800;
+}
+.gt-cnt-desc {
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.gt-cnt-sku {
+  font-size: 11px;
+  color: var(--gt-muted);
+}
+
+/* ---- The four figures ------------------------------------------
+ * Wraps rather than scrolls: four numbers on one line at 412px would each be
+ * too small to read from a forklift.
+ * ----------------------------------------------------------------- */
+.gt-cnt-figs {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 4px;
+}
+.gt-cnt-fig {
+  display: grid;
+  gap: 1px;
+  padding: 6px 4px;
+  border-radius: 8px;
+  background: var(--gt-surface);
+  text-align: center;
+  min-width: 0;
+}
+.gt-cnt-fig strong {
+  font-size: 16px;
+  font-weight: 800;
+}
+.gt-cnt-fig small {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .2px;
+  color: var(--gt-muted);
+  overflow-wrap: anywhere;
+}
+/* On hand is the number that is wrong; what to pull is the number to act on. */
+.gt-cnt-fig.is-low strong  { color: var(--gt-warn); }
+.gt-cnt-fig.is-pull        { background: #E8F3EC; }
+.gt-cnt-fig.is-pull strong { color: var(--gt-good); }
+
+.gt-cnt-more {
+  margin: 0 0 var(--gt-gap);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gt-muted);
+  text-align: center;
+}
+
+/* ---- Wider screens --------------------------------------------- */
+@media (min-width: 835px) {
+  .gt-cnt-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .gt-cnt-card { margin-bottom: 0; }
+}
+
+@media (min-width: 1280px) {
+  .gt-cnt-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ---- Count-specific bits ---------------------------------------- */
+.gt-cnt-hit { grid-template-columns: minmax(0, 1fr); }
+.gt-cnt-top { display: flex; align-items: baseline; gap: 8px; }
+.gt-cnt-loc { flex: 1 1 auto; min-width: 0; font-size: 20px; font-weight: 800; }
+.gt-cnt-stat {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+.gt-cnt-id { font-size: 12px; color: var(--gt-muted); }
+.gt-cnt-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+
+/* Status as the left edge: not started, counting, approved. */
+.gt-cnt-card.is-open { border-left-color: var(--gt-muted); }
+.gt-cnt-card.is-cntd { border-left-color: var(--gt-yellow); }
+.gt-cnt-card.is-appr { border-left-color: var(--gt-good); }
+
+.gt-cnt-prog { display: grid; gap: 4px; margin-top: 8px; }
+.gt-cnt-bar {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--gt-line);
+  overflow: hidden;
+}
+.gt-cnt-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gt-red);
+}
+.gt-cnt-figs { font-size: 12px; font-weight: 700; color: var(--gt-muted); }

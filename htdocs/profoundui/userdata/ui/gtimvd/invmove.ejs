@@ -1,0 +1,283 @@
+<%
+/* ====================================================================
+ * Inventory -- move stock.
+ *
+ * FROM is prefilled and LOCKED: the operator is standing at it, and letting
+ * them edit it is how stock ends up moved out of the wrong rack. The TO
+ * location is SCANNED -- a keyed location is a typo waiting to happen, a
+ * scanned one is evidence the operator was actually there.
+ *
+ * Two entry paths, one screen: a plain move arrives with TO blank, a
+ * replenishment arrives with everything filled in and the operator confirms.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'MOVE STOCK',
+        openCamera:'Open camera', closeCamera:'Close camera',
+        scanTo:'Scan the destination location', decode:'Go',
+        from:'From', to:'To', onHand:'On hand', available:'Available',
+        alreadyThere:'Already there', zone:'Zone',
+        qty:'Quantity to move', all:'All', reason:'Reason',
+        move:'Move stock', moved:'Moved', again:'Move something else',
+        back:'Back to location', done:'Move complete',
+        before:'Before', after:'After',
+        less:'Less', more:'More',
+        types:{PICK:'Pick face',BULK:'Bulk',STAG:'Staging',RETN:'Returns',DAMG:'Damage hold'},
+        confirmTo:'Destination confirmed' },
+  FR: { appName:'GT Entrepôt', appSub:'DÉPLACER',
+        openCamera:'Ouvrir la caméra', closeCamera:'Fermer la caméra',
+        scanTo:'Scannez l’emplacement de destination', decode:'Aller',
+        from:'Origine', to:'Destination', onHand:'En stock', available:'Disponible',
+        alreadyThere:'Déjà sur place', zone:'Zone',
+        qty:'Quantité à déplacer', all:'Tout', reason:'Motif',
+        move:'Déplacer', moved:'Déplacé', again:'Déplacer autre chose',
+        back:'Retour à l’emplacement', done:'Déplacement effectué',
+        before:'Avant', after:'Après',
+        less:'Moins', more:'Plus',
+        types:{PICK:'Prélèvement',BULK:'Vrac',STAG:'Transit',RETN:'Retours',DAMG:'Avaries'},
+        confirmTo:'Destination confirmée' }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v, dp) {
+  return Number(v || 0).toLocaleString(loc, { minimumFractionDigits: dp === undefined ? 0 : dp,
+                                              maximumFractionDigits: dp === undefined ? 0 : dp });
+};
+var IMG = '/profoundui/userdata/ui/gtimg/';
+
+var reasons = (typeof rsnsfl !== 'undefined' && rsnsfl) ? rsnsfl : [];
+var isDone  = s(typeof mdone !== 'undefined' ? mdone : '') === 'Y';
+var toOk    = s(typeof mtook !== 'undefined' ? mtook : '') === 'Y';
+var kind    = s(typeof msgkind !== 'undefined' ? msgkind : '').toLowerCase();
+var avail   = Number(typeof mavail !== 'undefined' ? mavail : 0);
+/* Step by a case where the item has one -- the same reasoning as receiving. */
+var step    = Number(typeof mcase !== 'undefined' ? mcase : 0) > 1
+                ? Number(mcase) : 1;
+var curRsn  = s(typeof mreason !== 'undefined' ? mreason : '');
+%>
+<div class="gt-app gt-invmove-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg<%= kind ? ' is-' + kind : '' %>"><%= s(msg) %></div>
+    <% } %>
+
+    <!-- ---- What is being moved ---------------------------------- -->
+    <section class="gt-mv-item">
+      <span class="gt-mv-img">
+        <% if (Number(typeof mimg !== 'undefined' ? mimg : 0) > 0) { %>
+          <img src="<%= IMG %><%= s(mimg) %>.jpg" alt="" loading="lazy">
+        <% } else { %>
+          <span class="gt-mv-noimg" aria-hidden="true"></span>
+        <% } %>
+      </span>
+      <span class="gt-mv-id">
+        <span class="gt-mv-desc"><%= s(typeof mdesc !== 'undefined' ? mdesc : '') %></span>
+        <span class="gt-mv-sku gt-mono"><%= s(typeof msku !== 'undefined' ? msku : '') %></span>
+      </span>
+    </section>
+
+    <% if (isDone) { %>
+      <!-- ---- Done: before and after side by side ---------------- -->
+      <section class="gt-mv-done">
+        <h2 class="gt-mv-done-t"><%= T.done %></h2>
+        <div class="gt-mv-ba">
+          <div class="gt-mv-ba-col">
+            <span class="gt-mv-ba-loc gt-mono"><%= s(mfrom) %></span>
+            <span class="gt-mv-ba-row">
+              <small><%= T.before %></small><strong><%= num(mfrombef, 2) %></strong>
+            </span>
+            <span class="gt-mv-ba-row is-after">
+              <small><%= T.after %></small><strong><%= num(mfromaft, 2) %></strong>
+            </span>
+          </div>
+          <div class="gt-mv-ba-arrow" aria-hidden="true">&rarr;</div>
+          <div class="gt-mv-ba-col">
+            <span class="gt-mv-ba-loc gt-mono"><%= s(mto) %></span>
+            <span class="gt-mv-ba-row">
+              <small><%= T.before %></small><strong><%= num(mtobef, 2) %></strong>
+            </span>
+            <span class="gt-mv-ba-row is-after">
+              <small><%= T.after %></small><strong><%= num(mtoaft, 2) %></strong>
+            </span>
+          </div>
+        </div>
+        <div class="gt-mv-done-qty">
+          <%= T.moved %> <strong><%= num(mqty, 2) %></strong>
+          <%= s(typeof muom !== 'undefined' ? muom : '') %>
+        </div>
+      </section>
+
+      <div class="gt-mv-acts">
+        <button type="button" class="gt-btn gt-btn-primary"
+                onclick="pui.submit({action:'AGAIN'})"><%= T.again %></button>
+      </div>
+
+    <% } else { %>
+
+      <!-- ---- FROM, locked --------------------------------------- -->
+      <section class="gt-mv-loc is-from">
+        <span class="gt-mv-loc-lbl"><%= T.from %></span>
+        <span class="gt-mv-loc-id gt-mono"><%= s(typeof mfrom !== 'undefined' ? mfrom : '') %></span>
+        <span class="gt-mv-loc-meta">
+          <%= T.types[s(typeof mfromtyp !== 'undefined' ? mfromtyp : '')] || s(mfromtyp) %>
+          <% if (has(typeof mfromzon !== 'undefined' ? mfromzon : '')) { %>
+            &middot; <%= T.zone %> <%= s(mfromzon) %>
+          <% } %>
+        </span>
+        <span class="gt-mv-loc-figs">
+          <span><strong><%= num(typeof monhand !== 'undefined' ? monhand : 0, 2) %></strong>
+                <small><%= T.onHand %></small></span>
+          <span><strong><%= num(avail, 2) %></strong>
+                <small><%= T.available %></small></span>
+        </span>
+      </section>
+
+      <!-- ---- TO, scanned ---------------------------------------- -->
+      <section class="gt-mv-loc is-to<%= toOk ? ' is-ok' : '' %>">
+        <span class="gt-mv-loc-lbl"><%= T.to %></span>
+        <% if (toOk) { %>
+          <span class="gt-mv-loc-id gt-mono"><%= s(mto) %></span>
+          <span class="gt-mv-loc-meta">
+            <%= T.types[s(typeof mtotyp !== 'undefined' ? mtotyp : '')] || s(mtotyp) %>
+            <% if (has(typeof mtozon !== 'undefined' ? mtozon : '')) { %>
+              &middot; <%= T.zone %> <%= s(mtozon) %>
+            <% } %>
+            &middot; <%= T.alreadyThere %> <%= num(typeof mtoqty !== 'undefined' ? mtoqty : 0, 2) %>
+          </span>
+        <% } else { %>
+          <span class="gt-mv-loc-id is-empty"><%= T.scanTo %></span>
+        <% } %>
+      </section>
+
+      <!-- ---- Scan the destination ------------------------------- -->
+      <div class="gt-scan-camera" id="gt-scan-camera">
+        <div class="gt-scan-stage">
+          <video id="gt-scan-video" muted playsinline></video>
+          <div class="gt-scan-frame" id="gt-scan-frame"></div>
+        </div>
+        <div class="gt-scan-status" id="gt-scan-status"></div>
+
+        <div class="gt-inv-scanrow">
+          <div class="gt-scan-camctl">
+            <button type="button" class="gt-iconbtn gt-iconbtn-go" id="gt-scan-start"
+                    title="<%= T.openCamera %>" aria-label="<%= T.openCamera %>">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                <circle cx="16" cy="18" r="5"/>
+              </svg>
+            </button>
+            <button type="button" class="gt-iconbtn gt-iconbtn-stop" id="gt-scan-stop"
+                    title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <g class="gt-icon-cam">
+                  <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                  <circle cx="15" cy="18" r="4.6"/>
+                </g>
+                <g class="gt-icon-ban">
+                  <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+                  <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+                  <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+                </g>
+              </svg>
+            </button>
+          </div>
+
+          <div class="gt-scan-manual">
+            <label for="gt-scan-manual"><%= T.scanTo %></label>
+            <div class="gt-scan-manual-row">
+              <input type="text" id="gt-scan-manual" name="scanval"
+                     value="" autocomplete="off" autocapitalize="characters"
+                     spellcheck="false" inputmode="text">
+              <button type="button" class="gt-btn gt-btn-primary"
+                      onclick="pui.submit({action:'SCAN'})"><%= T.decode %></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- How much ------------------------------------------- -->
+      <section class="gt-mv-qty">
+        <label class="gt-mv-lbl" for="gt-mv-qty"><%= T.qty %></label>
+        <%# Same stepper as receiving: .gt-stepbtn and .gt-numbox come from
+            gt-theme.css so both screens use one definition. Steps by the case
+            pack where the item has one. %>
+        <div class="gt-mv-step">
+          <button type="button" class="gt-stepbtn"
+                  title="<%= T.less %> <%= num(step) %>"
+                  aria-label="<%= T.less %> <%= num(step) %>"
+                  onclick="if(window.gtInvMove)gtInvMove.step(-1)">
+            &minus;<% if (step > 1) { %><small><%= num(step) %></small><% } %>
+          </button>
+
+          <input type="number" class="gt-numbox" id="gt-mv-qty" name="mqty"
+                 value="<%= Number(typeof mqty !== 'undefined' ? mqty : 0).toFixed(2) %>"
+                 inputmode="decimal" step="any" min="0"
+                 data-gt-step="<%= step %>"
+                 data-gt-max="<%= avail %>"
+                 aria-label="<%= T.qty %>">
+
+          <button type="button" class="gt-stepbtn gt-stepbtn-up"
+                  title="<%= T.more %> <%= num(step) %>"
+                  aria-label="<%= T.more %> <%= num(step) %>"
+                  onclick="if(window.gtInvMove)gtInvMove.step(1)">
+            +<% if (step > 1) { %><small><%= num(step) %></small><% } %>
+          </button>
+
+          <%# "All" is the common case for a consolidation or a relocation. %>
+          <button type="button" class="gt-btn gt-mv-all"
+                  onclick="if(window.gtInvMove)gtInvMove.all()"><%= T.all %></button>
+        </div>
+      </section>
+
+      <!-- ---- Why ------------------------------------------------ -->
+      <section class="gt-mv-reason">
+        <label class="gt-mv-lbl" for="gt-mv-reason"><%= T.reason %></label>
+        <%# Codes come from GTREASON, bilingual, so the list is data rather
+            than something hardcoded in the template. %>
+        <select id="gt-mv-reason" name="mreason" class="gt-mv-select">
+          <% reasons.forEach(function (row) { %>
+            <option value="<%= s(row.rcode) %>"<%= s(row.rcode) === curRsn ? ' selected' : '' %>>
+              <%= s(row.rdesc) %>
+            </option>
+          <% }); %>
+        </select>
+      </section>
+
+      <div class="gt-mv-acts">
+        <button type="button" class="gt-btn gt-btn-go<%= toOk ? '' : ' is-waiting' %>"
+                onclick="pui.submit({action:'MOVE'})"><%= T.move %></button>
+      </div>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+  </footer>
+</div>

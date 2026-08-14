@@ -1,0 +1,192 @@
+<%
+/* ====================================================================
+ * Inventory & Movement -- home.
+ *
+ * ONE SCAN BOX, SEVERAL MEANINGS. The operator never has to say what kind of
+ * thing they are scanning: a location label, an item barcode and a pallet SSCC
+ * all go in the same box and RPG decides what it was.
+ *
+ * The list underneath is replenishment alerts -- pick faces below their
+ * minimum with bulk stock to pull from. Tapping one goes straight to that
+ * location with the move pre-filled.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'INVENTORY',
+        lead:'Scan a location, an item or a pallet.',
+        openCamera:'Open camera', closeCamera:'Close camera',
+        manual:'Scan or key a location, item or pallet', decode:'Go',
+        alerts:'Needs replenishing', none:'Nothing needs replenishing',
+        onHand:'On hand', min:'Minimum', bulk:'In bulk', pull:'Pull',
+        zone:'Zone', back:'Back to menu',
+        showing:'showing', of:'of' },
+  FR: { appName:'GT Entrepôt', appSub:'INVENTAIRE',
+        lead:'Scannez un emplacement, un article ou une palette.',
+        openCamera:'Ouvrir la caméra', closeCamera:'Fermer la caméra',
+        manual:'Scannez ou saisissez un emplacement, article ou palette',
+        decode:'Aller',
+        alerts:'À réapprovisionner', none:'Rien à réapprovisionner',
+        onHand:'En stock', min:'Minimum', bulk:'En vrac', pull:'Tirer',
+        zone:'Zone', back:'Retour au menu',
+        showing:'affichés', of:'sur' }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v, dp) {
+  return Number(v || 0).toLocaleString(loc, { minimumFractionDigits: dp === undefined ? 0 : dp,
+                                              maximumFractionDigits: dp === undefined ? 0 : dp });
+};
+var IMG = '/profoundui/userdata/ui/gtimg/';
+
+var rows = (typeof alrsfl !== 'undefined' && alrsfl) ? alrsfl : [];
+var total = Number(typeof nalerts !== 'undefined' ? nalerts : 0);
+var kind = s(typeof msgkind !== 'undefined' ? msgkind : '').toLowerCase();
+%>
+<div class="gt-app gt-invhome-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg<%= kind ? ' is-' + kind : '' %>"><%= s(msg) %></div>
+    <% } %>
+
+    <%# The scan band is pinned: the alert list runs to 40 cards, and the whole
+        point of the screen is that the box is always there to scan into. %>
+    <div class="gt-inv-top">
+      <p class="gt-scan-lead"><%= T.lead %></p>
+
+      <div class="gt-scan-camera" id="gt-scan-camera">
+        <div class="gt-scan-stage">
+          <video id="gt-scan-video" muted playsinline></video>
+          <div class="gt-scan-frame" id="gt-scan-frame"></div>
+        </div>
+        <div class="gt-scan-status" id="gt-scan-status"></div>
+
+        <div class="gt-inv-scanrow">
+          <div class="gt-scan-camctl">
+            <button type="button" class="gt-iconbtn gt-iconbtn-go" id="gt-scan-start"
+                    title="<%= T.openCamera %>" aria-label="<%= T.openCamera %>">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                <circle cx="16" cy="18" r="5"/>
+              </svg>
+            </button>
+            <button type="button" class="gt-iconbtn gt-iconbtn-stop" id="gt-scan-stop"
+                    title="<%= T.closeCamera %>" aria-label="<%= T.closeCamera %>">
+              <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <g class="gt-icon-cam">
+                  <path d="M3 11h5l2-3h10l2 3h5a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V12a1 1 0 0 1 1-1z"/>
+                  <circle cx="15" cy="18" r="4.6"/>
+                </g>
+                <g class="gt-icon-ban">
+                  <circle cx="23" cy="23" r="8.4" class="gt-icon-ban-plate"/>
+                  <circle cx="23" cy="23" r="6.4" stroke-width="2.2"/>
+                  <line x1="18.5" y1="27.5" x2="27.5" y2="18.5" stroke-width="2.2"/>
+                </g>
+              </svg>
+            </button>
+          </div>
+
+          <div class="gt-scan-manual">
+            <label for="gt-scan-manual"><%= T.manual %></label>
+            <div class="gt-scan-manual-row">
+              <input type="text" id="gt-scan-manual" name="scanval"
+                     value="" autocomplete="off" autocapitalize="characters"
+                     spellcheck="false" inputmode="text">
+              <button type="button" class="gt-btn gt-btn-primary"
+                      onclick="pui.submit({action:'SCAN'})"><%= T.decode %></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- Replenishment alerts ---------------------------------- -->
+    <h2 class="gt-section-title">
+      <%= T.alerts %> <span class="gt-count"><%= num(total) %></span>
+    </h2>
+
+    <% if (rows.length > 0) { %>
+      <ul class="gt-alr-list">
+        <% rows.forEach(function (row) { %>
+          <li class="gt-alr-card">
+            <%# The whole card is the target: a gloved hand gets the card, not
+                a link inside it. %>
+            <button type="button" class="gt-alr-hit"
+                    onclick="pui.submit({action:'PICK<%= s(row.aseq) %>'})">
+              <span class="gt-alr-img">
+                <% if (Number(row.aimg) > 0) { %>
+                  <img src="<%= IMG %><%= s(row.aimg) %>.jpg" alt="" loading="lazy">
+                <% } else { %>
+                  <span class="gt-alr-noimg" aria-hidden="true"></span>
+                <% } %>
+              </span>
+
+              <span class="gt-alr-id">
+                <span class="gt-alr-loc gt-mono"><%= s(row.aloc) %></span>
+                <span class="gt-alr-desc"><%= s(row.adesc) %></span>
+                <span class="gt-alr-sku gt-mono"><%= s(row.asku) %></span>
+              </span>
+
+              <span class="gt-alr-figs">
+                <span class="gt-alr-fig is-low">
+                  <strong><%= num(row.aoh) %></strong>
+                  <small><%= T.onHand %></small>
+                </span>
+                <span class="gt-alr-fig">
+                  <strong><%= num(row.amin) %></strong>
+                  <small><%= T.min %></small>
+                </span>
+                <span class="gt-alr-fig">
+                  <strong><%= num(row.abulk) %></strong>
+                  <small><%= T.bulk %></small>
+                </span>
+                <span class="gt-alr-fig is-pull">
+                  <strong><%= num(row.asugg) %></strong>
+                  <small><%= T.pull %></small>
+                </span>
+              </span>
+            </button>
+          </li>
+        <% }); %>
+      </ul>
+
+      <% if (total > rows.length) { %>
+        <p class="gt-alr-more">
+          <%= T.showing %> <%= num(rows.length) %> <%= T.of %> <%= num(total) %>
+        </p>
+      <% } %>
+    <% } else { %>
+      <section class="gt-card gt-scan-empty"><%= T.none %></section>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+  </footer>
+</div>

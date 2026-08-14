@@ -1,0 +1,267 @@
+/* ==================================================================
+ * Cycle Count -- BLIND entry.
+ *
+ * The camera, scan row, icon buttons and stepper controls come from
+ * gt-theme.css. Only the location header and the item cards are specific
+ * to this screen.
+ * ================================================================== */
+
+/* ---- The location header ---------------------------------------- */
+.gt-ce-hdr {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+  /* Location type as the left edge, so a bulk rack and a pick face are
+   * distinguishable before reading a word. */
+  border-left: 5px solid var(--gt-line);
+}
+.gt-ce-hdr.is-pick { border-left-color: var(--gt-red); }
+.gt-ce-hdr.is-bulk { border-left-color: #1F5FA8; }
+.gt-ce-hdr.is-stag { border-left-color: var(--gt-warn); }
+.gt-ce-hdr.is-retn { border-left-color: var(--gt-muted); }
+.gt-ce-hdr.is-damg { border-left-color: var(--gt-bad); }
+
+.gt-ce-hdr-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.gt-ce-loc {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  overflow-wrap: anywhere;
+}
+.gt-ce-type {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+
+.gt-ce-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.gt-ce-figs2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gt-muted);
+}
+.gt-ce-figs2 strong {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gt-ink);
+}
+
+/* Capacity. Amber past 90%: a full location is where putaway goes wrong. */
+.gt-ce-cap {
+  display: block;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: var(--gt-line);
+  overflow: hidden;
+}
+.gt-ce-cap > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gt-good);
+}
+.gt-ce-cap.is-tight > span { background: var(--gt-warn); }
+
+/* ---- The pinned scan band --------------------------------------
+ * Same component and same reasoning as the Receiving line list and the
+ * Inventory home screen; see the note in invhome.css.
+ * ----------------------------------------------------------------- */
+.gt-inv-top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  margin: 0 calc(-1 * var(--gt-pad)) 10px;
+  padding: 8px var(--gt-pad) 10px;
+  background: var(--gt-surface);
+  box-shadow: 0 4px 10px -6px rgba(0, 0, 0, .45);
+}
+.gt-cntentry-screen .gt-scan-camera { margin-bottom: 0; }
+.gt-cntentry-screen .gt-scan-camera:not(.is-live) .gt-scan-camctl { margin-top: 0; }
+.gt-cntentry-screen .gt-scan-status:empty { min-height: 0; margin: 0; }
+
+.gt-inv-scanrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+.gt-cntentry-screen .gt-inv-scanrow .gt-scan-camctl { margin: 0; }
+.gt-cntentry-screen .gt-inv-scanrow .gt-scan-manual { margin-bottom: 0; }
+.gt-cntentry-screen .gt-inv-scanrow .gt-scan-manual label {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+
+/* ---- Blind-count notice ----------------------------------------
+ * Said out loud on the screen. An operator who does not know the count is
+ * blind assumes the app is broken when no expected figure appears.
+ * ----------------------------------------------------------------- */
+.gt-ce-sub { margin-top: 4px; font-size: 12px; font-weight: 700; color: var(--gt-muted); }
+.gt-ce-blind {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #FFF8DC;
+  border-left: 4px solid var(--gt-yellow);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--gt-ink);
+}
+
+/* ---- Progress, inside the pinned band --------------------------- */
+.gt-ce-sum {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  margin-bottom: 8px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+}
+.gt-ce-bar {
+  flex: 1 1 auto;
+  min-width: 60px;
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--gt-line);
+  overflow: hidden;
+}
+.gt-ce-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gt-red);
+}
+.gt-ce-figs { flex: 0 0 auto; font-size: 12px; font-weight: 700; color: var(--gt-muted); }
+.gt-ce-figs strong { color: var(--gt-ink); }
+
+/* ---- Count cards ------------------------------------------------
+ * No expected quantity, no variance, no colour that could imply either --
+ * a counter must not be able to infer the answer from the styling.
+ * ----------------------------------------------------------------- */
+.gt-ce-list { list-style: none; margin: 0 0 var(--gt-gap); padding: 0; }
+
+.gt-ce-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 8px 10px;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+  border-left: 5px solid var(--gt-line);
+}
+/* Counted or not is the ONLY state this screen shows. Neutral green: it says
+ * "done", not "correct" -- nobody here knows whether it is correct yet. */
+.gt-ce-row.is-done { border-left-color: var(--gt-good); }
+
+.gt-ce-row.is-hit { animation: gt-ce-flash 1.1s ease-out 1; }
+@keyframes gt-ce-flash {
+  0%   { background: var(--gt-yellow); }
+  100% { background: var(--gt-card); }
+}
+
+.gt-ce-img img,
+.gt-ce-noimg {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--gt-line);
+}
+
+.gt-ce-id { display: grid; gap: 2px; min-width: 0; }
+.gt-ce-desc { font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.gt-ce-sku { font-size: 11px; color: var(--gt-muted); }
+
+.gt-ce-qty { grid-column: 1 / -1; display: grid; gap: 4px; }
+.gt-ce-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+.gt-ce-step {
+  display: grid;
+  grid-template-columns: 48px minmax(72px, 1fr) 48px auto;
+  gap: 6px;
+  align-items: stretch;
+}
+@media (max-width: 420px) {
+  .gt-ce-step { grid-template-columns: 44px minmax(72px, 1fr) 44px auto; gap: 5px; }
+  .gt-ce-step .gt-stepbtn,
+  .gt-ce-step .gt-numbox,
+  .gt-ce-zero { min-height: 44px; }
+}
+.gt-ce-zero {
+  min-height: 48px;
+  padding: 0 12px;
+  border: 2px solid var(--gt-line);
+  border-radius: 10px;
+  background: var(--gt-surface);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+.gt-ce-zero:active { background: var(--gt-line); }
+
+.gt-ce-state { grid-column: 1 / -1; }
+.gt-ce-chip {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--gt-surface);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+.gt-ce-row.is-done .gt-ce-chip { background: var(--gt-good); color: #fff; }
+
+.gt-ce-acts { display: grid; gap: 8px; margin-bottom: var(--gt-gap); }
+.gt-btn-go {
+  min-height: var(--gt-action);
+  background: var(--gt-good);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+@media (min-width: 835px) {
+  .gt-ce-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .gt-ce-row { margin-bottom: 0; }
+}
+@media (min-width: 1280px) {
+  .gt-ce-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

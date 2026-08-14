@@ -1,0 +1,212 @@
+/* ==================================================================
+ * Putaway -- the staging queue.
+ *
+ * Scoped to .gt-puthome-screen. No html/body rules, no position:fixed, no
+ * 100vh: this renders inside a Genie skin that owns the page. The Genie
+ * div/span resets live once in gt-theme.css.
+ *
+ * Every grid track is minmax(0, 1fr). A bare 1fr will not shrink below its
+ * content's min-content width, which is how a long description pushes a card
+ * off the right of a 360px screen.
+ * ================================================================== */
+
+/* ---- The pinned band --------------------------------------------
+ * The queue is several screens long and the operator scans throughout, so the
+ * camera and the scan box stay in frame. Sticky needs all three of these or it
+ * silently does nothing:
+ *   - an opaque background, or the cards show through it;
+ *   - a z-index above 20, since the cards claim 20-21 to beat Genie's
+ *     `div { z-index: 10 }`;
+ *   - no ancestor with `overflow` other than visible.
+ * Asserted by actually scrolling in the pre-flight, not assumed.
+ * ----------------------------------------------------------------- */
+.gt-puthome-screen .gt-put-top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--gt-surface);
+  margin: 0 calc(-1 * var(--gt-pad)) var(--gt-gap);
+  padding: 8px var(--gt-pad) 10px;
+  border-bottom: 1px solid var(--gt-line);
+}
+
+.gt-puthome-screen .gt-put-tot {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--gt-muted);
+}
+.gt-puthome-screen .gt-put-tot strong {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--gt-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The camera control and the manual box share a row: on a phone the camera is
+ * a square button and the box takes the rest. */
+.gt-puthome-screen .gt-put-scanrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: 10px;
+}
+
+/* ---- The queue -------------------------------------------------- */
+.gt-puthome-screen .gt-put-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.gt-puthome-screen .gt-put-card { min-width: 0; }
+
+/* The card a scan just landed on. Flashes once so an operator working by feel
+ * sees which row matched without hunting for it. */
+.gt-puthome-screen .gt-put-card.is-hit .gt-put-hit {
+  animation: gt-put-flash 1.4s ease-out 1;
+  border-color: var(--gt-red);
+}
+@keyframes gt-put-flash {
+  0%   { background: var(--gt-yellow); }
+  100% { background: var(--gt-card); }
+}
+
+.gt-puthome-screen .gt-put-hit {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "img   id     qty"
+    "route route  route";
+  align-items: start;
+  gap: 8px 10px;
+  width: 100%;
+  min-height: var(--gt-tap);
+  padding: 10px 12px;
+  border: 1px solid var(--gt-line);
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.gt-puthome-screen .gt-put-hit:active { background: var(--gt-surface); }
+
+.gt-puthome-screen .gt-put-img { grid-area: img; }
+.gt-puthome-screen .gt-put-img img,
+.gt-puthome-screen .gt-put-noimg {
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--gt-surface);
+}
+
+.gt-puthome-screen .gt-put-id { grid-area: id; min-width: 0; }
+.gt-puthome-screen .gt-put-desc {
+  display: block;
+  font-weight: 700;
+  /* break-word, not anywhere: a long description should wrap at a space
+   * rather than split a word down the middle. */
+  overflow-wrap: break-word;
+}
+.gt-puthome-screen .gt-put-sku,
+.gt-puthome-screen .gt-put-sscc {
+  display: block;
+  font-size: 11px;
+  color: var(--gt-muted);
+}
+
+.gt-puthome-screen .gt-put-qty {
+  grid-area: qty;
+  text-align: right;
+  min-width: 0;
+}
+.gt-puthome-screen .gt-put-qty strong {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.gt-puthome-screen .gt-put-qty small {
+  display: block;
+  font-size: 11px;
+  color: var(--gt-muted);
+}
+
+/* ---- The route: from staging to the suggestion ------------------- */
+.gt-puthome-screen .gt-put-route {
+  grid-area: route;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--gt-line);
+  min-width: 0;
+}
+
+.gt-puthome-screen .gt-put-from {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--gt-surface);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.gt-puthome-screen .gt-put-arrow {
+  color: var(--gt-muted);
+  font-weight: 800;
+}
+
+.gt-puthome-screen .gt-put-to { min-width: 0; }
+/* The suggested destination is the answer the operator came for, so it is the
+ * one coloured thing on the card. --gt-good, not --gt-action: the latter is the
+ * 64px action-height metric and using it as a colour is invalid CSS. */
+.gt-puthome-screen .gt-put-toloc {
+  display: block;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--gt-good);
+}
+.gt-puthome-screen .gt-put-why {
+  display: block;
+  font-size: 11px;
+  color: var(--gt-muted);
+}
+
+/* No suggestion is a state worth naming, not an empty gap. */
+.gt-puthome-screen .gt-put-to.is-none {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gt-bad);
+}
+
+.gt-puthome-screen .gt-put-more {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--gt-muted);
+  text-align: center;
+}
+
+/* ---- Wider screens get more columns, not bigger ones ------------ */
+@media (min-width: 835px) {
+  /* The route moves onto the card's own row once there is width for it. */
+  .gt-puthome-screen .gt-put-hit {
+    grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1.2fr);
+    grid-template-areas: "img id qty route";
+    align-items: center;
+  }
+  .gt-puthome-screen .gt-put-route {
+    padding-top: 0;
+    border-top: 0;
+    border-left: 1px dashed var(--gt-line);
+    padding-left: 12px;
+  }
+}

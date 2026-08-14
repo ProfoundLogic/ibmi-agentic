@@ -167,11 +167,51 @@ dcl-proc normalise;
     work = %subst(work : 4);
   endif;
 
+  // CODE 39 START/STOP CHARACTERS. The '*' either side of a Code 39 symbol is
+  // part of the symbology, not part of the data, and readers disagree about
+  // whether to hand it over: ZXing and Android's BarcodeDetector strip it, plenty
+  // of keyboard wedges do not.
+  //
+  // Left in place, a rack label reads as "*D01011*" -- eight characters that match
+  // no location, so the scan is rejected with "not a known location" while the
+  // operator is standing in front of that exact rack. Nothing in this application
+  // has data that legitimately begins and ends with an asterisk, so removing a
+  // matched pair is unambiguous.
+  if %len(work) >= 3 and %subst(work : 1 : 1) = '*' and
+     %subst(work : %len(work) : 1) = '*';
+    work = %subst(work : 2 : %len(work) - 2);
+  endif;
+
   // Some scanners emit FNC1 as the literal text {GS}.
   p = %scan('{GS}' : work);
   dow p > 0;
     work = %replace(GS : work : p : 4);
     p = %scan('{GS}' : work);
+  enddo;
+
+  // A LEADING FNC1 carries no data. It is the GS1 flag character that marks the
+  // symbol as an element string, and scanners disagree about whether to emit
+  // it: some send it, some drop it, some send ]C1 instead.
+  //
+  // It has to go, because GS1 detection tests the first two characters for an
+  // application identifier. With a leading separator the payload starts with
+  // x'1D' rather than '01', detection fails, and a fully-formed pallet label
+  // resolves as an anonymous CODE-128 with nothing parsed out of it. Found by
+  // feeding the demo's own showpiece barcode through the running application in
+  // all three prefix forms: no prefix parsed, ]C1 parsed, a leading FNC1 did
+  // not.
+  //
+  // Dropping it is unambiguous: an element string never begins with a
+  // separator, so a leading GS can only ever be that flag.
+  //  The length check is not decoration: %subst(work : 2) on a string of length
+  //  1 is RNX0100, so a payload consisting only of a separator would take the
+  //  caller down. Found while auditing the same mistake in two other programs.
+  dow %len(work) > 0 and %subst(work : 1 : 1) = GS;
+    if %len(work) = 1;
+      work = '';
+      leave;
+    endif;
+    work = %subst(work : 2);
   enddo;
 
   return %trim(work);

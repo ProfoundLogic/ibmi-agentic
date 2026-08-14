@@ -121,6 +121,31 @@
   border-bottom: 4px solid var(--gt-yellow);
 }
 
+/* ---- The header on a phone --------------------------------------
+ * Brand, operator name and the EN/FR toggle do not fit one 412px row: something
+ * has to give, and squeezing the brand made it read "GT / Wareho / use".
+ *
+ * So below 480px the row is BRAND ... EN/FR, and the operator name drops to its
+ * own line underneath. Nothing is crushed, nothing is hidden, and the header
+ * costs one extra line on the screen size that has the most vertical room.
+ * ----------------------------------------------------------------- */
+@media (max-width: 479px) {
+  .gt-header { flex-wrap: wrap; row-gap: 2px; }
+
+  /* The brand takes the row it needs; the spacer is what pushed EN/FR right and
+     is not needed once the operator name has moved off this line. */
+  .gt-logo { flex: 1 1 auto; min-width: 0; }
+  .gt-header-spacer { display: none; }
+
+  .gt-operator {
+    order: 3;
+    flex: 1 1 100%;
+    text-align: left;
+    font-size: 11px;
+    opacity: .85;
+  }
+}
+
 /* Placeholder for the official lockup artwork.
  * The Giant Tiger logo is a registered trademark that must not be recreated,
  * so this deliberately does NOT redraw the wordmark. Drop the approved
@@ -148,8 +173,24 @@
   line-height: 1;
 }
 .gt-logo-text {
-  min-width: 0;
-  overflow-wrap: anywhere;
+  /* NO min-width: 0 HERE.
+   *
+   * `min-width: 0` explicitly permits a flex item to be squeezed below its
+   * min-content width, and once it is, even `overflow-wrap: break-word` has to
+   * break mid-word -- which is how the header rendered "GT / Wareho / use" and
+   * "SUPERVIS / OR" on a 412px phone. The brand is the one thing in this header
+   * that must not be crushed; the operator name is the flex item that gives way,
+   * and it truncates with an ellipsis instead.
+   *
+   * break-word rather than anywhere.
+   *
+   * `anywhere` also lets the flex item's min-content width collapse to a single
+   * character, so on a 412px phone the header shrank the title and rendered
+   * "GT Warehous / e". `break-word` keeps the longest word as the minimum, so it
+   * wraps at the space -- "GT / Warehouse" -- and still breaks a genuinely
+   * unbreakable string rather than overflowing. */
+  min-width: auto;
+  overflow-wrap: break-word;
   font-weight: 700;
   font-size: 14px;
   line-height: 1.15;
@@ -165,7 +206,15 @@
 
 .gt-header-spacer { flex: 1 1 auto; min-width: 0; }
 
+/* The operator name is what gives way when the header is tight: it truncates,
+ * the brand does not wrap. Before this the title broke mid-word while the name
+ * sat on two comfortable lines, which is the wrong thing to protect. */
 .gt-operator {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   text-align: right;
   font-size: 12px;
   line-height: 1.3;
@@ -186,6 +235,20 @@
    The S24 Ultra sits at ~412px, so the demo device keeps it. */
 @media (max-width: 399px) {
   .gt-operator { display: none; }
+}
+
+/* ---- Reclaiming pinned height on a phone -------------------------
+ * Every scanning screen carries a lead sentence ("Scan a pallet or an item in
+ * staging.") directly above the field's own label ("Scan or key a pallet or
+ * item"). On a desk that reads as a helpful preamble. On a 412px phone it is the
+ * same instruction twice, and on four of these screens it sits INSIDE the pinned
+ * band -- so it costs its height on every screen of the list underneath it, for
+ * the whole session.
+ *
+ * The label stays, because it is the one attached to the input. The sentence goes.
+ * ----------------------------------------------------------------- */
+@media (max-width: 479px) {
+  .gt-scan-lead { display: none; }
 }
 
 /* Language toggle -- present on every screen, per the design. */
@@ -458,3 +521,294 @@
 /* Exactly one visible, driven by the same class gt-scan.js toggles. */
 .gt-scan-camera:not(.is-live) #gt-scan-stop { display: none; }
 .gt-scan-camera.is-live #gt-scan-start { display: none; }
+
+
+/* ==================================================================
+ * Stepper controls -- shared by every screen with a quantity to adjust.
+ *
+ * Receiving adjusts a line's received quantity; Inventory adjusts the quantity
+ * to move. Both need the same 48px button and the same numeric box, so the
+ * APPEARANCE lives here once and each screen supplies only its own layout.
+ * (This file is where the scan camera ended up for the same reason.)
+ *
+ * A native <input type="number">'s spinner arrows are a few pixels tall and
+ * stacked on each other -- unusable with a thumb -- so they are suppressed and
+ * replaced by the buttons.
+ * ================================================================== */
+.gt-stepbtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0;
+  border: 2px solid var(--gt-line);
+  border-radius: 10px;
+  background: var(--gt-surface);
+  color: var(--gt-ink);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  /* Stops the double-tap-to-zoom delay on a control meant to be tapped
+   * repeatedly, without disabling pinch-zoom on the page. */
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.gt-stepbtn:active {
+  background: var(--gt-line);
+  transform: translateY(1px);
+}
+/* The step size, when it is not 1. Small, because the sign is the button and
+ * this is only there so nobody has to guess what a tap will do. */
+.gt-stepbtn small {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--gt-muted);
+  margin-top: 1px;
+}
+/* The "add" side carries the brand colour: it is the one pressed most. */
+.gt-stepbtn-up {
+  border-color: var(--gt-red);
+  background: var(--gt-red);
+  color: #fff;
+}
+.gt-stepbtn-up small { color: rgba(255, 255, 255, .82); }
+.gt-stepbtn-up:active { background: #c2142e; }
+
+.gt-numbox {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 8px 10px;
+  border: 2px solid var(--gt-line);
+  border-radius: 10px;
+  background: var(--gt-card);
+  color: var(--gt-ink);
+  /* 16px floor or iOS zooms the page on focus and stays zoomed. */
+  font-size: max(18px, 1.05rem);
+  font-weight: 800;
+  text-align: center;
+  /* `appearance: textfield` covers Firefox; the ::-webkit- pseudo-elements
+   * cover Chrome, Edge and iOS Safari, which is what the demo device runs. */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.gt-numbox::-webkit-outer-spin-button,
+.gt-numbox::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+.gt-numbox:focus {
+  outline: none;
+  border-color: var(--gt-red);
+}
+
+
+/* ==================================================================
+ * Manual scan entry -- shared by every screen that accepts a barcode.
+ *
+ * Moved here from scnhome.css once Receiving and Inventory became consumers:
+ * they were using these class names without loading that file, so the input
+ * rendered as a bare 25px browser default. The pre-flight now measures it.
+ * ================================================================== */
+
+.gt-scan-manual { margin-bottom: var(--gt-gap); }
+.gt-scan-manual label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gt-muted);
+  margin-bottom: 6px;
+}
+.gt-scan-manual-row { display: flex; gap: 8px; }
+.gt-scan-manual-row input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: var(--gt-action);
+  padding: 0 14px;
+  font-size: 16px;   /* 16px stops iOS zooming the page on focus */
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  border: 2px solid var(--gt-line);
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+}
+.gt-scan-manual-row input:focus {
+  outline: none;
+  border-color: var(--gt-red);
+  box-shadow: 0 0 0 3px rgba(227, 24, 55, 0.15);
+}
+.gt-scan-manual-row .gt-btn { flex: 0 0 auto; padding: 0 20px; }
+
+
+/* ==================================================================
+ * Camera-capture overlay -- shared.
+ *
+ * The item carousel captures product photographs; the count variance review
+ * captures evidence for a discrepancy. Same component, same markup, so the
+ * styling lives here once. Taken out of itmdetl.css rather than copied -- the
+ * fourth time that lesson has come up, and by now it is a reflex.
+ *
+ * The overlay is positioned inside a wrapper, never fixed, because Genie owns
+ * the page. Any screen using it must be a positioning context.
+ * ================================================================== */
+.gt-app { position: relative; }
+
+/* The file input must stay in the layout for .click() to work reliably on
+ * mobile Safari, so it is hidden by size rather than by display:none. */
+.gt-photo-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---- Confirmation overlay --------------------------------------- */
+.gt-photo-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, .72);
+  padding: var(--gt-pad);
+  overflow: auto;
+}
+.gt-photo-overlay.is-open {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.gt-photo-panel {
+  width: 100%;
+  max-width: 520px;
+  margin: auto;
+  padding: 14px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .5);
+}
+.gt-photo-title {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 800;
+}
+.gt-photo-hint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--gt-muted);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.gt-photo-stage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  background: var(--gt-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.gt-photo-stage img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* ---- Live camera in the stage -----------------------------------
+ * Three mutually exclusive states, driven by the overlay's class so that the
+ * markup, the controls and the actual camera can never disagree:
+ *
+ *   (no class)  starting up -- neither video nor still
+ *   .is-live    streaming: video + shutter + close
+ *   .is-shot    captured:  still + Use / Retake
+ * ----------------------------------------------------------------- */
+.gt-photo-stage video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+  background: #000;
+}
+.gt-photo-overlay.is-live .gt-photo-stage video { display: block; }
+
+/* The still and the live view never show at once. */
+.gt-photo-stage img { display: none; }
+.gt-photo-overlay.is-shot .gt-photo-stage img { display: block; }
+
+/* Camera controls float over the video, thumb-height at the bottom. */
+.gt-photo-camctl {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 10px;
+  z-index: 21;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+.gt-photo-overlay.is-live .gt-photo-camctl { display: flex; }
+
+.gt-photo-shutter,
+.gt-photo-stop {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .45);
+}
+.gt-photo-shutter svg,
+.gt-photo-stop svg { width: 30px; height: 30px; }
+.gt-photo-shutter:active,
+.gt-photo-stop:active { transform: translateY(1px) scale(.97); }
+
+.gt-photo-shutter {
+  border: 3px solid rgba(255, 255, 255, .92);
+  background: var(--gt-red);
+  color: #fff;
+}
+/* Same camera-with-a-no-entry-badge as the scan screen. */
+.gt-photo-stop {
+  border: 2px solid var(--gt-line);
+  background: var(--gt-card);
+}
+.gt-photo-stop .gt-icon-cam { color: var(--gt-ink); stroke: currentColor; }
+.gt-photo-stop .gt-icon-ban { color: var(--gt-red); stroke: currentColor; }
+.gt-photo-stop .gt-icon-ban-plate {
+  fill: var(--gt-card);
+  stroke: var(--gt-card);
+  stroke-width: 2;
+}
+
+/* Use and Retake are meaningless until there is a still to act on, and the
+ * file fallback is meaningless unless the live camera was refused. */
+.gt-photo-retake { display: none; }
+.gt-photo-overlay.is-shot .gt-photo-retake { display: inline-flex; }
+.gt-photo-choose { display: none; }
+.gt-photo-overlay.is-fallback .gt-photo-choose { display: inline-flex; }
+.gt-photo-status {
+  min-height: 18px;
+  margin: 8px 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gt-muted);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.gt-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.gt-photo-actions .gt-btn { flex: 1 1 auto; }
+.gt-photo-actions .gt-btn:disabled { opacity: .45; }

@@ -1,0 +1,278 @@
+<%
+/* ====================================================================
+ * Supervisor View -- progress, alerts and the open work queue.
+ *
+ * Renders with NO JavaScript. The only script on the screen is the inline
+ * onclick that calls pui.submit, exactly like the main menu: a file in the
+ * "js" array runs before this markup is in the DOM, so anything that binds
+ * with addEventListener binds to nothing, and a screen that needs JS to become
+ * readable shows a blank white page when that JS fails to arrive.
+ *
+ * Every row of the work queue is a button that opens the real screen -- a
+ * receipt goes to the receiving lines, a count goes to the variance review.
+ * A dashboard nobody can act on is a poster.
+ *
+ * The per-zone strip is parsed out of ZONESTAT, a JSON string, because two
+ * subfiles in one EJS format do not compile.
+ * ==================================================================== */
+var lang = (typeof langpref !== 'undefined' && langpref &&
+            langpref.toString().trim().toUpperCase() === 'FR') ? 'FR' : 'EN';
+
+var T = {
+  EN: { appName:'GT Warehouse', appSub:'SUPERVISOR',
+        lead:'Shift status', receiving:'Receiving', counting:'Counting',
+        openRcpts:'Open receipts', linesToDo:'Lines to confirm',
+        countsOpen:'Counts open', alerts:'Replen alerts',
+        staged:'Units staged', moves:'Moves today',
+        variance:'variance', photos:'photos',
+        confirmed:'confirmed', counted:'counted',
+        queue:'Open work', none:'Nothing open. The floor is clear.',
+        zones:'By zone', zone:'Zone', locs:'locations', skus:'SKUs',
+        onHand:'on hand', zalerts:'low',
+        lines:'lines', of:'of', open:'Open',
+        refresh:'Refresh', back:'Back to menu',
+        stat:{ OPEN:'Not started', PART:'In progress', CNTD:'Counted',
+               RVW:'In review', POST:'Posted' },
+        kind:{ RECV:'Receipt', CNT:'Count' } },
+  FR: { appName:'GT Entrepôt', appSub:'SUPERVISEUR',
+        lead:'État du quart', receiving:'Réception', counting:'Dénombrement',
+        openRcpts:'Réceptions ouvertes', linesToDo:'Lignes à confirmer',
+        countsOpen:'Dénombrements ouverts', alerts:'Alertes de réappro',
+        staged:'Unités en zone', moves:'Transferts aujourd’hui',
+        variance:'écart', photos:'photos',
+        confirmed:'confirmées', counted:'dénombrées',
+        queue:'Travail en cours', none:'Rien en cours. Le plancher est à jour.',
+        zones:'Par zone', zone:'Zone', locs:'emplacements', skus:'articles',
+        onHand:'en stock', zalerts:'sous le min',
+        lines:'lignes', of:'sur', open:'Ouvert',
+        refresh:'Rafraîchir', back:'Retour au menu',
+        stat:{ OPEN:'Non commencé', PART:'En cours', CNTD:'Dénombré',
+               RVW:'En révision', POST:'Affiché' },
+        kind:{ RECV:'Réception', CNT:'Dénombrement' } }
+}[lang];
+
+var s = function (v) { return (v === undefined || v === null) ? '' : v.toString().trim(); };
+var has = function (v) { return s(v) !== ''; };
+var loc = lang === 'FR' ? 'fr-CA' : 'en-CA';
+var num = function (v, dp) {
+  return Number(v || 0).toLocaleString(loc, { minimumFractionDigits: dp === undefined ? 0 : dp,
+                                              maximumFractionDigits: dp === undefined ? 0 : dp });
+};
+var n = function (v) { return Number(v || 0); };
+
+/* Percent complete, guarding the empty case: 0 of 0 lines is 100% done, not
+ * a division by zero. */
+var pct = function (done, total) {
+  var t = n(total);
+  if (t <= 0) return 100;
+  return Math.max(0, Math.min(100, Math.round((n(done) / t) * 100)));
+};
+
+var rows = (typeof wrksfl !== 'undefined' && wrksfl) ? wrksfl : [];
+var kind = s(typeof msgkind !== 'undefined' ? msgkind : '').toLowerCase();
+var role = s(typeof operrole !== 'undefined' ? operrole : 'OPER');
+
+/* ZONESTAT is built by RPG and is bounded to CHAR(1024). A truncated string
+ * would throw here and take the whole render with it, so a bad parse degrades
+ * to no zone strip rather than to a blank screen. */
+var zones = [];
+try {
+  var raw = s(typeof zonestat !== 'undefined' ? zonestat : '');
+  if (raw) zones = JSON.parse(raw);
+  if (!Array.isArray(zones)) zones = [];
+} catch (e) { zones = []; }
+
+var rPct = pct(typeof nrdone !== 'undefined' ? nrdone : 0,
+               typeof nrlines !== 'undefined' ? nrlines : 0);
+var cPct = pct(typeof ncdone !== 'undefined' ? ncdone : 0,
+               typeof nclines !== 'undefined' ? nclines : 0);
+%>
+<div class="gt-app gt-supv-screen" data-gt-lang="<%= lang %>">
+
+  <header class="gt-header">
+    <div class="gt-logo">
+      <span class="gt-logo-mark">GT</span>
+      <span class="gt-logo-text"><%= T.appName %><small><%= T.appSub %></small></span>
+    </div>
+    <div class="gt-header-spacer"></div>
+    <div class="gt-operator">
+      <strong><%= s(typeof opername !== 'undefined' ? opername : '') %></strong>
+    </div>
+    <div class="gt-lang">
+      <button type="button" class="<%= lang === 'EN' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGEN'})">EN</button>
+      <button type="button" class="<%= lang === 'FR' ? 'is-active' : '' %>"
+              onclick="pui.submit({action:'LANGFR'})">FR</button>
+    </div>
+  </header>
+
+  <main class="gt-main">
+    <% if (has(typeof msg !== 'undefined' ? msg : '')) { %>
+      <div class="gt-msg<%= kind ? ' is-' + kind : '' %>"><%= s(msg) %></div>
+    <% } %>
+
+    <!-- ---- Six figures, the shift in one glance ------------------- -->
+    <h2 class="gt-section-title"><%= T.lead %></h2>
+
+    <div class="gt-sv-stats">
+      <div class="gt-sv-stat">
+        <strong><%= num(typeof nrcpts !== 'undefined' ? nrcpts : 0) %></strong>
+        <small><%= T.openRcpts %></small>
+      </div>
+      <div class="gt-sv-stat">
+        <strong><%= num(n(typeof nrlines !== 'undefined' ? nrlines : 0) -
+                        n(typeof nrdone  !== 'undefined' ? nrdone  : 0)) %></strong>
+        <small><%= T.linesToDo %></small>
+      </div>
+      <div class="gt-sv-stat">
+        <strong><%= num(typeof ncounts !== 'undefined' ? ncounts : 0) %></strong>
+        <small><%= T.countsOpen %></small>
+      </div>
+      <div class="gt-sv-stat<%= n(typeof nalerts !== 'undefined' ? nalerts : 0) > 0 ? ' is-warn' : '' %>">
+        <strong><%= num(typeof nalerts !== 'undefined' ? nalerts : 0) %></strong>
+        <small><%= T.alerts %></small>
+      </div>
+      <div class="gt-sv-stat<%= n(typeof nstaged !== 'undefined' ? nstaged : 0) > 0 ? ' is-warn' : '' %>">
+        <strong><%= num(typeof nstaged !== 'undefined' ? nstaged : 0) %></strong>
+        <small><%= T.staged %></small>
+      </div>
+      <div class="gt-sv-stat">
+        <strong><%= num(typeof nmoves !== 'undefined' ? nmoves : 0) %></strong>
+        <small><%= T.moves %></small>
+      </div>
+    </div>
+
+    <!-- ---- Progress, with the raw counts beside the bar ----------- -->
+    <section class="gt-card gt-sv-prog">
+      <div class="gt-sv-progrow">
+        <div class="gt-sv-proghd">
+          <span><%= T.receiving %></span>
+          <span class="gt-mono"><%= num(typeof nrdone !== 'undefined' ? nrdone : 0) %>
+            <%= T.of %> <%= num(typeof nrlines !== 'undefined' ? nrlines : 0) %>
+            <%= T.lines %></span>
+        </div>
+        <div class="gt-sv-bar" role="img"
+             aria-label="<%= T.receiving %> <%= rPct %>%">
+          <span style="width: <%= rPct %>%"></span>
+        </div>
+        <div class="gt-sv-progft">
+          <span><%= rPct %>% <%= T.confirmed %></span>
+          <% if (n(typeof nrvar !== 'undefined' ? nrvar : 0) > 0) { %>
+            <span class="gt-sv-varn"><%= num(nrvar) %> <%= T.variance %></span>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="gt-sv-progrow">
+        <div class="gt-sv-proghd">
+          <span><%= T.counting %></span>
+          <span class="gt-mono"><%= num(typeof ncdone !== 'undefined' ? ncdone : 0) %>
+            <%= T.of %> <%= num(typeof nclines !== 'undefined' ? nclines : 0) %>
+            <%= T.lines %></span>
+        </div>
+        <div class="gt-sv-bar" role="img"
+             aria-label="<%= T.counting %> <%= cPct %>%">
+          <span style="width: <%= cPct %>%"></span>
+        </div>
+        <div class="gt-sv-progft">
+          <span><%= cPct %>% <%= T.counted %></span>
+          <% if (n(typeof ncvar !== 'undefined' ? ncvar : 0) > 0) { %>
+            <span class="gt-sv-varn"><%= num(ncvar) %> <%= T.variance %></span>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- By zone (parsed from ZONESTAT) ------------------------- -->
+    <% if (zones.length > 0) { %>
+      <h2 class="gt-section-title"><%= T.zones %></h2>
+      <div class="gt-sv-zones">
+        <% zones.forEach(function (z) { %>
+          <div class="gt-sv-zone<%= n(z.a) > 0 ? ' is-warn' : '' %>">
+            <span class="gt-sv-zname"><%= T.zone %> <%= s(z.z) %></span>
+            <span class="gt-sv-zfig"><strong><%= num(z.q) %></strong>
+              <small><%= T.onHand %></small></span>
+            <span class="gt-sv-zsub"><%= num(z.l) %> <%= T.locs %> &middot;
+              <%= num(z.s) %> <%= T.skus %></span>
+            <% if (n(z.a) > 0) { %>
+              <span class="gt-sv-zalert"><%= num(z.a) %> <%= T.zalerts %></span>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+
+    <!-- ---- The work queue ---------------------------------------- -->
+    <h2 class="gt-section-title">
+      <%= T.queue %>
+      <span class="gt-count"><%= num(typeof nwork !== 'undefined' ? nwork : rows.length) %></span>
+    </h2>
+
+    <% if (rows.length > 0) { %>
+      <ul class="gt-sv-list">
+        <% rows.forEach(function (row) { %>
+          <%
+            var k  = s(row.wtype);
+            var st = s(row.wstat);
+            var p  = pct(row.wdone, row.wlines);
+          %>
+          <li class="gt-sv-card">
+            <%# The whole card is the target: a gloved hand gets the card, not
+                a link inside it. %>
+            <button type="button" class="gt-sv-hit"
+                    onclick="pui.submit({action:'PICK<%= s(row.wseq) %>'})">
+              <span class="gt-sv-kind is-<%= k.toLowerCase() %>">
+                <%= T.kind[k] || k %>
+              </span>
+
+              <span class="gt-sv-id">
+                <span class="gt-sv-doc gt-mono"><%= s(row.wdoc) %></span>
+                <span class="gt-sv-where"><%= s(row.wwhere) %></span>
+                <% if (has(row.wwho)) { %>
+                  <span class="gt-sv-who"><%= s(row.wwho) %></span>
+                <% } %>
+              </span>
+
+              <span class="gt-sv-figs">
+                <span class="gt-sv-fig">
+                  <strong><%= num(row.wdone) %>/<%= num(row.wlines) %></strong>
+                  <small><%= T.lines %></small>
+                </span>
+                <% if (n(row.wvar) > 0) { %>
+                  <span class="gt-sv-fig is-var">
+                    <strong><%= num(row.wvar) %></strong>
+                    <small><%= T.variance %></small>
+                  </span>
+                <% } %>
+                <% if (n(row.wphoto) > 0) { %>
+                  <span class="gt-sv-fig">
+                    <strong><%= num(row.wphoto) %></strong>
+                    <small><%= T.photos %></small>
+                  </span>
+                <% } %>
+              </span>
+
+              <span class="gt-sv-state">
+                <span class="gt-chip is-<%= st.toLowerCase() %>">
+                  <%= T.stat[st] || st %>
+                </span>
+                <span class="gt-sv-minibar"><span style="width: <%= p %>%"></span></span>
+              </span>
+            </button>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <section class="gt-card gt-scan-empty"><%= T.none %></section>
+    <% } %>
+  </main>
+
+  <input type="hidden" name="action" value="">
+
+  <footer class="gt-actions">
+    <button type="button" class="gt-btn gt-btn-primary" data-fkey="F3"
+            onclick="pui.submit({action:'EXIT'})">&lsaquo; <%= T.back %></button>
+    <button type="button" class="gt-btn gt-btn-ghost" data-fkey="F5"
+            onclick="pui.submit({action:'REFRESH'})"><%= T.refresh %></button>
+  </footer>
+</div>

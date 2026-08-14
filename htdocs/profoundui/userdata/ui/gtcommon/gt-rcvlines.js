@@ -91,49 +91,25 @@
   }
 
   /* ---- Saving the quantities --------------------------------------
-   * WHY THIS IS NOT A READC.
-   *
-   * In an EJS Rich Display screen the subfile rows are rendered by the
-   * TEMPLATE, not by Profound UI grid widgets. Every quantity box therefore
-   * carries the same name="lqty" with no record number attached, and the
-   * runtime derives its {SUBFILE}.rrn changed-record marker from its own grid
-   * widgets -- of which there are none here. So RPG's READC sees nothing,
-   * whether the value was typed, stepped or set by "in full", and the screen
-   * answered "no quantities were changed" every time.
-   *
-   * The changed rows travel in one field instead, "seq:qty;seq:qty;", with the
-   * row index encoded the same way this application already encodes it in its
-   * PICKnn action codes. Only rows that actually differ from what the server
-   * rendered are sent, so the payload stays small and RPG still does not stamp
-   * updated_by across untouched lines.
+   * The collector lives in gt-edits.js: three screens need it now (receiving
+   * quantities, count quantities, count reasons) and the reason a READC cannot
+   * do this job is documented there.
    * ---------------------------------------------------------------- */
+  var EDITS = {
+    root: '.gt-rcvlines-screen', box: '.gt-lin-qty', number: true,
+    hiddenId: 'gt-qtyedits', field: 'qtyedits', action: 'APPLY'
+  };
+
   function collect() {
-    var out = [];
-    var boxes = document.querySelectorAll('.gt-rcvlines-screen .gt-lin-qty');
-    for (var i = 0; i < boxes.length; i++) {
-      var box = boxes[i];
-      var seq = box.getAttribute('data-gt-seq');
-      var orig = box.getAttribute('data-gt-orig');
-      if (!seq) continue;
-      /* An empty box is not a zero -- it is somebody mid-edit, or a value the
-       * browser rejected. Skipping it is the safe reading; writing 0 would
-       * silently receive nothing for that line. */
-      if (box.value === '' || box.value === null) continue;
-      var now = (Math.round(Number(box.value) * 100) / 100).toFixed(2);
-      if (now !== orig) out.push(seq + ':' + now);
-    }
-    return out.length ? out.join(';') + ';' : '';
+    return window.gtEdits ? gtEdits.collect(EDITS) : '';
   }
 
   function save() {
-    var payload = collect();
-    var hidden = document.getElementById('gt-qtyedits');
-    /* Set the named input AND pass it to pui.submit -- the same
-     * belt-and-braces the photo capture uses, because which one the runtime
-     * reads depends on how the field was bound. */
-    if (hidden) hidden.value = payload;
+    if (window.gtEdits) { gtEdits.submit(EDITS); return; }
+    /* Without the shared file there is no payload to build, so submit plainly
+     * and let RPG report that nothing changed rather than doing nothing. */
     if (window.pui && typeof pui.submit === 'function') {
-      pui.submit({ action: 'APPLY', qtyedits: payload });
+      pui.submit({ action: 'APPLY' });
     }
   }
 

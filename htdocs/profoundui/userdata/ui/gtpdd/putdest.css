@@ -1,0 +1,255 @@
+/* ==================================================================
+ * Putaway -- confirm the destination.
+ *
+ * Scoped to .gt-putdest-screen. No html/body rules, no position:fixed, no
+ * 100vh. The Genie div/span resets live once in gt-theme.css.
+ * Every grid track is minmax(0, 1fr) so a long description cannot push the
+ * card off the right of a 360px screen.
+ * ================================================================== */
+
+/* ---- What is being put away ------------------------------------- */
+.gt-putdest-screen .gt-pd-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+}
+
+.gt-putdest-screen .gt-pd-img img,
+.gt-putdest-screen .gt-pd-noimg {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--gt-surface);
+}
+
+.gt-putdest-screen .gt-pd-id { min-width: 0; }
+.gt-putdest-screen .gt-pd-desc {
+  display: block;
+  font-weight: 700;
+  overflow-wrap: break-word;
+}
+.gt-putdest-screen .gt-pd-sku,
+.gt-putdest-screen .gt-pd-sscc {
+  display: block;
+  font-size: 11px;
+  color: var(--gt-muted);
+}
+
+.gt-putdest-screen .gt-pd-avail { text-align: right; min-width: 0; }
+.gt-putdest-screen .gt-pd-avail strong {
+  display: block;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.gt-putdest-screen .gt-pd-avail small {
+  display: block;
+  font-size: 11px;
+  color: var(--gt-muted);
+}
+
+/* ---- The destination ------------------------------------------- */
+/* Colour tokens only: --gt-action is the 64px action-height metric, and using a
+ * metric where a colour belongs is invalid CSS that is silently dropped. */
+.gt-putdest-screen .gt-pd-dest {
+  border-left: 4px solid var(--gt-good);
+}
+/* No destination is a state worth naming loudly: it is the one thing that
+ * stops the operator booking. */
+.gt-putdest-screen .gt-pd-dest.is-empty {
+  border-left-color: var(--gt-bad);
+}
+
+.gt-putdest-screen .gt-pd-desthd {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gt-putdest-screen .gt-pd-destloc {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+
+.gt-putdest-screen .gt-pd-destbadge {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--gt-surface);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+/* A scanned override reads differently from a suggestion, so the operator can
+ * see at a glance whose decision is on screen. */
+.gt-putdest-screen .gt-pd-destbadge.is-scanned {
+  background: var(--gt-ink);
+  color: #fff;
+}
+
+.gt-putdest-screen .gt-pd-destfacts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.gt-putdest-screen .gt-pd-fact { min-width: 0; }
+.gt-putdest-screen .gt-pd-fact strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.gt-putdest-screen .gt-pd-fact small {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+
+.gt-putdest-screen .gt-pd-why {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--gt-muted);
+}
+
+.gt-putdest-screen .gt-pd-nodest {
+  margin: 0;
+  font-weight: 700;
+  color: var(--gt-bad);
+}
+
+/* ---- Quantity -------------------------------------------------- */
+.gt-putdest-screen .gt-pd-qtylabel {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+
+.gt-putdest-screen .gt-pd-qtyrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+/* "All" is a three-letter word, and a button sized to its label came out 35px
+ * wide -- present, visible, hit-testable and still too small for a gloved
+ * thumb. Caught by the pre-flight's minimum-target check, which is the only one
+ * that looks at size rather than existence. */
+.gt-putdest-screen .gt-pd-qtyrow .gt-btn {
+  min-width: 84px;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+/* An input with no background of its own stays white against a dark theme, so
+ * it is set explicitly rather than inherited. */
+.gt-putdest-screen .gt-pd-qtyrow .gt-numbox {
+  width: 100%;
+  min-height: var(--gt-tap);
+  font-size: 22px;
+  text-align: center;
+  background: var(--gt-card);
+  color: var(--gt-ink);
+}
+
+/* ---- The scan row --------------------------------------------- */
+.gt-putdest-screen .gt-pd-scanrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: 10px;
+}
+
+/* ---- Alternatives --------------------------------------------- */
+.gt-putdest-screen .gt-pd-alts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.gt-putdest-screen .gt-pd-alt {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 11px;
+  border: 1px solid var(--gt-line);
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  min-width: 0;
+}
+
+/* The one currently chosen. Not a button: choosing is done by scanning, so a
+ * row that looks tappable and is not would be a lie. */
+.gt-putdest-screen .gt-pd-alt.is-current {
+  border-color: var(--gt-good);
+  background: var(--gt-surface);
+}
+
+.gt-putdest-screen .gt-pd-altloc { font-weight: 800; }
+.gt-putdest-screen .gt-pd-alttyp,
+.gt-putdest-screen .gt-pd-altroom {
+  font-size: 12px;
+  color: var(--gt-muted);
+}
+.gt-putdest-screen .gt-pd-altroom {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.gt-putdest-screen .gt-pd-althint {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--gt-muted);
+}
+
+/* ---- What just happened --------------------------------------- */
+.gt-putdest-screen .gt-pd-receipt {
+  border-left: 4px solid var(--gt-good);
+}
+.gt-putdest-screen .gt-pd-recrow {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--gt-muted);
+}
+.gt-putdest-screen .gt-pd-recrow strong { color: var(--gt-ink); }
+
+/* ---- The footer ----------------------------------------------- */
+/* Three buttons, and in French they do not fit one 360px row: "Utiliser la
+ * suggestion" alone is wider than a third of it, and squeezing them made the
+ * label overflow its own button by 3px.
+ *
+ * WRAPPING RATHER THAN SHRINKING. The theme already lays .gt-actions out as
+ * flex with `flex: 1 1 0`, so all this adds is a real basis and permission to
+ * wrap: the buttons share one row when they fit and drop to a second row when
+ * they do not. Tuning the label strings instead would fix this French and break
+ * on the next translation. */
+.gt-putdest-screen .gt-pd-actions { flex-wrap: wrap; }
+.gt-putdest-screen .gt-pd-actions .gt-btn { flex: 1 1 116px; }
+
+@media (min-width: 640px) {
+  .gt-putdest-screen .gt-pd-destfacts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .gt-putdest-screen .gt-pd-alts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

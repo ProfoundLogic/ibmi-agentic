@@ -1,0 +1,149 @@
+/* ==================================================================
+ * Settings.
+ *
+ * Scoped to .gt-sett-screen. No html/body rules, no position:fixed, no 100vh.
+ * The Genie div/span resets live once in gt-theme.css.
+ * ================================================================== */
+
+/* ---- Read-only fact rows (who, about) --------------------------- */
+.gt-sett-screen .gt-st-who,
+.gt-sett-screen .gt-st-about {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.gt-sett-screen .gt-st-fact { min-width: 0; }
+.gt-sett-screen .gt-st-fact small {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+.gt-sett-screen .gt-st-fact strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: break-word;
+}
+
+/* ---- A preference row ------------------------------------------ */
+.gt-sett-screen .gt-st-row {
+  display: grid;
+  gap: 10px;
+}
+
+.gt-sett-screen .gt-st-label strong {
+  display: block;
+  font-weight: 700;
+}
+.gt-sett-screen .gt-st-label small {
+  display: block;
+  font-size: 12px;
+  color: var(--gt-muted);
+}
+
+/* Two-option choices share the row evenly rather than sizing to their labels:
+ * "Français" and "Désactivé" are longer than their English equivalents and
+ * would otherwise make the two buttons different sizes. */
+.gt-sett-screen .gt-st-choice {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+/* Zones wrap: there are eight of them and a phone is 360px wide. */
+.gt-sett-screen .gt-st-zones {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.gt-sett-screen .gt-st-opt {
+  min-height: var(--gt-tap);
+  padding: 8px 10px;
+  border: 1px solid var(--gt-line);
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+.gt-sett-screen .gt-st-opt:active { background: var(--gt-surface); }
+
+/* The chosen option. Filled, not merely outlined -- an outline alone is not
+ * readable at arm's length under warehouse lighting. */
+.gt-sett-screen .gt-st-opt.is-on {
+  background: var(--gt-red);
+  border-color: var(--gt-red);
+  color: #fff;
+}
+
+.gt-sett-screen .gt-st-optz { display: block; font-size: 15px; }
+.gt-sett-screen .gt-st-optn {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  opacity: .75;
+}
+
+/* ---- The footer ------------------------------------------------ */
+/* Same wrapping treatment as the Putaway footer, for the same reason: three
+ * buttons and longer French labels. The theme's flex layout is kept; this only
+ * gives the buttons a basis and lets them drop to a second row. */
+.gt-sett-screen .gt-st-actions { flex-wrap: wrap; }
+.gt-sett-screen .gt-st-actions .gt-btn { flex: 1 1 116px; }
+
+/* ==================================================================
+ * LARGE TOUCH -- the preview.
+ *
+ * The class is put on this screen's wrapper the moment the option is chosen,
+ * so the operator feels the change before saving rather than reading a
+ * description of it. Scoped to this screen: rolling it out to the other twelve
+ * means each of their display files carrying the flag, which is a separate
+ * piece of work and is noted in the design doc rather than half-done here.
+ * ================================================================== */
+.gt-sett-screen.gt-large-touch .gt-st-opt {
+  min-height: 64px;
+  font-size: 17px;
+  padding: 12px 14px;
+}
+.gt-sett-screen.gt-large-touch .gt-st-optz { font-size: 19px; }
+.gt-sett-screen.gt-large-touch .gt-st-zones {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.gt-sett-screen.gt-large-touch .gt-btn {
+  min-height: 64px;
+  font-size: 17px;
+}
+.gt-sett-screen.gt-large-touch .gt-st-label strong { font-size: 17px; }
+.gt-sett-screen.gt-large-touch .gt-st-fact strong { font-size: 17px; }
+
+@media (min-width: 640px) {
+  .gt-sett-screen .gt-st-who,
+  .gt-sett-screen .gt-st-about {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .gt-sett-screen .gt-st-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    align-items: center;
+  }
+  .gt-sett-screen .gt-st-zones {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .gt-sett-screen .gt-st-about {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .gt-sett-screen .gt-st-zones {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
+}

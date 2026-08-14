@@ -1,0 +1,283 @@
+/* ==================================================================
+ * Inventory -- move stock.
+ *
+ * The camera, the scan row and the stepper controls (.gt-stepbtn, .gt-numbox)
+ * all come from gt-theme.css. This file is the form's own layout: what is
+ * moving, from where, to where, how much and why -- in that order, because
+ * that is the order the operator answers them in.
+ * ================================================================== */
+
+/* ---- What is moving --------------------------------------------- */
+.gt-mv-item {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+}
+.gt-mv-img img,
+.gt-mv-noimg {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--gt-line);
+}
+.gt-mv-id { display: grid; gap: 2px; min-width: 0; }
+.gt-mv-desc {
+  font-size: 15px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.gt-mv-sku { font-size: 12px; color: var(--gt-muted); }
+
+/* ---- From and To -----------------------------------------------
+ * FROM is locked and reads as settled; TO reads as a question until it has
+ * been scanned. The difference is deliberate: the operator should be able to
+ * see at a glance which half of the move is still missing.
+ * ----------------------------------------------------------------- */
+.gt-mv-loc {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+  border-left: 5px solid var(--gt-line);
+}
+.gt-mv-loc.is-from { border-left-color: var(--gt-muted); }
+/* The destination is outlined on all four sides, not just the left edge: it is
+ * the one thing on this screen the operator still has to supply, so it reads as
+ * a field to fill rather than a fact already established. Dashed while empty,
+ * solid green once scanned. Stated explicitly -- a bare `border-style` would
+ * pick up the default medium width on the other three sides by accident. */
+.gt-mv-loc.is-to {
+  border: 2px dashed var(--gt-line);
+  border-left-width: 5px;
+}
+.gt-mv-loc.is-to.is-ok {
+  border: 2px solid var(--gt-good);
+  border-left-width: 5px;
+}
+
+.gt-mv-loc-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+.gt-mv-loc-id {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  overflow-wrap: anywhere;
+}
+/* Not yet scanned: an instruction, not a value. */
+.gt-mv-loc-id.is-empty {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--gt-muted);
+}
+.gt-mv-loc-meta {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gt-muted);
+  overflow-wrap: anywhere;
+}
+.gt-mv-loc-figs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 2px;
+}
+.gt-mv-loc-figs strong { font-size: 18px; font-weight: 800; }
+.gt-mv-loc-figs small {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .2px;
+  color: var(--gt-muted);
+}
+
+/* ---- The scan row ---------------------------------------------- */
+.gt-invmove-screen .gt-scan-camera { margin-bottom: 10px; }
+.gt-invmove-screen .gt-scan-camera:not(.is-live) .gt-scan-camctl { margin-top: 0; }
+.gt-invmove-screen .gt-scan-status:empty { min-height: 0; margin: 0; }
+.gt-inv-scanrow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+.gt-invmove-screen .gt-inv-scanrow .gt-scan-camctl { margin: 0; }
+.gt-invmove-screen .gt-inv-scanrow .gt-scan-manual { margin-bottom: 0; }
+.gt-invmove-screen .gt-inv-scanrow .gt-scan-manual label {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+/* ---- How much and why ------------------------------------------ */
+.gt-mv-qty,
+.gt-mv-reason {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+}
+.gt-mv-lbl {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--gt-muted);
+}
+
+.gt-mv-step {
+  display: grid;
+  grid-template-columns: 48px minmax(72px, 1fr) 48px auto;
+  gap: 6px;
+  align-items: stretch;
+}
+/* Below 420px the buttons come down to 44px so the box keeps its width -- the
+ * same trade as the receiving cards. */
+@media (max-width: 420px) {
+  .gt-mv-step { grid-template-columns: 44px minmax(72px, 1fr) 44px auto; gap: 5px; }
+  .gt-mv-step .gt-stepbtn,
+  .gt-mv-step .gt-numbox,
+  .gt-mv-all { min-height: 44px; }
+}
+.gt-mv-all {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 2px solid var(--gt-line);
+  border-radius: 10px;
+  background: var(--gt-surface);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+.gt-mv-all:active { background: var(--gt-line); }
+
+.gt-mv-select {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 2px solid var(--gt-line);
+  border-radius: 10px;
+  background: var(--gt-card);
+  color: var(--gt-ink);
+  font-weight: 700;
+}
+.gt-mv-select:focus { outline: none; border-color: var(--gt-red); }
+
+/* ---- The action ------------------------------------------------- */
+.gt-mv-acts {
+  display: grid;
+  gap: 8px;
+  margin-bottom: var(--gt-gap);
+}
+.gt-btn-go {
+  min-height: var(--gt-action);
+  background: var(--gt-good);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 800;
+}
+/* Still waiting for a destination. Dimmed rather than disabled: pressing it
+ * gives a message saying what is missing, which teaches; a dead button does
+ * not. */
+.gt-btn-go.is-waiting { opacity: .55; }
+
+/* ---- Done: before and after ------------------------------------
+ * Two columns and an arrow. Four numbers is the whole proof that the move did
+ * what it said, and it is worth showing rather than a toast that disappears.
+ * ----------------------------------------------------------------- */
+.gt-mv-done {
+  padding: 14px 12px;
+  margin-bottom: 10px;
+  border-radius: var(--gt-radius);
+  background: var(--gt-card);
+  box-shadow: var(--gt-shadow);
+  border-left: 5px solid var(--gt-good);
+}
+.gt-mv-done-t {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--gt-good);
+}
+.gt-mv-ba {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+.gt-mv-ba-col {
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--gt-surface);
+  min-width: 0;
+}
+.gt-mv-ba-loc {
+  font-size: 14px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.gt-mv-ba-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+.gt-mv-ba-row small {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .2px;
+  color: var(--gt-muted);
+}
+.gt-mv-ba-row strong { font-size: 16px; font-weight: 800; }
+.gt-mv-ba-row.is-after strong { color: var(--gt-good); }
+.gt-mv-ba-arrow {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gt-muted);
+}
+.gt-mv-done-qty {
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gt-muted);
+}
+.gt-mv-done-qty strong { font-size: 18px; color: var(--gt-ink); }
+
+/* ---- Wider screens --------------------------------------------- */
+@media (min-width: 835px) {
+  .gt-invmove-screen .gt-main {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 var(--gt-pad);
+    align-content: start;
+  }
+  /* The message and the item span both columns; from/to sit side by side. */
+  .gt-invmove-screen .gt-msg,
+  .gt-mv-item,
+  .gt-invmove-screen .gt-scan-camera,
+  .gt-mv-done,
+  .gt-mv-acts { grid-column: 1 / -1; }
+}

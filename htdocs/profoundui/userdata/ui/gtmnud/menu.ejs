@@ -34,6 +34,7 @@ var T = {
     due:       'due',
     alerts:    'alerts',
     items:     'items',
+    toPut:     'to put away',
     soon:      'Coming soon',
     signOff:   'Sign Off',
     role:      { OPER: 'Operator', SUPV: 'Supervisor' }
@@ -55,6 +56,7 @@ var T = {
     due:       'à faire',
     alerts:    'alertes',
     items:     'articles',
+    toPut:     'à ranger',
     soon:      'Bientôt',
     signOff:   'Déconnexion',
     role:      { OPER: 'Opérateur', SUPV: 'Superviseur' }
@@ -77,14 +79,16 @@ var tiles = [
     badge: (typeof nitems  !== 'undefined' ? nitems  : 0), badgeLabel: T.items },
   { act: 'RECV', t: T.recv, s: T.recvSub, icon: 'pallet',  built: true,
     badge: (typeof nrcpts  !== 'undefined' ? nrcpts  : 0), badgeLabel: T.open },
-  { act: 'INV',  t: T.inv,  s: T.invSub,  icon: 'shelf',   built: false },
-  { act: 'CNT',  t: T.cnt,  s: T.cntSub,  icon: 'check',   built: false,
+  { act: 'INV',  t: T.inv,  s: T.invSub,  icon: 'shelf',   built: true,
+    badge: (typeof nreplen !== 'undefined' ? nreplen : 0), badgeLabel: T.alerts },
+  { act: 'CNT',  t: T.cnt,  s: T.cntSub,  icon: 'check',   built: true,
     badge: (typeof ncounts !== 'undefined' ? ncounts : 0), badgeLabel: T.due },
   { act: 'SCAN', t: T.scan, s: T.scanSub, icon: 'barcode', built: true },
-  { act: 'SUPV', t: T.supv, s: T.supvSub, icon: 'chart',   built: false,
+  { act: 'SUPV', t: T.supv, s: T.supvSub, icon: 'chart',   built: true,
     badge: (typeof nreplen !== 'undefined' ? nreplen : 0), badgeLabel: T.alerts },
-  { act: 'PUTA', t: T.puta, s: T.putaSub, icon: 'box',     built: false },
-  { act: 'SETT', t: T.sett, s: T.settSub, icon: 'gear',    built: false }
+  { act: 'PUTA', t: T.puta, s: T.putaSub, icon: 'box',     built: true,
+    badge: (typeof nstaged !== 'undefined' ? nstaged : 0), badgeLabel: T.toPut },
+  { act: 'SETT', t: T.sett, s: T.settSub, icon: 'gear',    built: true }
 ];
 
 var ICONS = {

@@ -80,7 +80,15 @@ SELECT c.count_id,
        c.count_status,
        c.assigned_to,
        COUNT(d.line_no)                                                AS line_count,
-       SUM(CASE WHEN d.qty_counted <> d.qty_expected
+       SUM(CASE WHEN d.counted_flag = 'Y' THEN 1 ELSE 0 END)           AS lines_counted,
+       --  A variance is a line that HAS BEEN COUNTED and disagrees. Without
+       --  the counted_flag test an untouched count reports every one of its
+       --  lines as a variance, because qty_counted is still zero and zero
+       --  differs from the expectation. Found by the Supervisor View, which is
+       --  this view's first caller -- the same way every gap in a shared
+       --  derivation here has surfaced.
+       SUM(CASE WHEN d.counted_flag = 'Y'
+                 AND d.qty_counted <> d.qty_expected
                 THEN 1 ELSE 0 END)                                     AS lines_variance,
        SUM(d.qty_expected)                                             AS qty_expected,
        SUM(d.qty_counted)                                              AS qty_counted,

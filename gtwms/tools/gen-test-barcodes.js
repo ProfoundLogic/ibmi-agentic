@@ -1,5 +1,19 @@
 #!/usr/bin/env node
 /*
+ * SUPERSEDED by gen-demo-sheet.js / verify-demo-sheet.js.
+ *
+ * This pair needs a hand-supplied `aitool sql` dump at /tmp/barcodes.json, which
+ * is ephemeral -- so on any fresh container it simply crashes with ENOENT rather
+ * than telling you what it wants. The demo-sheet pair queries the database
+ * itself, covers 32 barcodes across every act of the script, and the verifier
+ * derives its work list from the generator so it cannot silently cover less.
+ *
+ * Kept because the layout work here is still useful reference. Neither
+ * rebuild-all.sh nor the playbook's test list runs it. Pass an input file
+ * explicitly if you want it:
+ *     node gtwms/tools/gen-test-barcodes.js rows.json out.pdf
+ */
+/*
  * GT Warehouse Mobile -- printable barcode test sheet.
  *
  *   node gtwms/tools/gen-test-barcodes.js <rows.json> <out.pdf>
