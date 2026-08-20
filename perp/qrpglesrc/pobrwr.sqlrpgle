@@ -21,12 +21,14 @@
 // Epic:    PERP-7 (PERP-41)
 // ---------------------------------------------------------------------
 
-// datfmt(*iso) is REQUIRED here (not decorative) -- filter defaults
-// use 0001-01-01 / 9999-12-31 as sentinels, and the job DATFMT on
-// this environment is *MDY (2-digit year, 1940-2039). Without this
-// ctl-opt, every Date variable in this program is capped at *MDY's
-// range and RNQ0114 fires at runtime the first time the DSPF WRITEs
-// the FFRDT/FTODT fields or the SQL fetches one.
+// datfmt(*iso) is REQUIRED here (not decorative). FFRDT/FTODT are
+// DATFMT(*MDY) on pobrwd.dspf, which binds their underlying variables
+// to *MDY's 1940-2039 year range regardless of this ctl-opt (which
+// only governs Date variables not tied to a display-file field) --
+// see the PERP-89 clamp below, which uses 1940-01-01/2039-12-31 as
+// in-range sentinels for exactly this reason (an out-of-range sentinel
+// like 0001-01-01 crashes with RNQ0114 the moment it's assigned to
+// one of these fields -- confirmed live in poentr's EEXPDT).
 ctl-opt dftactgrp(*no) actgrp(*new) datfmt(*iso);
 
 dcl-f pobrwd workstn sfile(bsfl:rrn) sfile(rmsgsfl:msgrrn);
@@ -76,6 +78,7 @@ dcl-s selOpt   char(1);
 dcl-s selPo    int(20);
 dcl-s firstLine int(10);
 dcl-s cnt       int(10);
+dcl-s doneAll   ind;
 
 // Cursor scalars.
 dcl-s cPo      int(20);
@@ -131,11 +134,12 @@ fbuy   = '';
 // with :*ISO in case a future ctl-opt change drops the datfmt override.
 ffrdt  = %date('1940-01-01' : *ISO);
 ftodt  = %date('2039-12-31' : *ISO);
+doneAll = *off;
 
 // -----------------------------------------------------------------------
 // Browse loop.
 // -----------------------------------------------------------------------
-dow '1';
+dow not doneAll;
   exsr loadPOs;
 
   if numRows = 0;
@@ -156,6 +160,24 @@ dow '1';
 
   if *in03 or *in12;
     leave;
+  endif;
+
+  // PERP-89: blanking (or otherwise invalidating) either date filter
+  // produces a value outside the *MDY-safe 1940-2039 range, which then
+  // crashes with RNQ0114 the moment loadPOs' embedded SQL touches it
+  // (the SQL precompiler's own intermediate host variable for a date
+  // parameter is bound to the JOB's *MDY format regardless of this
+  // program's ctl-opt datfmt(*iso) override -- see the header comment
+  // and DDL_STYLE_GUIDE.md). %subdt is a plain RPG built-in, not an
+  // SQL host variable, so it's safe to test the *year* of whatever
+  // came back from the screen -- including an out-of-range value --
+  // before it ever reaches loadPOs. Clamping back to the sentinel is
+  // exactly "blank means no filter on that side" per the ticket.
+  if %subdt(ffrdt : *years) < 1940 or %subdt(ffrdt : *years) > 2039;
+    ffrdt = %date('1940-01-01' : *ISO);
+  endif;
+  if %subdt(ftodt : *years) < 1940 or %subdt(ftodt : *years) > 2039;
+    ftodt = %date('2039-12-31' : *ISO);
   endif;
 
   exsr clearMsgs;
@@ -183,6 +205,13 @@ dow '1';
       select;
         when selOpt = '5';
           exsr showDetail;
+          // PERP-96: F3 on the detail popup should exit the whole
+          // program like everywhere else, not just fall through to
+          // redisplaying the browse list (which is already correct
+          // for F12/Enter -- no change needed there).
+          if doneAll;
+            leave;
+          endif;
         when selOpt = '9';
           // Find the first (lowest-numbered) line to hand to poschr.
           exec sql
@@ -230,7 +259,7 @@ begsr loadPOs;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode)
            + ' STATE=' + sqlstate);
-    return;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -290,7 +319,7 @@ begsr showDetail;
   if sqlcode <> 0;
     writeMsg('PO ' + %char(selPo) + ' lookup failed: SQLCODE='
            + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   ddponbr = %char(selPo);
@@ -357,6 +386,13 @@ begsr showDetail;
   endif;
   write rmsgctl;
   exfmt bdetail;
+
+  // PERP-96: F3 here should exit the whole program (consistent with
+  // every other PERP screen), not just fall through and return to the
+  // browse list the way F12/Enter already correctly do.
+  if *in03;
+    doneAll = *on;
+  endif;
 endsr;
 
 // putLine -- ln, cItem, cOrd, cRcv, cOpen, cPrice, cSrcReq, cSrcLn

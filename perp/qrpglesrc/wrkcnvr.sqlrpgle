@@ -37,6 +37,13 @@ dcl-pr QMHSNDPM extpgm;
   errorCode   char(8)   const;
 end-pr;
 
+// Standard, reusable Item Number prompt (PERP-51/PERP-56). Same dynamic
+// CALL idiom as wrkitmr's callWrkcnvr/callWrklotr.
+dcl-pr callItmprmt extpgm('ITMPRMT');
+  pCompcd char(3)     const;
+  pItem   varchar(25);
+end-pr;
+
 dcl-ds statusDS psds qualified;
   programName char(10) pos(334);
 end-ds;
@@ -58,6 +65,8 @@ dcl-s selRrn  int(10);
 dcl-s selOpt  char(1);
 dcl-s filter  varchar(25);
 dcl-s compcd  char(3);
+dcl-s promptItem varchar(25);
+dcl-s holdMsg   ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -93,7 +102,17 @@ dow not *in03 and not *in12;
     leave;
   endif;
 
-  exsr clearMsgs;
+  // A message queued by an action handler below (2=Change, etc.) must
+  // survive one full loop pass before being cleared, or it never
+  // reaches the screen -- clearMsgs wipes msgrrn back to 0 on the very
+  // next pass, before this pass's own exfmt ever shows it. holdMsg
+  // skips exactly one clearMsgs call right after such a message was
+  // queued. Same pattern as wrkivpr (PERP-74).
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
 
   if filter = '';
     *in30 = *off;
@@ -138,6 +157,16 @@ dow not *in03 and not *in12;
     iter;
   endif;
 
+  // Item Number prompt (PERP-54): '?' + Enter invokes the standard
+  // reusable Item Number lookup (PERP-56) and returns the selection.
+  if %trim(sfitem) = '?';
+    promptItem = sfitem;
+    callItmprmt(compcd : promptItem);
+    sfitem = promptItem;
+    filter = promptItem;
+    iter;
+  endif;
+
   // Refresh scope from screen entry
   if sfitem <> filter;
     filter = sfitem;
@@ -179,7 +208,7 @@ begsr loadRows;
   exec sql open c1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -261,7 +290,8 @@ begsr changeRow;
        and from_uom = :efrom and to_uom = :eto;
   if sqlcode <> 0;
     writeMsg('Row disappeared before change.');
-    return;
+    holdMsg = *on;
+    leavesr;
   endif;
   exsr editLoop;
   if not *in12;

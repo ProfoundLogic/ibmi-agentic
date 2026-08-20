@@ -75,6 +75,7 @@ dcl-s nextSeq  int(10);
 dcl-s selOpt   char(1);
 dcl-s cnt      int(10);
 dcl-s parmed   ind;
+dcl-s calledWithParms ind;
 // po_line context for the header.
 dcl-s itemNbr  varchar(25);
 dcl-s vndCd    varchar(10);
@@ -123,6 +124,7 @@ dow '1';
     if msgrrn > 0;
       *in40 = *on;
     endif;
+    write hmsgctl;
     exfmt hhead;
 
     if *in03 or *in12;
@@ -179,6 +181,15 @@ dow '1';
   leave;
 enddo;
 
+// PERP-95: remember whether this invocation ever showed the header
+// entry screen (hhead). parmed is only ever cleared inside the loop
+// above, never re-set once cleared, so its value here tells us
+// whether hhead was skipped entirely (called with valid parms from
+// PO Browse -- no earlier screen to step back to) or was displayed
+// at least once (standalone menu invocation -- there IS an earlier
+// screen conceptually behind the schedule list).
+calledWithParms = parmed;
+
 // -----------------------------------------------------------------------
 // Schedule maintenance loop.
 // -----------------------------------------------------------------------
@@ -215,8 +226,20 @@ dow '1';
   write hmsgctl;
   exfmt hsctl;
 
-  if *in03 or *in12;
+  // PERP-95: F3 always exits. F12 exits only when this invocation was
+  // called with parms from PO Browse (no header screen was shown, so
+  // F12 correctly returns control to that caller). When invoked
+  // standalone from the menu, the header screen (hhead) was shown
+  // first, so F12 here should just redisplay this list, not end the
+  // program.
+  if *in03;
     leave;
+  endif;
+  if *in12;
+    if calledWithParms;
+      leave;
+    endif;
+    iter;
   endif;
 
   exsr clearMsgs;
@@ -270,7 +293,7 @@ begsr loadSched;
   exec sql open sc1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -345,7 +368,7 @@ begsr addSched;
   dow '1';
     exfmt hedit;
     if *in12;
-      return;
+      leavesr;
     endif;
 
     if eschqty <= 0;
@@ -383,7 +406,7 @@ begsr addSched;
   if sqlcode < 0;
     writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
            + ' STATE=' + sqlstate);
-    return;
+    leavesr;
   endif;
 
   exec sql commit;
@@ -403,17 +426,17 @@ begsr changeSched;
 
   exfmt hedit;
   if *in12;
-    return;
+    leavesr;
   endif;
 
   if eschqty <= 0;
     writeMsg('Scheduled Qty must be greater than zero.');
-    return;
+    leavesr;
   endif;
 
   if ercvqty < 0 or ercvqty > eschqty;
     writeMsg('Received Qty must be between 0 and Scheduled Qty.');
-    return;
+    leavesr;
   endif;
 
   exec sql
@@ -430,7 +453,7 @@ begsr changeSched;
        and schedule_seq = :chgSeq;
   if sqlcode < 0;
     writeMsg('Change failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   exec sql commit;
@@ -447,7 +470,7 @@ begsr deleteSched;
        and schedule_seq = :slseq;
   if sqlcode < 0;
     writeMsg('Delete failed: SQLSTATE=' + sqlstate);
-    return;
+    leavesr;
   endif;
   exec sql commit;
   writeMsg('Deleted schedule seq ' + %char(slseq) + '.');

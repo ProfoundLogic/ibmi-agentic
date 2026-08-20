@@ -17,11 +17,16 @@
 // Epic:    PERP-7 (PERP-38)
 // ---------------------------------------------------------------------
 
-// datfmt(*iso) is REQUIRED (not decorative) -- eexpdt uses 0001-01-01
-// as its "no expected receipt date" sentinel, and the job DATFMT on
-// this environment is *MDY (2-digit year, 1940-2039). Without this
-// ctl-opt, RPG Date variables are capped at that range and any
-// out-of-range value crashes at runtime with RNQ0114.
+// eexpdt (PERP-92/PERP-78) uses 1940-01-01 as its "no expected receipt
+// date" sentinel. This field is DATFMT(*MDY) on poentd.dspf (so the
+// screen renders MM/DD/YY per PERP-78) -- that DDS-level format binds
+// the underlying variable's valid year range to 1940-2039 REGARDLESS
+// of this program's own datfmt(*iso) ctl-opt, which only governs Date
+// variables NOT tied to a display-file field. An earlier attempt used
+// 0001-01-01 as the sentinel and crashed with RNQ0114 the moment F6=Add
+// assigned it to eexpdt -- confirmed live. 1940-01-01 is both a real,
+// in-range *MDY date and obviously never a genuine business date, so
+// it works as a sentinel without fighting the field's own DDS format.
 ctl-opt dftactgrp(*no) actgrp(*new) bnddir('PERP') datfmt(*iso);
 
 dcl-f poentd workstn sfile(plsfl:rrn) sfile(pmsgsfl:msgrrn);
@@ -42,6 +47,18 @@ dcl-pr QMHSNDPM extpgm;
   stackCntr   int(10)   const;
   msgKey      char(4);
   errorCode   char(8)   const;
+end-pr;
+
+// Standard, reusable Item/Vendor Number prompts (PERP-51/PERP-56/PERP-70).
+// Same dynamic CALL idiom as wrkitmr's callWrkcnvr/callWrklotr.
+dcl-pr callItmprmt extpgm('ITMPRMT');
+  pCompcd char(3)     const;
+  pItem   varchar(25);
+end-pr;
+
+dcl-pr callVndprmt extpgm('VNDPRMT');
+  pCompcd char(3)     const;
+  pVendor varchar(10);
 end-pr;
 
 dcl-ds statusDS psds qualified;
@@ -76,6 +93,10 @@ dcl-s edefprice packed(15:4);
 dcl-s edesc     varchar(60);
 dcl-s hbuyer    char(10);
 dcl-s hvname    varchar(60);
+dcl-s promptItem varchar(25);
+dcl-s promptVendor varchar(10);
+dcl-s doneAll   ind;
+dcl-s holdMsg   ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -97,50 +118,72 @@ hcompdsp = compcd;
 // Header entry -- collect vendor / order_date / notes, validate,
 // snapshot buyer from vendor, allocate the doc number, insert the
 // DRAFT header. Currency is hard-coded to USD (see program header).
+// Wrapped in an outer loop (PERP-93) so a successful F8=Submit on the
+// line screen below returns here for the NEXT PO instead of leaving
+// the user stranded on the now-read-only submitted line list -- same
+// pattern as reqentr.sqlrpgle (PERP-86).
 // -----------------------------------------------------------------------
-hvndcd  = '';
-hvndnm  = '';
-hbuycd  = '';
-horddt  = %date();
-hnotes  = '';
+doneAll = *off;
 
-exsr clearMsgs;
+dow not doneAll;
+  hvndcd  = '';
+  hvndnm  = '';
+  hbuycd  = '';
+  horddt  = %date();
+  hnotes  = '';
 
-dow '1';
-  *in40 = *off;
-  if msgrrn > 0;
-    *in40 = *on;
-  endif;
-  exfmt phead;
-
-  if *in03 or *in12;
-    *inlr = *on;
-    return;
+  // PERP-93: a submit confirmation queued just before restarting this
+  // loop must survive one pass before clearMsgs wipes it -- same
+  // holdMsg pattern as reqentr.sqlrpgle (PERP-86).
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
   endif;
 
-  exsr clearMsgs;
+  dow '1';
+    *in40 = *off;
+    if msgrrn > 0;
+      *in40 = *on;
+    endif;
+    write pmsgctl;
+    exfmt phead;
 
-  if %trim(hvndcd) = '';
-    writeMsg('Vendor Code is required.');
-    iter;
-  endif;
+    if *in03 or *in12;
+      *inlr = *on;
+      return;
+    endif;
 
-  exec sql
-    select vendor_name, buyer_code
-      into :hvname, :hbuyer
-      from perpdemo.vendor
-     where company_code = :compcd and vendor_code = :hvndcd
-       and is_active = 'Y';
-  if sqlcode <> 0;
-    writeMsg('Vendor ' + %trim(hvndcd) + ' not found for this company.');
-    iter;
-  endif;
+    exsr clearMsgs;
 
-  hvndnm = hvname;
-  hbuycd = hbuyer;
+    if %trim(hvndcd) = '?';
+      promptVendor = hvndcd;
+      callVndprmt(compcd : promptVendor);
+      hvndcd = promptVendor;
+      iter;
+    endif;
 
-  leave;
-enddo;
+    if %trim(hvndcd) = '';
+      writeMsg('Vendor Code is required.');
+      iter;
+    endif;
+
+    exec sql
+      select vendor_name, buyer_code
+        into :hvname, :hbuyer
+        from perpdemo.vendor
+       where company_code = :compcd and vendor_code = :hvndcd
+         and is_active = 'Y';
+    if sqlcode <> 0;
+      writeMsg('Vendor ' + %trim(hvndcd) + ' not found for this company.');
+      iter;
+    endif;
+
+    hvndnm = hvname;
+    hbuycd = hbuyer;
+
+    leave;
+  enddo;
 
 ponbr = docseq_next(compcd : 'PO' : docerrmsg);
 if ponbr = 0;
@@ -192,8 +235,16 @@ dow '1';
   write pmsgctl;
   exfmt plctl;
 
-  if *in03 or *in12;
+  // PERP-94: F3 exits the program; F12 must NOT -- it should just step
+  // back to (redisplay) this line list rather than ending the whole
+  // flow. The PO header is already committed at this point, so
+  // there's no earlier screen to unwind into.
+  if *in03;
+    doneAll = *on;
     leave;
+  endif;
+  if *in12;
+    iter;
   endif;
 
   exsr clearMsgs;
@@ -223,7 +274,13 @@ dow '1';
         writeMsg('Submit failed: SQLCODE=' + %char(sqlcode));
       else;
         exec sql commit;
+        // PERP-93: return to a fresh header entry screen for the next
+        // PO instead of staying parked on this now read-only line
+        // list. holdMsg carries this confirmation through to the
+        // restarted header loop above.
         writeMsg('PO ' + %char(ponbr) + ' submitted (OPEN).');
+        holdMsg = *on;
+        leave;
       endif;
     endif;
     iter;
@@ -254,6 +311,7 @@ dow '1';
     endif;
   endif;
 
+  enddo;
 enddo;
 
 *inlr = *on;
@@ -284,7 +342,7 @@ begsr loadLines;
   exec sql open pc1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -323,7 +381,7 @@ begsr handleOpt;
   if %found(poentd);
     if poStatus <> 'DRAFT';
       writeMsg('PO already submitted - no further changes allowed.');
-      return;
+      leavesr;
     endif;
     select;
       when selOpt = '2';
@@ -351,12 +409,21 @@ begsr addLine;
   // Sentinel "no expected receipt date". %date() with no format uses
   // the job DATFMT which on this environment is *MDY (year range
   // 1940-2039), so '0001' triggers RNQ0114. Force *ISO.
-  eexpdt  = %date('0001-01-01' : *ISO);
+  eexpdt  = %date('1940-01-01' : *ISO);
 
   dow '1';
     exfmt pledit;
     if *in12;
-      return;
+      leavesr;
+    endif;
+
+    // Item Number prompt (PERP-62): '?' + Enter invokes the standard
+    // reusable Item Number lookup (PERP-56) and returns the selection.
+    if %trim(eitem) = '?';
+      promptItem = eitem;
+      callItmprmt(compcd : promptItem);
+      eitem = promptItem;
+      iter;
     endif;
 
     if %trim(eitem) = '';
@@ -410,7 +477,7 @@ begsr addLine;
       from perpdemo.po_line
      where company_code = :compcd and po_number = :ponbr;
 
-  if eexpdt = %date('0001-01-01' : *ISO);
+  if eexpdt = %date('1940-01-01' : *ISO);
     exec sql
       insert into perpdemo.po_line
         (company_code, po_number, line_number, item_number,
@@ -455,14 +522,37 @@ begsr changeLine;
     eitmdsc = '';
   endif;
 
-  exfmt pledit;
-  if *in12;
-    return;
-  endif;
+  dow '1';
+    exfmt pledit;
+    if *in12;
+      leavesr;
+    endif;
+
+    // Item Number prompt (PERP-62): '?' + Enter invokes the standard
+    // reusable Item Number lookup (PERP-56) and returns the selection.
+    if %trim(eitem) = '?';
+      promptItem = eitem;
+      callItmprmt(compcd : promptItem);
+      eitem = promptItem;
+      exec sql
+        select item_description
+          into :edesc
+          from perpdemo.item
+         where company_code = :compcd and item_number = :eitem;
+      if sqlcode = 0;
+        eitmdsc = edesc;
+      else;
+        eitmdsc = '';
+      endif;
+      iter;
+    endif;
+
+    leave;
+  enddo;
 
   if eqty <= 0;
     writeMsg('Quantity must be greater than zero.');
-    return;
+    leavesr;
   endif;
 
   exec sql

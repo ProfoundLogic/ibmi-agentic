@@ -2,6 +2,7 @@
      A                                      PRINT
      A                                      CA03(03 'Exit')
      A                                      CA05(05 'Refresh')
+     A                                      CA06(06 'Add')
      A                                      CA12(12 'Cancel')
      A          R COSFL                     SFL
      A  51                                  SFLNXTCHG
@@ -24,7 +25,8 @@
      A                                  2  2'Currently selected  . . :'
      A            SCURSEL        3A  O  2 30DSPATR(HI)
      A                                  4  2'Type option, press Enter.'
-     A                                  5  4'1=Select this company'
+     A                                  5  4'1=Select this company   2=Chan-
+     A                                      ge company info'
      A                                  7  4'Opt'
      A                                      DSPATR(UL)
      A                                  7  9'Code'
@@ -34,8 +36,33 @@
      A                                  7 76'Curr'
      A                                      DSPATR(UL)
      A          R COFOOT
-     A                                 23  2'F3=Exit   F5=Refresh   F12=Ca-
-     A                                      ncel'
+     A                                 23  2'F3=Exit   F5=Refresh   F6=Add -
+     A                                        F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R COEDIT
+     A                                      OVERLAY
+     A                                  1 30'Edit Company'
+     A                                      DSPATR(HI)
+     A                                  2  2'Mode:'
+     A            EMODE          1A  O  2  8
+     A                                  3  2'Company code:'
+     A            ECOMPC         3A  B  3 17
+     A  60                                  DSPATR(PR)
+     A                                  4  2'Company name:'
+     A            ECOMPNM       60A  B  4 17CHECK(LC)
+     A                                  5  2'Address:'
+     A            EADDR1        60A  B  5 17CHECK(LC)
+     A                                  6  2'City:'
+     A            ECITY         40A  B  6 17CHECK(LC)
+     A                                  6 59'State:'
+     A            ESTATE         3A  B  6 66
+     A                                  7  2'Postal code:'
+     A            EPOSTCD       12A  B  7 17
+     A                                  7 36'Country:'
+     A            ECNTRY         3A  B  7 45
+     A                                  8  2'Base currency:'
+     A            EBASECUR      20A  B  8 17
+     A                                 23  2'Enter=Save   F12=Cancel'
      A                                      COLOR(BLU)
      A          R CONONE
      A                                      OVERLAY

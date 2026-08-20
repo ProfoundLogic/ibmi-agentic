@@ -36,6 +36,18 @@ dcl-pr QMHSNDPM extpgm;
   errorCode   char(8)   const;
 end-pr;
 
+// Standard, reusable Item/Vendor Number prompts (PERP-51/PERP-56/PERP-70).
+// Same dynamic CALL idiom as wrkitmr's callWrkcnvr/callWrklotr.
+dcl-pr callItmprmt extpgm('ITMPRMT');
+  pCompcd char(3)     const;
+  pItem   varchar(25);
+end-pr;
+
+dcl-pr callVndprmt extpgm('VNDPRMT');
+  pCompcd char(3)     const;
+  pVendor varchar(10);
+end-pr;
+
 dcl-ds statusDS psds qualified;
   programName char(10) pos(334);
 end-ds;
@@ -57,6 +69,9 @@ dcl-s msgkey   char(4);
 dcl-s compcd   char(3);
 dcl-s fItem    varchar(25);
 dcl-s fVendor  varchar(10);
+dcl-s promptItem varchar(25);
+dcl-s promptVendor varchar(10);
+dcl-s holdMsg   ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -86,7 +101,17 @@ dow not *in03 and not *in12;
     leave;
   endif;
 
-  exsr clearMsgs;
+  // PERP-74: a message queued by an action handler below (F6, etc.)
+  // must survive one full loop pass before being cleared, or it never
+  // reaches the screen -- clearMsgs wipes msgrrn back to 0 on the very
+  // next pass, before the "if msgrrn > 0" check further down ever sees
+  // it. holdMsg skips exactly one clearMsgs call right after such a
+  // message was queued.
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
 
   if fItem = '' or fVendor = '';
     *in30 = *off;
@@ -128,6 +153,29 @@ dow not *in03 and not *in12;
     else;
       exsr addPrice;
     endif;
+    if msgrrn > 0;
+      holdMsg = *on;
+    endif;
+    iter;
+  endif;
+
+  // Item Number prompt (PERP-59): '?' + Enter invokes the standard
+  // reusable Item Number lookup (PERP-56) and returns the selection.
+  if %trim(sfitem) = '?';
+    promptItem = sfitem;
+    callItmprmt(compcd : promptItem);
+    sfitem = promptItem;
+    fItem = promptItem;
+    iter;
+  endif;
+
+  // Vendor Number prompt (PERP-75): '?' + Enter invokes the standard
+  // reusable Vendor Number lookup (PERP-70) and returns the selection.
+  if %trim(sfvendor) = '?';
+    promptVendor = sfvendor;
+    callVndprmt(compcd : promptVendor);
+    sfvendor = promptVendor;
+    fVendor = promptVendor;
     iter;
   endif;
 
@@ -145,9 +193,21 @@ return;
 // ---------------------------------------------------------------------
 begsr loadRows;
   numRows = 0;
+  // PERP-83: display as MM/DD/YY. effective_from/to are stored as
+  // native DATE columns but rendered here as plain strings (SEFFFRM/
+  // SEFFTO carry no DATFMT keyword), so the format has to be built by
+  // hand from the ISO string -- DB2 for i's CHAR(date,fmt) built-in
+  // formats (ISO/USA/EUR/JIS) all use a 4-digit year, none produce a
+  // 2-digit year directly.
   exec sql declare p1 cursor for
-    select char(effective_from, iso),
-           case when effective_to is null then '' else char(effective_to, iso) end,
+    select substr(char(effective_from, iso), 6, 2) || '/'
+             || substr(char(effective_from, iso), 9, 2) || '/'
+             || substr(char(effective_from, iso), 3, 2),
+           case when effective_to is null then ''
+                else substr(char(effective_to, iso), 6, 2) || '/'
+                       || substr(char(effective_to, iso), 9, 2) || '/'
+                       || substr(char(effective_to, iso), 3, 2)
+           end,
            unit_price, currency_code, price_source
       from perpdemo.item_vendor_price
      where company_code = :compcd and item_number = :fItem
@@ -156,7 +216,7 @@ begsr loadRows;
   exec sql open p1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -196,7 +256,7 @@ begsr addPrice;
   eprcsrc = 'MANUAL';
   exfmt ipadd;
   if *in12 or enewprc <= 0;
-    return;
+    leavesr;
   endif;
 
   // Close the current row, if one exists (no current row is fine --
@@ -210,7 +270,7 @@ begsr addPrice;
        and vendor_code = :fVendor and effective_to is null;
   if sqlcode < 0;
     writeMsg('Close of prior price failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   exec sql

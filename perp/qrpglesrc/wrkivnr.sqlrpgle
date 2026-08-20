@@ -33,6 +33,18 @@ dcl-pr QMHSNDPM extpgm;
   errorCode   char(8)   const;
 end-pr;
 
+// Standard, reusable Item/Vendor Number prompts (PERP-51/PERP-56/PERP-70).
+// Same dynamic CALL idiom as wrkitmr's callWrkcnvr/callWrklotr.
+dcl-pr callItmprmt extpgm('ITMPRMT');
+  pCompcd char(3)     const;
+  pItem   varchar(25);
+end-pr;
+
+dcl-pr callVndprmt extpgm('VNDPRMT');
+  pCompcd char(3)     const;
+  pVendor varchar(10);
+end-pr;
+
 dcl-ds statusDS psds qualified;
   programName char(10) pos(334);
 end-ds;
@@ -58,6 +70,9 @@ dcl-s selOpt   char(1);
 dcl-s compcd   char(3);
 dcl-s fItem    varchar(25);
 dcl-s fVendor  varchar(10);
+dcl-s promptItem   varchar(25);
+dcl-s promptVendor varchar(10);
+dcl-s holdMsg   ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -87,7 +102,17 @@ dow not *in03 and not *in12;
     leave;
   endif;
 
-  exsr clearMsgs;
+  // A message queued by an action handler below (F6=Add, 2=Change,
+  // etc.) must survive one full loop pass before being cleared, or it
+  // never reaches the screen -- clearMsgs wipes msgrrn back to 0 on
+  // the very next pass, before this pass's own exfmt ever shows it.
+  // holdMsg skips exactly one clearMsgs call right after such a
+  // message was queued. Same pattern as wrkivpr (PERP-74).
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
 
   if fItem = '' and fVendor = '';
     *in30 = *off;
@@ -125,6 +150,25 @@ dow not *in03 and not *in12;
 
   if *in06;
     exsr addRow;
+    iter;
+  endif;
+
+  // Item/Vendor Number prompts (PERP-58/PERP-71): '?' + Enter invokes
+  // the standard reusable lookups (PERP-56/PERP-70) and returns the
+  // selection into the filter field that was prompted.
+  if %trim(sfitem) = '?';
+    promptItem = sfitem;
+    callItmprmt(compcd : promptItem);
+    sfitem = promptItem;
+    fItem  = promptItem;
+    iter;
+  endif;
+
+  if %trim(sfvendor) = '?';
+    promptVendor = sfvendor;
+    callVndprmt(compcd : promptVendor);
+    sfvendor = promptVendor;
+    fVendor  = promptVendor;
     iter;
   endif;
 
@@ -173,7 +217,7 @@ begsr loadRows;
   exec sql open iv1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -228,7 +272,8 @@ endsr;
 begsr addRow;
   if fItem = '' and fVendor = '';
     writeMsg('Enter an item or vendor before adding a profile.');
-    return;
+    holdMsg = *on;
+    leavesr;
   endif;
   emode   = 'A';
   eitem   = fItem;
@@ -274,7 +319,8 @@ begsr changeRow;
        and vendor_code = :evendor;
   if sqlcode <> 0;
     writeMsg('Row disappeared before change.');
-    return;
+    holdMsg = *on;
+    leavesr;
   endif;
   exsr editLoop;
   if not *in12;
@@ -317,7 +363,25 @@ endsr;
 
 // ---------------------------------------------------------------------
 begsr editLoop;
-  exfmt ivedit;
+  dow not *in12;
+    exfmt ivedit;
+    if *in12;
+      leave;
+    endif;
+    if %trim(eitem) = '?';
+      promptItem = eitem;
+      callItmprmt(compcd : promptItem);
+      eitem = promptItem;
+      iter;
+    endif;
+    if %trim(evendor) = '?';
+      promptVendor = evendor;
+      callVndprmt(compcd : promptVendor);
+      evendor = promptVendor;
+      iter;
+    endif;
+    leave;
+  enddo;
 endsr;
 
 // ---------------------------------------------------------------------

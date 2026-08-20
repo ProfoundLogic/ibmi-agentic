@@ -114,6 +114,7 @@ dcl-s compcd    char(3);
 dcl-s selReqnbr int(20);
 dcl-s confPct   packed(5:2);
 dcl-s confInd   int(5);
+dcl-s holdMsg   ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -133,7 +134,15 @@ endif;
 lcompdsp = compcd;
 
 dow '1';
-  exsr clearMsgs;
+  // PERP-87: a confirmation queued by reviewReq's Approve/Reject just
+  // before returning here must survive one pass before clearMsgs
+  // wipes it, or it never reaches the screen -- same holdMsg pattern
+  // as PERP-74/PERP-86.
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
   exsr loadReqs;
 
   if numReqs = 0;
@@ -176,10 +185,15 @@ dow '1';
           if reviewRrn = 0;
             reviewRrn = selRrn;
           else;
+            // Queued mid-readc, before this pass's own exfmt already
+            // happened -- must survive one more full loop pass before
+            // clearMsgs wipes it, or it never reaches the screen.
             writeMsg('Only one requisition may be reviewed per Enter.');
+            holdMsg = *on;
           endif;
         else;
           writeMsg('Option ' + selOpt + ' not valid - use 5.');
+          holdMsg = *on;
         endif;
         selRrn = 0;
       endif;
@@ -209,7 +223,7 @@ begsr loadReqs;
   exec sql open c1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numReqs < %elem(reqs);
@@ -263,7 +277,14 @@ begsr reviewReq;
   exsr fillDetailLines;
 
   dow '1';
-    exsr clearMsgs;
+    // PERP-87: same holdMsg pattern as the outer list loop -- an
+    // Approve/Reject SQL-failure message queued below must survive
+    // one pass before being wiped by clearMsgs.
+    if holdMsg;
+      holdMsg = *off;
+    else;
+      exsr clearMsgs;
+    endif;
     if msgrrn > 0;
       *in40 = *on;
     else;
@@ -272,8 +293,20 @@ begsr reviewReq;
     write rmsgctl;
     exfmt rdetail;
 
+    // PERP-87: response indicators are program-level, not
+    // format-level -- RPG does not automatically turn them back off
+    // between EXFMTs to different record formats sharing this device
+    // file. Leaving *in06/*in07/*in12 ON here would make the OUTER
+    // list loop's own "if *in03 or *in12" check (evaluated right
+    // after its NEXT exfmt asctl, before the user has pressed
+    // anything on that screen) fire immediately, ending the whole
+    // program and looking exactly like "F6/F7/F12 kick back to the
+    // menu" -- reset all three explicitly on every path out of here.
     if *in12;
-      return;
+      *in06 = *off;
+      *in07 = *off;
+      *in12 = *off;
+      leavesr;
     endif;
 
     if *in06;
@@ -288,12 +321,17 @@ begsr reviewReq;
                updated_at            = current_timestamp,
                updated_by            = user
          where company_code = :compcd and requisition_number = :selReqnbr;
+      *in06 = *off;
       if sqlcode < 0;
         writeMsg('Approve failed: SQLCODE=' + %char(sqlcode));
+        holdMsg = *on;
         iter;
       endif;
       writeMsg('Requisition ' + %trim(ddreqnbr) + ' approved.');
-      return;
+      holdMsg = *on;
+      *in07 = *off;
+      *in12 = *off;
+      leavesr;
     endif;
 
     if *in07;
@@ -308,12 +346,17 @@ begsr reviewReq;
                updated_at            = current_timestamp,
                updated_by            = user
          where company_code = :compcd and requisition_number = :selReqnbr;
+      *in07 = *off;
       if sqlcode < 0;
         writeMsg('Reject failed: SQLCODE=' + %char(sqlcode));
+        holdMsg = *on;
         iter;
       endif;
       writeMsg('Requisition ' + %trim(ddreqnbr) + ' rejected.');
-      return;
+      holdMsg = *on;
+      *in06 = *off;
+      *in12 = *off;
+      leavesr;
     endif;
 
     iter;
@@ -331,7 +374,7 @@ begsr loadLines2;
   exec sql open c2;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numLines < %elem(detailLines);

@@ -38,6 +38,7 @@ end-ds;
 dcl-s compcd  char(3);
 dcl-s exists  ind;
 dcl-s msgrrn  int(10);
+dcl-s holdMsg ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -61,7 +62,17 @@ dow not *in03 and not *in12;
     leave;
   endif;
 
-  exsr clearMsgs;
+  // A message queued by an action handler below (F6=Add) must survive
+  // one full loop pass before being cleared, or it never reaches the
+  // screen -- clearMsgs wipes msgrrn back to 0 on the very next pass,
+  // before this pass's own exfmt ever shows it. holdMsg skips exactly
+  // one clearMsgs call right after such a message was queued. Same
+  // pattern as wrkivpr (PERP-74).
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
   exsr loadRow;
 
   write wlfoot;
@@ -132,7 +143,8 @@ begsr addRow;
   if exists;
     writeMsg('Row already exists for company ' + %trim(compcd)
            + ' - press Enter to save changes.');
-    return;
+    holdMsg = *on;
+    leavesr;
   endif;
 
   exec sql

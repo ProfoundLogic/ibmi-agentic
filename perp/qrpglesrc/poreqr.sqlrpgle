@@ -195,6 +195,12 @@ dow '1';
   endif;
 
   if *in06;
+    // *in06 is a response indicator: the workstation turns it on when
+    // F6 is pressed but never turns it off on its own, so it must be
+    // cleared here or it stays "stuck on" and every later Enter/F5/F12
+    // press on this screen is misread as another F6 (PERP-97 follow-up
+    // bug found during live testing -- distinct from the DDS overflow).
+    *in06 = *off;
     if selCnt = 0;
       writeMsg('Select at least one requisition (option 1) before F6.');
       iter;
@@ -215,6 +221,8 @@ dow '1';
     exsr showPreview;
 
     if *in06;
+      // Same stuck-indicator concern as above -- clear it once consumed.
+      *in06 = *off;
       // Confirmed -- create the POs.
       exsr createPOs;
       // After creation, refresh the list (converted lines drop out
@@ -287,7 +295,7 @@ begsr loadReqs;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode)
            + ' STATE=' + sqlstate);
-    return;
+    leavesr;
   endif;
 
   dow numReqs < %elem(reqs);
@@ -376,7 +384,7 @@ begsr buildPlan;
     exec sql open rc2;
     if sqlcode < 0;
       writeMsg('buildPlan open failed: SQLCODE=' + %char(sqlcode));
-      return;
+      leavesr;
     endif;
 
     dow '1';
@@ -530,14 +538,14 @@ begsr createPOs;
       writeMsg('Vendor ' + %trim(xVndCd)
              + ' lookup failed: SQLCODE=' + %char(sqlcode));
       exec sql rollback;
-      return;
+      leavesr;
     endif;
 
     newPo = docseq_next(compcd : 'PO' : docerrmsg);
     if newPo = 0;
       writeMsg('docseq_next failed: ' + docerrmsg);
       exec sql rollback;
-      return;
+      leavesr;
     endif;
 
     exec sql
@@ -550,7 +558,7 @@ begsr createPOs;
       writeMsg('po_header insert failed: SQLCODE=' + %char(sqlcode)
              + ' STATE=' + sqlstate);
       exec sql rollback;
-      return;
+      leavesr;
     endif;
 
     lineNbr = 0;
@@ -575,7 +583,7 @@ begsr createPOs;
                + %trim(plan(v).vndcd) + ': SQLCODE='
                + %char(sqlcode) + ' STATE=' + sqlstate);
         exec sql rollback;
-        return;
+        leavesr;
       endif;
     endfor;
 

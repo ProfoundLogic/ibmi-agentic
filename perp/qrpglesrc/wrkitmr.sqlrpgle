@@ -45,6 +45,13 @@ dcl-pr callWrklotr extpgm('WRKLOTR');
   pItem   varchar(25) const;
 end-pr;
 
+// Standard, reusable Item Number prompt (PERP-51/PERP-56). Same dynamic
+// CALL idiom as callWrkcnvr/callWrklotr above.
+dcl-pr callItmprmt extpgm('ITMPRMT');
+  pCompcd char(3)     const;
+  pItem   varchar(25);
+end-pr;
+
 dcl-ds statusDS psds qualified;
   programName char(10) pos(334);
 end-ds;
@@ -70,6 +77,9 @@ dcl-s compcd   char(3);
 dcl-s fClass   varchar(10);
 dcl-s fActOnly char(1);
 dcl-s fLowOnly char(1);
+dcl-s fPosTo   varchar(30);
+dcl-s promptItem varchar(25);
+dcl-s holdMsg   ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -77,9 +87,11 @@ scompdsp = compcd;
 fClass   = '';
 fActOnly = 'N';
 fLowOnly = 'N';
+fPosTo   = '';
 sfclass  = '';
 sfact    = 'N';
 sflow    = 'N';
+sposto   = '';
 
 if compcd = '';
   exsr clearMsgs;
@@ -101,7 +113,17 @@ dow not *in03 and not *in12;
     leave;
   endif;
 
-  exsr clearMsgs;
+  // A message queued by an action handler below (2=Change, etc.) must
+  // survive one full loop pass before being cleared, or it never
+  // reaches the screen -- clearMsgs wipes msgrrn back to 0 on the very
+  // next pass, before this pass's own exfmt ever shows it. holdMsg
+  // skips exactly one clearMsgs call right after such a message was
+  // queued. Same pattern as wrkivpr (PERP-74).
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
   exsr loadRows;
 
   if numRows = 0;
@@ -129,6 +151,7 @@ dow not *in03 and not *in12;
     fClass   = sfclass;
     fActOnly = sfact;
     fLowOnly = sflow;
+    fPosTo   = %trim(sposto);
     iter;
   endif;
 
@@ -138,10 +161,12 @@ dow not *in03 and not *in12;
   endif;
 
   // Refresh filters from screen entry
-  if sfclass <> fClass or sfact <> fActOnly or sflow <> fLowOnly;
+  if sfclass <> fClass or sfact <> fActOnly or sflow <> fLowOnly
+     or sposto <> fPosTo;
     fClass   = sfclass;
     fActOnly = sfact;
     fLowOnly = sflow;
+    fPosTo   = %trim(sposto);
     iter;
   endif;
 
@@ -180,11 +205,14 @@ begsr loadRows;
        and (:fClass   = '' or class_code = :fClass)
        and (:fActOnly = 'N' or is_active = 'Y')
        and (:fLowOnly = 'N' or qty_on_hand <= reorder_point)
+       and (:fPosTo = ''
+            or upper(item_number) like upper(:fPosTo) || '%'
+            or upper(item_description) like '%' || upper(:fPosTo) || '%')
      order by item_number;
   exec sql open c1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -306,7 +334,8 @@ begsr changeRow;
      where company_code = :compcd and item_number = :eitem;
   if sqlcode <> 0;
     writeMsg('Row disappeared before change.');
-    return;
+    holdMsg = *on;
+    leavesr;
   endif;
   exsr editLoop;
   if not *in12;
@@ -372,7 +401,19 @@ endsr;
 
 // ---------------------------------------------------------------------
 begsr editLoop;
-  exfmt wiedit;
+  dow not *in12;
+    exfmt wiedit;
+    if *in12;
+      leave;
+    endif;
+    if %trim(eitem) = '?';
+      promptItem = eitem;
+      callItmprmt(compcd : promptItem);
+      eitem = promptItem;
+      iter;
+    endif;
+    leave;
+  enddo;
 endsr;
 
 // ---------------------------------------------------------------------

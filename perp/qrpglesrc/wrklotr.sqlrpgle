@@ -13,7 +13,12 @@
 // Epic:    PERP-3 (PERP-24)
 // ---------------------------------------------------------------------
 
-ctl-opt dftactgrp(*no) actgrp(*new);
+// PERP-84: datfmt(*iso) is required now that this program declares
+// Date-typed variables (parsedRecv/parsedExpd below) to validate the
+// MM/DD/YY Received/Expiry Date entry fields. Without this override the
+// job's *MDY (1940-2039) DATFMT becomes the Date variables' storage
+// format, per perp/AGENTS.md's RNQ0114 gotcha.
+ctl-opt dftactgrp(*no) actgrp(*new) datfmt(*iso);
 
 dcl-pi *n;
   pCompcd char(3)      const options(*nopass);
@@ -36,6 +41,13 @@ dcl-pr QMHSNDPM extpgm;
   stackCntr   int(10)   const;
   msgKey      char(4);
   errorCode   char(8)   const;
+end-pr;
+
+// Standard, reusable Item Number prompt (PERP-51/PERP-56). Same dynamic
+// CALL idiom as wrkitmr's callWrkcnvr/callWrklotr.
+dcl-pr callItmprmt extpgm('ITMPRMT');
+  pCompcd char(3)     const;
+  pItem   varchar(25);
 end-pr;
 
 dcl-ds statusDS psds qualified;
@@ -61,6 +73,18 @@ dcl-s filter   varchar(25);
 dcl-s compcd   char(3);
 dcl-s itemOh   packed(15:4);
 dcl-s lotTotal packed(15:4);
+dcl-s promptItem varchar(25);
+
+// PERP-84: MM/DD/YY entry validation for ERECV/EEXPD (see editLoop).
+// parsedRecv/parsedExpd are Date-typed working vars used only to
+// validate/reformat the typed text -- they are never bound directly to
+// an SQL host variable (erecv/eexpd stay char(10) for that), so the
+// SQL-precompiler-intermediate-host-variable *MDY cap documented in
+// perp/AGENTS.md #13 does not come into play here.
+dcl-s parsedRecv date;
+dcl-s parsedExpd date;
+dcl-s validRecv  ind;
+dcl-s validExpd  ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -146,6 +170,16 @@ dow not *in03 and not *in12;
     iter;
   endif;
 
+  // Item Number prompt (PERP-60): '?' + Enter invokes the standard
+  // reusable Item Number lookup (PERP-56) and returns the selection.
+  if %trim(sfitem) = '?';
+    promptItem = sfitem;
+    callItmprmt(compcd : promptItem);
+    sfitem = promptItem;
+    filter = promptItem;
+    iter;
+  endif;
+
   // Refresh scope from screen entry
   if sfitem <> filter;
     filter = sfitem;
@@ -201,17 +235,29 @@ endsr;
 // ---------------------------------------------------------------------
 begsr loadRows;
   numRows = 0;
+  // PERP-84: display as MM/DD/YY. received_date/expiry_date are stored
+  // as native DATE columns but rendered here as plain strings (SRECV/
+  // SEXPD carry no DATFMT keyword), so the format has to be built by
+  // hand from the ISO string -- DB2 for i's CHAR(date,fmt) built-in
+  // formats (ISO/USA/EUR/JIS) all use a 4-digit year, none produce a
+  // 2-digit year directly. Same technique as wrkivpr.sqlrpgle (PERP-83).
   exec sql declare c1 cursor for
     select lot_number, qty_on_hand,
-           char(received_date, iso),
-           coalesce(char(expiry_date, iso), '')
+           substr(char(received_date, iso), 6, 2) || '/'
+             || substr(char(received_date, iso), 9, 2) || '/'
+             || substr(char(received_date, iso), 3, 2),
+           case when expiry_date is null then ''
+                else substr(char(expiry_date, iso), 6, 2) || '/'
+                       || substr(char(expiry_date, iso), 9, 2) || '/'
+                       || substr(char(expiry_date, iso), 3, 2)
+           end
       from perpdemo.item_lot
      where company_code = :compcd and item_number = :filter
      order by lot_number;
   exec sql open c1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -264,7 +310,7 @@ begsr addRow;
   emode  = 'A';
   elot   = '';
   eqty   = 0;
-  erecv  = %char(%date():*iso);
+  erecv  = %char(%date():*mdy);
   eexpd  = '';
   eactive = 'Y';
   exsr editLoop;
@@ -322,8 +368,66 @@ begsr deleteRow;
 endsr;
 
 // ---------------------------------------------------------------------
+// PERP-84: erecv/eexpd are typed by the user as MM/DD/YY on LTEDIT.
+// Validate on every Enter; on failure, show the error in the message
+// subfile alongside LTEDIT and let the user retry (never crash into
+// the SQL date(:erecv) cast in addRow/changeRow with unparsed text).
+// On success, erecv/eexpd are normalized to ISO ('yyyy-mm-dd') text so
+// the existing date(:erecv)/date(:eexpd) SQL casts in addRow/changeRow
+// keep working unchanged.
 begsr editLoop;
-  exfmt ltedit;
+  exsr clearMsgs;
+  dow *on;
+    if msgrrn > 0;
+      *in40 = *on;
+      write ltmsgctl;
+    else;
+      *in40 = *off;
+    endif;
+    exfmt ltedit;
+
+    if *in12;
+      leave;
+    endif;
+
+    exsr clearMsgs;
+
+    if %trim(erecv) = '';
+      writeMsg('Received Date is required (MM/DD/YY).');
+      iter;
+    endif;
+
+    validRecv = *on;
+    monitor;
+      parsedRecv = %date(%trim(erecv):*mdy);
+    on-error;
+      validRecv = *off;
+    endmon;
+    if not validRecv;
+      writeMsg('Invalid Received Date - enter as MM/DD/YY.');
+      iter;
+    endif;
+
+    validExpd = *on;
+    if %trim(eexpd) <> '';
+      monitor;
+        parsedExpd = %date(%trim(eexpd):*mdy);
+      on-error;
+        validExpd = *off;
+      endmon;
+    endif;
+    if not validExpd;
+      writeMsg('Invalid Expiry Date - enter as MM/DD/YY, or blank for none.');
+      iter;
+    endif;
+
+    erecv = %char(parsedRecv:*iso);
+    if %trim(eexpd) <> '';
+      eexpd = %char(parsedExpd:*iso);
+    endif;
+
+    leave;
+  enddo;
 endsr;
 
 // ---------------------------------------------------------------------

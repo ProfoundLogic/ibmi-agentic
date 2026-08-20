@@ -84,7 +84,7 @@ wrkuomr.pgm:  qrpglesrc/wrkuomr.sqlrpgle qddssrc/wrkuomd.dspf | wrkuomd.file uom
 
 # Scoped by *LDA company (perpselr) + item number entered on screen.
 wrkcnvd.file: qddssrc/wrkcnvd.dspf
-wrkcnvr.pgm:  qrpglesrc/wrkcnvr.sqlrpgle qddssrc/wrkcnvd.dspf | wrkcnvd.file item_uom_conversion.file
+wrkcnvr.pgm:  qrpglesrc/wrkcnvr.sqlrpgle qddssrc/wrkcnvd.dspf | wrkcnvd.file item_uom_conversion.file itmprmt.pgm
 
 
 # --- PERP-22: Item class maintenance --------------------------------------
@@ -98,7 +98,7 @@ wrkiclr.pgm:  qrpglesrc/wrkiclr.sqlrpgle qddssrc/wrkicld.dspf | wrkicld.file ite
 # pre-scoped to the selected item (dynamic CALL via EXTPGM, not compile-time
 # bound -- wrkcnvr.pgm listed as order-only so build order still makes sense).
 wrkitmd.file: qddssrc/wrkitmd.dspf
-wrkitmr.pgm:  qrpglesrc/wrkitmr.sqlrpgle qddssrc/wrkitmd.dspf | wrkitmd.file item.file wrkcnvr.pgm wrklotr.pgm
+wrkitmr.pgm:  qrpglesrc/wrkitmr.sqlrpgle qddssrc/wrkitmd.dspf | wrkitmd.file item.file wrkcnvr.pgm wrklotr.pgm itmprmt.pgm
 
 
 # --- PERP-24: Item lot maintenance & inquiry --------------------------------
@@ -106,7 +106,7 @@ wrkitmr.pgm:  qrpglesrc/wrkitmr.sqlrpgle qddssrc/wrkitmd.dspf | wrkitmd.file ite
 # idiom as wrkcnvr. Discrepancy indicator: item.qty_on_hand vs
 # SUM(item_lot.qty_on_hand) for the scoped item.
 wrklotd.file: qddssrc/wrklotd.dspf
-wrklotr.pgm:  qrpglesrc/wrklotr.sqlrpgle qddssrc/wrklotd.dspf | wrklotd.file item_lot.file
+wrklotr.pgm:  qrpglesrc/wrklotr.sqlrpgle qddssrc/wrklotd.dspf | wrklotd.file item_lot.file itmprmt.pgm
 
 
 # --- PERP-27: Warehouse coordinate query service --------------------------
@@ -138,6 +138,18 @@ item_vendor_preferred_ak.file: qddlsrc/item_vendor_preferred_ak.index.sql item_v
 item_vendor_price.file:        qddlsrc/item_vendor_price.table.sql item_vendor.file code_master.file            | perpsjpf.pgm
 
 
+# --- PERP-51: Standard, reusable Item/Vendor Number prompt programs ------
+# Field-level "?" + Enter lookup, callable from any screen with a keyable
+# Item Number or Vendor field via a plain dynamic CALL (EXTPGM prototype
+# declared in each caller) -- same idiom wrkitmr already uses to call
+# wrkcnvr/wrklotr. Not bound service programs, so no bnddir/exports.
+itmprm2d.file: qddssrc/itmprm2d.dspf
+itmprmt.pgm:   qrpglesrc/itmprmt.sqlrpgle qddssrc/itmprm2d.dspf | itmprm2d.file item.file
+
+vndprmtd.file: qddssrc/vndprmtd.dspf
+vndprmt.pgm:   qrpglesrc/vndprmt.sqlrpgle qddssrc/vndprmtd.dspf | vndprmtd.file vendor.file
+
+
 # --- PERP-29: Vendor master maintenance -----------------------------------
 # Scoped by *LDA company (perpselr). Subfile filters by active-only and
 # buyer_code.
@@ -149,7 +161,7 @@ wrkvndr.pgm:  qrpglesrc/wrkvndr.sqlrpgle qddssrc/wrkvndd.dspf | wrkvndd.file ven
 # Scoped by *LDA company (perpselr) plus an item OR vendor entered on
 # screen (item wins if both are entered).
 wrkivnd.file: qddssrc/wrkivnd.dspf
-wrkivnr.pgm:  qrpglesrc/wrkivnr.sqlrpgle qddssrc/wrkivnd.dspf | wrkivnd.file item_vendor.file
+wrkivnr.pgm:  qrpglesrc/wrkivnr.sqlrpgle qddssrc/wrkivnd.dspf | wrkivnd.file item_vendor.file itmprmt.pgm vndprmt.pgm
 
 
 # --- PERP-31: Item-vendor price maintenance (effective-dated) --------------
@@ -157,7 +169,7 @@ wrkivnr.pgm:  qrpglesrc/wrkivnr.sqlrpgle qddssrc/wrkivnd.dspf | wrkivnd.file ite
 # screen. Read-only history list; F6=Add closes the current row and
 # inserts a new one dated today.
 wrkivpd.file: qddssrc/wrkivpd.dspf
-wrkivpr.pgm:  qrpglesrc/wrkivpr.sqlrpgle qddssrc/wrkivpd.dspf | wrkivpd.file item_vendor_price.file
+wrkivpr.pgm:  qrpglesrc/wrkivpr.sqlrpgle qddssrc/wrkivpd.dspf | wrkivpd.file item_vendor_price.file itmprmt.pgm vndprmt.pgm
 
 
 # --- PERP-32: Pricing history query service --------------------------------
@@ -185,7 +197,7 @@ requisition_line.file:   qddlsrc/requisition_line.table.sql   requisition_header
 # for numbering; defaults line UOM from item, est_unit_cost from the
 # preferred vendor's current item_vendor_price row.
 reqentd.file: qddssrc/reqentd.dspf
-reqentr.pgm:  qrpglesrc/reqentr.sqlrpgle qrpglesrc/docseq_pr.rpgle qddssrc/reqentd.dspf | reqentd.file perp.bnddir requisition_header.file requisition_line.file item.file item_vendor.file item_vendor_price.file uom.file perp_user.file
+reqentr.pgm:  qrpglesrc/reqentr.sqlrpgle qrpglesrc/docseq_pr.rpgle qddssrc/reqentd.dspf | reqentd.file perp.bnddir requisition_header.file requisition_line.file item.file item_vendor.file item_vendor_price.file uom.file perp_user.file itmprmt.pgm
 
 # Requisition approval program (list of SUBMITTED reqs -> detail w/ up to
 # 6 lines as plain fields + confidence badge -> Approve/Reject stamping
@@ -233,7 +245,7 @@ po_line_open.file:     qddlsrc/po_line_open.view.sql     po_line.file
 # defaults line UOM from item, unit_price from the entered vendor's
 # current item_vendor_price row. Same shape as reqentr (PERP-34).
 poentd.file: qddssrc/poentd.dspf
-poentr.pgm:  qrpglesrc/poentr.sqlrpgle qrpglesrc/docseq_pr.rpgle qddssrc/poentd.dspf | poentd.file perp.bnddir po_header.file po_line.file item.file item_vendor.file item_vendor_price.file uom.file vendor.file perp_user.file
+poentr.pgm:  qrpglesrc/poentr.sqlrpgle qrpglesrc/docseq_pr.rpgle qddssrc/poentd.dspf | poentd.file perp.bnddir po_header.file po_line.file item.file item_vendor.file item_vendor_price.file uom.file vendor.file perp_user.file itmprmt.pgm vndprmt.pgm
 
 # PO from requisition (consolidate/split). Selects APPROVED requisitions,
 # groups their lines by preferred vendor (one PO per vendor -> splitting),
@@ -280,7 +292,11 @@ reconciliation_log.file: qddlsrc/reconciliation_log.table.sql item.file         
 # the PO-status-transition-from-receipts follow-up PERP-7's recap deferred
 # to this epic.
 rcventd.file: qddssrc/rcventd.dspf
-rcventr.pgm:  qrpglesrc/rcventr.sqlrpgle qrpglesrc/docseq_pr.rpgle qddssrc/rcventd.dspf | rcventd.file perp.bnddir po_receipt.file po_receipt_line.file po_header.file po_line.file item.file item_uom_conversion.file item_lot.file perp_user.file uom.file
+rcventr.pgm:  qrpglesrc/rcventr.sqlrpgle qrpglesrc/docseq_pr.rpgle qddssrc/rcventd.dspf | rcventd.file perp.bnddir po_receipt.file po_receipt_line.file po_header.file po_line.file item.file item_uom_conversion.file item_lot.file perp_user.file uom.file poprmt.pgm
+
+# --- PERP-51/PERP-98: standard, reusable PO Number prompt (rcventr) -----
+poprmtd.file: qddssrc/poprmtd.dspf
+poprmt.pgm:   qrpglesrc/poprmt.sqlrpgle qddssrc/poprmtd.dspf | poprmtd.file po_header.file vendor.file
 
 # Lot reconciliation service. Module + srvpgm + bnddir, same pattern as
 # docseq/itmvprcq/whcoord/reqauto. Scans lot-controlled items for one

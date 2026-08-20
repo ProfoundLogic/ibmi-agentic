@@ -1,0 +1,1501 @@
+CPC7301:  File QSQLPRE created in library QTEMP.
+CPC7305:  Member ITMPRMT added to file QSQLPRE in QTEMP.
+CPC3201:  Member ITMPRMT file QSQLPRE in QTEMP changed.
+RNS9307:  Diagnostic check of source is complete. Highest severity is 00.
+CPC0904:  Data area RETURNCODE created in library QTEMP.
+CPC7301:  File QSQLTEMP1 created in library QTEMP.
+CPC7305:  Member ITMPRMT added to file QSQLTEMP1 in QTEMP.
+CPI2119:  AUT and USRPRF parameter values were ignored.
+CPI2121:  Replaced object ITMPRMT type *PGM was moved to QRPLOBJ.
+RNS9304:  Program ITMPRMT placed in library PERPDEMO. 00 highest severity. Created on 08/20/26 at 16:25:09.
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      1
+   Command  . . . . . . . . . . . . :   CRTBNDRPG
+     Issued by  . . . . . . . . . . :     AIDEMO
+   Program  . . . . . . . . . . . . :   ITMPRMT
+     Library  . . . . . . . . . . . :     PERPDEMO
+   Text 'description' . . . . . . . :   *SRCMBRTXT
+   Source stream file   . . . . . . :   qrpglesrc/itmprmt.sqlrpgle
+     CCSID  . . . . . . . . . . . . :     1208
+   Target CCSID . . . . . . . . . . :   *JOB (37)
+   Text 'description' . . . . . . . :
+   Last Change  . . . . . . . . . . :   08/20/26  16:25:03
+   Generation severity level  . . . :   10
+   Default activation group . . . . :   *YES
+   Compiler options . . . . . . . . :   *XREF      *GEN       *NOSECLVL  *SHOWCPY
+                                        *EXPDDS    *EXT       *NOSHOWSKP *NOSRCSTMT
+                                        *DEBUGIO   *UNREF     *NOEVENTF
+   Debugging views  . . . . . . . . :   *ALL
+   Debug encryption key . . . . . . :   *NONE
+   Output . . . . . . . . . . . . . :   *PRINT
+   Optimization level . . . . . . . :   *NONE
+   Source listing indentation . . . :   *NONE
+   Type conversion options  . . . . :   *NONE
+   Sort sequence  . . . . . . . . . :   *JOB
+   Language identifier  . . . . . . :   *JOB
+   Replace program  . . . . . . . . :   *YES
+   User profile . . . . . . . . . . :   *USER
+   Authority  . . . . . . . . . . . :   *LIBCRTAUT
+   Truncate numeric . . . . . . . . :   *YES
+   Fix numeric  . . . . . . . . . . :   *NONE
+   Target release . . . . . . . . . :   V7R4M0
+   Allow null values  . . . . . . . :   *NO
+   Define condition names . . . . . :   *NONE
+   Enable performance collection  . :   *PEP
+   Profiling data . . . . . . . . . :   *NOCOL
+   Licensed Internal Code options . :
+   Generate program interface . . . :   *NO
+   Include directory  . . . . . . . :   .
+   Preprocessor options . . . . . . :   *NORMVCOMMENT *EXPINCLUDE   *NOSEQSRC
+   Output source file . . . . . . . :   QSQLPRE
+     Library  . . . . . . . . . . . :     QTEMP
+   Output source member . . . . . . :   ITMPRMT
+   MINIMUM OUTPUT LINE LENGTH . . . :   100
+   Require prototype for export . . :   *NO
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      2
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+                           S o u r c e   L i s t i n g
+      1 **free                                                                                                               000001
+      2                                                                                                                      000002
+      3 // ---------------------------------------------------------------------                                             000003
+      4 // Program: itmprmt  (standard, reusable Item Number prompt/lookup)                                                  000004
+      5 // Purpose: System-wide "?" + Enter lookup for any keyable Item Number                                               000005
+      6 //          field. Caller CALLs this program passing the company code                                                000006
+      7 //          and the field's current value; typing '?' into the field                                                 000007
+      8 //          before Enter is the trigger convention every caller uses,                                                000008
+      9 //          so this program treats a '?' seed the same as a blank                                                    000009
+     10 //          search (full list). Any other seed value pre-fills the                                                   000010
+     11 //          Search field so partial text the user already typed keeps                                                000011
+     12 //          working as a filter. The subfile lists item_number +                                                     000012
+     13 //          item_description, filtered case-insensitively on either                                                  000013
+     14 //          column; 1=Select on a row returns that item_number in the                                                000014
+     15 //          same parameter. F3/F12 cancel and return the field blank.                                                000015
+     16 //          Model: perpselr's subfile-picker pattern (PERP-16),                                                      000016
+     17 //          adapted for field-level invocation instead of a full-screen                                              000017
+     18 //          menu step. Called via a plain dynamic CALL (EXTPGM                                                       000018
+     19 //          prototype declared in each caller) -- the same idiom                                                     000019
+     20 //          wrkitmr already uses to call wrkcnvr/wrklotr -- not a bound                                              000020
+     21 //          service program, so no bnddir/exports wiring is needed.                                                  000021
+     22 // Callers: wrkcnvr (PERP-54), wrkitmr (PERP-57), wrkivnr (PERP-58),                                                 000022
+     23 //          wrkivpr (PERP-59), wrklotr (PERP-60), reqentr (PERP-61),                                                 000023
+     24 //          poentr (PERP-62).                                                                                        000024
+     25 // Epic:    PERP-51 (PERP-56)                                                                                        000025
+     26 // ---------------------------------------------------------------------                                             000026
+     27                                                                                                                      000027
+     28 ctl-opt dftactgrp(*no) actgrp(*new);                                                                                 000028
+     29                                                                                                                      000029
+     30 dcl-pi *n;                                                                                                           000030
+     31   pCompcd char(3)     const;                                                                                         000031
+     32   pItem   varchar(25);                                                                                               000032
+     33 end-pi;                                                                                                              000033
+     34                                                                                                                      000034
+     35 dcl-f itmprm2d workstn sfile(itpsfl:rrn) sfile(itpmsgsfl:msgrrn);                                                    000035
+     36                                                                                                                      000036
+     37 dcl-pr QMHSNDPM extpgm;                                                                                              000037
+     38   msgId       char(7)   const;                                                                                       000038
+     39   msgF        char(20)  const;                                                                                       000039
+     40   msgData     char(256) const;                                                                                       000040
+     41   msgDataLen  int(10)   const;                                                                                       000041
+     42   msgType     char(10)  const;                                                                                       000042
+     43   stackEntry  char(10)  const;                                                                                       000043
+     44   stackCntr   int(10)   const;                                                                                       000044
+     45   msgKey      char(4);                                                                                               000045
+     46   errorCode   char(8)   const;                                                                                       000046
+     47 end-pr;                                                                                                              000047
+     48                                                                                                                      000048
+     49 dcl-ds statusDS psds qualified;                                                                                      000049
+     50   programName char(10) pos(334);                                                                                     000050
+     51 end-ds;                                                                                                              000051
+     52                                                                                                                      000052
+     53 dcl-ds itemRow qualified;                                                                                            000053
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      3
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+     54   item varchar(25);                                                                                                  000054
+     55   desc varchar(60);                                                                                                  000055
+     56 end-ds;                                                                                                              000056
+     57                                                                                                                      000057
+     58 dcl-ds rows likeds(itemRow) dim(500);                                                                                000058
+     59 dcl-s numRows int(10);                                                                                               000059
+     60 dcl-s i       int(10);                                                                                               000060
+     61 dcl-s rrn     int(10);                                                                                               000061
+     62 dcl-s msgrrn  int(10);                                                                                               000062
+     63 dcl-s msgkey  char(4);                                                                                               000063
+     64 dcl-s selRrn  int(10);                                                                                               000064
+     65 dcl-s search  varchar(30);                                                                                           000065
+     66                                                                                                                      000066
+     67 search = %trim(pItem);                                                                                               000067
+     68 if search = '?';                                                                                                     000068
+     69   search = '';                                                                                                       000069
+     70 endif;                                                                                                               000070
+     71 ssearch = search;                                                                                                    000071
+     72                                                                                                                      000072
+     73 dow not *in03 and not *in12;                                                                                         000073
+     74   exsr clearMsgs;                                                                                                    000074
+     75   exsr loadRows;                                                                                                     000075
+     76                                                                                                                      000076
+     77   if numRows = 0;                                                                                                    000077
+     78     *in30 = *off;                                                                                                    000078
+     79     write itpnone;                                                                                                   000079
+     80   else;                                                                                                              000080
+     81     exsr fillSubfile;                                                                                                000081
+     82     *in30 = *on;                                                                                                     000082
+     83   endif;                                                                                                             000083
+     84                                                                                                                      000084
+     85   write itpfoot;                                                                                                     000085
+     86   if msgrrn > 0;                                                                                                     000086
+     87     *in40 = *on;                                                                                                     000087
+     88     write itpmsgctl;                                                                                                 000088
+     89   else;                                                                                                              000089
+     90     *in40 = *off;                                                                                                    000090
+     91   endif;                                                                                                             000091
+     92                                                                                                                      000092
+     93   exfmt itpctl;                                                                                                      000093
+     94                                                                                                                      000094
+     95   if *in03 or *in12;                                                                                                 000095
+     96     pItem = '';                                                                                                      000096
+     97     leave;                                                                                                           000097
+     98   endif;                                                                                                             000098
+     99                                                                                                                      000099
+    100   if *in05;                                                                                                          000100
+    101     iter;                                                                                                            000101
+    102   endif;                                                                                                             000102
+    103                                                                                                                      000103
+    104   if ssearch <> search;                                                                                              000104
+    105     search = %trim(ssearch);                                                                                         000105
+    106     iter;                                                                                                            000106
+    107   endif;                                                                                                             000107
+    108                                                                                                                      000108
+    109   // Guard on numRows: READC against a subfile that was never written                                                000109
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      4
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+    110   // to this cycle (0 rows loaded) raises a "Session or device error"                                                000110
+    111   // (CPF5006-class) runtime error instead of just returning *EOF.                                                   000111
+    112   if numRows > 0;                                                                                                    000112
+    113     selRrn = 0;                                                                                                      000113
+    114     readc itpsfl;                                                                                                    000114
+    115     dow not %eof(itmprm2d);                                                                                          000115
+    116       if sopt = '1';                                                                                                 000116
+    117         if selRrn = 0;                                                                                               000117
+    118           selRrn = rrn;                                                                                              000118
+    119         else;                                                                                                        000119
+    120           writeMsg('Only one item may be selected per Enter.');                                                      000120
+    121         endif;                                                                                                       000121
+    122       elseif sopt <> '';                                                                                             000122
+    123         writeMsg('Option ' + sopt + ' is not valid - use 1.');                                                       000123
+    124       endif;                                                                                                         000124
+    125       readc itpsfl;                                                                                                  000125
+    126     enddo;                                                                                                           000126
+    127   endif;                                                                                                             000127
+    128                                                                                                                      000128
+    129   if selRrn > 0 and msgrrn = 0;                                                                                      000129
+    130     chain selRrn itpsfl;                                                                                             000130
+    131     pItem = siitem;                                                                                                  000131
+    132     leave;                                                                                                           000132
+    133   endif;                                                                                                             000133
+    134                                                                                                                      000134
+    135 enddo;                                                                                                               000135
+    136                                                                                                                      000136
+    137 *inlr = *on;                                                                                                         000137
+    138 return;                                                                                                              000138
+    139                                                                                                                      000139
+    140 // ---------------------------------------------------------------------                                             000140
+    141 begsr loadRows;                                                                                                      000141
+    142   numRows = 0;                                                                                                       000142
+    143   exec sql declare ip1 cursor for                                                                                    000143
+    144     select item_number, item_description                                                                             000144
+    145       from perpdemo.item                                                                                             000145
+    146      where company_code = :pCompcd                                                                                   000146
+    147        and (:search = ''                                                                                             000147
+    148             or upper(item_number) like '%' || upper(:search) || '%'                                                  000148
+    149             or upper(item_description) like '%' || upper(:search) || '%')                                            000149
+    150      order by item_number;                                                                                           000150
+    151   exec sql open ip1;                                                                                                 000151
+    152   if sqlcode < 0;                                                                                                    000152
+    153     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));                                                          000153
+    154     leavesr;                                                                                                         000154
+    155   endif;                                                                                                             000155
+    156                                                                                                                      000156
+    157   dow numRows < %elem(rows);                                                                                         000157
+    158     exec sql fetch ip1 into :itemRow;                                                                                000158
+    159     if sqlcode = 100 or sqlcode < 0;                                                                                 000159
+    160       leave;                                                                                                         000160
+    161     endif;                                                                                                           000161
+    162     numRows += 1;                                                                                                    000162
+    163     rows(numRows) = itemRow;                                                                                         000163
+    164   enddo;                                                                                                             000164
+    165   exec sql close ip1;                                                                                                000165
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      5
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+    166 endsr;                                                                                                               000166
+    167                                                                                                                      000167
+    168 // ---------------------------------------------------------------------                                             000168
+    169 begsr fillSubfile;                                                                                                   000169
+    170   rrn = 0;                                                                                                           000170
+    171   *in31 = *on;                                                                                                       000171
+    172   write itpctl;                                                                                                      000172
+    173   *in31 = *off;                                                                                                      000173
+    174   for i = 1 to numRows;                                                                                              000174
+    175     *in50 = *off;                                                                                                    000175
+    176     *in51 = *off;                                                                                                    000176
+    177     sopt   = '';                                                                                                     000177
+    178     siitem = rows(i).item;                                                                                           000178
+    179     sidesc = %subst(rows(i).desc : 1 : %min(%len(rows(i).desc) : 48));                                               000179
+    180     rrn += 1;                                                                                                        000180
+    181     write itpsfl;                                                                                                    000181
+    182   endfor;                                                                                                            000182
+    183 endsr;                                                                                                               000183
+    184                                                                                                                      000184
+    185 // ---------------------------------------------------------------------                                             000185
+    186 begsr clearMsgs;                                                                                                     000186
+    187   msgrrn = 0;                                                                                                        000187
+    188   *in41 = *on;                                                                                                       000188
+    189   write itpmsgctl;                                                                                                   000189
+    190   *in41 = *off;                                                                                                      000190
+    191 endsr;                                                                                                               000191
+    192                                                                                                                      000192
+    193 // ---------------------------------------------------------------------                                             000193
+    194 dcl-proc writeMsg;                                                                                                   000194
+    195   dcl-pi *n;                                                                                                         000195
+    196     text varchar(256) const;                                                                                         000196
+    197   end-pi;                                                                                                            000197
+    198   dcl-s data char(256);                                                                                              000198
+    199   data = text;                                                                                                       000199
+    200   QMHSNDPM(                                                                                                          000200
+    201     'CPF9897' :                                                                                                      000201
+    202     'QCPFMSG   QSYS      ' :                                                                                         000202
+    203     data :                                                                                                           000203
+    204     %len(text) :                                                                                                     000204
+    205     '*INFO     ' :                                                                                                   000205
+    206     '*         ' :                                                                                                   000206
+    207     1 :                                                                                                              000207
+    208     smsgkey :                                                                                                        000208
+    209     x'0000000000000000');                                                                                            000209
+    210   msgrrn += 1;                                                                                                       000210
+    211   spgmq = statusDS.programName;                                                                                      000211
+    212   write itpmsgsfl;                                                                                                   000212
+    213 end-proc;                                                                                                            000213
+        * * * * *   E N D   O F   S O U R C E   * * * * *
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      6
+ Line   <---------------------- Data Records -------------------------------------------------------------->      Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10      Date   Id  Number
+                        C o m p i l e   T i m e   D a t a
+     * * * * *   E N D   O F   C O M P I L E   T I M E   D A T A   * * * * *
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      7
+                           M e s s a g e   S u m m a r y
+  Msg id  Sv Number Message text
+        * * * * *   E N D   O F   M E S S A G E   S U M M A R Y   * * * * *
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      8
+                             F i n a l   S u m m a r y
+   Message Totals:
+     Information  (00) . . . . . . . :        0
+     Warning      (10) . . . . . . . :        0
+     Error        (20) . . . . . . . :        0
+     Severe Error (30+)  . . . . . . :        0
+     ---------------------------------  -------
+     Total . . . . . . . . . . . . . :        0
+   Source Totals:
+     Records . . . . . . . . . . . . :      213
+     Specifications  . . . . . . . . :      154
+     Data records  . . . . . . . . . :        0
+     Comments  . . . . . . . . . . . :       56
+          * * * * *   E N D   O F   F I N A L   S U M M A R Y   * * * * *
+ Diagnostic check of source is complete. Highest severity is 00.
+           * * * * *   E N D   O F   C O M P I L A T I O N   * * * * *
+ 5770ST1 V7R5M0 220415            Create SQL ILE RPG Object         ITMPRMT                     08/20/26 16:25:08          Page     1
+ Source type...............RPG
+ Object name...............PERPDEMO/ITMPRMT
+ Source file...............QTEMP/QSQLPRE
+ Member....................*OBJ
+ To source file............QTEMP/QSQLTEMP1
+ Options...................*XREF
+ RPG preprocessor options..*LVL2
+ Listing option............*PRINT
+ Target release............V7R4M0
+ INCLUDE file..............*LIBL/QRPGLESRC
+ Commit....................*CHG
+ Allow copy of data........*OPTIMIZE
+ Close SQL cursor..........*ENDACTGRP
+ Allow blocking............*ALLREAD
+ Delay PREPARE.............*NO
+ Concurrent access
+   resolution..............*DFT
+ Generation level..........10
+ Printer file..............*LIBL/QSYSPRT
+ Date format...............*JOB
+ Date separator............*JOB
+ Time format...............*HMS
+ Time separator ...........*JOB
+ Replace...................*YES
+ Relational database.......*LOCAL
+ User .....................*CURRENT
+ RDB connect method........*DUW
+ Default collection........*NONE
+ Dynamic default
+   collection..............*NO
+ Package name..............*OBJLIB/*OBJ
+ Path......................*NAMING
+ SQL rules.................*DB2
+ Created object type.......*PGM
+ Debugging view............*SOURCE
+ Debugging encryption key..*NONE
+ User profile .............*NAMING
+ Dynamic user profile......*USER
+ Sort sequence.............*JOB
+ Language ID...............*JOB
+ IBM SQL flagging..........*NOFLAG
+ ANS flagging..............*NONE
+ Text......................*SRCMBRTXT
+ Source file CCSID.........37
+ Conversion CCSID..........1208
+ Job CCSID.................37
+ Decimal result options:
+   Maximum precision.......31
+   Maximum scale...........31
+   Minimum divide scale....0
+ DECFLOAT rounding mode....*HALFEVEN
+ Compiler options..........incdir('.') tgtccsid(*job) output(*print)
+ Source member changed on 08/20/26  16:25:08
+ 5770ST1 V7R5M0 220415            Create SQL ILE RPG Object         ITMPRMT                     08/20/26 16:25:08          Page     2
+ Record  *...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0   SEQNBR  Last change
+     1   **free                                                                                                 000001   08/20/26
+     2                                                                                                          000002   08/20/26
+     3   // ---------------------------------------------------------------------                               000003   08/20/26
+     4   // Program: itmprmt  (standard, reusable Item Number prompt/lookup)                                    000004   08/20/26
+     5   // Purpose: System-wide "?" + Enter lookup for any keyable Item Number                                 000005   08/20/26
+     6   //          field. Caller CALLs this program passing the company code                                  000006   08/20/26
+     7   //          and the field's current value; typing '?' into the field                                   000007   08/20/26
+     8   //          before Enter is the trigger convention every caller uses,                                  000008   08/20/26
+     9   //          so this program treats a '?' seed the same as a blank                                      000009   08/20/26
+    10   //          search (full list). Any other seed value pre-fills the                                     000010   08/20/26
+    11   //          Search field so partial text the user already typed keeps                                  000011   08/20/26
+    12   //          working as a filter. The subfile lists item_number +                                       000012   08/20/26
+    13   //          item_description, filtered case-insensitively on either                                    000013   08/20/26
+    14   //          column; 1=Select on a row returns that item_number in the                                  000014   08/20/26
+    15   //          same parameter. F3/F12 cancel and return the field blank.                                  000015   08/20/26
+    16   //          Model: perpselr's subfile-picker pattern (PERP-16),                                        000016   08/20/26
+    17   //          adapted for field-level invocation instead of a full-screen                                000017   08/20/26
+    18   //          menu step. Called via a plain dynamic CALL (EXTPGM                                         000018   08/20/26
+    19   //          prototype declared in each caller) -- the same idiom                                       000019   08/20/26
+    20   //          wrkitmr already uses to call wrkcnvr/wrklotr -- not a bound                                000020   08/20/26
+    21   //          service program, so no bnddir/exports wiring is needed.                                    000021   08/20/26
+    22   // Callers: wrkcnvr (PERP-54), wrkitmr (PERP-57), wrkivnr (PERP-58),                                   000022   08/20/26
+    23   //          wrkivpr (PERP-59), wrklotr (PERP-60), reqentr (PERP-61),                                   000023   08/20/26
+    24   //          poentr (PERP-62).                                                                          000024   08/20/26
+    25   // Epic:    PERP-51 (PERP-56)                                                                          000025   08/20/26
+    26   // ---------------------------------------------------------------------                               000026   08/20/26
+    27                                                                                                          000027   08/20/26
+    28   ctl-opt dftactgrp(*no) actgrp(*new);                                                                   000028   08/20/26
+    29                                                                                                          000029   08/20/26
+    30   dcl-pi *n;                                                                                             000030   08/20/26
+    31     pCompcd char(3)     const;                                                                           000031   08/20/26
+    32     pItem   varchar(25);                                                                                 000032   08/20/26
+    33   end-pi;                                                                                                000033   08/20/26
+    34                                                                                                          000034   08/20/26
+    35   dcl-f itmprm2d workstn sfile(itpsfl:rrn) sfile(itpmsgsfl:msgrrn);                                      000035   08/20/26
+    36                                                                                                          000036   08/20/26
+    37   dcl-pr QMHSNDPM extpgm;                                                                                000037   08/20/26
+    38     msgId       char(7)   const;                                                                         000038   08/20/26
+    39     msgF        char(20)  const;                                                                         000039   08/20/26
+    40     msgData     char(256) const;                                                                         000040   08/20/26
+    41     msgDataLen  int(10)   const;                                                                         000041   08/20/26
+    42     msgType     char(10)  const;                                                                         000042   08/20/26
+    43     stackEntry  char(10)  const;                                                                         000043   08/20/26
+    44     stackCntr   int(10)   const;                                                                         000044   08/20/26
+    45     msgKey      char(4);                                                                                 000045   08/20/26
+    46     errorCode   char(8)   const;                                                                         000046   08/20/26
+    47   end-pr;                                                                                                000047   08/20/26
+    48                                                                                                          000048   08/20/26
+    49   dcl-ds statusDS psds qualified;                                                                        000049   08/20/26
+    50     programName char(10) pos(334);                                                                       000050   08/20/26
+    51   end-ds;                                                                                                000051   08/20/26
+    52                                                                                                          000052   08/20/26
+    53   dcl-ds itemRow qualified;                                                                              000053   08/20/26
+    54     item varchar(25);                                                                                    000054   08/20/26
+    55     desc varchar(60);                                                                                    000055   08/20/26
+    56   end-ds;                                                                                                000056   08/20/26
+ 5770ST1 V7R5M0 220415            Create SQL ILE RPG Object         ITMPRMT                     08/20/26 16:25:08          Page     3
+ Record  *...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0   SEQNBR  Last change
+    57                                                                                                          000057   08/20/26
+    58   dcl-ds rows likeds(itemRow) dim(500);                                                                  000058   08/20/26
+    59   dcl-s numRows int(10);                                                                                 000059   08/20/26
+    60   dcl-s i       int(10);                                                                                 000060   08/20/26
+    61   dcl-s rrn     int(10);                                                                                 000061   08/20/26
+    62   dcl-s msgrrn  int(10);                                                                                 000062   08/20/26
+    63   dcl-s msgkey  char(4);                                                                                 000063   08/20/26
+    64   dcl-s selRrn  int(10);                                                                                 000064   08/20/26
+    65   dcl-s search  varchar(30);                                                                             000065   08/20/26
+    66                                                                                                          000066   08/20/26
+    67   search = %trim(pItem);                                                                                 000067   08/20/26
+    68   if search = '?';                                                                                       000068   08/20/26
+    69     search = '';                                                                                         000069   08/20/26
+    70   endif;                                                                                                 000070   08/20/26
+    71   ssearch = search;                                                                                      000071   08/20/26
+    72                                                                                                          000072   08/20/26
+    73   dow not *in03 and not *in12;                                                                           000073   08/20/26
+    74     exsr clearMsgs;                                                                                      000074   08/20/26
+    75     exsr loadRows;                                                                                       000075   08/20/26
+    76                                                                                                          000076   08/20/26
+    77     if numRows = 0;                                                                                      000077   08/20/26
+    78       *in30 = *off;                                                                                      000078   08/20/26
+    79       write itpnone;                                                                                     000079   08/20/26
+    80     else;                                                                                                000080   08/20/26
+    81       exsr fillSubfile;                                                                                  000081   08/20/26
+    82       *in30 = *on;                                                                                       000082   08/20/26
+    83     endif;                                                                                               000083   08/20/26
+    84                                                                                                          000084   08/20/26
+    85     write itpfoot;                                                                                       000085   08/20/26
+    86     if msgrrn > 0;                                                                                       000086   08/20/26
+    87       *in40 = *on;                                                                                       000087   08/20/26
+    88       write itpmsgctl;                                                                                   000088   08/20/26
+    89     else;                                                                                                000089   08/20/26
+    90       *in40 = *off;                                                                                      000090   08/20/26
+    91     endif;                                                                                               000091   08/20/26
+    92                                                                                                          000092   08/20/26
+    93     exfmt itpctl;                                                                                        000093   08/20/26
+    94                                                                                                          000094   08/20/26
+    95     if *in03 or *in12;                                                                                   000095   08/20/26
+    96       pItem = '';                                                                                        000096   08/20/26
+    97       leave;                                                                                             000097   08/20/26
+    98     endif;                                                                                               000098   08/20/26
+    99                                                                                                          000099   08/20/26
+   100     if *in05;                                                                                            000100   08/20/26
+   101       iter;                                                                                              000101   08/20/26
+   102     endif;                                                                                               000102   08/20/26
+   103                                                                                                          000103   08/20/26
+   104     if ssearch <> search;                                                                                000104   08/20/26
+   105       search = %trim(ssearch);                                                                           000105   08/20/26
+   106       iter;                                                                                              000106   08/20/26
+   107     endif;                                                                                               000107   08/20/26
+   108                                                                                                          000108   08/20/26
+   109     // Guard on numRows: READC against a subfile that was never written                                  000109   08/20/26
+   110     // to this cycle (0 rows loaded) raises a "Session or device error"                                  000110   08/20/26
+   111     // (CPF5006-class) runtime error instead of just returning *EOF.                                     000111   08/20/26
+   112     if numRows > 0;                                                                                      000112   08/20/26
+ 5770ST1 V7R5M0 220415            Create SQL ILE RPG Object         ITMPRMT                     08/20/26 16:25:08          Page     4
+ Record  *...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0   SEQNBR  Last change
+   113       selRrn = 0;                                                                                        000113   08/20/26
+   114       readc itpsfl;                                                                                      000114   08/20/26
+   115       dow not %eof(itmprm2d);                                                                            000115   08/20/26
+   116         if sopt = '1';                                                                                   000116   08/20/26
+   117           if selRrn = 0;                                                                                 000117   08/20/26
+   118             selRrn = rrn;                                                                                000118   08/20/26
+   119           else;                                                                                          000119   08/20/26
+   120             writeMsg('Only one item may be selected per Enter.');                                        000120   08/20/26
+   121           endif;                                                                                         000121   08/20/26
+   122         elseif sopt <> '';                                                                               000122   08/20/26
+   123           writeMsg('Option ' + sopt + ' is not valid - use 1.');                                         000123   08/20/26
+   124         endif;                                                                                           000124   08/20/26
+   125         readc itpsfl;                                                                                    000125   08/20/26
+   126       enddo;                                                                                             000126   08/20/26
+   127     endif;                                                                                               000127   08/20/26
+   128                                                                                                          000128   08/20/26
+   129     if selRrn > 0 and msgrrn = 0;                                                                        000129   08/20/26
+   130       chain selRrn itpsfl;                                                                               000130   08/20/26
+   131       pItem = siitem;                                                                                    000131   08/20/26
+   132       leave;                                                                                             000132   08/20/26
+   133     endif;                                                                                               000133   08/20/26
+   134                                                                                                          000134   08/20/26
+   135   enddo;                                                                                                 000135   08/20/26
+   136                                                                                                          000136   08/20/26
+   137   *inlr = *on;                                                                                           000137   08/20/26
+   138   return;                                                                                                000138   08/20/26
+   139                                                                                                          000139   08/20/26
+   140   // ---------------------------------------------------------------------                               000140   08/20/26
+   141   begsr loadRows;                                                                                        000141   08/20/26
+   142     numRows = 0;                                                                                         000142   08/20/26
+   143     exec sql declare ip1 cursor for                                                                      000143   08/20/26
+   144       select item_number, item_description                                                               000144   08/20/26
+   145         from perpdemo.item                                                                               000145   08/20/26
+   146        where company_code = :pCompcd                                                                     000146   08/20/26
+   147          and (:search = ''                                                                               000147   08/20/26
+   148               or upper(item_number) like '%' || upper(:search) || '%'                                    000148   08/20/26
+   149               or upper(item_description) like '%' || upper(:search) || '%')                              000149   08/20/26
+   150        order by item_number;                                                                             000150   08/20/26
+   151     exec sql open ip1;                                                                                   000151   08/20/26
+   152     if sqlcode < 0;                                                                                      000152   08/20/26
+   153       writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));                                            000153   08/20/26
+   154       leavesr;                                                                                           000154   08/20/26
+   155     endif;                                                                                               000155   08/20/26
+   156                                                                                                          000156   08/20/26
+   157     dow numRows < %elem(rows);                                                                           000157   08/20/26
+   158       exec sql fetch ip1 into :itemRow;                                                                  000158   08/20/26
+   159       if sqlcode = 100 or sqlcode < 0;                                                                   000159   08/20/26
+   160         leave;                                                                                           000160   08/20/26
+   161       endif;                                                                                             000161   08/20/26
+   162       numRows += 1;                                                                                      000162   08/20/26
+   163       rows(numRows) = itemRow;                                                                           000163   08/20/26
+   164     enddo;                                                                                               000164   08/20/26
+   165     exec sql close ip1;                                                                                  000165   08/20/26
+   166   endsr;                                                                                                 000166   08/20/26
+   167                                                                                                          000167   08/20/26
+   168   // ---------------------------------------------------------------------                               000168   08/20/26
+ 5770ST1 V7R5M0 220415            Create SQL ILE RPG Object         ITMPRMT                     08/20/26 16:25:08          Page     5
+ Record  *...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+... 8 ...+... 9 ...+... 0   SEQNBR  Last change
+   169   begsr fillSubfile;                                                                                     000169   08/20/26
+   170     rrn = 0;                                                                                             000170   08/20/26
+   171     *in31 = *on;                                                                                         000171   08/20/26
+   172     write itpctl;                                                                                        000172   08/20/26
+   173     *in31 = *off;                                                                                        000173   08/20/26
+   174     for i = 1 to numRows;                                                                                000174   08/20/26
+   175       *in50 = *off;                                                                                      000175   08/20/26
+   176       *in51 = *off;                                                                                      000176   08/20/26
+   177       sopt   = '';                                                                                       000177   08/20/26
+   178       siitem = rows(i).item;                                                                             000178   08/20/26
+   179       sidesc = %subst(rows(i).desc : 1 : %min(%len(rows(i).desc) : 48));                                 000179   08/20/26
+   180       rrn += 1;                                                                                          000180   08/20/26
+   181       write itpsfl;                                                                                      000181   08/20/26
+   182     endfor;                                                                                              000182   08/20/26
+   183   endsr;                                                                                                 000183   08/20/26
+   184                                                                                                          000184   08/20/26
+   185   // ---------------------------------------------------------------------                               000185   08/20/26
+   186   begsr clearMsgs;                                                                                       000186   08/20/26
+   187     msgrrn = 0;                                                                                          000187   08/20/26
+   188     *in41 = *on;                                                                                         000188   08/20/26
+   189     write itpmsgctl;                                                                                     000189   08/20/26
+   190     *in41 = *off;                                                                                        000190   08/20/26
+   191   endsr;                                                                                                 000191   08/20/26
+   192                                                                                                          000192   08/20/26
+   193   // ---------------------------------------------------------------------                               000193   08/20/26
+   194   dcl-proc writeMsg;                                                                                     000194   08/20/26
+   195     dcl-pi *n;                                                                                           000195   08/20/26
+   196       text varchar(256) const;                                                                           000196   08/20/26
+   197     end-pi;                                                                                              000197   08/20/26
+   198     dcl-s data char(256);                                                                                000198   08/20/26
+   199     data = text;                                                                                         000199   08/20/26
+   200     QMHSNDPM(                                                                                            000200   08/20/26
+   201       'CPF9897' :                                                                                        000201   08/20/26
+   202       'QCPFMSG   QSYS      ' :                                                                           000202   08/20/26
+   203       data :                                                                                             000203   08/20/26
+   204       %len(text) :                                                                                       000204   08/20/26
+   205       '*INFO     ' :                                                                                     000205   08/20/26
+   206       '*         ' :                                                                                     000206   08/20/26
+   207       1 :                                                                                                000207   08/20/26
+   208       smsgkey :                                                                                          000208   08/20/26
+   209       x'0000000000000000');                                                                              000209   08/20/26
+   210     msgrrn += 1;                                                                                         000210   08/20/26
+   211     spgmq = statusDS.programName;                                                                        000211   08/20/26
+   212     write itpmsgsfl;                                                                                     000212   08/20/26
+   213   end-proc;                                                                                              000213   08/20/26
+                                 * * * * *  E N D  O F  S O U R C E  * * * * *
+ 5770ST1 V7R5M0 220415            Create SQL ILE RPG Object         ITMPRMT                     08/20/26 16:25:08          Page     6
+                                                CROSS REFERENCE
+ Data Names                    Define    Reference
+ AISLE                            145      VARCHAR(10) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ AISLE_CODE                       145      COLUMN FOR AISLE IN PERPDEMO.ITEM
+ BAY                              145      VARCHAR(10) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ BAY_CODE                         145      COLUMN FOR BAY IN PERPDEMO.ITEM
+ CLASS_CODE                       145      COLUMN FOR CLSCD IN PERPDEMO.ITEM
+ CLSCD                            145      VARCHAR(10) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ COMPANY_CODE                     ****     COLUMN
+                                           146
+ COMPANY_CODE                     145      COLUMN FOR COMPCD IN PERPDEMO.ITEM
+ COMPCD                           145      CHARACTER(3) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ CREATED_AT                       145      COLUMN FOR CRTAT IN PERPDEMO.ITEM
+ CREATED_BY                       145      COLUMN FOR CRTBY IN PERPDEMO.ITEM
+ CRITICAL_LEVEL                   145      COLUMN FOR CRITLV IN PERPDEMO.ITEM
+ CRITLV                           145      DECIMAL(15,4) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ CRTAT                            145      TIMESTAMP(26) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ CRTBY                            145      VARCHAR(18) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ DATA                             198      CHARACTER(256) IN RPG PROCEDURE WRITEMSG
+ DESC                             55       VARCHAR(60) IN ITEMROW
+ DESC                             58       VARCHAR(60) IN ROWS
+ I                                60       INTEGER PRECISION(9,0)
+ INVENTORY_UOM                    145      COLUMN FOR INVUOM IN PERPDEMO.ITEM
+ INVUOM                           145      VARCHAR(5) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ IP1                              143      CURSOR
+                                           151 158 165
+ IS_ACTIVE                        145      COLUMN FOR ISACT IN PERPDEMO.ITEM
+ ISACT                            145      CHARACTER(1) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ ITEM                             54       VARCHAR(25) IN ITEMROW
+ ITEM                             58       VARCHAR(25) IN ROWS
+ ITEM                             ****     TABLE IN PERPDEMO
+                                           145
+ 5770ST1 V7R5M0 220415            Create SQL ILE RPG Object         ITMPRMT                     08/20/26 16:25:08          Page     7
+                                                CROSS REFERENCE
+ ITEM_DESCRIPTION                 ****     COLUMN
+                                           144 149
+ ITEM_DESCRIPTION                 145      COLUMN FOR ITMDSC IN PERPDEMO.ITEM
+ ITEM_NUMBER                      ****     COLUMN
+                                           144 148 150
+ ITEM_NUMBER                      145      COLUMN FOR ITMNBR IN PERPDEMO.ITEM
+ ITEMROW                          53       STRUCTURE
+                                           158
+ ITMDSC                           145      VARCHAR(60) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ ITMNBR                           145      VARCHAR(25) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ LEAD_TIME_DAYS                   145      COLUMN FOR LEADTM IN PERPDEMO.ITEM
+ LEADTM                           145      INTEGER PRECISION(9,0) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ LOT_CONTROLLED                   145      COLUMN FOR LOTCTL IN PERPDEMO.ITEM
+ LOTCTL                           145      CHARACTER(1) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ MAX_QTY                          145      COLUMN FOR MAXQTY IN PERPDEMO.ITEM
+ MAXQTY                           145      DECIMAL(15,4) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ MIN_QTY                          145      COLUMN FOR MINQTY IN PERPDEMO.ITEM
+ MINQTY                           145      DECIMAL(15,4) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ MSGKEY                           63       CHARACTER(4)
+ MSGRRN                           62       INTEGER PRECISION(9,0)
+ NUMROWS                          59       INTEGER PRECISION(9,0)
+ PCOMPCD                          31       CHARACTER(3) CONSTANT
+                                           146
+ PERPDEMO                         ****     SCHEMA
+                                           145
+ PITEM                            32       VARCHAR(25)
+ PROGRAMNAME                      50       CHARACTER(10) IN STATUSDS
+ QMHSNDPM                         37
+ QTY_AVAILABLE                    145      COLUMN FOR QTYAVL IN PERPDEMO.ITEM
+ QTY_FROZEN                       145      COLUMN FOR QTYFRZ IN PERPDEMO.ITEM
+ QTY_ON_HAND                      145      COLUMN FOR QTYOH IN PERPDEMO.ITEM
+ QTY_ON_ORDER                     145      COLUMN FOR QTYOO IN PERPDEMO.ITEM
+ QTYAVL                           145      DECIMAL(15,4) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ QTYFRZ                           145      DECIMAL(15,4) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ 5770ST1 V7R5M0 220415            Create SQL ILE RPG Object         ITMPRMT                     08/20/26 16:25:08          Page     8
+                                                CROSS REFERENCE
+ QTYOH                            145      DECIMAL(15,4) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ QTYOO                            145      DECIMAL(15,4) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ REORDER_POINT                    145      COLUMN FOR RORDPT IN PERPDEMO.ITEM
+ RORDPT                           145      DECIMAL(15,4) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ ROWS                             58       ARRAY(500) STRUCTURE
+ RRN                              61       INTEGER PRECISION(9,0)
+ SAFETY_STOCK                     145      COLUMN FOR SAFSTK IN PERPDEMO.ITEM
+ SAFSTK                           145      DECIMAL(15,4) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ SEARCH                           65       VARCHAR(30)
+                                           147 148 149
+ SELRRN                           64       INTEGER PRECISION(9,0)
+ SHELF                            145      VARCHAR(10) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ SHELF_CODE                       145      COLUMN FOR SHELF IN PERPDEMO.ITEM
+ SHORT_DESCRIPTION                145      COLUMN FOR SHTDSC IN PERPDEMO.ITEM
+ SHTDSC                           145      VARCHAR(20) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ SIDESC                           35       CHARACTER(48)
+ SIITEM                           35       CHARACTER(25)
+ SMSGKEY                          35       CHARACTER(4)
+ SOPT                             35       CHARACTER(1)
+ SPGMQ                            35       CHARACTER(10)
+ SSEARCH                          35       CHARACTER(30)
+ STATUSDS                         49       STRUCTURE
+ STKUOM                           145      VARCHAR(5) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ STOCKING_UOM                     145      COLUMN FOR STKUOM IN PERPDEMO.ITEM
+ TEXT                             196      VARCHAR(256) CONSTANT IN RPG PROCEDURE WRITEMSG
+ UPDAT                            145      TIMESTAMP(26) COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ UPDATED_AT                       145      COLUMN FOR UPDAT IN PERPDEMO.ITEM
+ UPDATED_BY                       145      COLUMN FOR UPDBY IN PERPDEMO.ITEM
+ UPDBY                            145      VARCHAR(18) CCSID 37 COLUMN (NOT NULL) IN PERPDEMO.ITEM
+ 5770ST1 V7R5M0 220415            Create SQL ILE RPG Object         ITMPRMT                     08/20/26 16:25:08          Page     9
+                                                CROSS REFERENCE
+ WRITEMSG                         194      RPG PROCEDURE
+ No errors found in source
+   213 Source records processed
+                                * * * * *  E N D  O F  L I S T I N G  * * * * *
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      1
+   Command  . . . . . . . . . . . . :   CRTBNDRPG
+     Issued by  . . . . . . . . . . :     AIDEMO
+   Program  . . . . . . . . . . . . :   ITMPRMT
+     Library  . . . . . . . . . . . :     PERPDEMO
+   Text 'description' . . . . . . . :   *SRCMBRTXT
+   Source stream file   . . . . . . :   /QSYS.LIB/QTEMP.LIB/QSQLTEMP1.FILE/ITMPRMT.MBR
+     CCSID  . . . . . . . . . . . . :     37
+   Target CCSID . . . . . . . . . . :   *JOB (37)
+   Text 'description' . . . . . . . :
+   Last Change  . . . . . . . . . . :   08/20/26  16:25:08
+   Generation severity level  . . . :   10
+   Default activation group . . . . :   *YES
+   Compiler options . . . . . . . . :   *XREF      *GEN       *NOSECLVL  *SHOWCPY
+                                        *EXPDDS    *EXT       *NOSHOWSKP *NOSRCSTMT
+                                        *DEBUGIO   *UNREF     *NOEVENTF
+   Debugging views  . . . . . . . . :   *ALL
+   Debug encryption key . . . . . . :   *NONE
+   Output . . . . . . . . . . . . . :   *PRINT
+   Optimization level . . . . . . . :   *NONE
+   Source listing indentation . . . :   *NONE
+   Type conversion options  . . . . :   *NONE
+   Sort sequence  . . . . . . . . . :   *JOB
+   Language identifier  . . . . . . :   *JOB
+   Replace program  . . . . . . . . :   *YES
+   User profile . . . . . . . . . . :   *USER
+   Authority  . . . . . . . . . . . :   *LIBCRTAUT
+   Truncate numeric . . . . . . . . :   *YES
+   Fix numeric  . . . . . . . . . . :   *NONE
+   Target release . . . . . . . . . :   V7R4M0
+   Allow null values  . . . . . . . :   *NO
+   Define condition names . . . . . :   *NONE
+   Enable performance collection  . :   *PEP
+   Profiling data . . . . . . . . . :   *NOCOL
+   Licensed Internal Code options . :
+   Generate program interface . . . :   *NO
+   Include directory  . . . . . . . :   .
+   Preprocessor options . . . . . . :   *NONE
+   Require prototype for export . . :   *NO
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      2
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+                           S o u r c e   L i s t i n g
+      1 **free                                                                                                               000001
+      2                                                                                                                      000002
+      3 // ---------------------------------------------------------------------                                             000003
+      4 // Program: itmprmt  (standard, reusable Item Number prompt/lookup)                                                  000004
+      5 // Purpose: System-wide "?" + Enter lookup for any keyable Item Number                                               000005
+      6 //          field. Caller CALLs this program passing the company code                                                000006
+      7 //          and the field's current value; typing '?' into the field                                                 000007
+      8 //          before Enter is the trigger convention every caller uses,                                                000008
+      9 //          so this program treats a '?' seed the same as a blank                                                    000009
+     10 //          search (full list). Any other seed value pre-fills the                                                   000010
+     11 //          Search field so partial text the user already typed keeps                                                000011
+     12 //          working as a filter. The subfile lists item_number +                                                     000012
+     13 //          item_description, filtered case-insensitively on either                                                  000013
+     14 //          column; 1=Select on a row returns that item_number in the                                                000014
+     15 //          same parameter. F3/F12 cancel and return the field blank.                                                000015
+     16 //          Model: perpselr's subfile-picker pattern (PERP-16),                                                      000016
+     17 //          adapted for field-level invocation instead of a full-screen                                              000017
+     18 //          menu step. Called via a plain dynamic CALL (EXTPGM                                                       000018
+     19 //          prototype declared in each caller) -- the same idiom                                                     000019
+     20 //          wrkitmr already uses to call wrkcnvr/wrklotr -- not a bound                                              000020
+     21 //          service program, so no bnddir/exports wiring is needed.                                                  000021
+     22 // Callers: wrkcnvr (PERP-54), wrkitmr (PERP-57), wrkivnr (PERP-58),                                                 000022
+     23 //          wrkivpr (PERP-59), wrklotr (PERP-60), reqentr (PERP-61),                                                 000023
+     24 //          poentr (PERP-62).                                                                                        000024
+     25 // Epic:    PERP-51 (PERP-56)                                                                                        000025
+     26 // ---------------------------------------------------------------------                                             000026
+     27                                                                                                                      000027
+     28 ctl-opt dftactgrp(*no) actgrp(*new);                                                                                 000028
+     29                                                                                                                      000029
+         *--------------------------------------------------------------------*
+         * Compiler Options in Effect:                                        *
+         *--------------------------------------------------------------------*
+         *  Text 'description' . . . . . . . :                                *
+         *  Generation severity level  . . . :   10                           *
+         *  Default activation group . . . . :   *NO                          *
+         *  Compiler options . . . . . . . . :   *XREF      *GEN              *
+         *                                       *NOSECLVL  *SHOWCPY          *
+         *                                       *EXPDDS    *EXT              *
+         *                                       *NOSHOWSKP *NOSRCSTMT        *
+         *                                       *DEBUGIO   *UNREF            *
+         *                                       *NOEVENTF                    *
+         *  Optimization level . . . . . . . :   *NONE                        *
+         *  Source listing indentation . . . :   *NONE                        *
+         *  Type conversion options  . . . . :   *NONE                        *
+         *  Sort sequence  . . . . . . . . . :   *JOB                         *
+         *  Language identifier  . . . . . . :   *JOB                         *
+         *  User profile . . . . . . . . . . :   *USER                        *
+         *  Authority  . . . . . . . . . . . :   *LIBCRTAUT                   *
+         *  Truncate numeric . . . . . . . . :   *YES                         *
+         *  Fix numeric  . . . . . . . . . . :   *NONE                        *
+         *  Allow null values  . . . . . . . :   *NO                          *
+         *  Storage model . . .  . . . . . . :   *SNGLVL                      *
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      3
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+         *  Binding directory from Command . :   *NONE                        *
+         *  Binding directory from Source  . :   *NONE                        *
+         *  Activation group . . . . . . . . :   *NEW                         *
+         *  Enable performance collection  . :   *PEP                         *
+         *  Profiling data . . . . . . . . . :   *NOCOL                       *
+         *  Generate program interface . . . :   *NO                          *
+         *  REQUIRE PROTOTYPE FOR EXPORT . . :   *NO                          *
+         *--------------------------------------------------------------------*
+     30 dcl-pi *n;                                                                                                           000030
+     31   pCompcd char(3)     const;                                                                                         000031
+     32   pItem   varchar(25);                                                                                               000032
+     33 end-pi;                                                                                                              000033
+     34                                                                                                                      000034
+     35 dcl-f itmprm2d workstn sfile(itpsfl:rrn) sfile(itpmsgsfl:msgrrn);                                                    000035
+         *--------------------------------------------------------------------------------------------*
+         *                               RPG name         External name                               *
+         * File name. . . . . . . . . :  ITMPRM2D         PERPDEMO/ITMPRM2D                           *
+         * Record format(s) . . . . . :  ITPSFL           ITPSFL                                      *
+         *                               ITPCTL           ITPCTL                                      *
+         *                               ITPFOOT          ITPFOOT                                     *
+         *                               ITPNONE          ITPNONE                                     *
+         *                               ITPMSGSFL        ITPMSGSFL                                   *
+         *                               ITPMSGCTL        ITPMSGCTL                                   *
+         *--------------------------------------------------------------------------------------------*
+     36                                                                                                                      000036
+     37 dcl-pr QMHSNDPM extpgm;                                                                                              000037
+     38   msgId       char(7)   const;                                                                                       000038
+     39   msgF        char(20)  const;                                                                                       000039
+     40   msgData     char(256) const;                                                                                       000040
+     41   msgDataLen  int(10)   const;                                                                                       000041
+     42   msgType     char(10)  const;                                                                                       000042
+     43   stackEntry  char(10)  const;                                                                                       000043
+     44   stackCntr   int(10)   const;                                                                                       000044
+     45   msgKey      char(4);                                                                                               000045
+     46   errorCode   char(8)   const;                                                                                       000046
+     47 end-pr;                                                                                                              000047
+     48                                                                                                                      000048
+     49 dcl-ds statusDS psds qualified;                                                                                      000049
+     50   programName char(10) pos(334);                                                                                     000050
+     51 end-ds;                                                                                                              000051
+     52                                                                                                                      000052
+     53 dcl-ds itemRow qualified;                                                                                            000053
+     54   item varchar(25);                                                                                                  000054
+     55   desc varchar(60);                                                                                                  000055
+     56 end-ds;                                                                                                              000056
+     57                                                                                                                      000057
+     58 dcl-ds rows likeds(itemRow) dim(500);                                                                                000058
+     59 dcl-s numRows int(10);                                                                                               000059
+     60 dcl-s i       int(10);                                                                                               000060
+     61 dcl-s rrn     int(10);                                                                                               000061
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      4
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+     62 dcl-s msgrrn  int(10);                                                                                               000062
+     63 dcl-s msgkey  char(4);                                                                                               000063
+     64 dcl-s selRrn  int(10);                                                                                               000064
+     65 dcl-s search  varchar(30);                                                                                           000065
+     66                                                                                                                      000066
+     67        /SET CCSID(*CHAR:*JOBRUNMIX)                                                                                  000067
+     68        // SQL COMMUNICATION AREA                                                //SQL                                000068
+     69        DCL-DS SQLCA;                                                            //SQL                                000069
+     70          SQLCAID CHAR(8) INZ(X'0000000000000000');                              //SQL                                000070
+     71           SQLAID CHAR(8) OVERLAY(SQLCAID);                                      //SQL                                000071
+     72          SQLCABC INT(10);                                                       //SQL                                000072
+     73           SQLABC BINDEC(9) OVERLAY(SQLCABC);                                    //SQL                                000073
+     74          SQLCODE INT(10);                                                       //SQL                                000074
+     75           SQLCOD BINDEC(9) OVERLAY(SQLCODE);                                    //SQL                                000075
+     76          SQLERRML INT(5);                                                       //SQL                                000076
+     77           SQLERL BINDEC(4) OVERLAY(SQLERRML);                                   //SQL                                000077
+     78          SQLERRMC CHAR(70);                                                     //SQL                                000078
+     79           SQLERM CHAR(70) OVERLAY(SQLERRMC);                                    //SQL                                000079
+     80          SQLERRP CHAR(8);                                                       //SQL                                000080
+     81           SQLERP CHAR(8) OVERLAY(SQLERRP);                                      //SQL                                000081
+     82          SQLERR CHAR(24);                                                       //SQL                                000082
+     83           SQLER1 BINDEC(9) OVERLAY(SQLERR:*NEXT);                               //SQL                                000083
+     84           SQLER2 BINDEC(9) OVERLAY(SQLERR:*NEXT);                               //SQL                                000084
+     85           SQLER3 BINDEC(9) OVERLAY(SQLERR:*NEXT);                               //SQL                                000085
+     86           SQLER4 BINDEC(9) OVERLAY(SQLERR:*NEXT);                               //SQL                                000086
+     87           SQLER5 BINDEC(9) OVERLAY(SQLERR:*NEXT);                               //SQL                                000087
+     88           SQLER6 BINDEC(9) OVERLAY(SQLERR:*NEXT);                               //SQL                                000088
+     89           SQLERRD INT(10) DIM(6) OVERLAY(SQLERR);                               //SQL                                000089
+     90          SQLWRN CHAR(11);                                                       //SQL                                000090
+     91           SQLWN0 CHAR(1) OVERLAY(SQLWRN:*NEXT);                                 //SQL                                000091
+     92           SQLWN1 CHAR(1) OVERLAY(SQLWRN:*NEXT);                                 //SQL                                000092
+     93           SQLWN2 CHAR(1) OVERLAY(SQLWRN:*NEXT);                                 //SQL                                000093
+     94           SQLWN3 CHAR(1) OVERLAY(SQLWRN:*NEXT);                                 //SQL                                000094
+     95           SQLWN4 CHAR(1) OVERLAY(SQLWRN:*NEXT);                                 //SQL                                000095
+     96           SQLWN5 CHAR(1) OVERLAY(SQLWRN:*NEXT);                                 //SQL                                000096
+     97           SQLWN6 CHAR(1) OVERLAY(SQLWRN:*NEXT);                                 //SQL                                000097
+     98           SQLWN7 CHAR(1) OVERLAY(SQLWRN:*NEXT);                                 //SQL                                000098
+     99           SQLWN8 CHAR(1) OVERLAY(SQLWRN:*NEXT);                                 //SQL                                000099
+    100           SQLWN9 CHAR(1) OVERLAY(SQLWRN:*NEXT);                                 //SQL                                000100
+    101           SQLWNA CHAR(1) OVERLAY(SQLWRN:*NEXT);                                 //SQL                                000101
+    102           SQLWARN CHAR(1) DIM(11) OVERLAY(SQLWRN);                              //SQL                                000102
+    103          SQLSTATE CHAR(5);                                                      //SQL                                000103
+    104           SQLSTT CHAR(5) OVERLAY(SQLSTATE);                                     //SQL                                000104
+    105        END-DS SQLCA;                                                            //SQL                                000105
+    106        DCL-PR SQLROUTE_CALL EXTPGM(SQLROUTE);                                   //SQL                                000106
+    107          CA LIKEDS(SQLCA);                                                      //SQL                                000107
+    108          *N BINDEC(4) OPTIONS(*NOPASS);                                         //SQL                                000108
+    109          *N CHAR(1) OPTIONS(*NOPASS);                                           //SQL                                000109
+    110        END-PR SQLROUTE_CALL;                                                    //SQL                                000110
+    111        DCL-PR SQLOPEN_CALL EXTPGM(SQLOPEN);                                     //SQL                                000111
+    112          CA LIKEDS(SQLCA);                                                      //SQL                                000112
+    113          *N BINDEC(4);                                                          //SQL                                000113
+    114        END-PR SQLOPEN_CALL;                                                     //SQL                                000114
+    115        DCL-PR SQLCLSE_CALL EXTPGM(SQLCLSE);                                     //SQL                                000115
+    116          CA LIKEDS(SQLCA);                                                      //SQL                                000116
+    117          *N BINDEC(4);                                                          //SQL                                000117
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      5
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+    118        END-PR SQLCLSE_CALL;                                                     //SQL                                000118
+    119        DCL-PR SQLCMIT_CALL EXTPGM(SQLCMIT);                                     //SQL                                000119
+    120          CA LIKEDS(SQLCA);                                                      //SQL                                000120
+    121          *N BINDEC(4);                                                          //SQL                                000121
+    122        END-PR SQLCMIT_CALL;                                                     //SQL                                000122
+    123        /RESTORE CCSID(*CHAR)                                                                                         000123
+    124        DCL-C SQLROUTE CONST('QSYS/QSQROUTE');                                   //SQL                                000124
+    125        DCL-C SQLOPEN CONST('QSYS/QSQROUTE');                                    //SQL                                000125
+    126        DCL-C SQLCLSE CONST('QSYS/QSQLCLSE');                                    //SQL                                000126
+    127        DCL-C SQLCMIT CONST('QSYS/QSQLCMIT');                                    //SQL                                000127
+    128        DCL-C SQFRD CONST(2);                                                    //SQL                                000128
+    129        DCL-C SQFCRT CONST(8);                                                   //SQL                                000129
+    130        DCL-C SQFOVR CONST(16);                                                  //SQL                                000130
+    131        DCL-C SQFAPP CONST(32);                                                  //SQL                                000131
+    132 **END-FREE                                                                                                           000132
+ Line   <---------------------- Source Specifications ----------------------------><---- Comments ----> Do  Page  Change Src Seq
+ Number ....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10 Num Line  Date   Id  Number
+    133 D                 DS                                                       OPEN                                      000133
+    134 D  SQL_00000              1      2B 0 INZ(128)                             length of header                          000134
+    135 D  SQL_00001              3      4B 0 INZ(2)                               statement number                          000135
+    136 D  SQL_00002              5      8U 0 INZ(0)                               invocation mark                           000136
+    137 D  SQL_00003              9      9A   INZ('0') CCSID(*JOBRUNMIX)           data is okay                              000137
+    138 D  SQL_00004             10    128A   CCSID(*JOBRUNMIX)                    end of header                             000138
+    139 D  SQL_00005            129    131A   CCSID(*JOBRUNMIX)                    PCOMPCD                                   000139
+    140 D  SQL_00006            132    163A   VARYING CCSID(*JOBRUNMIX)            SEARCH                                    000140
+    141 D  SQL_00007            164    195A   VARYING CCSID(*JOBRUNMIX)            SEARCH                                    000141
+    142 D  SQL_00008            196    227A   VARYING CCSID(*JOBRUNMIX)            SEARCH                                    000142
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+    143 **FREE                                                                                                               000143
+    144 **END-FREE                                                                                                           000144
+ Line   <---------------------- Source Specifications ----------------------------><---- Comments ----> Do  Page  Change Src Seq
+ Number ....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10 Num Line  Date   Id  Number
+    145 D                 DS                                                       FETCH                                     000145
+    146 D  SQL_00009              1      2B 0 INZ(128)                             length of header                          000146
+    147 D  SQL_00010              3      4B 0 INZ(3)                               statement number                          000147
+    148 D  SQL_00011              5      8U 0 INZ(0)                               invocation mark                           000148
+    149 D  SQL_00012              9      9A   INZ('0') CCSID(*JOBRUNMIX)           data is okay                              000149
+    150 D  SQL_00013             10    128A   CCSID(*JOBRUNMIX)                    end of header                             000150
+    151 D  SQL_00014            129    155A   VARYING CCSID(*JOBRUNMIX)            ITEMROW.ITEM                              000151
+    152 D  SQL_00015            156    217A   VARYING CCSID(*JOBRUNMIX)            ITEMROW.DESC                              000152
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+    153 **FREE                                                                                                               000153
+    154 **END-FREE                                                                                                           000154
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      6
+ Line   <---------------------- Source Specifications ----------------------------><---- Comments ----> Do  Page  Change Src Seq
+ Number ....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10 Num Line  Date   Id  Number
+    155 D                 DS                                                       CLOSE                                     000155
+    156 D  SQL_00016              1      2B 0 INZ(128)                             length of header                          000156
+    157 D  SQL_00017              3      4B 0 INZ(4)                               statement number                          000157
+    158 D  SQL_00018              5      8U 0 INZ(0)                               invocation mark                           000158
+    159 D  SQL_00019              9      9A   INZ('0') CCSID(*JOBRUNMIX)           data is okay                              000159
+    160 D  SQL_00020             10    127A   CCSID(*JOBRUNMIX)                    end of header                             000160
+    161 D  SQL_00021            128    128A   CCSID(*JOBRUNMIX)                    end of header                             000161
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+    162 **FREE                                                                                                               000162
+    163=IITPSFL                                                                                                             1000001
+         *--------------------------------------------------------------------------------------------*                     1
+         * RPG record format  . . . . :  ITPSFL                                                       *                     1
+         * External format  . . . . . :  ITPSFL : PERPDEMO/ITMPRM2D                                   *                     1
+         *--------------------------------------------------------------------------------------------*                     1
+    164=I                             N    1    1  *IN03                           Exit                                     1000002
+    165=I                             N    2    2  *IN05                           Refresh                                  1000003
+    166=I                             N    3    3  *IN12                           Cancel                                   1000004
+    167=I                             A    4    4  SOPT                                                                     1000005
+    168=I                             A    5   29  SIITEM                                                                   1000006
+    169=I                             A   30   77  SIDESC                                                                   1000007
+    170=IITPCTL                                                                                                             2000001
+         *--------------------------------------------------------------------------------------------*                     2
+         * RPG record format  . . . . :  ITPCTL                                                       *                     2
+         * External format  . . . . . :  ITPCTL : PERPDEMO/ITMPRM2D                                   *                     2
+         *--------------------------------------------------------------------------------------------*                     2
+    171=I                             N    1    1  *IN03                           Exit                                     2000002
+    172=I                             N    2    2  *IN05                           Refresh                                  2000003
+    173=I                             N    3    3  *IN12                           Cancel                                   2000004
+    174=I                             A    4   33  SSEARCH                                                                  2000005
+    175=IITPFOOT                                                                                                            3000001
+         *--------------------------------------------------------------------------------------------*                     3
+         * RPG record format  . . . . :  ITPFOOT                                                      *                     3
+         * External format  . . . . . :  ITPFOOT : PERPDEMO/ITMPRM2D                                  *                     3
+         *--------------------------------------------------------------------------------------------*                     3
+    176=I                             N    1    1  *IN03                           Exit                                     3000002
+    177=I                             N    2    2  *IN05                           Refresh                                  3000003
+    178=I                             N    3    3  *IN12                           Cancel                                   3000004
+    179=IITPNONE                                                                                                            4000001
+         *--------------------------------------------------------------------------------------------*                     4
+         * RPG record format  . . . . :  ITPNONE                                                      *                     4
+         * External format  . . . . . :  ITPNONE : PERPDEMO/ITMPRM2D                                  *                     4
+         *--------------------------------------------------------------------------------------------*                     4
+    180=I                             N    1    1  *IN03                           Exit                                     4000002
+    181=I                             N    2    2  *IN05                           Refresh                                  4000003
+    182=I                             N    3    3  *IN12                           Cancel                                   4000004
+    183=IITPMSGSFL                                                                                                          5000001
+         *--------------------------------------------------------------------------------------------*                     5
+         * RPG record format  . . . . :  ITPMSGSFL                                                    *                     5
+         * External format  . . . . . :  ITPMSGSFL : PERPDEMO/ITMPRM2D                                *                     5
+         *--------------------------------------------------------------------------------------------*                     5
+    184=I                             N    1    1  *IN03                           Exit                                     5000002
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      7
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+    185=I                             N    2    2  *IN05                           Refresh                                  5000003
+    186=I                             N    3    3  *IN12                           Cancel                                   5000004
+    187=I                             A    4    7  SMSGKEY                                                                  5000005
+    188=I                             A    8   17  SPGMQ                                                                    5000006
+    189=IITPMSGCTL                                                                                                          6000001
+         *--------------------------------------------------------------------------------------------*                     6
+         * RPG record format  . . . . :  ITPMSGCTL                                                    *                     6
+         * External format  . . . . . :  ITPMSGCTL : PERPDEMO/ITMPRM2D                                *                     6
+         *--------------------------------------------------------------------------------------------*                     6
+    190=I                             N    1    1  *IN03                           Exit                                     6000002
+    191=I                             N    2    2  *IN05                           Refresh                                  6000003
+    192=I                             N    3    3  *IN12                           Cancel                                   6000004
+    193 search = %trim(pItem);                                                                                               000163
+    194 if search = '?';                                                                                     B01             000164
+    195   search = '';                                                                                        01             000165
+    196 endif;                                                                                               E01             000166
+    197 ssearch = search;                                                                                                    000167
+    198                                                                                                                      000168
+    199 dow not *in03 and not *in12;                                                                         B01             000169
+    200   exsr clearMsgs;                                                                                     01             000170
+    201   exsr loadRows;                                                                                      01             000171
+    202                                                                                                                      000172
+    203   if numRows = 0;                                                                                    B02             000173
+    204     *in30 = *off;                                                                                     02             000174
+    205     write itpnone;                                                                                    02             000175
+    206   else;                                                                                              X02             000176
+    207     exsr fillSubfile;                                                                                 02             000177
+    208     *in30 = *on;                                                                                      02             000178
+    209   endif;                                                                                             E02             000179
+    210                                                                                                                      000180
+    211   write itpfoot;                                                                                      01             000181
+    212   if msgrrn > 0;                                                                                     B02             000182
+    213     *in40 = *on;                                                                                      02             000183
+    214     write itpmsgctl;                                                                                  02             000184
+    215   else;                                                                                              X02             000185
+    216     *in40 = *off;                                                                                     02             000186
+    217   endif;                                                                                             E02             000187
+    218                                                                                                                      000188
+    219   exfmt itpctl;                                                                                       01             000189
+    220                                                                                                                      000190
+    221   if *in03 or *in12;                                                                                 B02             000191
+    222     pItem = '';                                                                                       02             000192
+    223     leave;                                                                                            02             000193
+    224   endif;                                                                                             E02             000194
+    225                                                                                                                      000195
+    226   if *in05;                                                                                          B02             000196
+    227     iter;                                                                                             02             000197
+    228   endif;                                                                                             E02             000198
+    229                                                                                                                      000199
+    230   if ssearch <> search;                                                                              B02             000200
+    231     search = %trim(ssearch);                                                                          02             000201
+    232     iter;                                                                                             02             000202
+    233   endif;                                                                                             E02             000203
+    234                                                                                                                      000204
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      8
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+    235   // Guard on numRows: READC against a subfile that was never written                                                000205
+    236   // to this cycle (0 rows loaded) raises a "Session or device error"                                                000206
+    237   // (CPF5006-class) runtime error instead of just returning *EOF.                                                   000207
+    238   if numRows > 0;                                                                                    B02             000208
+    239     selRrn = 0;                                                                                       02             000209
+    240     readc itpsfl;                                                                                     02             000210
+    241     dow not %eof(itmprm2d);                                                                          B03             000211
+    242       if sopt = '1';                                                                                 B04             000212
+    243         if selRrn = 0;                                                                               B05             000213
+    244           selRrn = rrn;                                                                               05             000214
+    245         else;                                                                                        X05             000215
+    246           writeMsg('Only one item may be selected per Enter.');                                       05             000216
+    247         endif;                                                                                       E05             000217
+    248       elseif sopt <> '';                                                                             X04             000218
+    249         writeMsg('Option ' + sopt + ' is not valid - use 1.');                                        04             000219
+    250       endif;                                                                                         E04             000220
+    251       readc itpsfl;                                                                                   03             000221
+    252     enddo;                                                                                           E03             000222
+    253   endif;                                                                                             E02             000223
+    254                                                                                                                      000224
+    255   if selRrn > 0 and msgrrn = 0;                                                                      B02             000225
+    256     chain selRrn itpsfl;                                                                              02             000226
+    257     pItem = siitem;                                                                                   02             000227
+    258     leave;                                                                                            02             000228
+    259   endif;                                                                                             E02             000229
+    260                                                                                                                      000230
+    261 enddo;                                                                                               E01             000231
+    262                                                                                                                      000232
+    263 *inlr = *on;                                                                                                         000233
+    264 return;                                                                                                              000234
+    265                                                                                                                      000235
+    266 // ---------------------------------------------------------------------                                             000236
+    267 begsr loadRows;                                                                                                      000237
+    268   numRows = 0;                                                                                                       000238
+    269 //*  exec sql declare ip1 cursor for                                                                                 000239
+    270 //*    select item_number, item_description                                                                          000240
+    271 //*      from perpdemo.item                                                                                          000241
+    272 //*     where company_code = :pCompcd                                                                                000242
+    273 //*       and (:search = ''                                                                                          000243
+    274 //*            or upper(item_number) like '%' || upper(:search) || '%'                                               000244
+    275 //*            or upper(item_description) like '%' || upper(:search) || '%')                                         000245
+    276 //*     order by item_number;                                                                                        000246
+    277 //*  exec sql open ip1;                                                                                              000247
+    278           SQL_00005 = PCOMPCD;                                                  //SQL                                000248
+    279           SQL_00006 = SEARCH;                                                   //SQL                                000249
+    280           SQL_00007 = SEARCH;                                                   //SQL                                000250
+    281           SQL_00008 = SEARCH;                                                   //SQL                                000251
+    282           SQLER6 = -4;                                                          //SQL                                000252
+    283           IF SQL_00002 = 0                                                      //SQL                B01             000253
+    284           OR SQL_00003 <> *LOVAL;                                               //SQL                B01             000254
+    285           SQLROUTE_CALL(                                                        //SQL                 01             000255
+    286                SQLCA                                                            //SQL                 01             000256
+    287              : SQL_00000                                                        //SQL                 01             000257
+    288           );                                                                    //SQL                 01             000258
+    289           ELSE;                                                                 //SQL                X01             000259
+    290           SQLOPEN_CALL(                                                         //SQL                 01             000260
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page      9
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+    291                SQLCA                                                            //SQL                 01             000261
+    292              : SQL_00000                                                        //SQL                 01             000262
+    293           );                                                                    //SQL                 01             000263
+    294           ENDIF;                                                                //SQL                E01             000264
+    295   if sqlcode < 0;                                                                                    B01             000265
+    296     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));                                           01             000266
+    297     leavesr;                                                                                          01             000267
+    298   endif;                                                                                             E01             000268
+    299                                                                                                                      000269
+    300   dow numRows < %elem(rows);                                                                         B01             000270
+    301 //*    exec sql fetch ip1 into :itemRow;                                                                             000271
+    302           SQLER6 = -4;                                                          //SQL 3               01             000272
+    303           SQLROUTE_CALL(                                                        //SQL                 01             000273
+    304                SQLCA                                                            //SQL                 01             000274
+    305              : SQL_00009                                                        //SQL                 01             000275
+    306           );                                                                    //SQL                 01             000276
+    307           IF SQL_00012 = '1';                                                   //SQL                B02             000277
+    308           EVAL ITEMROW.ITEM = SQL_00014;                                        //SQL                 02             000278
+    309           EVAL ITEMROW.DESC = SQL_00015;                                        //SQL                 02             000279
+    310           ENDIF;                                                                //SQL                E02             000280
+    311     if sqlcode = 100 or sqlcode < 0;                                                                 B02             000281
+    312       leave;                                                                                          02             000282
+    313     endif;                                                                                           E02             000283
+    314     numRows += 1;                                                                                     01             000284
+    315     rows(numRows) = itemRow;                                                                          01             000285
+    316   enddo;                                                                                             E01             000286
+    317 //*  exec sql close ip1;                                                                                             000287
+    318           SQLER6 = 4;                                                           //SQL                                000288
+    319           IF SQL_00018 = 0;                                                     //SQL                B01             000289
+    320           SQLROUTE_CALL(                                                        //SQL                 01             000290
+    321                SQLCA                                                            //SQL                 01             000291
+    322              : SQL_00016                                                        //SQL                 01             000292
+    323           );                                                                    //SQL                 01             000293
+    324           ELSE;                                                                 //SQL                X01             000294
+    325           SQLCLSE_CALL(                                                         //SQL                 01             000295
+    326                SQLCA                                                            //SQL                 01             000296
+    327              : SQL_00016                                                        //SQL                 01             000297
+    328           );                                                                    //SQL                 01             000298
+    329           ENDIF;                                                                //SQL                E01             000299
+    330 endsr;                                                                                                               000300
+    331                                                                                                                      000301
+    332 // ---------------------------------------------------------------------                                             000302
+    333 begsr fillSubfile;                                                                                                   000303
+    334   rrn = 0;                                                                                                           000304
+    335   *in31 = *on;                                                                                                       000305
+    336   write itpctl;                                                                                                      000306
+    337   *in31 = *off;                                                                                                      000307
+    338   for i = 1 to numRows;                                                                              B01             000308
+    339     *in50 = *off;                                                                                     01             000309
+    340     *in51 = *off;                                                                                     01             000310
+    341     sopt   = '';                                                                                      01             000311
+    342     siitem = rows(i).item;                                                                            01             000312
+    343     sidesc = %subst(rows(i).desc : 1 : %min(%len(rows(i).desc) : 48));                                01             000313
+    344     rrn += 1;                                                                                         01             000314
+    345     write itpsfl;                                                                                     01             000315
+    346   endfor;                                                                                            E01             000316
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page     10
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+    347 endsr;                                                                                                               000317
+    348                                                                                                                      000318
+    349 // ---------------------------------------------------------------------                                             000319
+    350 begsr clearMsgs;                                                                                                     000320
+    351   msgrrn = 0;                                                                                                        000321
+    352   *in41 = *on;                                                                                                       000322
+    353   write itpmsgctl;                                                                                                   000323
+    354   *in41 = *off;                                                                                                      000324
+    355 endsr;                                                                                                               000325
+    356                                                                                                                      000326
+    357 // ---------------------------------------------------------------------                                             000327
+    358=OITPSFL                                                                                                             7000001
+         *--------------------------------------------------------------------------------------------*                     7
+         * RPG record format  . . . . :  ITPSFL                                                       *                     7
+         * External format  . . . . . :  ITPSFL : PERPDEMO/ITMPRM2D                                   *                     7
+         *--------------------------------------------------------------------------------------------*                     7
+    359=O                       *IN50                2N CHAR        1                                                       7000002
+    360=O                       *IN51                1N CHAR        1                                                       7000003
+    361=O                       SOPT                 3A CHAR        1                                                       7000004
+    362=O                       SIITEM              28A CHAR       25                                                       7000005
+    363=O                       SIDESC              76A CHAR       48                                                       7000006
+    364=OITPCTL                                                                                                             8000001
+         *--------------------------------------------------------------------------------------------*                     8
+         * RPG record format  . . . . :  ITPCTL                                                       *                     8
+         * External format  . . . . . :  ITPCTL : PERPDEMO/ITMPRM2D                                   *                     8
+         *--------------------------------------------------------------------------------------------*                     8
+    365=O                       *IN30                2N CHAR        1                                                       8000002
+    366=O                       *IN31                1N CHAR        1                                                       8000003
+    367=O                       SSEARCH             32A CHAR       30                                                       8000004
+    368=OITPFOOT                                                                                                            9000001
+         *--------------------------------------------------------------------------------------------*                     9
+         * RPG record format  . . . . :  ITPFOOT                                                      *                     9
+         * External format  . . . . . :  ITPFOOT : PERPDEMO/ITMPRM2D                                  *                     9
+         *--------------------------------------------------------------------------------------------*                     9
+    369=OITPNONE                                                                                                           10000001
+         *--------------------------------------------------------------------------------------------*                    10
+         * RPG record format  . . . . :  ITPNONE                                                      *                    10
+         * External format  . . . . . :  ITPNONE : PERPDEMO/ITMPRM2D                                  *                    10
+         *--------------------------------------------------------------------------------------------*                    10
+    370=OITPMSGSFL                                                                                                         11000001
+         *--------------------------------------------------------------------------------------------*                    11
+         * RPG record format  . . . . :  ITPMSGSFL                                                    *                    11
+         * External format  . . . . . :  ITPMSGSFL : PERPDEMO/ITMPRM2D                                *                    11
+         *--------------------------------------------------------------------------------------------*                    11
+    371=O                       SMSGKEY              4A CHAR        4                                                      11000002
+    372=O                       SPGMQ               14A CHAR       10                                                      11000003
+    373=OITPMSGCTL                                                                                                         12000001
+         *--------------------------------------------------------------------------------------------*                    12
+         * RPG record format  . . . . :  ITPMSGCTL                                                    *                    12
+         * External format  . . . . . :  ITPMSGCTL : PERPDEMO/ITMPRM2D                                *                    12
+         *--------------------------------------------------------------------------------------------*                    12
+    374=O                       *IN40                2N CHAR        1                                                      12000002
+    375=O                       *IN41                1N CHAR        1                                                      12000003
+    376 dcl-proc writeMsg;                                                                                                   000328
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page     11
+ Line   <---------------------- Source Specifications ----------------------------------------------------->  Do  Change Src Seq
+ Number ....+....1....+....2....+....3....+....4....+....5....+....6....+....7....+....8....+....9....+...10  Num Date   Id  Number
+    377   dcl-pi *n;                                                                                                         000329
+    378     text varchar(256) const;                                                                                         000330
+    379   end-pi;                                                                                                            000331
+    380   dcl-s data char(256);                                                                                              000332
+    381   data = text;                                                                                                       000333
+    382   QMHSNDPM(                                                                                                          000334
+    383     'CPF9897' :                                                                                                      000335
+    384     'QCPFMSG   QSYS      ' :                                                                                         000336
+    385     data :                                                                                                           000337
+    386     %len(text) :                                                                                                     000338
+    387     '*INFO     ' :                                                                                                   000339
+    388     '*         ' :                                                                                                   000340
+    389     1 :                                                                                                              000341
+    390     smsgkey :                                                                                                        000342
+    391     x'0000000000000000');                                                                                            000343
+    392   msgrrn += 1;                                                                                                       000344
+    393   spgmq = statusDS.programName;                                                                                      000345
+    394   write itpmsgsfl;                                                                                                   000346
+    395 end-proc;                                                                                                            000347
+        * * * * *   E N D   O F   S O U R C E   * * * * *
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page     12
+           A d d i t i o n a l   D i a g n o s t i c   M e s s a g e s
+  Msg id  Sv Number Seq     Message text
+  * * * * *   E N D   O F   A D D I T I O N A L   D I A G N O S T I C   M E S S A G E S   * * * * *
+                  O u t p u t   B u f f e r   P o s i t i o n s
+ Line   Start End   Field or Constant
+ Number Pos   Pos
+    359     2     2 *IN50
+    360     1     1 *IN51
+    361     3     3 SOPT
+    362     4    28 SIITEM
+    363    29    76 SIDESC
+    359     2     2 *IN50
+    360     1     1 *IN51
+    361     3     3 SOPT
+    362     4    28 SIITEM
+    363    29    76 SIDESC
+    365     2     2 *IN30
+    366     1     1 *IN31
+    367     3    32 SSEARCH
+    365     2     2 *IN30
+    366     1     1 *IN31
+    367     3    32 SSEARCH
+    371     1     4 SMSGKEY
+    372     5    14 SPGMQ
+    371     1     4 SMSGKEY
+    372     5    14 SPGMQ
+    374     2     2 *IN40
+    375     1     1 *IN41
+    374     2     2 *IN40
+    375     1     1 *IN41
+  * * * * *   E N D   O F   O U T P U T   B U F F E R   P O S I T I O N   *  * * * *
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page     13
+                           C r o s s   R e f e r e n c e
+       File and Record References:
+          File              Device             References (D=Defined)
+            Record
+          ITMPRM2D          WORKSTN                35D    241
+            ITPSFL                                 35D    163     240     251
+                                                  256     345     358
+            ITPCTL                                 35D    170     219     336
+                                                  364
+            ITPFOOT                                35D    175     211     368
+            ITPNONE                                35D    179     205     369
+            ITPMSGSFL                              35D    183     370     394
+            ITPMSGCTL                              35D    189     214     353
+                                                  373
+       Global Field References:
+          Field             Attributes         References (D=Defined M=Modified)
+          *INLR             N(1)                  263M
+          *IN03             N(1)                  164D    171M    176M    180M
+                                                  184M    190M    199     221
+          *IN05             N(1)                  165D    172M    177M    181M
+                                                  185M    191M    226
+          *IN12             N(1)                  166D    173M    178M    182M
+                                                  186M    192M    199     221
+          *IN30             N(1)                  204M    208M    365
+          *IN31             N(1)                  335M    337M    366
+          *IN40             N(1)                  213M    216M    374
+          *IN41             N(1)                  352M    354M    375
+          *IN50             N(1)                  339M    359
+          *IN51             N(1)                  340M    360
+          CLEARMSGS         BEGSR                 200     350D
+          FILLSUBFILE       BEGSR                 207     333D
+          I                 I(10,0)                60D    338     342     343
+                                                  343
+          ITEMROW           DS(89)                 53D     58     308M    309M
+                                                  315
+            DESC            A(60)                  55D    309
+                            VARYING(2)
+            ITEM            A(25)                  54D    308
+                            VARYING(2)
+          LOADROWS          BEGSR                 201     267D
+ *RNF7031 MSGKEY            A(4)                   63D
+          MSGRRN            I(10,0)                35      62D    212     255
+                                                  351M    392M
+          NUMROWS           I(10,0)                59D    203     238     268M
+                                                  300     314M    315     338
+          PCOMPCD           A(3)                   31D    278
+                            BASED(_QRNL_PRM+)
+          PITEM             A(25)                  32D    193     222M    257M
+                            BASED(_QRNL_PRM+)
+                            VARYING(2)
+          QMHSNDPM          PROTOTYPE              37D    382M
+          ROWS(500)         DS(89)                 58D    300     315M    342
+                                                  343     343
+            DESC            A(60)                 343     343
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page     14
+                            VARYING(2)
+            ITEM            A(25)                 342
+                            VARYING(2)
+          RRN               I(10,0)                35      61D    244     334M
+                                                  344M
+          SEARCH            A(30)                  65D    193M    194     195M
+                            VARYING(2)            197     230     231M    279
+                                                  280     281
+          SELRRN            I(10,0)                64D    239M    243     244M
+                                                  255     256
+          SIDESC            A(48)                 169M    343M    363
+          SIITEM            A(25)                 168M    257     342M    362
+          SMSGKEY           A(4)                  187M    371     390
+          SOPT              A(1)                  167M    242     248     249
+                                                  341M    361
+          SPGMQ             A(10)                 188M    372     393M
+ *RNF7031 SQFAPP            CONST                 131D
+ *RNF7031 SQFCRT            CONST                 129D
+ *RNF7031 SQFOVR            CONST                 130D
+ *RNF7031 SQFRD             CONST                 128D
+          SQL_00000         B(4,0)                134D    287     292
+ *RNF7031 SQL_00001         B(4,0)                135D
+          SQL_00002         U(10,0)               136D    283
+          SQL_00003         A(1)                  137D    284
+ *RNF7031 SQL_00004         A(119)                138D
+          SQL_00005         A(3)                  139D    278M
+          SQL_00006         A(30)                 140D    279M
+                            VARYING(2)
+          SQL_00007         A(30)                 141D    280M
+                            VARYING(2)
+          SQL_00008         A(30)                 142D    281M
+                            VARYING(2)
+          SQL_00009         B(4,0)                146D    305
+ *RNF7031 SQL_00010         B(4,0)                147D
+ *RNF7031 SQL_00011         U(10,0)               148D
+          SQL_00012         A(1)                  149D    307
+ *RNF7031 SQL_00013         A(119)                150D
+          SQL_00014         A(25)                 151D    308
+                            VARYING(2)
+          SQL_00015         A(60)                 152D    309
+                            VARYING(2)
+          SQL_00016         B(4,0)                156D    322     327
+ *RNF7031 SQL_00017         B(4,0)                157D
+          SQL_00018         U(10,0)               158D    319
+ *RNF7031 SQL_00019         A(1)                  159D
+ *RNF7031 SQL_00020         A(118)                160D
+ *RNF7031 SQL_00021         A(1)                  161D
+ *RNF7031 SQLABC            B(9,0)                 73D
+ *RNF7031 SQLAID            A(8)                   71D
+          SQLCA             DS(136)                69D    107     112     116
+                                                  120     286     291     304
+                                                  321     326
+          SQLCABC           I(10,0)                72D     73
+          SQLCAID           A(8)                   70D     71
+          SQLCLSE           CONST                 115     126D
+          SQLCLSE_CALL      PROTOTYPE             115D    325M
+          SQLCMIT           CONST                 119     127D
+ *RNF7031 SQLCMIT_CALL      PROTOTYPE             119D
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page     15
+ *RNF7031 SQLCOD            B(9,0)                 75D
+          SQLCODE           I(10,0)                74D     75     295     296
+                                                  311     311
+ *RNF7031 SQLERL            B(4,0)                 77D
+ *RNF7031 SQLERM            A(70)                  79D
+ *RNF7031 SQLERP            A(8)                   81D
+          SQLERR            A(24)                  82D     83      84      85
+                                                   86      87      88      89
+ *RNF7031 SQLERRD(6)        I(10,0)                89D
+          SQLERRMC          A(70)                  78D     79
+          SQLERRML          I(5,0)                 76D     77
+          SQLERRP           A(8)                   80D     81
+ *RNF7031 SQLER1            B(9,0)                 83D
+ *RNF7031 SQLER2            B(9,0)                 84D
+ *RNF7031 SQLER3            B(9,0)                 85D
+ *RNF7031 SQLER4            B(9,0)                 86D
+ *RNF7031 SQLER5            B(9,0)                 87D
+          SQLER6            B(9,0)                 88D    282M    302M    318M
+          SQLOPEN           CONST                 111     125D
+          SQLOPEN_CALL      PROTOTYPE             111D    290M
+          SQLROUTE          CONST                 106     124D
+          SQLROUTE_CALL     PROTOTYPE             106D    285M    303M    320M
+          SQLSTATE          A(5)                  103D    104
+ *RNF7031 SQLSTT            A(5)                  104D
+ *RNF7031 SQLWARN(11)       A(1)                  102D
+ *RNF7031 SQLWNA            A(1)                  101D
+ *RNF7031 SQLWN0            A(1)                   91D
+ *RNF7031 SQLWN1            A(1)                   92D
+ *RNF7031 SQLWN2            A(1)                   93D
+ *RNF7031 SQLWN3            A(1)                   94D
+ *RNF7031 SQLWN4            A(1)                   95D
+ *RNF7031 SQLWN5            A(1)                   96D
+ *RNF7031 SQLWN6            A(1)                   97D
+ *RNF7031 SQLWN7            A(1)                   98D
+ *RNF7031 SQLWN8            A(1)                   99D
+ *RNF7031 SQLWN9            A(1)                  100D
+          SQLWRN            A(11)                  90D     91      92      93
+                                                   94      95      96      97
+                                                   98      99     100     101
+                                                  102
+          SSEARCH           A(30)                 174M    197M    230     231
+                                                  367
+          STATUSDS          DS(343)                49D    393
+            PROGRAMNAME     A(10)                  50D    393
+          WRITEMSG          PROTOTYPE             246M    249M    296M    376
+       Field References for subprocedure WRITEMSG
+          Field             Attributes         References (D=Defined M=Modified)
+          DATA              A(256)                380D    381M    385
+          TEXT              A(256)                378D    381     386
+                            BASED(_QRNL_PST+)
+                            VARYING(2)
+       Indicator References:
+          Indicator                            References (D=Defined M=Modified)
+          03                                      164M    171M    176M    180M
+                                                  184M    190M    199     221
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page     16
+          05                                      165M    172M    177M    181M
+                                                  185M    191M    226
+          12                                      166M    173M    178M    182M
+                                                  186M    192M    199     221
+          30                                      204M    208M    365
+          31                                      335M    337M    366
+          40                                      213M    216M    374
+          41                                      352M    354M    375
+          50                                      339M    359
+          51                                      340M    360
+          LR                                      263M
+        * * * * *   E N D   O F   C R O S S   R E F E R E N C E   * * * * *
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page     17
+                       E x t e r n a l   R e f e r e n c e s
+       Statically bound procedures:
+          Procedure                            References
+       Imported fields:
+          Field             Attributes         Defined
+          No references in the source.
+       Exported fields:
+          Field             Attributes         Defined
+          No references in the source.
+    * * * * *   E N D   O F   E X T E R N A L   R E F E R E N C E S   * * * * *
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page     18
+                           M e s s a g e   S u m m a r y
+  Msg id  Sv Number Message text
+ *RNF7031 00     40 The name or indicator is not referenced.
+        * * * * *   E N D   O F   M E S S A G E   S U M M A R Y   * * * * *
+  5770WDS V7R5M0  220415 RN        IBM ILE RPG             PERPDEMO/ITMPRMT         IDEV       08/20/26 16:25:08        Page     19
+                             F i n a l   S u m m a r y
+   Message Totals:
+     Information  (00) . . . . . . . :       40
+     Warning      (10) . . . . . . . :        0
+     Error        (20) . . . . . . . :        0
+     Severe Error (30+)  . . . . . . :        0
+     ---------------------------------  -------
+     Total . . . . . . . . . . . . . :       40
+   Source Totals:
+     Records . . . . . . . . . . . . :      395
+     Specifications  . . . . . . . . :      316
+     Data records  . . . . . . . . . :        0
+     Comments  . . . . . . . . . . . :       68
+          * * * * *   E N D   O F   F I N A L   S U M M A R Y   * * * * *
+ Program ITMPRMT placed in library PERPDEMO. 00 highest severity. Created on 08/20/26 at 16:25:09.
+           * * * * *   E N D   O F   C O M P I L A T I O N   * * * * *

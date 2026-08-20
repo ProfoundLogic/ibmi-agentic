@@ -36,6 +36,13 @@ dcl-pr QMHSNDPM extpgm;
   errorCode   char(8)   const;
 end-pr;
 
+// Standard, reusable Item Number prompt (PERP-51/PERP-56). Same dynamic
+// CALL idiom as wrkitmr's callWrkcnvr/callWrklotr.
+dcl-pr callItmprmt extpgm('ITMPRMT');
+  pCompcd char(3)     const;
+  pItem   varchar(25);
+end-pr;
+
 dcl-ds statusDS psds qualified;
   programName char(10) pos(334);
 end-ds;
@@ -66,6 +73,9 @@ dcl-s cnt       int(10);
 dcl-s edefuom   varchar(5);
 dcl-s edefcost  packed(15:4);
 dcl-s edesc     varchar(60);
+dcl-s promptItem varchar(25);
+dcl-s doneAll   ind;
+dcl-s holdMsg   ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -85,20 +95,48 @@ hcompdsp = compcd;
 
 // -----------------------------------------------------------------------
 // Header entry -- collect requested_by/need_by/priority/notes, validate,
-// allocate the doc number, insert the DRAFT header.
+// allocate the doc number, insert the DRAFT header. Wrapped in an outer
+// loop (PERP-86) so a successful F8=Submit on the line screen below
+// returns here for the NEXT requisition instead of leaving the user
+// stranded on the now-read-only submitted line list.
 // -----------------------------------------------------------------------
-hreqby  = '';
-hneedby = %date() + %days(7);
-hpricd  = 'NORMAL';
-hnotes  = '';
+doneAll = *off;
 
-exsr clearMsgs;
+dow not doneAll;
+  // PERP-76: default Requested By to the current job user, but only when
+  // that job user is actually a known perp_user -- an interactive/SSH job
+  // user (e.g. AIDEMO) will almost never be one, and pre-filling with a
+  // value that then fails the "not found" check below just traded a blank
+  // required field for a confusing default the human has to notice and
+  // overwrite anyway. Leaving it blank keeps the existing, already-clear
+  // "Requested By is required" prompt as the fallback.
+  exec sql values(user) into :hreqby;
+  exec sql
+    select count(*) into :cnt
+      from perpdemo.perp_user
+     where user_code = :hreqby;
+  if cnt = 0;
+    hreqby = '';
+  endif;
+  hneedby = %date() + %days(7);
+  hpricd  = 'NORMAL';
+  hnotes  = '';
 
-dow '1';
+  // PERP-86: a submit confirmation queued just before restarting this
+  // loop must survive one pass before clearMsgs wipes it -- same
+  // holdMsg pattern as PERP-74/PERP-87.
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
+
+  dow '1';
   *in40 = *off;
   if msgrrn > 0;
     *in40 = *on;
   endif;
+  write rmsgctl;
   exfmt rhead;
 
   if *in03 or *in12;
@@ -183,8 +221,16 @@ dow '1';
   write rmsgctl;
   exfmt rlctl;
 
-  if *in03 or *in12;
+  // PERP-85: F3 exits the program; F12 must NOT -- it should just step
+  // back to (redisplay) this line list rather than ending the whole
+  // flow. The requisition header is already committed at this point,
+  // so there's no earlier screen to unwind into.
+  if *in03;
+    doneAll = *on;
     leave;
+  endif;
+  if *in12;
+    iter;
   endif;
 
   exsr clearMsgs;
@@ -213,7 +259,13 @@ dow '1';
       if sqlcode < 0;
         writeMsg('Submit failed: SQLCODE=' + %char(sqlcode));
       else;
+        // PERP-86: return to a fresh header entry screen for the next
+        // requisition instead of staying parked on this now read-only
+        // line list. holdMsg carries this confirmation through to the
+        // restarted header loop above.
         writeMsg('Requisition ' + %char(reqnbr) + ' submitted.');
+        holdMsg = *on;
+        leave;
       endif;
     endif;
     iter;
@@ -249,6 +301,7 @@ dow '1';
     endif;
   endif;
 
+  enddo;
 enddo;
 
 *inlr = *on;
@@ -277,7 +330,7 @@ begsr loadLines;
   exec sql open c1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -316,7 +369,7 @@ begsr handleOpt;
   if %found(reqentd);
     if reqStatus <> 'DRAFT';
       writeMsg('Requisition already submitted - no further changes allowed.');
-      return;
+      leavesr;
     endif;
     select;
       when selOpt = '2';
@@ -344,7 +397,16 @@ begsr addLine;
   dow '1';
     exfmt rledit;
     if *in12;
-      return;
+      leavesr;
+    endif;
+
+    // Item Number prompt (PERP-61): '?' + Enter invokes the standard
+    // reusable Item Number lookup (PERP-56) and returns the selection.
+    if %trim(eitem) = '?';
+      promptItem = eitem;
+      callItmprmt(compcd : promptItem);
+      eitem = promptItem;
+      iter;
     endif;
 
     if %trim(eitem) = '';
@@ -428,14 +490,27 @@ begsr changeLine;
   euom    = rows(selRrn).uom;
   ecost   = rows(selRrn).cost;
 
-  exfmt rledit;
-  if *in12;
-    return;
-  endif;
+  dow '1';
+    exfmt rledit;
+    if *in12;
+      leavesr;
+    endif;
+
+    // Item Number prompt (PERP-61): '?' + Enter invokes the standard
+    // reusable Item Number lookup (PERP-56) and returns the selection.
+    if %trim(eitem) = '?';
+      promptItem = eitem;
+      callItmprmt(compcd : promptItem);
+      eitem = promptItem;
+      iter;
+    endif;
+
+    leave;
+  enddo;
 
   if eqty <= 0;
     writeMsg('Quantity must be greater than zero.');
-    return;
+    leavesr;
   endif;
 
   exec sql

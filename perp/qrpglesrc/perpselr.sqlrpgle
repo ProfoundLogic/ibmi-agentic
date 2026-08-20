@@ -44,18 +44,31 @@ dcl-ds coRow qualified;
 end-ds;
 
 dcl-ds companies likeds(coRow) dim(200);
-dcl-s numCo    int(10);
-dcl-s i        int(10);
-dcl-s rrn      int(10);
-dcl-s msgrrn   int(10);
-dcl-s selRrn   int(10);
-dcl-s msgkey   char(4);
+dcl-s numCo     int(10);
+dcl-s i         int(10);
+dcl-s rrn       int(10);
+dcl-s msgrrn    int(10);
+dcl-s selRrn    int(10);
+dcl-s changeRrn int(10);
+dcl-s selOpt    char(1);
+dcl-s msgkey    char(4);
+dcl-s holdMsg   ind;
 
 in ldaDS;
 scursel = ldaDS.compcd;
 
 dow not *in03 and not *in12;
-  exsr clearMsgs;
+  // A message queued by an action handler below (F6=Add, 2=Change,
+  // 1=Select) must survive one full loop pass before being cleared,
+  // or it never reaches the screen -- clearMsgs wipes msgrrn back to 0
+  // on the very next pass, before this pass's own exfmt ever shows it.
+  // holdMsg skips exactly one clearMsgs call right after such a
+  // message was queued. Same pattern as wrkivpr (PERP-74).
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
   exsr loadCompanies;
 
   if numCo = 0;
@@ -84,32 +97,51 @@ dow not *in03 and not *in12;
     iter;  // refresh
   endif;
 
+  if *in06;
+    exsr addCompany;
+    iter;
+  endif;
+
   // Guard on numCo: READC against a subfile that was never written to
   // this cycle (0 rows loaded) raises a "Session or device error"
   // (CPF5006-class) runtime error instead of just returning *EOF.
   if numCo > 0;
-    selRrn = 0;
+    selRrn    = 0;
+    changeRrn = 0;
     readc cosfl;
     dow not %eof(perpseld);
-      if sopt = '1';
-        if selRrn = 0;
+      if sopt <> '';
+        selOpt = sopt;
+        if selRrn > 0 or changeRrn > 0;
+          writeMsg('Only one option may be used per Enter.');
+        elseif selOpt = '1';
           selRrn = rrn;
+        elseif selOpt = '2';
+          changeRrn = rrn;
         else;
-          writeMsg('Only one company may be selected per Enter.');
+          writeMsg('Option ' + %trim(selOpt) + ' is not valid - use 1 or 2.');
         endif;
-      elseif sopt <> '';
-        writeMsg('Option ' + %trim(sopt) + ' is not valid - use 1.');
       endif;
       readc cosfl;
     enddo;
   endif;
 
+  // 1=Select commits the LDA update and then exits the program
+  // straight back to the caller (the menu) -- same as F3 -- instead
+  // of redisplaying this list. No point queuing a confirmation message
+  // first: with no further EXFMT on this device, it would never be
+  // seen.
   if selRrn > 0 and msgrrn = 0;
     chain selRrn cosfl;
     ldaDS.compcd = scompc;
     out ldaDS;
-    writeMsg('Company ' + ldaDS.compcd + ' selected for this session.');
     scursel = ldaDS.compcd;
+    leave;
+  endif;
+
+  if changeRrn > 0 and msgrrn = 0;
+    chain changeRrn cosfl;
+    exsr changeCompany;
   endif;
 
 enddo;
@@ -128,7 +160,7 @@ begsr loadCompanies;
   exec sql open cocsr;
   if sqlcode < 0;
     writeMsg('SQL error opening cursor: ' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numCo < %elem(companies);
@@ -166,6 +198,92 @@ begsr clearMsgs;
   *in41 = *on;
   write comsgctl;
   *in41 = *off;
+endsr;
+
+// ---------------------------------------------------------------------
+// PERP-52: F6=Create new company. Minimal add panel over the company
+// table -- required fields only, defaults matching the DDL's DEFAULTs
+// (country_code='US', base_currency='USD'). *in60 off -- ECOMPC (the
+// primary key) is editable while adding, protected while changing
+// (see changeCompany below).
+begsr addCompany;
+  emode    = 'A';
+  *in60    = *off;
+  ecompc   = '';
+  ecompnm  = '';
+  eaddr1   = '';
+  ecity    = '';
+  estate   = '';
+  epostcd  = '';
+  ecntry   = 'US';
+  ebasecur = 'USD';
+  exfmt coedit;
+  if not *in12 and ecompc <> '' and ecompnm <> '';
+    exec sql
+      insert into perpdemo.company
+        (company_code, company_name, address_line1, city_name,
+         state_code, postal_code, country_code, base_currency)
+        values (:ecompc, :ecompnm, :eaddr1, :ecity,
+                :estate, :epostcd, :ecntry, :ebasecur);
+    if sqlcode < 0;
+      writeMsg('Add company failed: SQLCODE=' + %char(sqlcode)
+             + ' SQLSTATE=' + sqlstate);
+    else;
+      writeMsg('Company ' + %trim(ecompc) + ' created.');
+    endif;
+    holdMsg = *on;
+  endif;
+  // *in12 (F12) here only cancels the Add Company panel, not the
+  // whole Select Company screen -- reset before returning to the
+  // outer dow, which also tests *in12 to decide whether to exit.
+  *in12 = *off;
+endsr;
+
+// ---------------------------------------------------------------------
+// PERP-52: 2=Change. Same COEDIT panel as Add, but the company code
+// (primary key, referenced by FK from nearly every other PERP table)
+// is protected -- *in60 on makes ECOMPC display-only via DSPATR(PR)
+// in the DDS, so the WHERE clause below always matches the row the
+// user actually selected, never a typo'd or retyped code.
+begsr changeCompany;
+  emode    = 'C';
+  *in60    = *on;
+  ecompc   = scompc;
+  exec sql
+    select company_name, address_line1, city_name, state_code,
+           postal_code, country_code, base_currency
+      into :ecompnm, :eaddr1, :ecity, :estate,
+           :epostcd, :ecntry, :ebasecur
+      from perpdemo.company
+     where company_code = :ecompc;
+  if sqlcode <> 0;
+    writeMsg('Company ' + %trim(ecompc) + ' disappeared before change.');
+    holdMsg = *on;
+    leavesr;
+  endif;
+  exfmt coedit;
+  if not *in12;
+    exec sql
+      update perpdemo.company
+         set company_name  = :ecompnm,
+             address_line1 = :eaddr1,
+             city_name     = :ecity,
+             state_code    = :estate,
+             postal_code   = :epostcd,
+             country_code  = :ecntry,
+             base_currency = :ebasecur,
+             updated_at    = current_timestamp,
+             updated_by    = user
+       where company_code = :ecompc;
+    if sqlcode < 0;
+      writeMsg('Change failed: SQLCODE=' + %char(sqlcode)
+             + ' SQLSTATE=' + sqlstate);
+    else;
+      writeMsg('Company ' + %trim(ecompc) + ' updated.');
+    endif;
+    holdMsg = *on;
+  endif;
+  *in12 = *off;
 endsr;
 
 // ---------------------------------------------------------------------

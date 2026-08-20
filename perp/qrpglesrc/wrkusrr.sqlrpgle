@@ -46,9 +46,20 @@ dcl-s msgrrn  int(10);
 dcl-s msgkey  char(4);
 dcl-s selRrn  int(10);
 dcl-s selOpt  char(1);
+dcl-s holdMsg ind;
 
 dow not *in03 and not *in12;
-  exsr clearMsgs;
+  // A message queued by an action handler below (2=Change, etc.) must
+  // survive one full loop pass before being cleared, or it never
+  // reaches the screen -- clearMsgs wipes msgrrn back to 0 on the very
+  // next pass, before this pass's own exfmt ever shows it. holdMsg
+  // skips exactly one clearMsgs call right after such a message was
+  // queued. Same pattern as wrkivpr (PERP-74).
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
   exsr loadRows;
 
   if numRows = 0;
@@ -113,7 +124,7 @@ begsr loadRows;
   exec sql open u1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -197,7 +208,8 @@ begsr changeRow;
      where user_code = :eucode;
   if sqlcode <> 0;
     writeMsg('Row disappeared before change.');
-    return;
+    holdMsg = *on;
+    leavesr;
   endif;
   exsr editLoop;
   if not *in12;

@@ -49,6 +49,14 @@ dcl-pr QMHSNDPM extpgm;
   errorCode   char(8)   const;
 end-pr;
 
+// Standard, reusable PO Number prompt (PERP-51/PERP-98). Numeric field,
+// so invoked via F4=Prompt rather than the "?" convention item/vendor
+// prompts use. Same dynamic CALL idiom as wrkitmr's callWrkcnvr etc.
+dcl-pr callPoprmt extpgm('POPRMT');
+  pCompcd char(3)     const;
+  pPonbr  packed(15:0);
+end-pr;
+
 dcl-ds statusDS psds qualified;
   programName char(10) pos(334);
 end-ds;
@@ -79,6 +87,7 @@ dcl-s convFactor packed(15:6);
 dcl-s qtyInv     packed(15:4);
 dcl-s nextRLine  int(10);
 dcl-s newHdrStat varchar(20);
+dcl-s promptPonbr packed(15:0);
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -121,6 +130,17 @@ dow '1';
   endif;
 
   exsr clearMsgs;
+
+  // PO Number prompt (PERP-98): F4 invokes the standard reusable PO
+  // Number lookup (lists POs still awaiting receipt) and returns the
+  // selection. HPONBR is numeric, so this uses F4=Prompt rather than
+  // the "?" + Enter convention item/vendor fields use.
+  if *in04;
+    promptPonbr = hponbr;
+    callPoprmt(compcd : promptPonbr);
+    hponbr = promptPonbr;
+    iter;
+  endif;
 
   if hponbr <= 0;
     writeMsg('PO Number is required.');
@@ -288,7 +308,7 @@ begsr loadOpenLines;
   exec sql open rc1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -351,7 +371,7 @@ begsr receiveLine;
     write rmsgctl;
     exfmt rledit;
     if *in12;
-      return;
+      leavesr;
     endif;
 
     exsr clearMsgs;
@@ -386,7 +406,7 @@ begsr receiveLine;
     if sqlcode <> 0;
       writeMsg('No UOM conversion from ' + %trim(euom) + ' to '
              + %trim(invuom) + ' defined for this item.');
-      return;
+      leavesr;
     endif;
   endif;
 
@@ -419,7 +439,7 @@ begsr receiveLine;
   if sqlcode < 0;
     writeMsg('Receipt line insert failed: SQLCODE=' + %char(sqlcode)
            + ' SQLSTATE=' + sqlstate);
-    return;
+    leavesr;
   endif;
 
   if elotctl = 'Y';
@@ -452,7 +472,7 @@ begsr receiveLine;
        and line_number = :eline;
   if sqlcode < 0;
     writeMsg('po_line update failed: SQLCODE=' + %char(sqlcode));
-    return;
+    leavesr;
   endif;
 
   exec sql
