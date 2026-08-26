@@ -46,9 +46,21 @@ dcl-s msgrrn  int(10);
 dcl-s msgkey  char(4);
 dcl-s selRrn  int(10);
 dcl-s selOpt  char(1);
+dcl-s holdMsg ind;
+dcl-s validationFailed ind;
 
 dow not *in03 and not *in12;
-  exsr clearMsgs;
+  // A message queued by an action handler below (addRow, etc.) must
+  // survive one full loop pass before being cleared, or it never
+  // reaches the screen -- clearMsgs wipes msgrrn back to 0 on the very
+  // next pass, before this pass's own exfmt ever shows it. holdMsg
+  // skips exactly one clearMsgs call right after such a message was
+  // queued. Same pattern as wrkitmr.
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
   exsr loadRows;
 
   if numRows = 0;
@@ -115,7 +127,8 @@ begsr loadRows;
   exec sql open c1;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    holdMsg = *on;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -160,33 +173,42 @@ begsr handleOpt;
         exsr displayRow;
       other;
         writeMsg('Option ' + selOpt + ' not valid.');
+        holdMsg = *on;
     endsl;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr addRow;
+  exsr clearMsgs;
   emode   = 'A';
   ecode   = '';
   edesc   = '';
   ecat    = '';
   eactive = 'Y';
   exsr editLoop;
-  if not *in12 and ecode <> '';
-    exec sql
-      insert into perpdemo.uom (uom_code, description, uom_category, is_active)
-        values (:ecode, :edesc, :ecat, :eactive);
-    if sqlcode < 0;
-      writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
-             + ' SQLSTATE=' + sqlstate);
+  if not *in12;
+    exsr validateUom;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Added ' + %trim(ecode) + '.');
+      exec sql
+        insert into perpdemo.uom (uom_code, description, uom_category, is_active)
+          values (:ecode, :edesc, :ecat, :eactive);
+      if sqlcode < 0;
+        writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
+               + ' SQLSTATE=' + sqlstate);
+      else;
+        writeMsg('Added ' + %trim(ecode) + '.');
+      endif;
+      holdMsg = *on;
     endif;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr changeRow;
+  exsr clearMsgs;
   emode = 'C';
   ecode = scode;
   exec sql
@@ -196,28 +218,36 @@ begsr changeRow;
      where uom_code = :ecode;
   if sqlcode <> 0;
     writeMsg('Row disappeared before change.');
-    return;
+    holdMsg = *on;
+    leavesr;
   endif;
   exsr editLoop;
   if not *in12;
-    exec sql
-      update perpdemo.uom
-         set description  = :edesc,
-             uom_category = :ecat,
-             is_active    = :eactive,
-             updated_at   = current_timestamp,
-             updated_by   = user
-       where uom_code = :ecode;
-    if sqlcode < 0;
-      writeMsg('Change failed: SQLCODE=' + %char(sqlcode));
+    exsr validateUom;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Updated ' + %trim(ecode) + '.');
+      exec sql
+        update perpdemo.uom
+           set description  = :edesc,
+               uom_category = :ecat,
+               is_active    = :eactive,
+               updated_at   = current_timestamp,
+               updated_by   = user
+         where uom_code = :ecode;
+      if sqlcode < 0;
+        writeMsg('Change failed: SQLCODE=' + %char(sqlcode));
+      else;
+        writeMsg('Updated ' + %trim(ecode) + '.');
+      endif;
+      holdMsg = *on;
     endif;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr deleteRow;
+  exsr clearMsgs;
   exec sql
     delete from perpdemo.uom
      where uom_code = :scode;
@@ -226,6 +256,7 @@ begsr deleteRow;
   else;
     writeMsg('Deleted ' + %trim(scode) + '.');
   endif;
+  holdMsg = *on;
 endsr;
 
 // ---------------------------------------------------------------------
@@ -243,6 +274,21 @@ endsr;
 // ---------------------------------------------------------------------
 begsr editLoop;
   exfmt uoedit;
+endsr;
+
+// ---------------------------------------------------------------------
+// Required-field validation for the Add/Change panel, done here in RPG
+// instead of letting a blank required field surface as a raw NOT-NULL
+// violation from the database.
+begsr validateUom;
+  validationFailed = *off;
+  if %trim(ecode) = '';
+    writeMsg('UOM Code is required.');
+    validationFailed = *on;
+  elseif %trim(edesc) = '';
+    writeMsg('Description is required.');
+    validationFailed = *on;
+  endif;
 endsr;
 
 // ---------------------------------------------------------------------

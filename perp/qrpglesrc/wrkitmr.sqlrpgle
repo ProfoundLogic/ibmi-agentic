@@ -80,6 +80,7 @@ dcl-s fLowOnly char(1);
 dcl-s fPosTo   varchar(30);
 dcl-s promptItem varchar(25);
 dcl-s holdMsg   ind;
+dcl-s validationFailed ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -273,7 +274,17 @@ endsr;
 
 // ---------------------------------------------------------------------
 begsr addRow;
+  // Clear any message left over from a PRIOR action before this one queues
+  // its own -- without this, pressing F6 again right after seeing a message
+  // (before the outer loop's own clearMsgs ever runs) stacks a second
+  // message behind the first, and the stale one shows instead of this
+  // action's real result.
+  exsr clearMsgs;
   emode   = 'A';
+  // PERP-57: the item prompt makes no sense while adding a brand-new item
+  // (there's nothing to look up yet) -- *in60 on hides the "(? = prompt)"
+  // hint and skips the prompt-invocation check in editLoop below.
+  *in60   = *on;
   eitem   = '';
   edesc   = '';
   eshort  = '';
@@ -294,8 +305,24 @@ begsr addRow;
   eaisle  = '';
   ebay    = '';
   eshelf  = '';
-  exsr editLoop;
-  if not *in12 and eitem <> '';
+  // Loop so a failed insert redisplays THIS SAME panel with the error and
+  // the user's own entries intact, instead of bouncing back to the list --
+  // only a successful add or an explicit Cancel (F12) leaves the loop.
+  dow *on;
+    exsr editLoop;
+    if *in12;
+      leave;
+    endif;
+    // Clear the message the user just saw (if any) before queuing THIS
+    // iteration's own result -- otherwise a retry within this same loop
+    // stacks its message behind the previous iteration's, same as the
+    // across-actions case clearMsgs at the top of this subroutine guards.
+    exsr clearMsgs;
+    exsr validateEdit;
+    if validationFailed;
+      holdMsg = *on;
+      iter;
+    endif;
     exec sql
       insert into perpdemo.item
         (company_code, item_number, item_description, short_description,
@@ -309,15 +336,21 @@ begsr addRow;
     if sqlcode < 0;
       writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
              + ' SQLSTATE=' + sqlstate);
+      holdMsg = *on;
+      iter;
     else;
       writeMsg('Added ' + %trim(eitem) + '.');
+      holdMsg = *on;
+      leave;
     endif;
-  endif;
+  enddo;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr changeRow;
+  exsr clearMsgs;
   emode = 'C';
+  *in60 = *off;
   eitem = siitem;
   exec sql
     select item_description, short_description, class_code,
@@ -337,8 +370,19 @@ begsr changeRow;
     holdMsg = *on;
     leavesr;
   endif;
-  exsr editLoop;
-  if not *in12;
+  // Same retry-in-place shape as addRow: a failed update redisplays this
+  // panel with the error and the user's entries intact.
+  dow *on;
+    exsr editLoop;
+    if *in12;
+      leave;
+    endif;
+    exsr clearMsgs;
+    exsr validateEdit;
+    if validationFailed;
+      holdMsg = *on;
+      iter;
+    endif;
     exec sql
       update perpdemo.item
          set item_description  = :edesc,
@@ -361,14 +405,19 @@ begsr changeRow;
        where company_code = :compcd and item_number = :eitem;
     if sqlcode < 0;
       writeMsg('Change failed: SQLCODE=' + %char(sqlcode));
+      holdMsg = *on;
+      iter;
     else;
       writeMsg('Updated ' + %trim(eitem) + '.');
+      holdMsg = *on;
+      leave;
     endif;
-  endif;
+  enddo;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr deleteRow;
+  exsr clearMsgs;
   exec sql
     delete from perpdemo.item
      where company_code = :compcd and item_number = :siitem;
@@ -377,11 +426,13 @@ begsr deleteRow;
   else;
     writeMsg('Deleted ' + %trim(siitem) + '.');
   endif;
+  holdMsg = *on;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr displayRow;
   emode = 'D';
+  *in60 = *off;
   eitem = siitem;
   exec sql
     select item_description, short_description, class_code,
@@ -402,11 +453,19 @@ endsr;
 // ---------------------------------------------------------------------
 begsr editLoop;
   dow not *in12;
+    // Re-issue the message SFLCTL record before every exfmt on this format,
+    // exactly like the outer loop does for wictl -- otherwise a message
+    // queued by a failed insert/update (with the caller looping back into
+    // this same edit panel to show it) never reaches the screen, and any
+    // stale message left over from the calling list screen can bleed
+    // through WIEDIT's OVERLAY instead of being explicitly cleared.
+    *in40 = (msgrrn > 0);
+    write wimsgctl;
     exfmt wiedit;
     if *in12;
       leave;
     endif;
-    if %trim(eitem) = '?';
+    if not *in60 and %trim(eitem) = '?';
       promptItem = eitem;
       callItmprmt(compcd : promptItem);
       eitem = promptItem;
@@ -414,6 +473,31 @@ begsr editLoop;
     endif;
     leave;
   enddo;
+endsr;
+
+// ---------------------------------------------------------------------
+// Required-field validation for the Add/Change panel, done here in RPG
+// instead of letting a blank required field surface as a raw FK violation
+// (e.g. ITEM_STKUOM_FK) from the database. Checked in screen order so the
+// first message matches the first blank field the user would fix.
+begsr validateEdit;
+  validationFailed = *off;
+  if %trim(eitem) = '';
+    writeMsg('Item Number is required.');
+    validationFailed = *on;
+  elseif %trim(edesc) = '';
+    writeMsg('Description is required.');
+    validationFailed = *on;
+  elseif %trim(eclass) = '';
+    writeMsg('Class is required.');
+    validationFailed = *on;
+  elseif %trim(einvuom) = '';
+    writeMsg('Inventory UOM is required.');
+    validationFailed = *on;
+  elseif %trim(estkuom) = '';
+    writeMsg('Stocking UOM is required.');
+    validationFailed = *on;
+  endif;
 endsr;
 
 // ---------------------------------------------------------------------

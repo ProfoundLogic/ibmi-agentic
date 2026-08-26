@@ -53,6 +53,7 @@ dcl-s changeRrn int(10);
 dcl-s selOpt    char(1);
 dcl-s msgkey    char(4);
 dcl-s holdMsg   ind;
+dcl-s validationFailed ind;
 
 in ldaDS;
 scursel = ldaDS.compcd;
@@ -193,6 +194,24 @@ begsr fillSubfile;
 endsr;
 
 // ---------------------------------------------------------------------
+// Required-field validation for the Add/Change Company panel, done here
+// in RPG instead of letting a blank required field surface as a raw
+// FK/NOT-NULL violation from the database.
+begsr validateCompany;
+  validationFailed = *off;
+  if %trim(ecompc) = '';
+    writeMsg('Company Code is required.');
+    validationFailed = *on;
+  elseif %trim(ecompnm) = '';
+    writeMsg('Company Name is required.');
+    validationFailed = *on;
+  elseif %trim(ebasecur) = '';
+    writeMsg('Base Currency is required.');
+    validationFailed = *on;
+  endif;
+endsr;
+
+// ---------------------------------------------------------------------
 begsr clearMsgs;
   msgrrn = 0;
   *in41 = *on;
@@ -207,6 +226,7 @@ endsr;
 // primary key) is editable while adding, protected while changing
 // (see changeCompany below).
 begsr addCompany;
+  exsr clearMsgs;
   emode    = 'A';
   *in60    = *off;
   ecompc   = '';
@@ -218,20 +238,25 @@ begsr addCompany;
   ecntry   = 'US';
   ebasecur = 'USD';
   exfmt coedit;
-  if not *in12 and ecompc <> '' and ecompnm <> '';
-    exec sql
-      insert into perpdemo.company
-        (company_code, company_name, address_line1, city_name,
-         state_code, postal_code, country_code, base_currency)
-        values (:ecompc, :ecompnm, :eaddr1, :ecity,
-                :estate, :epostcd, :ecntry, :ebasecur);
-    if sqlcode < 0;
-      writeMsg('Add company failed: SQLCODE=' + %char(sqlcode)
-             + ' SQLSTATE=' + sqlstate);
+  if not *in12;
+    exsr validateCompany;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Company ' + %trim(ecompc) + ' created.');
+      exec sql
+        insert into perpdemo.company
+          (company_code, company_name, address_line1, city_name,
+           state_code, postal_code, country_code, base_currency)
+          values (:ecompc, :ecompnm, :eaddr1, :ecity,
+                  :estate, :epostcd, :ecntry, :ebasecur);
+      if sqlcode < 0;
+        writeMsg('Add company failed: SQLCODE=' + %char(sqlcode)
+               + ' SQLSTATE=' + sqlstate);
+      else;
+        writeMsg('Company ' + %trim(ecompc) + ' created.');
+      endif;
+      holdMsg = *on;
     endif;
-    holdMsg = *on;
   endif;
   // *in12 (F12) here only cancels the Add Company panel, not the
   // whole Select Company screen -- reset before returning to the
@@ -246,6 +271,7 @@ endsr;
 // in the DDS, so the WHERE clause below always matches the row the
 // user actually selected, never a typo'd or retyped code.
 begsr changeCompany;
+  exsr clearMsgs;
   emode    = 'C';
   *in60    = *on;
   ecompc   = scompc;
@@ -263,25 +289,30 @@ begsr changeCompany;
   endif;
   exfmt coedit;
   if not *in12;
-    exec sql
-      update perpdemo.company
-         set company_name  = :ecompnm,
-             address_line1 = :eaddr1,
-             city_name     = :ecity,
-             state_code    = :estate,
-             postal_code   = :epostcd,
-             country_code  = :ecntry,
-             base_currency = :ebasecur,
-             updated_at    = current_timestamp,
-             updated_by    = user
-       where company_code = :ecompc;
-    if sqlcode < 0;
-      writeMsg('Change failed: SQLCODE=' + %char(sqlcode)
-             + ' SQLSTATE=' + sqlstate);
+    exsr validateCompany;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Company ' + %trim(ecompc) + ' updated.');
+      exec sql
+        update perpdemo.company
+           set company_name  = :ecompnm,
+               address_line1 = :eaddr1,
+               city_name     = :ecity,
+               state_code    = :estate,
+               postal_code   = :epostcd,
+               country_code  = :ecntry,
+               base_currency = :ebasecur,
+               updated_at    = current_timestamp,
+               updated_by    = user
+         where company_code = :ecompc;
+      if sqlcode < 0;
+        writeMsg('Change failed: SQLCODE=' + %char(sqlcode)
+               + ' SQLSTATE=' + sqlstate);
+      else;
+        writeMsg('Company ' + %trim(ecompc) + ' updated.');
+      endif;
+      holdMsg = *on;
     endif;
-    holdMsg = *on;
   endif;
   *in12 = *off;
 endsr;

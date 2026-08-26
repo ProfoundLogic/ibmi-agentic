@@ -555,6 +555,11 @@ begsr changeLine;
     leavesr;
   endif;
 
+  if %trim(euom) = '';
+    writeMsg('UOM is required.');
+    leavesr;
+  endif;
+
   exec sql
     update perpdemo.po_line
        set ordered_qty  = :eqty,

@@ -67,6 +67,7 @@ dcl-s filter  varchar(25);
 dcl-s compcd  char(3);
 dcl-s promptItem varchar(25);
 dcl-s holdMsg   ind;
+dcl-s validationFailed ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -150,6 +151,7 @@ dow not *in03 and not *in12;
   if *in06;
     if sfitem = '';
       writeMsg('Enter an item number before adding a conversion.');
+      holdMsg = *on;
     else;
       filter = sfitem;
       exsr addRow;
@@ -251,34 +253,43 @@ begsr handleOpt;
         exsr deleteRow;
       other;
         writeMsg('Option ' + selOpt + ' not valid.');
+        holdMsg = *on;
     endsl;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr addRow;
+  exsr clearMsgs;
   emode   = 'A';
   efrom   = '';
   eto     = '';
   efact   = 0;
   eactive = 'Y';
   exsr editLoop;
-  if not *in12 and efrom <> '' and eto <> '';
-    exec sql
-      insert into perpdemo.item_uom_conversion
-        (company_code, item_number, from_uom, to_uom, conversion_factor, is_active)
-        values (:compcd, :filter, :efrom, :eto, :efact, :eactive);
-    if sqlcode < 0;
-      writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
-             + ' SQLSTATE=' + sqlstate);
+  if not *in12;
+    exsr validateConv;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Added ' + %trim(efrom) + ' -> ' + %trim(eto) + '.');
+      exec sql
+        insert into perpdemo.item_uom_conversion
+          (company_code, item_number, from_uom, to_uom, conversion_factor, is_active)
+          values (:compcd, :filter, :efrom, :eto, :efact, :eactive);
+      if sqlcode < 0;
+        writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
+               + ' SQLSTATE=' + sqlstate);
+      else;
+        writeMsg('Added ' + %trim(efrom) + ' -> ' + %trim(eto) + '.');
+      endif;
+      holdMsg = *on;
     endif;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr changeRow;
+  exsr clearMsgs;
   emode = 'C';
   efrom = sfrom;
   eto   = sto;
@@ -295,24 +306,31 @@ begsr changeRow;
   endif;
   exsr editLoop;
   if not *in12;
-    exec sql
-      update perpdemo.item_uom_conversion
-         set conversion_factor = :efact,
-             is_active         = :eactive,
-             updated_at        = current_timestamp,
-             updated_by        = user
-       where company_code = :compcd and item_number = :filter
-         and from_uom = :efrom and to_uom = :eto;
-    if sqlcode < 0;
-      writeMsg('Change failed: SQLCODE=' + %char(sqlcode));
+    exsr validateConv;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Updated ' + %trim(efrom) + ' -> ' + %trim(eto) + '.');
+      exec sql
+        update perpdemo.item_uom_conversion
+           set conversion_factor = :efact,
+               is_active         = :eactive,
+               updated_at        = current_timestamp,
+               updated_by        = user
+         where company_code = :compcd and item_number = :filter
+           and from_uom = :efrom and to_uom = :eto;
+      if sqlcode < 0;
+        writeMsg('Change failed: SQLCODE=' + %char(sqlcode));
+      else;
+        writeMsg('Updated ' + %trim(efrom) + ' -> ' + %trim(eto) + '.');
+      endif;
+      holdMsg = *on;
     endif;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr deleteRow;
+  exsr clearMsgs;
   exec sql
     delete from perpdemo.item_uom_conversion
      where company_code = :compcd and item_number = :filter
@@ -322,11 +340,30 @@ begsr deleteRow;
   else;
     writeMsg('Deleted ' + %trim(sfrom) + ' -> ' + %trim(sto) + '.');
   endif;
+  holdMsg = *on;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr editLoop;
   exfmt cvedit;
+endsr;
+
+// ---------------------------------------------------------------------
+// Required-field validation for the Add/Change panel, done here in RPG
+// instead of letting a blank From/To UOM or zero Factor surface as a raw
+// FK/CHECK-constraint violation from the database.
+begsr validateConv;
+  validationFailed = *off;
+  if %trim(efrom) = '';
+    writeMsg('From UOM is required.');
+    validationFailed = *on;
+  elseif %trim(eto) = '';
+    writeMsg('To UOM is required.');
+    validationFailed = *on;
+  elseif efact <= 0;
+    writeMsg('Factor is required.');
+    validationFailed = *on;
+  endif;
 endsr;
 
 // ---------------------------------------------------------------------

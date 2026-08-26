@@ -74,6 +74,7 @@ dcl-s compcd   char(3);
 dcl-s itemOh   packed(15:4);
 dcl-s lotTotal packed(15:4);
 dcl-s promptItem varchar(25);
+dcl-s holdMsg    ind;
 
 // PERP-84: MM/DD/YY entry validation for ERECV/EEXPD (see editLoop).
 // parsedRecv/parsedExpd are Date-typed working vars used only to
@@ -121,7 +122,17 @@ dow not *in03 and not *in12;
     leave;
   endif;
 
-  exsr clearMsgs;
+  // A message queued by an action handler below (addRow, etc.) must
+  // survive one full loop pass before being cleared, or it never
+  // reaches the screen -- clearMsgs wipes msgrrn back to 0 on the very
+  // next pass, before this pass's own exfmt ever shows it. holdMsg
+  // skips exactly one clearMsgs call right after such a message was
+  // queued. Same pattern as wrkitmr.
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
 
   if filter = '';
     *in30 = *off;
@@ -163,6 +174,7 @@ dow not *in03 and not *in12;
   if *in06;
     if sfitem = '';
       writeMsg('Enter an item number before adding a lot.');
+      holdMsg = *on;
     else;
       filter = sfitem;
       exsr addRow;
@@ -301,12 +313,14 @@ begsr handleOpt;
         exsr deleteRow;
       other;
         writeMsg('Option ' + selOpt + ' not valid.');
+        holdMsg = *on;
     endsl;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr addRow;
+  exsr clearMsgs;
   emode  = 'A';
   elot   = '';
   eqty   = 0;
@@ -326,11 +340,13 @@ begsr addRow;
     else;
       writeMsg('Added lot ' + %trim(elot) + '.');
     endif;
+    holdMsg = *on;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr changeRow;
+  exsr clearMsgs;
   emode = 'C';
   elot  = slot;
   eqty  = sqty;
@@ -352,11 +368,13 @@ begsr changeRow;
     else;
       writeMsg('Updated lot ' + %trim(elot) + '.');
     endif;
+    holdMsg = *on;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr deleteRow;
+  exsr clearMsgs;
   exec sql
     delete from perpdemo.item_lot
      where company_code = :compcd and item_number = :filter and lot_number = :slot;
@@ -365,6 +383,7 @@ begsr deleteRow;
   else;
     writeMsg('Deleted lot ' + %trim(slot) + '.');
   endif;
+  holdMsg = *on;
 endsr;
 
 // ---------------------------------------------------------------------
@@ -391,6 +410,11 @@ begsr editLoop;
     endif;
 
     exsr clearMsgs;
+
+    if %trim(elot) = '';
+      writeMsg('Lot Number is required.');
+      iter;
+    endif;
 
     if %trim(erecv) = '';
       writeMsg('Received Date is required (MM/DD/YY).');

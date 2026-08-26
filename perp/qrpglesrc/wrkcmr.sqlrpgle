@@ -49,12 +49,24 @@ dcl-s msgkey  char(4);
 dcl-s selRrn  int(10);
 dcl-s selOpt  char(1);
 dcl-s filter  varchar(20);
+dcl-s holdMsg ind;
+dcl-s validationFailed ind;
 
 filter = '';
 sftype = '';
 
 dow not *in03 and not *in12;
-  exsr clearMsgs;
+  // A message queued by an action handler below (addRow, etc.) must
+  // survive one full loop pass before being cleared, or it never
+  // reaches the screen -- clearMsgs wipes msgrrn back to 0 on the very
+  // next pass, before this pass's own exfmt ever shows it. holdMsg
+  // skips exactly one clearMsgs call right after such a message was
+  // queued. Same pattern as wrkitmr.
+  if holdMsg;
+    holdMsg = *off;
+  else;
+    exsr clearMsgs;
+  endif;
   exsr loadRows;
 
   if numRows = 0;
@@ -143,7 +155,8 @@ begsr loadRows;
   endif;
   if sqlcode < 0;
     writeMsg('SQL open failed: SQLCODE=' + %char(sqlcode));
-    return;
+    holdMsg = *on;
+    leavesr;
   endif;
 
   dow numRows < %elem(rows);
@@ -197,12 +210,14 @@ begsr handleOpt;
         exsr displayRow;
       other;
         writeMsg('Option ' + selOpt + ' not valid.');
+        holdMsg = *on;
     endsl;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr addRow;
+  exsr clearMsgs;
   emode   = 'A';
   etype   = filter;
   evalue  = '';
@@ -211,23 +226,30 @@ begsr addRow;
   esort   = 0;
   eactive = 'Y';
   exsr editLoop;
-  if not *in12 and etype <> '' and evalue <> '';
-    exec sql
-      insert into perpdemo.code_master
-        (code_type, code_value, description, short_desc,
-         sort_order, is_active)
-        values (:etype, :evalue, :edesc, :eshort, :esort, :eactive);
-    if sqlcode < 0;
-      writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
-             + ' SQLSTATE=' + sqlstate);
+  if not *in12;
+    exsr validateCode;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Added ' + %trim(etype) + '/' + %trim(evalue) + '.');
+      exec sql
+        insert into perpdemo.code_master
+          (code_type, code_value, description, short_desc,
+           sort_order, is_active)
+          values (:etype, :evalue, :edesc, :eshort, :esort, :eactive);
+      if sqlcode < 0;
+        writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
+               + ' SQLSTATE=' + sqlstate);
+      else;
+        writeMsg('Added ' + %trim(etype) + '/' + %trim(evalue) + '.');
+      endif;
+      holdMsg = *on;
     endif;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr changeRow;
+  exsr clearMsgs;
   emode   = 'C';
   etype   = stype;
   evalue  = svalue;
@@ -238,29 +260,37 @@ begsr changeRow;
      where code_type = :etype and code_value = :evalue;
   if sqlcode <> 0;
     writeMsg('Row disappeared before change.');
-    return;
+    holdMsg = *on;
+    leavesr;
   endif;
   exsr editLoop;
   if not *in12;
-    exec sql
-      update perpdemo.code_master
-         set description = :edesc,
-             short_desc  = :eshort,
-             sort_order  = :esort,
-             is_active   = :eactive,
-             updated_at  = current_timestamp,
-             updated_by  = user
-       where code_type = :etype and code_value = :evalue;
-    if sqlcode < 0;
-      writeMsg('Change failed: SQLCODE=' + %char(sqlcode));
+    exsr validateCode;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Updated ' + %trim(etype) + '/' + %trim(evalue) + '.');
+      exec sql
+        update perpdemo.code_master
+           set description = :edesc,
+               short_desc  = :eshort,
+               sort_order  = :esort,
+               is_active   = :eactive,
+               updated_at  = current_timestamp,
+               updated_by  = user
+         where code_type = :etype and code_value = :evalue;
+      if sqlcode < 0;
+        writeMsg('Change failed: SQLCODE=' + %char(sqlcode));
+      else;
+        writeMsg('Updated ' + %trim(etype) + '/' + %trim(evalue) + '.');
+      endif;
+      holdMsg = *on;
     endif;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr deleteRow;
+  exsr clearMsgs;
   exec sql
     delete from perpdemo.code_master
      where code_type = :stype and code_value = :svalue;
@@ -269,6 +299,7 @@ begsr deleteRow;
   else;
     writeMsg('Deleted ' + %trim(stype) + '/' + %trim(svalue) + '.');
   endif;
+  holdMsg = *on;
 endsr;
 
 // ---------------------------------------------------------------------
@@ -287,6 +318,24 @@ endsr;
 // ---------------------------------------------------------------------
 begsr editLoop;
   exfmt cmedit;
+endsr;
+
+// ---------------------------------------------------------------------
+// Required-field validation for the Add/Change panel, done here in RPG
+// instead of letting a blank required field surface as a raw NOT-NULL
+// violation from the database.
+begsr validateCode;
+  validationFailed = *off;
+  if %trim(etype) = '';
+    writeMsg('Code Type is required.');
+    validationFailed = *on;
+  elseif %trim(evalue) = '';
+    writeMsg('Code Value is required.');
+    validationFailed = *on;
+  elseif %trim(edesc) = '';
+    writeMsg('Description is required.');
+    validationFailed = *on;
+  endif;
 endsr;
 
 // ---------------------------------------------------------------------

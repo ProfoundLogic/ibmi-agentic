@@ -51,6 +51,7 @@ dcl-s selRrn  int(10);
 dcl-s selOpt  char(1);
 dcl-s compcd  char(3);
 dcl-s holdMsg ind;
+dcl-s validationFailed ind;
 
 in ldaDS;
 compcd = ldaDS.compcd;
@@ -198,32 +199,41 @@ begsr handleOpt;
         exsr displayRow;
       other;
         writeMsg('Option ' + selOpt + ' not valid.');
+        holdMsg = *on;
     endsl;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr addRow;
+  exsr clearMsgs;
   emode   = 'A';
   eclass  = '';
   edesc   = '';
   eactive = 'Y';
   exsr editLoop;
-  if not *in12 and eclass <> '';
-    exec sql
-      insert into perpdemo.item_class (company_code, class_code, description, is_active)
-        values (:compcd, :eclass, :edesc, :eactive);
-    if sqlcode < 0;
-      writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
-             + ' SQLSTATE=' + sqlstate);
+  if not *in12;
+    exsr validateClass;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Added ' + %trim(eclass) + '.');
+      exec sql
+        insert into perpdemo.item_class (company_code, class_code, description, is_active)
+          values (:compcd, :eclass, :edesc, :eactive);
+      if sqlcode < 0;
+        writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
+               + ' SQLSTATE=' + sqlstate);
+      else;
+        writeMsg('Added ' + %trim(eclass) + '.');
+      endif;
+      holdMsg = *on;
     endif;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr changeRow;
+  exsr clearMsgs;
   emode  = 'C';
   eclass = sclass;
   exec sql
@@ -238,23 +248,30 @@ begsr changeRow;
   endif;
   exsr editLoop;
   if not *in12;
-    exec sql
-      update perpdemo.item_class
-         set description = :edesc,
-             is_active   = :eactive,
-             updated_at  = current_timestamp,
-             updated_by  = user
-       where company_code = :compcd and class_code = :eclass;
-    if sqlcode < 0;
-      writeMsg('Change failed: SQLCODE=' + %char(sqlcode));
+    exsr validateClass;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Updated ' + %trim(eclass) + '.');
+      exec sql
+        update perpdemo.item_class
+           set description = :edesc,
+               is_active   = :eactive,
+               updated_at  = current_timestamp,
+               updated_by  = user
+         where company_code = :compcd and class_code = :eclass;
+      if sqlcode < 0;
+        writeMsg('Change failed: SQLCODE=' + %char(sqlcode));
+      else;
+        writeMsg('Updated ' + %trim(eclass) + '.');
+      endif;
+      holdMsg = *on;
     endif;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr deleteRow;
+  exsr clearMsgs;
   exec sql
     delete from perpdemo.item_class
      where company_code = :compcd and class_code = :sclass;
@@ -263,6 +280,7 @@ begsr deleteRow;
   else;
     writeMsg('Deleted ' + %trim(sclass) + '.');
   endif;
+  holdMsg = *on;
 endsr;
 
 // ---------------------------------------------------------------------
@@ -280,6 +298,21 @@ endsr;
 // ---------------------------------------------------------------------
 begsr editLoop;
   exfmt icedit;
+endsr;
+
+// ---------------------------------------------------------------------
+// Required-field validation for the Add/Change panel, done here in RPG
+// instead of letting a blank required field surface as a raw NOT-NULL
+// violation from the database.
+begsr validateClass;
+  validationFailed = *off;
+  if %trim(eclass) = '';
+    writeMsg('Class Code is required.');
+    validationFailed = *on;
+  elseif %trim(edesc) = '';
+    writeMsg('Description is required.');
+    validationFailed = *on;
+  endif;
 endsr;
 
 // ---------------------------------------------------------------------

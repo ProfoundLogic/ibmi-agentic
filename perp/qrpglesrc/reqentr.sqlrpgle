@@ -513,6 +513,11 @@ begsr changeLine;
     leavesr;
   endif;
 
+  if %trim(euom) = '';
+    writeMsg('UOM is required.');
+    leavesr;
+  endif;
+
   exec sql
     update perpdemo.requisition_line
        set quantity      = :eqty,

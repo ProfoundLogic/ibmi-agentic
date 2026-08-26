@@ -255,7 +255,16 @@ begsr addPrice;
   ecurr   = 'USD';
   eprcsrc = 'MANUAL';
   exfmt ipadd;
-  if *in12 or enewprc <= 0;
+  if *in12;
+    leavesr;
+  endif;
+
+  if enewprc <= 0;
+    writeMsg('New Price is required.');
+    leavesr;
+  endif;
+  if %trim(ecurr) = '';
+    writeMsg('Currency is required.');
     leavesr;
   endif;
 

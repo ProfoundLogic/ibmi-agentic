@@ -47,6 +47,7 @@ dcl-s msgkey  char(4);
 dcl-s selRrn  int(10);
 dcl-s selOpt  char(1);
 dcl-s holdMsg ind;
+dcl-s validationFailed ind;
 
 dow not *in03 and not *in12;
   // A message queued by an action handler below (2=Change, etc.) must
@@ -170,12 +171,14 @@ begsr handleOpt;
         exsr displayRow;
       other;
         writeMsg('Option ' + selOpt + ' not valid.');
+        holdMsg = *on;
     endsl;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr addRow;
+  exsr clearMsgs;
   emode   = 'A';
   eucode  = '';
   euname  = '';
@@ -183,22 +186,29 @@ begsr addRow;
   eurole  = 'REQUESTER';
   euact   = 'Y';
   exsr editLoop;
-  if not *in12 and eucode <> '';
-    exec sql
-      insert into perpdemo.perp_user
-        (user_code, display_name, email_address, role_code, is_active)
-        values (:eucode, :euname, :euemail, :eurole, :euact);
-    if sqlcode < 0;
-      writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
-             + ' SQLSTATE=' + sqlstate);
+  if not *in12;
+    exsr validateUser;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Added ' + %trim(eucode) + '.');
+      exec sql
+        insert into perpdemo.perp_user
+          (user_code, display_name, email_address, role_code, is_active)
+          values (:eucode, :euname, :euemail, :eurole, :euact);
+      if sqlcode < 0;
+        writeMsg('Add failed: SQLCODE=' + %char(sqlcode)
+               + ' SQLSTATE=' + sqlstate);
+      else;
+        writeMsg('Added ' + %trim(eucode) + '.');
+      endif;
+      holdMsg = *on;
     endif;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr changeRow;
+  exsr clearMsgs;
   emode  = 'C';
   eucode = sucode;
   exec sql
@@ -213,26 +223,33 @@ begsr changeRow;
   endif;
   exsr editLoop;
   if not *in12;
-    exec sql
-      update perpdemo.perp_user
-         set display_name  = :euname,
-             email_address = :euemail,
-             role_code     = :eurole,
-             is_active     = :euact,
-             updated_at    = current_timestamp,
-             updated_by    = user
-       where user_code = :eucode;
-    if sqlcode < 0;
-      writeMsg('Change failed: SQLCODE=' + %char(sqlcode)
-             + ' SQLSTATE=' + sqlstate);
+    exsr validateUser;
+    if validationFailed;
+      holdMsg = *on;
     else;
-      writeMsg('Updated ' + %trim(eucode) + '.');
+      exec sql
+        update perpdemo.perp_user
+           set display_name  = :euname,
+               email_address = :euemail,
+               role_code     = :eurole,
+               is_active     = :euact,
+               updated_at    = current_timestamp,
+               updated_by    = user
+         where user_code = :eucode;
+      if sqlcode < 0;
+        writeMsg('Change failed: SQLCODE=' + %char(sqlcode)
+               + ' SQLSTATE=' + sqlstate);
+      else;
+        writeMsg('Updated ' + %trim(eucode) + '.');
+      endif;
+      holdMsg = *on;
     endif;
   endif;
 endsr;
 
 // ---------------------------------------------------------------------
 begsr deleteRow;
+  exsr clearMsgs;
   exec sql
     delete from perpdemo.perp_user
      where user_code = :sucode;
@@ -241,6 +258,7 @@ begsr deleteRow;
   else;
     writeMsg('Deleted ' + %trim(sucode) + '.');
   endif;
+  holdMsg = *on;
 endsr;
 
 // ---------------------------------------------------------------------
@@ -258,6 +276,21 @@ endsr;
 // ---------------------------------------------------------------------
 begsr editLoop;
   exfmt uedit;
+endsr;
+
+// ---------------------------------------------------------------------
+// Required-field validation for the Add/Change panel, done here in RPG
+// instead of letting a blank required field surface as a raw FK/NOT-NULL
+// violation from the database.
+begsr validateUser;
+  validationFailed = *off;
+  if %trim(eucode) = '';
+    writeMsg('User Code is required.');
+    validationFailed = *on;
+  elseif %trim(eurole) = '';
+    writeMsg('Role is required.');
+    validationFailed = *on;
+  endif;
 endsr;
 
 // ---------------------------------------------------------------------
