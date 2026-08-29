@@ -1,0 +1,91 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA06(06 'Add')
+     A                                      CA12(12 'Cancel')
+     A          R LTSFL                     SFL
+     A  51                                  SFLNXTCHG
+     A            SOPT           1A  B 10  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SLOT          20A  O 10  5
+     A            SQTY          15Y 4O 10 26EDTCDE(3)
+     A            SRECV         10A  O 10 44
+     A            SEXPD         10A  O 10 56
+     A          R LTCTL                     SFLCTL(LTSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 28'Work with Item Lots'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            SCOMPDSP       3A  O  2 11
+     A                                  2 20'Item Number:'
+     A            SFITEM        25A  B  2 33
+     A                                  2 59'(? = prompt)'
+     A                                  3  2'Item On Hand:'
+     A            SIOH          15Y 4O  3 16EDTCDE(3)
+     A                                  3 38'Lot Total:'
+     A            SLOTTOT       15Y 4O  3 51EDTCDE(3)
+     A  60                              4  2'** DISCREPANCY -- on-hand does not-
+     A                                       match lot total **'
+     A  60                                  DSPATR(HI)
+     A  60                                  COLOR(RED)
+     A                                  6  2'Type option, press Enter.'
+     A                                  7  4'2=Change   4=Delete'
+     A                                  9  2'Opt'
+     A                                      DSPATR(UL)
+     A                                  9  6'Lot'
+     A                                      DSPATR(UL)
+     A                                  9 26'Qty On Hand'
+     A                                      DSPATR(UL)
+     A                                  9 44'Received'
+     A                                      DSPATR(UL)
+     A                                  9 56'Expiry'
+     A                                      DSPATR(UL)
+     A          R LTFOOT
+     A                                 23  2'F3=Exit  F5=Refresh  F6=Add  -
+     A                                      F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R LTNONE
+     A                                      OVERLAY
+     A                                 12 20'** No lots for this item **'
+     A          R LTNOITEM
+     A                                      OVERLAY
+     A                                 12 20'** Enter an item number to be-
+     A                                      gin **'
+     A          R LTEDIT
+     A                                      OVERLAY
+     A                                  1 28'Edit Item Lot'
+     A                                      DSPATR(HI)
+     A                                  2  2'Mode:'
+     A            EMODE          1A  O  2  8
+     A                                  3  2'Lot Number:'
+     A            ELOT          20A  B  3 14
+     A                                  4  2'Qty On Hand:'
+     A            EQTY          15Y 4B  4 15EDTCDE(3)
+     A                                  5  2'Received Date (MM/DD/YY):'
+     A            ERECV         10A  B  5 31
+     A                                  6  2'Expiry Date (MM/DD/YY, bla-
+     A                                      nk=none):'
+     A            EEXPD         10A  B  6 41
+     A                                  7  2'Active:'
+     A            EACTIVE        1A  B  7 10
+     A                                 23  2'Enter=Save   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R LTMSGSFL                  SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R LTMSGCTL                  SFLCTL(LTMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)

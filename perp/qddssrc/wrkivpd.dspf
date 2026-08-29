@@ -1,0 +1,81 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA06(06 'Add New Price')
+     A                                      CA12(12 'Cancel')
+     A          R IPSFL                     SFL
+     A            SEFFFRM       10A  O  8  2
+     A            SEFFTO        10A  O  8 14
+     A            SPRICE        11Y 4O  8 26EDTCDE(3)
+     A            SCURR          5A  O  8 40
+     A            SSRC          10A  O  8 47
+     A          R IPCTL                     SFLCTL(IPSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 15'Item-Vendor Price History'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            SCOMPDSP       3A  O  2 11
+     A                                  2 16'Item:'
+     A            SFITEM        15A  B  2 22
+     A                                  2 39'Vendor:'
+     A            SFVENDOR      10A  B  2 47
+     A                                  2 58'(? = prompt)'
+     A                                  4  2'Historical rows are read-only. F-
+     A                                      6=Add a new current price.'
+     A                                  7  2'From'
+     A                                      DSPATR(UL)
+     A                                  7 14'To'
+     A                                      DSPATR(UL)
+     A                                  7 26'Price'
+     A                                      DSPATR(UL)
+     A                                  7 40'Curr'
+     A                                      DSPATR(UL)
+     A                                  7 47'Source'
+     A                                      DSPATR(UL)
+     A          R IPFOOT
+     A                                      OVERLAY
+     A                                 23  2'F3=Exit   F5=Refresh   F6=Add Ne-
+     A                                      w Price   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R IPNONE
+     A                                      OVERLAY
+     A                                 10 20'** No price history for this ite-
+     A                                      m-vendor **'
+     A          R IPNOSCP
+     A                                      OVERLAY
+     A                                 10 20'** Enter an item and vendor to b-
+     A                                      egin **'
+     A          R IPADD
+     A                                      OVERLAY
+     A                                  1 28'Enter New Price'
+     A                                      DSPATR(HI)
+     A                                  3  2'Item:'
+     A            EITEM         25A  O  3 15
+     A                                  4  2'Vendor:'
+     A            EVENDOR       10A  O  4 15
+     A                                  5  2'New Unit Price:'
+     A            ENEWPRC       11Y 4B  5 19EDTCDE(3)
+     A                                  6  2'Currency:'
+     A            ECURR         20A  B  6 19
+     A                                  7  2'Price Source:'
+     A            EPRCSRC       20A  B  7 19
+     A                                 23  2'Enter=Save   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R IPMSGSFL                  SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R IPMSGCTL                  SFLCTL(IPMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)
