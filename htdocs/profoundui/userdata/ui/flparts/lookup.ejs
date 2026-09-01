@@ -1,0 +1,83 @@
+<div class="fl-screen fllk-screen">
+
+  <div class="fl-mast">
+    <div class="fl-logo" role="img" aria-label="J.H. Fletcher &amp; Co."></div>
+    <div>
+      <div class="fl-mast-title">Find a machine</div>
+      <div class="fl-mast-sub">Search by customer, mine site, model or serial</div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+
+  <div class="fllk-bar">
+    <div class="fl-field fllk-grow">
+      <label for="ssearch">Customer, site, model or serial</label>
+      <input class="fl-input" type="text" name="ssearch" id="ssearch"
+             value="<%= ssearch %>" placeholder="Cumberland, Gilsonite, HDDR, FL0042&hellip;">
+    </div>
+    <button class="fl-btn" onclick="pui.submit({action:'SEARCH'})">Search</button>
+  </div>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+    <div class="fl-msg"><%= msg %></div>
+  <% } %>
+
+  <div class="fllk-hint">
+    A parts call usually starts with a company name, not a serial number. Any of
+    these will find the machine.
+  </div>
+
+  <% if (typeof lkupsfl !== 'undefined' && lkupsfl && lkupsfl.length > 0) { %>
+    <div class="fllk-count">
+      <strong><%= scount %></strong> machine<%= Number(scount) === 1 ? '' : 's' %> found.
+      <% if (typeof soptdesc !== 'undefined' && soptdesc && soptdesc.trim()) { %>
+        <%= soptdesc %>
+      <% } %>
+    </div>
+    <div class="fl-grid-scroll">
+    <table class="fl-table">
+      <thead>
+        <tr>
+          <th style="width:44px">Opt</th>
+          <th style="width:100px">Serial</th>
+          <th style="width:110px">Model</th>
+          <th class="fl-hide-sm">Description</th>
+          <th>Customer</th>
+          <th class="fl-hide-sm">Site</th>
+          <th style="width:100px">Built</th>
+          <th style="width:84px">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% lkupsfl.forEach(function(row) { %>
+        <tr class="fl-row-pick" ondblclick="flPickRow(this,'5')"
+            title="Double-click to use this machine">
+          <td><input class="fl-input fllk-opt" name="lkupsfl.sopt.<%= row._rrn %>"
+                     value="<%= row.sopt %>" size="2" maxlength="2"></td>
+          <td><strong><%= row.sserial %></strong></td>
+          <td><%= row.smodel %></td>
+          <td class="fl-hide-sm"><%= row.smodeldsc %></td>
+          <td><%= row.scustname %></td>
+          <td class="fl-hide-sm"><%= row.ssitename %></td>
+          <td><%= row.sbuilt %></td>
+          <td><%= row.sstatusd %></td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+    </div>
+    <% if (lkupsfl.length > 15) { %>
+      <div class="fl-grid-note"><%= scount %> rows &mdash; scroll the grid for the rest,
+        or narrow the search.</div>
+    <% } %>
+  <% } else { %>
+    <div class="fl-empty">No machines match that search.</div>
+  <% } %>
+
+  <input type="hidden" name="action" value="">
+
+  <div class="fl-foot">
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'EXIT'})" data-fkey="F3">Cancel (F3)</button>
+  </div>
+</div>

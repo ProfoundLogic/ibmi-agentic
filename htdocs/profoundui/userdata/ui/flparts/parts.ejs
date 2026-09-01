@@ -1,0 +1,131 @@
+<%
+  function fmt(n, d) {
+    n = Number(n) || 0;
+    var s = n.toFixed(d === undefined ? 0 : d).split('.');
+    s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return s.join('.');
+  }
+  var dupWarn = Number(typeof sdupwarn !== 'undefined' ? sdupwarn : 0) || 0;
+%>
+<div class="fl-screen flparts-screen">
+
+  <div class="fl-mast">
+    <div class="fl-logo" role="img" aria-label="J.H. Fletcher &amp; Co."></div>
+    <div>
+      <div class="fl-mast-title">Parts Finder</div>
+      <div class="fl-mast-sub">Parts that fit this machine as built</div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+
+  <div class="flparts-bar">
+    <div class="fl-field">
+      <label for="sserial">Machine serial</label>
+      <input class="fl-input flparts-ser" type="text" name="sserial" id="sserial"
+             value="<%= sserial %>" size="10" maxlength="8">
+    </div>
+    <div class="fl-field flparts-grow">
+      <label for="ssearch">Search within this machine</label>
+      <input class="fl-input" type="text" name="ssearch" id="ssearch"
+             value="<%= ssearch %>" placeholder="pump, filter, cylinder&hellip;">
+    </div>
+    <button class="fl-btn" onclick="pui.submit({action:'SEARCH'})">Find parts</button>
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'LOOKUP'})"
+            title="Search by customer, site, model or partial serial">Look up machine&hellip;</button>
+  </div>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+    <div class="fl-msg"><%= msg %></div>
+  <% } %>
+
+  <% if (typeof smodel !== 'undefined' && smodel && smodel.trim()) { %>
+    <div class="fl-card flparts-ident">
+      <div class="flparts-ident-row">
+        <div><label>Model</label><span><%= smodel %> &mdash; <%= smodeldsc %></span></div>
+        <div><label>Customer</label><span><%= scustname %></span></div>
+        <div><label>Site</label><span><%= ssitename %></span></div>
+        <div><label>Built</label><span><%= sbuilt %></span></div>
+      </div>
+      <% if (typeof soptions !== 'undefined' && soptions && soptions.trim()) { %>
+        <div class="flparts-opts"><label>Options fitted</label> <span><%= soptions %></span></div>
+      <% } %>
+    </div>
+  <% } %>
+
+  <% if (dupWarn > 0) { %>
+    <div class="flparts-dupbar">
+      <strong><%= dupWarn %></strong> of the parts below have near-duplicate part numbers
+      elsewhere in the item master. Type <strong>5</strong> against a row to see the cluster.
+    </div>
+  <% } %>
+
+  <% if (typeof soptdesc !== 'undefined' && soptdesc && soptdesc.trim()) { %>
+    <div class="flparts-hint"><%= soptdesc %></div>
+  <% } %>
+
+  <% if (typeof partsfl !== 'undefined' && partsfl && partsfl.length > 0) { %>
+    <div class="fl-grid-scroll">
+    <table class="fl-table flparts-table">
+      <thead>
+        <tr>
+          <th style="width:44px">Opt</th>
+          <th style="width:150px">Part number</th>
+          <th>Description</th>
+          <th style="width:150px" class="fl-hide-sm">Assembly</th>
+          <th style="width:52px" class="fl-num">Qty</th>
+          <th style="width:66px" class="fl-num">Stock</th>
+          <th style="width:96px" class="fl-num">Price</th>
+          <th style="width:64px" class="fl-num fl-hide-sm">Lead</th>
+          <th style="width:104px">Status</th>
+          <th style="width:104px">Duplicates</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% partsfl.forEach(function(row) { %>
+        <tr class="fl-row-pick" ondblclick="flPickRow(this,'5')"
+            title="Double-click to show near-duplicate part numbers">
+          <td><input class="fl-input flparts-opt" name="partsfl.sopt.<%= row._rrn %>"
+                     value="<%= row.sopt %>" size="2" maxlength="2"></td>
+          <td><strong><%= row.spart %></strong></td>
+          <td><%= row.sdescr %></td>
+          <td class="fl-hide-sm"><%= row.sassy %></td>
+          <td class="fl-num"><%= fmt(row.sqty) %></td>
+          <td class="fl-num <%= Number(row.sstock) === 0 ? 'flparts-nostock' : '' %>"><%= fmt(row.sstock) %></td>
+          <td class="fl-num">$<%= fmt(row.sprice, 2) %></td>
+          <td class="fl-num fl-hide-sm"><%= fmt(row.slead) %>d</td>
+          <td>
+            <% if (row.sstatusd && row.sstatusd.trim() === 'Active') { %>
+              <span class="fl-pill fl-pill-ok"><%= row.sstatusd %></span>
+            <% } else { %>
+              <span class="fl-pill fl-pill-warn"><%= row.sstatusd %></span>
+            <% } %>
+          </td>
+          <td>
+            <% if (Number(row.sdupes) > 0) { %>
+              <span class="fl-pill fl-pill-bad"><%= row.sdupes %> similar</span>
+            <% } else { %>
+              <span class="flparts-none">&mdash;</span>
+            <% } %>
+          </td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+    </div>
+    <% if (partsfl.length > 15) { %>
+      <div class="fl-grid-note"><%= partsfl.length %> rows &mdash; scroll the grid for the rest,
+        or search within this machine.</div>
+    <% } %>
+  <% } else if (typeof smodel !== 'undefined' && smodel && smodel.trim()) { %>
+    <div class="fl-empty">No parts match that search for this machine.</div>
+  <% } %>
+
+  <input type="hidden" name="action" value="">
+
+  <div class="fl-foot">
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'EXIT'})" data-fkey="F3">Exit (F3)</button>
+    <span class="fl-mast-spacer"></span>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+</div>

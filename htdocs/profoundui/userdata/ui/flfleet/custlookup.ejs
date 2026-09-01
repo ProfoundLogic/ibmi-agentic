@@ -1,0 +1,99 @@
+<%
+  function fmt(n, d) {
+    n = Number(n) || 0;
+    var s = n.toFixed(d === undefined ? 0 : d).split('.');
+    s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return s.join('.');
+  }
+%>
+<div class="fl-screen flcl-screen">
+
+  <div class="fl-mast">
+    <div class="fl-logo" role="img" aria-label="J.H. Fletcher &amp; Co."></div>
+    <div>
+      <div class="fl-mast-title">Find a customer</div>
+      <div class="fl-mast-sub">Search by name, city, state, region or account manager</div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+
+  <div class="flcl-bar">
+    <div class="fl-field flcl-grow">
+      <label for="ssearch">Name, city, state, region, manager or number</label>
+      <input class="fl-input" type="text" name="ssearch" id="ssearch"
+             value="<%= ssearch %>" placeholder="Cumberland, WV, Appalachia, Ferris&hellip;">
+    </div>
+    <button class="fl-btn" onclick="pui.submit({action:'SEARCH'})">Search</button>
+  </div>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+    <div class="fl-msg"><%= msg %></div>
+  <% } %>
+
+  <div class="flcl-hint">
+    Fleet size and parts spend are shown per account, so this doubles as an
+    installed-base-by-customer view.
+  </div>
+
+  <% if (typeof clkpsfl !== 'undefined' && clkpsfl && clkpsfl.length > 0) { %>
+    <div class="flcl-count">
+      <strong><%= scount %></strong> customer<%= Number(scount) === 1 ? '' : 's' %>.
+      <% if (typeof soptdesc !== 'undefined' && soptdesc && soptdesc.trim()) { %>
+        <%= soptdesc %>
+      <% } %>
+    </div>
+    <div class="fl-grid-scroll">
+    <table class="fl-table">
+      <thead>
+        <tr>
+          <th style="width:44px">Opt</th>
+          <th style="width:80px">Number</th>
+          <th>Customer</th>
+          <th class="fl-hide-sm">City</th>
+          <th style="width:50px" class="fl-hide-sm">St</th>
+          <th style="width:110px">Region</th>
+          <th style="width:150px" class="fl-hide-sm">Account manager</th>
+          <th style="width:80px" class="fl-num">Machines</th>
+          <th style="width:60px" class="fl-num">Sites</th>
+          <th style="width:120px" class="fl-num">Parts spend</th>
+          <th style="width:80px" class="fl-num">Trend</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% clkpsfl.forEach(function(row) { %>
+        <tr class="fl-row-pick" ondblclick="flPickRow(this,'5')"
+            title="Double-click to show this customer's fleet">
+          <td><input class="fl-input flcl-opt" name="clkpsfl.sopt.<%= row._rrn %>"
+                     value="<%= row.sopt %>" size="2" maxlength="2"></td>
+          <td><%= row.scustno %></td>
+          <td><strong><%= row.scustname %></strong></td>
+          <td class="fl-hide-sm"><%= row.scity %></td>
+          <td class="fl-hide-sm"><%= row.sstate %></td>
+          <td><span class="fl-pill"><%= row.sregion %></span></td>
+          <td class="fl-hide-sm"><%= row.smgr %></td>
+          <td class="fl-num"><%= fmt(row.smachcnt) %></td>
+          <td class="fl-num"><%= fmt(row.ssitecnt) %></td>
+          <td class="fl-num">$<%= fmt(row.sspend, 2) %></td>
+          <td class="fl-num <%= Number(row.strend) < 0 ? 'flcl-down' : '' %>">
+            <%= Number(row.strend) > 0 ? '+' : '' %><%= fmt(row.strend, 1) %>%
+          </td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+    </div>
+    <% if (clkpsfl.length > 15) { %>
+      <div class="fl-grid-note"><%= scount %> rows &mdash; scroll the grid for the rest,
+        or narrow the search.</div>
+    <% } %>
+  <% } else { %>
+    <div class="fl-empty">No customers match that search.</div>
+  <% } %>
+
+  <input type="hidden" name="action" value="">
+
+  <div class="fl-foot">
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'EXIT'})" data-fkey="F3">Cancel (F3)</button>
+  </div>
+</div>

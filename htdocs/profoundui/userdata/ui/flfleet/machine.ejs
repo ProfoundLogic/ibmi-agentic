@@ -1,0 +1,101 @@
+<%
+  function fmt(n, d) {
+    n = Number(n) || 0;
+    var s = n.toFixed(d === undefined ? 0 : d).split('.');
+    s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return s.join('.');
+  }
+%>
+<div class="fl-screen flmach-screen">
+
+  <div class="fl-mast">
+    <div class="fl-logo" role="img" aria-label="J.H. Fletcher &amp; Co."></div>
+    <div>
+      <div class="fl-mast-title">Machine <%= sserial %></div>
+      <div class="fl-mast-sub"><%= smodel %> &mdash; <%= smodeldsc %></div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <% if (typeof smodflag !== 'undefined' && smodflag && smodflag.trim()) { %>
+      <span class="fl-pill <%= smodflag.indexOf('FULL') === 0 ? 'fl-pill-bad' : 'fl-pill-warn' %>"><%= smodflag %></span>
+    <% } %>
+    <span class="fl-demo-flag">Demo data</span>
+  </div>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+    <div class="fl-msg"><%= msg %></div>
+  <% } %>
+
+  <div class="flmach-grid">
+    <div class="fl-card">
+      <h2>Ownership</h2>
+      <div class="flmach-f"><label>Customer</label><span><%= scustname %></span></div>
+      <div class="flmach-f"><label>Site</label><span><%= ssitename %></span></div>
+      <div class="flmach-f"><label>Region</label><span><%= sregion %></span></div>
+      <div class="flmach-f"><label>Status</label><span><%= sstatusd %></span></div>
+    </div>
+    <div class="fl-card">
+      <h2>Build</h2>
+      <div class="flmach-f"><label>Built</label><span><%= sbuilt %></span></div>
+      <div class="flmach-f"><label>Shipped</label><span><%= sshipped %></span></div>
+      <div class="flmach-f"><label>Operating hours</label><span><%= fmt(shours) %></span></div>
+    </div>
+    <div class="fl-card">
+      <h2>Service &amp; modernization</h2>
+      <div class="flmach-f"><label>Last service</label><span><%= slastsvc %></span></div>
+      <div class="flmach-f"><label>Last modernization</label><span><%= slastmod && slastmod.trim() ? slastmod : 'None' %></span></div>
+      <div class="flmach-f"><label>Modernization type</label><span><%= smodtyped %></span></div>
+      <div class="flmach-f"><label>Review status</label>
+        <span><%= smodflag && smodflag.trim() ? smodflag : 'Current' %></span></div>
+    </div>
+    <div class="fl-card flmach-opts">
+      <h2>Options fitted</h2>
+      <% if (typeof soptions !== 'undefined' && soptions && soptions.trim()) { %>
+        <ul class="flmach-optlist">
+        <% soptions.split(',').forEach(function (o) { if (o.trim()) { %>
+          <li><%= o.trim() %></li>
+        <% } }); %>
+        </ul>
+      <% } else { %>
+        <div class="flmach-none">No options recorded &mdash; base machine.</div>
+      <% } %>
+    </div>
+  </div>
+
+  <% if (typeof svcsfl !== 'undefined' && svcsfl && svcsfl.length > 0) { %>
+    <h3 class="flmach-h">Service history</h3>
+    <div class="fl-grid-scroll">
+    <table class="fl-table">
+      <thead>
+        <tr>
+          <th style="width:120px">Date</th>
+          <th style="width:150px">Type</th>
+          <th style="width:220px" class="fl-hide-sm">Technician</th>
+          <th style="width:38%">Description</th>
+          <th style="width:130px" class="fl-num">Downtime</th>
+          <th style="width:150px" class="fl-num">Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% svcsfl.forEach(function(row) { %>
+        <tr>
+          <td><%= row.ssvcdate %></td>
+          <td><span class="fl-pill"><%= row.ssvctyped %></span></td>
+          <td class="fl-hide-sm"><%= row.stech %></td>
+          <td><%= row.sdescr %></td>
+          <td class="fl-num"><%= fmt(row.sdownhrs, 1) %> h</td>
+          <td class="fl-num">$<%= fmt(row.scost, 2) %></td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+    </div>
+  <% } else { %>
+    <div class="fl-empty">No service events recorded for this machine.</div>
+  <% } %>
+
+  <input type="hidden" name="action" value="">
+
+  <div class="fl-foot">
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'EXIT'})" data-fkey="F3">Back (F3)</button>
+  </div>
+</div>

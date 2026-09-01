@@ -1,0 +1,138 @@
+<%
+  function fmt(n, d) {
+    n = Number(n) || 0;
+    var s = n.toFixed(d === undefined ? 0 : d).split('.');
+    s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return s.join('.');
+  }
+  var trend = Number(typeof strendpct !== 'undefined' ? strendpct : 0) || 0;
+%>
+<div class="fl-screen flfleet-screen">
+
+  <div class="fl-mast">
+    <div class="fl-logo" role="img" aria-label="J.H. Fletcher &amp; Co."></div>
+    <div>
+      <div class="fl-mast-title">Fleet 360</div>
+      <div class="fl-mast-sub">Installed base by customer</div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+
+  <div class="flfleet-bar">
+    <div class="fl-field">
+      <label for="scustno">Customer number</label>
+      <input class="fl-input flfleet-cust" type="text" name="scustno" id="scustno"
+             value="<%= scustno %>" size="8" maxlength="6">
+    </div>
+    <button class="fl-btn" onclick="pui.submit({action:'SEARCH'})">Show fleet</button>
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'LOOKUP'})"
+            title="Search by name, city, state, region or account manager">Look up customer&hellip;</button>
+  </div>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+    <div class="fl-msg"><%= msg %></div>
+  <% } %>
+
+  <% if (typeof scustname !== 'undefined' && scustname && scustname.trim()) { %>
+    <div class="flfleet-cust-head">
+      <span class="flfleet-cust-name"><%= scustname %></span>
+      <% if (typeof sregion !== 'undefined' && sregion && sregion.trim()) { %>
+        <span class="fl-pill"><%= sregion %></span>
+      <% } %>
+    </div>
+
+    <div class="flfleet-kpis">
+      <div class="fl-card flfleet-kpi">
+        <div class="flfleet-kpi-v"><%= fmt(smachcnt) %></div>
+        <div class="flfleet-kpi-l">Machines</div>
+      </div>
+      <div class="fl-card flfleet-kpi">
+        <div class="flfleet-kpi-v"><%= fmt(ssitecnt) %></div>
+        <div class="flfleet-kpi-l">Sites</div>
+      </div>
+      <div class="fl-card flfleet-kpi">
+        <div class="flfleet-kpi-v">$<%= fmt(sspendcur, 2) %></div>
+        <div class="flfleet-kpi-l">Parts spend, prior full year</div>
+      </div>
+      <div class="fl-card flfleet-kpi">
+        <div class="flfleet-kpi-v <%= trend < 0 ? 'flfleet-down' : 'flfleet-up' %>">
+          <%= trend > 0 ? '+' : '' %><%= fmt(trend, 1) %>%
+        </div>
+        <div class="flfleet-kpi-l">Year on year</div>
+      </div>
+      <div class="fl-card flfleet-kpi">
+        <div class="flfleet-kpi-v <%= Number(smodcand) > 0 ? 'flfleet-down' : '' %>"><%= fmt(smodcand) %></div>
+        <div class="flfleet-kpi-l">Modernization candidates</div>
+      </div>
+    </div>
+
+    <% if (typeof sinsight !== 'undefined' && sinsight && sinsight.trim()) { %>
+      <div class="fl-card flfleet-insight">
+        <h2>Account summary</h2>
+        <p><%= sinsight %></p>
+        <p class="flfleet-src">Every figure above is computed from the machine,
+           service and parts-order tables &mdash; not generated text.</p>
+      </div>
+    <% } %>
+  <% } %>
+
+  <% if (typeof soptdesc !== 'undefined' && soptdesc && soptdesc.trim()) { %>
+    <div class="flfleet-hint"><%= soptdesc %></div>
+  <% } %>
+
+  <% if (typeof machsfl !== 'undefined' && machsfl && machsfl.length > 0) { %>
+    <div class="fl-grid-scroll">
+    <table class="fl-table flfleet-table">
+      <thead>
+        <tr>
+          <th style="width:44px">Opt</th>
+          <th style="width:90px">Serial</th>
+          <th style="width:110px">Model</th>
+          <th class="fl-hide-sm">Description</th>
+          <th class="fl-hide-sm">Site</th>
+          <th style="width:96px">Built</th>
+          <th style="width:90px" class="fl-num">Hours</th>
+          <th style="width:84px">Status</th>
+          <th style="width:96px" class="fl-hide-sm">Last service</th>
+          <th style="width:118px">Modernization</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% machsfl.forEach(function(row) { %>
+        <tr class="fl-row-pick" ondblclick="flPickRow(this,'5')"
+            title="Double-click for machine detail and service history">
+          <td><input class="fl-input flfleet-opt" name="machsfl.sopt.<%= row._rrn %>"
+                     value="<%= row.sopt %>" size="2" maxlength="2"></td>
+          <td><strong><%= row.sserial %></strong></td>
+          <td><%= row.smodel %></td>
+          <td class="fl-hide-sm"><%= row.smodeldsc %></td>
+          <td class="fl-hide-sm"><%= row.ssite %></td>
+          <td><%= row.sbuilt %></td>
+          <td class="fl-num"><%= fmt(row.shours) %></td>
+          <td><%= row.sstatusd %></td>
+          <td class="fl-hide-sm"><%= row.slastsvc %></td>
+          <td>
+            <% if (row.smodflag && row.smodflag.trim()) { %>
+              <span class="fl-pill <%= row.smodflag.indexOf('FULL') === 0 ? 'fl-pill-bad' : 'fl-pill-warn' %>"><%= row.smodflag %></span>
+            <% } else { %>
+              <span class="fl-pill fl-pill-ok">Current</span>
+            <% } %>
+          </td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+    </div>
+  <% } else if (typeof scustname !== 'undefined' && scustname && scustname.trim()) { %>
+    <div class="fl-empty">No machines on record for this customer.</div>
+  <% } %>
+
+  <input type="hidden" name="action" value="">
+
+  <div class="fl-foot">
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'EXIT'})" data-fkey="F3">Exit (F3)</button>
+    <span class="fl-mast-spacer"></span>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+</div>

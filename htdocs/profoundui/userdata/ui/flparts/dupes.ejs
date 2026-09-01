@@ -1,0 +1,73 @@
+<%
+  function fmt(n, d) {
+    n = Number(n) || 0;
+    var s = n.toFixed(d === undefined ? 0 : d).split('.');
+    s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return s.join('.');
+  }
+%>
+<div class="fl-screen fldup-screen">
+
+  <div class="fl-mast">
+    <div class="fl-logo" role="img" aria-label="J.H. Fletcher &amp; Co."></div>
+    <div>
+      <div class="fl-mast-title">Near-duplicate parts</div>
+      <div class="fl-mast-sub"><%= spart %> &mdash; <%= sdescr %></div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <span class="fl-demo-flag">Demo data</span>
+  </div>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+    <div class="fl-msg"><%= msg %></div>
+  <% } %>
+
+  <div class="fldup-note">
+    These part numbers describe the same item under different naming conventions
+    adopted over the years. They are shown for review &mdash; nothing is blocked
+    or merged automatically.
+  </div>
+
+  <% if (typeof dupsfl !== 'undefined' && dupsfl && dupsfl.length > 0) { %>
+    <table class="fl-table">
+      <thead>
+        <tr>
+          <th style="width:160px">Part number</th>
+          <th>Description</th>
+          <th style="width:90px">Created</th>
+          <th style="width:74px" class="fl-num">Stock</th>
+          <th style="width:100px" class="fl-num">Price</th>
+          <th style="width:110px">Status</th>
+          <th style="width:150px" class="fl-hide-sm">Superseded by</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% dupsfl.forEach(function(row) { %>
+        <tr>
+          <td><strong><%= row.sdpart %></strong></td>
+          <td><%= row.sddescr %></td>
+          <td><%= row.sdyear %></td>
+          <td class="fl-num"><%= fmt(row.sdstock) %></td>
+          <td class="fl-num">$<%= fmt(row.sdprice, 2) %></td>
+          <td>
+            <% if (row.sdstatusd && row.sdstatusd.trim() === 'Active') { %>
+              <span class="fl-pill fl-pill-ok"><%= row.sdstatusd %></span>
+            <% } else { %>
+              <span class="fl-pill fl-pill-warn"><%= row.sdstatusd %></span>
+            <% } %>
+          </td>
+          <td class="fl-hide-sm"><%= row.sdsuper && row.sdsuper.trim() ? row.sdsuper : '—' %></td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <div class="fl-empty">No near-duplicates found for this part.</div>
+  <% } %>
+
+  <input type="hidden" name="action" value="">
+
+  <div class="fl-foot">
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'EXIT'})" data-fkey="F3">Back (F3)</button>
+  </div>
+</div>
