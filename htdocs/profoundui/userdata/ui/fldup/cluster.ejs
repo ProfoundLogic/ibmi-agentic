@@ -1,0 +1,149 @@
+<%
+  function fmt(n, d) {
+    n = Number(n) || 0;
+    var s = n.toFixed(d === undefined ? 0 : d).split('.');
+    s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return s.join('.');
+  }
+  var surv = (typeof ssurv !== 'undefined' && ssurv) ? ssurv.trim() : '';
+  var conf = Number(typeof sconf !== 'undefined' ? sconf : 0) || 0;
+%>
+<div class="fl-screen fldc-screen">
+
+  <div class="fl-mast">
+    <div class="fl-logo" role="img" aria-label="J.H. Fletcher &amp; Co."></div>
+    <div>
+      <div class="fl-mast-title">Cluster #<%= sclid %></div>
+      <div class="fl-mast-sub">Decide once for the whole group</div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <span class="fl-pill fl-pill-<%= conf >= 80 ? 'ok' : conf >= 60 ? 'warn' : 'bad' %>"><%= sconf %>% confidence</span>
+    <span class="fl-pill"><%= sstatd %></span>
+    <span class="fl-demo-flag">Demo data</span>
+  </div>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+    <div class="fl-msg"><%= msg %></div>
+  <% } %>
+
+  <div class="fl-card fldc-reason">
+    <h2>Why these were flagged</h2>
+    <p><%= sreason %></p>
+  </div>
+
+  <div class="fldc-impact">
+    <strong><%= fmt(stotbom) %></strong> BOM lines and
+    <strong>$<%= fmt(stotval, 2) %></strong> of stock sit under these part numbers.
+    Superseding a part does not delete it &mdash; existing BOMs and history keep
+    pointing at the old number, and the supersession tells anyone who looks what
+    to order instead.
+  </div>
+
+  <div class="fldc-how">
+    <div class="fldc-how-t">How to use this screen</div>
+    <ol>
+      <li>Put <strong>1</strong> against the part you want to <strong>keep</strong>
+          (or double-click it).</li>
+      <li>Put <strong>2</strong> against each part you want to
+          <strong>merge into it</strong>.</li>
+      <li>Leave the Opt column <strong>blank</strong> on anything that is a
+          genuinely separate part &mdash; it will not be touched.</li>
+      <li>Press <strong>Merge</strong>.</li>
+    </ol>
+    <div class="fldc-how-n">You do not have to resolve the whole group at once.
+      Merge the two you are sure about and leave the rest alone.</div>
+  </div>
+  <% if (surv) { %>
+    <div class="fldc-pick">Keeping <strong><%= surv %></strong>.</div>
+  <% } %>
+
+  <% if (typeof memsfl !== 'undefined' && memsfl && memsfl.length > 0) { %>
+    <div class="fl-grid-scroll">
+    <table class="fl-table">
+      <thead>
+        <tr>
+          <th style="width:44px">Opt</th>
+          <th style="width:150px">Part number</th>
+          <th>Description</th>
+          <th style="width:100px">Created</th>
+          <th style="width:220px" class="fl-hide-sm">Naming convention</th>
+          <th style="width:110px">Status</th>
+          <th style="width:150px">Superseded by</th>
+          <th style="width:70px" class="fl-num">Stock</th>
+          <th style="width:110px" class="fl-num">Price</th>
+          <th style="width:120px" class="fl-num">Stock value</th>
+          <th style="width:70px" class="fl-num">BOM</th>
+          <th style="width:78px" class="fl-num">Orders</th>
+          <th style="width:110px">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% memsfl.forEach(function(row) { %>
+        <tr class="fl-row-pick <%= surv && row.spart.trim() === surv ? 'fldc-keep' : '' %>"
+            ondblclick="flPickRow(this,'1')" title="Double-click to keep this part (option 1)">
+          <td><input class="fl-input fldc-opt" name="memsfl.sopt.<%= row._rrn %>"
+                     value="<%= row.sopt %>" size="2" maxlength="2"></td>
+          <td><strong><%= row.spart %></strong>
+            <% if (surv && row.spart.trim() === surv) { %>
+              <span class="fl-pill fl-pill-ok">KEEP</span>
+            <% } %>
+          </td>
+          <td><%= row.sdescr %></td>
+          <td><%= row.screated %></td>
+          <td class="fl-hide-sm fldc-why"><%= row.swhy %></td>
+          <td>
+            <% if (row.sstatusd && row.sstatusd.trim() === 'Active') { %>
+              <span class="fl-pill fl-pill-ok"><%= row.sstatusd %></span>
+            <% } else { %>
+              <span class="fl-pill fl-pill-warn"><%= row.sstatusd %></span>
+            <% } %>
+          </td>
+          <td>
+            <% if (row.ssuper && row.ssuper.trim()) { %>
+              <span class="fldc-sup">&rarr; <%= row.ssuper %></span>
+            <% } else { %>
+              <span class="fldc-none">&mdash;</span>
+            <% } %>
+          </td>
+          <td class="fl-num"><%= fmt(row.sstock) %></td>
+          <td class="fl-num">$<%= fmt(row.sprice, 2) %></td>
+          <td class="fl-num">$<%= fmt(row.svalm, 2) %></td>
+          <td class="fl-num"><%= fmt(row.sbomm) %></td>
+          <td class="fl-num"><%= fmt(row.sordm) %></td>
+          <td>
+            <% if (row.sroled && row.sroled.trim()) { %>
+              <span class="fl-pill <%= row.sroled.trim() === 'Kept' ? 'fl-pill-ok'
+                    : row.sroled.trim() === 'Merged in' ? 'fl-pill-warn' : '' %>"><%= row.sroled %></span>
+            <% } else { %>
+              <span class="fldc-none">&mdash;</span>
+            <% } %>
+          </td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+    </div>
+  <% } else { %>
+    <div class="fl-empty">No members found for this cluster.</div>
+  <% } %>
+
+  <div class="fl-field fldc-note">
+    <label for="snote">Note (optional &mdash; recorded against the decision)</label>
+    <input class="fl-input" type="text" name="snote" id="snote" value="<%= snote %>"
+           placeholder="e.g. confirmed with engineering, same casting">
+  </div>
+
+  <input type="hidden" name="action" value="">
+  <input type="hidden" name="ssurv" value="<%= ssurv %>">
+
+  <div class="fl-foot">
+    <button class="fl-btn" onclick="pui.submit({action:'MERGE'})"
+            title="Supersede the parts marked 2 by the part marked 1">Merge marked into kept</button>
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'REJECT'})"
+            title="These are genuinely different parts - never raise this cluster again">Not duplicates</button>
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'DEFER'})"
+            title="Come back to this one later">Defer</button>
+    <span class="fl-mast-spacer"></span>
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'EXIT'})" data-fkey="F3">Back (F3)</button>
+  </div>
+</div>

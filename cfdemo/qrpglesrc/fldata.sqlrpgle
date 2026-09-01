@@ -40,9 +40,20 @@ dcl-ds sigCache qualified dim(2000);
   part char(15);
   words varchar(120);
   sizes varchar(40);
+  descr char(40);
+  line char(3);
+  super char(15);
+  status char(1);
+  price packed(11:2);
+  stock packed(7:0);
+  created packed(8:0);
 end-ds;
 dcl-s sigCount int(10) inz(0);
 dcl-s sigLoaded ind inz(*off);
+
+// scan bookkeeping - global because free-form RPG requires declarations
+// before the first procedure, not between them (RNF0256)
+dcl-s used ind dim(2000);
 
 // ------------------------------------------------------------------ helpers
 dcl-proc fl_lookup;
@@ -116,12 +127,18 @@ dcl-proc fl_norm;
       endif;
     endif;
 
-    // a token starting with a digit is a size; strip any trailing unit
-    isSize = %check('0123456789' : tok) <> 1 and %len(tok) > 0;
+    // Any token containing a digit is a size or variant designation, not a
+    // descriptive word: 4IN, 200, A1, B3. Treating short ones like A1 as
+    // words-too-short-to-keep made A1, A2 and B3 pumps look identical.
+    isSize = %check('ABCDEFGHIJKLMNOPQRSTUVWXYZ' : %trimr(tok)) <> 0
+             and %len(%trim(tok)) > 0;
     if isSize;
-      n = %check('0123456789' : tok);
-      if n > 0;
-        tok = %subst(tok : 1 : n - 1);
+      // if it starts with digits, drop a trailing unit: 4IN -> 4
+      if %check('0123456789' : tok) <> 1;
+        n = %check('0123456789' : tok);
+        if n > 0;
+          tok = %subst(tok : 1 : n - 1);
+        endif;
       endif;
       if tok = '';
         iter;
@@ -172,22 +189,39 @@ dcl-proc fl_norm;
 end-proc;
 
 dcl-proc fl_loadSigs;
-  dcl-s pn char(15);
-  dcl-s pd char(40);
+  dcl-ds r qualified;
+    part char(15);
+    descr char(40);
+    line char(3);
+    super char(15);
+    status char(1);
+    price packed(11:2);
+    stock packed(7:0);
+    created packed(8:0);
+  end-ds;
   if sigLoaded;
     return;
   endif;
   exec sql declare cSig cursor for
-    select flpart, flpdesc from flpartp order by flpart;
+    select flpart, flpdesc, flpline, flpsuper, flpstat, flpprice, flpstock,
+           flpcreat
+      from flpartp order by flpart;
   exec sql open cSig;
   dow sigCount < %elem(sigCache);
-    exec sql fetch cSig into :pn, :pd;
+    exec sql fetch cSig into :r;
     if sqlcode <> 0;
       leave;
     endif;
     sigCount += 1;
-    sigCache(sigCount).part = pn;
-    fl_norm(pd : sigCache(sigCount).words : sigCache(sigCount).sizes);
+    sigCache(sigCount).part    = r.part;
+    sigCache(sigCount).descr   = r.descr;
+    sigCache(sigCount).line    = r.line;
+    sigCache(sigCount).super   = r.super;
+    sigCache(sigCount).status  = r.status;
+    sigCache(sigCount).price   = r.price;
+    sigCache(sigCount).stock   = r.stock;
+    sigCache(sigCount).created = r.created;
+    fl_norm(r.descr : sigCache(sigCount).words : sigCache(sigCount).sizes);
   enddo;
   exec sql close cSig;
   sigLoaded = *on;
@@ -1005,5 +1039,587 @@ dcl-proc fl_getFleetSummary export;
     txt += 'No prior-year parts spend to compare.';
   endif;
   summary.insight = txt;
+  return '';
+end-proc;
+
+// ==================================================================
+//  Duplicate review (A7)
+//
+//  fl_scanDuplicates groups the item master by normalised description
+//  signature and writes each multi-member group to FLDUPC/FLDUPM with an
+//  explainable confidence score, a plain-language reason, and the blast
+//  radius per member. The review utility then applies a decision.
+//
+//  Confidence is built from named signals so it can be defended:
+//     identical description text        40
+//     same normalised word set          30   (always true by construction)
+//     same size / rating                15
+//     already linked by supersession    10
+//     same product line                 5
+//     prices within 15%                 5
+//  Capped at 100. A size mismatch scores nothing and says so - those are
+//  usually genuine variants (HOSE 25FT vs 40FT) and belong low in the queue
+//  rather than hidden, because only a human can settle them.
+// ==================================================================
+
+
+dcl-proc fl_dupRoleDesc export;
+  dcl-pi *n char(12);
+    code char(1) const;
+  end-pi;
+  select;
+    when code = 'S';
+      return 'Kept';
+    when code = 'L';
+      return 'Merged in';
+    when code = 'X';
+      return 'Left alone';
+    other;
+      return '';
+  endsl;
+end-proc;
+
+dcl-proc fl_dupStatusDesc export;
+  dcl-pi *n char(14);
+    code char(1) const;
+  end-pi;
+  select;
+    when code = 'N';
+      return 'Not reviewed';
+    when code = 'M';
+      return 'Merged';
+    when code = 'R';
+      return 'Not duplicate';
+    when code = 'D';
+      return 'Deferred';
+    other;
+      return code;
+  endsl;
+end-proc;
+
+// Names the era convention a part number follows. Useful to an engineer:
+// it explains WHY the duplicate exists rather than just that it does.
+dcl-proc fl_styleOf;
+  dcl-pi *n char(40);
+    part char(15) const;
+    descr char(40) const;
+  end-pi;
+  dcl-s p varchar(15);
+  dcl-s hyph int(10);
+  dcl-s i int(10);
+  p = %trimr(part);
+  hyph = 0;
+  for i = 1 to %len(p);
+    if %subst(p : i : 1) = '-';
+      hyph += 1;
+    endif;
+  endfor;
+  if %scan('-STD' : p) > 0 or %scan('(STANDARD)' : %upper(descr)) > 0;
+    return 'Short code + STD suffix (recent)';
+  endif;
+  if %scan(',' : descr) > 0;
+    return 'Comma-inverted description';
+  endif;
+  if hyph >= 2;
+    return 'Hyphenated abbreviations (older)';
+  endif;
+  if hyph = 0;
+    return 'Run-together abbreviations';
+  endif;
+  return 'Mixed convention';
+end-proc;
+
+dcl-proc fl_scanDuplicates export;
+  dcl-pi *n varchar(80);
+    run packed(9:0);
+    created int(10);
+    skipped int(10);
+  end-pi;
+  dcl-s i int(10);
+  dcl-s j int(10);
+  dcl-s m int(10);
+  dcl-s n int(10);
+  dcl-s mem int(10) dim(50);
+  dcl-s cnt int(10);
+  dcl-s conf int(10);
+  dcl-s reason varchar(250);
+  dcl-s reasonOut char(150);
+  dcl-s sig char(100);
+  dcl-s fullSig varchar(200);
+  dcl-s newid packed(9:0);
+  dcl-s judged int(10);
+  dcl-s descIdent ind;
+  dcl-s sizesOk ind;
+  dcl-s superLink ind;
+  dcl-s sameLine ind;
+  dcl-s priceNear ind;
+  dcl-s loPrice packed(11:2);
+  dcl-s hiPrice packed(11:2);
+  dcl-s pn char(15);
+  dcl-s nbom int(10);
+  dcl-s nord int(10);
+  dcl-s totVal packed(13:2);
+  dcl-s totBom int(10);
+  dcl-s mval packed(11:2);
+  dcl-s pctDiff int(10);
+  // SQL host variables must be plain scalars - an expression, a procedure
+  // call or an array-indexed DS subfield is rejected (SQL0104 / SQL0312),
+  // so stage every value into a scalar first.
+  dcl-s mwhy char(80);
+  dcl-s mstk packed(7:0);
+
+  created = 0;
+  skipped = 0;
+  fl_loadSigs();
+  clear used;
+
+  // Sweep orphaned members. Cluster ids restart if the header file is ever
+  // recreated, so leftover member rows would attach themselves to the wrong
+  // cluster - which is exactly what happened during development.
+  exec sql delete from fldupm
+    where fldmid not in (select fldcid from fldupc);
+
+  for i = 1 to sigCount;
+    if used(i) or sigCache(i).status = 'O';
+      iter;
+    endif;
+    // a single word is too weak a signal to cluster on
+    if %scan(' ' : %trim(sigCache(i).words)) = 0;
+      iter;
+    endif;
+
+    cnt = 0;
+    for j = i to sigCount;
+      if used(j) or sigCache(j).status = 'O';
+        iter;
+      endif;
+      // full signature, not just words - see the note above fl_scanDuplicates
+      if sigCache(j).words = sigCache(i).words
+         and sigCache(j).sizes = sigCache(i).sizes
+         and cnt < %elem(mem);
+        cnt += 1;
+        mem(cnt) = j;
+        used(j) = *on;
+      endif;
+    endfor;
+    if cnt < 2;
+      iter;
+    endif;
+
+    // %subst on a VARCHAR shorter than the requested length raises RNX0100.
+    // Plain assignment to a fixed-length field pads or truncates safely.
+    fullSig = %trim(sigCache(i).words) + '|' + %trim(sigCache(i).sizes);
+    if %len(fullSig) > 100;
+      sig = %subst(fullSig : 1 : 100);
+    else;
+      sig = fullSig;
+    endif;
+
+    // already decided? do not raise it again - a tool that re-asks gets
+    // abandoned. Deferred counts as decided until the membership changes.
+    exec sql
+      select count(*) into :judged from fldupc
+       where fldckey = :sig and fldccnt = :cnt
+         and fldcstat in ('M', 'R', 'D');
+    if judged > 0;
+      skipped += 1;
+      iter;
+    endif;
+    // clear any prior un-reviewed row for this group before re-inserting
+    exec sql delete from fldupm
+      where fldmid in (select fldcid from fldupc
+                        where fldckey = :sig and fldcstat = 'N');
+    exec sql delete from fldupc where fldckey = :sig and fldcstat = 'N';
+
+    // ---- signals
+    descIdent = *on;
+    sizesOk = *on;
+    superLink = *off;
+    sameLine = *on;
+    loPrice = sigCache(mem(1)).price;
+    hiPrice = sigCache(mem(1)).price;
+    for m = 2 to cnt;
+      if %upper(%trimr(sigCache(mem(m)).descr))
+         <> %upper(%trimr(sigCache(mem(1)).descr));
+        descIdent = *off;
+      endif;
+      if sigCache(mem(m)).sizes <> sigCache(mem(1)).sizes;
+        sizesOk = *off;
+      endif;
+      if sigCache(mem(m)).line <> sigCache(mem(1)).line;
+        sameLine = *off;
+      endif;
+      if sigCache(mem(m)).price < loPrice;
+        loPrice = sigCache(mem(m)).price;
+      endif;
+      if sigCache(mem(m)).price > hiPrice;
+        hiPrice = sigCache(mem(m)).price;
+      endif;
+    endfor;
+    for m = 1 to cnt;
+      for n = 1 to cnt;
+        if m <> n and %trimr(sigCache(mem(m)).super) <> ''
+           and %trimr(sigCache(mem(m)).super) = %trimr(sigCache(mem(n)).part);
+          superLink = *on;
+        endif;
+      endfor;
+    endfor;
+    priceNear = *off;
+    pctDiff = 0;
+    if hiPrice > 0;
+      pctDiff = %int((hiPrice - loPrice) * 100 / hiPrice);
+      priceNear = pctDiff <= 15;
+    endif;
+
+    // Matching normalised descriptions IS the core signal, so it carries the
+    // weight. A size/rating mismatch is a penalty rather than a missing
+    // bonus - those are usually genuine variants and belong low in the queue.
+    // Clusters are grouped on the full signature, so same size/rating is a
+    // precondition rather than a signal. Confidence now ranks how well
+    // corroborated a cluster is, not whether it is real.
+    conf = 60;
+    reason = 'Same description and size after expanding abbreviations';
+    if superLink;
+      conf += 15;
+      reason += '; linked by supersession';
+    endif;
+    if sameLine;
+      conf += 10;
+    endif;
+    if descIdent;
+      conf += 10;
+      reason += '; identical description text';
+    endif;
+    if priceNear;
+      conf += 5;
+      reason += '; prices within 15%';
+    else;
+      reason += '; prices differ ' + %char(pctDiff) + '%';
+    endif;
+    if conf > 100;
+      conf = 100;
+    endif;
+    if conf < 5;
+      conf = 5;
+    endif;
+    // the column is char(150); never let the buffer decide
+    if %len(reason) > 150;
+      reasonOut = %subst(reason : 1 : 150);
+    else;
+      reasonOut = reason;
+    endif;
+
+    // ---- write the cluster
+    exec sql select coalesce(max(fldcid), 0) + 1 into :newid from fldupc;
+    totVal = 0;
+    totBom = 0;
+    for m = 1 to cnt;
+      pn = sigCache(mem(m)).part;
+      exec sql select count(*) into :nbom from flbomp where flbpart = :pn;
+      exec sql select count(*) into :nord from flpordp where flopart = :pn;
+      mval = sigCache(mem(m)).stock * sigCache(mem(m)).price;
+      totVal += mval;
+      totBom += nbom;
+    endfor;
+
+    exec sql insert into fldupc
+      (fldcid, fldcrun, fldckey, fldccnt, fldcconf, fldcreas, fldcstat,
+       fldcsurv, fldcuser, fldcdate, fldcnote, fldcval, fldcbom)
+      values (:newid, :run, :sig, :cnt, :conf, :reasonOut, 'N',
+              '', '', 0, '', :totVal, :totBom);
+    if sqlcode < 0;
+      return 'Error writing cluster. SQLCODE=' + %char(sqlcode);
+    endif;
+
+    for m = 1 to cnt;
+      pn = sigCache(mem(m)).part;
+      exec sql select count(*) into :nbom from flbomp where flbpart = :pn;
+      exec sql select count(*) into :nord from flpordp where flopart = :pn;
+      mstk = sigCache(mem(m)).stock;
+      mval = mstk * sigCache(mem(m)).price;
+      mwhy = fl_styleOf(sigCache(mem(m)).part : sigCache(mem(m)).descr);
+      exec sql insert into fldupm
+        (fldmid, fldmpart, fldmrole, fldmwhy, fldmbom, fldmord, fldmstk, fldmval)
+        values (:newid, :pn, 'U', :mwhy, :nbom, :nord, :mstk, :mval);
+    endfor;
+    created += 1;
+  endfor;
+  return '';
+end-proc;
+
+dcl-proc fl_dupScorecard export;
+  dcl-pi *n varchar(80);
+    sc likeds(fl_dupsc_t);
+  end-pi;
+  clear sc;
+  exec sql select count(*) into :sc.parts from flpartp;
+  exec sql
+    select count(*),
+           coalesce(sum(fldccnt), 0),
+           coalesce(sum(fldcval), 0),
+           coalesce(sum(fldcbom), 0),
+           coalesce(sum(case when fldcconf >= 80 then 1 else 0 end), 0),
+           coalesce(sum(case when fldcstat = 'N' then 1 else 0 end), 0),
+           coalesce(sum(case when fldcstat = 'M' then 1 else 0 end), 0),
+           coalesce(sum(case when fldcstat = 'R' then 1 else 0 end), 0),
+           coalesce(sum(case when fldcstat = 'D' then 1 else 0 end), 0)
+      into :sc.clusters, :sc.involved, :sc.val, :sc.bomlines, :sc.c80,
+           :sc.cnew, :sc.cmerged, :sc.crej, :sc.cdef
+      from fldupc;
+  if sqlcode < 0;
+    return 'Error reading scorecard. SQLCODE=' + %char(sqlcode);
+  endif;
+  return '';
+end-proc;
+
+dcl-proc fl_listClusters export;
+  dcl-pi *n varchar(80);
+    statusFilter char(1) const;
+    clusters likeds(fl_dupc_t) dim(500);
+    limit int(10) const;
+    returned int(10);
+  end-pi;
+  dcl-ds r qualified;
+    id packed(9:0);
+    run packed(9:0);
+    sig char(60);
+    cnt packed(3:0);
+    conf packed(3:0);
+    reason char(150);
+    status char(1);
+    survivor char(15);
+    user char(18);
+    revdate packed(8:0);
+    note char(120);
+    val packed(13:2);
+    bom packed(5:0);
+    topdesc char(40);
+  end-ds;
+  dcl-s f char(1);
+  f = statusFilter;
+  returned = 0;
+  exec sql declare cClu cursor for
+    select c.fldcid, c.fldcrun, c.fldckey, c.fldccnt, c.fldcconf, c.fldcreas,
+           c.fldcstat, c.fldcsurv, c.fldcuser, c.fldcdate, c.fldcnote,
+           c.fldcval, c.fldcbom,
+           coalesce((select min(p.flpdesc) from fldupm m
+                       join flpartp p on p.flpart = m.fldmpart
+                      where m.fldmid = c.fldcid), '')
+      from fldupc c
+     where :f = '*' or c.fldcstat = :f
+     order by c.fldcconf desc, c.fldcval desc, c.fldcid;
+  exec sql open cClu;
+  if sqlcode < 0;
+    return 'Error listing clusters. SQLCODE=' + %char(sqlcode);
+  endif;
+  dow returned < limit and returned < %elem(clusters);
+    exec sql fetch cClu into :r;
+    if sqlcode <> 0;
+      leave;
+    endif;
+    returned += 1;
+    clear clusters(returned);
+    clusters(returned).id       = r.id;
+    clusters(returned).run      = r.run;
+    clusters(returned).sig      = r.sig;
+    clusters(returned).cnt      = r.cnt;
+    clusters(returned).conf     = r.conf;
+    clusters(returned).reason   = r.reason;
+    clusters(returned).status   = r.status;
+    clusters(returned).statusd  = fl_dupStatusDesc(r.status);
+    clusters(returned).survivor = r.survivor;
+    clusters(returned).user     = r.user;
+    clusters(returned).revdate  = fl_fmtDate(r.revdate);
+    clusters(returned).note     = r.note;
+    clusters(returned).val      = r.val;
+    clusters(returned).bom      = r.bom;
+    clusters(returned).topdesc  = r.topdesc;
+  enddo;
+  exec sql close cClu;
+  return '';
+end-proc;
+
+dcl-proc fl_getCluster export;
+  dcl-pi *n varchar(80);
+    id packed(9:0) const;
+    hdr likeds(fl_dupc_t);
+    found ind;
+  end-pi;
+  dcl-ds r qualified;
+    id packed(9:0);
+    run packed(9:0);
+    sig char(60);
+    cnt packed(3:0);
+    conf packed(3:0);
+    reason char(150);
+    status char(1);
+    survivor char(15);
+    user char(18);
+    revdate packed(8:0);
+    note char(120);
+    val packed(13:2);
+    bom packed(5:0);
+  end-ds;
+  found = *off;
+  clear hdr;
+  exec sql
+    select fldcid, fldcrun, fldckey, fldccnt, fldcconf, fldcreas, fldcstat,
+           fldcsurv, fldcuser, fldcdate, fldcnote, fldcval, fldcbom
+      into :r from fldupc where fldcid = :id;
+  if sqlcode < 0;
+    return 'Error reading cluster. SQLCODE=' + %char(sqlcode);
+  endif;
+  if sqlcode = 100;
+    return '';
+  endif;
+  found = *on;
+  hdr.id = r.id;
+  hdr.run = r.run;
+  hdr.sig = r.sig;
+  hdr.cnt = r.cnt;
+  hdr.conf = r.conf;
+  hdr.reason = r.reason;
+  hdr.status = r.status;
+  hdr.statusd = fl_dupStatusDesc(r.status);
+  hdr.survivor = r.survivor;
+  hdr.user = r.user;
+  hdr.revdate = fl_fmtDate(r.revdate);
+  hdr.note = r.note;
+  hdr.val = r.val;
+  hdr.bom = r.bom;
+  return '';
+end-proc;
+
+dcl-proc fl_listClusterMembers export;
+  dcl-pi *n varchar(80);
+    id packed(9:0) const;
+    members likeds(fl_dupm_t) dim(50);
+    limit int(10) const;
+    returned int(10);
+  end-pi;
+  dcl-ds r qualified;
+    part char(15);
+    role char(1);
+    why char(80);
+    bom packed(5:0);
+    ord packed(5:0);
+    stock packed(7:0);
+    val packed(11:2);
+    descr char(40);
+    created packed(8:0);
+    status char(1);
+    super char(15);
+    price packed(11:2);
+  end-ds;
+  returned = 0;
+  exec sql declare cMem cursor for
+    select m.fldmpart, m.fldmrole, m.fldmwhy, m.fldmbom, m.fldmord,
+           m.fldmstk, m.fldmval,
+           coalesce(p.flpdesc, ''), coalesce(p.flpcreat, 0),
+           coalesce(p.flpstat, ''), coalesce(p.flpsuper, ''),
+           coalesce(p.flpprice, 0)
+      from fldupm m
+      left join flpartp p on p.flpart = m.fldmpart
+     where m.fldmid = :id
+     order by p.flpcreat, m.fldmpart;
+  exec sql open cMem;
+  if sqlcode < 0;
+    return 'Error listing members. SQLCODE=' + %char(sqlcode);
+  endif;
+  dow returned < limit and returned < %elem(members);
+    exec sql fetch cMem into :r;
+    if sqlcode <> 0;
+      leave;
+    endif;
+    returned += 1;
+    clear members(returned);
+    members(returned).part    = r.part;
+    members(returned).descr   = r.descr;
+    members(returned).created = fl_fmtDate(r.created);
+    members(returned).status  = r.status;
+    members(returned).statusd = fl_partStatusDesc(r.status);
+    members(returned).super   = r.super;
+    members(returned).stock   = r.stock;
+    members(returned).price   = r.price;
+    members(returned).val     = r.val;
+    members(returned).bom     = r.bom;
+    members(returned).ord     = r.ord;
+    members(returned).role    = r.role;
+    members(returned).roled   = fl_dupRoleDesc(r.role);
+    members(returned).why     = r.why;
+  enddo;
+  exec sql close cMem;
+  return '';
+end-proc;
+
+// Applies a review decision. On a merge the losers are marked superseded and
+// pointed at the survivor; the cluster records who decided and why. Nothing
+// is deleted - supersession is reversible, deletion is not.
+dcl-proc fl_resolveCluster export;
+  dcl-pi *n varchar(80);
+    id packed(9:0) const;
+    survivor char(15) const;
+    mergeList char(15) dim(50) const options(*varsize);
+    mergeCount int(10) const;
+    decision char(1) const;
+    note char(120) const;
+    user char(18) const;
+  end-pi;
+  dcl-s today packed(8:0);
+  dcl-s surv char(15);
+  dcl-s d char(1);
+  dcl-s n char(120);
+  dcl-s u char(18);
+  dcl-s i int(10);
+  dcl-s pn char(15);
+
+  d = decision;
+  surv = survivor;
+  n = note;
+  u = user;
+  today = %dec(%char(%date() : *iso0) : 8 : 0);
+
+  if d = 'M';
+    if %trimr(surv) = '';
+      return 'Type 1 against the part you want to keep.';
+    endif;
+    if mergeCount < 1;
+      return 'Type 2 against at least one part to merge into the kept part.';
+    endif;
+  endif;
+
+  if d = 'M';
+    // everything starts excluded; only the marked members become losers
+    exec sql update fldupm set fldmrole = 'X' where fldmid = :id;
+    exec sql update fldupm set fldmrole = 'S'
+      where fldmid = :id and fldmpart = :surv;
+    for i = 1 to mergeCount;
+      pn = mergeList(i);
+      if %trimr(pn) = '' or %trimr(pn) = %trimr(surv);
+        iter;
+      endif;
+      exec sql update fldupm set fldmrole = 'L'
+        where fldmid = :id and fldmpart = :pn;
+      exec sql update flpartp set flpstat = 'S', flpsuper = :surv
+        where flpart = :pn;
+      if sqlcode < 0;
+        return 'Error updating part ' + %trimr(pn) + '. SQLCODE='
+             + %char(sqlcode);
+      endif;
+    endfor;
+    // the survivor stays active and points at nothing
+    exec sql update flpartp set flpstat = 'A', flpsuper = ''
+      where flpart = :surv;
+  endif;
+
+  exec sql update fldupc
+     set fldcstat = :d, fldcsurv = :surv, fldcuser = :u,
+         fldcdate = :today, fldcnote = :n
+   where fldcid = :id;
+  if sqlcode < 0;
+    return 'Error updating cluster. SQLCODE=' + %char(sqlcode);
+  endif;
+  sigLoaded = *off;
+  sigCount = 0;
   return '';
 end-proc;

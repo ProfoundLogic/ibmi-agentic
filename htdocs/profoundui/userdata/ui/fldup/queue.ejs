@@ -1,0 +1,126 @@
+<%
+  function fmt(n, d) {
+    n = Number(n) || 0;
+    var s = n.toFixed(d === undefined ? 0 : d).split('.');
+    s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return s.join('.');
+  }
+  function band(c) { c = Number(c) || 0; return c >= 80 ? 'ok' : c >= 60 ? 'warn' : 'bad'; }
+%>
+<div class="fl-screen fldq-screen">
+
+  <div class="fl-mast">
+    <div class="fl-logo" role="img" aria-label="J.H. Fletcher &amp; Co."></div>
+    <div>
+      <div class="fl-mast-title">Duplicate part review</div>
+      <div class="fl-mast-sub">Item master cleanup &mdash; one cluster, one decision</div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+    <div class="fl-msg"><%= msg %></div>
+  <% } %>
+
+  <div class="fldq-kpis">
+    <div class="fl-card fldq-kpi"><div class="fldq-v"><%= fmt(sparts) %></div>
+      <div class="fldq-l">Parts in master</div></div>
+    <div class="fl-card fldq-kpi"><div class="fldq-v fldq-bad"><%= fmt(sclust) %></div>
+      <div class="fldq-l">Duplicate clusters</div></div>
+    <div class="fl-card fldq-kpi"><div class="fldq-v fldq-bad"><%= fmt(sinvol) %></div>
+      <div class="fldq-l">Parts involved</div></div>
+    <div class="fl-card fldq-kpi"><div class="fldq-v fldq-bad">$<%= fmt(sval, 2) %></div>
+      <div class="fldq-l">Stock under duplicate numbers</div></div>
+    <div class="fl-card fldq-kpi"><div class="fldq-v"><%= fmt(sbom) %></div>
+      <div class="fldq-l">BOM lines affected</div></div>
+    <div class="fl-card fldq-kpi"><div class="fldq-v"><%= fmt(sconf80) %></div>
+      <div class="fldq-l">At 80%+ confidence</div></div>
+  </div>
+
+  <div class="fldq-prog">
+    <span class="fl-pill"><%= fmt(scnew) %> not reviewed</span>
+    <span class="fl-pill fl-pill-ok"><%= fmt(scmerg) %> merged</span>
+    <span class="fl-pill"><%= fmt(screj) %> not duplicates</span>
+    <span class="fl-pill fl-pill-warn"><%= fmt(scdef) %> deferred</span>
+    <span class="fl-mast-spacer"></span>
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'RESCAN'})"
+            title="Re-run the detector. Decisions already made are never re-raised.">Re-run detector</button>
+  </div>
+
+<%
+  var f = (typeof sfilter !== 'undefined' && sfilter) ? sfilter.trim() : 'N';
+  var choices = [
+    ['N', 'Not reviewed', scnew],
+    ['M', 'Merged',       scmerg],
+    ['R', 'Not duplicates', screj],
+    ['D', 'Deferred',     scdef],
+    ['*', 'All clusters', sclust]
+  ];
+%>
+  <div class="fldq-bar">
+    <div class="fl-field">
+      <label for="sfilter">Show</label>
+      <select class="fl-select fldq-sel" name="sfilter" id="sfilter"
+              onchange="pui.submit({action:'SEARCH'})">
+      <% choices.forEach(function (c) { %>
+        <option value="<%= c[0] %>"<%= f === c[0] ? ' selected' : '' %>><%= c[1] %> (<%= fmt(c[2]) %>)</option>
+      <% }); %>
+      </select>
+    </div>
+  </div>
+
+  <% if (typeof soptdesc !== 'undefined' && soptdesc && soptdesc.trim()) { %>
+    <div class="fldq-hint"><%= soptdesc %></div>
+  <% } %>
+
+  <% if (typeof dupsfl !== 'undefined' && dupsfl && dupsfl.length > 0) { %>
+    <div class="fl-grid-scroll">
+    <table class="fl-table">
+      <thead>
+        <tr>
+          <th style="width:44px">Opt</th>
+          <th style="width:70px">Cluster</th>
+          <th style="width:90px" class="fl-num">Conf</th>
+          <th style="width:70px" class="fl-num">Parts</th>
+          <th style="width:250px">Item</th>
+          <th>Why it was flagged</th>
+          <th style="width:120px" class="fl-num">Stock value</th>
+          <th style="width:78px" class="fl-num">BOM</th>
+          <th style="width:120px">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% dupsfl.forEach(function(row) { %>
+        <tr class="fl-row-pick" ondblclick="flPickRow(this,'5')" title="Double-click to review this cluster">
+          <td><input class="fl-input fldq-opt" name="dupsfl.sopt.<%= row._rrn %>"
+                     value="<%= row.sopt %>" size="2" maxlength="2"></td>
+          <td><strong>#<%= row.sclid %></strong></td>
+          <td class="fl-num"><span class="fl-pill fl-pill-<%= band(row.sconf) %>"><%= row.sconf %>%</span></td>
+          <td class="fl-num"><%= row.scnt %></td>
+          <td><%= row.stopdesc %></td>
+          <td class="fldq-reason"><%= row.sreason %></td>
+          <td class="fl-num">$<%= fmt(row.svalc, 2) %></td>
+          <td class="fl-num"><%= fmt(row.sbomc) %></td>
+          <td><%= row.sstatd %></td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+    </div>
+    <% if (dupsfl.length > 15) { %>
+      <div class="fl-grid-note"><%= dupsfl.length %> rows &mdash; scroll the grid, or filter by status.</div>
+    <% } %>
+  <% } else { %>
+    <div class="fl-empty">No clusters match that filter. Try <strong>*</strong> to see all,
+      or re-run the detector.</div>
+  <% } %>
+
+  <input type="hidden" name="action" value="">
+
+  <div class="fl-foot">
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'EXIT'})" data-fkey="F3">Exit (F3)</button>
+    <span class="fl-mast-spacer"></span>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+</div>

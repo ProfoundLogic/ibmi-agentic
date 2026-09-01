@@ -29,6 +29,8 @@ flpartp.file: qddssrc/flpartp.pf
 flbomp.file:  qddssrc/flbomp.pf
 flsvcp.file:  qddssrc/flsvcp.pf
 flpordp.file: qddssrc/flpordp.pf
+fldupc.file:  qddssrc/fldupc.pf
+fldupm.file:  qddssrc/fldupm.pf
 
 # Logical files
 products1l.file: qddssrc/products1l.lf | productsp.file
@@ -63,7 +65,7 @@ custr.module: qrpglesrc/custr.sqlrpgle qrpglesrc/custr_pr.rpgle qddssrc/custp.pf
 custr.srvpgm: custr.module qsrvsrc/custr.bnd
 
 # --- J.H. Fletcher demo: data access service program -------------------------
-fldata.module: qrpglesrc/fldata.sqlrpgle qrpglesrc/fldata_pr.rpgle | flcustp.file flsitep.file flmodlp.file flmachp.file floptnp.file flpartp.file flbomp.file flsvcp.file flpordp.file
+fldata.module: qrpglesrc/fldata.sqlrpgle qrpglesrc/fldata_pr.rpgle | fldupc.file fldupm.file flcustp.file flsitep.file flmodlp.file flmachp.file floptnp.file flpartp.file flbomp.file flsvcp.file flpordp.file
 fldata.srvpgm: fldata.module qsrvsrc/fldata.bnd
 fletcher.bnddir: fletcher.bnddir
 
@@ -89,6 +91,8 @@ wrkcust1eo.pgm: qrpglesrc/wrkcust1eo.rpgle qddssrc/wrkcust1eo.json qrpglesrc/cus
 # --- J.H. Fletcher demo: EJS rich display files ------------------------------
 flfleeteo.file:  qddssrc/flfleeteo.json
 flcusteo.file:   qddssrc/flcusteo.json
+fldupeo.file:    qddssrc/fldupeo.json
+fldup1eo.file:   qddssrc/fldup1eo.json
 flfleet1eo.file: qddssrc/flfleet1eo.json
 flparteo.file:   qddssrc/flparteo.json
 flmacheo.file:   qddssrc/flmacheo.json
@@ -101,3 +105,6 @@ flparteo.pgm:   qrpglesrc/flparteo.rpgle   qddssrc/flparteo.json   qrpglesrc/fld
 flpart1eo.pgm:  qrpglesrc/flpart1eo.rpgle  qddssrc/flpart1eo.json  qrpglesrc/fldata_pr.rpgle fldata.srvpgm | flpart1eo.file  fletcher.bnddir
 flmacheo.pgm:   qrpglesrc/flmacheo.rpgle   qddssrc/flmacheo.json   qrpglesrc/fldata_pr.rpgle fldata.srvpgm | flmacheo.file   fletcher.bnddir
 flcusteo.pgm:   qrpglesrc/flcusteo.rpgle   qddssrc/flcusteo.json   qrpglesrc/fldata_pr.rpgle fldata.srvpgm | flcusteo.file   fletcher.bnddir
+fldupscn.pgm:   qrpglesrc/fldupscn.rpgle qrpglesrc/fldata_pr.rpgle fldata.srvpgm | fldupc.file fldupm.file fletcher.bnddir
+fldupeo.pgm:    qrpglesrc/fldupeo.rpgle    qddssrc/fldupeo.json    qrpglesrc/fldata_pr.rpgle fldata.srvpgm | fldupeo.file    fletcher.bnddir
+fldup1eo.pgm:   qrpglesrc/fldup1eo.rpgle   qddssrc/fldup1eo.json   qrpglesrc/fldata_pr.rpgle fldata.srvpgm | fldup1eo.file   fletcher.bnddir

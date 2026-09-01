@@ -200,9 +200,25 @@ all `th` in a row share the row height, so height tells you nothing.
 
 ## 6. Interaction standards
 
-**Double-click a row = select with the default option (5).** Standard on every screen
-with selectable rows. Typing the option still works and is the only way to reach
-non-default options like `7`.
+**Double-click a row performs that row's default action.** On most screens that is
+option `5`; on the duplicate-cluster review it is `1` (keep this part), because keeping
+is the primary decision there. State it as "the default action", not "sets 5" — the
+gesture is the standard, the option number is per-screen. Typing the option always
+works and is the only way to reach non-default options.
+
+**If a screen's option scheme *is* the screen, document it on the screen.** The
+duplicate review needs `1` to keep, `2` to merge and blank to leave alone; a one-line
+hint was not enough and the screen was unusable until it carried a numbered how-to
+panel. Instructions belong adjacent to the field, not in a tooltip.
+
+**Read every changed subfile row, not just the first.** A screen taking one selection
+can stop at the first non-blank option; a screen taking a *set* of marks must loop the
+whole `readc`. And because the subfile is reloaded from the database each cycle, pending
+marks must be held in the program and re-applied on redisplay.
+
+**Don't force a whole-group decision when partial is the normal case.** The cluster
+review originally merged every member into one survivor, which cannot express "these two
+are duplicates, that third one is a separate part" — which is the common case.
 
 **Inline handlers calling window globals.** `ondblclick="flPickRow(this,'5')"`, with
 `flPickRow` defined in the shim. Never `addEventListener` from a `js`-array file.
@@ -246,6 +262,13 @@ the record the user is trying to move away from, which makes it useless. **But**
 the user typed something that failed to resolve, carry that text into the lookup — it
 is meaningful and retyping is annoying. Two entry paths, deliberately different;
 comment the reason in the source so it doesn't get "tidied".
+
+**Prefer a `<select>` that submits on change over a coded text field plus a button.**
+`genie.js` collects values by scanning `input`, `select` and `textarea` and reading
+`.value`, so a dropdown needs no special handling — `onchange="pui.submit({action:'X'})"`
+is enough, and the RPG side is unchanged. If you find yourself writing a legend to
+explain single-letter codes, the field should have been a dropdown. Put the count in
+each option label and it doubles as a progress summary.
 
 **Submit contract:** hidden `action` input, `pui.submit({action:'X'})` for named
 actions, plain `pui.submit()` for a subfile selection, `data-fkey="F3"` on buttons.
@@ -301,6 +324,10 @@ exec sql set option closqlcsr = *endmod; // on non-journaled files inserts vanis
 | `DEC()` on a ratio | overflow on a large swing (+135%) | compute percentages in RPG |
 | `CASE WHEN EXISTS` | `SQL0104 Token EXISTS was not valid` | rewrite as a `LEFT JOIN` |
 | `%editc(int:'X')` | returns **hex** | build zero-padded strings from `%char` + `%subst` |
+| `%subst(v : 1 : n)` on a VARCHAR shorter than `n` | `RNX0100` at runtime | guard with `if %len(v) > n`, or assign straight to a fixed-length field (it pads/truncates) |
+| Appending past a VARCHAR's declared length | `RNX0100` | size the working buffer well over the column, then truncate explicitly on the way out |
+| Procedure call or array-indexed DS subfield as an SQL host variable | `SQL0104` / `SQL0312` | stage every value into a plain scalar first |
+| Global `dcl-s` placed between procedures | `RNF0256 Specification found between procedures` | all globals go before the first `dcl-proc` |
 
 **One formatter, one rule, one place.** Date display goes through a single
 `fl_fmtDate`; the modernization rule lives once in `fl_modFlag` and is used by both
@@ -468,6 +495,9 @@ panel at all. Data layout can do demo work that UI cannot.
 | `ORDER BY` has no effect | DECIMAL division truncated to 0 | `DOUBLE()` casts |
 | Inserts vanish at program exit | `COMMIT(*CHG)` default | `SET OPTION COMMIT = *NONE` |
 | Bogus `SQL0314` on an unrelated field | `like()` on a DS host variable | `likeds()` |
+| `RNX0100` at a statement number | VARCHAR overflow, or `%subst` past its length | check both; the second is easy to miss |
+| Fuzzy match groups things that are genuinely different | short alphanumeric tokens (`A1`, `B3`) dropped as too-short words | treat any token containing a digit as a variant token, not a word |
+| Rows attach to the wrong parent after a table rebuild | ids restart; orphaned child rows remain | sweep orphans at the start of any regeneration |
 | Menu option missing | session cached the menu from sign-on | sign off and back on |
 | Object changes have no effect | stale copy in a preceding library | delete the shadow |
 

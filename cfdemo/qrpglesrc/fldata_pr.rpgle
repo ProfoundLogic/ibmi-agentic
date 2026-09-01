@@ -132,6 +132,100 @@
          returned int(10);
        end-pr;
 
+      // ---- duplicate review (A7) -------------------------------------
+      // The detector writes clusters to FLDUPC/FLDUPM; the review utility
+      // reads them, shows the blast radius, and applies a decision.
+       dcl-ds fl_dupc_t qualified template;
+         id       packed(9:0);
+         run      packed(9:0);
+         sig      char(60);
+         cnt      packed(3:0);
+         conf     packed(3:0);
+         reason   char(150);
+         status   char(1);
+         statusd  char(14);
+         survivor char(15);
+         user     char(18);
+         revdate  char(10);
+         note     char(120);
+         val      packed(13:2);
+         bom      packed(5:0);
+         topdesc  char(40);
+       end-ds;
+
+       dcl-ds fl_dupm_t qualified template;
+         part     char(15);
+         descr    char(40);
+         created  char(10);
+         status   char(1);
+         statusd  char(12);
+         super    char(15);
+         stock    packed(7:0);
+         price    packed(11:2);
+         val      packed(11:2);
+         bom      packed(5:0);
+         ord      packed(5:0);
+         role     char(1);
+         roled    char(12);
+         why      char(80);
+       end-ds;
+
+       dcl-ds fl_dupsc_t qualified template;
+         parts    int(10);
+         clusters int(10);
+         involved int(10);
+         val      packed(13:2);
+         bomlines int(10);
+         c80      int(10);
+         cnew     int(10);
+         cmerged  int(10);
+         crej     int(10);
+         cdef     int(10);
+       end-ds;
+
+       dcl-pr fl_scanDuplicates varchar(80);
+         run packed(9:0);
+         created int(10);
+         skipped int(10);
+       end-pr;
+
+       dcl-pr fl_dupScorecard varchar(80);
+         sc likeds(fl_dupsc_t);
+       end-pr;
+
+       dcl-pr fl_listClusters varchar(80);
+         statusFilter char(1) const;
+         clusters likeds(fl_dupc_t) dim(500);
+         limit int(10) const;
+         returned int(10);
+       end-pr;
+
+       dcl-pr fl_getCluster varchar(80);
+         id packed(9:0) const;
+         hdr likeds(fl_dupc_t);
+         found ind;
+       end-pr;
+
+       dcl-pr fl_listClusterMembers varchar(80);
+         id packed(9:0) const;
+         members likeds(fl_dupm_t) dim(50);
+         limit int(10) const;
+         returned int(10);
+       end-pr;
+
+      // mergeList names ONLY the members being folded into the survivor.
+      // Anything unmarked is left alone and recorded as excluded - a cluster
+      // often contains parts that are genuinely separate items.
+       dcl-pr fl_resolveCluster varchar(80);
+         id packed(9:0) const;
+         survivor char(15) const;
+         mergeList char(15) dim(50) const options(*varsize);
+         mergeCount int(10) const;
+         decision char(1) const;
+         note char(120) const;
+         user char(18) const;
+       end-pr;
+
       // Customer lookup row: carries fleet size and spend so the picker is
       // useful for choosing, not just for finding.
        dcl-ds fl_clkp_t qualified template;
