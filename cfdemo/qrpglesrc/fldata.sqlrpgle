@@ -55,6 +55,73 @@ dcl-s sigLoaded ind inz(*off);
 // before the first procedure, not between them (RNF0256)
 dcl-s used ind dim(2000);
 
+// ---- A4 schedule board caches -----------------------------------------
+// Loaded once per activation. The board and its two detail screens are
+// read-only inquiries, so nothing invalidates these mid-run; if a
+// maintenance screen is ever added it must reset schedLoaded.
+dcl-ds wcCache qualified dim(50);
+  code char(6);
+  descr char(40);
+  seq packed(3:0);
+  cap packed(5:1);
+  crew packed(3:0);
+  shifts packed(1:0);
+  status char(1);
+  wip int(10);
+  queued int(10);
+  loadhrs packed(7:1);
+  late int(10);
+end-ds;
+dcl-s wcCount int(10) inz(0);
+
+dcl-ds woCache likeds(fl_wo_t) dim(300);
+dcl-s woCount int(10) inz(0);
+dcl-s woModelOk ind dim(300);
+
+// Stored dates, kept alongside the formatted display copies in woCache.
+// The projection walk and the confidence scan both need real dates; parsing
+// them back out of char(10) display text would be absurd.
+dcl-ds woRaw qualified dim(300);
+  opened packed(8:0);
+  promised packed(8:0);
+  started packed(8:0);
+  compl packed(8:0);
+  projected packed(8:0);
+end-ds;
+
+dcl-ds opCache qualified dim(1200);
+  wo packed(8:0);
+  seq packed(3:0);
+  wctr char(6);
+  descr char(40);
+  std packed(5:1);
+  act packed(5:1);
+  status char(1);
+  started packed(8:0);
+  compl packed(8:0);
+end-ds;
+dcl-s opCount int(10) inz(0);
+
+dcl-ds shCache qualified dim(300);
+  wo packed(8:0);
+  part char(15);
+  seq packed(3:0);
+  reqd packed(5:0);
+  avail packed(5:0);
+  due packed(8:0);
+  status char(1);
+  po char(8);
+  vend char(30);
+  price packed(11:2);
+end-ds;
+dcl-s shCount int(10) inz(0);
+
+dcl-ds dqCache likeds(fl_dq_t) dim(400);
+dcl-s dqCount int(10) inz(0);
+
+dcl-s schedLoaded ind inz(*off);
+dcl-s schedToday packed(8:0) inz(0);
+
 // ------------------------------------------------------------------ helpers
 dcl-proc fl_lookup;
   dcl-pi *n varchar(30);
@@ -1622,4 +1689,1403 @@ dcl-proc fl_resolveCluster export;
   sigLoaded = *off;
   sigCount = 0;
   return '';
+end-proc;
+
+// ==========================================================================
+// A4 production schedule board                                     (GJA-917)
+//
+// Everything the board shows is derived here, so the board, the work order
+// detail and the data-confidence screen cannot disagree with each other.
+//
+// The one thing this code will not do is guess. Where the data does not
+// support a projection - no routing, no promised date, material with no
+// arrival date - it returns no projection and the scan reports why, rather
+// than producing a plausible-looking date. A schedule that quietly invents
+// its inputs is worse than no schedule, and the whole point of the
+// confidence panel is to say so out loud.
+// ==========================================================================
+
+// ------------------------------------------------------------ date helpers
+dcl-proc fl_dateOk;
+  dcl-pi *n ind;
+    ymd packed(8:0) const;
+  end-pi;
+  dcl-s d date(*iso);
+  if ymd < 19000101 or ymd > 29991231;
+    return *off;
+  endif;
+  monitor;
+    d = %date(ymd : *iso);
+  on-error;
+    return *off;
+  endmon;
+  return *on;
+end-proc;
+
+dcl-proc fl_today;
+  dcl-pi *n packed(8:0);
+  end-pi;
+  return %dec(%char(%date() : *iso0) : 8 : 0);
+end-proc;
+
+dcl-proc fl_daysBetween;
+  dcl-pi *n int(10);
+    fromYmd packed(8:0) const;
+    toYmd packed(8:0) const;
+  end-pi;
+  if not fl_dateOk(fromYmd) or not fl_dateOk(toYmd);
+    return 0;
+  endif;
+  return %diff(%date(toYmd : *iso) : %date(fromYmd : *iso) : *days);
+end-proc;
+
+// RPG has no weekday BIF, so weekday comes from the distance to a known
+// Monday. 2000-01-03 was a Monday; 0 = Monday through 6 = Sunday.
+dcl-proc fl_isWeekend;
+  dcl-pi *n ind;
+    d date(*iso) const;
+  end-pi;
+  dcl-s n int(10);
+  n = %rem(%diff(d : d'2000-01-03' : *days) : 7);
+  if n < 0;
+    n += 7;
+  endif;
+  return n >= 5;
+end-proc;
+
+// Shop days only. A capacity plan that counts weekends ships every order
+// two days early and is wrong in the customer's favour, which is worse.
+dcl-proc fl_addWorkDays;
+  dcl-pi *n packed(8:0);
+    fromYmd packed(8:0) const;
+    days int(10) const;
+  end-pi;
+  dcl-s d date(*iso);
+  dcl-s n int(10) inz(0);
+  dcl-s guard int(10) inz(0);
+  if not fl_dateOk(fromYmd);
+    return 0;
+  endif;
+  d = %date(fromYmd : *iso);
+  dow n < days and guard < 5000;
+    d += %days(1);
+    guard += 1;
+    if not fl_isWeekend(d);
+      n += 1;
+    endif;
+  enddo;
+  return %dec(%char(d : *iso0) : 8 : 0);
+end-proc;
+
+// ------------------------------------------------------- coded value text
+dcl-proc fl_woTypeDesc;
+  dcl-pi *n char(16);
+    code char(1) const;
+  end-pi;
+  select;
+    when code = 'N';
+      return 'New build';
+    when code = 'M';
+      return 'Modernization';
+    when code = 'R';
+      return 'Rebuild';
+    when code = 'E';
+      return 'Eng Solutions';
+    other;
+      return code;
+  endsl;
+end-proc;
+
+dcl-proc fl_woStatusDesc;
+  dcl-pi *n char(12);
+    code char(1) const;
+  end-pi;
+  select;
+    when code = 'P';
+      return 'Planned';
+    when code = 'R';
+      return 'Released';
+    when code = 'I';
+      return 'In process';
+    when code = 'H';
+      return 'On hold';
+    when code = 'C';
+      return 'Complete';
+    other;
+      return code;
+  endsl;
+end-proc;
+
+dcl-proc fl_prioDesc;
+  dcl-pi *n char(8);
+    code char(1) const;
+  end-pi;
+  select;
+    when code = 'H';
+      return 'High';
+    when code = 'M';
+      return 'Medium';
+    when code = 'L';
+      return 'Low';
+    other;
+      return code;
+  endsl;
+end-proc;
+
+dcl-proc fl_opStatusDesc;
+  dcl-pi *n char(12);
+    code char(1) const;
+  end-pi;
+  select;
+    when code = 'W';
+      return 'Waiting';
+    when code = 'R';
+      return 'Running';
+    when code = 'C';
+      return 'Complete';
+    when code = 'H';
+      return 'On hold';
+    other;
+      return code;
+  endsl;
+end-proc;
+
+dcl-proc fl_wcStatusDesc;
+  dcl-pi *n char(10);
+    code char(1) const;
+  end-pi;
+  select;
+    when code = 'A';
+      return 'Active';
+    when code = 'I';
+      return 'Inactive';
+    other;
+      return code;
+  endsl;
+end-proc;
+
+dcl-proc fl_sevDesc;
+  dcl-pi *n char(8);
+    code char(1) const;
+  end-pi;
+  select;
+    when code = 'H';
+      return 'High';
+    when code = 'M';
+      return 'Medium';
+    when code = 'L';
+      return 'Low';
+    other;
+      return code;
+  endsl;
+end-proc;
+
+// Hours left on an operation. One rule, used by the order KPI, the work
+// centre load and the projection, so the three cannot drift apart: a
+// completed operation has none left, one that has reported time has its
+// standard less what it has booked, anything else has its full standard.
+dcl-proc fl_opRemaining;
+  dcl-pi *n packed(5:1);
+    std packed(5:1) const;
+    act packed(5:1) const;
+    status char(1) const;
+  end-pi;
+  if status = 'C';
+    return 0;
+  endif;
+  if act > 0;
+    if act >= std;
+      return 0;
+    endif;
+    return std - act;
+  endif;
+  return std;
+end-proc;
+
+dcl-proc fl_prioRank;
+  dcl-pi *n int(10);
+    prio char(1) const;
+  end-pi;
+  select;
+    when prio = 'H';
+      return 1;
+    when prio = 'M';
+      return 2;
+    other;
+      return 3;
+  endsl;
+end-proc;
+
+dcl-proc fl_wcIndex;
+  dcl-pi *n int(10);
+    code char(6) const;
+  end-pi;
+  dcl-s i int(10);
+  for i = 1 to wcCount;
+    if wcCache(i).code = code;
+      return i;
+    endif;
+  endfor;
+  return 0;
+end-proc;
+
+dcl-proc fl_woIndex;
+  dcl-pi *n int(10);
+    wo packed(8:0) const;
+  end-pi;
+  dcl-s i int(10);
+  for i = 1 to woCount;
+    if woCache(i).wo = wo;
+      return i;
+    endif;
+  endfor;
+  return 0;
+end-proc;
+
+// -------------------------------------------------------- confidence scan
+// Fourteen checks, every one of them a condition that a real scheduling
+// application trips over. They read the loaded data, never a list of known
+// problems, so they keep finding things after the data changes - which is
+// the only version of this that is worth showing anybody.
+//
+// Severity is the honest distinction between "this projection is degraded"
+// and "this projection is meaningless": only High counts against an order in
+// the trust percentage.
+dcl-proc fl_dqAdd;
+  dcl-pi *n;
+    sev char(1) const;
+    cat char(26) const;
+    wo packed(8:0) const;
+    subject char(22) const;
+    finding char(110) const;
+    impact char(90) const;
+  end-pi;
+  if dqCount >= %elem(dqCache);
+    return;
+  endif;
+  dqCount += 1;
+  clear dqCache(dqCount);
+  dqCache(dqCount).sev = sev;
+  dqCache(dqCount).sevd = fl_sevDesc(sev);
+  dqCache(dqCount).cat = cat;
+  dqCache(dqCount).wo = wo;
+  dqCache(dqCount).subject = subject;
+  dqCache(dqCount).finding = finding;
+  dqCache(dqCount).impact = impact;
+end-proc;
+
+dcl-proc fl_dqScan;
+  dcl-pi *n;
+  end-pi;
+  dcl-s i int(10);
+  dcl-s j int(10);
+  dcl-s wc int(10);
+  dcl-s t varchar(200);
+  dcl-s subj varchar(60);
+  dcl-s pctDiff int(10);
+
+  dqCount = 0;
+
+  // ---------------------------------------------------------- high severity
+  for i = 1 to woCount;
+    // 1. a promised date that precedes the order it belongs to
+    if woRaw(i).promised > 0 and woRaw(i).opened > 0
+       and woRaw(i).promised < woRaw(i).opened;
+      t = 'Promised ship ' + %trim(woCache(i).promised)
+        + ' is earlier than the order date ' + %trim(woCache(i).opened) + '.';
+      fl_dqAdd('H' : 'Impossible date' : woCache(i).wo : 'Order header' : t
+             : 'Order reads late from the day it was entered.');
+    endif;
+
+    // 2. in process with nothing to measure elapsed time from
+    if woCache(i).status = 'I' and woRaw(i).started = 0;
+      fl_dqAdd('H' : 'Missing start date' : woCache(i).wo : 'Order header'
+             : 'Work order is in process but carries no actual start date.'
+             : 'Cycle time and elapsed time cannot be computed.');
+    endif;
+
+    // 3. released or running with no promised ship date at all
+    if (woCache(i).status = 'R' or woCache(i).status = 'I')
+       and woRaw(i).promised = 0;
+      fl_dqAdd('H' : 'No promised ship date' : woCache(i).wo : 'Order header'
+             : 'Order is released to the floor with no promised ship date.'
+             : 'Nothing to schedule backwards from or measure against.');
+    endif;
+
+    // 4. no routing: the order consumes capacity no plan can see
+    if woCache(i).ops = 0 and woCache(i).status <> 'C';
+      fl_dqAdd('H' : 'No routing operations' : woCache(i).wo : 'Order header'
+             : 'Work order has no routing operations, so it carries no hours.'
+             : 'Consumes shop capacity that no schedule can account for.');
+    endif;
+
+    // 5. current work centre that is not in the work centre file
+    if woCache(i).wctr <> '' and fl_wcIndex(woCache(i).wctr) = 0;
+      t = 'Current work centre ' + %trim(woCache(i).wctr)
+        + ' does not exist in the work centre file.';
+      fl_dqAdd('H' : 'Unknown work centre' : woCache(i).wo
+             : %trim(woCache(i).wctr) : t
+             : 'Hours on this order roll up to no work centre at all.');
+    endif;
+
+    // 6. in process but nobody can say where
+    if woCache(i).status = 'I' and woCache(i).wctr = '';
+      fl_dqAdd('H' : 'No current work centre' : woCache(i).wo : 'Order header'
+             : 'Work order is in process but no current work centre is set.'
+             : 'Order does not appear on any shop floor view.');
+    endif;
+  endfor;
+
+  // 7. operations queued at a work centre that has been stood down
+  for i = 1 to opCount;
+    if opCache(i).status = 'C';
+      iter;
+    endif;
+    wc = fl_wcIndex(opCache(i).wctr);
+    if wc > 0 and wcCache(wc).status <> 'A';
+      subj = 'Op ' + %char(opCache(i).seq) + ' / ' + %trim(opCache(i).wctr);
+      t = 'Operation ' + %char(opCache(i).seq) + ' is routed to '
+        + %trim(opCache(i).wctr) + ', which is marked inactive.';
+      fl_dqAdd('H' : 'Inactive work centre' : opCache(i).wo : subj : t
+             : 'Work is queued at a centre with no crew assigned.');
+    elseif wc = 0;
+      subj = 'Op ' + %char(opCache(i).seq) + ' / ' + %trim(opCache(i).wctr);
+      t = 'Operation ' + %char(opCache(i).seq) + ' is routed to '
+        + %trim(opCache(i).wctr) + ', which is not a known work centre.';
+      fl_dqAdd('H' : 'Unknown work centre' : opCache(i).wo : subj : t
+             : 'These hours are missing from every capacity figure.');
+    endif;
+  endfor;
+
+  // -------------------------------------------------------- medium severity
+  for i = 1 to woCount;
+    // 8. complete, but on-time delivery cannot be measured
+    if woCache(i).status = 'C' and woRaw(i).compl = 0;
+      fl_dqAdd('M' : 'Missing completion date' : woCache(i).wo : 'Order header'
+             : 'Work order is complete but carries no completion date.'
+             : 'On-time delivery cannot be measured for this order.');
+    endif;
+
+    // 9. a model code with no master record behind it
+    if not woModelOk(i);
+      t = 'Model ' + %trim(woCache(i).model) + ' is not in the model file.';
+      fl_dqAdd('M' : 'Unknown model' : woCache(i).wo : %trim(woCache(i).model)
+             : t : 'No product line or standard routing for this build.');
+    endif;
+
+    // 10. the board and the floor disagree about the same order
+    if woCache(i).ops > 0;
+      pctDiff = woCache(i).pctrptd - woCache(i).pctroute;
+      if pctDiff < 0;
+        pctDiff = -pctDiff;
+      endif;
+      if pctDiff > 20;
+        t = 'Reported ' + %char(woCache(i).pctrptd) + '% complete; routing '
+          + 'shows ' + %char(woCache(i).pctroute) + '%.';
+        fl_dqAdd('M' : 'Reported percent conflict' : woCache(i).wo
+               : 'Order header' : t
+               : 'Board and shop floor disagree on this order.');
+      endif;
+    endif;
+  endfor;
+
+  // 11. completed work with no labour behind it
+  for i = 1 to opCount;
+    if opCache(i).status = 'C' and opCache(i).act = 0 and opCache(i).std > 0;
+      subj = 'Op ' + %char(opCache(i).seq) + ' / ' + %trim(opCache(i).wctr);
+      t = 'Operation ' + %char(opCache(i).seq) + ' at '
+        + %trim(opCache(i).wctr) + ' is complete with no actual hours.';
+      fl_dqAdd('M' : 'Zero actual hours' : opCache(i).wo : subj : t
+             : 'Standard hours cannot be validated at this work centre.');
+    endif;
+    // 12. work the capacity plan is treating as free
+    if opCache(i).std = 0;
+      subj = 'Op ' + %char(opCache(i).seq) + ' / ' + %trim(opCache(i).wctr);
+      t = 'Operation ' + %char(opCache(i).seq) + ' at '
+        + %trim(opCache(i).wctr) + ' carries no standard hours.';
+      fl_dqAdd('M' : 'No standard hours' : opCache(i).wo : subj : t
+             : 'Capacity plan treats this operation as taking no time.');
+    endif;
+  endfor;
+
+  for i = 1 to shCount;
+    if shCache(i).status <> 'O';
+      iter;
+    endif;
+    // 13. material that was due and never landed
+    if shCache(i).due > 0 and shCache(i).due < schedToday;
+      t = 'Part ' + %trim(shCache(i).part) + ' was expected '
+        + %trim(fl_fmtDate(shCache(i).due)) + ' and has not arrived.';
+      fl_dqAdd('M' : 'Shortage overdue' : shCache(i).wo
+             : %trim(shCache(i).part) : t
+             : 'Projection cannot be pushed out - no arrival date exists.');
+    endif;
+    // 14. a shortage with nothing on order behind it
+    if shCache(i).po = '';
+      t = 'Part ' + %trim(shCache(i).part)
+        + ' is short with no purchase order raised.';
+      fl_dqAdd('M' : 'Shortage with no PO' : shCache(i).wo
+             : %trim(shCache(i).part) : t
+             : 'No expected date exists for this material at all.');
+    endif;
+  endfor;
+
+  // --- tally back onto the orders, so the board can mark the rows whose
+  //     projection should not be relied on
+  for i = 1 to woCount;
+    woCache(i).dqcount = 0;
+    woCache(i).dqhigh = 0;
+  endfor;
+  for i = 1 to dqCount;
+    j = fl_woIndex(dqCache(i).wo);
+    if j = 0;
+      iter;
+    endif;
+    woCache(j).dqcount += 1;
+    if dqCache(i).sev = 'H';
+      woCache(j).dqhigh += 1;
+    endif;
+  endfor;
+end-proc;
+
+// ------------------------------------------------------------- cache load
+// One pass over the four schedule files, then everything the screens need
+// is computed in memory. Fourteen separate confidence checks over 44 orders
+// and 357 operations is exactly the shape of query that is cheap in an array
+// and expensive as fourteen round trips.
+dcl-proc fl_loadSchedule;
+  dcl-pi *n varchar(80);
+  end-pi;
+  dcl-ds w qualified;
+    wo packed(8:0);
+    serial char(8);
+    model char(10);
+    custno packed(6:0);
+    custname char(40);
+    siteno packed(6:0);
+    sitename char(40);
+    otype char(1);
+    status char(1);
+    prio char(1);
+    opened packed(8:0);
+    promised packed(8:0);
+    started packed(8:0);
+    compl packed(8:0);
+    wctr char(6);
+    pctrptd packed(3:0);
+    value packed(11:2);
+    descr char(40);
+    note char(60);
+    modeldsc char(40);
+    modelok char(1);
+  end-ds;
+  dcl-ds c qualified;
+    code char(6);
+    descr char(40);
+    seq packed(3:0);
+    cap packed(5:1);
+    crew packed(3:0);
+    shifts packed(1:0);
+    status char(1);
+  end-ds;
+  dcl-ds o qualified;
+    wo packed(8:0);
+    seq packed(3:0);
+    wctr char(6);
+    descr char(40);
+    std packed(5:1);
+    act packed(5:1);
+    status char(1);
+    started packed(8:0);
+    compl packed(8:0);
+  end-ds;
+  dcl-ds h qualified;
+    wo packed(8:0);
+    part char(15);
+    seq packed(3:0);
+    reqd packed(5:0);
+    avail packed(5:0);
+    due packed(8:0);
+    status char(1);
+    po char(8);
+    vend char(30);
+    price packed(11:2);
+  end-ds;
+  dcl-s i int(10);
+  dcl-s j int(10);
+  dcl-s k int(10);
+  dcl-s wc int(10);
+  dcl-s cursor packed(8:0);
+  dcl-s share float(8);
+  dcl-s dayf float(8);
+  dcl-s days int(10);
+  dcl-s counted ind dim(50);
+  dcl-s wcClock packed(8:0) dim(50);
+  dcl-s ord int(10) dim(300);
+  dcl-s nord int(10) inz(0);
+  dcl-s p int(10);
+  dcl-s best int(10);
+  dcl-s tmp int(10);
+  dcl-s ra int(10);
+  dcl-s rb int(10);
+  dcl-s da packed(8:0);
+  dcl-s db packed(8:0);
+  dcl-s cap packed(5:1);
+  dcl-s rem packed(5:1);
+
+  if schedLoaded;
+    return '';
+  endif;
+  schedToday = fl_today();
+  wcCount = 0;
+  woCount = 0;
+  opCount = 0;
+  shCount = 0;
+
+  // --- work centres
+  exec sql declare cWc cursor for
+    select flwctr, flwcdesc, flwcseq, flwccap, flwccrew, flwcshft, flwcstat
+      from flwcp order by flwcseq, flwctr;
+  exec sql open cWc;
+  if sqlcode < 0;
+    return 'Error reading work centres. SQLCODE=' + %char(sqlcode);
+  endif;
+  dow wcCount < %elem(wcCache);
+    exec sql fetch cWc into :c;
+    if sqlcode <> 0;
+      leave;
+    endif;
+    wcCount += 1;
+    clear wcCache(wcCount);
+    wcCache(wcCount).code = c.code;
+    wcCache(wcCount).descr = c.descr;
+    wcCache(wcCount).seq = c.seq;
+    wcCache(wcCount).cap = c.cap;
+    wcCache(wcCount).crew = c.crew;
+    wcCache(wcCount).shifts = c.shifts;
+    wcCache(wcCount).status = c.status;
+  enddo;
+  exec sql close cWc;
+
+  // --- work orders. modelok comes back from the join so an unknown model
+  //     is a fact about the data rather than a second query per row.
+  exec sql declare cWo cursor for
+    select w.flwo, w.flwser, w.flwmodl, w.flwcust, coalesce(cu.flcname,''),
+           w.flwsite, coalesce(si.flsname,''), w.flwtype, w.flwstat,
+           w.flwprio, w.flwopen, w.flwprom, w.flwstrt, w.flwcomp, w.flwwctr,
+           w.flwpct, w.flwvalue, w.flwdesc, w.flwnote,
+           coalesce(mo.flmdesc,''),
+           case when mo.flmodl is null then 'N' else 'Y' end
+      from flwop w
+      left join flcustp cu on cu.flcust = w.flwcust
+      left join flsitep si on si.flsite = w.flwsite
+      left join flmodlp mo on mo.flmodl = w.flwmodl
+     order by w.flwo;
+  exec sql open cWo;
+  if sqlcode < 0;
+    return 'Error reading work orders. SQLCODE=' + %char(sqlcode);
+  endif;
+  dow woCount < %elem(woCache);
+    exec sql fetch cWo into :w;
+    if sqlcode <> 0;
+      leave;
+    endif;
+    woCount += 1;
+    clear woCache(woCount);
+    woCache(woCount).wo = w.wo;
+    woCache(woCount).serial = w.serial;
+    woCache(woCount).model = w.model;
+    woCache(woCount).modeldsc = w.modeldsc;
+    woCache(woCount).custno = w.custno;
+    woCache(woCount).custname = w.custname;
+    woCache(woCount).siteno = w.siteno;
+    woCache(woCount).sitename = w.sitename;
+    woCache(woCount).otype = w.otype;
+    woCache(woCount).otyped = fl_woTypeDesc(w.otype);
+    woCache(woCount).status = w.status;
+    woCache(woCount).statusd = fl_woStatusDesc(w.status);
+    woCache(woCount).prio = w.prio;
+    woCache(woCount).priod = fl_prioDesc(w.prio);
+    woCache(woCount).opened = fl_fmtDate(w.opened);
+    woCache(woCount).promised = fl_fmtDate(w.promised);
+    woCache(woCount).started = fl_fmtDate(w.started);
+    woCache(woCount).compl = fl_fmtDate(w.compl);
+    woCache(woCount).wctr = w.wctr;
+    woCache(woCount).pctrptd = w.pctrptd;
+    woCache(woCount).value = w.value;
+    woCache(woCount).descr = w.descr;
+    woCache(woCount).note = w.note;
+    woModelOk(woCount) = (w.modelok = 'Y');
+    // The projection walk and the confidence scan both need the stored
+    // dates, not the formatted display copies, so they are kept separately
+    // rather than parsed back out of char(10) text.
+    woRaw(woCount).opened = w.opened;
+    woRaw(woCount).promised = w.promised;
+    woRaw(woCount).started = w.started;
+    woRaw(woCount).compl = w.compl;
+    wc = fl_wcIndex(w.wctr);
+    if wc > 0;
+      woCache(woCount).wctrd = wcCache(wc).descr;
+    elseif w.wctr <> '';
+      woCache(woCount).wctrd = '(not a known work centre)';
+    endif;
+  enddo;
+  exec sql close cWo;
+
+  // --- routing
+  exec sql declare cOps cursor for
+    select flrwo, flrseq, flrwctr, flrdesc, flrsthr, flrachr, flrstat,
+           flrstrt, flrcomp
+      from flroutp order by flrwo, flrseq;
+  exec sql open cOps;
+  if sqlcode < 0;
+    return 'Error reading routing. SQLCODE=' + %char(sqlcode);
+  endif;
+  dow opCount < %elem(opCache);
+    exec sql fetch cOps into :o;
+    if sqlcode <> 0;
+      leave;
+    endif;
+    opCount += 1;
+    opCache(opCount).wo = o.wo;
+    opCache(opCount).seq = o.seq;
+    opCache(opCount).wctr = o.wctr;
+    opCache(opCount).descr = o.descr;
+    opCache(opCount).std = o.std;
+    opCache(opCount).act = o.act;
+    opCache(opCount).status = o.status;
+    opCache(opCount).started = o.started;
+    opCache(opCount).compl = o.compl;
+  enddo;
+  exec sql close cOps;
+
+  // --- shortages
+  exec sql declare cSh cursor for
+    select s.flshwo, s.flshpart, s.flshseq, s.flshqtyr, s.flshqtya,
+           s.flshdue, s.flshstat, s.flshpo, s.flshvend,
+           coalesce(p.flpprice, 0)
+      from flshrtp s
+      left join flpartp p on p.flpart = s.flshpart
+     order by s.flshwo, s.flshseq, s.flshpart;
+  exec sql open cSh;
+  if sqlcode < 0;
+    return 'Error reading shortages. SQLCODE=' + %char(sqlcode);
+  endif;
+  dow shCount < %elem(shCache);
+    exec sql fetch cSh into :h;
+    if sqlcode <> 0;
+      leave;
+    endif;
+    shCount += 1;
+    shCache(shCount).wo = h.wo;
+    shCache(shCount).part = h.part;
+    shCache(shCount).seq = h.seq;
+    shCache(shCount).reqd = h.reqd;
+    shCache(shCount).avail = h.avail;
+    shCache(shCount).due = h.due;
+    shCache(shCount).status = h.status;
+    shCache(shCount).po = h.po;
+    shCache(shCount).vend = h.vend;
+    shCache(shCount).price = h.price;
+  enddo;
+  exec sql close cSh;
+
+  // --- routed hours per order, and load per work centre
+  for i = 1 to opCount;
+    j = fl_woIndex(opCache(i).wo);
+    if j = 0;
+      iter;
+    endif;
+    woCache(j).ops += 1;
+    woCache(j).stdhrs += opCache(i).std;
+    woCache(j).acthrs += opCache(i).act;
+    if opCache(i).status = 'C';
+      woCache(j).opsdone += 1;
+    endif;
+    woCache(j).remhrs +=
+      fl_opRemaining(opCache(i).std : opCache(i).act : opCache(i).status);
+  endfor;
+  for i = 1 to woCount;
+    if woCache(i).stdhrs > 0;
+      woCache(i).pctroute =
+        %int((woCache(i).stdhrs - woCache(i).remhrs) * 100 / woCache(i).stdhrs);
+    endif;
+  endfor;
+
+  // Queue depth: how many live orders still have work routed at each centre.
+  // The projection divides a centre's daily hours by this, which is the
+  // honest reading - a crew of nine is not nine crews.
+  for i = 1 to woCount;
+    if woCache(i).status = 'C';
+      iter;
+    endif;
+    clear counted;
+    for j = 1 to opCount;
+      if opCache(j).wo <> woCache(i).wo or opCache(j).status = 'C';
+        iter;
+      endif;
+      wc = fl_wcIndex(opCache(j).wctr);
+      if wc = 0;
+        iter;
+      endif;
+      wcCache(wc).loadhrs +=
+        fl_opRemaining(opCache(j).std : opCache(j).act : opCache(j).status);
+      if not counted(wc);
+        counted(wc) = *on;
+        wcCache(wc).queued += 1;
+      endif;
+    endfor;
+    wc = fl_wcIndex(woCache(i).wctr);
+    if wc > 0 and woCache(i).status = 'I';
+      wcCache(wc).wip += 1;
+    endif;
+  endfor;
+
+  // --- open shortages per order
+  for i = 1 to shCount;
+    if shCache(i).status <> 'O';
+      iter;
+    endif;
+    j = fl_woIndex(shCache(i).wo);
+    if j = 0;
+      iter;
+    endif;
+    woCache(j).shorts += 1;
+    if shCache(i).due > 0 and shCache(i).due < schedToday;
+      woCache(j).shortlat += 1;
+    endif;
+  endfor;
+
+  // --- projected ship: a forward finite-capacity load
+  //
+  // The first version of this divided each work centre's daily hours by the
+  // number of orders queued on it and walked every order independently. That
+  // double-counts contention - an order only competes for a centre while it
+  // is actually there - and it put 27 of 36 orders at risk, which is not a
+  // schedule, it is an artefact.
+  //
+  // This is the textbook version instead, and it says in one sentence what it
+  // did: the orders are loaded onto the work centres in promised-date order,
+  // each centre working one order at a time at its own daily capacity, and an
+  // operation cannot start before its material has landed.
+  clear wcClock;
+  for i = 1 to wcCount;
+    wcClock(i) = schedToday;
+  endfor;
+
+  // Load sequence: promised date, then priority, then work order number.
+  // Undated orders load last - they have nothing to be early or late for.
+  nord = 0;
+  for i = 1 to woCount;
+    if woCache(i).status = 'C' or woCache(i).ops = 0;
+      iter;
+    endif;
+    nord += 1;
+    ord(nord) = i;
+  endfor;
+  for i = 1 to nord - 1;
+    best = i;
+    for j = i + 1 to nord;
+      da = woRaw(ord(best)).promised;
+      db = woRaw(ord(j)).promised;
+      if da = 0;
+        da = 99999999;
+      endif;
+      if db = 0;
+        db = 99999999;
+      endif;
+      ra = fl_prioRank(woCache(ord(best)).prio);
+      rb = fl_prioRank(woCache(ord(j)).prio);
+      if db < da
+         or (db = da and rb < ra)
+         or (db = da and rb = ra and woCache(ord(j)).wo < woCache(ord(best)).wo);
+        best = j;
+      endif;
+    endfor;
+    if best <> i;
+      tmp = ord(i);
+      ord(i) = ord(best);
+      ord(best) = tmp;
+    endif;
+  endfor;
+
+  for p = 1 to nord;
+    i = ord(p);
+    cursor = schedToday;
+    for j = 1 to opCount;
+      if opCache(j).wo <> woCache(i).wo or opCache(j).status = 'C';
+        iter;
+      endif;
+      // Material first: an operation cannot start before its parts land.
+      // A shortage already past its expected date is NOT pushed forward -
+      // there is no arrival date to push to. The scan reports it instead,
+      // and the board marks the row, rather than inventing an estimate.
+      for k = 1 to shCount;
+        if shCache(k).wo = woCache(i).wo and shCache(k).seq = opCache(j).seq
+           and shCache(k).status = 'O' and shCache(k).due > cursor;
+          cursor = shCache(k).due;
+        endif;
+      endfor;
+      wc = fl_wcIndex(opCache(j).wctr);
+      cap = 8;
+      if wc > 0 and wcCache(wc).cap > 0;
+        cap = wcCache(wc).cap;
+        // Queue: the centre is busy with the orders loaded ahead of this one.
+        if wcClock(wc) > cursor;
+          cursor = wcClock(wc);
+        endif;
+      endif;
+      rem = fl_opRemaining(opCache(j).std : opCache(j).act : opCache(j).status);
+      days = 0;
+      if rem > 0;
+        dayf = %float(rem) / %float(cap);
+        days = %int(dayf);
+        if dayf > days;
+          days += 1;
+        endif;
+        if days < 1;
+          days = 1;
+        endif;
+      endif;
+      if days > 0;
+        cursor = fl_addWorkDays(cursor : days);
+      endif;
+      if wc > 0;
+        wcClock(wc) = cursor;
+      endif;
+    endfor;
+    woRaw(i).projected = cursor;
+    woCache(i).projectd = fl_fmtDate(cursor);
+  endfor;
+
+  // --- day counts and the flag
+  for i = 1 to woCount;
+    if woCache(i).status = 'C';
+      woRaw(i).projected = woRaw(i).compl;
+      woCache(i).projectd = woCache(i).compl;
+    elseif woCache(i).ops = 0;
+      // No routing means no projection. Refusing to invent one, and saying
+      // why on the screen, is the entire point of the confidence panel.
+      woRaw(i).projected = 0;
+      woCache(i).projectd = *blanks;
+    endif;
+
+    woCache(i).promdays = fl_daysBetween(schedToday : woRaw(i).promised);
+    woCache(i).projdays = fl_daysBetween(schedToday : woRaw(i).projected);
+    woCache(i).slipdays = 0;
+    if woRaw(i).promised > 0 and woRaw(i).projected > 0;
+      woCache(i).slipdays =
+        fl_daysBetween(woRaw(i).promised : woRaw(i).projected);
+    endif;
+
+    // Flag precedence: a fact about the data outranks a fact about the
+    // schedule, because the second one is only as good as the first.
+    select;
+      when woCache(i).status = 'C';
+        woCache(i).flag = 'SHIPPED';
+      when woCache(i).status = 'H';
+        woCache(i).flag = 'HOLD';
+      when woCache(i).ops = 0;
+        woCache(i).flag = 'NO DATA';
+      when woRaw(i).promised = 0;
+        woCache(i).flag = 'NO DATE';
+      when woRaw(i).promised < schedToday;
+        woCache(i).flag = 'LATE';
+      when woCache(i).slipdays > 0;
+        woCache(i).flag = 'AT RISK';
+      other;
+        woCache(i).flag = 'ON TRACK';
+    endsl;
+  endfor;
+
+  // Orders already past their promised ship date, queued at each work centre.
+  // This counted AT RISK too at first, which made every downstream centre
+  // show a large number and the chip carry no signal at all.
+  for i = 1 to woCount;
+    if woCache(i).flag <> 'LATE';
+      iter;
+    endif;
+    clear counted;
+    for j = 1 to opCount;
+      if opCache(j).wo <> woCache(i).wo or opCache(j).status = 'C';
+        iter;
+      endif;
+      wc = fl_wcIndex(opCache(j).wctr);
+      if wc > 0 and not counted(wc);
+        counted(wc) = *on;
+        wcCache(wc).late += 1;
+      endif;
+    endfor;
+  endfor;
+
+  schedLoaded = *on;
+  fl_dqScan();
+  return '';
+end-proc;
+
+// ---------------------------------------------------------- exported board
+dcl-proc fl_listWorkCentres export;
+  dcl-pi *n varchar(80);
+    lanes likeds(fl_wctr_t) dim(50);
+    limit int(10) const;
+    returned int(10);
+  end-pi;
+  dcl-s i int(10);
+  dcl-s err varchar(80);
+  returned = 0;
+  err = fl_loadSchedule();
+  if err <> '';
+    return err;
+  endif;
+  for i = 1 to wcCount;
+    if returned >= limit or returned >= %elem(lanes);
+      leave;
+    endif;
+    returned += 1;
+    clear lanes(returned);
+    lanes(returned).code = wcCache(i).code;
+    lanes(returned).descr = wcCache(i).descr;
+    lanes(returned).seq = wcCache(i).seq;
+    lanes(returned).cap = wcCache(i).cap;
+    lanes(returned).crew = wcCache(i).crew;
+    lanes(returned).shifts = wcCache(i).shifts;
+    lanes(returned).status = wcCache(i).status;
+    lanes(returned).statusd = fl_wcStatusDesc(wcCache(i).status);
+    lanes(returned).wip = wcCache(i).wip;
+    lanes(returned).queued = wcCache(i).queued;
+    lanes(returned).loadhrs = wcCache(i).loadhrs;
+    lanes(returned).late = wcCache(i).late;
+    // Load as a share of the next month of capacity, which is the horizon a
+    // scheduler actually plans over. A stood-down centre reports zero rather
+    // than infinity; the confidence scan is what explains the queue on it.
+    if wcCache(i).cap > 0;
+      lanes(returned).loaddays = wcCache(i).loadhrs / wcCache(i).cap;
+      lanes(returned).loadpct =
+        %int(wcCache(i).loadhrs * 100 / (wcCache(i).cap * 20));
+      lanes(returned).weeks = wcCache(i).loadhrs / (wcCache(i).cap * 5);
+    endif;
+  endfor;
+  return '';
+end-proc;
+
+// Does this order still have work routed at this centre?
+dcl-proc fl_atCentre;
+  dcl-pi *n ind;
+    wo packed(8:0) const;
+    wctr char(6) const;
+  end-pi;
+  dcl-s i int(10);
+  for i = 1 to opCount;
+    if opCache(i).wo = wo and opCache(i).wctr = wctr
+       and opCache(i).status <> 'C';
+      return *on;
+    endif;
+  endfor;
+  return *off;
+end-proc;
+
+// Flag order for the board. A scheduler wants the trouble at the top, and
+// "we cannot tell" ranks above "on track" because it is not the same thing.
+dcl-proc fl_flagRank;
+  dcl-pi *n int(10);
+    flag char(10) const;
+  end-pi;
+  select;
+    when flag = 'LATE';
+      return 1;
+    when flag = 'AT RISK';
+      return 2;
+    when flag = 'NO DATE';
+      return 3;
+    when flag = 'NO DATA';
+      return 4;
+    when flag = 'HOLD';
+      return 5;
+    when flag = 'ON TRACK';
+      return 6;
+    other;
+      return 7;
+  endsl;
+end-proc;
+
+dcl-proc fl_listWorkOrders export;
+  dcl-pi *n varchar(80);
+    view char(1) const;
+    wctr char(6) const;
+    orders likeds(fl_wo_t) dim(300);
+    limit int(10) const;
+    returned int(10);
+  end-pi;
+  dcl-s i int(10);
+  dcl-s j int(10);
+  dcl-s p int(10);
+  dcl-s best int(10);
+  dcl-s keep ind;
+  dcl-s err varchar(80);
+  dcl-s pick int(10) dim(300);
+  dcl-s n int(10) inz(0);
+  dcl-s ra int(10);
+  dcl-s rb int(10);
+  dcl-s da int(10);
+  dcl-s db int(10);
+  dcl-s tmp int(10);
+
+  returned = 0;
+  err = fl_loadSchedule();
+  if err <> '';
+    return err;
+  endif;
+
+  for i = 1 to woCount;
+    select;
+      when view = '*';
+        keep = *on;
+      when view = 'C';
+        keep = (woCache(i).status = 'C');
+      when view = 'L';
+        keep = (woCache(i).flag = 'LATE');
+      when view = 'R';
+        keep = (woCache(i).flag = 'AT RISK');
+      when view = 'S';
+        keep = (woCache(i).shorts > 0);
+      when view = 'H';
+        keep = (woCache(i).status = 'H');
+      when view = 'D';
+        keep = (woCache(i).dqcount > 0);
+      other;
+        keep = (woCache(i).status <> 'C');
+    endsl;
+    if keep and wctr <> '';
+      keep = fl_atCentre(woCache(i).wo : wctr);
+    endif;
+    if keep and n < %elem(pick);
+      n += 1;
+      pick(n) = i;
+    endif;
+  endfor;
+
+  // Selection sort on the index array: flag rank, then promised date with
+  // blanks last, then work order number. n is at most a few hundred.
+  for i = 1 to n - 1;
+    best = i;
+    for j = i + 1 to n;
+      ra = fl_flagRank(woCache(pick(best)).flag);
+      rb = fl_flagRank(woCache(pick(j)).flag);
+      da = woRaw(pick(best)).promised;
+      db = woRaw(pick(j)).promised;
+      if da = 0;
+        da = 99999999;
+      endif;
+      if db = 0;
+        db = 99999999;
+      endif;
+      if rb < ra
+         or (rb = ra and db < da)
+         or (rb = ra and db = da and woCache(pick(j)).wo
+                                     < woCache(pick(best)).wo);
+        best = j;
+      endif;
+    endfor;
+    if best <> i;
+      tmp = pick(i);
+      pick(i) = pick(best);
+      pick(best) = tmp;
+    endif;
+  endfor;
+
+  for p = 1 to n;
+    if returned >= limit or returned >= %elem(orders);
+      leave;
+    endif;
+    returned += 1;
+    orders(returned) = woCache(pick(p));
+  endfor;
+  return '';
+end-proc;
+
+dcl-proc fl_getWorkOrder export;
+  dcl-pi *n varchar(80);
+    wo packed(8:0) const;
+    order likeds(fl_wo_t);
+    found ind;
+  end-pi;
+  dcl-s i int(10);
+  dcl-s err varchar(80);
+  found = *off;
+  clear order;
+  err = fl_loadSchedule();
+  if err <> '';
+    return err;
+  endif;
+  i = fl_woIndex(wo);
+  if i > 0;
+    order = woCache(i);
+    found = *on;
+  endif;
+  return '';
+end-proc;
+
+dcl-proc fl_listOperations export;
+  dcl-pi *n varchar(80);
+    wo packed(8:0) const;
+    ops likeds(fl_op_t) dim(100);
+    limit int(10) const;
+    returned int(10);
+  end-pi;
+  dcl-s i int(10);
+  dcl-s k int(10);
+  dcl-s wc int(10);
+  dcl-s err varchar(80);
+  dcl-s extra int(10);
+  dcl-s t varchar(120);
+  returned = 0;
+  err = fl_loadSchedule();
+  if err <> '';
+    return err;
+  endif;
+  for i = 1 to opCount;
+    if opCache(i).wo <> wo;
+      iter;
+    endif;
+    if returned >= limit or returned >= %elem(ops);
+      leave;
+    endif;
+    returned += 1;
+    clear ops(returned);
+    ops(returned).wo = opCache(i).wo;
+    ops(returned).seq = opCache(i).seq;
+    ops(returned).wctr = opCache(i).wctr;
+    wc = fl_wcIndex(opCache(i).wctr);
+    if wc > 0;
+      ops(returned).wctrd = wcCache(wc).descr;
+    else;
+      ops(returned).wctrd = '(not a known work centre)';
+    endif;
+    ops(returned).descr = opCache(i).descr;
+    ops(returned).stdhrs = opCache(i).std;
+    ops(returned).acthrs = opCache(i).act;
+    ops(returned).status = opCache(i).status;
+    ops(returned).statusd = fl_opStatusDesc(opCache(i).status);
+    ops(returned).started = fl_fmtDate(opCache(i).started);
+    ops(returned).compl = fl_fmtDate(opCache(i).compl);
+    // Variance is computed here rather than in SQL: DECIMAL / DECIMAL comes
+    // back with the scale truncated to zero, so every ratio is 0.
+    if opCache(i).std > 0 and opCache(i).act > 0;
+      ops(returned).varpct =
+        %int((opCache(i).act - opCache(i).std) * 100 / opCache(i).std);
+    endif;
+
+    // Shortages hang off the operation they block, so the screen can say
+    // which step is stalled rather than only that the order is short.
+    extra = 0;
+    for k = 1 to shCount;
+      if shCache(k).wo <> wo or shCache(k).seq <> opCache(i).seq
+         or shCache(k).status <> 'O';
+        iter;
+      endif;
+      ops(returned).shorts += 1;
+      if ops(returned).shorts = 1;
+        ops(returned).shortpar = shCache(k).part;
+        ops(returned).shortqty = shCache(k).reqd - shCache(k).avail;
+        ops(returned).shortdue = fl_fmtDate(shCache(k).due);
+        ops(returned).shortpo = shCache(k).po;
+        ops(returned).shortven = shCache(k).vend;
+      else;
+        extra += 1;
+      endif;
+    endfor;
+    if ops(returned).shorts > 0;
+      t = %trim(%char(ops(returned).shortqty)) + ' short of '
+        + %trim(ops(returned).shortpar);
+      if ops(returned).shortdue = *blanks;
+        t += ' - no expected date';
+      elseif ops(returned).shortpo = *blanks;
+        t += ' - no purchase order';
+      else;
+        t += ' - due ' + %trim(ops(returned).shortdue);
+      endif;
+      if extra > 0;
+        t += ' (+' + %trim(%char(extra)) + ' more)';
+      endif;
+      ops(returned).shortdsc = t;
+    endif;
+  endfor;
+  return '';
+end-proc;
+
+dcl-proc fl_shopSummary export;
+  dcl-pi *n varchar(80);
+    summary likeds(fl_shop_t);
+  end-pi;
+  dcl-s i int(10);
+  dcl-s err varchar(80);
+  clear summary;
+  err = fl_loadSchedule();
+  if err <> '';
+    return err;
+  endif;
+  for i = 1 to wcCount;
+    if wcCache(i).status = 'A';
+      summary.capday += wcCache(i).cap;
+    endif;
+  endfor;
+  for i = 1 to woCount;
+    if woCache(i).status = 'C';
+      iter;
+    endif;
+    summary.orders += 1;
+    summary.value += woCache(i).value;
+    summary.remhrs += woCache(i).remhrs;
+    if woCache(i).status = 'I';
+      summary.wip += 1;
+    endif;
+    if woCache(i).shorts > 0;
+      summary.shorts += 1;
+    endif;
+    if woCache(i).dqcount > 0;
+      summary.dqorders += 1;
+    endif;
+    if woCache(i).dqhigh = 0;
+      summary.dqtrust += 1;
+    endif;
+    select;
+      when woCache(i).flag = 'LATE';
+        summary.late += 1;
+      when woCache(i).flag = 'AT RISK';
+        summary.risk += 1;
+      when woCache(i).flag = 'HOLD';
+        summary.hold += 1;
+      when woCache(i).flag = 'ON TRACK';
+        summary.ontrack += 1;
+    endsl;
+  endfor;
+  for i = 1 to shCount;
+    if shCache(i).status = 'O' and shCache(i).reqd > shCache(i).avail;
+      summary.shortval +=
+        (shCache(i).reqd - shCache(i).avail) * shCache(i).price;
+    endif;
+  endfor;
+  summary.dqfind = dqCount;
+  for i = 1 to dqCount;
+    if dqCache(i).sev = 'H';
+      summary.dqhigh += 1;
+    endif;
+  endfor;
+  if summary.capday > 0;
+    summary.weeks = summary.remhrs / (summary.capday * 5);
+  endif;
+  if summary.orders > 0;
+    summary.dqpct = %int(summary.dqtrust * 100 / summary.orders);
+  endif;
+  return '';
+end-proc;
+
+dcl-proc fl_scanSchedule export;
+  dcl-pi *n varchar(80);
+    findings likeds(fl_dq_t) dim(400);
+    limit int(10) const;
+    returned int(10);
+  end-pi;
+  dcl-s i int(10);
+  dcl-s err varchar(80);
+  returned = 0;
+  err = fl_loadSchedule();
+  if err <> '';
+    return err;
+  endif;
+  for i = 1 to dqCount;
+    if returned >= limit or returned >= %elem(findings);
+      leave;
+    endif;
+    returned += 1;
+    findings(returned) = dqCache(i);
+  endfor;
+  return '';
+end-proc;
+
+// The board opens on a real order rather than an empty prompt: the worst
+// slip that also has material missing, because that is the order somebody
+// would actually be chasing. Chosen by data, never hardcoded.
+dcl-proc fl_defaultWorkOrder export;
+  dcl-pi *n varchar(80);
+    wo packed(8:0);
+  end-pi;
+  dcl-s i int(10);
+  dcl-s best int(10) inz(0);
+  dcl-s bestScore int(10) inz(-99999);
+  dcl-s score int(10);
+  dcl-s err varchar(80);
+  wo = 0;
+  err = fl_loadSchedule();
+  if err <> '';
+    return err;
+  endif;
+  for i = 1 to woCount;
+    if woCache(i).status = 'C' or woCache(i).ops = 0;
+      iter;
+    endif;
+    score = woCache(i).slipdays + woCache(i).shorts * 12
+          + woCache(i).dqcount * 5;
+    if score > bestScore;
+      bestScore = score;
+      best = i;
+    endif;
+  endfor;
+  if best = 0 and woCount > 0;
+    best = 1;
+  endif;
+  if best > 0;
+    wo = woCache(best).wo;
+  endif;
+  return '';
+end-proc;
+
+dcl-proc fl_jsonStr export;
+  dcl-pi *n varchar(300);
+    v varchar(250) const;
+  end-pi;
+  // NB: not named "out" - IN and OUT are free-form RPG opcodes, so a
+  // statement starting with `out =` is parsed as a data-area operation and
+  // fails with RNF7064 "not a data area", which names nothing recognisable.
+  dcl-s buf varchar(300);
+  dcl-s c char(1);
+  dcl-s i int(10);
+  buf = '"';
+  for i = 1 to %len(v);
+    // Stop well short of the declared length: appending past a VARCHAR's
+    // size is RNX0100 at runtime, and an escape can cost two characters.
+    if %len(buf) > 292;
+      leave;
+    endif;
+    c = %subst(v : i : 1);
+    select;
+      when c = '"';
+        buf += '\"';
+      when c = '\';
+        buf += '\\';
+      when c < ' ';
+        buf += ' ';
+      other;
+        buf += c;
+    endsl;
+  endfor;
+  return buf + '"';
+end-proc;
+
+dcl-proc fl_jsonNum export;
+  dcl-pi *n varchar(24);
+    numText varchar(24) const;
+  end-pi;
+  dcl-s t varchar(24);
+  t = %trim(numText);
+  if t = '';
+    return '0';
+  endif;
+  if %subst(t : 1 : 1) = '.';
+    return '0' + t;
+  endif;
+  if %len(t) > 1 and %subst(t : 1 : 2) = '-.';
+    return '-0' + %subst(t : 2);
+  endif;
+  return t;
 end-proc;

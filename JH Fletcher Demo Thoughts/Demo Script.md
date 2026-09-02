@@ -1,7 +1,8 @@
 # J.H. Fletcher — Demo Script
 
-For the two screens now live in `FLTDEMO`: **Parts Finder** and **Fleet 360**.
-Roughly 12 minutes for both. Read §1 before you drive it.
+For the screens now live in `FLTDEMO`: **Parts Finder**, **Fleet 360**, **Duplicate part review**
+and the **Production Schedule Board**. Roughly 12 minutes for the first two, another 8 for the
+schedule board. Read §1 before you drive it.
 
 ---
 
@@ -240,6 +241,83 @@ F3 back out.
 
 ---
 
+## 4b. Production Schedule Board — the Mike demo
+
+`FLTMENU` option 4. This is the one that replaces something they can point at: the physical
+sticky-note schedule. Budget 8 minutes.
+
+### Beat 0 — say what it is before they ask
+
+> *"This is your build schedule. Every machine on the floor, where it is, and when we think it
+> actually ships. Invented data — but the shape is your shape: work centres, routings, standard
+> hours, material shortages."*
+
+### Beat 1 — the lane strip is the bottleneck, in one glance
+
+The row of work-centre cards is load in **working weeks of queued work**, coloured green through red.
+Point at the spread: the front of the shop (Teardown, Fabrication) is green at 3–4 weeks; the back
+half (Blast, Hydraulic, Electrical, Assembly, Test) is red at 10–16 weeks.
+
+> *"The shop average is 8.5 weeks of routed work. But Electrical is sixteen. That's not a capacity
+> problem, it's a **sequencing** problem, and nobody can see it on a corkboard."*
+
+**Click a lane** to filter the grid to the orders with work left at that centre. Click the chip next
+to the dropdown to clear it.
+
+**Point at WELD2.** It says *no capacity* in red, with an **Inactive** chip — and it still has two
+orders and 600-odd hours queued on it. That's a real finding, and it leads straight into Beat 3.
+
+### Beat 2 — promised against projected
+
+The **Ship window** column is a 300-day track: black tick is the promised date, orange is where the
+schedule actually lands, the pink bar between them is the slip, and the thin grey line is today.
+
+Sort by it, or just read the top of the grid — it opens with the trouble first: past-promised, then
+projected-to-miss, then the ones you cannot say anything about at all.
+
+**Double-click a row.** Work order detail: the routing operation by operation, standard against
+actual hours with the variance, and any operation waiting on material shaded red with the part, the
+quantity short, the vendor and the PO.
+
+**The yellow sticky note in the corner is the point.** That is `FLWNOTE`, free text, straight off
+the board — *"Second shift approved on FAB through month end"*, *"Trade-in core arrived short"*.
+
+> *"We didn't structure that field. That's the note as it exists today. The system doesn't need to
+> understand it to stop it being the only place the information lives."*
+
+### Beat 3 — the honest panel ⭐ do not skip this
+
+The orange panel at the top says **schedule confidence** and a percentage. Click **Review data
+confidence**.
+
+Fourteen checks, run against the data every time the screen opens. On the seeded data: **40 findings
+across 23 of 44 work orders, 16 of which invalidate a projected date outright.** Impossible promised
+dates. Orders in process with no start date. Operations reported complete with no hours booked.
+Material overdue with no arrival date. Work queued at a work centre that has no crew.
+
+> *"Mike told us you're plugging this data into scheduling applications and finding a lot of database
+> issues. He's right, and this is what that looks like. We are not going to show you a board that
+> pretends otherwise — a schedule that quietly invents its inputs is worse than no schedule."*
+
+**Double-click a finding** to land on the work order it is on. The detail screen repeats it in plain
+language next to its own projected date.
+
+Then show one that refuses to answer: a work order with no routing shows a blank projected date, a
+`NO DATA` flag, and *"This work order has no routing operations at all, so it carries no hours and
+no capacity plan can see it. That is the finding, not a display problem."*
+
+> *"That order is consuming your shop and no plan can see it. We could have put a plausible date
+> there. We'd rather tell you."*
+
+### What this beat buys you
+
+It is the answer to *"how do we know it's right?"* asked before they ask it, and it turns the data
+quality problem from something IT is embarrassed about into something with a number, an owner and a
+work queue. It also sets up the live B4 database health scan on their real data: same idea, their
+system.
+
+---
+
 ## 5. What to say when they push
 
 **"How long did this take?"**
@@ -281,6 +359,14 @@ If asked, say so plainly. Getting caught overstating costs more than the gap doe
 - **Read-only.** Nothing writes back.
 - **Modernization thresholds are assumptions** (full at 15 years, partial at 7). Ask them what the real
   intervals are — it's a good question to leave the room with.
+- **The schedule board is read-only and does not reschedule.** It projects; it will not let you drag
+  an order or reorder the queue. Say so before someone tries.
+- **The capacity model is deliberately simple**: one clock per work centre, one order at a time at
+  that centre's daily hours, loaded in promised-date order. Real finite-capacity scheduling has
+  alternate routings, overlapping operations and setup times. This is honest about what it is, and
+  the assumption is one sentence — which is the point.
+- **The confidence scan's fourteen checks are ours, not theirs.** Ask which ones they'd add. That is
+  the best question in the whole demo, because the answer is a specification.
 
 ---
 
@@ -302,6 +388,21 @@ If asked, say so plainly. Getting caught overstating costs more than the gap doe
 | 10:30 | | Option 7 — jump to parts for that machine | Julia, Mike |
 | 11:00 | — | The close: run it on your real item master | Julia, Mike |
 
+Add the schedule board when you have the time for it — it plays best straight after Fleet 360,
+because both are "your business, computed" and it hands off naturally into the live B4 database
+health scan:
+
+| | Screen | Beat | For |
+|---|---|---|---|
+| 11:30 | Schedule Board | Lane strip — 8.5 weeks average, Electrical at 16 | Mike, Julia |
+| 12:30 | | WELD2: inactive, and still has work queued on it | Mike |
+| 13:00 | | Ship window — promised against projected | Chuck, Rod |
+| 14:00 | | Double-click: routing, variances, material block | Mike, Ray |
+| 15:00 | | The sticky note, carried through as free text | Everyone |
+| 16:00 | | **Review data confidence** — 40 findings, 16 blocking | Mike, Ray |
+| 17:30 | | An order it refuses to give a date for | Mike |
+| 18:00 | — | Hand off to the live B4 scan on their real data | Mike, Ray |
+
 ---
 
 ## 8. If you remember one thing
@@ -311,3 +412,7 @@ counted, on screen, in under three minutes. Everything else is context for that 
 
 And the close is not "buy the platform." It's *"let us run this read-only query against your real item
 master and tell you how big it actually is."* That's a yes they can give in the room.
+
+If you show the schedule board, it has a second one of these: **the confidence panel is the demo**,
+not the board. Anyone can draw a schedule. Saying out loud which of your own dates you don't believe,
+and why, with a number, is the thing no ERP demo will do for them.

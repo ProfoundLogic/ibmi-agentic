@@ -1,0 +1,136 @@
+<%
+  function fmt(n, d) {
+    n = Number(n) || 0;
+    var s = n.toFixed(d === undefined ? 0 : d).split('.');
+    s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return s.join('.');
+  }
+  function txt(v) { return (typeof v === 'undefined' || v === null) ? '' : String(v).trim(); }
+
+  // Category rollup, one JSON payload for the same reason as the board's
+  // lane strip: a second list cannot be a second subfile.
+  var cats = [];
+  try { cats = JSON.parse(txt(typeof scats !== 'undefined' ? scats : '') || '[]'); }
+  catch (e) { cats = []; }
+
+  var sev  = txt(typeof ssev !== 'undefined' ? ssev : '') || '*';
+  var pct  = Number(typeof spct !== 'undefined' ? spct : 0) || 0;
+  var SEVS = [
+    ['*', 'Every finding'],
+    ['H', 'Only findings that invalidate a projection'],
+    ['M', 'Only findings that degrade a projection']
+  ];
+%>
+<div class="fl-screen flsdq-screen">
+
+  <div class="fl-mast">
+    <div class="fl-logo" role="img" aria-label="J.H. Fletcher &amp; Co."></div>
+    <div>
+      <div class="fl-mast-title">Schedule data confidence</div>
+      <div class="fl-mast-sub">What the schedule cannot be trusted about, and why</div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+    <div class="fl-msg"><%= msg %></div>
+  <% } %>
+
+  <div class="fl-card flsdq-lead">
+    <div class="flsdq-score flsdq-<%= pct >= 85 ? 'ok' : pct >= 65 ? 'warn' : 'bad' %>">
+      <div class="flsdq-pct"><%= fmt(pct) %>%</div>
+      <div class="flsdq-cap">schedule<br>confidence</div>
+    </div>
+    <div class="flsdq-lead-body">
+      <div class="flsdq-lead-head">
+        <%= fmt(strust) %> of <%= fmt(stotal) %> live work orders carry no defect that
+        invalidates their projected ship date.
+      </div>
+      <div class="flsdq-lead-sub">
+        <%= fmt(sfind) %> findings across <%= fmt(sord) %> work orders:
+        <span class="fl-pill fl-pill-bad"><%= fmt(shigh) %> invalidating</span>
+        <span class="fl-pill fl-pill-warn"><%= fmt(smed) %> degrading</span>.
+        Every one is produced by querying the live data, not from a stored list &mdash;
+        fix the record and the finding disappears on the next look.
+      </div>
+    </div>
+  </div>
+
+  <% if (cats.length > 0) { %>
+    <div class="flsdq-cats">
+    <% cats.forEach(function (c) { %>
+      <div class="fl-card flsdq-cat<%= txt(c.s) === 'H' ? ' flsdq-cat-h' : '' %>">
+        <div class="flsdq-cat-n"><%= fmt(c.n) %></div>
+        <div class="flsdq-cat-l"><%= txt(c.c) %></div>
+      </div>
+    <% }); %>
+    </div>
+  <% } %>
+
+  <div class="flsdq-bar">
+    <div class="fl-field">
+      <label for="ssev">Show</label>
+      <select class="fl-select flsdq-sel" name="ssev" id="ssev"
+              onchange="pui.submit({action:'SEV'})">
+      <% SEVS.forEach(function (s) { %>
+        <option value="<%= s[0] %>"<%= sev === s[0] ? ' selected' : '' %>><%= s[1] %></option>
+      <% }); %>
+      </select>
+    </div>
+    <span class="fl-mast-spacer"></span>
+    <% if (typeof soptdesc !== 'undefined' && soptdesc && soptdesc.trim()) { %>
+      <span class="flsdq-hint"><%= soptdesc %></span>
+    <% } %>
+  </div>
+
+  <% if (typeof dqsfl !== 'undefined' && dqsfl && dqsfl.length > 0) { %>
+    <div class="fl-grid-scroll">
+    <table class="fl-table">
+      <thead>
+        <tr>
+          <th style="width:42px">Opt</th>
+          <th style="width:84px">Severity</th>
+          <th style="width:180px">Category</th>
+          <th style="width:82px" class="fl-num">Work order</th>
+          <th style="width:120px">Subject</th>
+          <th>What is wrong</th>
+          <th style="width:270px" class="fl-hide-sm">What it blocks</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% dqsfl.forEach(function (row) { %>
+        <tr class="fl-row-pick" ondblclick="flPickRow(this,'5')"
+            title="Double-click to open this work order">
+          <td><input class="fl-input flsdq-opt" name="dqsfl.sopt.<%= row._rrn %>"
+                     value="<%= row.sopt %>" size="2" maxlength="2"></td>
+          <td><span class="fl-pill <%= txt(row.ssevc) === 'H' ? 'fl-pill-bad' : 'fl-pill-warn' %>"><%=
+            row.ssevd %></span></td>
+          <td><%= row.scat %></td>
+          <td class="fl-num"><strong><%= row.sdwo %></strong></td>
+          <td class="flsdq-subj"><%= row.ssubj %></td>
+          <td><%= row.sfnd %></td>
+          <td class="fl-hide-sm flsdq-imp"><%= row.simp %></td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+    </div>
+    <% if (dqsfl.length > 12) { %>
+      <div class="fl-grid-note"><%= dqsfl.length %> findings &mdash; scroll the grid,
+        or narrow by severity.</div>
+    <% } %>
+  <% } else { %>
+    <div class="fl-empty">No findings at that severity. On this data that would be
+      a first &mdash; check the filter.</div>
+  <% } %>
+
+  <input type="hidden" name="action" value="">
+
+  <div class="fl-foot">
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'EXIT'})"
+            data-fkey="F12">Back to the board (F12)</button>
+    <span class="fl-mast-spacer"></span>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+</div>

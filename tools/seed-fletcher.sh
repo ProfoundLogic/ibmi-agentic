@@ -14,8 +14,20 @@ if [ -z "$LIB" ]; then
   exit 2
 fi
 LIB="$(echo "$LIB" | tr '[:lower:]' '[:upper:]')"
-SQL="$(dirname "$0")/../cfdemo/seed/flseed.sql"
-[ -f "$SQL" ] || { echo "seed file not found: $SQL" >&2; exit 2; }
+SEEDS=("$(dirname "$0")/../cfdemo/seed/flseed.sql"
+       "$(dirname "$0")/../cfdemo/seed/flsched.sql")
+for SQL in "${SEEDS[@]}"; do
+  [ -f "$SQL" ] || { echo "seed file not found: $SQL" >&2; exit 2; }
+done
+
+# Optionally load just one section: tools/seed-fletcher.sh FLTDEMO flsched
+if [ -n "${2:-}" ]; then
+  SEEDS=("$(dirname "$0")/../cfdemo/seed/$2.sql")
+  [ -f "${SEEDS[0]}" ] || { echo "seed file not found: ${SEEDS[0]}" >&2; exit 2; }
+fi
 
 echo "Seeding Fletcher demo data into $LIB"
-python3 "$(dirname "$0")/seed-fletcher.py" "$LIB" "$SQL"
+for SQL in "${SEEDS[@]}"; do
+  echo "  $(basename "$SQL")"
+  python3 "$(dirname "$0")/seed-fletcher.py" "$LIB" "$SQL"
+done

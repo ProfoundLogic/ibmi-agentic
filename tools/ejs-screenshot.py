@@ -35,16 +35,44 @@ def ctx_from_session(screen_json):
     return fmt["name"], ctx
 
 
+def fmt_all_subfiles(fmt):
+    return list((fmt.get("subfiles") or {}).keys())
+
+
 def main(rdf_path, screen_json, out_png):
     rdf = json.load(open(rdf_path))
     fmt_name, ctx = ctx_from_session(screen_json)
     fmt = next(v for k, v in rdf["formats"].items() if k.lower() == fmt_name.lower())
 
-    payload = {"template": open(resolve(fmt["template"])).read(),
-               "data": ctx, "filename": os.path.basename(fmt["template"])}
-    p = subprocess.run(["aitool", "ejs-validate", "--input", "-"],
-                       input=json.dumps(payload), capture_output=True, text=True)
-    r = json.loads(p.stdout or p.stderr)
+    # `aitool ejs-validate` truncates its stdout at about 64 KB, so a long
+    # subfile produces a response that is cut mid-string and will not parse.
+    # That is a limit of the renderer, not a fault in the template: halve the
+    # rows and retry, and say what was dropped rather than screenshotting a
+    # shorter grid as if it were the whole thing.
+    tpl = open(resolve(fmt["template"])).read()
+    sfl_keys = [k.lower() for k in (fmt_all_subfiles(fmt) or [])]
+    rows_used = None
+    r = None
+    while True:
+        payload = {"template": tpl, "data": ctx,
+                   "filename": os.path.basename(fmt["template"])}
+        p = subprocess.run(["aitool", "ejs-validate", "--input", "-"],
+                           input=json.dumps(payload), capture_output=True, text=True)
+        try:
+            r = json.loads(p.stdout or p.stderr)
+            break
+        except json.JSONDecodeError:
+            longest = max((k for k in sfl_keys if isinstance(ctx.get(k), list)),
+                          key=lambda k: len(ctx[k]), default=None)
+            if longest is None or len(ctx[longest]) <= 4:
+                print("RENDER FAILED: renderer response would not parse even at "
+                      "4 subfile rows")
+                return 1
+            keep = max(4, len(ctx[longest]) // 2)
+            print(f"  note: renderer response exceeded its output limit - "
+                  f"retrying with {keep} of {len(ctx[longest])} {longest} rows")
+            ctx[longest] = ctx[longest][:keep]
+            rows_used = (longest, keep)
     if not r.get("success"):
         print("RENDER FAILED:", r.get("error", {}).get("message", "")[:300])
         return 1

@@ -1,0 +1,134 @@
+/* Production schedule board - prefixed .flsch- (see GJA-914 / GJA-917).
+   Every rule is scoped to .fl-screen because the Genie shim injects all
+   snapshotted CSS globally, so an unprefixed name is a live collision. */
+
+.fl-screen .flsch-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.fl-screen .flsch-v { font-size: 19px; font-weight: 700; color: var(--fl-accent-dk); line-height: 1.2; }
+.fl-screen .flsch-bad  { color: var(--fl-bad); }
+.fl-screen .flsch-warn { color: var(--fl-warn); }
+.fl-screen .flsch-good { color: var(--fl-ok); }
+.fl-screen .flsch-l {
+  font-size: 11px; color: var(--fl-muted); text-transform: uppercase;
+  letter-spacing: .04em; margin-top: 3px;
+}
+.fl-screen .flsch-sub  { font-size: 10px; color: var(--fl-muted); margin-top: 2px; }
+.fl-screen .flsch-sub2 { font-size: 10px; color: var(--fl-muted); margin-top: 1px; }
+.fl-screen .flsch-mini { font-size: 9px; padding: 1px 5px; }
+
+/* ---------------------------------------------------- data confidence panel */
+.fl-screen .flsch-dq {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 12px;
+  border-left: 4px solid var(--fl-accent); flex-wrap: wrap;
+}
+.fl-screen .flsch-dq-score {
+  display: flex; align-items: center; gap: 9px; padding-right: 16px;
+  border-right: 1px solid var(--fl-line); flex: 0 0 auto;
+}
+.fl-screen .flsch-dq-pct { font-size: 30px; font-weight: 700; line-height: 1; }
+.fl-screen .flsch-dq-ok   .flsch-dq-pct { color: var(--fl-ok); }
+.fl-screen .flsch-dq-warn .flsch-dq-pct { color: var(--fl-warn); }
+.fl-screen .flsch-dq-bad  .flsch-dq-pct { color: var(--fl-bad); }
+.fl-screen .flsch-dq-cap {
+  font-size: 10px; color: var(--fl-muted); text-transform: uppercase;
+  letter-spacing: .05em; line-height: 1.3;
+}
+.fl-screen .flsch-dq-body { flex: 1 1 340px; min-width: 0; }
+.fl-screen .flsch-dq-head { font-size: 13px; font-weight: 600; color: var(--fl-ink); }
+.fl-screen .flsch-dq-sub  { font-size: 11px; color: var(--fl-ink-soft); margin-top: 3px; }
+.fl-screen .fl-pill.flsch-pill-dq {
+  background: #F3E8FF; border-color: #D8B4FE; color: #6B21A8; font-weight: 700;
+}
+
+/* ------------------------------------------------------ work centre lanes */
+.fl-screen .flsch-lanes {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px; margin-bottom: 12px;
+}
+.fl-screen .flsch-lane { padding: 8px 10px; cursor: pointer; }
+.fl-screen .flsch-lane:hover { background: var(--fl-accent-wash); border-color: var(--fl-accent-lt); }
+.fl-screen .flsch-lane-on { border-color: var(--fl-accent); box-shadow: inset 0 0 0 1px var(--fl-accent); }
+.fl-screen .flsch-lane-top { display: flex; align-items: center; gap: 6px; }
+.fl-screen .flsch-lane-code { font-size: 13px; font-weight: 700; color: var(--fl-ink); }
+.fl-screen .flsch-lane-desc {
+  font-size: 10px; color: var(--fl-muted); margin: 1px 0 5px;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.fl-screen .flsch-lane-foot {
+  display: flex; justify-content: space-between; gap: 6px;
+  font-size: 10px; color: var(--fl-muted); margin-top: 4px;
+}
+.fl-screen .flsch-bar {
+  height: 7px; background: var(--fl-surface-alt); border: 1px solid var(--fl-line);
+  border-radius: 4px; overflow: hidden;
+}
+.fl-screen .flsch-bar-fill { height: 100%; }
+.fl-screen .flsch-load-ok   { background: var(--fl-ok); }
+.fl-screen .flsch-load-high { background: var(--fl-warn); }
+.fl-screen .flsch-load-over { background: var(--fl-bad); }
+
+/* ------------------------------------------------------------- filter bar */
+.fl-screen .flsch-bar-row {
+  display: flex; gap: 12px; align-items: flex-end; margin-bottom: 8px; flex-wrap: wrap;
+}
+.fl-screen .flsch-sel { min-width: 220px; }
+.fl-screen .flsch-clear { align-self: flex-end; }
+.fl-screen .flsch-hint { font-size: 11px; color: var(--fl-muted); align-self: flex-end; }
+.fl-screen .flsch-opt { width: 34px; padding: 3px 4px; font-size: 12px; }
+.fl-screen .flsch-note { font-size: 11px; color: var(--fl-ink-soft); }
+
+/* --------------------------------------------------- routed progress bar */
+.fl-screen .flsch-mbar {
+  height: 5px; background: var(--fl-surface-alt); border: 1px solid var(--fl-line);
+  border-radius: 3px; overflow: hidden; margin-top: 3px;
+}
+.fl-screen .flsch-mbar-fill { height: 100%; background: var(--fl-accent); }
+
+/* ----------------------------------------------------------- ship window
+   A 300-shop-day track: 60 days behind today on the left, 240 ahead. The
+   markers are absolutely positioned inside it, so the track needs its own
+   positioning context and a fixed height. */
+.fl-screen .flsch-track {
+  position: relative; height: 16px; background: var(--fl-surface-alt);
+  border: 1px solid var(--fl-line); border-radius: 3px; overflow: hidden;
+}
+.fl-screen .flsch-today {
+  position: absolute; left: 20%; top: 0; bottom: 0; width: 1px;
+  background: var(--fl-muted);
+}
+.fl-screen .flsch-slipbar {
+  position: absolute; top: 4px; height: 8px; background: #F3B9B4; opacity: .85;
+}
+.fl-screen .flsch-mark { position: absolute; top: 2px; width: 3px; height: 12px; border-radius: 1px; }
+.fl-screen .flsch-mark-prom { background: var(--fl-ink); }
+.fl-screen .flsch-mark-proj { background: var(--fl-accent); }
+.fl-screen .flsch-slip { font-size: 10px; color: var(--fl-muted); margin-top: 2px; }
+
+/* Legend swatches in the footer reuse the marker classes, so they have to
+   escape the absolute positioning those carry. */
+.fl-screen .flsch-key {
+  font-size: 10px; color: var(--fl-muted); display: flex; align-items: center; gap: 5px;
+}
+.fl-screen .flsch-mark.flsch-inline,
+.fl-screen .flsch-today.flsch-inline {
+  position: static; display: inline-block; width: 3px; height: 10px;
+  margin-left: 8px; top: auto; bottom: auto; left: auto;
+}
+
+/* Grid sizing. This screen carries a lot of chrome above the grid - KPI
+   strip, confidence panel, lane strip, filter bar - so both the row cap and
+   the viewport reserve are well below the 15-row default. */
+.fl-screen.flsch-screen { --fl-grid-max: 601px; --fl-grid-reserve: 620px; }
+
+@media (max-width: 1100px) {
+  .fl-screen .flsch-lanes { grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); }
+  .fl-screen .flsch-dq-pct { font-size: 24px; }
+}
+
+/* A stood-down work centre still has work queued on it - that is a finding,
+   not a zero. Say so rather than drawing a 0% bar. */
+.fl-screen .flsch-nocap { color: var(--fl-bad); font-weight: 600; }

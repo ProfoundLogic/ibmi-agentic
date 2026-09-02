@@ -1,10 +1,19 @@
 # Fletcher Demo — Build Design
 
-**Status: created in Jira.** Epic **GJA-907**, tickets **GJA-908 … GJA-915**.
-Target library changed to the persistent **`FLTDEMO`** (was a task-scoped `AITSKxxxxx`).
+**Status: built.** Epic **GJA-907**, tickets **GJA-908 … GJA-915** (A1 + A2 + foundation),
+**GJA-916** (A7 duplicate part review), **GJA-917** (A4 production schedule board).
+Target library is the persistent **`FLTDEMO`** (not a task-scoped `AITSKxxxxx`).
 
 Scope: menu navigation + **A1 Parts Finder** + **A2 Fleet 360**, built on mocked Fletcher data in the
-existing `cfdemo` application, following its established patterns.
+existing `cfdemo` application, following its established patterns. **A7** (duplicate part review)
+and **A4** (production schedule board) were built later against the same foundation; A4 is
+documented in §9 below.
+
+> **Deployment prerequisite, and it will bite you in the room:** `FLTDEMO` is not on the demo
+> profile's initial library list (the `AIDEMO` job description carries
+> `AIDEMOBASE QGPL QTEMP DRPUIDEV`). Until someone adds it, a fresh sign-on resolves
+> `AIDEMOBASE/MENU`, which has **no option 4 and no command line**, so the Fletcher menu is
+> unreachable. Add `FLTDEMO` to the initial library list before the onsite.
 
 ---
 
@@ -361,3 +370,116 @@ If you want something demoable fastest: **F0 → F1 → F2 → F3 → F5 (Fleet 
 Fleet 360 is the better first build — it's the simpler screen, it needs no fitment logic, and it's the
 one that carries the revenue story for Chuck and Rod. Parts Finder is the stronger demo but depends on
 the duplicate-detection logic and the BOM join, so it benefits from the data model having settled.
+
+
+---
+
+## 9. A4 — Production Schedule Board (GJA-917)
+
+Demo A4 from the onsite plan: the visual replacement for the physical sticky-note schedule, plus
+the data-confidence panel that says where the schedule cannot be trusted.
+
+**Why the confidence panel is the point.** Mike described the actual state of play himself:
+*"we're getting into actually using the data in the system to plug into scheduling applications and
+we're finding a lot of database issues."* A board that presented its dates as reliable would be the
+wrong answer, confidently delivered — and confident wrong answers are exactly what produced the
+suspicion after the last demo. So the board computes a projection, and then says out loud how much
+of it rests on data that will not support it.
+
+### Data model — four DDS physical files
+
+**`flwcp.pf` — FLWCP** · shop work centres in build-flow sequence
+`FLWCTR 6A` key · `FLWCDESC 40A` · `FLWCSEQ 3P0` · `FLWCCAP 5P1` hours/day · `FLWCCREW 3P0` ·
+`FLWCSHFT 1P0` · `FLWCSTAT 1A` A/I
+
+**`flwop.pf` — FLWOP** · machine build work orders
+`FLWO 8P0` key · `FLWSER 8A` · `FLWMODL 10A` · `FLWCUST 6P0` · `FLWSITE 6P0` ·
+`FLWTYPE 1A` N/M/R/E · `FLWSTAT 1A` P/R/I/H/C · `FLWPRIO 1A` · `FLWOPEN`/`FLWPROM`/`FLWSTRT`/
+`FLWCOMP 8S0` · `FLWWCTR 6A` · `FLWPCT 3P0` reported · `FLWVALUE 11P2` · `FLWDESC 40A` ·
+`FLWNOTE 60A` — **the sticky note, deliberately unstructured, because that is how the information
+actually exists today**
+
+**`flroutp.pf` — FLROUTP** · routing, one row per operation
+`FLRWO 8P0` · `FLRSEQ 3P0` · `FLRWCTR 6A` · `FLRDESC 40A` · `FLRSTHR`/`FLRACHR 5P1` ·
+`FLRSTAT 1A` W/R/C/H · `FLRSTRT`/`FLRCOMP 8S0`
+
+**`flshrtp.pf` — FLSHRTP** · material shortages, tied to the operation they block
+`FLSHWO 8P0` · `FLSHPART 15A` · `FLSHSEQ 3P0` · `FLSHQTYR`/`FLSHQTYA 5P0` · `FLSHDUE 8S0` ·
+`FLSHSTAT 1A` · `FLSHPO 8A` · `FLSHVEND 30A`
+
+Modernization and rebuild orders reference serials that really exist in `FLMACHP`, so a machine on
+the Fleet 360 installed base is the same machine that turns up in the shop. Shortages reference real
+`FLPARTP` rows, so the value of missing material is a join, not a guess.
+
+### How projected ship is computed
+
+A **forward finite-capacity load**, and it can be defended in one sentence: *the orders are loaded
+onto the work centres in promised-date order, each centre working one order at a time at its own
+daily capacity, and an operation cannot start before its material has landed.*
+
+One clock per work centre; each order walks its remaining operations, waiting for whichever comes
+later — the centre being free, or the parts arriving. Remaining hours on a running operation are its
+standard less what has been booked, and that one rule drives the order KPI, the work centre load and
+the projection, so the three cannot drift apart.
+
+> **The version that was wrong, and why.** The first attempt divided each centre's daily hours by
+> the number of orders queued on it and walked every order independently. That double-counts
+> contention — an order only competes for a centre while it is actually there — and it put **27 of
+> 36 orders at risk against 1 on track**, which is not a schedule, it is an artefact. Caught by
+> reading the numbers on the screen, not the code.
+
+Where the data will not support a projection, **no projection is produced**: an order with no
+routing gets a blank projected date and a `NO DATA` flag, and the screen says why. Inventing a
+plausible date there would defeat the entire exercise.
+
+### The data-confidence scan
+
+Fourteen checks, seven High and seven Medium, all computed by querying the loaded data — never from
+a stored list of known problems, so fixing a record makes the finding disappear on the next look.
+Severity is the honest distinction between *this projection is degraded* and *this projection is
+meaningless*: only High counts against an order in the trust percentage.
+
+| Sev | Category | What it means |
+|---|---|---|
+| H | Impossible date | Promised ship precedes the order date |
+| H | Missing start date | In process with nothing to measure elapsed time from |
+| H | No promised ship date | Released to the floor with nothing to schedule backwards from |
+| H | No routing operations | Carries no hours; invisible to any capacity plan |
+| H | Unknown work centre | Current centre, or a routed one, not in `FLWCP` |
+| H | No current work centre | In process but on no shop-floor view |
+| H | Inactive work centre | Work queued at a centre with no crew |
+| M | Missing completion date | On-time delivery unmeasurable |
+| M | Unknown model | No product line or standard routing |
+| M | Reported percent conflict | Board and shop floor disagree by more than 20 points |
+| M | Zero actual hours | Complete with no labour booked; standards unvalidatable |
+| M | No standard hours | Capacity plan treats the operation as free |
+| M | Shortage overdue | Material was due and did not arrive; no date to reschedule to |
+| M | Shortage with no PO | Nothing on order, so no expected date exists at all |
+
+### Screens
+
+- **`FLSCHEO`** — the board. KPI strip, confidence panel, a clickable work-centre lane strip
+  (load in working weeks against a 16-week horizon), a view filter, and the work order grid with a
+  promised-vs-projected ship-window track per row.
+- **`FLSCH1EO`** — work order detail. Identity, schedule, routed progress, the scheduler's note
+  drawn as an actual sticky note, the findings against *this* order in plain language, and the
+  routing operation by operation with the material blocking each one.
+- **`FLSCHDEO`** — data confidence. Every finding, its category, what it blocks, and option 5
+  straight to the work order it is on.
+
+`FLTMENU` option 4.
+
+### Seed data
+
+`tools/gen-flsched-seed.py` → `cfdemo/seed/flsched.sql`, deterministic and committed as source.
+11 work centres, 44 work orders, 357 routing operations, 31 shortages.
+
+**It is deliberately dirty in 40 places across 23 work orders**, which is the only honest way to
+demonstrate a panel whose job is to find defects by query. Every planted defect is listed in the
+generator's `DEFECTS` section with the finding it should produce, and the scan is written against
+the data rather than against that list. The generator asserts every character value fits its column,
+because DB2 rejects an over-long literal with a message that names the column and not the row.
+
+Notes are scoped by order type: a single pool put *"Partial mod only - customer declined full"* on a
+new build, and a note contradicting the order it is stuck to is what a Fletcher engineer spots in
+the first ten seconds.

@@ -139,9 +139,24 @@ They do different jobs and the mix matters:
 Effort is my estimate for one engineer with CoderFlow, assuming mocked data. **"Needs"** is what we must
 get from Fletcher *now* — several of these have a lead time we don't control.
 
+> ### Build status
+>
+> | | Demo | Status |
+> |---|---|---|
+> | **A1** | Parts Finder | ✅ **Built** — `FLPARTEO` / `FLPART1EO`, `FLTMENU` option 1 (GJA-912) |
+> | **A2** | Fleet 360 | ✅ **Built** — `FLFLEETEO` / `FLFLEET1EO`, option 2 (GJA-913) |
+> | **A7** | Duplicate part review | ✅ **Built on mocked data** — `FLDUPEO` / `FLDUP1EO`, option 3 (GJA-916). Still needs their real item-master extract to become the credibility artifact it is meant to be. |
+> | **A4** | Production Schedule Board | ✅ **Built** — `FLSCHEO` / `FLSCH1EO` / `FLSCHDEO`, option 4 (GJA-917), including the data-confidence panel |
+> | **A6** | Warehouse scan fix | ⛔ **Blocked** — needs their tablet hardware, a sample label and the scan program. Nothing can start without it, and it has the longest lead time on the list. |
+> | A3, A5, A8–A12 | — | Not started |
+>
+> All four built demos live in the persistent **`FLTDEMO`** library. ⚠️ **`FLTDEMO` is not on the
+> demo profile's initial library list**, and until it is, a fresh sign-on lands on a menu with no
+> Fletcher option and no command line. Fix that before the onsite, not in the room.
+
 ---
 
-### A1. Parts Finder — "which part fits serial #4417?" ⭐ top pick
+### A1. Parts Finder — "which part fits serial #4417?" ⭐ top pick ✅ BUILT
 **Effort: M (3–5 days) · Needs: nothing (fully mockable); far better with a real item-master extract**
 
 A tablet-and-desktop EJS app for a parts rep or a distributor. Enter a customer or machine serial →
@@ -163,7 +178,7 @@ hygiene problem into a revenue problem. Best single artifact for the "we underst
 
 ---
 
-### A2. Installed Base / Fleet 360 ⭐ top pick
+### A2. Installed Base / Fleet 360 ⭐ top pick ✅ BUILT
 **Effort: M (3–4 days) · Needs: nothing to mock**
 
 Customer → every machine they own (serial, model, build date, operating hours, mine site) → service
@@ -201,8 +216,16 @@ map."* We can't out-feature Infor's process library — but we can show **their*
 
 ---
 
-### A4. Production Schedule Board — retire the sticky notes
+### A4. Production Schedule Board — retire the sticky notes ✅ BUILT
 **Effort: M (3–5 days) · Needs: nothing to mock; ideally a real work-order extract**
+
+> **Built.** `FLSCHEO` (board) → `FLSCH1EO` (work order) and `FLSCHDEO` (data confidence), on
+> `FLTMENU` option 4. Work centre lane strip with load in working weeks, a forward finite-capacity
+> projected ship date, promised-vs-projected per row, material shortages tied to the operation they
+> block, and the scheduler's sticky note carried through as free text. The data-confidence panel
+> runs fourteen checks and reports **40 findings across 23 of 44 work orders** on the seeded data —
+> deliberately dirty, because a panel that finds nothing proves nothing. See `Demo Build Design.md`
+> §9.
 
 A visual board replacing the physical sticky-note schedule: machine builds in progress by work centre,
 shop capacity, material-shortage flags, promised vs. projected ship dates. Include a **data-confidence
@@ -250,7 +273,7 @@ longest lead time on the list, because it needs their physical hardware.
 
 ---
 
-### A7. Duplicate Part Number Analysis — real data, not mocked ⭐ pair with A1
+### A7. Duplicate Part Number Analysis — real data, not mocked ⭐ pair with A1 ✅ BUILT (mocked)
 **Effort: S–M (2–3 days once we have data) · Needs: ⚠️ an item-master extract (read-only)**
 
 Fuzzy-match their **actual** item master. Deliver: duplicate/near-duplicate clusters with counts, an
@@ -449,13 +472,18 @@ room, and it's the only demo where **we're not the ones performing.**
 Exhaustive lists are for choosing from. If I had to pick:
 
 **Build ahead (four, ~2 weeks):**
-1. **A1 Parts Finder** — the business-understanding piece
-2. **A2 Fleet 360** — the revenue piece, for Chuck and Rod
-3. **A7 Duplicate Part Analysis** — the credibility piece, real data *(chase the extract now)*
-4. **A6 Warehouse scan fix** — the liability *(needs their hardware — longest lead time)*
+1. **A1 Parts Finder** — the business-understanding piece ✅ built
+2. **A2 Fleet 360** — the revenue piece, for Chuck and Rod ✅ built
+3. **A7 Duplicate Part Analysis** — the credibility piece, real data ✅ built on mocked data;
+   *still chasing the extract, and it is not the credibility piece until we have it*
+4. **A6 Warehouse scan fix** — the liability ⛔ blocked on their hardware
 
-Then **A4 Schedule Board** if time allows; it's the most visually striking and the most visible manual
-process in the building.
+**A4 Schedule Board** ✅ built as well — the most visually striking of the set and the most visible
+manual process in the building.
+
+**So the open ask has narrowed to one thing we control and three we don't:** get `FLTDEMO` onto the
+demo profile's library list, and chase the item-master extract, the tablet hardware, and the source
+repo.
 
 **Run live (six, in this order):**
 1. **B10** add a column — safe opener, known timing

@@ -140,7 +140,7 @@ begsr loadMachine;
   err = fl_getMachine(wantSer : machine : found);
   if err <> '';
     msg = err;
-    return;
+    leavesr;
   endif;
   if not found;
     // Dead ends are unhelpful. Here the typed text IS worth carrying over -
@@ -156,7 +156,7 @@ begsr loadMachine;
     if not found;
       msg = 'No machine matched "' + %trim(wantSer) + '". Use Look up machine.';
       wantSer = *blanks;
-      return;
+      leavesr;
     endif;
   endif;
 
@@ -183,7 +183,7 @@ begsr loadMachine;
                                %elem(parts) : numParts);
   if err <> '';
     msg = err;
-    return;
+    leavesr;
   endif;
   for i = 1 to numParts;
     if parts(i).dupes > 0;

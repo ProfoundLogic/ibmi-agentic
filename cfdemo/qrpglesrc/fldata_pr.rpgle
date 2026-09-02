@@ -273,3 +273,198 @@
          custno like(fl_cust_t.custno) const;
          summary likeds(fl_sum_t);
        end-pr;
+
+      // ---- A4 production schedule board ------------------------------
+      // The board answers three questions: what is on the floor, when will
+      // it actually ship, and how much of that answer can be trusted.
+      //
+      // Projected ship is COMPUTED here rather than stored, because a stored
+      // projection is just another number nobody maintains. The walk is:
+      // remaining standard hours at each work centre, divided by that
+      // centre's capacity share (its daily hours split across the orders
+      // queued on it), accumulated over working days, then pushed out by any
+      // open material shortage whose expected date lands later.
+
+       dcl-ds fl_wctr_t qualified template;
+         code     char(6);
+         descr    char(40);
+         seq      packed(3:0);
+         cap      packed(5:1);
+         crew     packed(3:0);
+         shifts   packed(1:0);
+         status   char(1);
+         statusd  char(10);
+         wip      int(10);
+         queued   int(10);
+         loadhrs  packed(7:1);
+         loaddays packed(5:1);
+         loadpct  packed(5:0);
+         // Queued work in working weeks. Percent-of-a-month was unreadable
+         // once the real loads came out between 150% and 406%: every bar
+         // pinned at full width and told the eye nothing.
+         weeks    packed(5:1);
+         late     int(10);
+       end-ds;
+
+       dcl-ds fl_wo_t qualified template;
+         wo       packed(8:0);
+         serial   char(8);
+         model    char(10);
+         modeldsc char(40);
+         custno   packed(6:0);
+         custname char(40);
+         siteno   packed(6:0);
+         sitename char(40);
+         otype    char(1);
+         otyped   char(16);
+         status   char(1);
+         statusd  char(12);
+         prio     char(1);
+         priod    char(8);
+         opened   char(10);
+         promised char(10);
+         started  char(10);
+         compl    char(10);
+         wctr     char(6);
+         wctrd    char(40);
+         pctrptd  packed(3:0);
+         pctroute packed(3:0);
+         stdhrs   packed(7:1);
+         acthrs   packed(7:1);
+         remhrs   packed(7:1);
+         ops      int(10);
+         opsdone  int(10);
+         projectd char(10);
+         slipdays packed(5:0);
+         promdays packed(5:0);
+         projdays packed(5:0);
+         shorts   int(10);
+         shortlat int(10);
+         value    packed(11:2);
+         descr    char(40);
+         note     char(60);
+         flag     char(10);
+         dqcount  int(10);
+         dqhigh   int(10);
+       end-ds;
+
+       dcl-ds fl_op_t qualified template;
+         wo       packed(8:0);
+         seq      packed(3:0);
+         wctr     char(6);
+         wctrd    char(40);
+         descr    char(40);
+         stdhrs   packed(5:1);
+         acthrs   packed(5:1);
+         varpct   packed(5:0);
+         status   char(1);
+         statusd  char(12);
+         started  char(10);
+         compl    char(10);
+         shorts   int(10);
+         shortpar char(15);
+         shortqty packed(5:0);
+         shortdue char(10);
+         shortpo  char(8);
+         shortven char(30);
+         shortdsc char(60);
+       end-ds;
+
+       dcl-ds fl_shop_t qualified template;
+         orders   int(10);
+         wip      int(10);
+         late     int(10);
+         risk     int(10);
+         ontrack  int(10);
+         hold     int(10);
+         shorts   int(10);
+         shortval packed(13:2);
+         value    packed(13:2);
+         remhrs   packed(9:1);
+         capday   packed(7:1);
+         weeks    packed(5:1);
+         dqfind   int(10);
+         dqorders int(10);
+         dqhigh   int(10);
+         dqtrust  int(10);
+         dqpct    packed(3:0);
+       end-ds;
+
+      // One data-confidence finding. Severity is the screen's sort key and
+      // the trust calculation only counts H, because a missing standard-hour
+      // value degrades a projection while an impossible date invalidates it.
+       dcl-ds fl_dq_t qualified template;
+         sev      char(1);
+         sevd     char(8);
+         cat      char(26);
+         wo       packed(8:0);
+         subject  char(22);
+         finding  char(110);
+         impact   char(90);
+       end-ds;
+
+       dcl-pr fl_listWorkCentres varchar(80);
+         lanes likeds(fl_wctr_t) dim(50);
+         limit int(10) const;
+         returned int(10);
+       end-pr;
+
+      // view: A=all live  L=past promised  R=projected late  S=short
+      //       H=on hold   C=complete       *=everything
+      // wctr blank means every work centre.
+       dcl-pr fl_listWorkOrders varchar(80);
+         view char(1) const;
+         wctr char(6) const;
+         orders likeds(fl_wo_t) dim(300);
+         limit int(10) const;
+         returned int(10);
+       end-pr;
+
+       dcl-pr fl_getWorkOrder varchar(80);
+         wo packed(8:0) const;
+         order likeds(fl_wo_t);
+         found ind;
+       end-pr;
+
+       dcl-pr fl_listOperations varchar(80);
+         wo packed(8:0) const;
+         ops likeds(fl_op_t) dim(100);
+         limit int(10) const;
+         returned int(10);
+       end-pr;
+
+       dcl-pr fl_shopSummary varchar(80);
+         summary likeds(fl_shop_t);
+       end-pr;
+
+      // The data-confidence scan. Every finding is produced by querying the
+      // data, never from a list of known problems, so it keeps working when
+      // the data changes.
+       dcl-pr fl_scanSchedule varchar(80);
+         findings likeds(fl_dq_t) dim(400);
+         limit int(10) const;
+         returned int(10);
+       end-pr;
+
+       dcl-pr fl_defaultWorkOrder varchar(80);
+         wo packed(8:0);
+       end-pr;
+
+      // Quote a value as a JSON string, quotes included. The board, the work
+      // order detail and the confidence screen all deliver a secondary list
+      // as one JSON string field, because a second subfile in the same RDF
+      // format compiles to malformed DDS. Shared rather than written three
+      // times, slightly differently.
+       dcl-pr fl_jsonStr varchar(300);
+         v varchar(250) const;
+       end-pr;
+
+      // Repair a number on its way into a JSON payload. %CHAR on a packed
+      // value drops the leading zero - 0.0 comes out as ".0" and -0.5 as
+      // "-.5" - and neither is valid JSON. JSON.parse then throws and the
+      // entire payload renders as nothing, with no error anywhere. Pass the
+      // %CHAR output through here rather than taking the number, so each
+      // caller keeps its own precision.
+       dcl-pr fl_jsonNum varchar(24);
+         numText varchar(24) const;
+       end-pr;

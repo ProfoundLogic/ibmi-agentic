@@ -100,7 +100,7 @@ begsr loadQueue;
   err = fl_dupScorecard(sc);
   if err <> '';
     msg = err;
-    return;
+    leavesr;
   endif;
   sparts  = sc.parts;
   sclust  = sc.clusters;

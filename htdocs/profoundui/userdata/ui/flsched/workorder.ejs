@@ -1,0 +1,214 @@
+<%
+  function fmt(n, d) {
+    n = Number(n) || 0;
+    var s = n.toFixed(d === undefined ? 0 : d).split('.');
+    s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return s.join('.');
+  }
+  function txt(v) { return (typeof v === 'undefined' || v === null) ? '' : String(v).trim(); }
+  function dash(v) { return txt(v) !== '' ? txt(v) : '—'; }
+
+  var slip = Number(typeof sslip !== 'undefined' ? sslip : 0) || 0;
+  var pctr = Number(typeof spctr !== 'undefined' ? spctr : 0) || 0;
+  var rptd = Number(typeof spctrptd !== 'undefined' ? spctrptd : 0) || 0;
+  var flag = txt(typeof sflag !== 'undefined' ? sflag : '');
+  var dqh  = Number(typeof sdqh !== 'undefined' ? sdqh : 0) || 0;
+  var dqc  = Number(typeof sdqc !== 'undefined' ? sdqc : 0) || 0;
+
+  // Findings against this order arrive as a JSON array of strings. A bad
+  // payload has to degrade to "none listed", never abort the render.
+  var dq = [];
+  try { dq = JSON.parse(txt(typeof sdqtext !== 'undefined' ? sdqtext : '') || '[]'); }
+  catch (e) { dq = []; }
+
+  function flagClass(f) {
+    if (f === 'LATE') return 'fl-pill-bad';
+    if (f === 'AT RISK') return 'fl-pill-warn';
+    if (f === 'ON TRACK') return 'fl-pill-ok';
+    if (f === 'NO DATA' || f === 'NO DATE') return 'flswo-pill-dq';
+    return '';
+  }
+%>
+<div class="fl-screen flswo-screen">
+
+  <div class="fl-mast">
+    <div class="fl-logo" role="img" aria-label="J.H. Fletcher &amp; Co."></div>
+    <div>
+      <div class="fl-mast-title">Work order <%= swo %></div>
+      <div class="fl-mast-sub">Machine build detail</div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <span class="fl-pill <%= flagClass(flag) %> flswo-flag"><%= flag %></span>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+    <div class="fl-msg"><%= msg %></div>
+  <% } %>
+
+  <div class="flswo-top">
+    <div class="fl-card flswo-ident">
+      <h2>Build</h2>
+      <div class="flswo-machine"><%= dash(smodel) %>
+        <span class="flswo-model-desc"><%= dash(smodeld) %></span></div>
+      <div class="flswo-rows">
+        <div><span class="flswo-k">Serial</span>
+          <span class="flswo-val"><%= txt(sser) !== '' ? sser : 'not yet assigned' %></span></div>
+        <div><span class="flswo-k">Type</span><span class="flswo-val"><%= dash(stype) %></span></div>
+        <div><span class="flswo-k">Description</span><span class="flswo-val"><%= dash(sdesc) %></span></div>
+        <div><span class="flswo-k">Customer</span>
+          <span class="flswo-val"><%= dash(scust) %>
+            <span class="flswo-dim">(<%= scustno %>)</span></span></div>
+        <div><span class="flswo-k">Destination</span><span class="flswo-val"><%= dash(ssite) %></span></div>
+        <div><span class="flswo-k">Priority</span><span class="flswo-val"><%= dash(sprio) %></span></div>
+        <div><span class="flswo-k">Order value</span>
+          <span class="flswo-val">$<%= fmt(svalue, 2) %></span></div>
+        <div><span class="flswo-k">Status</span>
+          <span class="flswo-val"><%= dash(sstat) %><% if (txt(swcc) !== '') { %>
+            &mdash; at <%= swcc %> <span class="flswo-dim"><%= dash(swcd) %></span><% } %></span></div>
+      </div>
+    </div>
+
+    <div class="fl-card flswo-dates">
+      <h2>Schedule</h2>
+      <div class="flswo-dgrid">
+        <div><div class="flswo-dk">Ordered</div><div class="flswo-dv"><%= dash(sopened) %></div></div>
+        <div><div class="flswo-dk">Promised</div><div class="flswo-dv"><%= dash(sprom) %></div></div>
+        <div><div class="flswo-dk">Started</div><div class="flswo-dv"><%= dash(sstarted) %></div></div>
+        <div><div class="flswo-dk">Projected</div>
+          <div class="flswo-dv flswo-proj"><%= dash(sproj) %></div></div>
+        <% if (txt(scompl) !== '') { %>
+          <div><div class="flswo-dk">Completed</div><div class="flswo-dv"><%= scompl %></div></div>
+        <% } %>
+      </div>
+      <div class="flswo-slip <%= slip > 0 ? 'flswo-bad' : slip < 0 ? 'flswo-good' : '' %>">
+        <% if (txt(sprom) === '') { %>
+          No promised ship date on the order &mdash; there is nothing to measure against.
+        <% } else if (txt(sproj) === '') { %>
+          Not projectable from the data on this order.
+        <% } else if (slip > 0) { %>
+          Projected <strong><%= slip %> days</strong> past the promised ship date.
+        <% } else if (slip < 0) { %>
+          <strong><%= -slip %> days</strong> of slack against the promised date.
+        <% } else { %>
+          Projected to land on the promised date.
+        <% } %>
+      </div>
+      <div class="flswo-prog">
+        <div class="flswo-prog-l">Routed work complete</div>
+        <div class="flswo-pbar"><div class="flswo-pbar-fill"
+             style="width:<%= Math.max(0, Math.min(100, pctr)) %>%"></div></div>
+        <div class="flswo-prog-f">
+          <%= pctr %>% by standard hours &middot;
+          <%= sopsdone %> of <%= sops %> operations
+          <% if (Math.abs(rptd - pctr) > 20) { %>
+            <span class="fl-pill fl-pill-bad">order says <%= rptd %>%</span>
+          <% } %>
+        </div>
+        <div class="flswo-hrs">
+          <span><strong><%= fmt(sstdhrs, 1) %></strong> std hrs</span>
+          <span><strong><%= fmt(sacthrs, 1) %></strong> actual</span>
+          <span><strong><%= fmt(sremhrs, 1) %></strong> remaining</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flswo-side">
+      <% if (txt(snote) !== '') { %>
+        <div class="flswo-sticky">
+          <div class="flswo-sticky-k">Scheduler note</div>
+          <div class="flswo-sticky-v"><%= snote %></div>
+        </div>
+      <% } %>
+      <div class="fl-card flswo-dq">
+        <h2>Data confidence</h2>
+        <% if (dqc === 0) { %>
+          <div class="flswo-dq-ok">Nothing found against this order. The projected
+            date rests on complete data.</div>
+        <% } else { %>
+          <div class="flswo-dq-head">
+            <%= dqc %> finding<%= dqc === 1 ? '' : 's' %><% if (dqh > 0) { %>,
+            <strong><%= dqh %></strong> of which invalidate the projection<% } %>.
+          </div>
+          <% if (dq.length > 0) { %>
+            <ul class="flswo-dq-list">
+            <% dq.forEach(function (line) { %>
+              <li><%= line %></li>
+            <% }); %>
+            </ul>
+          <% } %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <% if (typeof soptdesc !== 'undefined' && soptdesc && soptdesc.trim()) { %>
+    <div class="flswo-hint"><%= soptdesc %></div>
+  <% } %>
+
+  <% if (typeof opsfl !== 'undefined' && opsfl && opsfl.length > 0) { %>
+    <div class="fl-grid-scroll">
+    <table class="fl-table">
+      <thead>
+        <tr>
+          <th style="width:52px" class="fl-num">Op</th>
+          <th style="width:150px">Work centre</th>
+          <th style="width:200px">Operation</th>
+          <th style="width:72px" class="fl-num">Std hrs</th>
+          <th style="width:72px" class="fl-num">Actual</th>
+          <th style="width:82px" class="fl-num">Variance</th>
+          <th style="width:92px">Status</th>
+          <th style="width:88px">Started</th>
+          <th style="width:92px">Completed</th>
+          <th>Material</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% opsfl.forEach(function (row) { %>
+        <tr class="<%= Number(row.soshort) > 0 ? 'flswo-blocked' : '' %>">
+          <td class="fl-num"><strong><%= row.sseq %></strong></td>
+          <td><%= dash(row.sowc) %>
+            <div class="flswo-sub2"><%= dash(row.sowcd) %></div></td>
+          <td><%= dash(row.sodesc) %></td>
+          <td class="fl-num"><%= fmt(row.sostd, 1) %></td>
+          <td class="fl-num"><%= Number(row.soact) > 0 ? fmt(row.soact, 1) : '—' %></td>
+          <td class="fl-num">
+            <% var v = Number(row.sovar) || 0; %>
+            <% if (Number(row.soact) > 0 && Number(row.sostd) > 0) { %>
+              <span class="<%= v > 10 ? 'flswo-bad' : v < -10 ? 'flswo-good' : '' %>"><%=
+                v > 0 ? '+' : '' %><%= v %>%</span>
+            <% } else { %>&mdash;<% } %>
+          </td>
+          <td><%= dash(row.sostat) %></td>
+          <td><%= dash(row.sostrt) %></td>
+          <td><%= dash(row.socomp) %></td>
+          <td>
+            <% if (Number(row.soshort) > 0) { %>
+              <span class="fl-pill fl-pill-bad">Short</span>
+              <span class="flswo-short"><%= dash(row.soshdsc) %></span>
+              <% if (txt(row.soshven) !== '') { %>
+                <div class="flswo-sub2"><%= row.soshven %><% if (txt(row.soshpo) !== '') { %>
+                  &middot; <%= row.soshpo %><% } %></div>
+              <% } %>
+            <% } else { %>&mdash;<% } %>
+          </td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+    </div>
+  <% } else { %>
+    <div class="fl-empty">This work order has <strong>no routing operations at
+      all</strong>, so it carries no hours and no capacity plan can see it.
+      That is the finding, not a display problem.</div>
+  <% } %>
+
+  <input type="hidden" name="action" value="">
+
+  <div class="fl-foot">
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'EXIT'})"
+            data-fkey="F12">Back to the board (F12)</button>
+    <span class="fl-mast-spacer"></span>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+</div>

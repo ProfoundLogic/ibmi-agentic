@@ -32,6 +32,12 @@ flpordp.file: qddssrc/flpordp.pf
 fldupc.file:  qddssrc/fldupc.pf
 fldupm.file:  qddssrc/fldupm.pf
 
+# A4 production schedule board (GJA-917)
+flwcp.file:   qddssrc/flwcp.pf
+flwop.file:   qddssrc/flwop.pf
+flroutp.file: qddssrc/flroutp.pf
+flshrtp.file: qddssrc/flshrtp.pf
+
 # Logical files
 products1l.file: qddssrc/products1l.lf | productsp.file
 products2l.file: qddssrc/products2l.lf | productsp.file
@@ -65,7 +71,7 @@ custr.module: qrpglesrc/custr.sqlrpgle qrpglesrc/custr_pr.rpgle qddssrc/custp.pf
 custr.srvpgm: custr.module qsrvsrc/custr.bnd
 
 # --- J.H. Fletcher demo: data access service program -------------------------
-fldata.module: qrpglesrc/fldata.sqlrpgle qrpglesrc/fldata_pr.rpgle | fldupc.file fldupm.file flcustp.file flsitep.file flmodlp.file flmachp.file floptnp.file flpartp.file flbomp.file flsvcp.file flpordp.file
+fldata.module: qrpglesrc/fldata.sqlrpgle qrpglesrc/fldata_pr.rpgle | fldupc.file fldupm.file flcustp.file flsitep.file flmodlp.file flmachp.file floptnp.file flpartp.file flbomp.file flsvcp.file flpordp.file flwcp.file flwop.file flroutp.file flshrtp.file
 fldata.srvpgm: fldata.module qsrvsrc/fldata.bnd
 fletcher.bnddir: fletcher.bnddir
 
@@ -98,6 +104,11 @@ flparteo.file:   qddssrc/flparteo.json
 flmacheo.file:   qddssrc/flmacheo.json
 flpart1eo.file:  qddssrc/flpart1eo.json
 
+# A4 production schedule board (GJA-917)
+flscheo.file:    qddssrc/flscheo.json
+flsch1eo.file:   qddssrc/flsch1eo.json
+flschdeo.file:   qddssrc/flschdeo.json
+
 # --- J.H. Fletcher demo: EJS RPGOA programs ----------------------------------
 flfleeteo.pgm:  qrpglesrc/flfleeteo.rpgle  qddssrc/flfleeteo.json  qrpglesrc/fldata_pr.rpgle fldata.srvpgm | flfleeteo.file  fletcher.bnddir
 flfleet1eo.pgm: qrpglesrc/flfleet1eo.rpgle qddssrc/flfleet1eo.json qrpglesrc/fldata_pr.rpgle fldata.srvpgm | flfleet1eo.file fletcher.bnddir
@@ -108,3 +119,8 @@ flcusteo.pgm:   qrpglesrc/flcusteo.rpgle   qddssrc/flcusteo.json   qrpglesrc/fld
 fldupscn.pgm:   qrpglesrc/fldupscn.rpgle qrpglesrc/fldata_pr.rpgle fldata.srvpgm | fldupc.file fldupm.file fletcher.bnddir
 fldupeo.pgm:    qrpglesrc/fldupeo.rpgle    qddssrc/fldupeo.json    qrpglesrc/fldata_pr.rpgle fldata.srvpgm | fldupeo.file    fletcher.bnddir
 fldup1eo.pgm:   qrpglesrc/fldup1eo.rpgle   qddssrc/fldup1eo.json   qrpglesrc/fldata_pr.rpgle fldata.srvpgm | fldup1eo.file   fletcher.bnddir
+
+# A4 production schedule board (GJA-917)
+flscheo.pgm:    qrpglesrc/flscheo.rpgle    qddssrc/flscheo.json    qrpglesrc/fldata_pr.rpgle fldata.srvpgm | flscheo.file    fletcher.bnddir
+flsch1eo.pgm:   qrpglesrc/flsch1eo.rpgle   qddssrc/flsch1eo.json   qrpglesrc/fldata_pr.rpgle fldata.srvpgm | flsch1eo.file   fletcher.bnddir
+flschdeo.pgm:   qrpglesrc/flschdeo.rpgle   qddssrc/flschdeo.json   qrpglesrc/fldata_pr.rpgle fldata.srvpgm | flschdeo.file   fletcher.bnddir

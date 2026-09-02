@@ -121,7 +121,7 @@ begsr loadCustomer;
   if err <> '';
     msg = err;
     clear summary;
-    return;
+    leavesr;
   endif;
   scustname = summary.custname;
   sregion   = summary.region;

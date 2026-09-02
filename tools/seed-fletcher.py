@@ -9,7 +9,9 @@ import json, re, subprocess, sys
 
 LIB, PATH = sys.argv[1], sys.argv[2]
 TABLES = ["FLCUSTP", "FLSITEP", "FLMODLP", "FLMACHP", "FLOPTNP",
-          "FLPARTP", "FLBOMP", "FLSVCP", "FLPORDP"]
+          "FLPARTP", "FLBOMP", "FLSVCP", "FLPORDP",
+          # A4 schedule board (GJA-917)
+          "FLWCP", "FLWOP", "FLROUTP", "FLSHRTP"]
 ROWS_PER_STMT = 100
 
 raw = []

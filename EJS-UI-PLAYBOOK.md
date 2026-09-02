@@ -8,7 +8,7 @@ broke or actually had to be decided.
 **Read §1 and §2 before writing a screen.** The rest is reference.
 
 Reference implementation: `cfdemo/qddssrc/fl*eo.json`, `cfdemo/qrpglesrc/fl*eo.rpgle`,
-`htdocs/profoundui/userdata/ui/{fletcher,flfleet,flparts}/`.
+`htdocs/profoundui/userdata/ui/{fletcher,flfleet,flparts,fldup,flsched}/`.
 
 ---
 
@@ -42,7 +42,7 @@ skin's `start.html` between `BEGIN/END` markers, and:
 - patches `XMLHttpRequest.prototype.open/send` so **only** the snapshotted template
   URLs resolve locally; every other request goes to the network untouched
 - injects all stylesheets as one `<style>` element
-- defines shared JS globals (`window.flPickRow`)
+- defines shared JS globals (`window.flPickRow`, `window.flSetField`)
 - re-implements the full-bleed escape keyed on our own wrapper class
 - sizes grids from their measured position
 - initialises sortable headings
@@ -92,7 +92,8 @@ same algorithm and the same CSS overrides, keyed on `.fl-screen`.
 □ RDF JSON in cfdemo/qddssrc/<name>.json
     □ one subfile per format, never two (see §7)
     □ cache-bust every template/css/js URL (?v=N)
-    □ size hint/description fields generously - char(60), not char(20)
+    □ size hint/description fields generously - char(80) (60 still truncated)
+    □ any secondary list travels as a JSON string field (§7), not a 2nd subfile
 □ Template in htdocs/profoundui/userdata/ui/<app>/<screen>.ejs
     □ wrapper <div class="fl-screen <prefix>-screen">
     □ every optional value guarded with typeof
@@ -120,8 +121,8 @@ same algorithm and the same CSS overrides, keyed on `.fl-screen`.
 | RDF / program | `fl<area><n>eo` | `flparteo`, `flpart1eo` |
 | List → detail | list calls detail via `extpgm` | `flfleeteo` → `flfleet1eo` |
 | Wrapper class | `fl-screen <prefix>-screen` | `fl-screen flparts-screen` |
-| CSS prefix | one per screen | `.flparts-` `.flfleet-` `.flmach-` `.fldup-` `.fllk-` `.flcl-` |
-| Asset directory | per app, not per screen | `ui/flparts/`, `ui/flfleet/` |
+| CSS prefix | one per screen | `.flparts-` `.flfleet-` `.flmach-` `.fldup-` `.flsch-` `.flswo-` `.flsdq-` `.fllk-` `.flcl-` |
+| Asset directory | per app, not per screen | `ui/flparts/`, `ui/flfleet/`, `ui/flsched/` |
 | Shared assets | `ui/fletcher/` | theme, logo |
 
 ---
@@ -222,6 +223,10 @@ are duplicates, that third one is a separate part" — which is the common case.
 
 **Inline handlers calling window globals.** `ondblclick="flPickRow(this,'5')"`, with
 `flPickRow` defined in the shim. Never `addEventListener` from a `js`-array file.
+For anything that is not a subfile option or a `<select>` — the board's clickable
+work-centre lanes, the chip that clears a filter — use `flSetField(name, value,
+action)`, also in the shim. Do not define the helper in the template: an inline
+`<script>` tag does not execute here.
 
 **Setting `.value` programmatically is sufficient.** `genie.js` collects field values
 at submit time by scanning named inputs:
@@ -290,6 +295,26 @@ Guard every optional value:
 program per screen; the list calls the detail via `extpgm`. That is also the house
 pattern in `wrkcusteo` → `wrkcust1eo`.
 
+**A screen needing a *second* list carries it as one JSON string field.** The
+schedule board's work-centre lane strip, the confidence screen's category rollup
+and the work order's own findings all travel this way, parsed in the template
+inside a `try`/`catch` that degrades to an empty list. Three rules:
+
+- **Size the field for the whole payload and count what you drop.** `char(900)`
+  held 10 of 11 lanes; the screen said so out loud and the eleventh silently
+  looked like it did not exist. `char(1400)` fits, and `CRTDSPF` accepts a field
+  that size in an RDF format without complaint.
+- **Every number goes through `fl_jsonNum`.** `%char()` on a packed value drops
+  the leading zero — `0.0` comes out as `.0` and `-0.5` as `-.5`. Neither is valid
+  JSON, `JSON.parse` throws, and the *entire* strip renders as nothing with no
+  error anywhere. One work centre at zero load was enough to blank the lane strip.
+- **Every string goes through `fl_jsonStr`**, and the parse is wrapped. A payload
+  problem must cost you the list, never the screen.
+
+**Size hint fields at `char(80)`, not `char(60)`.** `soptdesc` at 60 truncated
+*"Double-click a finding to open the work order it is on, or type 5"* to
+*"…or t"* — the fourth time this field has been too small.
+
 **Cache-bust `template`, `css` and `js` URLs** whenever an asset changes. Strip `?v=`
 when mapping a URL to a filesystem path.
 
@@ -328,6 +353,10 @@ exec sql set option closqlcsr = *endmod; // on non-journaled files inserts vanis
 | Appending past a VARCHAR's declared length | `RNX0100` | size the working buffer well over the column, then truncate explicitly on the way out |
 | Procedure call or array-indexed DS subfield as an SQL host variable | `SQL0104` / `SQL0312` | stage every value into a plain scalar first |
 | Global `dcl-s` placed between procedures | `RNF0256 Specification found between procedures` | all globals go before the first `dcl-proc` |
+| `%date(num : *iso0)` | `RNF7514 The Date, Time, or Timestamp separator '0' is not allowed with numeric entry` | a number has no separator: use `*iso` when converting **from** a numeric. `%char(date : *iso0)` — the other direction — is correct and is what `fl_today` uses |
+| A variable named `out` (or `in`) | `RNF7064 The Factor 2 operand of IN or OUT is not a data area`, plus `RNF7260`/`RNF5008` about Factor operands in a **free-form** program | `IN` and `OUT` are opcodes, so `out = x;` parses as a data-area operation. Rename it. The messages name nothing recognisable and mention Factor 1/2 in free-form source, which is the tell |
+| `%char()` on a packed value | leading zero dropped: `.0`, `-.5` | fine for display, **fatal in JSON** — see §7 |
+| Procedure called before it is defined, same module | `RNF7030` unresolved | define it earlier in the source or prototype it before the first call. `fl_dqScan` sits ahead of the loader that calls it for exactly this reason |
 
 **One formatter, one rule, one place.** Date display goes through a single
 `fl_fmtDate`; the modernization rule lives once in `fl_modFlag` and is used by both
@@ -393,6 +422,12 @@ with old stamps present and codermake concludes everything already exists, build
 scripted loop reads that as success. **Verify objects exist; never trust the exit
 code.** This produced a false "9/9 built" when nothing had been created.
 
+**Never hardcode the asset directory list.** `tools/deploy-ejs.sh` listed
+`fletcher flfleet flparts` in two separate loops, so the A7 duplicate-review assets
+under `ui/fldup` were never deployed and the script still reported success on
+everything it did copy. It now discovers the directories and exits non-zero on a
+verification failure.
+
 **Delete objects from the task library** once they live in the persistent one — a task
 library normally precedes it on the library list and a stale same-named object wins
 every resolution.
@@ -427,6 +462,12 @@ This is the section that cost the most to learn.
 headless session test.** That test drives the RDF data stream; it cannot see what a
 browser does with the result. Leaning on it as broader evidence than it is was the
 single most expensive mistake in this build.
+
+**`aitool ejs-validate` truncates its stdout at about 64 KB.** A grid of 36 rows
+produces a response cut mid-string, and the JSON will not parse. That is a limit of
+the renderer, not a fault in the template — `tools/ejs-screenshot.py` now halves the
+subfile and retries, and prints how many rows it dropped. A screenshot of a shorter
+grid presented as the whole thing would be worse than no screenshot.
 
 **Test the harness, not just the code.** A grid-sizing check reported 10 rows at every
 window height and looked exactly like a CSS bug. The CSS was correct — `viewportSize`
@@ -498,6 +539,11 @@ panel at all. Data layout can do demo work that UI cannot.
 | `RNX0100` at a statement number | VARCHAR overflow, or `%subst` past its length | check both; the second is easy to miss |
 | Fuzzy match groups things that are genuinely different | short alphanumeric tokens (`A1`, `B3`) dropped as too-short words | treat any token containing a digit as a variant token, not a word |
 | Rows attach to the wrong parent after a table rebuild | ids restart; orphaned child rows remain | sweep orphans at the start of any regeneration |
+| An entire JSON-payload strip renders as nothing | `%char()` emitted `.0` for a zero and `JSON.parse` threw | `fl_jsonNum` on every number in the payload |
+| A literal `&mdash;` on screen | an HTML entity written inside `<%= %>`, which escapes its output | use the character, not the entity |
+| `Could not find matching close tag for "<%"` | an EJS close delimiter inside a JS comment in a scriptlet — the scanner is textual and ends the scriptlet there | describe the delimiters in prose instead of writing them |
+| Every capacity bar pinned at full width | load expressed as percent-of-a-month, and the real loads were 150–406% | scale to the range the data actually spans (weeks against a 16-week horizon) |
+| Almost every order projected late | per-order projection divided each centre's capacity by its queue depth, which double-counts contention — an order only competes at the centre it is in | a forward finite-capacity load: one clock per work centre, orders loaded in promised-date order |
 | Menu option missing | session cached the menu from sign-on | sign off and back on |
 | Object changes have no effect | stale copy in a preceding library | delete the shadow |
 

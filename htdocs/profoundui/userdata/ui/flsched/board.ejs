@@ -1,0 +1,292 @@
+<%
+  function fmt(n, d) {
+    n = Number(n) || 0;
+    var s = n.toFixed(d === undefined ? 0 : d).split('.');
+    s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return s.join('.');
+  }
+  function txt(v) { return (typeof v === 'undefined' || v === null) ? '' : String(v).trim(); }
+  // NB: this renderer HTML-escapes interpolated output, so an entity written
+  // inside an output tag comes out as the literal text "&mdash;". Use the
+  // character itself.
+  function dash(v) { return txt(v) !== '' ? txt(v) : '—'; }
+
+  // The work-centre lane strip arrives as one JSON string rather than a
+  // second subfile: two subfiles in one RDF format compile to malformed DDS.
+  // A bad or empty payload must degrade to "no lanes", never to a render
+  // abort, which is why this is wrapped.
+  var lanes = [];
+  try { lanes = JSON.parse(txt(typeof slanes !== 'undefined' ? slanes : '') || '[]'); }
+  catch (e) { lanes = []; }
+
+  var view    = txt(typeof sview !== 'undefined' ? sview : '') || 'A';
+  var wctrSel = txt(typeof swctr !== 'undefined' ? swctr : '');
+  var trust   = Number(typeof sdqpct !== 'undefined' ? sdqpct : 0) || 0;
+
+  // Ship-window geometry: 60 shop days behind today, 240 ahead. Anything
+  // outside that clamps to the edge rather than escaping the track.
+  var BACK = 60, FWD = 240, SPAN = BACK + FWD;
+  function pos(days) {
+    return Math.max(0, Math.min(100, ((Number(days) || 0) + BACK) / SPAN * 100));
+  }
+  function flagClass(f) {
+    f = txt(f);
+    if (f === 'LATE') return 'fl-pill-bad';
+    if (f === 'AT RISK') return 'fl-pill-warn';
+    if (f === 'ON TRACK') return 'fl-pill-ok';
+    if (f === 'NO DATA' || f === 'NO DATE') return 'flsch-pill-dq';
+    return '';
+  }
+  // Lane load is drawn against a 16-week horizon. Scaling to a month made
+  // every downstream centre pin at full width - the real loads run from 3 to
+  // 16 weeks, so the bar has to span that to differentiate at all.
+  var LANE_WEEKS = 16;
+  function laneWidth(k) {
+    return Math.max(0, Math.min(100, (Number(k) || 0) / LANE_WEEKS * 100));
+  }
+  function loadClass(k) {
+    k = Number(k) || 0;
+    return k >= 10 ? 'flsch-load-over' : k >= 6 ? 'flsch-load-high' : 'flsch-load-ok';
+  }
+  var VIEWS = [
+    ['A', 'Everything on the floor'],
+    ['L', 'Past promised ship'],
+    ['R', 'Projected to miss'],
+    ['S', 'Waiting on material'],
+    ['H', 'On hold'],
+    ['D', 'Has a data problem'],
+    ['C', 'Shipped'],
+    ['*', 'All work orders']
+  ];
+%>
+<div class="fl-screen flsch-screen">
+
+  <div class="fl-mast">
+    <div class="fl-logo" role="img" aria-label="J.H. Fletcher &amp; Co."></div>
+    <div>
+      <div class="fl-mast-title">Production schedule</div>
+      <div class="fl-mast-sub">Machine builds on the floor</div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+
+  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
+    <div class="fl-msg"><%= msg %></div>
+  <% } %>
+
+  <div class="flsch-kpis">
+    <div class="fl-card flsch-kpi"><div class="flsch-v"><%= fmt(sorders) %></div>
+      <div class="flsch-l">Live work orders</div></div>
+    <div class="fl-card flsch-kpi"><div class="flsch-v"><%= fmt(swip) %></div>
+      <div class="flsch-l">In process</div></div>
+    <div class="fl-card flsch-kpi"><div class="flsch-v flsch-bad"><%= fmt(slate) %></div>
+      <div class="flsch-l">Past promised ship</div></div>
+    <div class="fl-card flsch-kpi"><div class="flsch-v flsch-warn"><%= fmt(srisk) %></div>
+      <div class="flsch-l">Projected to miss</div></div>
+    <div class="fl-card flsch-kpi"><div class="flsch-v flsch-warn"><%= fmt(sshort) %></div>
+      <div class="flsch-l">Waiting on material</div>
+      <div class="flsch-sub">$<%= fmt(sshortv, 0) %> short</div></div>
+    <div class="fl-card flsch-kpi"><div class="flsch-v">$<%= fmt(svalue, 0) %></div>
+      <div class="flsch-l">Value in build</div></div>
+    <div class="fl-card flsch-kpi"><div class="flsch-v"><%= fmt(sweeks, 1) %></div>
+      <div class="flsch-l">Weeks of routed work</div>
+      <div class="flsch-sub"><%= fmt(sremhrs, 0) %> hrs / <%= fmt(scapday, 0) %> hrs a day</div></div>
+  </div>
+
+  <!-- The honest panel. Everything above is only as good as this number, so
+       it sits next to the numbers rather than behind a menu option. -->
+  <div class="fl-card flsch-dq">
+    <div class="flsch-dq-score flsch-dq-<%= trust >= 85 ? 'ok' : trust >= 65 ? 'warn' : 'bad' %>">
+      <div class="flsch-dq-pct"><%= fmt(trust) %>%</div>
+      <div class="flsch-dq-cap">schedule<br>confidence</div>
+    </div>
+    <div class="flsch-dq-body">
+      <div class="flsch-dq-head">
+        <%= fmt(sdqtrust) %> of <%= fmt(sorders) %> live work orders can be scheduled
+        with no blocking data defect
+      </div>
+      <div class="flsch-dq-sub">
+        <%= fmt(sdqfind) %> findings across <%= fmt(sdqord) %> work orders &mdash;
+        <strong><%= fmt(sdqhigh) %></strong> of them invalidate the projection
+        outright. Rows below carry a
+        <span class="fl-pill flsch-pill-dq">!</span> where that is the case.
+      </div>
+    </div>
+    <div class="fl-mast-spacer"></div>
+    <button class="fl-btn" onclick="pui.submit({action:'DQ'})"
+            title="Every finding, what it blocks, and which work order it is on">Review
+      data confidence</button>
+  </div>
+
+  <% if (lanes.length > 0) { %>
+    <div class="flsch-lanes">
+    <% lanes.forEach(function (ln) { %>
+      <div class="fl-card flsch-lane<%= wctrSel === txt(ln.c) ? ' flsch-lane-on' : '' %>"
+           onclick="flSetField('swctr','<%= txt(ln.c) %>','WCTR')"
+           title="Show only work orders with work left at <%= txt(ln.d) %>">
+        <div class="flsch-lane-top">
+          <span class="flsch-lane-code"><%= txt(ln.c) %></span>
+          <% if (txt(ln.s) !== 'A') { %>
+            <span class="fl-pill fl-pill-bad">Inactive</span>
+          <% } else if (Number(ln.l) > 0) { %>
+            <span class="fl-pill fl-pill-bad"><%= fmt(ln.l) %> late</span>
+          <% } %>
+        </div>
+        <div class="flsch-lane-desc"><%= txt(ln.d) %></div>
+        <div class="flsch-bar">
+          <div class="flsch-bar-fill <%= loadClass(ln.k) %>"
+               style="width:<%= laneWidth(ln.k) %>%"></div>
+        </div>
+        <div class="flsch-lane-foot">
+          <% if (txt(ln.s) !== 'A' || !(Number(ln.k) > 0)) { %>
+            <span class="flsch-nocap">no capacity</span>
+          <% } else { %>
+            <span><%= fmt(ln.k, 1) %> weeks queued</span>
+          <% } %>
+          <span><%= fmt(ln.q) %> orders &middot; <%= fmt(ln.h, 0) %> hrs</span>
+        </div>
+      </div>
+    <% }); %>
+    </div>
+  <% } %>
+
+  <div class="flsch-bar-row">
+    <div class="fl-field">
+      <label for="sview">Show</label>
+      <select class="fl-select flsch-sel" name="sview" id="sview"
+              onchange="pui.submit({action:'VIEW'})">
+      <% VIEWS.forEach(function (v) { %>
+        <option value="<%= v[0] %>"<%= view === v[0] ? ' selected' : '' %>><%= v[1] %></option>
+      <% }); %>
+      </select>
+    </div>
+    <input type="hidden" name="swctr" value="<%= wctrSel %>">
+    <% if (wctrSel !== '') { %>
+      <button class="fl-btn fl-btn-2 flsch-clear"
+              onclick="flSetField('swctr','','WCTR')"
+              title="Show every work centre again">Work centre:
+        <strong><%= wctrSel %></strong> &times;</button>
+    <% } %>
+    <span class="fl-mast-spacer"></span>
+    <% if (typeof soptdesc !== 'undefined' && soptdesc && soptdesc.trim()) { %>
+      <span class="flsch-hint"><%= soptdesc %></span>
+    <% } %>
+  </div>
+
+  <% if (typeof wosfl !== 'undefined' && wosfl && wosfl.length > 0) { %>
+    <div class="fl-grid-scroll">
+    <table class="fl-table flsch-table">
+      <thead>
+        <tr>
+          <th style="width:42px">Opt</th>
+          <th style="width:104px">Work order</th>
+          <th style="width:150px">Machine</th>
+          <th style="width:170px">Customer</th>
+          <th style="width:130px">Status</th>
+          <th style="width:96px" class="fl-num">Routed</th>
+          <th style="width:88px">Promised</th>
+          <th style="width:88px">Projected</th>
+          <th style="width:172px">Ship window</th>
+          <th style="width:62px" class="fl-num">Short</th>
+          <th style="width:96px">Flag</th>
+          <th class="fl-hide-sm">Scheduler note</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% wosfl.forEach(function (row) { %>
+        <tr class="fl-row-pick" ondblclick="flPickRow(this,'5')"
+            title="Double-click to open this work order">
+          <td><input class="fl-input flsch-opt" name="wosfl.sopt.<%= row._rrn %>"
+                     value="<%= row.sopt %>" size="2" maxlength="2"></td>
+          <td>
+            <strong><%= row.swo %></strong>
+            <% if (txt(row.sprio) === 'High') { %>
+              <span class="fl-pill fl-pill-warn flsch-mini">High</span>
+            <% } %>
+            <div class="flsch-sub2"><%= txt(row.sser) !== '' ? row.sser : '— no serial' %></div>
+          </td>
+          <td>
+            <%= row.smodel %>
+            <div class="flsch-sub2"><%= row.stype %></div>
+          </td>
+          <td>
+            <%= row.scust %>
+            <div class="flsch-sub2"><%= row.sdesc %></div>
+          </td>
+          <td>
+            <%= row.sstat %>
+            <div class="flsch-sub2"><%= dash(row.swcc) %></div>
+          </td>
+          <td class="fl-num">
+            <%= row.spctr %>%
+            <div class="flsch-mbar"><div class="flsch-mbar-fill"
+                 style="width:<%= Math.max(0, Math.min(100, Number(row.spctr) || 0)) %>%"></div></div>
+          </td>
+          <td><%= dash(row.sprom) %></td>
+          <td><%= dash(row.sproj) %></td>
+          <td>
+            <%
+              var pd = Number(row.spromd) || 0, jd = Number(row.sprojd) || 0;
+              var hasProm = txt(row.sprom) !== '', hasProj = txt(row.sproj) !== '';
+              var slip = Number(row.sslip) || 0;
+            %>
+            <div class="flsch-track">
+              <div class="flsch-today"></div>
+              <% if (hasProm && hasProj && slip > 0) { %>
+                <div class="flsch-slipbar"
+                     style="left:<%= pos(pd) %>%;width:<%= Math.max(1, pos(jd) - pos(pd)) %>%"></div>
+              <% } %>
+              <% if (hasProm) { %>
+                <div class="flsch-mark flsch-mark-prom" style="left:<%= pos(pd) %>%"></div>
+              <% } %>
+              <% if (hasProj) { %>
+                <div class="flsch-mark flsch-mark-proj" style="left:<%= pos(jd) %>%"></div>
+              <% } %>
+            </div>
+            <div class="flsch-slip <%= slip > 0 ? 'flsch-bad' : slip < 0 ? 'flsch-good' : '' %>">
+              <% if (!hasProm) { %>no promised date<% } else if (!hasProj) { %>not projectable<%
+                 } else if (slip > 0) { %><%= slip %> days late<% } else if (slip < 0) { %><%= -slip %> days spare<%
+                 } else { %>on the day<% } %>
+            </div>
+          </td>
+          <td class="fl-num">
+            <% if (Number(row.sshortc) > 0) { %>
+              <span class="fl-pill fl-pill-warn"><%= row.sshortc %></span>
+            <% } else { %>&mdash;<% } %>
+          </td>
+          <td>
+            <span class="fl-pill <%= flagClass(row.sflag) %>"><%= row.sflag %></span>
+            <% if (Number(row.sdqh) > 0) { %>
+              <span class="fl-pill flsch-pill-dq"
+                    title="<%= row.sdqh %> finding(s) that invalidate this projection">!</span>
+            <% } %>
+          </td>
+          <td class="fl-hide-sm flsch-note"><%= dash(row.snote) %></td>
+        </tr>
+      <% }); %>
+      </tbody>
+    </table>
+    </div>
+    <% if (wosfl.length > 12) { %>
+      <div class="fl-grid-note"><%= wosfl.length %> work orders &mdash; scroll the grid,
+        pick a work centre above, or narrow the view.</div>
+    <% } %>
+  <% } else { %>
+    <div class="fl-empty">Nothing matches that view.
+      Try <strong>All work orders</strong>, or clear the work centre filter.</div>
+  <% } %>
+
+  <input type="hidden" name="action" value="">
+
+  <div class="fl-foot">
+    <button class="fl-btn fl-btn-2" onclick="pui.submit({action:'EXIT'})" data-fkey="F3">Exit (F3)</button>
+    <span class="flsch-key">
+      <span class="flsch-mark flsch-mark-prom flsch-inline"></span> promised
+      <span class="flsch-mark flsch-mark-proj flsch-inline"></span> projected
+      <span class="flsch-today flsch-inline"></span> today
+    </span>
+    <span class="fl-mast-spacer"></span>
+    <span class="fl-demo-flag">Demo data &mdash; fictional records</span>
+  </div>
+</div>
