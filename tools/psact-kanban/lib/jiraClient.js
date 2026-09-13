@@ -158,10 +158,18 @@ async function assignIssue(key, accountId) {
   });
 }
 
+async function addComment(key, adfBody) {
+  return jiraFetch(`/rest/api/3/issue/${key}/comment`, {
+    method: 'POST',
+    body: JSON.stringify({ body: adfBody }),
+  });
+}
+
 module.exports = {
   getMyself,
   searchMineAndUnassigned,
   getTransitions,
   transitionIssue,
   assignIssue,
+  addComment,
 };

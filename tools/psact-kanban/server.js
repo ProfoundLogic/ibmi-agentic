@@ -8,6 +8,7 @@ const jiraClient = require('./lib/jiraClient');
 const { reconcile } = require('./lib/reconcile');
 const { computeDiff } = require('./lib/diff');
 const { pushChanges } = require('./lib/push');
+const { cleanupComment } = require('./lib/cleanup');
 const { ALL_COLUMNS } = require('./lib/config');
 
 const PORT = process.env.PORT || 4287;
@@ -101,6 +102,27 @@ app.post('/api/discard', (req, res) => {
     }
     store.save();
     res.json(boardPayload());
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Comments bypass the review/push queue entirely - they post to Jira the
+// moment this is called, per the user's explicit "push immediately" request.
+app.post('/api/comment', async (req, res) => {
+  try {
+    const { key, text } = req.body || {};
+    if (!key || !text || !text.trim()) {
+      return res.status(400).json({ error: 'key and non-empty text are required' });
+    }
+    const s = store.getState();
+    if (!s.tickets[key]) return res.status(404).json({ error: `Unknown ticket ${key}` });
+
+    const { adf, preview } = cleanupComment(text);
+    await jiraClient.addComment(key, adf);
+    store.logChange('comment', key, preview);
+    store.save();
+    res.json({ success: true, key, posted: preview, ...boardPayload() });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

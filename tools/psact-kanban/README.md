@@ -27,6 +27,13 @@ pushed to Jira until you explicitly say so.
   or discard it.
 - Clicking a card (outside its buttons) opens the ticket in Jira in a new
   tab.
+- **Note button** on each card opens a text box for a quick comment. Unlike
+  everything else on the board, this **posts to Jira immediately** on
+  confirm - it does not go through Review & Push. Before posting, the text is
+  run through a small deterministic cleanup (no AI/LLM involved): sentence
+  casing and punctuation are tidied, multi-line input becomes a bullet list,
+  and a fixed set of common shorthand is expanded (`asap`, `w/`, `w/o`, `btw`,
+  `pls`, `tbd`, `mtg`, etc. - see `lib/cleanup.js` for the full list).
 
 ## Persistence
 
@@ -73,6 +80,7 @@ lib/
   reconcile.js    merges fresh Jira results into local state, conflict detection
   diff.js         computes pending-change list + the Jira actions each implies
   push.js         executes the pending actions against Jira
+  cleanup.js      deterministic (non-AI) comment text cleanup + ADF formatting
 server.js         Express app + API routes
 public/           vanilla HTML/CSS/JS frontend (no build step)
 ```

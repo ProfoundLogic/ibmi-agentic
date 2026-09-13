@@ -266,6 +266,11 @@ function buildCard(ticket, col, idx, total) {
     conflictFlag.title = ticket.conflictInfo ? ticket.conflictInfo.reason : 'Changed in Jira since your edit';
   }
 
+  node.querySelector('.comment-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openCommentModal(ticket.key, data.summary);
+  });
+
   const discardBtn = node.querySelector('.discard-btn');
   if (pending) {
     discardBtn.hidden = false;
@@ -568,6 +573,55 @@ async function pushSelected() {
   }
 }
 
+/* ---------- comment modal ---------- */
+const commentOverlay = document.getElementById('commentModalOverlay');
+const commentTitle = document.getElementById('commentModalTitle');
+const commentTextarea = document.getElementById('commentTextarea');
+const commentPostBtn = document.getElementById('commentPostBtn');
+let commentTargetKey = null;
+
+function openCommentModal(key, summary) {
+  commentTargetKey = key;
+  commentTitle.textContent = `Comment on ${key}${summary ? ' — ' + summary : ''}`;
+  commentTextarea.value = '';
+  commentPostBtn.disabled = false;
+  commentPostBtn.textContent = 'Post to Jira';
+  commentOverlay.hidden = false;
+  commentTextarea.focus();
+}
+
+function closeCommentModal() {
+  commentOverlay.hidden = true;
+  commentTargetKey = null;
+}
+
+async function postComment() {
+  const text = commentTextarea.value.trim();
+  if (!text) {
+    toast('error', 'Type something first');
+    return;
+  }
+  const key = commentTargetKey;
+  commentPostBtn.disabled = true;
+  commentPostBtn.textContent = 'Posting…';
+  try {
+    const resp = await api('api/comment', {
+      method: 'POST',
+      body: JSON.stringify({ key, text }),
+    });
+    const rects = flipCapture();
+    state = resp;
+    render();
+    flipPlay(rects);
+    closeCommentModal();
+    toast('success', `Posted to ${key}: “${resp.posted.split('\n')[0]}${resp.posted.includes('\n') ? '…' : ''}”`);
+  } catch (err) {
+    toast('error', `Couldn't post comment: ${err.message}`);
+    commentPostBtn.disabled = false;
+    commentPostBtn.textContent = 'Post to Jira';
+  }
+}
+
 /* ---------- wiring ---------- */
 document.getElementById('refreshBtn').addEventListener('click', () => refreshFromServer(true));
 document.getElementById('reviewBtn').addEventListener('click', openReviewModal);
@@ -582,6 +636,15 @@ document.getElementById('discardAllBtn').addEventListener('click', () => {
 });
 overlay.addEventListener('click', (e) => {
   if (e.target === overlay) closeReviewModal();
+});
+document.getElementById('commentModalClose').addEventListener('click', closeCommentModal);
+document.getElementById('commentCancel').addEventListener('click', closeCommentModal);
+document.getElementById('commentPostBtn').addEventListener('click', postComment);
+commentOverlay.addEventListener('click', (e) => {
+  if (e.target === commentOverlay) closeCommentModal();
+});
+commentTextarea.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') postComment();
 });
 document.getElementById('searchBox').addEventListener('input', (e) => {
   filterText = e.target.value.trim();
