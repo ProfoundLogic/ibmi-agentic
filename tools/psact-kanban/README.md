@@ -17,6 +17,10 @@ pushed to Jira until you explicitly say so.
   pending "assign to me (+ transition)" change. Moving one back into
   **Unassigned** marks it as a pending "unassign" change. Moving between your
   own columns marks a pending status transition.
+- Moving a card into **Waiting** (the closest thing PSACT has to "on hold")
+  also queues adding the `parked` label; moving it back out queues removing
+  that label. Like every other move, this is only a pending change until
+  **Review & Push**.
 - Nothing touches Jira until you click **Review & Push**, which shows every
   pending change (with a diff and per-action pills) so you can select exactly
   what to push, then reports success/failure per ticket.

@@ -24,6 +24,12 @@ async function pushChanges(store, jiraClient, myAccountId, onlyKeys) {
           await jiraClient.assignIssue(entry.key, null);
         } else if (action.type === 'status') {
           await jiraClient.transitionIssue(entry.key, action.to);
+        } else if (action.type === 'addLabel') {
+          await jiraClient.updateLabels(entry.key, { add: action.label });
+          addLocalLabel(ticket, action.label);
+        } else if (action.type === 'removeLabel') {
+          await jiraClient.updateLabels(entry.key, { remove: action.label });
+          removeLocalLabel(ticket, action.label);
         }
       }
       ticket.baselineColumn = store.findColumn(entry.key);
@@ -37,6 +43,16 @@ async function pushChanges(store, jiraClient, myAccountId, onlyKeys) {
     store.save();
   }
   return results;
+}
+
+function addLocalLabel(ticket, label) {
+  const labels = ticket.data.labels || (ticket.data.labels = []);
+  if (!labels.includes(label)) labels.push(label);
+}
+
+function removeLocalLabel(ticket, label) {
+  if (!ticket.data.labels) return;
+  ticket.data.labels = ticket.data.labels.filter((l) => l !== label);
 }
 
 module.exports = { pushChanges };

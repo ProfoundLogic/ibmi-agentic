@@ -101,6 +101,11 @@ function priorityClass(name) {
   return '';
 }
 
+function pendingActionsFor(key) {
+  const entry = (state.diff || []).find((d) => d.key === key);
+  return entry ? entry.actions : [];
+}
+
 function matchesFilter(ticket) {
   if (!filterText) return true;
   const needle = filterText.toLowerCase();
@@ -303,12 +308,25 @@ function buildCard(ticket, col, idx, total) {
   }
 
   const labelsEl = node.querySelector('.card-labels');
+  const pendingActions = pending ? pendingActionsFor(ticket.key) : [];
+  const pendingAdds = pendingActions.filter((a) => a.type === 'addLabel').map((a) => a.label);
+  const pendingRemoves = pendingActions.filter((a) => a.type === 'removeLabel').map((a) => a.label);
   (data.labels || []).forEach((label) => {
     const tag = document.createElement('span');
-    tag.className = 'label-tag';
+    tag.className = 'label-tag' + (pendingRemoves.includes(label) ? ' label-pending-remove' : '');
     tag.textContent = label;
+    if (pendingRemoves.includes(label)) tag.title = 'Will be removed on push';
     labelsEl.appendChild(tag);
   });
+  pendingAdds
+    .filter((label) => !(data.labels || []).includes(label))
+    .forEach((label) => {
+      const tag = document.createElement('span');
+      tag.className = 'label-tag label-pending-add';
+      tag.textContent = label;
+      tag.title = 'Will be added on push';
+      labelsEl.appendChild(tag);
+    });
 
   const avatar = node.querySelector('.avatar');
   if (col === 'Unassigned') {
@@ -520,9 +538,13 @@ function renderModalBody() {
     actions.className = 'diff-actions';
     entry.actions.forEach((a) => {
       const pill = document.createElement('span');
-      pill.className = 'action-pill' + (a.type === 'unassign' ? ' unassign' : '');
+      pill.className = 'action-pill' + (a.type === 'unassign' || a.type === 'removeLabel' ? ' unassign' : '');
       pill.textContent =
-        a.type === 'assign' ? 'Assign to you' : a.type === 'unassign' ? 'Unassign' : `Status → ${a.to}`;
+        a.type === 'assign' ? 'Assign to you'
+        : a.type === 'unassign' ? 'Unassign'
+        : a.type === 'addLabel' ? `+ ${a.label} label`
+        : a.type === 'removeLabel' ? `− ${a.label} label`
+        : `Status → ${a.to}`;
       actions.appendChild(pill);
     });
 

@@ -18,10 +18,18 @@ const DONE_RETENTION_DAYS = 7;
 
 const PROJECT_KEY = 'PSACT';
 
+// There's no separate "On Hold" Jira status for PSACT - "Waiting" is the
+// closest thing, so that's the column the "parked" label tracks: entering it
+// adds the label, leaving it removes the label.
+const ON_HOLD_COLUMN = 'Waiting';
+const PARKED_LABEL = 'parked';
+
 module.exports = {
   STATUS_COLUMNS,
   UNASSIGNED_COLUMN,
   ALL_COLUMNS,
   DONE_RETENTION_DAYS,
   PROJECT_KEY,
+  ON_HOLD_COLUMN,
+  PARKED_LABEL,
 };

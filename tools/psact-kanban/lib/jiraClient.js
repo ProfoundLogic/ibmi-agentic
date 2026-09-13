@@ -165,6 +165,19 @@ async function addComment(key, adfBody) {
   });
 }
 
+// Adds and/or removes a single label via Jira's update-operation syntax, so
+// it never has to read (and risk clobbering) the issue's full label list.
+async function updateLabels(key, { add, remove } = {}) {
+  const labelOps = [];
+  if (add) labelOps.push({ add });
+  if (remove) labelOps.push({ remove });
+  if (!labelOps.length) return;
+  await jiraFetch(`/rest/api/3/issue/${key}`, {
+    method: 'PUT',
+    body: JSON.stringify({ update: { labels: labelOps } }),
+  });
+}
+
 module.exports = {
   getMyself,
   searchMineAndUnassigned,
@@ -172,4 +185,5 @@ module.exports = {
   transitionIssue,
   assignIssue,
   addComment,
+  updateLabels,
 };
