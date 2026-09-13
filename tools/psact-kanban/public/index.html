@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PSACT Kanban</title>
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>PSACT Kanban</h1>
+      <span id="userChip" class="user-chip">loading…</span>
+      <span id="syncedAt" class="synced-at"></span>
+    </div>
+    <div class="topbar-right">
+      <input id="searchBox" class="search-box" type="search" placeholder="Filter by key, text, label, epic…" />
+      <button id="refreshBtn" class="btn btn-ghost">
+        <span class="spinner" id="refreshSpinner" hidden></span>
+        ⟳ Refresh from Jira
+      </button>
+      <button id="reviewBtn" class="btn btn-primary">
+        Review &amp; Push <span id="diffCount" class="badge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="board" class="board"></main>
+
+  <div id="toasts" class="toasts"></div>
+
+  <div id="modalOverlay" class="modal-overlay" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Review changes before pushing to Jira</h2>
+        <button id="modalClose" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+      <div class="modal-footer">
+        <button id="discardAllBtn" class="btn btn-ghost btn-danger">Discard all pending changes</button>
+        <div class="modal-footer-right">
+          <button id="modalCancel" class="btn btn-ghost">Cancel</button>
+          <button id="pushSelectedBtn" class="btn btn-primary">Push selected</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <template id="cardTemplate">
+    <article class="card" draggable="true">
+      <div class="card-top">
+        <a class="card-key" target="_blank" rel="noopener"></a>
+        <span class="conflict-flag" hidden title="">⚠</span>
+        <button class="icon-btn discard-btn" hidden title="Discard local change">↺</button>
+      </div>
+      <div class="card-summary"></div>
+      <div class="card-meta">
+        <span class="pill epic-pill" hidden></span>
+        <span class="pill priority-pill" hidden></span>
+        <span class="pill due-pill" hidden></span>
+      </div>
+      <div class="card-labels"></div>
+      <div class="card-bottom">
+        <span class="avatar"></span>
+        <div class="card-controls">
+          <button class="icon-btn move-up" title="Move up">▲</button>
+          <button class="icon-btn move-down" title="Move down">▼</button>
+          <select class="move-select" title="Move to column"></select>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="./app.js"></script>
+</body>
+</html>
