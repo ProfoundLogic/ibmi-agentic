@@ -8,6 +8,7 @@ const jiraClient = require('./lib/jiraClient');
 const { reconcile } = require('./lib/reconcile');
 const { computeDiff } = require('./lib/diff');
 const { pushChanges } = require('./lib/push');
+const { commitAndPushBoardState } = require('./lib/gitSync');
 const { cleanupComment } = require('./lib/cleanup');
 const { ALL_COLUMNS } = require('./lib/config');
 
@@ -133,7 +134,11 @@ app.post('/api/push', async (req, res) => {
     const me = await ensureMyself();
     const { keys } = req.body || {};
     const results = await pushChanges(store, jiraClient, me.accountId, keys);
-    res.json({ results, ...boardPayload() });
+    const ok = results.filter((r) => r.success).length;
+    const gitSync = await commitAndPushBoardState(
+      `sync board state (${ok}/${results.length} ticket change${results.length === 1 ? '' : 's'} pushed)`
+    );
+    res.json({ results, gitSync, ...boardPayload() });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

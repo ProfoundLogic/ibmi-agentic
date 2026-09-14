@@ -153,6 +153,14 @@ that file is ever `.gitignore`'d instead (see the note in `README.md`), this
 table changes — the board reverts to a fresh Jira pull on every new
 container.
 
+**This commit now happens automatically.** Every successful **Review &
+Push** click also runs `git add data/board-state.json && git commit && git
+push` (see `lib/gitSync.js`), scoped to just that one file. You don't need to
+manually commit it as part of a task's normal output — by the time a task
+ends, whatever was pushed through the UI is already on the branch. Any other
+uncommitted app-code changes in the repo are untouched by this and still flow
+through the normal CoderFlow commit/approve path.
+
 ## 9. Troubleshooting quick reference
 
 | Symptom | Likely cause | Fix |

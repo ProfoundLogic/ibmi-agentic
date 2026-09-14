@@ -588,6 +588,14 @@ async function pushSelected() {
       toast('error', `${ok} pushed, ${fail.length} failed: ${fail.map((f) => `${f.key} (${f.error})`).join('; ')}`, 8000);
       renderModalBody();
     }
+
+    if (resp.gitSync && resp.gitSync.attempted) {
+      if (resp.gitSync.success) {
+        toast('success', 'Board state committed and pushed to git');
+      } else {
+        toast('error', `Board state git sync failed: ${resp.gitSync.error}`, 8000);
+      }
+    }
   } catch (err) {
     toast('error', `Push failed: ${err.message}`);
     pushBtn.disabled = false;

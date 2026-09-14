@@ -24,6 +24,16 @@ pushed to Jira until you explicitly say so.
 - Nothing touches Jira until you click **Review & Push**, which shows every
   pending change (with a diff and per-action pills) so you can select exactly
   what to push, then reports success/failure per ticket.
+- After a push, the app also commits and pushes `data/board-state.json` to
+  whatever git branch is currently checked out - scoped to just that one file
+  (`git add data/board-state.json`, never `-A`/`.`), so it never sweeps up
+  other in-progress, uncommitted repo changes. Those stay uncommitted for the
+  normal review/approve flow, same as always. The commit is authored using
+  whatever git identity is already configured in the environment (the
+  container/task owner). If the git commit/push step fails (e.g. no network,
+  diverged branch), the Jira push itself is unaffected - you just get a
+  separate toast telling you the git sync failed, and can retry another push
+  or handle it manually.
 - **Refresh from Jira** re-pulls current data. Tickets with no pending local
   change silently follow whatever Jira says. Tickets with a pending change
   are left alone, but flagged with a conflict warning if Jira's side also
