@@ -126,13 +126,18 @@ h1 { font-size: 18px; margin: 0; }
 .column {
   background: #ebecf0;
   border-radius: var(--radius);
-  /* Six columns at a fixed 300px need ~1900px of board, which clipped Done
-     off the right on a normal screen once On Hold was added. Basis stays at
-     300px so a wide screen looks exactly as it did before; the shrink factor
-     lets the columns narrow to 260px to fit six in, and only below that does
-     the board fall back to horizontal scrolling. */
-  flex: 0 1 300px;
+  /* Columns share the board's width rather than sitting at a fixed size, so
+     the row always fills the window and closing Done hands its space to the
+     five that remain.
+
+     Basis 300px is the "natural" width. Shrink takes them down to the 260px
+     floor to fit six across before the board falls back to horizontal
+     scrolling; grow lets them spread past 300px when there's slack - capped
+     at 420px, because past that a card is mostly empty space with its summary
+     on one line, and whitespace reads better than an over-stretched card. */
+  flex: 1 1 300px;
   min-width: 260px;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 92px);
@@ -259,7 +264,11 @@ h1 { font-size: 18px; margin: 0; }
   color: var(--muted);
   border: 1px solid var(--border);
   white-space: nowrap;
-  max-width: 160px;
+  /* Bounded by the card, not by a fixed 160px. That cap truncated every epic
+     name ("PSACT-5 · Demo Environ…") even in a column with 115px to spare,
+     so widening the columns would otherwise have bought padding rather than
+     information. Narrow columns still ellipsis, just later. */
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
 }

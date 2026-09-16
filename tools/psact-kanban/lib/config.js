@@ -3,7 +3,7 @@
 // The five statuses that exist as real Jira workflow statuses for PSACT.
 // These map 1:1 to board columns of the same name. Order here is the order
 // the columns appear on the board, left to right.
-const STATUS_COLUMNS = ['To Do', 'In Progress', 'Waiting', 'On Hold', 'Done'];
+const STATUS_COLUMNS = ['To Do', 'In Progress', 'On Hold', 'Waiting', 'Done'];
 
 // "Unassigned" is not a Jira status - it's a local pool for tickets with no
 // assignee. A ticket's presence there is derived from assignee=null, not from

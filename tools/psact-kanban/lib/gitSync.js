@@ -21,17 +21,27 @@ function run(cmd, args) {
 
 // Commits and pushes ONLY data/board-state.json to whatever branch is
 // currently checked out, so the board's priority order and sync baseline
-// survive a container swap without waiting on a full task approval. Scoped
-// strictly to this one file via `git add <path>` (never `-A`/`.`) so it never
-// sweeps up other in-progress, uncommitted repo changes - those stay
-// uncommitted for the normal CoderFlow review/approve flow, same as always.
+// survive a container swap without waiting on a full task approval. Other
+// in-progress repo changes must stay uncommitted for the normal CoderFlow
+// review/approve flow.
+//
+// Scoping `git add` to the one path is NOT enough on its own, and assuming it
+// was is how this function once swallowed a whole task's worth of
+// work-in-progress into a board-sync commit: a bare `git commit` commits
+// everything already in the index, not just what this function staged. If
+// anything else had been staged beforehand - by a tool, an editor, or a
+// half-finished `git add` - it went along for the ride, and once pushed it
+// was no longer visible to CoderFlow as pending work. Both the add AND the
+// commit are therefore pathspec-scoped; the commit pathspec is the one that
+// actually guarantees it.
 async function commitAndPushBoardState(summary) {
   try {
     const status = await run('git', ['status', '--porcelain', '--', BOARD_STATE_REL]);
     if (!status.stdout.trim()) return { attempted: false };
 
     await run('git', ['add', '--', BOARD_STATE_REL]);
-    await run('git', ['commit', '-m', `psact-kanban: ${summary}`]);
+    // The trailing pathspec is load-bearing - see the note above.
+    await run('git', ['commit', '-m', `psact-kanban: ${summary}`, '--', BOARD_STATE_REL]);
     await run('git', ['push']);
     return { attempted: true, success: true };
   } catch (err) {

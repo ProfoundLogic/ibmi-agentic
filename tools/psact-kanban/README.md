@@ -9,7 +9,7 @@ pushed to Jira until you explicitly say so.
 - Pulls PSACT tickets that are either assigned to you or unassigned (never
   Cancelled). Done tickets drop off the board automatically 7 days after
   their last update.
-- Board columns: **Unassigned | To Do | In Progress | Waiting | On Hold | Done**.
+- Board columns: **Unassigned | To Do | In Progress | On Hold | Waiting | Done**.
 - **Done is hidden by default.** The **Show Done / Hide Done** button in the
   top bar toggles it, and the badge on that button is the Done count, so you
   can see it grow without opening the column. The choice is remembered per
