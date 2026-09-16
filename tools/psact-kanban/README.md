@@ -9,7 +9,14 @@ pushed to Jira until you explicitly say so.
 - Pulls PSACT tickets that are either assigned to you or unassigned (never
   Cancelled). Done tickets drop off the board automatically 7 days after
   their last update.
-- Board columns: **Unassigned | To Do | In Progress | Waiting | Done**.
+- Board columns: **Unassigned | To Do | In Progress | Waiting | On Hold | Done**.
+- **Done is hidden by default.** The **Show Done / Hide Done** button in the
+  top bar toggles it, and the badge on that button is the Done count, so you
+  can see it grow without opening the column. The choice is remembered per
+  browser (localStorage, not board state - it's a view preference, so it
+  deliberately doesn't end up in a git diff). A card can still be sent to Done
+  from its "Move to…" menu while the column is hidden; you get a toast saying
+  so, since the card otherwise just disappears.
 - Drag a card between columns, or use the ▲▼ buttons / "Move to…" dropdown.
   Reordering within a column is a **local priority order only** - Jira has no
   field for it, so it never gets pushed.
@@ -17,10 +24,16 @@ pushed to Jira until you explicitly say so.
   pending "assign to me (+ transition)" change. Moving one back into
   **Unassigned** marks it as a pending "unassign" change. Moving between your
   own columns marks a pending status transition.
-- Moving a card into **Waiting** (the closest thing PSACT has to "on hold")
-  also queues adding the `parked` label; moving it back out queues removing
-  that label. Like every other move, this is only a pending change until
-  **Review & Push**.
+- Moving a card into **Waiting** also queues adding the `parked` label;
+  moving it back out queues removing that label. Like every other move, this
+  is only a pending change until **Review & Push**.
+- **Waiting vs On Hold.** Both are real PSACT statuses and both are plain
+  columns here - drag a card in and Review & Push transitions it. The
+  `parked` label is currently bound to **Waiting** only, because that binding
+  predates the On Hold status (PSACT had no such status until Sep 2026, so
+  Waiting stood in for it). Whether `parked` should follow On Hold instead,
+  or apply to both, is an open team convention question - see
+  `PARKED_COLUMN` in `lib/config.js`.
 - Nothing touches Jira until you click **Review & Push**, which shows every
   pending change (with a diff and per-action pills) so you can select exactly
   what to push, then reports success/failure per ticket.

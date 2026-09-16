@@ -21,6 +21,15 @@
 
 * { box-sizing: border-box; }
 
+/* The UA stylesheet's `[hidden] { display: none }` is a bare attribute
+   selector, so ANY class rule that sets `display` outranks it and the element
+   stays on screen with its `hidden` attribute set and ignored. That is how the
+   refresh spinner ended up permanently visible and permanently animating
+   (.spinner sets display:inline-block), and how the modal's "Push selected"
+   button stayed clickable on an empty diff (.btn sets display:inline-flex).
+   Reset it once here rather than patching each element as it's noticed. */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -117,12 +126,29 @@ h1 { font-size: 18px; margin: 0; }
 .column {
   background: #ebecf0;
   border-radius: var(--radius);
-  width: 300px;
-  min-width: 300px;
+  /* Six columns at a fixed 300px need ~1900px of board, which clipped Done
+     off the right on a normal screen once On Hold was added. Basis stays at
+     300px so a wide screen looks exactly as it did before; the shrink factor
+     lets the columns narrow to 260px to fit six in, and only below that does
+     the board fall back to horizontal scrolling. */
+  flex: 0 1 300px;
+  min-width: 260px;
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 92px);
   border-top: 4px solid var(--col-color, var(--accent));
+}
+
+/* Done, when toggled off. The column stays in the DOM and keeps rendering so
+   showing it again needs no re-fetch. */
+.column.is-hidden { display: none; }
+
+/* A toggle that's currently "on" should look pressed, not just read that way
+   to a screen reader. */
+.btn-ghost[aria-pressed="true"] {
+  background: var(--bg);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .column-header {
@@ -334,7 +360,6 @@ h1 { font-size: 18px; margin: 0; }
   z-index: 200;
   animation: fade-in 0.15s ease;
 }
-.modal-overlay[hidden] { display: none; }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 
 .modal {

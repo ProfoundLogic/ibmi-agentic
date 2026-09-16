@@ -1,6 +1,6 @@
 'use strict';
 
-const { UNASSIGNED_COLUMN, ON_HOLD_COLUMN, PARKED_LABEL } = require('./config');
+const { UNASSIGNED_COLUMN, PARKED_COLUMN, PARKED_LABEL } = require('./config');
 
 // Computes the pending Jira actions for one ticket given where it started
 // (baselineColumn, i.e. Jira truth as of last sync) and where it sits now
@@ -19,9 +19,9 @@ function actionsFor(baselineColumn, currentColumn) {
     actions.push({ type: 'status', to: currentColumn });
   }
 
-  if (currentColumn === ON_HOLD_COLUMN) {
+  if (currentColumn === PARKED_COLUMN) {
     actions.push({ type: 'addLabel', label: PARKED_LABEL });
-  } else if (baselineColumn === ON_HOLD_COLUMN) {
+  } else if (baselineColumn === PARKED_COLUMN) {
     actions.push({ type: 'removeLabel', label: PARKED_LABEL });
   }
 

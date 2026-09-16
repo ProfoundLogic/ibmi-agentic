@@ -1,8 +1,9 @@
 'use strict';
 
-// The four statuses that exist as real Jira workflow statuses for PSACT.
-// These map 1:1 to board columns of the same name.
-const STATUS_COLUMNS = ['To Do', 'In Progress', 'Waiting', 'Done'];
+// The five statuses that exist as real Jira workflow statuses for PSACT.
+// These map 1:1 to board columns of the same name. Order here is the order
+// the columns appear on the board, left to right.
+const STATUS_COLUMNS = ['To Do', 'In Progress', 'Waiting', 'On Hold', 'Done'];
 
 // "Unassigned" is not a Jira status - it's a local pool for tickets with no
 // assignee. A ticket's presence there is derived from assignee=null, not from
@@ -18,10 +19,18 @@ const DONE_RETENTION_DAYS = 7;
 
 const PROJECT_KEY = 'PSACT';
 
-// There's no separate "On Hold" Jira status for PSACT - "Waiting" is the
-// closest thing, so that's the column the "parked" label tracks: entering it
-// adds the label, leaving it removes the label.
-const ON_HOLD_COLUMN = 'Waiting';
+// The column the "parked" label tracks: entering it adds the label, leaving
+// it removes the label.
+//
+// This is deliberately still "Waiting", even though PSACT gained a real
+// "On Hold" status in Sep 2026. The binding predates that status - back then
+// Waiting was the closest thing PSACT had to "on hold", so the label was
+// pinned there. Whether "parked" should follow the new On Hold column instead
+// (or apply to both) is a convention decision for the team, not something to
+// infer: changing it silently would start adding and removing real Jira
+// labels on a different set of tickets. The constant is named for the label
+// rather than the concept precisely so it isn't mistaken for the new column.
+const PARKED_COLUMN = 'Waiting';
 const PARKED_LABEL = 'parked';
 
 module.exports = {
@@ -30,6 +39,6 @@ module.exports = {
   ALL_COLUMNS,
   DONE_RETENTION_DAYS,
   PROJECT_KEY,
-  ON_HOLD_COLUMN,
+  PARKED_COLUMN,
   PARKED_LABEL,
 };

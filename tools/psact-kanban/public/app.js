@@ -9,8 +9,25 @@ const COLUMN_COLOR = {
   'To Do': '#0052cc',
   'In Progress': '#ff991f',
   Waiting: '#6554c0',
+  // Deliberately a darker shade of Waiting's violet: On Hold sits next to it
+  // and the two are sibling "not being worked right now" states, so reading
+  // as a pair is the point. Distinct enough in lightness to tell apart.
+  'On Hold': '#403294',
   Done: '#00875a',
 };
+
+const DONE_COLUMN = 'Done';
+
+// Whether the Done column is on screen. This is a *view* preference, not board
+// data, so it lives in localStorage rather than in data/board-state.json -
+// that file is committed to git, and writing it on every toggle would produce
+// a diff for a UI choice. The proxy path changes with each container but the
+// origin doesn't, so the preference still survives a container swap.
+//
+// Default is hidden: Done is only needed when moving cards in or out of it,
+// and the other five columns want the room.
+const SHOW_DONE_KEY = 'psact.showDone';
+let showDone = localStorage.getItem(SHOW_DONE_KEY) === '1';
 
 const boardEl = document.getElementById('board');
 const toastsEl = document.getElementById('toasts');
@@ -161,6 +178,17 @@ function buildColumnsScaffold() {
   }
 }
 
+// Done is built and rendered like any other column even while hidden, so
+// toggling it back on is a pure CSS flip with no re-fetch and no re-render.
+function applyDoneVisibility() {
+  const entry = columnEls[DONE_COLUMN];
+  if (entry) entry.root.classList.toggle('is-hidden', !showDone);
+  const btn = document.getElementById('doneToggle');
+  document.getElementById('doneToggleLabel').textContent =
+    showDone ? 'Hide Done' : 'Show Done';
+  btn.setAttribute('aria-pressed', String(showDone));
+}
+
 function attachColumnDnD(list, col) {
   list.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -232,7 +260,13 @@ function render() {
   diffBadge.textContent = state.diff.length;
   diffBadge.classList.toggle('zero', state.diff.length === 0);
 
+  const doneTotal = (state.board[DONE_COLUMN] || []).length;
+  const doneBadge = document.getElementById('doneCount');
+  doneBadge.textContent = doneTotal;
+  doneBadge.classList.toggle('zero', doneTotal === 0);
+
   for (const col of state.columns) renderColumn(col);
+  applyDoneVisibility();
 }
 
 function renderColumn(col) {
@@ -423,6 +457,11 @@ async function moveTicket(key, toColumn, toIndex) {
     state = fresh;
     render();
     flipPlay(rects);
+    // Without this the card simply vanishes - the move worked, but the column
+    // it landed in isn't on screen.
+    if (toColumn === DONE_COLUMN && !showDone) {
+      toast('info', `${key} moved to Done - that column is hidden`);
+    }
   } catch (err) {
     toast('error', `Couldn't save move for ${key}: ${err.message}`);
     await refreshFromServer(false);
@@ -675,6 +714,11 @@ commentOverlay.addEventListener('click', (e) => {
 });
 commentTextarea.addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') postComment();
+});
+document.getElementById('doneToggle').addEventListener('click', () => {
+  showDone = !showDone;
+  localStorage.setItem(SHOW_DONE_KEY, showDone ? '1' : '0');
+  applyDoneVisibility();
 });
 document.getElementById('searchBox').addEventListener('input', (e) => {
   filterText = e.target.value.trim();
