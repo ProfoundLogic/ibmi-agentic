@@ -23,9 +23,12 @@ featuresp.file: qddssrc/featuresp.pf
 products1l.file: qddssrc/products1l.lf | productsp.file
 products2l.file: qddssrc/products2l.lf | productsp.file
 
+# CL program: bridge from the demo menu to the PERP Demo menu
+goperp.pgm: qclsrc/goperp.clle
+
 # Message file and menu
 menu.msgf: menu.msgf
-menu.menu: menu.msgf | menu.file
+menu.menu: menu.msgf menu.file | goperp.pgm
 
 # Simple program
 hellor.pgm: qrpglesrc/hellor.rpgle qddssrc/hellod.dspf | hellod.file
