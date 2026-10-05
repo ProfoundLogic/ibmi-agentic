@@ -40,7 +40,50 @@ provisioned per-environment already, so a miss here means something is wrong
 with the environment itself, not this app; stop and report it rather than
 inventing credentials.
 
-## 2. Find the repo and install dependencies
+## 2. The short version: one command
+
+```bash
+bash tools/psact-kanban/start.sh      # or: cd tools/psact-kanban && npm run launch
+```
+
+That brings up code-server, installs dependencies if they're missing, starts
+the board detached, and prints the browser URL. Every step is a no-op if it's
+already done, so it's safe to re-run at any point.
+
+**It does not remove the "Open VS Code" click.** An earlier version of this
+runbook claimed it did; that was wrong, and the correction is worth stating
+plainly because the failure looks exactly like something the script should
+have handled.
+
+There are *two* gates between your browser and the board, not one:
+
+1. **code-server running in the container.** The script handles this, via
+   CoderFlow's own launcher `/usr/local/bin/start-code-server.sh` — same
+   binary and flags (`0.0.0.0:8080 --auth none`) the platform uses, documented
+   in that script as safe for a task to invoke directly. Nothing new is
+   exposed; container ports aren't externally reachable.
+2. **CoderFlow's own record that VS Code has been opened for this task.** This
+   is server-side state, and only the **Open VS Code** action in the CoderFlow
+   task UI sets it. Nothing inside the container can.
+
+Gate 2 is the one that bites. With code-server up and serving the board
+perfectly on `localhost:8080/proxy/4287/`, the external URL still answers:
+
+```
+Code-server not started for this task. Please click "Open VS Code" first.
+```
+
+So in a **new container**, the sequence is still: click *Open VS Code* once,
+then load the board URL. What the script does buy you is everything else -
+dependencies, a correctly detached server, and the URL printed for you - and
+it is worth running regardless. Getting rid of the click for good needs a
+CoderFlow-side change (auto-start code-server for tasks, or an API to register
+it), not a change in this repo.
+
+Steps 3 to 5 below are what the script does, kept for when you need to do it
+by hand or work out why it didn't.
+
+## 3. Find the repo and install dependencies
 
 ```bash
 find /workspace -maxdepth 4 -name .git   # confirms the repo root; layout has varied across containers
@@ -51,7 +94,7 @@ npm install
 `npm install` is required every time — `node_modules/` never survives a
 re-pull.
 
-## 3. Start the server, detached, and verify it's actually up
+## 4. Start the server, detached, and verify it's actually up
 
 The server must outlive the current shell/turn, so start it detached and
 confirm it's listening before moving on — don't just trust the log line.
@@ -83,7 +126,7 @@ sleep 1
 # then start fresh per the block above
 ```
 
-## 4. Get a browser-reachable URL
+## 5. Get a browser-reachable URL
 
 This container's ports aren't exposed to the internet directly. Reach it
 through the CoderFlow code-server proxy chain:
@@ -94,18 +137,18 @@ echo "${CODERFLOW_SERVER_URL}/tasks/${TASK_ID}/vscode/proxy/4287/"
 
 Two things that will bite you if skipped:
 
-- **Open the task's VS Code tab in the browser at least once first.**
-  code-server (and therefore this proxy path) only starts on demand, not
-  automatically at container boot. If the URL 404s or hangs, this is almost
-  always why.
+- **Click "Open VS Code" in the CoderFlow task UI once per container.**
+  This is the gate that actually blocks you — see step 2. `start.sh` starts
+  code-server inside the container but cannot set CoderFlow's server-side
+  record, and the proxy refuses until that is set.
 - **This URL is only valid for this container's lifetime.** A fresh re-pull
   into another container gets its own `TASK_ID` and needs the whole sequence
   above run again — there is no way to pre-generate a stable, permanent link.
 
-## 5. First load / what happens automatically
+## 6. First load / what happens automatically
 
 - If `data/board-state.json`'s `lastSyncedAt` is `null` (a genuinely fresh
-  board, or one that was reset per step 6), the frontend automatically fires
+  board, or one that was reset per step 7), the frontend automatically fires
   a "refresh from Jira" the moment the page loads — no manual click needed.
 - If `data/board-state.json` already carries synced data (committed from a
   prior session), the board renders that immediately; use the **Refresh from
@@ -114,19 +157,20 @@ Two things that will bite you if skipped:
   Push**. A freshly-started server with no interaction is 100% read-only
   toward Jira.
 
-## 6. Resetting board state (rare — only if asked, or the file looks corrupt)
+## 7. Resetting board state (rare — only if asked, or the file looks corrupt)
 
 ```bash
 fuser -k 4287/tcp   # stop it first
 rm tools/psact-kanban/data/board-state.json
-# then restart per step 3 — next load repopulates fresh from Jira, zero local edits
+# then restart per step 4 (or just re-run start.sh) — next load repopulates
+# fresh from Jira, zero local edits
 ```
 
 Only do this if the user asks for a clean slate or the JSON file is
 genuinely broken (fails to parse) — it discards every local column/order
 edit that hasn't been pushed to Jira.
 
-## 7. Verifying without a browser
+## 8. Verifying without a browser
 
 Useful when you can't (or don't want to) drive an actual browser:
 
@@ -139,13 +183,22 @@ A non-empty `diff` array in the response means there are local changes not
 yet pushed to Jira — normal mid-session, but worth noting if you're handing
 the board back to the user.
 
-## 8. What persists across containers vs. what doesn't
+## 9. What persists across containers vs. what doesn't
 
 | Persists (committed to git)              | Does not persist (redo every container) |
 |-------------------------------------------|------------------------------------------|
 | All code (`server.js`, `lib/`, `public/`) | `node_modules/` — run `npm install`      |
-| `data/board-state.json` (columns, local order, sync baseline, change log) | The running server process — run `npm start`/`node server.js` |
+| `data/board-state.json` (columns, local order, sync baseline, change log, cached comments) | The running server process — run `start.sh` |
+|                                            | code-server — `start.sh` starts the process, but CoderFlow's "VS Code opened" flag still needs the UI click |
 |                                            | The access URL — new `TASK_ID` each container |
+
+`data/board-state.json` also caches every ticket's comments, as flattened
+plain text, so the comment viewer opens instantly and works before the first
+refresh in a new container. That is most of the file's size — roughly 28 KB
+without comments and 43 KB with them at 25 tickets, and it re-churns on every
+sync. If that diff noise ever becomes a nuisance, the fix is to drop
+`comments` from the persisted state and fetch per-ticket on demand instead;
+nothing else depends on them being cached.
 
 The whole point of committing `data/board-state.json` is that your priority
 order and any not-yet-pushed pending changes survive a container swap. If
@@ -161,15 +214,46 @@ ends, whatever was pushed through the UI is already on the branch. Any other
 uncommitted app-code changes in the repo are untouched by this and still flow
 through the normal CoderFlow commit/approve path.
 
-## 9. Troubleshooting quick reference
+## 10. Troubleshooting quick reference
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `curl` gives `http_status=000` | server not running / crashed on start | check `/tmp/psact-kanban.log`; usually missing `JIRA_*` env vars |
 | `EADDRINUSE` on start | something already bound to the port | `fuser 4287/tcp` to find it, `fuser -k 4287/tcp` to free it, or `PORT=<other>` |
-| Proxy URL 404s or hangs | code-server not started for this task yet | open the task's VS Code tab once, retry |
+| `Code-server not started for this task. Please click "Open VS Code" first.` | CoderFlow's server-side flag for this task isn't set | Click **Open VS Code** in the task UI once, then reload. Not fixable from inside the container — `start.sh` cannot set it |
+| Proxy URL 404s or hangs | code-server not running in the container | `bash start.sh`, or `/usr/local/bin/start-code-server.sh` directly |
 | `/api/refresh` returns `{"error": "..."}` | Jira credentials missing/invalid, or PSACT unreachable | check the presence-only env checks in step 1; don't invent credentials |
-| Restarted the server but old data/behavior still shows | old process wasn't actually killed (see step 3's warning) | stop by port (`fuser -k <port>/tcp`), not by name/pattern match |
+| Restarted the server but old data/behavior still shows | old process wasn't actually killed (see step 4's warning) | stop by port (`fuser -k <port>/tcp`), not by name/pattern match |
+
+### Board state git sync fails but Jira is fine
+
+A green *"Pushed N changes to Jira"* followed by a warning that the board state
+could not be mirrored to git means exactly what it says: **the Jira work
+succeeded.** The two are independent — `/api/push` talks to Jira first, then
+calls `lib/gitSync.js` to commit and push `data/board-state.json`.
+
+The usual cause on a long-lived container is the credential helper's token
+expiring:
+
+```
+[coderflow-git-credential-helper] Git credential error (container_token_expired)
+```
+
+What that does and does not break:
+
+- **Jira is unaffected.** Status changes, labels and comments all landed.
+- **Board state is not lost.** The file is written to disk, and the commit
+  succeeds — it is only the `git push` that fails. Check with
+  `git status -sb` (it will say `ahead N`).
+- **It self-heals.** `git push` sends the whole backlog, so the next successful
+  sync pushes every waiting commit at once.
+- **The risk is container loss.** Unpushed commits live only in this container.
+  If it is discarded before they push, that board state goes with them — the
+  board simply repopulates from Jira on the next refresh, losing only local
+  column ordering.
+
+The remedy the helper suggests — fork the task into a new container — is the
+only way to get a fresh credential; it cannot be minted from inside.
 
 **Security note:** avoid `pgrep -af`, `ps aux` with full-command output, or
 similar broad process-line dumps in this environment when looking for this

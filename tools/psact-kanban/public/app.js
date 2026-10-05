@@ -26,6 +26,15 @@ const DONE_COLUMN = 'Done';
 //
 // Default is hidden: Done is only needed when moving cards in or out of it,
 // and the other five columns want the room.
+// Epics the board is filtered to. Empty = show everything. Several at once is
+// additive (a ticket matches if it is in ANY selected epic), which is what the
+// filter strip's multi-select implies.
+const selectedEpics = new Set();
+// Stand-in key for "has no epic at all". Without it, a ticket with no parent -
+// PSACT-85 is one right now - becomes unreachable the moment any epic filter
+// is on, with no pill that can bring it back.
+const NO_EPIC = '__no_epic__';
+
 const SHOW_DONE_KEY = 'psact.showDone';
 let showDone = localStorage.getItem(SHOW_DONE_KEY) === '1';
 
@@ -124,6 +133,11 @@ function pendingActionsFor(key) {
 }
 
 function matchesFilter(ticket) {
+  // Epic filter and text filter are AND-ed: narrowing by epic and typing a
+  // word should do both, not either.
+  if (selectedEpics.size && !selectedEpics.has(ticket.data.epicKey || NO_EPIC)) {
+    return false;
+  }
   if (!filterText) return true;
   const needle = filterText.toLowerCase();
   const haystack = [
@@ -247,6 +261,112 @@ document.addEventListener('dragend', () => {
   document.querySelectorAll('.column-list.drag-over').forEach((l) => l.classList.remove('drag-over'));
 });
 
+/* ---------- epic filter strip ---------- */
+const epicFilterEl = document.getElementById('epicFilter');
+
+// "PSACT-11" must sort after "PSACT-4". A plain string sort gives
+// 1, 11, 21, 4, 5 - which is exactly what this board produces.
+function epicNumber(key) {
+  const m = /-(\d+)\s*$/.exec(key || '');
+  return m ? Number(m[1]) : Number.MAX_SAFE_INTEGER;
+}
+
+// Built from the columns actually on screen, so hiding Done also drops any
+// epic that only lives there - a pill that filters to nothing is worse than
+// no pill.
+function epicsOnBoard() {
+  const names = new Map();
+  let noEpic = 0;
+  for (const col of state.columns) {
+    if (col === DONE_COLUMN && !showDone) continue;
+    for (const t of state.board[col] || []) {
+      const key = t.data.epicKey;
+      if (key) {
+        if (!names.has(key)) names.set(key, t.data.epicName || '');
+      } else {
+        noEpic += 1;
+      }
+    }
+  }
+  const list = [...names.entries()].sort((a, b) => epicNumber(a[0]) - epicNumber(b[0]));
+  return { list, noEpic };
+}
+
+// Publish the real height of everything above the board, so the board's and
+// columns' viewport-based heights can subtract it instead of guessing.
+//
+// Both parts have to be measured rather than hardcoded because both wrap: the
+// filter strip goes to a second row on a narrow window, and the topbar's
+// controls do the same (52px -> 92px at ~1100px). The old hardcoded 60px for
+// the topbar was already wrong at that width - the page carried a 32px
+// scrollbar before this strip existed - so measuring fixes that too.
+function syncChromeHeight() {
+  const topbar = document.querySelector('.topbar');
+  const h = Math.round(
+    (topbar ? topbar.getBoundingClientRect().height : 0) +
+    epicFilterEl.getBoundingClientRect().height
+  );
+  document.documentElement.style.setProperty('--chrome-h', `${h}px`);
+}
+if (typeof ResizeObserver === 'function') {
+  const ro = new ResizeObserver(syncChromeHeight);
+  ro.observe(epicFilterEl);
+  const tb = document.querySelector('.topbar');
+  if (tb) ro.observe(tb);
+}
+
+function renderEpicFilter() {
+  const { list, noEpic } = epicsOnBoard();
+
+  // Drop selections for epics that are no longer on the board (a refresh moved
+  // the last ticket out, or Done got hidden). Leaving them selected would
+  // silently filter the board down to nothing.
+  const live = new Set(list.map(([k]) => k));
+  if (noEpic) live.add(NO_EPIC);
+  for (const k of [...selectedEpics]) if (!live.has(k)) selectedEpics.delete(k);
+
+  epicFilterEl.innerHTML = '';
+
+  const chips = list.map(([key, name]) => ({
+    key,
+    text: name ? `${key} \u00b7 ${name}` : key,
+  }));
+  if (noEpic) chips.push({ key: NO_EPIC, text: `No epic (${noEpic})` });
+
+  for (const c of chips) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    // Same `pill` class the cards use, so the chip and the pill on the ticket
+    // are visually the same object.
+    b.className = 'pill epic-chip';
+    b.textContent = c.text;
+    const on = selectedEpics.has(c.key);
+    b.classList.toggle('is-on', on);
+    b.setAttribute('aria-pressed', String(on));
+    b.addEventListener('click', () => {
+      if (selectedEpics.has(c.key)) selectedEpics.delete(c.key);
+      else selectedEpics.add(c.key);
+      render();
+    });
+    epicFilterEl.appendChild(b);
+  }
+
+  const clear = document.createElement('button');
+  clear.type = 'button';
+  clear.className = 'pill epic-chip epic-chip-clear';
+  clear.textContent = selectedEpics.size
+    ? `Clear filters (${selectedEpics.size})`
+    : 'Clear filters';
+  clear.disabled = selectedEpics.size === 0;
+  clear.addEventListener('click', () => {
+    selectedEpics.clear();
+    render();
+  });
+  epicFilterEl.appendChild(clear);
+
+  syncChromeHeight();
+}
+
 /* ---------- rendering ---------- */
 function render() {
   document.getElementById('userChip').textContent = state.currentUser
@@ -265,6 +385,7 @@ function render() {
   doneBadge.textContent = doneTotal;
   doneBadge.classList.toggle('zero', doneTotal === 0);
 
+  renderEpicFilter();
   for (const col of state.columns) renderColumn(col);
   applyDoneVisibility();
 }
@@ -273,7 +394,8 @@ function renderColumn(col) {
   const { list, count } = columnEls[col];
   const all = state.board[col] || [];
   const entries = all.filter(matchesFilter);
-  count.textContent = filterText ? `${entries.length}/${all.length}` : all.length;
+  const filtering = Boolean(filterText) || selectedEpics.size > 0;
+  count.textContent = filtering ? `${entries.length}/${all.length}` : all.length;
 
   list.innerHTML = '';
   if (entries.length === 0) {
@@ -308,6 +430,18 @@ function buildCard(ticket, col, idx, total) {
   node.querySelector('.comment-btn').addEventListener('click', (e) => {
     e.stopPropagation();
     openCommentModal(ticket.key, data.summary);
+  });
+
+  const viewBtn = node.querySelector('.view-comments-btn');
+  const nComments = (data.comments || []).length;
+  viewBtn.querySelector('.vc-count').textContent = nComments;
+  viewBtn.classList.toggle('is-empty', nComments === 0);
+  viewBtn.title = nComments
+    ? `View ${nComments} comment${nComments === 1 ? '' : 's'}`
+    : 'No comments yet';
+  viewBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openViewComments(ticket.key);
   });
 
   const discardBtn = node.querySelector('.discard-btn');
@@ -629,10 +763,25 @@ async function pushSelected() {
     }
 
     if (resp.gitSync && resp.gitSync.attempted) {
-      if (resp.gitSync.success) {
+      const g = resp.gitSync;
+      if (g.success) {
         toast('success', 'Board state committed and pushed to git');
+      } else if (g.committed) {
+        // The Jira push already succeeded and the board state is committed
+        // locally - only the mirror to the remote failed. That is a warning,
+        // not an error, and the old red toast full of raw git stderr made it
+        // look as though the whole operation had failed.
+        const waiting = g.unpushed
+          ? `${g.unpushed} commit${g.unpushed === 1 ? '' : 's'} waiting`
+          : 'waiting to push';
+        const why = g.expiredCredential
+          ? "this container's git credential has expired - fork the task for a fresh one"
+          : g.error.split('\n')[0];
+        toast('warn',
+          `Jira updated. Board state saved and committed locally but not mirrored to git (${waiting}): ${why}. The next successful sync pushes the backlog.`,
+          9000);
       } else {
-        toast('error', `Board state git sync failed: ${resp.gitSync.error}`, 8000);
+        toast('error', `Board state could not be saved to git: ${g.error}`, 9000);
       }
     }
   } catch (err) {
@@ -691,6 +840,101 @@ async function postComment() {
   }
 }
 
+/* ---------- comment viewer ---------- */
+const viewOverlay = document.getElementById('viewCommentsOverlay');
+const viewBody = document.getElementById('viewCommentsBody');
+const viewTitle = document.getElementById('viewCommentsTitle');
+const viewNote = document.getElementById('viewCommentsNote');
+const viewJiraLink = document.getElementById('viewCommentsJiraLink');
+let viewTargetKey = null;
+
+function findTicket(key) {
+  for (const col of state.columns) {
+    const hit = (state.board[col] || []).find((t) => t.key === key);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+// Jira hands back an ISO timestamp; show it in the reader's own locale rather
+// than raw, but keep the full value in a tooltip.
+function commentStamp(iso) {
+  const d = new Date(iso);
+  return isNaN(d) ? iso : d.toLocaleString();
+}
+
+function openViewComments(key) {
+  const ticket = findTicket(key);
+  if (!ticket) return;
+  const data = ticket.data || {};
+  const comments = data.comments || [];
+
+  viewTargetKey = key;
+  viewTitle.textContent = `${key} — ${comments.length} comment${comments.length === 1 ? '' : 's'}`;
+  viewJiraLink.href = data.url || '#';
+
+  const shortfall = (data.commentTotal || comments.length) - comments.length;
+  viewNote.textContent = shortfall > 0
+    ? `Jira returned the ${comments.length} most recent of ${data.commentTotal}. Open in Jira for the full thread.`
+    : '';
+
+  viewBody.innerHTML = '';
+
+  if (!comments.length) {
+    const empty = document.createElement('div');
+    empty.className = 'diff-empty';
+    empty.textContent = 'No comments on this ticket yet.';
+    viewBody.appendChild(empty);
+  } else {
+    // Oldest first - Jira already returns them that way, but sort rather than
+    // trust it, so the order is right regardless of what the API does.
+    const ordered = comments
+      .slice()
+      .sort((a, b) => new Date(a.created) - new Date(b.created));
+
+    for (const c of ordered) {
+      const item = document.createElement('article');
+      item.className = 'vc-item';
+
+      const head = document.createElement('div');
+      head.className = 'vc-head';
+      const who = document.createElement('span');
+      who.className = 'vc-author';
+      who.textContent = c.author;
+      const when = document.createElement('time');
+      when.className = 'vc-when';
+      when.textContent = commentStamp(c.created);
+      when.title = c.created;
+      head.append(who, when);
+      if (c.updated) {
+        const edited = document.createElement('span');
+        edited.className = 'vc-edited';
+        edited.textContent = 'edited';
+        edited.title = `Last edited ${commentStamp(c.updated)}`;
+        head.appendChild(edited);
+      }
+
+      const body = document.createElement('div');
+      body.className = 'vc-text';
+      // textContent, never innerHTML: comment text is other people's input.
+      // white-space: pre-wrap in the CSS preserves the line breaks.
+      body.textContent = c.text || '(empty comment)';
+
+      item.append(head, body);
+      viewBody.appendChild(item);
+    }
+  }
+
+  viewOverlay.hidden = false;
+  // Long threads: show the newest first on screen by scrolling to the bottom.
+  viewBody.scrollTop = viewBody.scrollHeight;
+}
+
+function closeViewComments() {
+  viewOverlay.hidden = true;
+  viewTargetKey = null;
+}
+
 /* ---------- wiring ---------- */
 document.getElementById('refreshBtn').addEventListener('click', () => refreshFromServer(true));
 document.getElementById('reviewBtn').addEventListener('click', openReviewModal);
@@ -715,10 +959,24 @@ commentOverlay.addEventListener('click', (e) => {
 commentTextarea.addEventListener('keydown', (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') postComment();
 });
+document.getElementById('viewCommentsClose').addEventListener('click', closeViewComments);
+viewOverlay.addEventListener('click', (e) => {
+  if (e.target === viewOverlay) closeViewComments();
+});
+document.getElementById('viewCommentsAdd').addEventListener('click', () => {
+  const key = viewTargetKey;
+  const ticket = key && findTicket(key);
+  closeViewComments();
+  if (ticket) openCommentModal(key, (ticket.data || {}).summary);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !viewOverlay.hidden) closeViewComments();
+});
 document.getElementById('doneToggle').addEventListener('click', () => {
   showDone = !showDone;
   localStorage.setItem(SHOW_DONE_KEY, showDone ? '1' : '0');
   applyDoneVisibility();
+  renderEpicFilter();
 });
 document.getElementById('searchBox').addEventListener('input', (e) => {
   filterText = e.target.value.trim();

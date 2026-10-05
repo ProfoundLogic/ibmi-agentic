@@ -34,21 +34,52 @@ function run(cmd, args) {
 // was no longer visible to CoderFlow as pending work. Both the add AND the
 // commit are therefore pathspec-scoped; the commit pathspec is the one that
 // actually guarantees it.
+// How many commits are sitting locally that the remote has not got. Used to
+// tell the user how much is waiting when a push fails.
+async function unpushedCount() {
+  try {
+    const r = await run('git', ['rev-list', '--count', '@{u}..HEAD']);
+    return Number(r.stdout.trim()) || 0;
+  } catch {
+    return 0; // no upstream configured, or the ref is unreadable - not worth failing over
+  }
+}
+
+// CoderFlow's credential helper mints a short-lived Git token per container.
+// On a long-lived container it expires, and from then on commits still work
+// but pushes do not. The helper says so in its own words, so match on that.
+function isExpiredCredential(text) {
+  return /container_token_expired|credential has expired|could not read Username/i.test(text || '');
+}
+
 async function commitAndPushBoardState(summary) {
+  // Which step we are on, so a failure can say whether anything was saved.
+  let step = 'check';
   try {
     const status = await run('git', ['status', '--porcelain', '--', BOARD_STATE_REL]);
     if (!status.stdout.trim()) return { attempted: false };
 
+    step = 'commit';
     await run('git', ['add', '--', BOARD_STATE_REL]);
     // The trailing pathspec is load-bearing - see the note above.
     await run('git', ['commit', '-m', `psact-kanban: ${summary}`, '--', BOARD_STATE_REL]);
+
+    step = 'push';
     await run('git', ['push']);
     return { attempted: true, success: true };
   } catch (err) {
+    const error = (err.stderr && err.stderr.trim()) || err.message;
     return {
       attempted: true,
       success: false,
-      error: (err.stderr && err.stderr.trim()) || err.message,
+      // 'push' means the commit landed and only the mirror to the remote
+      // failed - the board state is not lost, and `git push` sends the whole
+      // backlog, so the next successful sync clears it.
+      step,
+      committed: step === 'push',
+      unpushed: step === 'push' ? await unpushedCount() : 0,
+      expiredCredential: isExpiredCredential(error),
+      error,
     };
   }
 }

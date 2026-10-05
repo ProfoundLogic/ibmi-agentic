@@ -15,6 +15,12 @@
   --col-waiting: #6554c0;
   --col-done: #00875a;
   --radius: 8px;
+  /* Combined height of the topbar and the epic filter strip, measured and set
+     by app.js. The board's and columns' heights are viewport-based, so what
+     sits above them has to come out of those sums or the page gains a
+     scrollbar. Measured rather than hardcoded because both wrap on a narrow
+     window - the previous hardcoded 60px topbar was already wrong at ~1100px. */
+  --chrome-h: 60px;
   --shadow: 0 1px 2px rgba(9, 30, 66, 0.15), 0 0 1px rgba(9, 30, 66, 0.31);
   --shadow-lift: 0 8px 16px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31);
 }
@@ -114,13 +120,54 @@ h1 { font-size: 18px; margin: 0; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ---- epic filter strip ---- */
+.epic-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px 0;
+}
+
+/* Inherits .pill, so a chip is the same object as the epic pill on a card.
+   Only the interactive bits are added here. .pill caps itself at max-width
+   100% with an ellipsis; in the strip the container is the full window, so
+   the epic name shows in full rather than truncating as it does on a card. */
+.epic-chip {
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1.6;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.epic-chip:hover { background: #dfe3ea; color: var(--text); }
+.epic-chip.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.epic-chip.is-on:hover { background: var(--accent-dark); color: #fff; }
+
+.epic-chip-clear {
+  margin-left: 4px;
+  border-style: dashed;
+}
+.epic-chip-clear:not(:disabled) {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.epic-chip-clear:not(:disabled):hover { background: #fff0ed; color: var(--danger); }
+/* Kept in place rather than hidden when nothing is selected, so the strip
+   does not reflow every time the last filter comes off. */
+.epic-chip-clear:disabled { opacity: 0.4; cursor: default; }
+
 .board {
   display: flex;
   gap: 14px;
   padding: 16px;
   overflow-x: auto;
   align-items: flex-start;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - var(--chrome-h));
 }
 
 .column {
@@ -140,7 +187,7 @@ h1 { font-size: 18px; margin: 0; }
   max-width: 420px;
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 92px);
+  max-height: calc(100vh - var(--chrome-h) - 32px);
   border-top: 4px solid var(--col-color, var(--accent));
 }
 
@@ -245,7 +292,84 @@ h1 { font-size: 18px; margin: 0; }
   padding: 2px 9px;
 }
 .card-top .comment-btn:hover { background: #e37f00; color: #fff; }
+/* Sits next to the (orange, add-a-comment) Comment button, so it is
+   deliberately quiet - outlined rather than filled - to keep "read"
+   subordinate to "write".
+   
+   A drawn speech bubble rather than a word or an emoji: a "Comments" label
+   pushed the card header onto two lines on 16 of 25 cards at a 318px column
+   and overflowed the card entirely at 263px, and emoji render as empty boxes
+   in this environment (no colour-emoji font). An inline SVG has neither
+   problem and keeps the control ~34px wide. */
+.card-top .view-comments-btn {
+  font-size: 10.5px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 1px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
+}
+.card-top .view-comments-btn .vc-icon {
+  width: 11px;
+  height: 11px;
+  display: block;
+  flex: none;
+}
+.card-top .view-comments-btn:hover { background: var(--bg); color: var(--text); }
+.card-top .view-comments-btn .vc-count {
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+/* A ticket with no discussion should read as such at a glance, without
+   having to open it. Still clickable - the modal says so explicitly. */
+.card-top .view-comments-btn.is-empty { opacity: 0.45; }
+
 .card-top .discard-btn { margin-left: auto; }
+
+/* ---- comment viewer ---- */
+.vc-item {
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+}
+.vc-item:first-child { padding-top: 0; }
+.vc-item:last-child { border-bottom: none; padding-bottom: 0; }
+.vc-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+.vc-author { font-size: 12.5px; font-weight: 600; color: var(--text); }
+.vc-when { font-size: 11px; color: var(--muted); }
+.vc-edited {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 5px;
+}
+.vc-text {
+  font-size: 13px;
+  line-height: 1.45;
+  /* Comments are flattened to plain text server-side, so the line breaks in
+     them are all the structure there is - preserve them, and let long URLs
+     wrap rather than force the modal wide. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.vc-note {
+  font-size: 11.5px;
+  color: var(--warn);
+  max-width: 55%;
+}
 
 .card-summary {
   font-size: 13px;
@@ -358,6 +482,9 @@ h1 { font-size: 18px; margin: 0; }
 }
 .toast.error { background: var(--danger); }
 .toast.success { background: var(--ok); }
+/* Something non-fatal happened alongside a successful operation - e.g. Jira
+   accepted the change but the board-state git mirror could not push. */
+.toast.warn { background: var(--warn); color: #241c00; }
 .toast.leaving { animation: toast-out 0.2s ease forwards; }
 @keyframes toast-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes toast-out { to { opacity: 0; transform: translateX(16px); } }

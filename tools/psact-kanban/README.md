@@ -9,6 +9,26 @@ pushed to Jira until you explicitly say so.
 - Pulls PSACT tickets that are either assigned to you or unassigned (never
   Cancelled). Done tickets drop off the board automatically 7 days after
   their last update.
+- **Start it with `bash start.sh`** (or `npm run launch`) — one idempotent
+  command that brings up code-server, installs dependencies, starts the board
+  and prints the browser URL. In a new container you **also** have to click
+  **Open VS Code** in the CoderFlow task UI once: that gate is CoderFlow's own
+  server-side state and nothing in the container can set it. See `RUNBOOK.md`
+  step 2.
+- **Epic filter strip** across the top of the board: one chip per epic
+  currently on the board, styled as the same pill the cards carry. Click to
+  filter; several chips at once is **additive** (a ticket shows if it is in any
+  selected epic), and it AND-s with the text box. A **No epic** chip appears
+  only when a parentless ticket is on the board, so those stay reachable. The
+  **Clear filters** chip at the end resets it. Column counts switch to
+  `shown/total` while any filter is active. Filtering is entirely client-side -
+  no Jira calls.
+- **Comments.** Every card carries a small speech-bubble button with the
+  comment count; clicking it opens the thread oldest-first, with author and
+  timestamp. **Refresh from Jira** pulls comments along with everything else,
+  so the viewer is instant and makes no request of its own. Comment bodies are
+  flattened from Jira's ADF to plain text server-side (`lib/adfText.js`) -
+  attachments show as `[attachment: name]` rather than disappearing.
 - Board columns: **Unassigned | To Do | In Progress | On Hold | Waiting | Done**.
 - **Done is hidden by default.** The **Show Done / Hide Done** button in the
   top bar toggles it, and the badge on that button is the Done count, so you

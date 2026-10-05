@@ -1,6 +1,7 @@
 'use strict';
 
 const { PROJECT_KEY } = require('./config');
+const { adfToText } = require('./adfText');
 
 const FIELDS = [
   'summary',
@@ -13,6 +14,11 @@ const FIELDS = [
   'issuetype',
   'updated',
   'created',
+  // Comments come back on the search response itself, so reading them costs
+  // no extra requests - no per-issue fetch, no N+1. Jira returns them oldest
+  // first, which is the order the board wants, and caps how many it embeds
+  // per issue (see normalizeComments for how a cap is surfaced).
+  'comment',
 ];
 
 function requireEnv() {
@@ -107,9 +113,31 @@ async function searchMineAndUnassigned(accountId) {
   return issues.map(normalizeIssue);
 }
 
+// Jira embeds only the most recent slice of a long comment thread in the
+// search response. When that happens we keep what we were given and record
+// the shortfall, so the UI can say "showing 20 of 34" rather than silently
+// presenting a partial thread as if it were complete.
+function normalizeComments(commentField) {
+  const c = commentField || {};
+  const list = c.comments || [];
+  return {
+    comments: list.map((x) => ({
+      id: x.id,
+      author: (x.author && x.author.displayName) || 'Unknown',
+      created: x.created,
+      updated: x.updated && x.updated !== x.created ? x.updated : null,
+      text: adfToText(x.body),
+    })),
+    commentTotal: typeof c.total === 'number' ? c.total : list.length,
+  };
+}
+
 function normalizeIssue(issue) {
   const f = issue.fields || {};
+  const { comments, commentTotal } = normalizeComments(f.comment);
   return {
+    comments,
+    commentTotal,
     key: issue.key,
     url: null, // filled in by caller (needs baseUrl, which is server-side only)
     summary: f.summary || '',
