@@ -1,0 +1,23 @@
+/* ------------------------------------------------------------------------- */
+/*  PRATTPO - menu launcher for the Pratt Purchase Order application.         */
+/*                                                                           */
+/*  POAPPUICL refuses to run unless the PUI_IS_GENIE environment variable is  */
+/*  '1', because in Pratt's system the app hands off to green screens through */
+/*  Genie macros.  This launcher sets the variable for the job and then calls */
+/*  their CL unchanged, with blank key fields so it opens on the PO search    */
+/*  screen (POSELUI).                                                        */
+/* ------------------------------------------------------------------------- */
+  PGM
+  DCL        VAR(&OHYY) TYPE(*CHAR) LEN(2) VALUE(' ')
+  DCL        VAR(&OH#P) TYPE(*DEC) LEN(6 0) VALUE(0)
+
+  ADDENVVAR  ENVVAR(PUI_IS_GENIE) VALUE('1') LEVEL(*JOB) REPLACE(*YES)
+  MONMSG     MSGID(CPF0000)
+
+  CALL       PGM(POAPPUICL) PARM((&OHYY) (&OH#P))
+  MONMSG     MSGID(CPF0000) EXEC(DO)
+     SNDPGMMSG  MSG('Purchase Order application ended unexpectedly - +
+                  see the job log.') MSGTYPE(*INFO)
+  ENDDO
+
+  ENDPGM

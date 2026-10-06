@@ -1,0 +1,20 @@
+/* ------------------------------------------------------------------------- */
+/*  PRATTREQ - menu launcher for the Pratt Material Requisition application.  */
+/*                                                                           */
+/*  Same PUI_IS_GENIE requirement as PRATTPO.  Blank key fields open the      */
+/*  requisition search screen (PMSELUI).                                     */
+/* ------------------------------------------------------------------------- */
+  PGM
+  DCL        VAR(&OMYY) TYPE(*CHAR) LEN(2) VALUE(' ')
+  DCL        VAR(&OMREQP) TYPE(*DEC) LEN(6 0) VALUE(0)
+
+  ADDENVVAR  ENVVAR(PUI_IS_GENIE) VALUE('1') LEVEL(*JOB) REPLACE(*YES)
+  MONMSG     MSGID(CPF0000)
+
+  CALL       PGM(PMAPPUICL) PARM((&OMYY) (&OMREQP))
+  MONMSG     MSGID(CPF0000) EXEC(DO)
+     SNDPGMMSG  MSG('Material Requisition application ended unexpectedly - +
+                  see the job log.') MSGTYPE(*INFO)
+  ENDDO
+
+  ENDPGM

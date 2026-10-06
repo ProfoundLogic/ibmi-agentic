@@ -1,0 +1,48 @@
+/* ---------------------------------------------------------------------------
+ * pratt_theme_fix.css  -  SECONDARY.  Read this before relying on it.
+ *
+ * The Genie skin on this instance switches to a dark palette under
+ * @media (prefers-color-scheme: dark) and repaints every div and span:
+ *
+ *   .genie-form--screen p, .genie-form--screen div { color: var(--color--text--primary) }
+ *
+ * In dark mode that is #dedede, so text goes near-white on panels that stay
+ * white - their background comes from Profound UI's stylesheet, not the skin.
+ * The selector scores (0,1,1) and outranks a plain `.label` at (0,1,0).
+ *
+ * The rules below score (0,2,1) and should win.  They did not, in the real
+ * browser: after shipping them the search-panel labels were still white.  Either
+ * this file is not reaching the page, or Genie's actual wrapper class differs
+ * from the one the skin's own CSS implies.  I could not determine which from
+ * inside the container - the proxy answers the agent HTTP 401.
+ *
+ * So the ACTUAL fix is not here.  tools/wire_assets.py sets a `color` widget
+ * property on every label, output field and entry field that does not already
+ * carry one.  Profound UI declares `color` as a `g:"css"` property, so the
+ * runtime renders it as an INLINE style, which nothing in any stylesheet can
+ * outrank.  Verified by serving a 404 for this file and confirming the labels
+ * still compute rgb(51,51,51).
+ *
+ * This file is kept as a net for anything a future screen adds without going
+ * through wire_assets.py, and because it may well be correct on a host where the
+ * wrapper class matches.  Do not assume it is doing any work here.
+ * --------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  .genie-form--screen div.label,
+  .genie-form--screen span.label {
+    color: rgb(51, 51, 51);
+  }
+
+  .genie-form--screen div.outputField,
+  .genie-form--screen span.outputField,
+  .genie-form--screen div.outputFieldClear,
+  .genie-form--screen span.outputFieldClear,
+  .genie-form--screen div.outputFieldOv,
+  .genie-form--screen span.outputFieldOv,
+  .genie-form--screen input.input,
+  .genie-form--screen input.search,
+  .genie-form--screen input.comboInput,
+  .genie-form--screen textarea {
+    color: #212121;
+  }
+}

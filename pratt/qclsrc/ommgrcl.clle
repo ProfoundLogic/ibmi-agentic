@@ -1,0 +1,28 @@
+  PGM        PARM(&UPDAT)
+  DCL        VAR(&UPDAT) TYPE(*CHAR) LEN(1)
+  DCL        VAR(&ISGENIE) TYPE(*CHAR)
+  DCL        VAR(&CHOICE) TYPE(*CHAR) LEN(16)
+  DCL        VAR(&OMYY) TYPE(*CHAR) LEN(2) VALUE(' ')
+  DCL        VAR(&OMREQ) TYPE(*DEC) LEN(6) VALUE(0)
+
+  RTVENVVAR  ENVVAR(PUI_IS_GENIE) RTNVAL(&ISGENIE)
+  IF         COND(&ISGENIE='1') THEN(DO)
+     PMTOPRCL   RTNVAR(&CHOICE) LEN(1) PROMPT('Which Application') +
+                   LINE1('M=Manager') LINE2('A=App') LINE4('X=eXit') +
+                   DFT(M) VALUES(M A X)
+     IF         COND(%SST(&CHOICE 1 1) = X) THEN(RETURN)
+     IF         COND(%SST(&CHOICE 1 1) = M) THEN(DO)
+        CALL       PGM(OMMGRCLO) PARM(&UPDAT)
+        RETURN
+     ENDDO
+     IF         COND(%SST(&CHOICE 1 1) = A) THEN(DO)
+        CALL       PGM(PMAPPUICL) PARM(&OMYY &OMREQ)
+        RETURN
+     ENDDO
+  ENDDO
+  ELSE       CMD(DO)
+     CALL       PGM(OMMGRCLO) PARM(&UPDAT)
+     RETURN
+  ENDDO
+
+  ENDPGM

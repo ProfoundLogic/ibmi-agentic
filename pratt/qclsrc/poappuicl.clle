@@ -1,0 +1,64 @@
+  PGM        PARM(&OHYY &OH#P)
+  DCLPRCOPT  DFTACTGRP(*NO)  ACTGRP(*NEW)
+  DCL        VAR(&OHYY) TYPE(*CHAR) LEN(2)
+  DCL        VAR(&OH#P) TYPE(*DEC) LEN(6)
+  DCL        VAR(&OH#) TYPE(*CHAR) LEN(6)
+  DCL        VAR(&LOAD) TYPE(*CHAR) LEN(1) VALUE(Y)
+  DCL        VAR(&ISGENIE) TYPE(*CHAR)
+  DCL        VAR(&EOJ) TYPE(*CHAR) LEN(1)
+/*   DCL        VAR(&START) TYPE(*CHAR) LEN(1) VALUE(N)                                           */
+/*   DCL        VAR(&USER) TYPE(*CHAR) LEN(10)                                                    */
+/*   DCL        VAR(&LVL) TYPE(*CHAR) LEN(10)                                                     */
+  DCL        VAR(&NN) TYPE(*CHAR) LEN(2)
+  DCL        VAR(&WH) TYPE(*CHAR) LEN(2)
+  DCL        VAR(&SIZE) TYPE(*CHAR) LEN(5) VALUE('00001')
+  DCL        VAR(&RET) TYPE(*CHAR) LEN(5) VALUE('00001')
+
+/*   RTVJOBA    USER(&USER)                                                                       */
+  /* Determine level of user */
+/*   CALL       PGM(USRRTV) PARM(&USER POAPPUI &LVL)                                              */
+/*   IF         COND(&LVL = PGMR) THEN(DO)                                                        */
+/*      CHGVAR     VAR(&START) VALUE(Y)                                                           */
+/*   ENDDO                                                                                        */
+/*   ELSE       CMD(DO)                                                                           */
+/*      SNDMSGDLY  M('You are not authorized for the Purchase Order App.') D(3)                   */
+/*      RETURN                                                                                    */
+/*   ENDDO                                                                                        */
+/*   PUISETENV  /* sets env vars if running GENIE */
+/* --- RECONSTRUCTION CHANGE -------------------------------------------- */
+/*  The Genie gate below is commented out.  It depends on two site specific  */
+/*  commands that were not part of the bundle and do not exist here:         */
+/*    - RTVENVVAR with an RTNVAL keyword (QGPL has an RTVENVVAR, but its     */
+/*      parameter names differ, so the original line will not compile)       */
+/*    - SNDMSGDLY (not present in any library on this system)                */
+/*  PRATTPO / PRATTREQ still set PUI_IS_GENIE before calling, so restoring   */
+/*  the gate is a matter of uncommenting these four lines once the two       */
+/*  commands are available.                                                  */
+/* RTVENVVAR  ENVVAR(PUI_IS_GENIE) RTNVAL(&ISGENIE)                        */
+/* IF         COND(&ISGENIE *NE '1') THEN(DO)                              */
+/*    SNDMSGDLY  M('This program must be used from Genie') D(3)            */
+/*    RETURN                                                               */
+/* ENDDO                                                                   */
+/* ---------------------------------------------------------------------- */
+/*   IF         COND(&START = N) THEN(RETURN)                                                     */
+  CALL       PGM(RTVUNN) PARM(&NN)
+  CALL       PGM(WHUSR) PARM(&WH)
+START:
+  OVRDBF     FILE(ORHDRL4) WAITRCD(5)
+  OVRDBF     FILE(ORHTX) WAITRCD(5)
+  OVRDBF     FILE(ORITML5) WAITRCD(5)
+  OVRDBF     FILE(ORITX) WAITRCD(5)
+
+  /* OHYY,OH# both blank = Selection */
+  /* OHYY not blank, OH# blank = New PO */
+  /* OHYY, OH# both not blank = Detail */
+  IF         COND(%TRIM(&OHYY) = ' ') THEN(DO)
+     CALL       PGM(POSELUI) PARM((&EOJ) (&LOAD) (&NN) (&WH))
+  ENDDO
+  ELSE       CMD(DO)
+     CHGVAR     VAR(&OH#) VALUE(&OH#P)
+     CALL       PGM(PODTLUI) PARM((&EOJ) (&RET) (&SIZE) (&OHYY) (&OH#))
+     IF         COND(&RET ¬= '00000') THEN(GOTO START)
+  ENDDO
+  RETURN
+  ENDPGM
