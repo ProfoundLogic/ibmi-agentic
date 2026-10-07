@@ -6,29 +6,33 @@
     "avatarUrl": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/615afb5dd9820f0070a0864e/1432e186-a20e-402f-b70e-ab659ed120ca/32",
     "email": "gjones@profoundlogic.com"
   },
-  "lastSyncedAt": "2026-10-06T21:52:00.137Z",
+  "lastSyncedAt": "2026-10-07T19:56:04.282Z",
   "columns": {
     "Unassigned": [
       "PSACT-37",
-      "PSACT-32"
+      "PSACT-32",
+      "PSACT-92",
+      "PSACT-91"
     ],
     "To Do": [
-      "PSACT-22"
+      "PSACT-22",
+      "PSACT-90"
     ],
     "In Progress": [
-      "PSACT-89",
-      "PSACT-88"
+      "PSACT-88",
+      "PSACT-94"
     ],
     "Waiting": [
       "PSACT-38",
       "PSACT-15",
       "PSACT-12",
-      "PSACT-55",
-      "PSACT-78"
+      "PSACT-78",
+      "PSACT-55"
     ],
     "Done": [
       "PSACT-85",
-      "PSACT-70"
+      "PSACT-70",
+      "PSACT-89"
     ],
     "On Hold": [
       "PSACT-10"
@@ -541,13 +545,20 @@
             "created": "2026-10-06T13:57:44.691+0000",
             "updated": null,
             "text": "Loaded up their samples and had CF build the screens as best it can understand."
+          },
+          {
+            "id": "77092",
+            "author": "Gary Jones",
+            "created": "2026-10-07T19:55:59.523+0000",
+            "updated": null,
+            "text": "Met with Isaac and Brian on what's been achieved so far. Will add some PAI pop-ups with EJS styling if possible before next week. Isaac researching additional pain points that were leading them to look at AWS AI DLC that CF cannot do. Reworking the slides to remove the PAI pieces."
           }
         ],
-        "commentTotal": 4,
+        "commentTotal": 5,
         "key": "PSACT-88",
         "url": "https://plogic.atlassian.net/browse/PSACT-88",
         "summary": "Pratt Industries - CoderFlow demo (Wed 14 Oct, 14:00-15:30 ET)",
-        "status": "To Do",
+        "status": "In Progress",
         "assigneeAccountId": "615afb5dd9820f0070a0864e",
         "assigneeName": "Gary Jones",
         "priority": "Medium",
@@ -559,21 +570,43 @@
         "epicKey": "PSACT-1",
         "epicName": "Customer Demos",
         "issuetype": "Task",
-        "updated": "2026-10-06T13:57:44.691+0000",
+        "updated": "2026-10-07T19:55:59.523+0000",
         "created": "2026-10-02T11:40:20.160+0000"
       }
     },
     "PSACT-89": {
-      "baselineColumn": "In Progress",
+      "baselineColumn": "Done",
       "conflict": false,
       "conflictInfo": null,
       "data": {
-        "comments": [],
-        "commentTotal": 0,
+        "comments": [
+          {
+            "id": "77064",
+            "author": "Gary Jones",
+            "created": "2026-10-06T22:50:12.398+0000",
+            "updated": null,
+            "text": "Taken this as far as possible. Have pulled Alex in to work out why I'm having EJS development issues when testing in the Genie proxy."
+          },
+          {
+            "id": "77074",
+            "author": "Gary Jones",
+            "created": "2026-10-07T13:13:44.323+0000",
+            "updated": null,
+            "text": "Alex got it fixed.. here’s the review of the changes\n\nHere's what each change does and why it helped. I checked the current environment, so some of this is what I can see directly and some is inference. I didn't open the task link, so I can't comment on the Hello World run itself.\n\n1. Removed the reference repo, so tasks work only in presalesdemo-ibmi\n\n- What I see now: /workspace holds only presalesdemo-ibmi. It is the only git repo, and the working directory is set to it.\n- Why it mattered: The updated EJS skill (ejs-screen-designer/SKILL.md, \"Choosing the Destination Repository\") says tasks may attach other repos for reference only. It says not to write into those repos, even when they contain similar code.\n  - With a sample or reference repo mounted, an agent can pattern-match to the nearest EJS example and put the new .ejs, .css and JSON files there.\n  - CoderFlow then finds no changes in the real app repo, or the output lands in the wrong place.\n- Effect of removing it: With one repo, the agent has nowhere else to write. It also keeps CoderFlow's review and approve flow tied to the right repo. That flow only looks at uncommitted changes in the task repos.\n\n2. Fixed .gitignore so generated logs stay out of Git\n\n- What changed: Commit 99fcb24 added a root .gitignore containing /tmp/ and /build/.\n- Why it mattered: Builds and interactive sessions write logs and generated output into the repo.\n  - Without those rules, that output shows up as uncommitted changes.\n  - CLAUDE.md says CoderFlow stages and commits whatever is uncommitted when a human approves. Build noise would have been committed along with the real work and cluttered the review diff.\n- Caveat: The file covers only /tmp/ and /build/. If other generated paths show up, such as session history or render output, they would need rules too.\n\n3. Updated all out-of-date skills, including the EJS skill, and reran the original prompt\n\n- What I see now: The ejs-screen-designer skill was recreated by Alex on 2026-10-07. It includes templates in examples/ (list-* and detail-* for JSON, EJS and CSS).\n- How it helped: The skill now spells out several things an agent would otherwise get wrong:\n  - Artifacts: JSON source for codermake to compile into DDS, plus .ejs, .css and optional .js files.\n  - File location: New files go in <repo-root>/htdocs/profoundui/userdata/ui/<display>/. CoderFlow's preview only searches the repo root, not a nested build directory's htdocs.\n  - Paths in the JSON: template, css and js entries use browser URLs (/profoundui/userdata/ui/...), with no htdocs and no repo name.\n  - Existing mappings: If a project already has a serving or deployment mapping, keep it.\n- Likely failures this fixed: Files in a location the preview couldn't find, wrong paths in the JSON, and writing into the wrong repo.\n- Rerunning the original prompt: This tested the fixes with the same input, so the Hello World result reflects the environment changes rather than a different prompt.\n\nNet effect\n\n- The agent is told what to build and where to put it.\n- It can only write to the right repo.\n- The diff stays clean, so the output is reviewable and approvable.\n\nGaps worth noting\n\n- The repo has no htdocs/ directory yet. Hello World's files would have been created by that task and are not in this clone, so I can't confirm them here.\n- The repo contains only the PSACT report tooling and a README. The EJS app is essentially new work.\n\nIf you'd like, I can diff the skills against older versions or compare Alex's working task's output against the skill's conventions. I'd need access to that task's artifacts for the second one."
+          },
+          {
+            "id": "77075",
+            "author": "Gary Jones",
+            "created": "2026-10-07T13:34:08.168+0000",
+            "updated": null,
+            "text": "Simple PUI/RDF and Agentic/EJS tested ok. Closing complete."
+          }
+        ],
+        "commentTotal": 3,
         "key": "PSACT-89",
         "url": "https://plogic.atlassian.net/browse/PSACT-89",
         "summary": "gj-enviro environment setup - troubleshooting with Alex",
-        "status": "In Progress",
+        "status": "Done",
         "assigneeAccountId": "615afb5dd9820f0070a0864e",
         "assigneeName": "Gary Jones",
         "priority": "Medium",
@@ -583,12 +616,128 @@
         "epicKey": "PSACT-5",
         "epicName": "Demo Environments & Assets",
         "issuetype": "Task",
-        "updated": "2026-10-06T21:51:49.588+0000",
+        "updated": "2026-10-07T13:34:11.769+0000",
         "created": "2026-10-06T21:51:23.006+0000"
+      }
+    },
+    "PSACT-90": {
+      "baselineColumn": "To Do",
+      "conflict": false,
+      "conflictInfo": null,
+      "data": {
+        "comments": [],
+        "commentTotal": 0,
+        "key": "PSACT-90",
+        "url": "https://plogic.atlassian.net/browse/PSACT-90",
+        "summary": "Add personal repo to gj-enviro environment",
+        "status": "To Do",
+        "assigneeAccountId": "615afb5dd9820f0070a0864e",
+        "assigneeName": "Gary Jones",
+        "priority": "Medium",
+        "priorityIcon": "https://plogic.atlassian.net/images/icons/priorities/medium_new.svg",
+        "duedate": null,
+        "labels": [],
+        "epicKey": "PSACT-5",
+        "epicName": "Demo Environments & Assets",
+        "issuetype": "Task",
+        "updated": "2026-10-07T13:40:14.489+0000",
+        "created": "2026-10-07T13:36:52.701+0000"
+      }
+    },
+    "PSACT-92": {
+      "baselineColumn": "Unassigned",
+      "conflict": false,
+      "conflictInfo": null,
+      "data": {
+        "comments": [],
+        "commentTotal": 0,
+        "key": "PSACT-92",
+        "url": "https://plogic.atlassian.net/browse/PSACT-92",
+        "summary": "Set up a presales Slack integration (@presalesCF) for the presalesdemo CoderFlow",
+        "status": "To Do",
+        "assigneeAccountId": null,
+        "assigneeName": null,
+        "priority": "Medium",
+        "priorityIcon": "https://plogic.atlassian.net/images/icons/priorities/medium_new.svg",
+        "duedate": null,
+        "labels": [],
+        "epicKey": null,
+        "epicName": null,
+        "issuetype": "Task",
+        "updated": "2026-10-07T16:23:57.131+0000",
+        "created": "2026-10-07T16:23:51.920+0000"
+      }
+    },
+    "PSACT-91": {
+      "baselineColumn": "Unassigned",
+      "conflict": false,
+      "conflictInfo": null,
+      "data": {
+        "comments": [],
+        "commentTotal": 0,
+        "key": "PSACT-91",
+        "url": "https://plogic.atlassian.net/browse/PSACT-91",
+        "summary": "Set up a coderflow.ai environment on presalesdemo CoderFlow with access to the product repos",
+        "status": "To Do",
+        "assigneeAccountId": null,
+        "assigneeName": null,
+        "priority": "Medium",
+        "priorityIcon": "https://plogic.atlassian.net/images/icons/priorities/medium_new.svg",
+        "duedate": null,
+        "labels": [],
+        "epicKey": null,
+        "epicName": null,
+        "issuetype": "Task",
+        "updated": "2026-10-07T16:23:57.105+0000",
+        "created": "2026-10-07T16:23:50.641+0000"
+      }
+    },
+    "PSACT-94": {
+      "baselineColumn": "In Progress",
+      "conflict": false,
+      "conflictInfo": null,
+      "data": {
+        "comments": [],
+        "commentTotal": 0,
+        "key": "PSACT-94",
+        "url": "https://plogic.atlassian.net/browse/PSACT-94",
+        "summary": "Discovery Solutions International - Genie & CoderFlow demo (Mon 12 Oct, 15:00)",
+        "status": "To Do",
+        "assigneeAccountId": "615afb5dd9820f0070a0864e",
+        "assigneeName": "Gary Jones",
+        "priority": "Medium",
+        "priorityIcon": "https://plogic.atlassian.net/images/icons/priorities/medium_new.svg",
+        "duedate": "2026-10-12",
+        "labels": [
+          "customer:discovery-solutions"
+        ],
+        "epicKey": "PSACT-1",
+        "epicName": "Customer Demos",
+        "issuetype": "Task",
+        "updated": "2026-10-07T19:55:19.219+0000",
+        "created": "2026-10-07T19:55:16.746+0000"
       }
     }
   },
   "changeLog": [
+    {
+      "at": "2026-10-07T20:43:18.907Z",
+      "key": "PSACT-94",
+      "action": "push",
+      "detail": "To Do -> In Progress"
+    },
+    {
+      "at": "2026-10-07T19:55:59.750Z",
+      "key": "PSACT-88",
+      "action": "comment",
+      "detail": "Met with Isaac and Brian on what's been achieved so far. Will add some PAI pop-ups with EJS styling if possible before next week. Isaac researching additional pain points that were leading them to look at AWS AI DLC that CF cannot do. Reworking the slides to remove the PAI pieces."
+    },
+    {
+      "at": "2026-10-06T22:50:12.895Z",
+      "key": "PSACT-89",
+      "action": "comment",
+      "detail": "Taken this as far as possible. Have pulled Alex in to work out why I'm having EJS development issues when testing in the Genie proxy."
+    },
     {
       "at": "2026-10-06T21:56:45.828Z",
       "key": "PSACT-88",
