@@ -5,6 +5,8 @@ What it takes to get this app running from scratch in a brand-new container
 (human or agent) with zero memory of building this can follow it top to
 bottom.
 
+> Moving the board to a **different CoderFlow environment**? See [MIGRATING.md](MIGRATING.md).
+
 ## 0. What you're starting with
 
 A fresh container that has this branch checked out gives you:
@@ -219,6 +221,7 @@ through the normal CoderFlow commit/approve path.
 | Symptom | Likely cause | Fix |
 |---|---|---|
 | `curl` gives `http_status=000` | server not running / crashed on start | check `/tmp/psact-kanban.log`; usually missing `JIRA_*` env vars |
+| Browser shows `connect ECONNREFUSED 0.0.0.0:4287` | code-server is up but the board isn't — almost always the container was restarted (resumed task), which kills the detached node process while code-server comes back on its own | `bash start.sh`; board state is in `data/board-state.json`, so nothing is lost. `ps -o lstart= -p 1` shows when the container last started |
 | `EADDRINUSE` on start | something already bound to the port | `fuser 4287/tcp` to find it, `fuser -k 4287/tcp` to free it, or `PORT=<other>` |
 | `Code-server not started for this task. Please click "Open VS Code" first.` | CoderFlow's server-side flag for this task isn't set | Click **Open VS Code** in the task UI once, then reload. Not fixable from inside the container — `start.sh` cannot set it |
 | Proxy URL 404s or hangs | code-server not running in the container | `bash start.sh`, or `/usr/local/bin/start-code-server.sh` directly |
