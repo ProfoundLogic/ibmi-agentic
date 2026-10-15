@@ -208,7 +208,8 @@ embedded SQL. All access is delegated to `CUSTR`, which reads `CUSTP` with set-b
 | `CZIP` | Char | 10 | | Concatenated into `SADDR` |
 | `CPHONE` | Char | 15 | | `SPHONE` |
 | `CEMAIL` | Char | 60 | | `SEMAIL` — **truncated to 25** by the subfile field |
-| `CSTATUS` / `CTYPE` | Char | 1 | | Not shown on the list |
+| `CSTATUS` | Char | 1 | | `SSTATUS` — shown on the list (`A`/`I`/`S`) |
+| `CTYPE` | Char | 1 | | Not shown on the list |
 | `CLIMIT` / `CBALANCE` | Packed | 11 | 2 | Not shown on the list |
 | `CLASTORD` / `CCREATED` | Zoned | 8 | 0 | Not shown on the list |
 
@@ -237,8 +238,8 @@ these fields and do not have this artefact.
                                                                                  
   5=Display                                                                      (6)  SOPTDESC
                                                                                  
-  Opt  Cust # Name                 Primary Email             Phone               (8)  headings
-  __   100001 ACME INDUSTRIES      orders@acme.example       555-0100            (9)  CUSTSFL line 1
+  Opt Cust # Sts Name                  Primary Email             Phone           (8)  headings
+  __  100001  A  ACME INDUSTRIES       orders@acme.example       555-0100        (9)  CUSTSFL line 1
        Address: 100 MAIN ST STE 4 SPRINGFIELD, IL 62704                          (10) CUSTSFL line 2
   __   100002 ...                                                                (11)
        Address: ...                                                              (12)
@@ -254,9 +255,10 @@ these fields and do not have this artefact.
 |---|---|---|---|---|
 | `SOPT` | 2A | B (both) | 9, 2 | Option entry; `DSPATR(RI)` + `DSPATR(PC)` when `*IN50` |
 | `SCUSTNO` | 6S 0 | O | 9, 6 | Customer number |
-| `SNAME` | 20A | O | 9, 15 | Customer name (truncated from 40) |
-| `SEMAIL` | 25A | O | 9, 37 | Email (truncated from 60) |
-| `SPHONE` | 15A | O | 9, 64 | Phone |
+| `SSTATUS` | 1A | O | 9, 14 | Customer status (`A`=Active, `I`=Inactive, `S`=Suspended) |
+| `SNAME` | 20A | O | 9, 17 | Customer name (truncated from 40) |
+| `SEMAIL` | 25A | O | 9, 39 | Email (truncated from 60) |
+| `SPHONE` | 15A | O | 9, 65 | Phone |
 | `SADDR` | 64A | O | 10, 15 | `CADDR1 CADDR2 CCITY, CSTATE CZIP` assembled by the program |
 
 Conditioning: `*IN51` → `SFLNXTCHG` (record is returned by the next `READC` even if the user does
@@ -282,7 +284,7 @@ line 10 is `COLOR(WHT)`.
 | `SFILTER` | 48A | B | 4, 31 | Free-text filter; `CHECK(LC)` permits lower case |
 | `SOPTDESC` | 77A | O | 6, 2 | Option legend (`5=Display`, or blank when the list is empty), `COLOR(BLU)` |
 
-Column headings (`Opt`, `Cust #`, `Name`, `Primary Email`, `Phone`) are `COLOR(WHT)` constants on
+Column headings (`Opt`, `Cust #`, `Sts`, `Name`, `Primary Email`, `Phone`) are `COLOR(WHT)` constants on
 row 8; the title `Work with Customers` is on row 1.
 
 **`CUSTFOOT`** — function-key footer.
