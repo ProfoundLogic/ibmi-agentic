@@ -1,0 +1,27 @@
+New report: Master data health check
+
+I'm in inventory control at ACME Distribution. I want one report that finds gaps and contradictions in our item and vendor master data, before they cause bad orders, wrong receipts or compliance problems.
+
+Data in library PERPDEMO:
+ITEM: inventory_uom, stocking_uom, reorder_point, safety_stock, critical_level, min_qty, max_qty, lead_time_days, lot_controlled.
+ITEM_UOM_CONVERSION: from_uom, to_uom, conversion_factor for each item.
+PO_LINE: uom_code the item was bought in.
+PO_RECEIPT_LINE: qty_received_vendor_uom, qty_received_inventory_uom, uom_conversion_factor.
+ITEM_VENDOR and ITEM_VENDOR_PRICE: approved vendors and their current prices.
+VENDOR: tax_id, address_line1, email_address, phone_number, contact_name.
+
+How it works: run these checks and list every failure as its own row with the check name:
+Unit of measure: an item bought in a different unit from its inventory unit, with no conversion on file. Show any receipts converted at a factor of 1.
+Stocking parameters: reorder point below safety stock, critical level above safety stock, max at or below the reorder point, or min above max.
+Pricing: an approved vendor with no current price, or two price rows covering the same date for the same vendor and item.
+Sourcing: an item with no preferred vendor, or more than one.
+Vendor details: a missing tax ID (critical, needed for year-end reporting), a missing address, or no email and no phone.
+Lot control: lot-controlled items with no lot records.
+
+What I'd like to see:
+Tiles: total issues, critical issues, items affected, and vendors affected.
+A health score per check, as a percentage of records passing.
+A table of all issues with the check, the record, what is wrong, and an action such as "Add a conversion from EA to LB for CON-002 and correct receipt 4".
+A bar chart of issues by check.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

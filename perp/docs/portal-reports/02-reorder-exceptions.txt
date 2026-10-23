@@ -1,0 +1,20 @@
+New report: Reorder exceptions
+
+I'm a buyer at ACME Distribution. I want a report of items that have dropped to or below their reorder point with nothing already on order, plus a suggested order for each, so I can place the buys this morning.
+
+Data in library PERPDEMO:
+ITEM: qty_on_hand, qty_available, reorder_point, safety_stock, critical_level, max_qty, lead_time_days, class_code.
+PO_HEADER and PO_LINE: open purchase orders (ordered_qty and received_qty).
+ITEM_VENDOR: preferred vendor, lead_time_days, moq (minimum order) and pack_size.
+ITEM_VENDOR_PRICE: unit_price with effective_from and effective_to dates.
+VENDOR: vendor name and buyer.
+
+How it works: do not use ITEM.qty_on_order, because it isn't maintained. Work out what's on order from open PO lines (status OPEN or PARTIAL) instead. An item needs reordering when available plus on order is at or below the reorder point. Severity is critical at or below critical_level, then below safety stock, then below reorder point. The suggested quantity tops the item back up to max_qty, is at least the vendor's moq, and is rounded up to a whole pack_size. Price it at the preferred vendor's current price, and show the expected arrival date (today plus the lead time).
+
+What I'd like to see:
+Tiles: items to reorder, critical items, total suggested spend, and the longest lead time.
+A table sorted with the emptiest shelves first, showing the suggested quantity, value, vendor, buyer and an action such as "Order 168 from Titan Tool, arrives Oct 30".
+A chart of available stock against the reorder point for each item.
+Let me filter by buyer and item class.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

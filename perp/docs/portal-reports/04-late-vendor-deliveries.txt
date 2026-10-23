@@ -1,0 +1,25 @@
+New report: Late vendor deliveries
+
+I'm a buyer at ACME Distribution. I want a list of every vendor delivery that is late, with the vendor's contact details, so I can start chasing first thing.
+
+Data in library PERPDEMO:
+PO_HEADER: vendor, buyer, order_date, status.
+PO_LINE: ordered_qty, received_qty, unit_price, expected_receipt_date.
+PO_LINE_SCHEDULE: split deliveries, with scheduled_date, scheduled_qty and received_qty.
+ITEM_VENDOR: lead_time_days.
+ITEM: available stock and reorder point.
+VENDOR: vendor_name, contact_name, phone_number, email_address.
+
+How it works: only include open PO lines (status OPEN or PARTIAL, with quantity still to receive). A delivery's due date comes from:
+1. Each unreceived schedule row, if the line has a schedule.
+2. Otherwise, the line's expected_receipt_date.
+3. Otherwise, the order date plus the vendor's lead time.
+Most lines have no expected date, so mark estimated dates as "est.". A delivery is late when its due date is before today. Flag it when the item is also at or below its reorder point, because then the lateness will cause a stock-out.
+
+What I'd like to see:
+Tiles: late deliveries, POs affected, value late, and the worst delay in days.
+A table sorted by days late, with the vendor contact as click-to-call and email links, and an action such as "Call Nina Park at Apex about PO 25, 30 tubes due Sep 5".
+A bar chart of value late by vendor.
+An aging chart in the bands 1-14, 15-30, 31-60 and over 60 days.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

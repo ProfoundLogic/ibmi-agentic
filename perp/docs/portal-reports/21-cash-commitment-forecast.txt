@@ -1,0 +1,26 @@
+New report: Cash commitment forecast
+
+I'm in finance at ACME Distribution. I want to see when the money committed on open purchase orders will actually have to be paid, week by week, so I can plan cash.
+
+Data in library PERPDEMO:
+PO_HEADER: vendor_code, order_date, status_code.
+PO_LINE: ordered_qty, received_qty, unit_price, expected_receipt_date.
+PO_LINE_SCHEDULE: scheduled delivery dates and quantities.
+ITEM_VENDOR: lead_time_days.
+VENDOR: vendor_name and payment_terms_code (NET15, NET30, NET60, COD or PREPAID).
+CODE_MASTER: descriptions for the payment terms (code type PAYTERMS).
+
+How it works: only include open PO lines (OPEN or PARTIAL orders with quantity still to receive). For each open delivery:
+Work out when it should arrive: the schedule date, else the expected_receipt_date, else the order date plus the vendor's lead time.
+If that date has already passed, assume it arrives today.
+Work out the payment date from the vendor's terms: NET15, NET30 and NET60 add 15, 30 or 60 days to the arrival date; COD is the arrival date; PREPAID is due immediately.
+The amount is the open quantity times the unit price.
+Group the amounts into weeks starting today, for the next 13 weeks, and show anything past due separately.
+
+What I'd like to see:
+Tiles: total committed, due in the next 30 days, due in the next 90 days, and the largest single payment.
+A weekly cash-out bar chart, stacked by vendor.
+A table of each upcoming payment showing the vendor, PO, terms, expected arrival date and payment date.
+A note explaining that this covers open purchase orders only, not invoices, because accounts payable is not in the system yet.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

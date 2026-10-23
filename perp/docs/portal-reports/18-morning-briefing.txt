@@ -1,0 +1,28 @@
+New report: Morning briefing
+
+I manage purchasing and inventory at ACME Distribution. I want one landing dashboard that rolls up everything that needs attention today, with a short written briefing, and links to the detail.
+
+Data in library PERPDEMO:
+REQUISITION_HEADER, REQUISITION_LINE, PO_HEADER, PO_LINE, PO_LINE_SCHEDULE, ITEM, ITEM_LOT, ITEM_VENDOR, ITEM_VENDOR_PRICE, VENDOR, PERP_USER and COMPANY_CONFIG.
+
+How it works: show one KPI tile for each of these, using plain rules:
+Requisitions waiting for approval (status SUBMITTED).
+Approved requisitions with no PO, by count and value.
+Items to reorder (available plus open PO quantity at or below the reorder point; ignore ITEM.qty_on_order).
+Items at critical level.
+Late deliveries (due date from the schedule, else expected date, else order date plus lead time), by count and value.
+Open PO value.
+Draft POs.
+Items heading over max.
+Lot mismatches (on-hand not equal to the lot total), by count and value.
+On-order mismatches.
+Approvals made by someone who isn't an authorised approver.
+CoderFlow approvals outside the COMPANY_CONFIG policy.
+
+What I'd like to see:
+A three-sentence briefing at the top: the biggest risk, the biggest backlog, and one piece of good news.
+The KPI tiles in four rows: Buy, Receive, Stock integrity, and Approvals. Each tile is coloured by severity and links to its detail report.
+A "do these first" list of the top 5 actions by dollar impact, each with an owner.
+A small table of open exceptions per person.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

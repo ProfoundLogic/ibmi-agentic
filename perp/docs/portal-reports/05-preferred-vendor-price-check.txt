@@ -1,0 +1,24 @@
+New report: Preferred vendor price check
+
+I'm a buyer at ACME Distribution. I want to know where our preferred vendor is not the cheapest approved source, how much that is costing us right now, and whether the cheaper vendor is any slower.
+
+Data in library PERPDEMO:
+ITEM_VENDOR: approved vendors per item, with is_preferred and lead_time_days.
+ITEM_VENDOR_PRICE: unit_price with effective_from and effective_to (a blank end date means it is still current).
+ITEM: description and max_qty.
+VENDOR: vendor names.
+PO_HEADER and PO_LINE: quantity still open with the preferred vendor.
+
+How it works: compare the preferred vendor's current price with the cheapest current price from the item's other vendors. List the items where another vendor is cheaper. Show:
+The saving per unit and the saving percentage.
+The lead-time difference (negative means the cheaper vendor is also faster).
+The saving still recoverable on open POs (open quantity times the saving).
+The saving for each refill up to max_qty.
+If two current prices overlap, use the newest.
+
+What I'd like to see:
+Tiles: items overpaying, savings recoverable now, savings per refill cycle, and items where the cheaper vendor is no slower.
+A table with a verdict ("switch", "trade-off" or "marginal") and an action such as "Move the 60 open on PO 25 to Summit Supply, save $1,298".
+A chart of saving % against the lead-time difference.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

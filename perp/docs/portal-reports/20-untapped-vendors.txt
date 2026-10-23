@@ -1,0 +1,26 @@
+New report: Untapped vendors
+
+I'm a buyer at ACME Distribution. I suspect we approved some vendors and then never used them, even where they are cheaper. I want a report that shows which approved vendors we never buy from, what they would save us, and what the catch is.
+
+Data in library PERPDEMO:
+VENDOR: vendor_name, payment_terms_code (NET15, NET30, NET60, COD or PREPAID), contact details.
+ITEM_VENDOR: the items each vendor is approved for, is_preferred, lead_time_days, moq and pack_size.
+ITEM_VENDOR_PRICE: unit_price with effective_from and effective_to dates (a blank end date means it is still current).
+PO_HEADER: which vendors have actually received orders.
+ITEM: item description and max_qty.
+
+How it works: an untapped vendor is approved for at least one item, is the preferred vendor for none, and has never had a non-draft PO. For each untapped vendor, compare its current price on every item it is approved for with the current preferred vendor's price. Show:
+How many items it is cheaper on.
+The average saving percentage.
+The lead-time difference.
+The saving per refill up to max_qty.
+Its payment terms, and flag less favourable ones: PREPAID or COD means paying before or at delivery.
+If two current prices overlap, use the newest.
+
+What I'd like to see:
+Tiles: untapped vendors, items where an untapped vendor is cheapest, and the total saving per refill cycle.
+One card per untapped vendor, with its items, savings, lead time and terms, and an action such as "Trial Summit Supply on LUB-001, 16% cheaper with the same lead time".
+A table of every item where an untapped vendor beats the preferred price.
+A bar chart of potential saving by vendor.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

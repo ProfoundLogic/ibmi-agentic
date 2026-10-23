@@ -1,0 +1,23 @@
+New report: Lot integrity check
+
+I'm in inventory control at ACME Distribution. I want to find lot-controlled items whose on-hand quantity doesn't match their lot records, because untraceable stock is a recall risk.
+
+Data in library PERPDEMO:
+ITEM: lot_controlled = 'Y', qty_on_hand, and bin location (aisle_code, bay_code, shelf_code).
+ITEM_LOT: lot_number, qty_on_hand, received_date, expiry_date.
+RECONCILIATION_LOG: past lot reconciliations, including automatic repairs made by CODERFLOW.
+ITEM_VENDOR_PRICE: used to value the difference.
+
+How it works: compare each lot-controlled item's on-hand quantity with the total of its lots. Flag mismatches:
+"No lots on file" (critical).
+"On hand exceeds lots".
+"Lots exceed on hand".
+Value the difference at the preferred vendor's current price, and show when the item was last reconciled ("never" if no log entry).
+
+What I'd like to see:
+Tiles: items out of balance, untraceable units, untraceable value, and items never reconciled.
+A table sorted by value, with an action such as "Count bin A3-B15-S3 and create lot records for 35 units".
+The reconciliation history.
+A printable count sheet sorted by bin.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

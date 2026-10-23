@@ -1,0 +1,21 @@
+New report: Unrealistic need-by dates
+
+I approve requisitions at ACME Distribution. I want to see requisitions where the need-by date is sooner than the vendor can possibly deliver, so we can set expectations with the requester, or expedite, before it becomes a late order.
+
+Data in library PERPDEMO:
+REQUISITION_HEADER: requisition number, requested_by, request_date, need_by_date, priority_code, status_code, total_estimated_cost.
+REQUISITION_LINE: item_number, quantity, and an optional line-level need_by_date.
+ITEM_VENDOR: the preferred vendor (is_preferred = 'Y') and its lead_time_days.
+ITEM: qty_available, to see whether the request could be filled from stock instead.
+VENDOR: vendor names.
+PERP_USER: names.
+
+How it works: for each line on a requisition that is still open (draft, submitted or approved without a PO), compare the days allowed (need-by date minus request date; use the line's date if it has one) with the preferred vendor's lead time. Flag lines where the days allowed are fewer than the lead time, and show the shortfall in days. If there is enough stock available to fill the line, say so: it can be filled from stock, so the date isn't a problem. Also show the earliest realistic date, which is today plus the lead time.
+
+What I'd like to see:
+Tiles: requisitions at risk, lines at risk, and the average shortfall in days.
+A table sorted by shortfall, with an action such as "Tell Roger the earliest realistic date is Oct 30, or expedite with Acme Fasteners".
+A chart of days allowed against lead time for each flagged line.
+Let me filter by requester and status.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

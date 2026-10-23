@@ -1,0 +1,27 @@
+New report: Waiting for my approval
+
+I approve requisitions at ACME Distribution. I want my approval queue sorted by what will be late first, with each requisition checked against our auto-approval policy, so I can see which ones CoderFlow could approve for me.
+
+Data in library PERPDEMO:
+REQUISITION_HEADER: status_code SUBMITTED, requested_by, request_date, need_by_date, priority_code, confidence_pct (CoderFlow's score), total_estimated_cost, updated_at.
+REQUISITION_LINE: the items requested.
+COMPANY_CONFIG: the policy values approval.auto_threshold (minimum confidence %) and approval.auto_max_amount (maximum $). Read these, don't hard-code them.
+PERP_USER: names.
+
+How it works: the queue is the SUBMITTED requisitions, sorted by days to need-by, then priority, then value. Mark each one:
+"Eligible for auto" when confidence meets the threshold and value is within the maximum.
+"Over auto limit".
+"Low confidence".
+"Not scored".
+Colour how long each one has been waiting: 0-1 days fine, 2-3 amber, 4 or more red.
+
+What I'd like to see:
+Tiles: waiting, past need-by, value waiting, and eligible for auto.
+The queue, with a confidence gauge and an action.
+A panel of the requisitions CoderFlow could approve.
+The current policy values.
+A small list of draft requisitions that may arrive soon.
+
+Make a friendly empty state ("Your approval queue is clear", plus the date of the last decision), because the queue may be empty.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.
