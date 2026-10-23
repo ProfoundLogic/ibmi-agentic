@@ -1,87 +1,301 @@
-<div class="detail-screen">
-  <div class="header">
-    <h1>Customer Detail</h1>
-    <span class="custno-badge">#<%= scustno %></span>
-  </div>
+<%
+  var val = function (v) { return (typeof v === 'undefined' || v === null) ? '' : String(v).trim(); };
+  var num = function (v) { var n = Number(val(v).replace(/,/g, '')); return isNaN(n) ? 0 : n; };
+  var money = function (n) { return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var money0 = function (n) { return '$' + Math.round(n).toLocaleString('en-US'); };
+  var parseUS = function (s) {
+    var m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(val(s));
+    if (!m || +m[3] < 1900) { return null; }
+    return new Date(+m[3], +m[1] - 1, +m[2]);
+  };
+  var fmtDate = function (d) { return d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not available'; };
+  var monthsBetween = function (a, b) {
+    var m = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
+    if (b.getDate() < a.getDate()) { m--; }
+    return Math.max(m, 0);
+  };
+  var human = function (months) {
+    var y = Math.floor(months / 12), m = months % 12, out = [];
+    if (y) { out.push(y + (y === 1 ? ' year' : ' years')); }
+    if (m || !y) { out.push(m + (m === 1 ? ' month' : ' months')); }
+    return out.join(' ');
+  };
+  var plural = function (n, one, many) { return n + ' ' + (n === 1 ? one : many); };
 
-  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
-    <div class="message message-error"><%= msg %></div>
-  <% } %>
+  var name = val(sname);
+  var found = name !== '';
+  var parts = name.replace(/[^A-Za-z0-9 ]/g, ' ').trim().split(/\s+/).filter(Boolean);
+  var initials = parts.length ? (parts[0].charAt(0) + (parts.length > 1 ? parts[1].charAt(0) : '')).toUpperCase() : '?';
+  var toneSum = 0; for (var ci = 0; ci < name.length; ci++) { toneSum += name.charCodeAt(ci); }
+  var tone = toneSum % 6;
 
-  <div class="detail-grid">
-    <section class="card">
-      <h2>Customer Information</h2>
-      <div class="field-group">
-        <div class="field">
-          <label>Name</label>
-          <span class="value"><%= sname %></span>
-        </div>
-        <div class="field">
-          <label>Type</label>
-          <span class="value"><%= stype === 'R' ? 'Retail' : stype === 'B' ? 'Business' : stype %></span>
-        </div>
-        <div class="field">
-          <label>Status</label>
-          <span class="value status-<%= sstatus %>">
-            <%= sstatus === 'A' ? 'Active' : sstatus === 'I' ? 'Inactive' : sstatus === 'S' ? 'Suspended' : sstatus %>
-          </span>
+  var limit = num(slimit), balance = num(sbalance);
+  var available = Math.max(limit - balance, 0);
+  var util = limit > 0 ? (balance / limit) * 100 : 0;
+  var utilShown = Math.round(util);
+  var risk = utilShown >= 90 ? 'high' : utilShown >= 60 ? 'watch' : 'ok';
+  var riskLabel = risk === 'high' ? 'High utilization' : risk === 'watch' ? 'Watch closely' : 'Healthy';
+  var CIRC = 2 * Math.PI * 52;
+  var dashOn = CIRC * Math.min(util, 100) / 100;
+
+  var now = new Date();
+  var created = parseUS(screated), lastOrder = parseUS(slastord);
+  var tenureMonths = created ? monthsBetween(created, now) : 0;
+  var daysSinceOrder = lastOrder ? Math.max(Math.floor((now - lastOrder) / 86400000), 0) : null;
+  var recency = daysSinceOrder === null ? { t: 'amber', l: 'No orders yet' }
+    : daysSinceOrder <= 90 ? { t: 'mint', l: 'Recently active' }
+    : daysSinceOrder <= 365 ? { t: 'amber', l: 'Cooling down' }
+    : { t: 'rose', l: 'Re-engagement needed' };
+
+  var status = val(sstatus).toUpperCase();
+  var statusInfo = status === 'A' ? { l: 'Active', t: 'mint', i: 'check' }
+    : status === 'S' ? { l: 'Suspended', t: 'amber', i: 'alert' }
+    : status === 'I' ? { l: 'Inactive', t: 'rose', i: 'alert' }
+    : { l: status || 'Unknown', t: 'blue', i: 'check' };
+  var type = val(stype).toUpperCase();
+  var typeInfo = type === 'B' ? { l: 'Business', i: 'building' } : type === 'R' ? { l: 'Retail', i: 'home' } : { l: type || 'Customer', i: 'user' };
+
+  var street = [val(saddr1), val(saddr2)].filter(Boolean).join(', ');
+  var cityLine = [val(scity), [val(sstate), val(szip)].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+  var fullAddr = [street, cityLine].filter(Boolean).join(', ');
+  var q = encodeURIComponent(fullAddr);
+  var email = val(semail), phone = val(sphone);
+  var telHref = phone.replace(/[^0-9+]/g, '');
+
+  /* Lifetime bar: where the last order sits between "created" and "today". */
+  var lifePos = 100;
+  if (created && lastOrder && now > created) { lifePos = Math.min(Math.max((lastOrder - created) / (now - created) * 100, 2), 98); }
+
+  /* Next anniversary milestone. */
+  var anniv = null, daysToAnniv = null;
+  if (created) {
+    anniv = new Date(now.getFullYear(), created.getMonth(), created.getDate());
+    if (anniv <= now) { anniv = new Date(now.getFullYear() + 1, created.getMonth(), created.getDate()); }
+    daysToAnniv = Math.ceil((anniv - now) / 86400000);
+  }
+  var annivYears = anniv && created ? anniv.getFullYear() - created.getFullYear() : 0;
+
+  /* Smart insights (rule based). */
+  var insights = [];
+  if (limit > 0) {
+    insights.push({ t: risk === 'ok' ? 'mint' : risk === 'watch' ? 'amber' : 'rose', i: 'gauge',
+      h: '<b>' + utilShown + '% of the credit limit</b> is in use, leaving <b>' + money0(available) + '</b> available. ' +
+         (risk === 'ok' ? 'A comfortable position.' : risk === 'watch' ? 'Worth keeping an eye on.' : 'Consider a payment follow-up before new orders.') });
+  }
+  if (daysSinceOrder !== null) {
+    insights.push({ t: recency.t, i: 'bag',
+      h: 'Last order was <b>' + (daysSinceOrder < 1 ? 'today' : plural(daysSinceOrder, 'day', 'days') + ' ago') + '</b>. ' +
+         (daysSinceOrder <= 90 ? 'Purchasing rhythm looks healthy.' : daysSinceOrder <= 365 ? 'A friendly check-in could restart momentum.' : 'This account is at risk of going quiet &mdash; a re-engagement offer is recommended.') });
+  }
+  if (created) {
+    insights.push({ t: 'lav', i: 'calendar',
+      h: 'Customer for <b>' + human(tenureMonths) + '</b>' + (tenureMonths >= 24 ? ' &mdash; a long-standing relationship worth protecting.' : '.') });
+  }
+  if (status === 'S') { insights.push({ t: 'amber', i: 'alert', h: '<b>Account suspended.</b> Review the reason before approving any new order.' }); }
+  if (status === 'I') { insights.push({ t: 'rose', i: 'alert', h: '<b>Account inactive.</b> A strong candidate for a reactivation campaign.' }); }
+
+  /* Timeline events, in chronological order. */
+  var events = [];
+  if (created) { events.push({ k: 'past', t: 'lav', i: 'calendar', title: 'Became a customer', date: fmtDate(created), note: human(tenureMonths) + ' ago' }); }
+  if (lastOrder) { events.push({ k: 'past', t: recency.t, i: 'bag', title: 'Most recent order', date: fmtDate(lastOrder), note: daysSinceOrder < 1 ? 'Today' : plural(daysSinceOrder, 'day', 'days') + ' ago' }); }
+  events.push({ k: 'now', t: 'blue', i: 'pulse', title: 'Today', date: fmtDate(now), note: statusInfo.l + ' &middot; ' + utilShown + '% credit used' });
+  if (daysSinceOrder !== null && daysSinceOrder > 90) { events.push({ k: 'future', t: 'peach', i: 'send', title: 'Suggested check-in', date: 'This week', note: 'Reach out before the account cools further' }); }
+  if (anniv) { events.push({ k: 'future', t: 'lav', i: 'star', title: annivYears + '-year anniversary', date: fmtDate(anniv), note: 'In ' + plural(daysToAnniv, 'day', 'days') }); }
+
+  var mailSubject = encodeURIComponent('Checking in from Profound Logic');
+  var mailBody = encodeURIComponent('Hi ' + (parts[0] || '') + ',\n\nIt has been a while since your last order and we would love to hear how things are going.\n\nBest regards');
+%>
+<div class="cx-screen cx-detail" data-pl-no-enter>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="cx-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></symbol>
+      <symbol id="cx-back" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+      <symbol id="cx-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+      <symbol id="cx-mail" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></symbol>
+      <symbol id="cx-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+      <symbol id="cx-nav" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></symbol>
+      <symbol id="cx-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+      <symbol id="cx-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+      <symbol id="cx-bag" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+      <symbol id="cx-dollar" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+      <symbol id="cx-gauge" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 12l5-5"/><circle cx="12" cy="12" r="1.2"/></symbol>
+      <symbol id="cx-check" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+      <symbol id="cx-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+      <symbol id="cx-building" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="7" x2="9.01" y2="7"/><line x1="15" y1="7" x2="15.01" y2="7"/><line x1="9" y1="12" x2="9.01" y2="12"/><line x1="15" y1="12" x2="15.01" y2="12"/><path d="M10 22v-4h4v4"/></symbol>
+      <symbol id="cx-home" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+      <symbol id="cx-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+      <symbol id="cx-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+      <symbol id="cx-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+      <symbol id="cx-pulse" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+      <symbol id="cx-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
+      <symbol id="cx-external" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
+      <symbol id="cx-sliders" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="cx-inner">
+
+    <nav class="cx-crumbs cx-rise" style="--i:0">
+      <button type="button" class="cx-btn cx-btn-ghost" onclick="pui.submit({action: 'EXIT'})" data-fkey="F3" data-pl-fkey="F3" data-pl-label="Back"><svg class="cx-ico"><use href="#cx-back"/></svg>Back to customers <span class="cx-kbd">F3</span></button>
+      <span class="cx-eyebrow">Profound Logic &middot; Customer 360&deg;</span>
+    </nav>
+
+    <% if (!found) { %>
+      <div class="cx-panel cx-notfound cx-rise" style="--i:1">
+        <div class="cx-empty-art"><svg class="cx-ico"><use href="#cx-alert"/></svg></div>
+        <h1>We couldn&rsquo;t find that customer</h1>
+        <p><%= val(typeof msg !== 'undefined' ? msg : '') || 'The customer record is not available.' %></p>
+        <button type="button" class="cx-btn cx-btn-primary" onclick="pui.submit({action: 'EXIT'})"><svg class="cx-ico"><use href="#cx-back"/></svg>Back to customers</button>
+      </div>
+    <% } else { %>
+
+    <% if (typeof msg !== 'undefined' && val(msg)) { %>
+      <div class="cx-message cx-message-error cx-rise" style="--i:1"><svg class="cx-ico"><use href="#cx-alert"/></svg><%= msg %></div>
+    <% } %>
+
+    <!-- HERO -->
+    <header class="cx-hero cx-profile cx-rise" style="--i:1">
+      <div class="cx-profile-main">
+        <span class="cx-avatar cx-avatar-xl cx-av-<%= tone %>"><%= initials %></span>
+        <div>
+          <h1><%= name %></h1>
+          <div class="cx-profile-chips">
+            <span class="cx-chip cx-chip-mono">#<%= Number(scustno) %></span>
+            <span class="cx-chip cx-chip-lav"><svg class="cx-ico"><use href="#cx-<%= typeInfo.i %>"/></svg><%= typeInfo.l %></span>
+            <span class="cx-chip cx-chip-<%= statusInfo.t %>"><svg class="cx-ico"><use href="#cx-<%= statusInfo.i %>"/></svg><%= statusInfo.l %></span>
+            <span class="cx-chip cx-chip-<%= recency.t %>"><svg class="cx-ico"><use href="#cx-pulse"/></svg><%= recency.l %></span>
+          </div>
+          <p class="cx-sub"><svg class="cx-ico"><use href="#cx-pin"/></svg><%= cityLine %></p>
         </div>
       </div>
-    </section>
-
-    <section class="card">
-      <h2>Financial</h2>
-      <div class="field-group">
-        <div class="field">
-          <label>Credit Limit</label>
-          <span class="value">$<%= Number(slimit).toLocaleString('en-US', {minimumFractionDigits: 2}) %></span>
-        </div>
-        <div class="field">
-          <label>Balance Due</label>
-          <span class="value">$<%= Number(sbalance).toLocaleString('en-US', {minimumFractionDigits: 2}) %></span>
-        </div>
-        <div class="field">
-          <label>Last Order</label>
-          <span class="value"><%= slastord %></span>
-        </div>
-        <div class="field">
-          <label>Created</label>
-          <span class="value"><%= screated %></span>
-        </div>
+      <div class="cx-hero-actions">
+        <% if (email) { %><a class="cx-btn cx-btn-soft" href="mailto:<%= email %>"><svg class="cx-ico"><use href="#cx-mail"/></svg>Email</a><% } %>
+        <% if (telHref) { %><a class="cx-btn cx-btn-soft" href="tel:<%= telHref %>"><svg class="cx-ico"><use href="#cx-phone"/></svg>Call</a><% } %>
+        <a class="cx-btn cx-btn-primary" href="https://www.google.com/maps/dir/?api=1&destination=<%= q %>" target="_blank" rel="noopener"><svg class="cx-ico"><use href="#cx-nav"/></svg>Directions</a>
       </div>
-    </section>
+    </header>
 
-    <section class="card">
-      <h2>Contact</h2>
-      <div class="field-group">
-        <div class="field">
-          <label>Email</label>
-          <span class="value"><%= semail %></span>
+    <div class="cx-grid">
+
+      <!-- CREDIT HEALTH -->
+      <article class="cx-panel cx-credit cx-rise" style="--i:2">
+        <div class="cx-panel-head"><h2 class="cx-panel-title"><svg class="cx-ico"><use href="#cx-gauge"/></svg>Credit health</h2><span class="cx-chip cx-chip-<%= risk === 'ok' ? 'mint' : risk === 'watch' ? 'amber' : 'rose' %>"><%= riskLabel %></span></div>
+        <div class="cx-credit-body">
+          <div class="cx-gauge" data-risk="<%= risk %>">
+            <svg viewBox="0 0 120 120" role="img" aria-label="<%= utilShown %> percent of credit used">
+              <circle class="cx-gauge-track" cx="60" cy="60" r="52" fill="none" stroke-width="11"/>
+              <circle class="cx-gauge-arc" cx="60" cy="60" r="52" fill="none" stroke-width="11" stroke-linecap="round"
+                      stroke-dasharray="<%= dashOn.toFixed(1) %> <%= CIRC.toFixed(1) %>" transform="rotate(-90 60 60)"/>
+            </svg>
+            <div class="cx-gauge-center"><strong><%= utilShown %><small>%</small></strong><span>used</span></div>
+          </div>
+          <dl class="cx-stats">
+            <div><dt><svg class="cx-ico"><use href="#cx-dollar"/></svg>Credit limit</dt><dd><%= money(limit) %></dd></div>
+            <div><dt><svg class="cx-ico"><use href="#cx-trend"/></svg>Balance due</dt><dd class="cx-dd-<%= risk %>"><%= money(balance) %></dd></div>
+            <div><dt><svg class="cx-ico"><use href="#cx-check"/></svg>Available</dt><dd class="cx-dd-<%= available > 0 ? 'ok' : 'high' %>"><%= money(available) %></dd></div>
+          </dl>
         </div>
-        <div class="field">
-          <label>Phone</label>
-          <span class="value"><%= sphone %></span>
+
+        <div class="cx-whatif" data-risk="<%= risk %>">
+          <div class="cx-whatif-head"><svg class="cx-ico"><use href="#cx-sliders"/></svg><b>What-if calculator</b><span>Simulate a new order</span></div>
+          <div class="cx-stack" aria-hidden="true">
+            <i class="cx-stack-used" style="width:<%= Math.min(util, 100).toFixed(1) %>%"></i>
+            <i class="cx-stack-add" data-out="bar" style="width:<%= Math.min(util, 100).toFixed(1) %>%"></i>
+          </div>
+          <input type="range" class="cx-range" min="0" max="<%= Math.max(Math.ceil((limit || 10000) / 100) * 100, 1000) %>" step="100" value="0"
+                 data-limit="<%= limit %>" data-bal="<%= balance %>" aria-label="New order amount"
+                 oninput="var v=+this.value,L=+this.dataset.limit,B=+this.dataset.bal,p=L>0?Math.round((B+v)/L*100):0,o=this.closest('.cx-whatif');o.querySelector('[data-out=add]').textContent='$'+v.toLocaleString('en-US');o.querySelector('[data-out=pct]').textContent=p+'%';o.querySelector('[data-out=rem]').textContent='$'+Math.max(L-B-v,0).toLocaleString('en-US');o.querySelector('[data-out=bar]').style.width=Math.min(p,100)+'%';o.setAttribute('data-risk',p>=90?'high':p>=60?'watch':'ok');">
+          <div class="cx-whatif-out">
+            <div><span>New order</span><b data-out="add">$0</b></div>
+            <div><span>Utilization</span><b data-out="pct"><%= utilShown %>%</b></div>
+            <div><span>Left after order</span><b data-out="rem"><%= money0(available) %></b></div>
+          </div>
         </div>
-      </div>
-    </section>
+      </article>
 
-    <section class="card">
-      <h2>Address</h2>
-      <div class="field-group">
-        <div class="field full-width">
-          <span class="value">
-            <%= saddr1 %><br>
-            <% if (typeof saddr2 !== 'undefined' && saddr2 && saddr2.trim()) { %><%= saddr2 %><br><% } %>
-            <%= scity %>, <%= sstate %> <%= szip %>
-          </span>
+      <!-- INSIGHTS -->
+      <article class="cx-panel cx-insights cx-rise" style="--i:3">
+        <div class="cx-panel-head"><h2 class="cx-panel-title"><svg class="cx-ico"><use href="#cx-sparkles"/></svg>Smart insights</h2><span class="cx-chip cx-chip-lav">Live</span></div>
+        <ul class="cx-insight-list">
+          <% insights.forEach(function (it) { %>
+            <li class="cx-insight"><span class="cx-insight-ico cx-tone-<%= it.t %>"><svg class="cx-ico"><use href="#cx-<%= it.i %>"/></svg></span><span><%- it.h %></span></li>
+          <% }); %>
+        </ul>
+        <div class="cx-actions-title">Suggested next steps</div>
+        <div class="cx-nba">
+          <% if (email && daysSinceOrder !== null && daysSinceOrder > 90) { %>
+            <a class="cx-nba-btn" href="mailto:<%= email %>?subject=<%= mailSubject %>&body=<%= mailBody %>"><svg class="cx-ico"><use href="#cx-send"/></svg>Send a check-in email</a>
+          <% } %>
+          <% if (telHref) { %><a class="cx-nba-btn" href="tel:<%= telHref %>"><svg class="cx-ico"><use href="#cx-phone"/></svg>Call <%= phone %></a><% } %>
+          <% if (limit > 0 && utilShown < 30 && tenureMonths >= 12 && status === 'A') { %>
+            <span class="cx-nba-btn is-static"><svg class="cx-ico"><use href="#cx-trend"/></svg>Candidate for a higher credit limit</span>
+          <% } %>
+          <% if (risk === 'high') { %>
+            <span class="cx-nba-btn is-static is-warn"><svg class="cx-ico"><use href="#cx-alert"/></svg>Review balance before next order</span>
+          <% } %>
+          <% if (status === 'I' || status === 'S') { %>
+            <span class="cx-nba-btn is-static is-warn"><svg class="cx-ico"><use href="#cx-alert"/></svg>Confirm account status with sales</span>
+          <% } %>
         </div>
-      </div>
-    </section>
-  </div>
+      </article>
 
-  <input type="hidden" name="action" value="">
+      <!-- MAP -->
+      <article class="cx-panel cx-mapcard cx-rise" style="--i:4">
+        <div class="cx-panel-head"><h2 class="cx-panel-title"><svg class="cx-ico"><use href="#cx-pin"/></svg>Location</h2>
+          <a class="cx-link" href="https://www.google.com/maps/search/?api=1&query=<%= q %>" target="_blank" rel="noopener">Open in Google Maps<svg class="cx-ico"><use href="#cx-external"/></svg></a></div>
+        <div class="cx-mapbox cx-mapbox-lg">
+          <iframe src="https://maps.google.com/maps?q=<%= q %>&z=15&output=embed" title="Location of <%= name %> on Google Maps" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        </div>
+      </article>
 
-  <div class="footer">
-    <button onclick="pui.submit({action: 'EXIT'})" data-fkey="F3" class="btn btn-secondary">Back (F3)</button>
+      <!-- CONTACT -->
+      <article class="cx-panel cx-contact cx-rise" style="--i:5">
+        <div class="cx-panel-head"><h2 class="cx-panel-title"><svg class="cx-ico"><use href="#cx-user"/></svg>Contact &amp; address</h2></div>
+        <ul class="cx-contact-list">
+          <li><span class="cx-insight-ico cx-tone-blue"><svg class="cx-ico"><use href="#cx-mail"/></svg></span>
+            <div><small>Email</small><% if (email) { %><a href="mailto:<%= email %>"><%= email %></a><% } else { %><em>Not on file</em><% } %></div>
+            <% if (email) { %><button type="button" class="cx-iconbtn" title="Copy email" data-copy="<%= email %>" onclick="var b=this;navigator.clipboard&&navigator.clipboard.writeText(b.getAttribute('data-copy'));b.classList.add('is-copied');setTimeout(function(){b.classList.remove('is-copied')},1300)"><svg class="cx-ico"><use href="#cx-copy"/></svg></button><% } %></li>
+          <li><span class="cx-insight-ico cx-tone-mint"><svg class="cx-ico"><use href="#cx-phone"/></svg></span>
+            <div><small>Phone</small><% if (phone) { %><a href="tel:<%= telHref %>"><%= phone %></a><% } else { %><em>Not on file</em><% } %></div>
+            <% if (phone) { %><button type="button" class="cx-iconbtn" title="Copy phone" data-copy="<%= phone %>" onclick="var b=this;navigator.clipboard&&navigator.clipboard.writeText(b.getAttribute('data-copy'));b.classList.add('is-copied');setTimeout(function(){b.classList.remove('is-copied')},1300)"><svg class="cx-ico"><use href="#cx-copy"/></svg></button><% } %></li>
+          <li><span class="cx-insight-ico cx-tone-rose"><svg class="cx-ico"><use href="#cx-pin"/></svg></span>
+            <div><small>Address</small><span class="cx-addr-lines"><%= street %><br><%= cityLine %></span></div>
+            <button type="button" class="cx-iconbtn" title="Copy address" data-copy="<%= fullAddr %>" onclick="var b=this;navigator.clipboard&&navigator.clipboard.writeText(b.getAttribute('data-copy'));b.classList.add('is-copied');setTimeout(function(){b.classList.remove('is-copied')},1300)"><svg class="cx-ico"><use href="#cx-copy"/></svg></button></li>
+        </ul>
+        <div class="cx-summary">
+          <div><small>Type</small><b><%= typeInfo.l %></b></div>
+          <div><small>Status</small><b><%= statusInfo.l %></b></div>
+          <div><small>Customer since</small><b><%= created ? fmtDate(created) : 'Not available' %></b></div>
+          <div><small>Last order</small><b><%= lastOrder ? fmtDate(lastOrder) : 'No orders yet' %></b></div>
+        </div>
+      </article>
+
+      <!-- TIMELINE -->
+      <article class="cx-panel cx-timeline-card cx-rise" style="--i:6">
+        <div class="cx-panel-head"><h2 class="cx-panel-title"><svg class="cx-ico"><use href="#cx-calendar"/></svg>Customer journey</h2><span class="cx-panel-note"><%= created ? human(tenureMonths) + ' together' : '' %></span></div>
+
+        <% if (created) { %>
+        <div class="cx-life" aria-hidden="true">
+          <div class="cx-life-track"><i class="cx-life-fill" style="width:100%"></i>
+            <% if (lastOrder) { %><span class="cx-life-dot" style="left:<%= lifePos.toFixed(1) %>%"><em>Last order</em></span><% } %>
+          </div>
+          <div class="cx-life-ends"><span><%= fmtDate(created) %></span><span>Today</span></div>
+        </div>
+        <% } %>
+
+        <ol class="cx-timeline">
+          <% events.forEach(function (ev) { %>
+            <li class="cx-ev cx-ev-<%= ev.k %>">
+              <span class="cx-ev-dot cx-tone-<%= ev.t %>"><svg class="cx-ico"><use href="#cx-<%= ev.i %>"/></svg></span>
+              <div class="cx-ev-body"><div class="cx-ev-title"><%= ev.title %><time><%= ev.date %></time></div><div class="cx-ev-note"><%- ev.note %></div></div>
+            </li>
+          <% }); %>
+        </ol>
+      </article>
+
+    </div>
+    <% } %>
+
+    <input type="hidden" name="action" value="">
   </div>
 </div>

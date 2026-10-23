@@ -1,94 +1,251 @@
-<div class="custlist-screen">
-  <div class="header">
-    <h1>Work with Customers</h1>
-  </div>
+<%
+  var rows = (typeof custsfl !== 'undefined' && custsfl) ? custsfl : [];
+  var hasMsg = (typeof msg !== 'undefined' && msg && String(msg).trim());
+  var clean = function (v) { return String(v == null ? '' : v).replace(/\s+/g, ' ').trim(); };
+  var initials = function (name) {
+    var parts = clean(name).replace(/[^A-Za-z0-9 ]/g, ' ').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) { return '?'; }
+    return (parts[0].charAt(0) + (parts.length > 1 ? parts[1].charAt(0) : '')).toUpperCase();
+  };
+  var tone = function (name) {
+    var sum = 0, s = clean(name);
+    for (var i = 0; i < s.length; i++) { sum += s.charCodeAt(i); }
+    return sum % 6;
+  };
+  var findVal = (typeof sfndcustno !== 'undefined' && Number(sfndcustno) > 0) ? String(Number(sfndcustno)) : '';
+  var filterVal = (typeof sfilter !== 'undefined' && sfilter) ? String(sfilter).trim() : '';
+%>
+<div class="cx-screen cx-list" data-density="comfortable">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="cx-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></symbol>
+      <symbol id="cx-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+      <symbol id="cx-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+      <symbol id="cx-mail" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></symbol>
+      <symbol id="cx-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+      <symbol id="cx-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+      <symbol id="cx-exit" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+      <symbol id="cx-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+      <symbol id="cx-nav" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></symbol>
+      <symbol id="cx-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+      <symbol id="cx-building" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="7" x2="9.01" y2="7"/><line x1="15" y1="7" x2="15.01" y2="7"/><line x1="9" y1="12" x2="9.01" y2="12"/><line x1="15" y1="12" x2="15.01" y2="12"/><path d="M10 22v-4h4v4"/></symbol>
+      <symbol id="cx-hash" viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></symbol>
+      <symbol id="cx-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+      <symbol id="cx-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+      <symbol id="cx-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+      <symbol id="cx-pie" viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></symbol>
+      <symbol id="cx-chev-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+      <symbol id="cx-chev-left" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></symbol>
+      <symbol id="cx-chev-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+      <symbol id="cx-first" viewBox="0 0 24 24"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></symbol>
+      <symbol id="cx-last" viewBox="0 0 24 24"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></symbol>
+      <symbol id="cx-columns" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></symbol>
+      <symbol id="cx-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+      <symbol id="cx-rows" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+      <symbol id="cx-map" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></symbol>
+      <symbol id="cx-sort" viewBox="0 0 24 24"><polyline points="8 9 12 5 16 9"/><polyline points="8 15 12 19 16 15"/></symbol>
+      <symbol id="cx-sort-up" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></symbol>
+      <symbol id="cx-sort-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
+    </defs>
+  </svg>
 
-  <div class="toolbar">
-    <div class="search-group">
-      <label for="sfndcustno">Find Customer #:</label>
-      <input type="text" name="sfndcustno" id="sfndcustno"
-             value="<%= sfndcustno %>" class="input-narrow">
-    </div>
-    <div class="search-group">
-      <label for="sfilter">Filter:</label>
-      <input type="text" name="sfilter" id="sfilter"
-             value="<%= sfilter %>" class="input-wide"
-             placeholder="Search by name, email, phone...">
-    </div>
-    <button onclick="pui.submit({action: 'SEARCH'})" class="btn">Search</button>
-  </div>
+  <div class="cx-inner">
 
-  <% if (typeof msg !== 'undefined' && msg && msg.trim()) { %>
-    <div class="message"><%= msg %></div>
-  <% } %>
+    <!-- HERO -->
+    <header class="cx-hero cx-rise" style="--i:0">
+      <div>
+        <div class="cx-brand">
+          <span class="cx-logo"><svg class="cx-ico"><use href="#cx-sparkles"/></svg></span>
+          <span class="cx-eyebrow">Profound Logic &middot; Customer Intelligence</span>
+        </div>
+        <h1>Customers</h1>
+        <p class="cx-sub">Search, sort and filter every account. Select a row to see its location, double-click or press Enter to open the full profile.</p>
+      </div>
+      <div class="cx-hero-actions">
+        <button type="button" class="cx-btn cx-btn-soft" onclick="pui.submit({action: 'EXIT'})" data-fkey="F3" data-pl-fkey="F3" data-pl-label="Main menu">
+          <svg class="cx-ico"><use href="#cx-exit"/></svg>Main menu <span class="cx-kbd">F3</span>
+        </button>
+      </div>
+    </header>
 
-  <% if (typeof soptdesc !== 'undefined' && soptdesc && soptdesc.trim()) { %>
-    <div class="options-hint"><%= soptdesc %></div>
-  <% } %>
+    <% if (hasMsg) { %>
+      <div class="cx-message cx-rise" style="--i:1"><svg class="cx-ico"><use href="#cx-alert"/></svg><%= msg %></div>
+    <% } %>
 
-  <table class="customer-table" data-sortable-table>
-    <thead>
-      <tr>
-        <th class="col-opt">Opt</th>
-        <th class="col-custno">
-          <button type="button" class="sort-button" data-sort-key="custno" data-sort-type="number">
-            Number
-            <span class="sort-indicator" aria-hidden="true"></span>
-          </button>
-        </th>
-        <th class="col-name">
-          <button type="button" class="sort-button" data-sort-key="name" data-sort-type="text">
-            Name
-            <span class="sort-indicator" aria-hidden="true"></span>
-          </button>
-        </th>
-        <th class="col-email">
-          <button type="button" class="sort-button" data-sort-key="email" data-sort-type="text">
-            Email
-            <span class="sort-indicator" aria-hidden="true"></span>
-          </button>
-        </th>
-        <th class="col-phone">
-          <button type="button" class="sort-button" data-sort-key="phone" data-sort-type="text">
-            Phone
-            <span class="sort-indicator" aria-hidden="true"></span>
-          </button>
-        </th>
-        <th class="col-addr">
-          <button type="button" class="sort-button" data-sort-key="addr" data-sort-type="text">
-            Address
-            <span class="sort-indicator" aria-hidden="true"></span>
-          </button>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <% if (typeof custsfl !== 'undefined' && custsfl && custsfl.length > 0) { %>
-        <% custsfl.forEach(function(row) { %>
-          <tr data-sort-custno="<%= row.scustno %>"
-              data-sort-name="<%= row.sname %>"
-              data-sort-email="<%= row.semail %>"
-              data-sort-phone="<%= row.sphone %>"
-              data-sort-addr="<%= row.saddr %>">
-            <td class="col-opt">
-              <input name="custsfl.sopt.<%= row._rrn %>"
-                     value="<%= row.sopt %>" size="2" maxlength="2"
-                     class="input-opt">
-            </td>
-            <td class="col-custno"><%= row.scustno %></td>
-            <td class="col-name"><%= row.sname %></td>
-            <td class="col-email"><%= row.semail %></td>
-            <td class="col-phone"><%= row.sphone %></td>
-            <td class="col-addr"><%= row.saddr %></td>
-          </tr>
-        <% }); %>
-      <% } %>
-    </tbody>
-  </table>
+    <!-- OVERVIEW (collapsible) -->
+    <section class="cx-panel cx-overview cx-rise" style="--i:1" data-role="overview">
+      <div class="cx-overview-head">
+        <h2 class="cx-panel-title"><svg class="cx-ico"><use href="#cx-chart"/></svg>Overview</h2>
+        <dl class="cx-stats-inline">
+          <div><dt>Customers</dt><dd data-kpi="count"><%= rows.length %></dd></div>
+          <div><dt>States</dt><dd data-kpi="states">&ndash;</dd></div>
+          <div><dt>Corporate email</dt><dd data-kpi="corp">&ndash;</dd></div>
+          <div><dt>Area codes</dt><dd data-kpi="codes">&ndash;</dd></div>
+        </dl>
+        <button type="button" class="cx-btn cx-btn-ghost cx-toggle-ov" data-act="toggle-overview" aria-expanded="true"><span data-role="ov-label">Hide insights</span><svg class="cx-ico"><use href="#cx-chev-down"/></svg></button>
+      </div>
+      <div class="cx-overview-body" data-role="overview-body">
+        <div class="cx-ov-col">
+          <h3 class="cx-ov-title"><svg class="cx-ico"><use href="#cx-pie"/></svg>Customers by state <span class="cx-panel-note" data-note="states"></span></h3>
+          <div class="cx-donut-wrap">
+            <div class="cx-donut" data-chart="donut"></div>
+            <ul class="cx-legend" data-chart="legend"></ul>
+          </div>
+        </div>
+        <div class="cx-ov-col">
+          <h3 class="cx-ov-title"><svg class="cx-ico"><use href="#cx-chart"/></svg>Contact profile</h3>
+          <div data-chart="bars"></div>
+        </div>
+        <div class="cx-ov-col cx-insights">
+          <h3 class="cx-ov-title"><svg class="cx-ico"><use href="#cx-sparkles"/></svg>Smart insights <span class="cx-chip cx-chip-lav">Live</span></h3>
+          <ul class="cx-insight-list" data-chart="insights"></ul>
+          <p class="cx-panel-note cx-insight-foot">Rule-based, calculated in your browser from the rows below.</p>
+        </div>
+      </div>
+    </section>
 
-  <input type="hidden" name="action" value="">
+    <!-- GRID + MAP -->
+    <section class="cx-workspace" data-map="on">
+      <div class="cx-gridpanel cx-panel cx-rise" style="--i:2">
 
-  <div class="footer">
-    <button onclick="pui.submit({action: 'EXIT'})" data-fkey="F3" class="btn btn-secondary">Exit (F3)</button>
+        <div class="cx-bar1">
+          <label class="cx-search">
+            <svg class="cx-ico"><use href="#cx-search"/></svg>
+            <input type="text" name="sfilter" id="sfilter" value="<%= filterVal %>" placeholder="Filter rows&hellip;  (Enter = search database)" autocomplete="off">
+            <button type="button" class="cx-clear" data-act="clear" aria-label="Clear search"><svg class="cx-ico"><use href="#cx-x"/></svg></button>
+          </label>
+          <label class="cx-field cx-find">
+            <svg class="cx-ico"><use href="#cx-hash"/></svg>
+            <input type="text" name="sfndcustno" id="sfndcustno" value="<%= findVal %>" placeholder="Customer #" inputmode="numeric" autocomplete="off">
+          </label>
+          <label class="cx-field cx-select">
+            <select data-role="state" aria-label="Filter by state"><option value="">All states</option></select>
+          </label>
+          <label class="cx-field cx-select">
+            <select data-role="mailtype" aria-label="Filter by email type">
+              <option value="">All email types</option>
+              <option value="corp">Corporate</option>
+              <option value="personal">Personal</option>
+            </select>
+          </label>
+          <button type="button" class="cx-btn cx-btn-primary" data-act="search" data-pl-fkey="Enter" data-pl-label="Search"><svg class="cx-ico"><use href="#cx-search"/></svg>Search</button>
+        </div>
+
+        <div class="cx-bar2">
+          <div class="cx-count" data-role="count" aria-live="polite"></div>
+          <div class="cx-tools">
+            <div class="cx-menu-wrap">
+              <button type="button" class="cx-btn cx-btn-ghost" data-act="toggle-cols" aria-haspopup="true"><svg class="cx-ico"><use href="#cx-columns"/></svg>Columns</button>
+              <div class="cx-menu" data-role="cols-menu" hidden>
+                <label><input type="checkbox" data-col="email" checked> Email</label>
+                <label><input type="checkbox" data-col="phone" checked> Phone</label>
+                <label><input type="checkbox" data-col="state" checked> State</label>
+                <label><input type="checkbox" data-col="addr" checked> Address</label>
+              </div>
+            </div>
+            <button type="button" class="cx-btn cx-btn-ghost" data-act="density" title="Row density"><svg class="cx-ico"><use href="#cx-rows"/></svg><span data-role="density-label">Comfortable</span></button>
+            <button type="button" class="cx-btn cx-btn-ghost" data-act="export" title="Download the filtered rows as CSV"><svg class="cx-ico"><use href="#cx-download"/></svg>Export CSV</button>
+            <button type="button" class="cx-btn cx-btn-ghost cx-maptoggle is-on" data-act="toggle-map"><svg class="cx-ico"><use href="#cx-map"/></svg>Map</button>
+          </div>
+        </div>
+
+        <% if (rows.length === 0) { %>
+          <div class="cx-empty">
+            <div class="cx-empty-art"><svg class="cx-ico"><use href="#cx-search"/></svg></div>
+            <h3>No customers found</h3>
+            <p>Try a different name, a partial email or clear the search to see everyone.</p>
+            <button type="button" class="cx-btn cx-btn-accent" data-act="reset">Show all customers</button>
+          </div>
+        <% } %>
+
+        <div class="cx-scroll" data-role="scroll" tabindex="0" aria-label="Customers grid. Use the arrow keys to move, Enter to open.">
+          <table class="cx-grid" data-role="grid">
+            <thead>
+              <tr>
+                <th class="col-act" aria-label="Open"></th>
+                <th class="col-no" data-sort="no"><button type="button">Number<svg class="cx-ico cx-sortico"><use href="#cx-sort"/></svg></button></th>
+                <th class="col-name" data-sort="name"><button type="button">Customer<svg class="cx-ico cx-sortico"><use href="#cx-sort"/></svg></button></th>
+                <th class="col-email" data-sort="email"><button type="button">Email<svg class="cx-ico cx-sortico"><use href="#cx-sort"/></svg></button></th>
+                <th class="col-phone" data-sort="phone"><button type="button">Phone<svg class="cx-ico cx-sortico"><use href="#cx-sort"/></svg></button></th>
+                <th class="col-state" data-sort="state"><button type="button">State<svg class="cx-ico cx-sortico"><use href="#cx-sort"/></svg></button></th>
+                <th class="col-addr" data-sort="addr"><button type="button">Address<svg class="cx-ico cx-sortico"><use href="#cx-sort"/></svg></button></th>
+              </tr>
+            </thead>
+            <tbody data-role="body">
+              <% rows.forEach(function (row) { %>
+                <tr class="cx-row" tabindex="-1"
+                    data-rrn="<%= row._rrn %>"
+                    data-no="<%= row.scustno %>"
+                    data-name="<%= clean(row.sname) %>"
+                    data-email="<%= clean(row.semail) %>"
+                    data-phone="<%= clean(row.sphone) %>"
+                    data-addr="<%= clean(row.saddr) %>">
+                  <td class="col-act">
+                    <button type="button" class="cx-open" data-act="open" title="Open profile" aria-label="Open profile for <%= clean(row.sname) %>"><svg class="cx-ico"><use href="#cx-arrow"/></svg></button>
+                    <input type="hidden" name="custsfl.sopt.<%= row._rrn %>" value="<%= row.sopt %>" data-role="opt">
+                  </td>
+                  <td class="col-no cx-mono">#<%= Number(row.scustno) %></td>
+                  <td class="col-name">
+                    <span class="cx-namecell">
+                      <button type="button" class="cx-expand" data-act="expand" aria-label="Show details"><svg class="cx-ico"><use href="#cx-chev-right"/></svg></button>
+                      <span class="cx-avatar cx-avatar-sm cx-av-<%= tone(row.sname) %>"><%= initials(row.sname) %></span>
+                      <span class="cx-nametext"><strong><%= clean(row.sname) %></strong><small class="cx-mobile-no">#<%= Number(row.scustno) %></small></span>
+                    </span>
+                  </td>
+                  <td class="col-email" title="<%= clean(row.semail) %>"><span class="cx-ellipsis"><%= clean(row.semail) %></span></td>
+                  <td class="col-phone cx-nowrap"><%= clean(row.sphone) %></td>
+                  <td class="col-state"><span class="cx-statechip" data-role="statechip"></span></td>
+                  <td class="col-addr" title="<%= clean(row.saddr) %>"><span class="cx-ellipsis"><%= clean(row.saddr) %></span></td>
+                </tr>
+                <tr class="cx-subrow" data-sub="<%= row._rrn %>">
+                  <td colspan="7">
+                    <div class="cx-subgrid">
+                      <div><small>Email</small><span><%= clean(row.semail) %></span></div>
+                      <div><small>Phone</small><span><%= clean(row.sphone) %></span></div>
+                      <div><small>Address</small><span><%= clean(row.saddr) %></span></div>
+                      <button type="button" class="cx-btn cx-btn-accent" data-act="open"><svg class="cx-ico"><use href="#cx-arrow"/></svg>Open profile</button>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+          <div class="cx-nomatch" data-role="nomatch" hidden>No customers match the current filters.</div>
+        </div>
+
+        <div class="cx-pager">
+          <label class="cx-pagesize">Rows per page
+            <select data-role="pagesize"><option>10</option><option selected>25</option><option>50</option><option>100</option></select>
+          </label>
+          <span class="cx-range" data-role="range"></span>
+          <nav class="cx-pages" data-role="pages" aria-label="Pagination"></nav>
+        </div>
+      </div>
+
+      <aside class="cx-preview cx-panel cx-rise" style="--i:3" data-role="preview" aria-live="polite">
+        <div class="cx-preview-empty" data-role="preview-empty">
+          <svg class="cx-ico"><use href="#cx-pin"/></svg>
+          <p>Select a customer to see their location.</p>
+        </div>
+        <div class="cx-preview-body" data-role="preview-body" hidden>
+          <div class="cx-preview-head">
+            <span class="cx-avatar cx-avatar-lg" data-pv="avatar"></span>
+            <div><h3 data-pv="name"></h3><span class="cx-no" data-pv="no"></span></div>
+          </div>
+          <div class="cx-mapbox">
+            <iframe data-pv="map" title="Customer location on Google Maps" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+          </div>
+          <p class="cx-preview-addr"><svg class="cx-ico"><use href="#cx-pin"/></svg><span data-pv="addr"></span></p>
+          <div class="cx-preview-links">
+            <a class="cx-btn cx-btn-soft" data-pv="dir" target="_blank" rel="noopener"><svg class="cx-ico"><use href="#cx-nav"/></svg>Directions</a>
+            <a class="cx-btn cx-btn-soft" data-pv="mail"><svg class="cx-ico"><use href="#cx-mail"/></svg>Email</a>
+            <a class="cx-btn cx-btn-soft" data-pv="tel"><svg class="cx-ico"><use href="#cx-phone"/></svg>Call</a>
+          </div>
+          <button type="button" class="cx-btn cx-btn-accent cx-btn-block" data-act="open-selected">Open full profile<svg class="cx-ico"><use href="#cx-arrow"/></svg></button>
+        </div>
+      </aside>
+    </section>
+
+    <input type="hidden" name="action" value="">
   </div>
 </div>
