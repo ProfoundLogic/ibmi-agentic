@@ -385,3 +385,30 @@ perpjrn.pgm: qclsrc/perpjrn.clle
 
 # STRJRNPF wrapper called after each SQL table create.
 perpsjpf.pgm: qclsrc/perpsjpf.clle
+
+
+# --- PERP direct launchers ------------------------------------------------
+# One CL per PERP program the menus call, named PL + the target program
+# (PLWRKCMR calls WRKCMR). Each sets the library list, sets company ACM in
+# *LDA(1:3), then calls the target by name, bypassing the company picker
+# (PERPSELR). No prerequisites: the targets are resolved at run time from the
+# library list, so building a launcher does not pull the target programs in.
+plwrkcmr.pgm: qclsrc/plwrkcmr.clle
+plwrkusrr.pgm: qclsrc/plwrkusrr.clle
+plwrkuomr.pgm: qclsrc/plwrkuomr.clle
+plwrkcnvr.pgm: qclsrc/plwrkcnvr.clle
+plwrkiclr.pgm: qclsrc/plwrkiclr.clle
+plwrkitmr.pgm: qclsrc/plwrkitmr.clle
+plwrklotr.pgm: qclsrc/plwrklotr.clle
+plwlmr.pgm: qclsrc/plwlmr.clle
+plwrkvndr.pgm: qclsrc/plwrkvndr.clle
+plwrkivnr.pgm: qclsrc/plwrkivnr.clle
+plwrkivpr.pgm: qclsrc/plwrkivpr.clle
+plreqentr.pgm: qclsrc/plreqentr.clle
+plreqaprr.pgm: qclsrc/plreqaprr.clle
+plpoentr.pgm: qclsrc/plpoentr.clle
+plporeqr.pgm: qclsrc/plporeqr.clle
+plposchr.pgm: qclsrc/plposchr.clle
+plpobrwr.pgm: qclsrc/plpobrwr.clle
+plrcventr.pgm: qclsrc/plrcventr.clle
+plrcnbrwr.pgm: qclsrc/plrcnbrwr.clle
