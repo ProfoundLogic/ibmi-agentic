@@ -1,0 +1,112 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CF06(06 'Convert/Confirm')
+     A                                      CA12(12 'Cancel/Back')
+     A          R SSFL                       SFL
+     A  51                                  SFLNXTCHG
+     A            SSOPT          1A  B  9  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SSREQNBR       8A  O  9  5
+     A            SSREQBY       10A  O  9 14
+     A            SSNEEDBY        L  O  9 27DATFMT(*MDY)
+     A            SSVNDR        10A  O  9 36
+     A            SSVNDNM       25A  O  9 47
+     A            SSTOTEST       6Y 2O  9 73EDTCDE(3)
+     A          R SSCTL                      SFLCTL(SSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 22'Create POs from Approved Requisi-
+     A                                      tions'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            LCOMPDSP       3A  O  2 11
+     A                                  6  2'Type option 1=Select, press Enter-
+     A                                      , then F6=Convert.'
+     A                                  8  2'Opt'
+     A                                      DSPATR(UL)
+     A                                  8  6'Req #'
+     A                                      DSPATR(UL)
+     A                                  8 14'Requested By'
+     A                                      DSPATR(UL)
+     A                                  8 27'Need By'
+     A                                      DSPATR(UL)
+     A                                  8 36'Vendor'
+     A                                      DSPATR(UL)
+     A                                  8 47'Vendor Name'
+     A                                      DSPATR(UL)
+     A                                  8 73'Est Cost'
+     A                                      DSPATR(UL)
+     A          R SFOOT
+     A                                      OVERLAY
+     A                                 23  2'F3=Exit  F5=Refresh  F6=Convert  -
+     A                                      F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R SNOSUB
+     A                                      OVERLAY
+     A                                 11 20'No approved requisitions to conv-
+     A                                      ert.'
+     A          R SPREV
+     A                                      OVERLAY
+     A                                  1 25'Preview - POs to Create'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            PCOMPDSP       3A  O  2 11
+     A                                  3  2'Selected requisitions:'
+     A            PSELCNT        4Y 0O  3 26EDTCDE(3)
+     A                                  3 34'lines:'
+     A            PLNCNT         4Y 0O  3 41EDTCDE(3)
+     A                                  3 47'PO count:'
+     A            PPOCNT         4Y 0O  3 57EDTCDE(3)
+     A                                  5  2'The following POs will be created-
+     A                                      :'
+     A                                  6  2'Vendor'
+     A                                      DSPATR(UL)
+     A                                  6 12'Vendor Name'
+     A                                      DSPATR(UL)
+     A                                  6 43'Lines'
+     A                                      DSPATR(UL)
+     A                                  6 51'Total Amount'
+     A                                      DSPATR(UL)
+     A  60        P1VNDR        10A  O  7  2
+     A  60        P1VNDNM       30A  O  7 12
+     A  60        P1LNS          4Y 0O  7 43EDTCDE(3)
+     A  60        P1TOT         15Y 2O  7 51EDTCDE(3)
+     A  61        P2VNDR        10A  O  8  2
+     A  61        P2VNDNM       30A  O  8 12
+     A  61        P2LNS          4Y 0O  8 43EDTCDE(3)
+     A  61        P2TOT         15Y 2O  8 51EDTCDE(3)
+     A  62        P3VNDR        10A  O  9  2
+     A  62        P3VNDNM       30A  O  9 12
+     A  62        P3LNS          4Y 0O  9 43EDTCDE(3)
+     A  62        P3TOT         15Y 2O  9 51EDTCDE(3)
+     A  63        P4VNDR        10A  O 10  2
+     A  63        P4VNDNM       30A  O 10 12
+     A  63        P4LNS          4Y 0O 10 43EDTCDE(3)
+     A  63        P4TOT         15Y 2O 10 51EDTCDE(3)
+     A  64        P5VNDR        10A  O 11  2
+     A  64        P5VNDNM       30A  O 11 12
+     A  64        P5LNS          4Y 0O 11 43EDTCDE(3)
+     A  64        P5TOT         15Y 2O 11 51EDTCDE(3)
+     A  34                             13  2'More vendors exist -- not all sho-
+     A                                      wn.'
+     A                                 15  2'F6=Confirm create   F12=Back'
+     A                                      COLOR(BLU)
+     A          R RMSGSFL                   SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R RMSGCTL                   SFLCTL(RMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)

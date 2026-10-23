@@ -1,0 +1,120 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA06(06 'Add')
+     A                                      CA12(12 'Cancel')
+     A          R VSFL                      SFL
+     A  51                                  SFLNXTCHG
+     A            SOPT           1A  B  8  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SVCODE        10A  O  8  5
+     A            SVNAME        30A  O  8 16
+     A            SVBUYER       10A  O  8 47
+     A            SVACT          1A  O  8 59
+     A          R VCTL                      SFLCTL(VSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 30'Work with Vendors'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            SCOMPDSP       3A  O  2 11
+     A                                  2 16'Active only (Y/N):'
+     A            SFACT          1A  B  2 36
+     A                                  3  2'Buyer (blank=all):'
+     A            SFBUYER       10A  B  3 21
+     A                                  5  2'Type option, press Enter.'
+     A                                  6  4'2=Change   4=Delete   5=Display'
+     A                                  7  2'Opt'
+     A                                      DSPATR(UL)
+     A                                  7  5'Vendor'
+     A                                      DSPATR(UL)
+     A                                  7 16'Name'
+     A                                      DSPATR(UL)
+     A                                  7 47'Buyer'
+     A                                      DSPATR(UL)
+     A                                  7 59'Act'
+     A                                      DSPATR(UL)
+     A          R VFOOT
+     A                                 23  2'F3=Exit   F5=Refresh   F6=Add   -
+     A                                      F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R VNONE
+     A                                      OVERLAY
+     A                                 10 20'** No vendors match this filter -
+     A                                      **'
+     A          R VNOCO
+     A                                      OVERLAY
+     A                                 10 20'** No company selected - run Sel-
+     A                                      ect Company first **'
+     A          R VEDIT
+     A                                      OVERLAY
+     A                                  1 30'Edit Vendor'
+     A                                      DSPATR(HI)
+     A                                  2  2'Mode:'
+     A            EMODE          1A  O  2  8
+     A                                  3  2'Vendor code:'
+     A            EVCODE        10A  B  3 15
+     A  60                                  DSPATR(PR)
+     A                                  4  2'Name:'
+     A            EVNAME        60A  B  4 15
+     A  60                                  DSPATR(PR)
+     A                                  5  2'Address 1:'
+     A            EADDR1        60A  B  5 15
+     A  60                                  DSPATR(PR)
+     A                                  6  2'Address 2:'
+     A            EADDR2        60A  B  6 15
+     A  60                                  DSPATR(PR)
+     A                                  7  2'City:'
+     A            ECITY         30A  B  7 15
+     A  60                                  DSPATR(PR)
+     A                                  8  2'State:'
+     A            ESTATE         3A  B  8 15
+     A  60                                  DSPATR(PR)
+     A                                  9  2'Postal Code:'
+     A            EPOSTCD       12A  B  9 15
+     A  60                                  DSPATR(PR)
+     A                                 10  2'Country:'
+     A            ECNTRY         3A  B 10 15
+     A  60                                  DSPATR(PR)
+     A                                 11  2'Phone:'
+     A            EPHONE        20A  B 11 15
+     A  60                                  DSPATR(PR)
+     A                                 12  2'Email:'
+     A            EEMAIL        60A  B 12 15
+     A  60                                  DSPATR(PR)
+     A                                 13  2'Contact Name:'
+     A            ECNTCT        30A  B 13 16
+     A  60                                  DSPATR(PR)
+     A                                 14  2'Buyer Code:'
+     A            EBUYER        10A  B 14 15
+     A  60                                  DSPATR(PR)
+     A                                 15  2'Payment Terms:'
+     A            EPTERMS       20A  B 15 17
+     A  60                                  DSPATR(PR)
+     A                                 16  2'Tax ID:'
+     A            ETAXID        20A  B 16 15
+     A  60                                  DSPATR(PR)
+     A                                 17  2'Active (Y/N):'
+     A            EACTIVE        1A  B 17 16
+     A  60                                  DSPATR(PR)
+     A N60                             23  2'Enter=Save   F12=Cancel'
+     A  60                             23  2'F12=Return to list'
+     A                                      COLOR(BLU)
+     A          R VMSGSFL                   SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R VMSGCTL                   SFLCTL(VMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)
