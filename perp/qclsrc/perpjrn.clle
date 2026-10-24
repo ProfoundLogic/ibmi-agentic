@@ -1,0 +1,26 @@
+/* PERPJRN - Create the PERP journal + receiver in PERPDEMO.        */
+/* Run once at library setup time.                                   */
+/*   PERPRCV001 - initial journal receiver                          */
+/*   PERPJRN     - the journal object                                */
+
+PGM
+
+  CRTJRNRCV JRNRCV(PERPDEMO/PERPRCV001) +
+            THRESHOLD(1000000) +
+            AUT(*USE) +
+            TEXT('PERP journal receiver (initial)')
+  MONMSG MSGID(CPF7010)
+
+  CRTJRN    JRN(PERPDEMO/PERPJRN) +
+            JRNRCV(PERPDEMO/PERPRCV001) +
+            MNGRCV(*SYSTEM) +
+            DLTRCV(*YES) +
+            RCVSIZOPT(*MAXOPT2 *RMVINTENT) +
+            JRNCACHE(*YES) +
+            AUT(*USE) +
+            TEXT('PERP journal - all PERP tables')
+  MONMSG MSGID(CPF7010)
+
+  SNDPGMMSG MSG('PERPJRN + PERPRCV001 ready in PERPDEMO')
+
+ENDPGM

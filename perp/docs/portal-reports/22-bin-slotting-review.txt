@@ -1,0 +1,22 @@
+New report: Bin slotting review
+
+I run the warehouse at ACME Distribution. I want to see how our items are slotted into bins, where unrelated items are crammed together, and a suggested better layout, given how much empty space we have.
+
+Data in library PERPDEMO:
+ITEM: item_number, item_description, class_code, qty_on_hand, and the bin, made up of aisle_code, bay_code and shelf_code (for example A3-B15-S3).
+ITEM_CLASS: class descriptions such as Fasteners, Lubricants and Safety equipment.
+WAREHOUSE_LAYOUT: aisle_count, bays_per_aisle, shelves_per_bay and bin sizes for the ACME Distribution Center.
+PO_HEADER and PO_LINE: open orders, to show where incoming stock will need room.
+
+How it works: the total number of bins is aisles times bays per aisle times shelves per bay. Count how many bins are in use. Flag:
+Bins holding more than one item.
+Bins that mix item classes, such as grease sharing a bin with washers.
+For each shared bin, suggest moving every item except one to the nearest empty bin, keeping each class together in its own aisle where possible. Keep the suggestion simple: one aisle per class, and fill bays in order. Items with open POs arriving should be moved first.
+
+What I'd like to see:
+Tiles: bins in use against total bins, shared bins, mixed-class bins, and items affected.
+A warehouse map grid with aisles as rows and bays as columns, coloured by the number of items in each bin.
+A table of shared bins listing their items and classes, with an action such as "Move LUB-001 from A3-B15-S3 to A6-B1-S1 (Lubricants aisle)".
+A printable move list sorted by aisle.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

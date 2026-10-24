@@ -1,0 +1,50 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA12(12 'Cancel')
+     A          R ITPSFL                     SFL
+     A  51                                  SFLNXTCHG
+     A            SOPT           1A  B  8  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SIITEM        25A  O  8  5
+     A            SIDESC        48A  O  8 31
+     A          R ITPCTL                     SFLCTL(ITPSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 31'Item Number Prompt'
+     A                                      DSPATR(HI)
+     A                                  2  2'Search (item/desc):'
+     A            SSEARCH       30A  B  2 35
+     A                                  4  2'Type 1 to select an item.'
+     A                                  7  2'Opt'
+     A                                      DSPATR(UL)
+     A                                  7  6'Item'
+     A                                      DSPATR(UL)
+     A                                  7 31'Description'
+     A                                      DSPATR(UL)
+     A          R ITPFOOT
+     A                                 23  2'F3=Exit   F5=Refresh   F12=Ca-
+     A                                      ncel'
+     A                                      COLOR(BLU)
+     A          R ITPNONE
+     A                                      OVERLAY
+     A                                 10 20'** No items match this searc-
+     A                                      h **'
+     A          R ITPMSGSFL                  SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R ITPMSGCTL                  SFLCTL(ITPMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)

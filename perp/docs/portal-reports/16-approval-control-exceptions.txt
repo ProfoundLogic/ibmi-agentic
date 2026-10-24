@@ -1,0 +1,21 @@
+New report: Approval control exceptions
+
+I'm the controller at ACME Distribution. I want to know whether any requisition was approved or rejected by someone who isn't an authorised approver, or by the person who requested it.
+
+Data in library PERPDEMO:
+REQUISITION_HEADER: requested_by, approved_by (whoever approved or rejected it), approved_at, approval_source_code, status_code, total_estimated_cost.
+PERP_USER: user_code, display_name, role_code (APPROVER and ADMIN are allowed to approve), is_active.
+
+How it works: look at human decisions only. The AI approval audit covers CODERFLOW decisions. Flag:
+"Self-approval" when the approver is the requester.
+"Not a PERP user" when the approver isn't in PERP_USER.
+"Inactive user".
+"Lacks approver role".
+
+What I'd like to see:
+Tiles: exceptions, value affected, and the number of people involved.
+A table sorted newest first, with an action such as "Re-approve requisition 22 with an authorised approver".
+A chart of decisions per person, split into compliant and exceptions.
+A list of the authorised approvers.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

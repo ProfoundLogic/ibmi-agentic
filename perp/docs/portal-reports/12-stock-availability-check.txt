@@ -1,0 +1,19 @@
+New report: Stock availability check
+
+I'm in inventory control at ACME Distribution. I want to find items where the available quantity doesn't add up, because a wrong available figure makes stock look out when it isn't, or the other way round.
+
+Data in library PERPDEMO:
+ITEM: qty_on_hand, qty_frozen, qty_available, reorder_point, updated_at, updated_by.
+
+How it works: available should equal on-hand minus frozen. Flag any item where it doesn't, and label the problem:
+"Stock invisible to orders" (available is zero but there is stock).
+"Available exceeds on hand".
+"Frozen exceeds on hand".
+Also flag a false reorder signal: when the wrong available figure puts the item below its reorder point but the correct figure would not.
+
+What I'd like to see:
+Tiles: items with bad availability, units misstated, and false reorder signals.
+A table showing who last changed each item, with an action such as "Correct available from 0 to 127".
+A health tile showing how many items are clean, so the report is useful even when it's nearly empty.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

@@ -1,0 +1,23 @@
+New report: AI approval audit
+
+I'm the controller at ACME Distribution. I want to audit the requisitions CoderFlow approved automatically: are they within our policy, how close to the limits are they, and how much faster is CoderFlow than human approvers?
+
+Data in library PERPDEMO:
+REQUISITION_HEADER: approval_source_code (HUMAN, CODERFLOW or AUTO_THRESHOLD), approved_by, approved_at, confidence_pct, total_estimated_cost, status_code, approval_notes.
+COMPANY_CONFIG: approval.auto_threshold and approval.auto_max_amount (read these, don't hard-code them).
+PO_LINE: source_requisition_number, to see whether an approved requisition has become a PO.
+
+How it works: include every CoderFlow decision, plus human decisions on requisitions CoderFlow had scored. Label each one:
+"Policy breach" when CoderFlow approved below the threshold or over the maximum.
+"Near threshold" when it was within 5 points or $50 of a limit.
+"Within policy".
+"Routed to human" when it was scored but a person decided.
+Compare the average hours from request to decision for CoderFlow and for humans. Also show whether each AI-approved requisition has a PO yet.
+
+What I'd like to see:
+Tiles: policy breaches (a big green zero when there are none), AI share of decisions, AI-approved value, and average confidence.
+A side-by-side "CoderFlow vs human" cycle time.
+The audit table, with the approval notes.
+A scatter chart of value against confidence, with the policy limits drawn as lines.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

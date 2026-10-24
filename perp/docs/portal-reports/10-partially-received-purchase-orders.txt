@@ -1,0 +1,23 @@
+New report: Partially received purchase orders
+
+I'm a buyer at ACME Distribution. I want to see PO lines that have been partly received, how much is still owed, and when anything last arrived, so I can chase the balance or close it short.
+
+Data in library PERPDEMO:
+PO_HEADER and PO_LINE: ordered_qty, received_qty, unit_price.
+PO_RECEIPT and PO_RECEIPT_LINE: receipt dates, quantities, lot numbers, and who received them (POSTED receipts only).
+PO_LINE_SCHEDULE: the next scheduled delivery.
+VENDOR and ITEM: names and descriptions.
+
+How it works: a line is partial when some, but not all, of it has been received on an OPEN or PARTIAL PO. Show:
+The balance and its value.
+The percentage received.
+The last receipt date and who received it.
+The next scheduled date.
+Flag it when the last receipt was over 30 days ago, or the next date has passed or is missing.
+
+What I'd like to see:
+Tiles: partial lines, balance owed, and the longest wait since a receipt.
+A table with progress bars and an action such as "Chase Apex for the remaining 60, or close the line short".
+Let me expand a row to see its receipt history.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

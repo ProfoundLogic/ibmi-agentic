@@ -1,0 +1,27 @@
+New report: My requisitions
+
+I raise requisitions at ACME Distribution. I want one place that shows where every requisition I raised stands, and what I need to do about any of them, so I don't have to call purchasing.
+
+Data in library PERPDEMO:
+REQUISITION_HEADER: requested_by, request_date, need_by_date, status_code, priority_code, total_estimated_cost, approval_notes.
+REQUISITION_LINE: the items on each requisition.
+PO_LINE and PO_HEADER: the PO each requisition became (source_requisition_number), and how much has been received.
+PERP_USER: names.
+
+How it works: default to the signed-in user, and let me pick another requester. Put each requisition in one plain stage:
+Empty draft.
+Not submitted.
+Waiting for approval.
+Rejected.
+Approved but no PO yet.
+On order, not yet received.
+Received.
+Anything empty, not submitted or rejected needs my action. Anything past its need-by date and not received should be flagged as late. For rejected requisitions, show the approver's note.
+
+What I'd like to see:
+Tiles: open requisitions, needs my action, late, and value in flight.
+A pipeline chart of the stages.
+A "needs your attention" list.
+A full tracker table with the PO number and a percentage-received bar.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

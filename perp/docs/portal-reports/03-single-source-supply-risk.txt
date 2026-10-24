@@ -1,0 +1,24 @@
+New report: Single-source supply risk
+
+I'm a purchasing manager at ACME Distribution. I want to know which items we can buy from only one vendor, and which of those are about to run out.
+
+Data in library PERPDEMO:
+ITEM_VENDOR: one row per approved vendor for an item, with lead_time_days.
+ITEM: qty_on_hand, qty_available, reorder_point.
+VENDOR: vendor name and buyer.
+PO_HEADER and PO_LINE: open orders.
+ITEM_VENDOR_PRICE: current price, used to value the stock.
+
+How it works: an item is single-source when it has exactly one active ITEM_VENDOR row. Risk levels:
+High when available plus open PO quantity is at or below the reorder point (work out the open quantity from PO lines with status OPEN or PARTIAL, not from ITEM.qty_on_order).
+Watch when available is within 25% above the reorder point.
+Low otherwise.
+Value the on-hand stock at the vendor's current price, to show how much inventory depends on one supplier.
+
+What I'd like to see:
+Tiles: single-source items, items at high risk, items on watch, and the dollar exposure.
+A table sorted by risk and then by longest lead time, with an action such as "Reorder now and qualify a second source".
+A chart of single-source items per vendor.
+A scatter chart of lead time against stock level.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

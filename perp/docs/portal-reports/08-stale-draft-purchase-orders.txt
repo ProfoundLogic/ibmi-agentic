@@ -1,0 +1,22 @@
+New report: Stale draft purchase orders
+
+I'm a buyer at ACME Distribution. I want a clean-up list of purchase orders stuck in Draft, telling me whether to release, finish or delete each one.
+
+Data in library PERPDEMO:
+PO_HEADER: status_code DRAFT, vendor, buyer, order_date, created_at, updated_at.
+PO_LINE: lines and their value.
+VENDOR: vendor names.
+PERP_USER: buyer names.
+
+How it works: show how many days each draft has gone untouched (since updated_at), its number of lines and its value. Recommend:
+"Delete" when it has no lines.
+"Release or cancel" when it has lines and hasn't been touched for over 30 days.
+"In progress" otherwise.
+
+What I'd like to see:
+Tiles: draft POs, empty drafts, and value stuck in draft.
+A table sorted by days untouched, with an action such as "Delete draft PO 18, no lines, untouched 93 days".
+A donut chart of drafts by age.
+Let me hide the empty drafts.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

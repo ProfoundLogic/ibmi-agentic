@@ -1,0 +1,17 @@
+New report: Overstock alert
+
+I'm a buyer at ACME Distribution. I want to catch items that will end up above their maximum stock level once open purchase orders arrive, and know which PO lines to cut.
+
+Data in library PERPDEMO:
+ITEM: qty_on_hand and max_qty.
+PO_HEADER and PO_LINE: open quantity per PO line (ordered_qty minus received_qty, on OPEN or PARTIAL orders).
+ITEM_VENDOR and ITEM_VENDOR_PRICE: the preferred vendor's current price.
+
+How it works: projected stock is on-hand plus open PO quantity. Flag items where projected stock is above max_qty. Show the excess quantity and its value, and how much of it can be cut from open POs. It's critical when on-hand alone is already over max.
+
+What I'd like to see:
+Tiles: items heading over max, excess value, and the quantity that can be cut.
+A table listing the PO lines involved, with an action such as "Cancel the 200 on PO 20 line 1, already 20 over max" or "Reduce PO 20 line 2 by 110".
+A bar chart of on-hand plus on-order against the max line.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

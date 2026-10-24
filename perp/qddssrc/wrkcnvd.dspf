@@ -1,0 +1,78 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA06(06 'Add')
+     A                                      CA12(12 'Cancel')
+     A          R CVSFL                     SFL
+     A  51                                  SFLNXTCHG
+     A            SOPT           1A  B  8  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SFROM          5A  O  8  6
+     A            STO            5A  O  8 12
+     A            SFACT         15Y 6O  8 18EDTCDE(3)
+     A          R CVCTL                     SFLCTL(CVSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 20'Work with Item UOM Conversions'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            SCOMPDSP       3A  O  2 11
+     A                                  2 20'Item Number:'
+     A            SFITEM        25A  B  2 33
+     A                                  2 59'(? = prompt)'
+     A                                  4  2'Type option, press Enter.'
+     A                                  5  4'2=Change   4=Delete'
+     A                                  7  2'Opt'
+     A                                      DSPATR(UL)
+     A                                  7  6'From'
+     A                                      DSPATR(UL)
+     A                                  7 12'To'
+     A                                      DSPATR(UL)
+     A                                  7 27'Factor'
+     A                                      DSPATR(UL)
+     A          R CVFOOT
+     A                                 23  2'F3=Exit   F5=Refresh   F6=Add-
+     A                                         F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R CVNONE
+     A                                      OVERLAY
+     A                                 10 20'** No conversions for this it-
+     A                                      em **'
+     A          R CVNOITEM
+     A                                      OVERLAY
+     A                                 10 20'** Enter an item number to be-
+     A                                      gin **'
+     A          R CVEDIT
+     A                                      OVERLAY
+     A                                  1 25'Edit Item UOM Conversion'
+     A                                      DSPATR(HI)
+     A                                  2  2'Mode:'
+     A            EMODE          1A  O  2  8
+     A                                  3  2'From UOM:'
+     A            EFROM          5A  B  3 13
+     A                                  4  2'To UOM:'
+     A            ETO            5A  B  4 13
+     A                                  5  2'Factor:'
+     A            EFACT         15Y 6B  5 13EDTCDE(3)
+     A                                  6  2'Active:'
+     A            EACTIVE        1A  B  6 13
+     A                                 23  2'Enter=Save   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R CVMSGSFL                  SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R CVMSGCTL                  SFLCTL(CVMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)

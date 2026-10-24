@@ -1,0 +1,20 @@
+New report: Today's dock
+
+I work in receiving at ACME Distribution. At the start of my shift I want a dock sheet showing what's due in today and this week, what's already overdue, which deliveries need lot numbers, and where each item gets put away.
+
+Data in library PERPDEMO:
+PO_HEADER and PO_LINE: open purchase orders.
+PO_LINE_SCHEDULE: split delivery dates.
+ITEM_VENDOR: lead_time_days.
+ITEM: lot_controlled (Y means a lot number must be captured), aisle_code, bay_code, shelf_code (the put-away bin), and available stock against the reorder point.
+VENDOR: vendor names.
+WAREHOUSE_LAYOUT: the warehouse shape, if you want to draw a bin map.
+
+How it works: work out due dates the same way as the late deliveries report: the schedule date, else the line's expected_receipt_date, else the order date plus the vendor lead time, marked "est.". Group deliveries into Overdue, Today, Tomorrow and Next 7 days, and within each group by vendor (one truck per vendor). Show the bin as aisle-bay-shelf. Flag lot-controlled items, and flag "hot" items that are below their reorder point and should be put away first.
+
+What I'd like to see:
+Tiles: due today, overdue, next 7 days, and deliveries that need a lot number.
+The dock schedule grouped as above.
+A printable put-away list sorted by aisle, bay and shelf.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

@@ -1,0 +1,27 @@
+New report: Vendor scorecard
+
+I'm the purchasing manager at ACME Distribution. I want one scorecard per vendor that shows how reliable and how expensive each one is, so I know who to reward, who to warn, and what to raise at our next vendor review.
+
+Data in library PERPDEMO:
+VENDOR: vendor_name, buyer_code, payment_terms_code, contact details.
+PO_HEADER and PO_LINE: orders, ordered_qty, received_qty, unit_price, expected_receipt_date.
+PO_LINE_SCHEDULE: scheduled delivery dates.
+PO_RECEIPT and PO_RECEIPT_LINE: what actually arrived and when (POSTED receipts only).
+ITEM_VENDOR: the items each vendor is approved for, is_preferred, and lead_time_days.
+ITEM_VENDOR_PRICE: the price history, used to measure price increases.
+
+How it works: score each vendor that has had at least one non-draft PO, on these measures:
+Delivery: how many deliveries arrived on or before their due date compared with how many arrived late. Work out the due date as the schedule date, else the expected_receipt_date, else the order date plus the vendor's lead time.
+Late now: open deliveries that are past due, and their value.
+Fill rate: quantity received compared with quantity ordered, on lines that are due.
+Price: the average 12-month price change across the vendor's items, and how many items went up 10% or more.
+Spend: total PO value, and value still open.
+Combine these into an overall grade, A to D, and explain in one sentence why each vendor got its grade. Also list the approved vendors that have never had a PO, with a count of the items they are approved for.
+
+What I'd like to see:
+Tiles: vendors scored, the worst grade and who has it, total value late, and the average price change.
+A scorecard table with one row per vendor, the grade as a coloured badge, and an action such as "Raise missed deliveries and the 12% grease increase with Apex at the next review".
+A chart comparing on-time percentage and price change by vendor.
+Let me click a vendor to see its late deliveries and price increases.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

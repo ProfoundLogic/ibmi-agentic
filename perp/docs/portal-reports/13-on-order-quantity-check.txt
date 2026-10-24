@@ -1,0 +1,17 @@
+New report: On-order quantity check
+
+I'm in inventory control at ACME Distribution. I want to check that the on-order quantity stored on each item matches what is actually open on purchase orders, because planners rely on it.
+
+Data in library PERPDEMO:
+ITEM: qty_on_order, qty_available, reorder_point.
+PO_HEADER and PO_LINE: the open quantity on OPEN or PARTIAL orders (ordered minus received). Draft POs don't count.
+
+How it works: compare ITEM.qty_on_order with the real open PO quantity for each item, and list the differences with the PO numbers involved. Flag a false reorder signal: when the stored figure makes the item look like it needs reordering but the real open quantity would not. If every item with open POs is wrong, show a banner saying the on-order quantity isn't being maintained by the system, which needs an IT fix.
+
+What I'd like to see:
+Tiles: items mismatched, units unaccounted for, and false reorder signals.
+The banner, with a button to raise an IT request.
+A table with an action such as "Item shows 0 on order; PO 20 has 200 open".
+A chart comparing the stored and real figures.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.

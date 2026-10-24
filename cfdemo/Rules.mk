@@ -25,7 +25,10 @@ products2l.file: qddssrc/products2l.lf | productsp.file
 
 # Message file and menu
 menu.msgf: menu.msgf
-menu.menu: menu.msgf | menu.file
+# .file MUST be a normal prereq (not order-only) or codermake silently
+# drops the CRTMNU recipe -- see perp/DDL_STYLE_GUIDE.md "codermake
+# gotchas" for the general rule (discovered there, applies here too).
+menu.menu: menu.msgf menu.file
 
 # Simple program
 hellor.pgm: qrpglesrc/hellor.rpgle qddssrc/hellod.dspf | hellod.file

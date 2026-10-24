@@ -1,0 +1,22 @@
+New report: Approved requisitions waiting for a PO
+
+I'm a buyer at ACME Distribution. Each morning I want to see every approved requisition that hasn't been put on a purchase order yet, so I know what to buy today and from which vendor.
+
+Data in library PERPDEMO:
+REQUISITION_HEADER: requisition number, requested_by, request_date, need_by_date, priority_code, status_code, approved_by, approved_at, approval_source_code, total_estimated_cost.
+REQUISITION_LINE: the items, quantities and estimated costs on each requisition.
+PO_LINE: source_requisition_number links a PO line back to its requisition.
+ITEM_VENDOR: the preferred vendor for each item (is_preferred = 'Y').
+VENDOR: vendor_name, and buyer_code (the buyer responsible for that vendor).
+PERP_USER: display names for user codes.
+
+How it works: a requisition is waiting when its status is APPROVED and no PO line points back to it. Group the waiting lines by each item's preferred vendor, so I can see one PO to create per vendor. Show how old each requisition is and how many days it is past its need-by date. Approvals made by CODERFLOW should show as "CoderFlow AI".
+
+What I'd like to see:
+Tiles: number waiting, total value, oldest approval in days, and how many are past need-by.
+A table with one row per vendor: buyer, requisitions, lines, value, and earliest need-by.
+A detail list of the requisitions, with an action such as "Place PO with Apex Lubricants today, 54 days past need-by".
+A bar chart of value waiting by buyer.
+Let me filter by buyer.
+
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.
