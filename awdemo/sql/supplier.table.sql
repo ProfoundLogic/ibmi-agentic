@@ -1,0 +1,19 @@
+--  AdelWiggins demo dataset - SUPPLIER master
+CREATE OR REPLACE TABLE SUPPLIER (
+  SUPPLIER_ID   FOR COLUMN SUPPL00001 CHAR(6),
+  SUPPLIER_NAME FOR COLUMN SUPPL00002 VARCHAR(50),
+  CONTACT_NAME  FOR COLUMN CONTA00001 VARCHAR(50),
+  PHONE                               VARCHAR(20),
+  EMAIL                               VARCHAR(50),
+  ACTIVE_FLAG   FOR COLUMN ACTIV00001 CHAR(1) DEFAULT 'Y',
+  PRIMARY KEY (SUPPLIER_ID)
+);
+
+LABEL ON COLUMN SUPPLIER (
+  SUPPLIER_ID   IS 'Supplier ID',
+  SUPPLIER_NAME IS 'Supplier Name',
+  CONTACT_NAME  IS 'Contact Name',
+  PHONE         IS 'Phone Number',
+  EMAIL         IS 'Email Address',
+  ACTIVE_FLAG   IS 'Is Active (Y/N)'
+);
