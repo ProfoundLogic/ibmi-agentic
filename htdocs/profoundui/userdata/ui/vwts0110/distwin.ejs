@@ -1,0 +1,453 @@
+<% if (typeof skusfl !== 'undefined' && skusfl) { %>
+<%
+/* shared helpers - injected by prfdemolib/web/build.py */
+/* Bootstrap: templates render before (or without) app.js, so the screen
+   must already work. Define a minimal VW with a real submit and safe no-op
+   versions of every handler the markup calls; app.js upgrades it. */
+var vwG = (function () { return this; })() || {};
+var vwErr = null;
+if (!vwG.VW) {
+  vwG.VW = { submit: function (a, f) { var o = f || {}; if (a) { o.action = a; } if (vwG.pui && vwG.pui.submit) { vwG.pui.submit(o); } return false; } };
+  ['pickInput', 'pickKey', 'pickBlur', 'pickChoose', 'open', 'close', 'toggleTheme', 'toggleDensity', 'copy', 'exportCsv',
+   'sort', 'filter', 'paletteFilter', 'paletteKey', 'paletteRun', 'toast', 'remember'].forEach(function (k) { vwG.VW[k] = function () { return false; }; });
+}
+var vwTheme = 'light';
+var vwDensity = 'comfortable';
+try { var vwT = JSON.parse(vwG.localStorage.getItem('vw.theme')); if (vwT) { vwTheme = vwT; } else if (vwG.matchMedia && vwG.matchMedia('(prefers-color-scheme: dark)').matches) { vwTheme = 'dark'; } } catch (vwErr) { vwTheme = 'light'; }
+try { var vwD = JSON.parse(vwG.localStorage.getItem('vw.density')); if (vwD) { vwDensity = vwD; } } catch (vwErr) { vwDensity = 'comfortable'; }
+function N(v) { var n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; }
+function F(v, d) { return N(v).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+function M(v) { var n = N(v); return (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function T(v) { return String(v == null ? '' : v).replace(/\s+$/, ''); }
+function MDY(v) { var s = String(Math.round(N(v))); if (s === '0') { return ''; } while (s.length < 6) { s = '0' + s; } return Number(s.slice(0, 2)) + '/' + s.slice(2, 4) + '/' + s.slice(4, 6); }
+var VWLOC = {"188":["188 ELIZ","Elizabethtown, KY","S",9002],"205":["205 LAUR","Laurel, MS","S",9002],"215":["215 MACO","Macon, GA","S",9002],"257":["257 GRIF","Griffin, GA","S",9002],"262":["262 JACK","Pearl, MS","S",9002],"406":["406 SOUT","South Hill, VA","S",9001],"458":["458 GRNS","Greensboro, NC","S",9001],"499":["499JCKSN","Jacksonville, FL","S",9002],"535":["535GLEN","Glen Burnie, MD","S",9001],"1838":["1838FARM","Farmville, NC","S",9001],"9001":["Henderson DC","Henderson, NC","W",9001],"9002":["Newnan GA DC","Newnan, GA","W",9002],"9006":["Henderson Return Ctr","Henderson, NC","W",9001],"9007":["Newnan Repack","Newnan, GA","W",9002],"9151":["Blots Henderson DC","Henderson, NC","W",9151],"9152":["Blots Newnan DC","Newnan, GA","W",9152]};
+var VWSEA = [["0","Non Seasonal Item"],["6","Spring/Summer 2026"],["7","Fall/Winter 2026"]];
+function LOCN(n) { var l = VWLOC[String(Math.round(N(n)))]; return l ? l[0] : String(n); }
+function LOCC(n) { var l = VWLOC[String(Math.round(N(n)))]; return l ? l[1] : ''; }
+function IND(n) { return String(inds).charAt(n - 1) === '1'; }
+function CLS(n) { return n < 0 ? ' vw-neg' : (n === 0 ? ' vw-zero' : ''); }
+function ICON(name, sz) {
+  var p = {
+    search: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16-4.3-4.3',
+    back: 'M15 18l-6-6 6-6',
+    next: 'M9 6l6 6-6 6',
+    prev: 'M15 6l-6 6 6 6',
+    moon: 'M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z',
+    cmd: 'M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3z',
+    key: 'M3 8h18v10H3zM7 12h.01M11 12h.01M15 12h.01M7 15h10',
+    copy: 'M9 9h10v10H9zM5 15V5h10',
+    dl: 'M12 4v11m0 0 4-4m-4 4-4-4M5 19h14',
+    print: 'M7 9V4h10v5M7 17H5v-6h14v6h-2M7 14h10v6H7z',
+    box: 'M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8',
+    store: 'M4 10l1-5h14l1 5M5 10v9h14v-9M9 19v-5h6v5',
+    truck: 'M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-.1M17 19a2 2 0 1 0 0-.1',
+    chart: 'M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6',
+    spark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
+    alert: 'M12 8v5M12 16.5v.5M4 20h16L12 4z',
+    ok: 'M5 12.5l4.5 4.5L19 7.5',
+    tag: 'M4 4h8l8 8-8 8-8-8zM8 8h.01',
+    cal: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+    exit: 'M10 17l-5-5 5-5M5 12h11M14 4h6v16h-6',
+    filter: 'M4 5h16l-6 8v6l-4-2v-4z',
+    grid: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+    rows: 'M4 6h16M4 12h16M4 18h16',
+    pack: 'M3 7l9-4 9 4-9 4zM3 7v10l9 4 9-4V7M12 11v10'
+  }[name] || '';
+  return '<svg width="' + (sz || 18) + '" height="' + (sz || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + p + '"/></svg>';
+}
+%>
+<% var VWSKU = {"12":"DEPARTMENT PRICE SKU","8558":"LADIES SINGLE PANTY ASSTD","31703":"LADIES ASSORTED PANTY","42322":"BB 10 PK PANTY","100001":"13x13 WASH CLOTH","104027":"2PK PILLOWCASE","110600":"SOFT PEPPERMINT PUFFS","159258":"STEAM PAN 1/2 SIZE","166402":"ASST SWIM SEPARATE TOPS VEN","248117":"1OF2 4176 MELON NAVY LAF SOFA","262657":"ASST TOPS","289999":"ASST BASIC BEANIE","294044":"S WHT FULL SLIP","294052":"M WHT FULL SLIP","294053":"L WHT FULL SLIP","294054":"XL WHT FULL SLIP","294055":"S BLK FULL SLIP","294056":"M BLK FULL SLIP","294058":"L BLK FULL SLIP","294059":"XL BLK FULL SLIP","294060":"1X WHT  FULL SLIP","294061":"2X WHT FULL SLIP","294062":"3X WHT FULL SLIP","294063":"1X BLK FULL SLIP","294064":"2X BLK FULL SLIP","294065":"3X BLK FULL SLIP","294066":"M WHT 24 INCH HALF SLIP","294067":"L WHT  24 INCH HALF SLIP","294068":"M BLK 24 INCH HALF SLIP","294069":"L BLK  24 INCH HALF SLIP","294070":"1X WHT 24 INCH HALF SLIP","294072":"2X WHT 24 INCH HALF SLIP","294074":"3X WHT 24 INCH HALF SLIP","294075":"1X BLK 24 INCH HALF SLIP","294080":"2X BLK 24 INCH HALF SLIP","294082":"3X BLK 24 INCH HALF SLIP","294083":"M WHT 20 INCH HALF SLIP","294084":"L WHT 20 INCH HALF SLIP","294085":"M BLK 20 INCH HALF SLIP","294086":"L BLK 20 INCH HALF SLIP","351404":"2X WHITE CONTROL BRIEF","351407":"flex4X WHITE CONTROL BRIEF","361653":"DOVE PINK BAR","385697":"36 C WHT FF CTN BRA","385731":"38 C WHT CTN WIRE FREE BRA","385747":"42 DD BLK CTN WIRE FREE BRA","413449":"WUNDERWEAR 5PK BRIEF","413450":"WUNDERWEAR 5PK HI CUT","413451":"WUNDERWEAR 5PK BIKINI","418842":"LAYS REGULAR 1OZ","424966":"flexPLUS 2PK CTN PAD SPORT BRA","426775":"2PK ASST COTTON MESH SPORT BRA","438888":"24PK .5 LITER WATER","493935":"BLACK MISSY T SHIRT BRA","493970":"FASHION MISSY CONVERTIBLE BRA","494315":"ASSORTED MISSY T SHIRT BRAS","494316":"ASSORTED MISSY CONVERTIBLE BRA","494317":"ASST MISSY PUSHUP BALCONETTE","494318":"ASST BACK SMOOTHING BRA","494319":"ASST MISSY T SHIRT BRAS #2","494320":"ASST MISSY CONVERTIBLE BRAS #2","494321":"ASST MISSY PUSH UP BALCONETTE","494322":"ASST BACK SMOOTHING BRA #2","503589":"LDM HOLIDAY COOKIES 9OZ","520792":"2PK MISSY SEAMLESS BRIEF","556614":"DOVE SHEA BUTTER BAR","563910":"SZ7 4PK COLOR BIKINI","701735":"AWESOME BLEACH LAV 96OZ","729934":"ALKA 65 ALKALINE WATER 1.5L","787780":"2PK ASST BRA","787781":"FF 2PK ASST BRA","787782":"BRA PANTY SET","787783":"FF BRA PANTY SET","787784":"10PK GIRLS UW","789425":"4PK SMLS BRA","789494":"7PK 7 14 PANTY","789497":"7PK 4 6X PANTY","789498":"7PK TODD PANTY","789514":"5PK BRALETTE","820093":"FOL POCKET TEES","824115":"38C WHITE BRA","824116":"40C WHITE BRA","824118":"42C WHITE BRA","824120":"44C WHITE BRA","824122":"38D WHITE BRA","824124":"40D WHITE BRA","824126":"42D WHITE BRA","824130":"44D WHITE BRA","824132":"46D WHITE BRA","824134":"48D WHITE BRA","824137":"42DD WHITE BRA","824139":"44DD WHITE BRA","824142":"38C WHITE BRA","824145":"40C WHITE BRA","824147":"42C WHITE BRA","824148":"44C WHITE BRA","824150":"38D WHITE BRA","824151":"40D WHITE BRA","824153":"42D WHITE BRA","824154":"44D WHITE BRA","824155":"38C NUDE BRA","824156":"40C NUDE BRA","824157":"42C NUDE BRA","824158":"44C NUDE BRA","824159":"38D NUDE BRA","824160":"40D NUDE BRA","824163":"42D NUDE BRA","824165":"44D NUDE BRA","824182":"44D NUDE BRA","824183":"44D BLK SATIN WIREFREE BRA","824184":"42D BLK SATIN WIREFREE BRA","824185":"38D BLK SATIN WIREFREE BRA","824186":"38C BLK SATIN WIREFREE BRA","824188":"44DD BLK SATIN WIREFREE BRA","824190":"42DD BLK SATIN WIREFREE BRA","824192":"48D BLK SATIN WIREFREE BRA","824195":"46D BLK SATIN WIREFREE BRA","824198":"40C BLK SATIN WIREFREE BRA","824199":"42C BLK SATIN WIREDREE BRA","824204":"44C BLK SATIN WIREFREE BRA","824205":"40D BLK SATIN WIREFREE BRA","824206":"38C BLK COTTON BRA W/LACE","824207":"40C BLK COTTON BRA W/LACE","824208":"42C BLK COTTON BRA W/LACE","824209":"44C BLK COTTON BRA W/LACE","824210":"38D BLK COTTON BRA W/LACE","824211":"40D BLK COTTON BRA W/LACE","824212":"42D BLK COTTON BRA W/LACE","824213":"44D BLK COTTON BRA W/LACE","824214":"46D BLK COTTON BRA W/LACE","824215":"48D BLK COTTON BRA W/LACE","824216":"42DD BLACK COTTON BRA W/LACE","824218":"44DD BLK COTTON BRA W/LACE","824220":"38C NUDE BRA","824222":"46D NUDE BRA","824235":"40C NUDE BRA","824236":"42C NUDE BRA","824237":"44C NUDE BRA","824242":"38D NUDE BRA","824243":"40D NUDE BRA","824246":"42D NUDE BRA","824251":"44D NUDE BRA","824253":"48D NUDE BRA","824255":"42DD NUDE BRA","824258":"44DD NUDE BRA","827408":"3PK MCR SHAP BRF","827412":"FF FASH UW BRA","827414":"2PK LNG LEG CONTROL","841039":"IRR BOYS S/S GILDAN","843016":"SINGLE PANTY","843909":"SINGLE PANTY","849528":"LADIES ASSORTED PANTIES","849531":"SMLS SPORT BRA","849533":"4PK SEAMLESS BRA","849535":"2PK SEAMLESS COOKIE BRA","849537":"2PK SEAMLESS LACE","849539":"2PK SEAMLESS CAMI","849623":"2PK PAD UW","849638":"BB 2PK MOLDED BRA","849645":"BB 5PK BLK","849649":"SP 2PK SMLS BRA/PADS","849650":"SP 4PK SMLS PANTY","880101":"HOLIDAY SUGAR COOKIES 10OZ","880102":"GINGERBREAD COOKIE TIN 12OZ","880103":"PEPPERMINT CANDY CANES 12CT","880104":"MINI CANDY CANES 24CT","880105":"FRUIT FLAVOR CANDY CANES 12CT","880106":"MILK CHOCOLATE SANTA 3OZ","880107":"ASST CHOCOLATE GIFT BOX 7OZ","880108":"PEPPERMINT BARK 8OZ","880109":"CHOC COVERED PRETZELS 8OZ","880110":"CANDY CORN 11OZ","880111":"AUTUMN MIX CANDY 11OZ","880112":"CARAMEL APPLE POPS 12CT","880201":"2PK MICROFIBER PILLOWCASE STD","880202":"MICROFIBER SHEET SET TWIN","880203":"MICROFIBER SHEET SET FULL","880204":"MICROFIBER SHEET SET QUEEN","880205":"FLANNEL SHEET SET QUEEN","880206":"7PC COMFORTER SET QUEEN","880207":"5PC COMFORTER SET TWIN","880208":"REVERSIBLE COMFORTER FULL/QN","880209":"SHERPA THROW 50X60","880210":"PLUSH FLEECE THROW 50X60","880211":"HOLIDAY PRINT THROW 50X60","880212":"PLUSH BLANKET QUEEN"}; %>
+<%
+var vwApp = 'Ticket Item Inventory';
+var vwSub = 'Store ' + T(dfstor) + ' ' + T(dfname) + ' - Dept ' + T(dfdept) + ' ' + T(dfdnam);
+var vwPgm = T(prog) || 'TS0110W';
+var vwDate = new Date().toLocaleDateString('en-US');
+var vwKeys = [['F10', 'Create distribution'], ['F2', 'Back to the prompt'], ['F7', 'Top of the list'], ['F8', 'Bottom of the list'],
+              ['Up / Down', 'Move between pack quantities'], ['+ / -', 'Add or remove a pack'], ['F1', 'Exit to the prompt']];
+var rows = (typeof skusfl !== 'undefined' && skusfl) ? skusfl : [];
+function kind(r) {
+  var f = T(r.sfind) + '000000';
+  if (f.charAt(0) === '1') { return f.charAt(3) === '1' ? 'sub' : 'cls'; }
+  if (f.charAt(1) === '1') { return f.charAt(4) === '1' ? 'fin' : (f.charAt(3) === '1' ? 'subtot' : 'clstot'); }
+  return 'sku';
+}
+var fin = null;
+var skus = 0;
+var mapped = 0;
+var hot = 0;
+var curSub = '';
+var curCls = '';
+rows.forEach(function (r) {
+  r._k = kind(r);
+  if (r._k === 'fin') { fin = r; }
+  if (r._k === 'sub') { curSub = T(r.sfsku); }
+  if (r._k === 'cls') { curCls = T(r.sfsku); }
+  r._g = curSub + '-' + curCls;
+  if (r._k === 'sku') {
+    skus++;
+    r._map = T(r.sfdes1).slice(-1) === 'Y';
+    if (r._map) { mapped++; }
+    if (N(r.sfpcts) >= 85) { hot++; }
+  }
+});
+var finShp = fin ? N(fin.sfushp) : 0;
+var finSld = fin ? N(fin.sfusld) : 0;
+var finOnh = fin ? N(fin.sfuonh) : 0;
+var finAv = fin ? N(fin.sfpavl) : 0;
+var finPh = fin ? N(fin.sfphqt) : 0;
+var finPct = finShp ? finSld / finShp * 100 : 0;
+function pctCls(p) { return p >= 90 ? 'is-ok' : (p >= 75 ? '' : (p >= 50 ? 'is-warn' : 'is-bad')); }
+function desc(r) { var d = VWSKU[String(Math.round(N(r.sfsku)))]; return d ? d : T(r.sfdes1).slice(0, 13).trim(); }
+var cols = 13;
+%>
+<div class="vw-app vw-ts0110 vw-ts-list" data-theme="<%= vwTheme %>" data-density="<%= vwDensity %>"
+     data-store="<%= T(dfstor) %>" data-dept="<%= T(dfdept) %>" data-label="<%= T(dfname) %> <%= T(dfstat) %> - <%= T(dfdnam) %>" data-nbr="<%= N(nbr) %>">
+  <div class="vw-busy" aria-hidden="true"><div class="vw-spinner"></div></div>
+  <header class="vw-topbar">
+    <a class="vw-brand" href="javascript:void(0)" title="Variety Wholesalers, Inc.">
+      <span class="vw-logo" role="img" aria-label="Variety Wholesalers logo"></span>
+      <span class="vw-wordmark"><strong>VARIETY</strong><small>WHOLESALERS INCORPORATED</small></span>
+    </a>
+    <div class="vw-appname"><b><%= vwApp %></b><span><%= vwSub %></span></div>
+    <div class="vw-topbar-spacer"></div>
+    <div class="vw-topbar-tools vw-noprint">
+      <span class="vw-chip-date" title="Merchandise date from SYSGET / browser clock"><%- ICON('cal', 14) %> <b><%= vwDate %></b> <span data-vw-clock></span></span>
+      <span class="vw-pgm" title="IBM i program behind this screen"><%= vwPgm %></span>
+      <button type="button" class="vw-iconbtn" onclick="VW.open('vw-palette')" title="Command palette (Ctrl+K)" data-cmd-skip><%- ICON('cmd') %><span class="vw-sr">Command palette</span></button>
+      <button type="button" class="vw-iconbtn" onclick="VW.open('vw-keys')" title="Keyboard shortcuts (?)"><%- ICON('key') %><span class="vw-sr">Keyboard shortcuts</span></button>
+      <button type="button" class="vw-iconbtn" onclick="VW.toggleTheme()" title="Dark / light theme (Alt+T)"><%- ICON('moon') %><span class="vw-sr">Toggle theme</span></button>
+    </div>
+  </header>
+  <div class="vw-toasts" aria-live="polite"><div></div></div>
+  <section class="vw-hero">
+    <div class="vw-hero-inner">
+      <div class="vw-hero-row">
+        <div style="min-width:0">
+          <span class="vw-eyebrow">Ticket item inventory &middot; ships from <%= T(whstxt) %></span>
+          <h1>Store <%= T(dfstor) %> <%= T(dfname) %>, <%= T(dfstat) %> &middot; Dept <%= N(dfdept) %> <%= T(dfdnam) %></h1>
+          <div class="vw-hero-meta">
+            <span class="vw-pill <%= T(tckyn) === 'Y' ? '' : 'is-mute' %>">Ticketed only: <%= T(tckyn) === 'Y' ? 'yes' : 'no' %></span>
+            <span class="vw-pill <%= T(avlyn) === 'Y' ? '' : 'is-mute' %>">Warehouse can ship: <%= T(avlyn) === 'Y' ? 'yes' : 'no' %></span>
+            <span class="vw-pill is-info">Season <%= T(dfseas) %></span>
+            <span class="vw-pill is-mute"><%= T(dfyrd) %></span>
+            <span class="vw-pill is-mute"><%= LOCN(N(T(whstxt).replace(/\D/g, ''))) %></span>
+          </div>
+        </div>
+        <div class="vw-actions vw-noprint">
+          <button type="button" class="vw-btn-ghost" data-fkey="F2" onclick="return VW.submit('F02')" data-cmd="Change store or department" data-cmd-key="F2"><%- ICON('back') %> Change <span class="vw-kbd">F2</span></button>
+          <button type="button" class="vw-btn-ghost" data-fkey="F1" onclick="return VW.submit('F01')" data-cmd="Exit to the prompt" data-cmd-key="F1"><%- ICON('exit') %> Exit <span class="vw-kbd">F1</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="vw-main">
+    <section class="vw-kpis">
+      <div class="vw-kpi"><div class="vw-kpi-label">SKUs listed</div><div class="vw-kpi-value"><%= F(N(skucnt) || skus) %></div><div class="vw-kpi-note"><%= mapped %> mapped to a replenishment profile</div></div>
+      <div class="vw-kpi"><div class="vw-kpi-label">Units shipped</div><div class="vw-kpi-value"><%= F(finShp) %></div><div class="vw-kpi-note"><%= F(finOnh) %> still on hand at the store</div></div>
+      <div class="vw-kpi <%= pctCls(finPct) %>"><div class="vw-kpi-label">Sell-through</div><div class="vw-kpi-value"><%= F(finPct, 1) %>%</div><div class="vw-kpi-note"><%= F(finSld) %> units sold &middot; <%= hot %> SKUs at 85%+</div><div class="vw-meter"><span style="width:<%= Math.min(100, finPct) %>%"></span></div></div>
+      <div class="vw-kpi is-ok"><div class="vw-kpi-label">Packs available</div><div class="vw-kpi-value"><%= F(finAv) %></div><div class="vw-kpi-note">at <%= T(whstxt) %> after allocations</div></div>
+      <div class="vw-kpi <%= finPh ? 'is-warn' : '' %>"><div class="vw-kpi-label">Pack &amp; hold</div><div class="vw-kpi-value"><%= F(finPh) %></div><div class="vw-kpi-note">packs held at the warehouse</div></div>
+    </section>
+
+    <section class="vw-card vw-dist vw-noprint" id="vw-dist" aria-live="polite">
+      <div class="vw-card-body vw-dist-row">
+        <div class="vw-dist-ico"><%- ICON('truck', 26) %></div>
+        <div class="vw-dist-sum">
+          <b data-dist="title">Build a distribution</b>
+          <span class="vw-hint" data-dist="detail">Key packs in the Pks column (or use Smart fill), then Create distribution. The totals update as you type.</span>
+        </div>
+        <div class="vw-dist-stats">
+          <div><span class="vw-label">SKUs</span><b data-dist="skus">0</b></div>
+          <div><span class="vw-label">Packs</span><b data-dist="packs">0</b></div>
+          <div><span class="vw-label">Units</span><b data-dist="units">0</b></div>
+          <div><span class="vw-label">Retail</span><b data-dist="retail">$0.00</b></div>
+        </div>
+        <div class="vw-actions">
+          <button type="button" class="vw-btn-ghost" onclick="window.VWts && VWts.smartFill()" data-cmd="Smart fill pack quantities" title="Suggest packs for fast sellers the warehouse can supply"><%- ICON('spark') %> Smart fill</button>
+          <button type="button" class="vw-btn-ghost" onclick="window.VWts && VWts.clearAll()" data-cmd="Clear all pack quantities">Clear</button>
+          <button type="button" class="vw-btn" data-fkey="F10" onclick="if (window.VWts) { VWts.beforeSubmit(); } return VW.submit('F10');" data-cmd="Create distribution" data-cmd-key="F10"><%- ICON('ok') %> Create distribution <span class="vw-kbd">F10</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="vw-card">
+      <div class="vw-tablebar vw-noprint">
+        <div class="vw-input-wrap"><%- ICON('filter') %><input class="vw-input" type="text" placeholder="Filter by SKU or description..." oninput="VW.filter(this, 'vw-skus')" data-vw-search aria-label="Filter SKUs"></div>
+        <div class="vw-chips" role="group" aria-label="Quick filters">
+          <button type="button" class="vw-chip" data-chip="map" onclick="window.VWts && VWts.chip(this)">Mapped</button>
+          <button type="button" class="vw-chip" data-chip="hot" onclick="window.VWts && VWts.chip(this)">Sell-through 85%+</button>
+          <button type="button" class="vw-chip" data-chip="avl" onclick="window.VWts && VWts.chip(this)">Warehouse can ship</button>
+          <button type="button" class="vw-chip" data-chip="qty" onclick="window.VWts && VWts.chip(this)">In distribution</button>
+        </div>
+        <span class="vw-hint" data-count-for="vw-skus"><%= skus %> SKUs</span>
+        <div class="vw-actions" style="margin-left:auto">
+          <button type="button" class="vw-btn-ghost vw-btn-sm" data-fkey="F7" onclick="window.VWts && VWts.go('top')" title="Top (F7)">Top <span class="vw-kbd">F7</span></button>
+          <button type="button" class="vw-btn-ghost vw-btn-sm" data-fkey="F8" onclick="window.VWts && VWts.go('bottom')" title="Bottom (F8)">Bottom <span class="vw-kbd">F8</span></button>
+          <button type="button" class="vw-btn-ghost vw-btn-sm" onclick="VW.exportCsv('vw-skus', 'ts0110-store<%= T(dfstor) %>-dept<%= N(dfdept) %>')" data-cmd="Export SKUs to CSV"><%- ICON('dl', 16) %> Export</button>
+        </div>
+      </div>
+      <% if (rows.length) { %>
+      <div class="vw-tablewrap" id="vw-skuwrap">
+        <table class="vw-table vw-stack" id="vw-skus">
+          <thead><tr>
+            <th data-noexport>Pks</th>
+            <th><button type="button" class="vw-sort" onclick="VW.sort(this,'sku','num')">SKU</button></th>
+            <th><button type="button" class="vw-sort" onclick="VW.sort(this,'ds','txt')">Description</button></th>
+            <th>Map</th>
+            <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'pr','num')">Price</button></th>
+            <th class="num">Pack</th>
+            <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'sh','num')">Shipped</button></th>
+            <th class="num">On hand</th>
+            <th class="num">Sold</th>
+            <th><button type="button" class="vw-sort" onclick="VW.sort(this,'pc','num')">Sell-through</button></th>
+            <th class="num" title="Units on transfers to the store">Resv</th>
+            <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'av','num')">Packs avail</button></th>
+            <th class="num" title="Pack and hold / reserved for new stores">P&amp;H / Rsrv</th>
+          </tr></thead>
+          <tbody>
+          <% rows.forEach(function (r) {
+               var k = r._k;
+               if (k === 'sub' || k === 'cls') { %>
+            <tr class="vw-grp vw-grp-<%= k %>" data-grp="<%= r._g %>">
+              <td colspan="<%= cols %>" class="vw-cell-head"><span class="vw-grp-tag"><%= k === 'sub' ? 'Subdept' : 'Class' %> <%= T(r.sfsku) %></span> <%= T(r.sfdes1) %></td>
+            </tr>
+          <%   } else if (k === 'subtot' || k === 'clstot') {
+                 var pc = N(r.sfushp) ? N(r.sfusld) / N(r.sfushp) * 100 : 0; %>
+            <tr class="vw-tot vw-tot-<%= k %>" data-grp="<%= r._g %>">
+              <td data-noexport></td>
+              <td colspan="4" class="vw-cell-head"><%= k === 'subtot' ? 'Subdept' : 'Class' %> total</td>
+              <td class="vw-hide-sm"></td>
+              <td class="num" data-label="Shipped"><%= F(r.sfushp) %></td>
+              <td class="num" data-label="On hand"><%= F(r.sfuonh) %></td>
+              <td class="num" data-label="Sold"><%= F(r.sfusld) %></td>
+              <td data-label="Sell-through"><span class="vw-pill <%= pctCls(pc) %>"><%= F(pc, 1) %>%</span></td>
+              <td class="num" data-label="Resv"><%= F(r.sfures) %></td>
+              <td class="num" data-label="Packs avail"><%= F(r.sfpavl) %></td>
+              <td class="num" data-label="P&H / Rsrv"><%= F(r.sfphqt) %> / <%= F(r.sfnewq) %></td>
+            </tr>
+          <%   } else if (k === 'sku') {
+                 var pct = N(r.sfpcts); var av = N(r.sfpavl); %>
+            <tr data-sortable data-group="<%= r._g %>" data-grp="<%= r._g %>" data-sku-row data-map="<%= r._map ? 1 : 0 %>" data-pct="<%= pct %>" data-avl="<%= av %>"
+                data-pack="<%= N(r.sfpack) %>" data-price="<%= N(r.sfpric) %>" data-rrn="<%= r._rrn %>" data-desc="<%= desc(r) %>"
+                data-search="<%= T(r.sfsku) %> <%= desc(r) %>">
+              <td data-label="Packs" data-noexport>
+                <span class="vw-step">
+                  <button type="button" tabindex="-1" aria-label="One pack less" onclick="window.VWts && VWts.step(this, -1)">&minus;</button>
+                  <input class="vw-qty" type="text" inputmode="numeric" maxlength="3" name="skusfl.sfqty.<%= r._rrn %>" value="<%= N(r.sfqty) ? T(r.sfqty) : '' %>"
+                         aria-label="Packs of <%= T(r.sfsku) %>" oninput="window.VWts && VWts.recalc()" onkeydown="window.VWts && VWts.key(this, event)">
+                  <button type="button" tabindex="-1" aria-label="One pack more" onclick="window.VWts && VWts.step(this, 1)">+</button>
+                </span>
+              </td>
+              <td class="num" data-label="SKU" data-col="sku" data-v="<%= T(r.sfsku) %>"><span class="vw-key"><%= T(r.sfsku) %></span></td>
+              <td class="vw-cell-desc" data-label="Description" data-col="ds" data-v="<%= desc(r) %>"><%= desc(r) %></td>
+              <td data-label="Map" data-v="<%= r._map ? 'Y' : 'N' %>"><span class="vw-pill <%= r._map ? 'is-ok' : 'is-mute' %>"><%= r._map ? 'Y' : 'N' %></span></td>
+              <td class="num" data-label="Price" data-col="pr" data-v="<%= N(r.sfpric) %>"><%= M(r.sfpric) %></td>
+              <td class="num" data-label="Pack" data-v="<%= N(r.sfpack) %>"><%= F(r.sfpack) %></td>
+              <td class="num" data-label="Shipped" data-col="sh" data-v="<%= N(r.sfushp) %>"><%= F(r.sfushp) %></td>
+              <td class="num<%= CLS(N(r.sfuonh)) %>" data-label="On hand" data-v="<%= N(r.sfuonh) %>"><%= F(r.sfuonh) %></td>
+              <td class="num" data-label="Sold" data-v="<%= N(r.sfusld) %>"><%= F(r.sfusld) %></td>
+              <td data-label="Sell-through" data-col="pc" data-v="<%= pct %>"><div class="vw-bar"><i><b class="<%= pctCls(pct) %>" style="width:<%= Math.min(100, pct) %>%"></b></i><span><%= F(pct, 1) %>%</span></div></td>
+              <td class="num<%= CLS(N(r.sfures)) %>" data-label="Resv" data-v="<%= N(r.sfures) %>"><%= F(r.sfures) %></td>
+              <td class="num" data-label="Packs avail" data-col="av" data-v="<%= av %>"><%- av > 0 ? '<b>' + F(av) + '</b>' : '<span class="vw-zero">0</span>' %></td>
+              <td class="num<%= CLS(N(r.sfphqt) + N(r.sfnewq)) %>" data-label="P&H / Rsrv" data-v="<%= N(r.sfphqt) %>"><%= F(r.sfphqt) %> / <%= F(r.sfnewq) %></td>
+            </tr>
+          <%   }
+             }); %>
+          </tbody>
+          <% if (fin) { %>
+          <tfoot><tr>
+            <td data-noexport></td><td colspan="4" class="vw-cell-head">Final totals &middot; Dept <%= N(dfdept) %></td><td class="vw-hide-sm"></td>
+            <td class="num" data-label="Shipped"><%= F(finShp) %></td><td class="num" data-label="On hand"><%= F(finOnh) %></td><td class="num" data-label="Sold"><%= F(finSld) %></td>
+            <td data-label="Sell-through"><span class="vw-pill <%= pctCls(finPct) %>"><%= F(finPct, 1) %>%</span></td>
+            <td class="num" data-label="Resv"><%= F(fin.sfures) %></td><td class="num" data-label="Packs avail"><%= F(finAv) %></td><td class="num" data-label="P&H / Rsrv"><%= F(finPh) %> / <%= F(fin.sfnewq) %></td>
+          </tr></tfoot>
+          <% } %>
+        </table>
+      </div>
+      <% } else { %>
+      <div class="vw-empty"><b>No SKUs match</b>Try turning off &ldquo;Ticketed SKUs only&rdquo; or &ldquo;Warehouse can ship&rdquo; on the prompt (F2).</div>
+      <% } %>
+    </section>
+  </main>
+  <footer class="vw-footer">
+    <div class="vw-footer-inner">
+      <span><b>&copy; 2026 Variety Wholesalers, Inc.</b> &middot; 218 South Garnett Street, Henderson, NC 27536 &middot; Big Lots &middot; Roses</span>
+      <span class="vw-noprint"><span class="vw-kbd">Ctrl</span>+<span class="vw-kbd">K</span> commands &nbsp; <span class="vw-kbd">?</span> shortcuts &nbsp; <span class="vw-kbd">/</span> search &nbsp; <%= vwPgm %> on IBM i</span>
+    </div>
+  </footer>
+  <div class="vw-backdrop" id="vw-palette" hidden data-vw-closable onmousedown="if (event.target === this) VW.close('vw-palette')">
+    <div class="vw-dialog vw-palette" role="dialog" aria-label="Command palette">
+      <div class="vw-input-wrap"><%- ICON('search') %><input class="vw-input" type="text" placeholder="Type a command or search..." oninput="VW.paletteFilter(this.value)" onkeydown="VW.paletteKey(this, event)" aria-label="Command"></div>
+      <ul id="vw-palette-list" role="listbox"></ul>
+    </div>
+  </div>
+  <div class="vw-backdrop" id="vw-keys" hidden data-vw-closable onmousedown="if (event.target === this) VW.close('vw-keys')">
+    <div class="vw-dialog" role="dialog" aria-label="Keyboard shortcuts" style="width:min(720px,100%)">
+      <div class="vw-dialog-head"><span class="vw-ico"><%- ICON('key', 22) %></span><div><h2>Keyboard shortcuts</h2><div class="vw-hint">Every green-screen function key still works, plus these browser extras.</div></div></div>
+      <div class="vw-shortcuts">
+        <% vwKeys.forEach(function (k) { %><div><span><%= k[1] %></span><span class="vw-kbd"><%= k[0] %></span></div><% }); %>
+        <div><span>Command palette</span><span class="vw-kbd">Ctrl+K</span></div>
+        <div><span>Focus search / filter</span><span class="vw-kbd">/</span></div>
+        <div><span>Dark / light theme</span><span class="vw-kbd">Alt+T</span></div>
+        <div><span>Compact / comfortable rows</span><span class="vw-kbd">Alt+D</span></div>
+        <div><span>Close dialog</span><span class="vw-kbd">Esc</span></div>
+      </div>
+      <div class="vw-dialog-foot"><button type="button" class="vw-btn-ghost" onclick="VW.close('vw-keys')">Close</button></div>
+    </div>
+  </div>
+</div>
+<% } else { %>
+<%
+/* shared helpers - injected by prfdemolib/web/build.py */
+/* Bootstrap: templates render before (or without) app.js, so the screen
+   must already work. Define a minimal VW with a real submit and safe no-op
+   versions of every handler the markup calls; app.js upgrades it. */
+var vwG = (function () { return this; })() || {};
+var vwErr = null;
+if (!vwG.VW) {
+  vwG.VW = { submit: function (a, f) { var o = f || {}; if (a) { o.action = a; } if (vwG.pui && vwG.pui.submit) { vwG.pui.submit(o); } return false; } };
+  ['pickInput', 'pickKey', 'pickBlur', 'pickChoose', 'open', 'close', 'toggleTheme', 'toggleDensity', 'copy', 'exportCsv',
+   'sort', 'filter', 'paletteFilter', 'paletteKey', 'paletteRun', 'toast', 'remember'].forEach(function (k) { vwG.VW[k] = function () { return false; }; });
+}
+var vwTheme = 'light';
+var vwDensity = 'comfortable';
+try { var vwT = JSON.parse(vwG.localStorage.getItem('vw.theme')); if (vwT) { vwTheme = vwT; } else if (vwG.matchMedia && vwG.matchMedia('(prefers-color-scheme: dark)').matches) { vwTheme = 'dark'; } } catch (vwErr) { vwTheme = 'light'; }
+try { var vwD = JSON.parse(vwG.localStorage.getItem('vw.density')); if (vwD) { vwDensity = vwD; } } catch (vwErr) { vwDensity = 'comfortable'; }
+function N(v) { var n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; }
+function F(v, d) { return N(v).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+function M(v) { var n = N(v); return (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function T(v) { return String(v == null ? '' : v).replace(/\s+$/, ''); }
+function MDY(v) { var s = String(Math.round(N(v))); if (s === '0') { return ''; } while (s.length < 6) { s = '0' + s; } return Number(s.slice(0, 2)) + '/' + s.slice(2, 4) + '/' + s.slice(4, 6); }
+var VWLOC = {"188":["188 ELIZ","Elizabethtown, KY","S",9002],"205":["205 LAUR","Laurel, MS","S",9002],"215":["215 MACO","Macon, GA","S",9002],"257":["257 GRIF","Griffin, GA","S",9002],"262":["262 JACK","Pearl, MS","S",9002],"406":["406 SOUT","South Hill, VA","S",9001],"458":["458 GRNS","Greensboro, NC","S",9001],"499":["499JCKSN","Jacksonville, FL","S",9002],"535":["535GLEN","Glen Burnie, MD","S",9001],"1838":["1838FARM","Farmville, NC","S",9001],"9001":["Henderson DC","Henderson, NC","W",9001],"9002":["Newnan GA DC","Newnan, GA","W",9002],"9006":["Henderson Return Ctr","Henderson, NC","W",9001],"9007":["Newnan Repack","Newnan, GA","W",9002],"9151":["Blots Henderson DC","Henderson, NC","W",9151],"9152":["Blots Newnan DC","Newnan, GA","W",9152]};
+var VWSEA = [["0","Non Seasonal Item"],["6","Spring/Summer 2026"],["7","Fall/Winter 2026"]];
+function LOCN(n) { var l = VWLOC[String(Math.round(N(n)))]; return l ? l[0] : String(n); }
+function LOCC(n) { var l = VWLOC[String(Math.round(N(n)))]; return l ? l[1] : ''; }
+function IND(n) { return String(inds).charAt(n - 1) === '1'; }
+function CLS(n) { return n < 0 ? ' vw-neg' : (n === 0 ? ' vw-zero' : ''); }
+function ICON(name, sz) {
+  var p = {
+    search: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16-4.3-4.3',
+    back: 'M15 18l-6-6 6-6',
+    next: 'M9 6l6 6-6 6',
+    prev: 'M15 6l-6 6 6 6',
+    moon: 'M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z',
+    cmd: 'M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3z',
+    key: 'M3 8h18v10H3zM7 12h.01M11 12h.01M15 12h.01M7 15h10',
+    copy: 'M9 9h10v10H9zM5 15V5h10',
+    dl: 'M12 4v11m0 0 4-4m-4 4-4-4M5 19h14',
+    print: 'M7 9V4h10v5M7 17H5v-6h14v6h-2M7 14h10v6H7z',
+    box: 'M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8',
+    store: 'M4 10l1-5h14l1 5M5 10v9h14v-9M9 19v-5h6v5',
+    truck: 'M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-.1M17 19a2 2 0 1 0 0-.1',
+    chart: 'M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6',
+    spark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
+    alert: 'M12 8v5M12 16.5v.5M4 20h16L12 4z',
+    ok: 'M5 12.5l4.5 4.5L19 7.5',
+    tag: 'M4 4h8l8 8-8 8-8-8zM8 8h.01',
+    cal: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+    exit: 'M10 17l-5-5 5-5M5 12h11M14 4h6v16h-6',
+    filter: 'M4 5h16l-6 8v6l-4-2v-4z',
+    grid: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+    rows: 'M4 6h16M4 12h16M4 18h16',
+    pack: 'M3 7l9-4 9 4-9 4zM3 7v10l9 4 9-4V7M12 11v10'
+  }[name] || '';
+  return '<svg width="' + (sz || 18) + '" height="' + (sz || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + p + '"/></svg>';
+}
+%>
+<%
+var vwApp = 'Ticket Item Inventory';
+var vwSub = 'Confirm the store distribution';
+var vwPgm = 'TS0110W';
+var vwDate = new Date().toLocaleDateString('en-US');
+var vwKeys = [['Enter', 'Create the distribution'], ['F1', 'Cancel and go back to the list']];
+var d = null;
+try { d = JSON.parse(vwG.sessionStorage.getItem('vw.dist')); } catch (vwErr) { d = null; }
+var notice = d && d.packs ? JSON.stringify({ text: 'Distribution submitted: ' + d.packs + ' packs (' + d.units + ' units) for store ' + d.store + ', dept ' + d.dept + '. CLTS0111 is processing it in batch.', kind: 'ok' }) : '';
+%>
+<div class="vw-app vw-ts0110 vw-ts-dist" data-theme="<%= vwTheme %>" data-density="<%= vwDensity %>">
+  <div class="vw-busy" aria-hidden="true"><div class="vw-spinner"></div></div>
+  <header class="vw-topbar">
+    <a class="vw-brand" href="javascript:void(0)" title="Variety Wholesalers, Inc.">
+      <span class="vw-logo" role="img" aria-label="Variety Wholesalers logo"></span>
+      <span class="vw-wordmark"><strong>VARIETY</strong><small>WHOLESALERS INCORPORATED</small></span>
+    </a>
+    <div class="vw-appname"><b><%= vwApp %></b><span><%= vwSub %></span></div>
+    <div class="vw-topbar-spacer"></div>
+    <div class="vw-topbar-tools vw-noprint">
+      <span class="vw-chip-date" title="Merchandise date from SYSGET / browser clock"><%- ICON('cal', 14) %> <b><%= vwDate %></b> <span data-vw-clock></span></span>
+      <span class="vw-pgm" title="IBM i program behind this screen"><%= vwPgm %></span>
+      <button type="button" class="vw-iconbtn" onclick="VW.open('vw-palette')" title="Command palette (Ctrl+K)" data-cmd-skip><%- ICON('cmd') %><span class="vw-sr">Command palette</span></button>
+      <button type="button" class="vw-iconbtn" onclick="VW.open('vw-keys')" title="Keyboard shortcuts (?)"><%- ICON('key') %><span class="vw-sr">Keyboard shortcuts</span></button>
+      <button type="button" class="vw-iconbtn" onclick="VW.toggleTheme()" title="Dark / light theme (Alt+T)"><%- ICON('moon') %><span class="vw-sr">Toggle theme</span></button>
+    </div>
+  </header>
+  <div class="vw-toasts" aria-live="polite"><div></div></div>
+  <main class="vw-main vw-confirm-main">
+    <section class="vw-dialog vw-confirm" role="dialog" aria-labelledby="vw-dist-h">
+      <div class="vw-dialog-head">
+        <span class="vw-ico"><%- ICON('truck', 24) %></span>
+        <div>
+          <span class="vw-eyebrow">Create distribution</span>
+          <h2 id="vw-dist-h"><% if (d && d.packs) { %><%= d.packs %> pack<%= d.packs === 1 ? '' : 's' %> to store <%= d.store %><% } else { %>Create a distribution?<% } %></h2>
+          <% if (d && d.label) { %><div class="vw-hint"><%= d.label %></div><% } %>
+        </div>
+      </div>
+      <div class="vw-dialog-body">
+        <% if (d && d.lines && d.lines.length) { %>
+        <div class="vw-confirm-stats">
+          <div><span class="vw-label">SKUs</span><b><%= d.skus %></b></div>
+          <div><span class="vw-label">Packs</span><b><%= F(d.packs) %></b></div>
+          <div><span class="vw-label">Units</span><b><%= F(d.units) %></b></div>
+          <div><span class="vw-label">Retail</span><b><%= M(d.retail) %></b></div>
+        </div>
+        <table class="vw-table vw-confirm-table">
+          <thead><tr><th>SKU</th><th>Description</th><th class="num">Packs</th><th class="num">Units</th></tr></thead>
+          <tbody>
+          <% d.lines.forEach(function (l) { %>
+            <tr><td><span class="vw-key"><%= l.sku %></span></td><td><%= l.desc %><% if (l.over) { %> <span class="vw-pill is-warn">more than available</span><% } %></td><td class="num"><%= l.packs %></td><td class="num"><%= F(l.units) %></td></tr>
+          <% }); %>
+          </tbody>
+        </table>
+        <% if (d.over) { %><div class="vw-alert is-info" style="margin-top:12px"><%- ICON('alert', 18) %><div><%= d.over %> line<%= d.over === 1 ? ' asks' : 's ask' %> for more packs than the warehouse shows available. The program will still write the quantities you keyed.</div></div><% } %>
+        <% } else { %>
+        <p>Press Enter to create a distribution from the pack quantities on the list, or F1 to go back.</p>
+        <% } %>
+        <p class="vw-hint" style="margin-top:12px">TS0110W adds a new work member to STR001WK and submits CLTS0111 to process it in batch.</p>
+      </div>
+      <div class="vw-dialog-foot">
+        <button type="button" class="vw-btn-ghost" data-fkey="F1" onclick="return VW.submit('F01')" data-cmd="Cancel and go back" data-cmd-key="F1"><%- ICON('back') %> Back to the list <span class="vw-kbd">F1</span></button>
+        <button type="button" class="vw-btn" data-fkey="Enter" data-notice="<%= notice %>"
+                onclick="try { var n = this.getAttribute('data-notice'); if (n) { localStorage.setItem('vw.notice', n); } sessionStorage.removeItem('vw.dist'); } catch (e) {} return VW.submit('ENTER');"
+                data-cmd="Create the distribution" data-cmd-key="Enter" autofocus><%- ICON('ok') %> Create distribution <span class="vw-kbd">Enter</span></button>
+      </div>
+    </section>
+  </main>
+  <footer class="vw-footer">
+    <div class="vw-footer-inner">
+      <span><b>&copy; 2026 Variety Wholesalers, Inc.</b> &middot; 218 South Garnett Street, Henderson, NC 27536 &middot; Big Lots &middot; Roses</span>
+      <span class="vw-noprint"><span class="vw-kbd">Ctrl</span>+<span class="vw-kbd">K</span> commands &nbsp; <span class="vw-kbd">?</span> shortcuts &nbsp; <span class="vw-kbd">/</span> search &nbsp; <%= vwPgm %> on IBM i</span>
+    </div>
+  </footer>
+  <div class="vw-backdrop" id="vw-palette" hidden data-vw-closable onmousedown="if (event.target === this) VW.close('vw-palette')">
+    <div class="vw-dialog vw-palette" role="dialog" aria-label="Command palette">
+      <div class="vw-input-wrap"><%- ICON('search') %><input class="vw-input" type="text" placeholder="Type a command or search..." oninput="VW.paletteFilter(this.value)" onkeydown="VW.paletteKey(this, event)" aria-label="Command"></div>
+      <ul id="vw-palette-list" role="listbox"></ul>
+    </div>
+  </div>
+  <div class="vw-backdrop" id="vw-keys" hidden data-vw-closable onmousedown="if (event.target === this) VW.close('vw-keys')">
+    <div class="vw-dialog" role="dialog" aria-label="Keyboard shortcuts" style="width:min(720px,100%)">
+      <div class="vw-dialog-head"><span class="vw-ico"><%- ICON('key', 22) %></span><div><h2>Keyboard shortcuts</h2><div class="vw-hint">Every green-screen function key still works, plus these browser extras.</div></div></div>
+      <div class="vw-shortcuts">
+        <% vwKeys.forEach(function (k) { %><div><span><%= k[1] %></span><span class="vw-kbd"><%= k[0] %></span></div><% }); %>
+        <div><span>Command palette</span><span class="vw-kbd">Ctrl+K</span></div>
+        <div><span>Focus search / filter</span><span class="vw-kbd">/</span></div>
+        <div><span>Dark / light theme</span><span class="vw-kbd">Alt+T</span></div>
+        <div><span>Compact / comfortable rows</span><span class="vw-kbd">Alt+D</span></div>
+        <div><span>Close dialog</span><span class="vw-kbd">Esc</span></div>
+      </div>
+      <div class="vw-dialog-foot"><button type="button" class="vw-btn-ghost" onclick="VW.close('vw-keys')">Close</button></div>
+    </div>
+  </div>
+</div>
+<% } %>

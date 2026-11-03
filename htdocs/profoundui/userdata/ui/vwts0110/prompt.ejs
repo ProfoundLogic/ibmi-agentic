@@ -1,0 +1,196 @@
+<%
+/* shared helpers - injected by prfdemolib/web/build.py */
+/* Bootstrap: templates render before (or without) app.js, so the screen
+   must already work. Define a minimal VW with a real submit and safe no-op
+   versions of every handler the markup calls; app.js upgrades it. */
+var vwG = (function () { return this; })() || {};
+var vwErr = null;
+if (!vwG.VW) {
+  vwG.VW = { submit: function (a, f) { var o = f || {}; if (a) { o.action = a; } if (vwG.pui && vwG.pui.submit) { vwG.pui.submit(o); } return false; } };
+  ['pickInput', 'pickKey', 'pickBlur', 'pickChoose', 'open', 'close', 'toggleTheme', 'toggleDensity', 'copy', 'exportCsv',
+   'sort', 'filter', 'paletteFilter', 'paletteKey', 'paletteRun', 'toast', 'remember'].forEach(function (k) { vwG.VW[k] = function () { return false; }; });
+}
+var vwTheme = 'light';
+var vwDensity = 'comfortable';
+try { var vwT = JSON.parse(vwG.localStorage.getItem('vw.theme')); if (vwT) { vwTheme = vwT; } else if (vwG.matchMedia && vwG.matchMedia('(prefers-color-scheme: dark)').matches) { vwTheme = 'dark'; } } catch (vwErr) { vwTheme = 'light'; }
+try { var vwD = JSON.parse(vwG.localStorage.getItem('vw.density')); if (vwD) { vwDensity = vwD; } } catch (vwErr) { vwDensity = 'comfortable'; }
+function N(v) { var n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; }
+function F(v, d) { return N(v).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+function M(v) { var n = N(v); return (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function T(v) { return String(v == null ? '' : v).replace(/\s+$/, ''); }
+function MDY(v) { var s = String(Math.round(N(v))); if (s === '0') { return ''; } while (s.length < 6) { s = '0' + s; } return Number(s.slice(0, 2)) + '/' + s.slice(2, 4) + '/' + s.slice(4, 6); }
+var VWLOC = {"188":["188 ELIZ","Elizabethtown, KY","S",9002],"205":["205 LAUR","Laurel, MS","S",9002],"215":["215 MACO","Macon, GA","S",9002],"257":["257 GRIF","Griffin, GA","S",9002],"262":["262 JACK","Pearl, MS","S",9002],"406":["406 SOUT","South Hill, VA","S",9001],"458":["458 GRNS","Greensboro, NC","S",9001],"499":["499JCKSN","Jacksonville, FL","S",9002],"535":["535GLEN","Glen Burnie, MD","S",9001],"1838":["1838FARM","Farmville, NC","S",9001],"9001":["Henderson DC","Henderson, NC","W",9001],"9002":["Newnan GA DC","Newnan, GA","W",9002],"9006":["Henderson Return Ctr","Henderson, NC","W",9001],"9007":["Newnan Repack","Newnan, GA","W",9002],"9151":["Blots Henderson DC","Henderson, NC","W",9151],"9152":["Blots Newnan DC","Newnan, GA","W",9152]};
+var VWSEA = [["0","Non Seasonal Item"],["6","Spring/Summer 2026"],["7","Fall/Winter 2026"]];
+function LOCN(n) { var l = VWLOC[String(Math.round(N(n)))]; return l ? l[0] : String(n); }
+function LOCC(n) { var l = VWLOC[String(Math.round(N(n)))]; return l ? l[1] : ''; }
+function IND(n) { return String(inds).charAt(n - 1) === '1'; }
+function CLS(n) { return n < 0 ? ' vw-neg' : (n === 0 ? ' vw-zero' : ''); }
+function ICON(name, sz) {
+  var p = {
+    search: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16-4.3-4.3',
+    back: 'M15 18l-6-6 6-6',
+    next: 'M9 6l6 6-6 6',
+    prev: 'M15 6l-6 6 6 6',
+    moon: 'M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z',
+    cmd: 'M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3z',
+    key: 'M3 8h18v10H3zM7 12h.01M11 12h.01M15 12h.01M7 15h10',
+    copy: 'M9 9h10v10H9zM5 15V5h10',
+    dl: 'M12 4v11m0 0 4-4m-4 4-4-4M5 19h14',
+    print: 'M7 9V4h10v5M7 17H5v-6h14v6h-2M7 14h10v6H7z',
+    box: 'M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8',
+    store: 'M4 10l1-5h14l1 5M5 10v9h14v-9M9 19v-5h6v5',
+    truck: 'M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-.1M17 19a2 2 0 1 0 0-.1',
+    chart: 'M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6',
+    spark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
+    alert: 'M12 8v5M12 16.5v.5M4 20h16L12 4z',
+    ok: 'M5 12.5l4.5 4.5L19 7.5',
+    tag: 'M4 4h8l8 8-8 8-8-8zM8 8h.01',
+    cal: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+    exit: 'M10 17l-5-5 5-5M5 12h11M14 4h6v16h-6',
+    filter: 'M4 5h16l-6 8v6l-4-2v-4z',
+    grid: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+    rows: 'M4 6h16M4 12h16M4 18h16',
+    pack: 'M3 7l9-4 9 4-9 4zM3 7v10l9 4 9-4V7M12 11v10'
+  }[name] || '';
+  return '<svg width="' + (sz || 18) + '" height="' + (sz || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + p + '"/></svg>';
+}
+%>
+<%
+var vwApp = 'Ticket Item Inventory';
+var vwSub = 'Sell-through by store and department, then build a distribution';
+var vwPgm = T(prog) || 'TS0110W';
+var vwDate = new Date().toLocaleDateString('en-US');
+var vwKeys = [['Enter', 'Show the SKUs'], ['F1', 'Exit to the menu']];
+var badStore = IND(90);
+var badDept = IND(91);
+var seas = T(dfseas) || 'ALL';
+var vwRecentTs = [];
+try { vwRecentTs = JSON.parse(vwG.localStorage.getItem('vw.recentTs')) || []; } catch (vwErr) { vwRecentTs = []; }
+var quick = [['205', '12', 'Laurel, MS - Ladies Intimate Basics'], ['205', '86', 'Laurel, MS - Seasonal Candy'], ['406', '86', 'South Hill, VA - Seasonal Candy'],
+             ['458', '59', 'Greensboro, NC - Bedding'], ['262', '12', 'Pearl, MS - Ladies Intimate Basics']];
+var fieldsJs = "{ dfstor: (document.getElementById('vw-dfstor').value.replace(/\\D/g, '') || '0'), dfdept: (document.getElementById('vw-dfdept').value.replace(/\\D/g, '') || '0'), " +
+               "dfseas: document.getElementById('vw-dfseas').value, tckyn: document.getElementById('vw-tckyn').value, avlyn: document.getElementById('vw-avlyn').value, dfyear: document.getElementById('vw-dfyear').value }";
+function sw(id, val, label, hint) {
+  return '<label class="vw-switch"><input type="checkbox"' + (val === 'Y' ? ' checked' : '') +
+    ' onchange="document.getElementById(\'' + id + '\').value = this.checked ? \'Y\' : \'N\'"><span class="vw-track"></span><span>' + label +
+    '<small class="vw-sub-line">' + hint + '</small></span></label>';
+}
+%>
+<div class="vw-app vw-ts0110 vw-ts-prompt" data-theme="<%= vwTheme %>" data-density="<%= vwDensity %>">
+  <div class="vw-busy" aria-hidden="true"><div class="vw-spinner"></div></div>
+  <header class="vw-topbar">
+    <a class="vw-brand" href="javascript:void(0)" title="Variety Wholesalers, Inc.">
+      <span class="vw-logo" role="img" aria-label="Variety Wholesalers logo"></span>
+      <span class="vw-wordmark"><strong>VARIETY</strong><small>WHOLESALERS INCORPORATED</small></span>
+    </a>
+    <div class="vw-appname"><b><%= vwApp %></b><span><%= vwSub %></span></div>
+    <div class="vw-topbar-spacer"></div>
+    <div class="vw-topbar-tools vw-noprint">
+      <span class="vw-chip-date" title="Merchandise date from SYSGET / browser clock"><%- ICON('cal', 14) %> <b><%= vwDate %></b> <span data-vw-clock></span></span>
+      <span class="vw-pgm" title="IBM i program behind this screen"><%= vwPgm %></span>
+      <button type="button" class="vw-iconbtn" onclick="VW.open('vw-palette')" title="Command palette (Ctrl+K)" data-cmd-skip><%- ICON('cmd') %><span class="vw-sr">Command palette</span></button>
+      <button type="button" class="vw-iconbtn" onclick="VW.open('vw-keys')" title="Keyboard shortcuts (?)"><%- ICON('key') %><span class="vw-sr">Keyboard shortcuts</span></button>
+      <button type="button" class="vw-iconbtn" onclick="VW.toggleTheme()" title="Dark / light theme (Alt+T)"><%- ICON('moon') %><span class="vw-sr">Toggle theme</span></button>
+    </div>
+  </header>
+  <div class="vw-toasts" aria-live="polite"><div></div></div>
+  <section class="vw-hero">
+    <div class="vw-hero-inner">
+      <span class="vw-eyebrow">Store merchandising &middot; Ticketed items</span>
+      <h1>How is a department selling at a store?</h1>
+      <p class="vw-lead">Pick a store and department to see every ticketed SKU: what was shipped, what sold, sell-through, and what the store&rsquo;s distribution center can still send. Then key packs and create a distribution in one step.</p>
+    </div>
+  </section>
+  <main class="vw-main">
+    <section class="vw-card">
+      <div class="vw-card-body">
+        <div class="vw-ts-form">
+          <div class="vw-field vw-picker">
+            <label for="vw-dfstor">Store</label>
+            <div class="vw-input-wrap"><%- ICON('store') %>
+              <input id="vw-dfstor" class="vw-input<%= badStore ? ' is-error' : '' %>" type="text" name="dfstor" inputmode="numeric" maxlength="5" autocomplete="off"
+                     value="<%= N(dfstor) ? T(dfstor) : '' %>" placeholder="e.g. 205 or a town" data-kind="store" data-pick-enter="1" data-vw-search autofocus
+                     onfocus="VW.pickInput(this)" oninput="VW.pickInput(this)" onkeydown="VW.pickKey(this, event)" onblur="VW.pickBlur(this)" aria-invalid="<%= badStore %>">
+            </div>
+            <ul class="vw-picker-list" role="listbox" hidden></ul>
+            <% if (badStore) { %><span class="vw-field-err">Invalid store number - pick one from the list.</span><% } else { %><span class="vw-hint" data-pick-label><%= N(dfstor) ? LOCN(dfstor) + ' ' + LOCC(dfstor) : 'Type a number or a town name' %></span><% } %>
+          </div>
+          <div class="vw-field vw-picker">
+            <label for="vw-dfdept">Department</label>
+            <div class="vw-input-wrap"><%- ICON('grid') %>
+              <input id="vw-dfdept" class="vw-input<%= badDept ? ' is-error' : '' %>" type="text" name="dfdept" inputmode="numeric" maxlength="3" autocomplete="off"
+                     value="<%= N(dfdept) ? T(dfdept) : '' %>" placeholder="e.g. 12 or candy" data-kind="dept" data-pick-enter="1"
+                     onfocus="VW.pickInput(this)" oninput="VW.pickInput(this)" onkeydown="VW.pickKey(this, event)" onblur="VW.pickBlur(this)" aria-invalid="<%= badDept %>">
+            </div>
+            <ul class="vw-picker-list" role="listbox" hidden></ul>
+            <% if (badDept) { %><span class="vw-field-err">Invalid department number - pick one from the list.</span><% } else { %><span class="vw-hint" data-pick-label>Departments with SKU counts in the demo data</span><% } %>
+          </div>
+          <div class="vw-field">
+            <label for="vw-dfseas">Season</label>
+            <select id="vw-dfseas" class="vw-select" name="dfseas">
+              <option value="ALL"<%= seas === 'ALL' ? ' selected' : '' %>>All seasons</option>
+              <% VWSEA.forEach(function (x) { %><option value="<%= x[0] %>"<%= seas === T(x[0]) ? ' selected' : '' %>><%= x[0] %> - <%= x[1] %></option><% }); %>
+            </select>
+            <span class="vw-hint">Season code on the item master</span>
+          </div>
+        </div>
+        <input type="hidden" id="vw-tckyn" name="tckyn" value="<%= T(tckyn) || 'Y' %>">
+        <input type="hidden" id="vw-avlyn" name="avlyn" value="<%= T(avlyn) || 'Y' %>">
+        <input type="hidden" id="vw-dfyear" name="dfyear" value="<%= T(dfyear) || 'Y' %>">
+        <div class="vw-ts-switches">
+          <%- sw('vw-tckyn', T(tckyn) || 'Y', 'Ticketed SKUs only', 'hang, tear or pre-ticketed items') %>
+          <%- sw('vw-avlyn', T(avlyn) || 'Y', 'Warehouse can ship', 'only SKUs with packs available') %>
+          <%- sw('vw-dfyear', T(dfyear) || 'Y', 'Include last year', 'adds LY sales to shipped and sold') %>
+        </div>
+        <div class="vw-actions" style="margin-top:18px">
+          <button type="button" class="vw-btn" data-fkey="Enter" onclick="return VW.submit('ENTER', <%= fieldsJs %>)" data-cmd="Show the SKUs" data-cmd-key="Enter"><%- ICON('rows') %> Show SKUs <span class="vw-kbd">Enter</span></button>
+          <button type="button" class="vw-btn-ghost" data-fkey="F1" onclick="return VW.submit('F01')" data-cmd="Exit to the menu" data-cmd-key="F1"><%- ICON('exit') %> Exit <span class="vw-kbd">F1</span></button>
+        </div>
+      </div>
+    </section>
+    <div class="vw-grid-2">
+      <section class="vw-card">
+        <div class="vw-card-head"><h2><%- ICON('spark') %> Quick picks <span class="vw-sub">store and department with demo depth</span></h2></div>
+        <div class="vw-card-body vw-recents vw-quick">
+          <% quick.forEach(function (q) { %>
+          <button type="button" onclick="return VW.submit('ENTER', { dfstor: '<%= q[0] %>', dfdept: '<%= q[1] %>', dfseas: 'ALL', tckyn: 'N', avlyn: 'N', dfyear: 'Y' })" data-cmd="Open store <%= q[0] %> dept <%= q[1] %>" data-cmd-group="Quick picks"><b><%= q[0] %> / <%= q[1] %></b> <%= q[2] %></button>
+          <% }); %>
+        </div>
+      </section>
+      <section class="vw-card">
+        <div class="vw-card-head"><h2><%- ICON('rows') %> Recently opened <span class="vw-sub">on this browser</span></h2></div>
+        <div class="vw-card-body vw-recents vw-quick">
+          <% if (vwRecentTs.length) { vwRecentTs.forEach(function (r) { var p = String(r.v).split('/'); %>
+          <button type="button" onclick="return VW.submit('ENTER', { dfstor: '<%= p[0] %>', dfdept: '<%= p[1] %>' })" data-cmd="Reopen store <%= p[0] %> dept <%= p[1] %>" data-cmd-group="Recently opened"><b><%= r.v %></b> <%= r.l %></button>
+          <% }); } else { %><span class="vw-hint">Store and department lists you open appear here.</span><% } %>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer class="vw-footer">
+    <div class="vw-footer-inner">
+      <span><b>&copy; 2026 Variety Wholesalers, Inc.</b> &middot; 218 South Garnett Street, Henderson, NC 27536 &middot; Big Lots &middot; Roses</span>
+      <span class="vw-noprint"><span class="vw-kbd">Ctrl</span>+<span class="vw-kbd">K</span> commands &nbsp; <span class="vw-kbd">?</span> shortcuts &nbsp; <span class="vw-kbd">/</span> search &nbsp; <%= vwPgm %> on IBM i</span>
+    </div>
+  </footer>
+  <div class="vw-backdrop" id="vw-palette" hidden data-vw-closable onmousedown="if (event.target === this) VW.close('vw-palette')">
+    <div class="vw-dialog vw-palette" role="dialog" aria-label="Command palette">
+      <div class="vw-input-wrap"><%- ICON('search') %><input class="vw-input" type="text" placeholder="Type a command or search..." oninput="VW.paletteFilter(this.value)" onkeydown="VW.paletteKey(this, event)" aria-label="Command"></div>
+      <ul id="vw-palette-list" role="listbox"></ul>
+    </div>
+  </div>
+  <div class="vw-backdrop" id="vw-keys" hidden data-vw-closable onmousedown="if (event.target === this) VW.close('vw-keys')">
+    <div class="vw-dialog" role="dialog" aria-label="Keyboard shortcuts" style="width:min(720px,100%)">
+      <div class="vw-dialog-head"><span class="vw-ico"><%- ICON('key', 22) %></span><div><h2>Keyboard shortcuts</h2><div class="vw-hint">Every green-screen function key still works, plus these browser extras.</div></div></div>
+      <div class="vw-shortcuts">
+        <% vwKeys.forEach(function (k) { %><div><span><%= k[1] %></span><span class="vw-kbd"><%= k[0] %></span></div><% }); %>
+        <div><span>Command palette</span><span class="vw-kbd">Ctrl+K</span></div>
+        <div><span>Focus search / filter</span><span class="vw-kbd">/</span></div>
+        <div><span>Dark / light theme</span><span class="vw-kbd">Alt+T</span></div>
+        <div><span>Compact / comfortable rows</span><span class="vw-kbd">Alt+D</span></div>
+        <div><span>Close dialog</span><span class="vw-kbd">Esc</span></div>
+      </div>
+      <div class="vw-dialog-foot"><button type="button" class="vw-btn-ghost" onclick="VW.close('vw-keys')">Close</button></div>
+    </div>
+  </div>
+</div>

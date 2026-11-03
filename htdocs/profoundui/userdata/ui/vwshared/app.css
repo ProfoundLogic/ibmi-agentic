@@ -1,0 +1,496 @@
+/* ============================================================================
+ * Variety Wholesalers - Merchandise Inquiry design system (vwshared/app.css)
+ *
+ * Brand tokens come from vwstores.com's own theme stylesheet (:root):
+ *   --blue #0054a6  --blue-dark #003f7f  --ink #152235  --muted #5f6d7c
+ *   --line #dfe6ee  --soft #f4f7fb       footer #071c33
+ *   Arial/Helvetica, 800-weight buttons and letter-spaced eyebrows,
+ *   9px buttons / 14px features / 20px cards / 24px hero, soft blue shadow.
+ * The logo (the blue V-over-W tile) is inlined below as a data URI by
+ * prfdemolib/web/build.py, so it never depends on a second fetch.
+ *
+ * Rules for living inside Genie (see prfdemolib/web/README.md):
+ *   - every selector is scoped under .vw-app; no html/body/* rules
+ *   - no position:fixed, no 100vh (the screen is embedded, not a page)
+ *   - Genie's skin ships `div{padding:1px;z-index:10;white-space:nowrap}` and
+ *     `INPUT{font-family:Monospace}`: neutralised first with :where() so the
+ *     reset costs one class of specificity and our components still win
+ *   - grids use minmax(0,1fr) so long values wrap instead of widening
+ * ==========================================================================*/
+
+/* --------------------------------------------------------------- tokens */
+.vw-app {
+  --vw-blue: #0054a6;
+  --vw-blue-dark: #003f7f;
+  --vw-blue-ink: #00356b;
+  --vw-blue-soft: #eef5fc;
+  --vw-blue-ring: rgba(0, 84, 166, .28);
+  --vw-ink: #152235;
+  --vw-muted: #5f6d7c;
+  --vw-line: #dfe6ee;
+  --vw-line-strong: #c9d5e2;
+  --vw-soft: #f4f7fb;
+  --vw-surface: #ffffff;
+  --vw-surface-2: #fbfcfe;
+  --vw-navy: #071c33;
+  --vw-navy-text: #c9d5e2;
+  --vw-ok: #157f4c;
+  --vw-ok-soft: #e5f5ec;
+  --vw-warn: #a86400;
+  --vw-warn-soft: #fff3df;
+  --vw-bad: #c62828;
+  --vw-bad-soft: #fdecec;
+  --vw-info: #5b3cc4;
+  --vw-info-soft: #efeafd;
+  --vw-shadow: 0 14px 40px rgba(17, 45, 78, .12);
+  --vw-shadow-sm: 0 8px 24px rgba(17, 45, 78, .08);
+  --vw-shadow-xs: 0 1px 2px rgba(17, 45, 78, .06);
+  --vw-r-btn: 9px;
+  --vw-r-feat: 14px;
+  --vw-r-card: 20px;
+  --vw-r-hero: 24px;
+  --vw-font: Arial, Helvetica, "Helvetica Neue", "Liberation Sans", sans-serif;
+  --vw-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --vw-maxw: 1440px;
+  --vw-gap: 20px;
+  --vw-row-pad: 10px;
+  /* VW_LOGO_DATA_URI */
+
+  display: block;
+  position: relative;
+  z-index: 100;               /* above Genie chrome (10-40), below its spinner */
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 640px;
+  margin: 0;
+  padding: 0;
+  background: var(--vw-soft);
+  color: var(--vw-ink);
+  font-family: var(--vw-font);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: left;
+  -webkit-font-smoothing: antialiased;
+}
+.vw-app[data-density="compact"] { --vw-row-pad: 5px; --vw-gap: 14px; }
+
+.vw-app[data-theme="dark"] {
+  --vw-blue: #5aa2ff;
+  --vw-blue-dark: #8bbcff;
+  --vw-blue-ink: #cfe3ff;
+  --vw-blue-soft: #10294a;
+  --vw-blue-ring: rgba(90, 162, 255, .35);
+  --vw-ink: #e6edf5;
+  --vw-muted: #9db0c4;
+  --vw-line: #22364f;
+  --vw-line-strong: #2f4866;
+  --vw-soft: #0b1726;
+  --vw-surface: #102035;
+  --vw-surface-2: #13263d;
+  --vw-navy: #050f1c;
+  --vw-ok: #4cd08b;  --vw-ok-soft: #10301f;
+  --vw-warn: #f3b04e; --vw-warn-soft: #3a2a10;
+  --vw-bad: #ff7b7b;  --vw-bad-soft: #3b1818;
+  --vw-info: #b9a6ff; --vw-info-soft: #241c45;
+  --vw-shadow: 0 14px 40px rgba(0, 0, 0, .45);
+  --vw-shadow-sm: 0 8px 24px rgba(0, 0, 0, .35);
+}
+
+/* ---------------------------------------------------- Genie skin resets */
+.vw-app *, .vw-app *::before, .vw-app *::after { box-sizing: border-box; }
+/* The Skyline-lineage skins scope Genie's rule as [id="5250"] div - specificity
+   (0,1,1) - which beats a one-class reset and turned every card, tile and
+   field into a z-index:10 layer, so dropdowns slid UNDER the next card.
+   .vw-app.vw-app :where(...) is (0,2,0): it beats both skin forms, and every
+   component rule below (also (0,2,0), later in the file) still beats it. */
+.vw-app.vw-app :where(div, span, label, section, header, footer, nav, main, aside, article,
+               details, summary, ul, ol, li, p, table, thead, tbody, tfoot, tr, th, td,
+               img, svg, button, input, select, textarea, a, form, fieldset, h1, h2, h3, h4) {
+  z-index: auto;
+  white-space: normal;
+}
+.vw-app.vw-app :where(div) { padding: 0; }
+.vw-app :where(input, select, textarea, button) {
+  font-family: var(--vw-font);
+  font-size: 14px;
+  color: inherit;
+}
+.vw-app :where(h1, h2, h3, h4, p) { margin: 0; }
+.vw-app :where(a) { color: var(--vw-blue); }
+.vw-app svg { display: inline-block; vertical-align: middle; flex: none; }
+.vw-app .vw-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ------------------------------------------------------------ app shell */
+.vw-app .vw-topbar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: 16px;
+  min-height: 68px; padding: 10px 24px;
+  background: color-mix(in srgb, var(--vw-surface) 96%, transparent);
+  border-bottom: 1px solid var(--vw-line);
+  backdrop-filter: blur(10px);
+}
+.vw-app .vw-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--vw-blue); min-width: 0; }
+.vw-app .vw-logo {
+  width: 42px; height: 42px; border-radius: 8px; flex: none;
+  background: var(--vw-logo) center / cover no-repeat, #0054a6;
+  box-shadow: 0 4px 12px rgba(0, 84, 166, .25);
+}
+.vw-app .vw-wordmark { display: flex; flex-direction: column; line-height: 1; min-width: 0; }
+.vw-app .vw-wordmark strong { font-size: 19px; font-weight: 800; letter-spacing: -.5px; color: var(--vw-blue); white-space: nowrap; }
+.vw-app .vw-wordmark small { font-size: 9px; font-weight: 700; letter-spacing: 2.4px; color: var(--vw-muted); margin-top: 4px; white-space: nowrap; }
+.vw-app .vw-appname {
+  display: flex; flex-direction: column; padding-left: 16px; margin-left: 4px;
+  border-left: 1px solid var(--vw-line); min-width: 0;
+}
+.vw-app .vw-appname b { font-size: 15px; font-weight: 800; color: var(--vw-ink); white-space: nowrap; }
+.vw-app .vw-appname span { font-size: 12px; color: var(--vw-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vw-app .vw-topbar-spacer { flex: 1 1 auto; }
+.vw-app .vw-topbar-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.vw-app .vw-chip-date {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px;
+  border: 1px solid var(--vw-line); border-radius: 999px; background: var(--vw-surface-2);
+  font-size: 12px; color: var(--vw-muted); white-space: nowrap;
+}
+.vw-app .vw-chip-date b { color: var(--vw-ink); font-weight: 700; }
+.vw-app .vw-pgm {
+  font-family: var(--vw-mono); font-size: 11px; padding: 5px 8px; border-radius: 6px;
+  background: var(--vw-blue-soft); color: var(--vw-blue-ink); white-space: nowrap;
+}
+.vw-app .vw-iconbtn {
+  display: inline-grid; place-items: center; width: 36px; height: 36px; padding: 0;
+  border: 1px solid var(--vw-line); border-radius: var(--vw-r-btn); background: var(--vw-surface);
+  color: var(--vw-ink); cursor: pointer; transition: background .15s, border-color .15s, transform .1s;
+}
+.vw-app .vw-iconbtn:hover { border-color: var(--vw-blue); color: var(--vw-blue); }
+.vw-app .vw-iconbtn:active { transform: translateY(1px); }
+.vw-app .vw-kbd {
+  display: inline-block; min-width: 20px; padding: 1px 6px; border: 1px solid var(--vw-line-strong);
+  border-bottom-width: 2px; border-radius: 5px; background: var(--vw-surface-2);
+  font-family: var(--vw-mono); font-size: 11px; line-height: 16px; color: var(--vw-muted); text-align: center; white-space: nowrap;
+}
+
+.vw-app .vw-hero {
+  padding: 28px 24px 22px;
+  background: linear-gradient(135deg, var(--vw-blue-soft) 0%, var(--vw-surface) 70%);
+  border-bottom: 1px solid var(--vw-line);
+}
+.vw-app[data-theme="dark"] .vw-hero { background: linear-gradient(135deg, #10294a 0%, var(--vw-soft) 75%); }
+.vw-app .vw-hero-inner, .vw-app .vw-main, .vw-app .vw-footer-inner { width: 100%; max-width: var(--vw-maxw); margin: 0 auto; }
+.vw-app .vw-eyebrow {
+  display: inline-block; text-transform: uppercase; letter-spacing: .14em;
+  color: var(--vw-blue); font-size: 11.5px; font-weight: 800;
+}
+.vw-app .vw-hero h1 { font-size: clamp(24px, 3.2vw, 36px); line-height: 1.08; font-weight: 800; letter-spacing: -.5px; margin: 6px 0 6px; color: var(--vw-ink); }
+.vw-app .vw-hero p.vw-lead { color: var(--vw-muted); font-size: 15px; max-width: 760px; }
+.vw-app .vw-hero-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+
+.vw-app .vw-main { padding: 22px 24px 32px; display: grid; gap: var(--vw-gap); grid-template-columns: minmax(0, 1fr); }
+
+.vw-app .vw-footer { background: var(--vw-navy); color: var(--vw-navy-text); padding: 18px 24px; font-size: 12px; }
+.vw-app .vw-footer-inner { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; }
+.vw-app .vw-footer b { color: #fff; }
+.vw-app .vw-footer .vw-kbd { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.18); color: #dbe6f2; }
+
+/* ---------------------------------------------------------------- cards */
+.vw-app .vw-card {
+  position: relative;
+  background: var(--vw-surface); border: 1px solid var(--vw-line); border-radius: var(--vw-r-card);
+  box-shadow: var(--vw-shadow-sm); min-width: 0;
+}
+.vw-app .vw-card-pad { padding: 20px 22px; }
+.vw-app .vw-card-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 16px 22px; border-bottom: 1px solid var(--vw-line);
+}
+.vw-app .vw-card-head h2 { font-size: 16px; font-weight: 800; color: var(--vw-ink); display: flex; align-items: center; gap: 8px; }
+.vw-app .vw-card-head .vw-sub { color: var(--vw-muted); font-size: 12.5px; font-weight: 400; }
+.vw-app .vw-card-body { padding: 18px 22px; }
+.vw-app .vw-grid-2 { display: grid; gap: var(--vw-gap); grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+.vw-app .vw-grid-3 { display: grid; gap: var(--vw-gap); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* --------------------------------------------------------------- KPIs */
+.vw-app .vw-kpis { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.vw-app .vw-kpi {
+  position: relative; overflow: hidden; padding: 16px 18px; border-radius: var(--vw-r-feat);
+  background: var(--vw-surface); border: 1px solid var(--vw-line); box-shadow: var(--vw-shadow-xs);
+}
+.vw-app .vw-kpi::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--vw-blue); }
+.vw-app .vw-kpi.is-ok::after { background: var(--vw-ok); }
+.vw-app .vw-kpi.is-warn::after { background: var(--vw-warn); }
+.vw-app .vw-kpi.is-bad::after { background: var(--vw-bad); }
+.vw-app .vw-kpi-label { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--vw-muted); }
+.vw-app .vw-kpi-value { font-size: 26px; font-weight: 800; letter-spacing: -.5px; color: var(--vw-ink); margin-top: 4px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vw-app .vw-kpi-note { font-size: 12px; color: var(--vw-muted); margin-top: 2px; }
+.vw-app .vw-meter { height: 6px; border-radius: 99px; background: var(--vw-line); overflow: hidden; margin-top: 10px; }
+.vw-app .vw-meter > span { display: block; height: 100%; border-radius: 99px; background: var(--vw-blue); }
+
+/* --------------------------------------------------------------- forms */
+.vw-app .vw-form { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); align-items: end; }
+.vw-app .vw-field { display: grid; gap: 6px; min-width: 0; position: relative; }
+.vw-app .vw-field > label, .vw-app .vw-label {
+  font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--vw-muted);
+}
+.vw-app .vw-input, .vw-app .vw-select {
+  width: 100%; height: 42px; padding: 0 12px; border: 1px solid var(--vw-line-strong); border-radius: var(--vw-r-btn);
+  background: var(--vw-surface); color: var(--vw-ink); font-size: 15px; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.vw-app .vw-input::placeholder { color: var(--vw-muted); font-style: italic; opacity: .8; }
+.vw-app .vw-input:focus, .vw-app .vw-select:focus { border-color: var(--vw-blue); box-shadow: 0 0 0 4px var(--vw-blue-ring); }
+.vw-app .vw-input.is-error { border-color: var(--vw-bad); box-shadow: 0 0 0 4px rgba(198, 40, 40, .15); }
+.vw-app .vw-input.num { text-align: right; font-variant-numeric: tabular-nums; }
+.vw-app .vw-hint { font-size: 12px; color: var(--vw-muted); }
+.vw-app .vw-field-err { font-size: 12px; color: var(--vw-bad); font-weight: 700; }
+.vw-app .vw-input-wrap { position: relative; }
+.vw-app .vw-input-wrap .vw-input { padding-left: 38px; }
+.vw-app .vw-input-wrap > svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--vw-muted); pointer-events: none; }
+
+/* segmented control (radio group) */
+.vw-app .vw-seg {
+  display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 12px;
+  background: var(--vw-soft); border: 1px solid var(--vw-line);
+}
+.vw-app .vw-seg label {
+  position: relative; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  padding: 7px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--vw-muted);
+  text-transform: none; letter-spacing: 0; white-space: nowrap;
+}
+.vw-app .vw-seg input { position: absolute; opacity: 0; pointer-events: none; }
+.vw-app .vw-seg label:hover { color: var(--vw-ink); }
+.vw-app .vw-seg input:checked + span { color: #fff; }
+.vw-app .vw-seg label:has(input:checked) { background: var(--vw-blue); color: #fff; box-shadow: 0 4px 12px rgba(0,84,166,.25); }
+.vw-app .vw-seg label:has(input:focus-visible) { outline: 3px solid var(--vw-blue-ring); }
+.vw-app .vw-seg .vw-code { font-family: var(--vw-mono); font-size: 11px; opacity: .75; }
+
+/* switch */
+.vw-app .vw-switch { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; font-size: 13.5px; color: var(--vw-ink); text-transform: none; letter-spacing: 0; }
+.vw-app .vw-switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.vw-app .vw-switch .vw-track { width: 40px; height: 22px; border-radius: 99px; background: var(--vw-line-strong); position: relative; transition: background .15s; flex: none; }
+.vw-app .vw-switch .vw-track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .15s; }
+.vw-app .vw-switch input:checked + .vw-track { background: var(--vw-blue); }
+.vw-app .vw-switch input:checked + .vw-track::after { transform: translateX(18px); }
+.vw-app .vw-switch input:focus-visible + .vw-track { outline: 3px solid var(--vw-blue-ring); }
+
+/* type-ahead picker (replaces the F4 prompt programs) */
+.vw-app .vw-picker { position: relative; }
+/* a field (and its card) with an open picker rises above its neighbours,
+   but stays below the sticky top bar (30) */
+.vw-app .vw-card:focus-within { z-index: 25; }   /* only the layer - never the positioning (the sticky distribution bar is a card) */
+.vw-app .vw-picker:focus-within { z-index: 26; }
+.vw-app .vw-picker-list {
+  position: absolute; left: 0; right: auto; top: calc(100% + 6px); z-index: 60;
+  /* at least as wide as the field, wide enough for a full 30-character
+     description, never wider than the window */
+  min-width: 100%; width: max-content; max-width: min(620px, calc(100vw - 28px));
+  max-height: 340px; overflow: auto; padding: 6px; margin: 0; list-style: none;
+  background: var(--vw-surface); border: 1px solid var(--vw-line); border-radius: 14px; box-shadow: var(--vw-shadow);
+}
+.vw-app .vw-picker-list.is-flip { left: auto; right: 0; }
+.vw-app .vw-picker-list[hidden] { display: none; }
+.vw-app .vw-picker-list li {
+  display: grid; grid-template-columns: minmax(52px, auto) minmax(180px, 1fr) auto; gap: 10px; align-items: center;
+  padding: 8px 10px; border-radius: 9px; cursor: pointer; font-size: 13.5px;
+}
+.vw-app .vw-picker-list li[aria-selected="true"], .vw-app .vw-picker-list li:hover { background: var(--vw-blue-soft); }
+.vw-app .vw-picker-list li b { font-family: var(--vw-mono); font-size: 12.5px; color: var(--vw-blue-ink); }
+.vw-app .vw-picker-list li span { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+.vw-app .vw-picker-list li em { font-style: normal; font-size: 11.5px; color: var(--vw-muted); white-space: nowrap; }
+.vw-app .vw-picker-list mark { background: transparent; color: var(--vw-blue); font-weight: 800; }
+.vw-app .vw-picker-empty { padding: 10px; color: var(--vw-muted); font-size: 13px; }
+
+/* ------------------------------------------------------------- buttons */
+.vw-app .vw-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 42px;
+  padding: 0 18px; border-radius: var(--vw-r-btn); border: 1px solid transparent; cursor: pointer;
+  background: var(--vw-blue); color: #fff; font-weight: 800; font-size: 14px; letter-spacing: .01em;
+  text-decoration: none; white-space: nowrap; transition: background .15s, box-shadow .15s, transform .1s;
+}
+.vw-app .vw-btn:hover { background: var(--vw-blue-dark); box-shadow: 0 6px 16px rgba(0,84,166,.25); }
+.vw-app[data-theme="dark"] .vw-btn { color: #04121f; }
+.vw-app .vw-btn:active { transform: translateY(1px); }
+.vw-app .vw-btn:focus-visible, .vw-app .vw-btn-ghost:focus-visible, .vw-app .vw-iconbtn:focus-visible { outline: 3px solid var(--vw-blue-ring); outline-offset: 2px; }
+.vw-app .vw-btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 38px; padding: 0 14px;
+  border-radius: var(--vw-r-btn); border: 1px solid var(--vw-line-strong); background: var(--vw-surface);
+  color: var(--vw-ink); font-weight: 700; font-size: 13.5px; cursor: pointer; white-space: nowrap;
+}
+.vw-app .vw-btn-ghost:hover { border-color: var(--vw-blue); color: var(--vw-blue); }
+.vw-app .vw-btn-ghost[disabled], .vw-app .vw-btn[disabled] { opacity: .45; cursor: not-allowed; box-shadow: none; }
+.vw-app .vw-btn-sm { height: 32px; padding: 0 10px; font-size: 12.5px; }
+.vw-app .vw-btn .vw-kbd, .vw-app .vw-btn-ghost .vw-kbd { margin-left: 2px; }
+.vw-app .vw-btn .vw-kbd { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.35); color: #fff; }
+.vw-app .vw-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+/* -------------------------------------------------------------- pills */
+.vw-app .vw-pill {
+  display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 800; letter-spacing: .02em; white-space: nowrap;
+  background: var(--vw-blue-soft); color: var(--vw-blue-ink);
+}
+.vw-app .vw-pill.is-ok { background: var(--vw-ok-soft); color: var(--vw-ok); }
+.vw-app .vw-pill.is-warn { background: var(--vw-warn-soft); color: var(--vw-warn); }
+.vw-app .vw-pill.is-bad { background: var(--vw-bad-soft); color: var(--vw-bad); }
+.vw-app .vw-pill.is-info { background: var(--vw-info-soft); color: var(--vw-info); }
+.vw-app .vw-pill.is-mute { background: var(--vw-soft); color: var(--vw-muted); border: 1px solid var(--vw-line); }
+.vw-app .vw-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+/* ------------------------------------------------------------ messages */
+.vw-app .vw-alert {
+  display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--vw-r-feat);
+  border: 1px solid var(--vw-line); background: var(--vw-surface);
+}
+.vw-app .vw-alert.is-bad { border-color: rgba(198,40,40,.35); background: var(--vw-bad-soft); color: var(--vw-bad); }
+.vw-app .vw-alert.is-info { border-color: rgba(0,84,166,.25); background: var(--vw-blue-soft); color: var(--vw-blue-ink); }
+.vw-app .vw-alert.is-ok { border-color: rgba(21,127,76,.3); background: var(--vw-ok-soft); color: var(--vw-ok); }
+.vw-app .vw-alert b { display: block; }
+
+/* toast stack lives inside the app (sticky, not fixed) */
+.vw-app .vw-toasts { position: sticky; top: 76px; z-index: 70; height: 0; display: flex; justify-content: flex-end; padding: 0 24px; }
+.vw-app .vw-toasts > div { display: grid; gap: 8px; width: min(380px, 100%); }
+.vw-app .vw-toast {
+  display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px;
+  background: var(--vw-navy); color: #fff; box-shadow: var(--vw-shadow); font-size: 13.5px;
+  animation: vw-toast-in .25s ease-out;
+}
+.vw-app .vw-toast.is-ok svg { color: #4cd08b; }
+.vw-app .vw-toast.is-bad svg { color: #ff8a8a; }
+@keyframes vw-toast-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+/* --------------------------------------------------------------- tables */
+.vw-app .vw-tablebar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px 22px; border-bottom: 1px solid var(--vw-line); background: var(--vw-surface-2); }
+.vw-app .vw-tablebar .vw-input-wrap { flex: 1 1 260px; max-width: 420px; }
+.vw-app .vw-tablebar .vw-input { height: 38px; font-size: 14px; }
+.vw-app .vw-tablewrap { overflow: auto; max-height: 640px; border-radius: 0 0 var(--vw-r-card) var(--vw-r-card); }
+.vw-app .vw-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; }
+.vw-app .vw-table th {
+  position: sticky; top: 0; z-index: 2; background: var(--vw-surface); text-align: left;
+  padding: 10px 12px; border-bottom: 1px solid var(--vw-line-strong);
+  font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--vw-muted); white-space: nowrap;
+}
+.vw-app .vw-table th.num, .vw-app .vw-table td.num { text-align: right; }
+.vw-app .vw-table th button.vw-sort {
+  all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+  font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit;
+}
+.vw-app .vw-table th button.vw-sort:hover { color: var(--vw-blue); }
+.vw-app .vw-table th[aria-sort="ascending"] button.vw-sort::after { content: "\25B2"; font-size: 8px; color: var(--vw-blue); }
+.vw-app .vw-table th[aria-sort="descending"] button.vw-sort::after { content: "\25BC"; font-size: 8px; color: var(--vw-blue); }
+.vw-app .vw-table td { padding: var(--vw-row-pad) 12px; border-bottom: 1px solid var(--vw-line); vertical-align: middle; }
+.vw-app .vw-table td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vw-app .vw-table tbody tr:hover td { background: var(--vw-blue-soft); }
+.vw-app .vw-table tbody tr.is-current td { box-shadow: inset 3px 0 0 var(--vw-blue); }
+.vw-app .vw-table tr.vw-hidden { display: none; }
+.vw-app .vw-table .vw-neg { color: var(--vw-bad); }
+.vw-app .vw-table .vw-zero { color: var(--vw-muted); opacity: .7; }
+.vw-app .vw-table tfoot td { position: sticky; bottom: 0; background: var(--vw-surface-2); font-weight: 800; border-top: 1px solid var(--vw-line-strong); border-bottom: 0; }
+.vw-app .vw-nowrap { white-space: nowrap; }
+.vw-app .vw-sub-line { display: block; font-size: 11px; color: var(--vw-muted); font-weight: 400; }
+.vw-app .vw-key { font-family: var(--vw-mono); font-weight: 700; color: var(--vw-blue-ink); }
+.vw-app .vw-empty { padding: 48px 20px; text-align: center; color: var(--vw-muted); }
+.vw-app .vw-empty b { display: block; font-size: 16px; color: var(--vw-ink); margin-bottom: 4px; }
+
+/* inline bars inside cells */
+.vw-app .vw-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-width: 120px; }
+.vw-app .vw-bar i { display: block; height: 8px; border-radius: 99px; background: var(--vw-line); overflow: hidden; position: relative; }
+.vw-app .vw-bar i > b { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; background: var(--vw-blue); }
+.vw-app .vw-bar i > b.is-ok { background: var(--vw-ok); }
+.vw-app .vw-bar i > b.is-warn { background: var(--vw-warn); }
+.vw-app .vw-bar i > b.is-bad { background: var(--vw-bad); }
+
+/* ------------------------------------------------------------ dialogs */
+.vw-app .vw-backdrop {
+  position: absolute; inset: 0; z-index: 80; display: grid; place-items: start center; padding: 0 16px 40px;
+  background: rgba(7, 28, 51, .55); backdrop-filter: blur(3px);
+}
+.vw-app .vw-backdrop[hidden] { display: none; }
+.vw-app .vw-dialog {
+  position: sticky; top: 9vh;            /* opens in view even when the page is scrolled */
+  width: min(560px, 100%); background: var(--vw-surface); color: var(--vw-ink); border-radius: var(--vw-r-hero);
+  box-shadow: var(--vw-shadow); border: 1px solid var(--vw-line); overflow: hidden; animation: vw-pop .2s ease-out;
+}
+.vw-app .vw-dialog-head { padding: 20px 24px 8px; display: flex; gap: 14px; align-items: flex-start; }
+.vw-app .vw-dialog-head .vw-ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--vw-blue-soft); color: var(--vw-blue); flex: none; }
+.vw-app .vw-dialog-head h2 { font-size: 20px; font-weight: 800; }
+.vw-app .vw-dialog-body { padding: 8px 24px 18px; color: var(--vw-muted); }
+.vw-app .vw-dialog-foot { padding: 14px 24px; display: flex; justify-content: flex-end; gap: 10px; background: var(--vw-surface-2); border-top: 1px solid var(--vw-line); flex-wrap: wrap; }
+@keyframes vw-pop { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+
+/* command palette */
+.vw-app .vw-palette { width: min(640px, 100%); }
+.vw-app .vw-palette .vw-input { height: 52px; font-size: 17px; border: 0; border-bottom: 1px solid var(--vw-line); border-radius: 0; box-shadow: none; padding-left: 50px; }
+.vw-app .vw-palette .vw-input-wrap > svg { left: 18px; }
+.vw-app .vw-palette ul { list-style: none; margin: 0; padding: 8px; max-height: 380px; overflow: auto; }
+.vw-app .vw-palette li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+.vw-app .vw-palette li[aria-selected="true"], .vw-app .vw-palette li:hover { background: var(--vw-blue-soft); }
+.vw-app .vw-palette li span { flex: 1 1 auto; min-width: 0; }
+.vw-app .vw-palette li small { color: var(--vw-muted); }
+.vw-app .vw-palette .vw-pal-group { padding: 8px 12px 4px; font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--vw-muted); }
+.vw-app .vw-shortcuts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px 18px; padding: 6px 24px 20px; }
+.vw-app .vw-shortcuts div { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px dashed var(--vw-line); font-size: 13px; }
+
+/* busy state while the IBM i answers */
+.vw-app .vw-busy { position: absolute; inset: 0; z-index: 90; display: none; place-items: center; background: rgba(244, 247, 251, .55); }
+.vw-app[data-theme="dark"] .vw-busy { background: rgba(11, 23, 38, .55); }
+.vw-app.is-busy .vw-busy { display: grid; }
+.vw-app .vw-spinner { width: 44px; height: 44px; border-radius: 50%; border: 4px solid var(--vw-blue-soft); border-top-color: var(--vw-blue); animation: vw-spin .8s linear infinite; }
+@keyframes vw-spin { to { transform: rotate(360deg); } }
+
+/* skeleton shimmer (wait window) */
+.vw-app .vw-skel { height: 14px; border-radius: 6px; background: linear-gradient(90deg, var(--vw-line) 0%, var(--vw-soft) 50%, var(--vw-line) 100%); background-size: 200% 100%; animation: vw-shimmer 1.2s infinite; }
+@keyframes vw-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* recents strip */
+.vw-app .vw-recents { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.vw-app .vw-recents button {
+  display: inline-flex; gap: 6px; align-items: center; padding: 6px 10px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--vw-line); background: var(--vw-surface); color: var(--vw-ink); font-size: 12.5px;
+}
+.vw-app .vw-recents button:hover { border-color: var(--vw-blue); color: var(--vw-blue); }
+.vw-app .vw-recents button b { font-family: var(--vw-mono); color: var(--vw-blue-ink); }
+
+/* --------------------------------------------------------- responsive */
+@media (max-width: 1360px) { .vw-app .vw-hide-md { display: none; } }
+@media (max-width: 1100px) {
+  .vw-app .vw-grid-2 { grid-template-columns: minmax(0, 1fr); }
+  .vw-app .vw-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .vw-app .vw-picker-list, .vw-app .vw-picker-list.is-flip { left: 0; right: 0; width: auto; min-width: 0; max-width: none; }
+  .vw-app .vw-picker-list li { grid-template-columns: minmax(52px, auto) minmax(0, 1fr) auto; }
+}
+@media (max-width: 760px) {
+  .vw-app .vw-topbar { padding: 10px 14px; gap: 10px; flex-wrap: wrap; position: static; }
+  .vw-app .vw-toasts { top: 8px; }
+  .vw-app .vw-appname { display: none; }
+  .vw-app .vw-chip-date, .vw-app .vw-pgm { display: none; }
+  .vw-app .vw-hero { padding: 20px 14px 16px; }
+  .vw-app .vw-main { padding: 14px; }
+  .vw-app .vw-card-head, .vw-app .vw-card-body, .vw-app .vw-tablebar { padding-left: 14px; padding-right: 14px; }
+  .vw-app .vw-grid-3 { grid-template-columns: minmax(0, 1fr); }
+  .vw-app .vw-kpi-value { font-size: 22px; }
+  .vw-app .vw-hide-sm, .vw-app .vw-table.vw-stack td.vw-hide-sm, .vw-app .vw-table.vw-stack th.vw-hide-sm { display: none; }
+  /* stacked table rows become cards */
+  .vw-app .vw-table.vw-stack thead { display: none; }
+  .vw-app .vw-table.vw-stack, .vw-app .vw-table.vw-stack tbody, .vw-app .vw-table.vw-stack tr, .vw-app .vw-table.vw-stack td { display: block; width: 100%; }
+  .vw-app .vw-table.vw-stack tbody tr { border-bottom: 8px solid var(--vw-soft); padding: 8px 0; }
+  .vw-app .vw-table.vw-stack td { display: flex; justify-content: space-between; gap: 12px; border-bottom: 0; padding: 4px 14px; text-align: right; }
+  .vw-app .vw-table.vw-stack td::before { content: attr(data-label); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--vw-muted); text-align: left; }
+  .vw-app .vw-table.vw-stack td.vw-cell-head { font-size: 15px; font-weight: 800; justify-content: flex-start; text-align: left; }
+  .vw-app .vw-table.vw-stack td.vw-cell-head::before { display: none; }
+  .vw-app .vw-table.vw-stack tfoot { display: block; }
+  .vw-app .vw-table.vw-stack tfoot tr { display: block; }
+  .vw-app .vw-table.vw-stack tfoot td { position: static; }
+  .vw-app .vw-bar { min-width: 0; width: 60%; }
+  .vw-app .vw-tablewrap { max-height: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vw-app *, .vw-app *::before, .vw-app *::after { animation: none !important; transition: none !important; }
+}
+@media print {
+  .vw-app { background: #fff; min-height: 0; }
+  .vw-app .vw-topbar, .vw-app .vw-footer, .vw-app .vw-noprint, .vw-app .vw-tablebar, .vw-app .vw-toasts { display: none !important; }
+  .vw-app .vw-card { box-shadow: none; break-inside: avoid; }
+  .vw-app .vw-tablewrap { max-height: none; overflow: visible; }
+  .vw-app .vw-hero { background: #fff; }
+}
+.vw-app .vw-picker, .vw-app [data-vw-search], .vw-app .vw-tablebar { scroll-margin-top: 90px; }

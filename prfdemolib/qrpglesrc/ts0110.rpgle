@@ -71,8 +71,14 @@ v110  *            Added BL PHPF* files PHPFB1 & PHPFB2
 0001  *  05/20/25: Stacy Jarvis - RTC
 0001  *            Pull correct price based on location/price zone
       *
+PRF1  *  11/03/26: Demo build - F10 submits CLTS0111 with CURLIB set to
+PRF1  *            the library TS0110 runs from, not JOBD(IMSJOB1).
+      *
       *================================================================
 
+      * codermake: compile options from the PRFDEMOLIB README (CRTBNDRPG
+      * DFTACTGRP(*NO) ACTGRP(*CALLER)) carried in the source.
+     H DFTACTGRP(*NO) ACTGRP(*CALLER)
      FTs0110d   CF   E             WORKSTN SFILE(SkuSfl:Rrn)
      F                                     USROPN
      FTblStr    IF   E           K DISK
@@ -94,6 +100,7 @@ v110 FPhPfb2    IF   E           K DISK    USROPN RENAME(rPhPf:rPhPfb2)
       * :.............................................................:
      D                SDS
      D  Prog                   1     10
+PRF1 D  PgmLib                81     90
 
       * ...............................................................
       * : Define work variables.                                      :
@@ -1024,8 +1031,15 @@ v110           CHAIN Inv_Inumbr rPhPfb2;
                LEAVESR;
            ENDIF;
 
+      //PRF1: Production submits with JOBD(IMSJOB1) INLLIBL(*JOBD), a job
+      //      description whose library list names the demo library. A task
+      //      or demo library built by codermake has no IMSJOB1 (and the
+      //      demo profile may not create one), so the submitted job gets
+      //      the library TS0110 runs from as its current library instead.
+      //CmdTxt = 'SBMJOB CMD(CALL PGM(CLTS0111) PARM(' + NewMbr +
+      //         ')) JOB(CLTS0111) JOBD(IMSJOB1) INLLIBL(*JOBD)';
            CmdTxt = 'SBMJOB CMD(CALL PGM(CLTS0111) PARM(' + NewMbr +
-                    ')) JOB(CLTS0111) JOBD(IMSJOB1) INLLIBL(*JOBD)';
+                    ')) JOB(CLTS0111) CURLIB(' + %TRIM(PgmLib) + ')';
            CmdLen =  %LEN(%TRIM(CmdTxt));
            CALLP QcmdExc (CmdTxt:CmdLen);
 

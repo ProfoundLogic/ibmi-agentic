@@ -1,0 +1,83 @@
+<%# include:helpers %>
+<%
+var vwApp = 'Item Inquiry';
+var vwSub = 'SKU details and warehouse balances';
+var vwPgm = 'INV502W';
+var vwDate = T(datlit).replace(/,/g, ', ') || new Date().toLocaleDateString('en-US');
+var vwKeys = [['Enter', 'Look up the SKU'], ['F1', 'Exit to the menu'], ['Down', 'Open the SKU finder']];
+var vwRecent = [];
+try { vwRecent = JSON.parse(vwG.localStorage.getItem('vw.recentSkus')) || []; } catch (vwErr) { vwRecent = []; }
+var vwFeatured = [['262657', 'Asst Tops', 'pack and hold'], ['100001', 'Wash Cloth', 'allocations'], ['248117', 'Navy Sofa', 'bundle'],
+                  ['880209', 'Sherpa Throw', 'holiday P&H'], ['880103', 'Candy Canes', 'holiday candy'], ['880206', 'Comforter Set', 'big ticket']];
+var vwSkuErr = IND(41) && IND(99);
+%>
+<div class="vw-app vw-inv502 vw-inv502-s1" data-theme="<%= vwTheme %>" data-density="<%= vwDensity %>">
+<%# include:topbar %>
+  <section class="vw-hero">
+    <div class="vw-hero-inner">
+      <span class="vw-eyebrow">Merchandise inquiry &middot; Item</span>
+      <h1>Look up any SKU in the chain</h1>
+      <p class="vw-lead">Vendor, hierarchy, pricing and what every distribution center holds - on hand, on order, allocated and pack&nbsp;&amp;&nbsp;hold. Start typing a number or a description.</p>
+    </div>
+  </section>
+
+  <main class="vw-main">
+    <section class="vw-card vw-search-card">
+      <div class="vw-card-body">
+        <div class="vw-search-row">
+          <div class="vw-field vw-picker vw-search-field">
+            <label for="vw-sku">SKU number</label>
+            <div class="vw-input-wrap">
+              <%- ICON('search', 20) %>
+              <input id="vw-sku" class="vw-input vw-input-xl<%= vwSkuErr ? ' is-error' : '' %>" type="text" name="inumbr" inputmode="numeric" autocomplete="off"
+                     maxlength="9" value="<%= N(inumbr) ? T(inumbr) : '' %>" placeholder="e.g. 262657 or start typing a description"
+                     data-kind="sku" data-pick-enter="1" data-vw-search autofocus
+                     oninput="VW.pickInput(this)" onfocus="VW.pickInput(this)" onkeydown="VW.pickKey(this, event)" onblur="VW.pickBlur(this)"
+                     aria-describedby="vw-sku-hint" aria-invalid="<%= vwSkuErr ? 'true' : 'false' %>">
+            </div>
+            <ul class="vw-picker-list" role="listbox" hidden></ul>
+            <span id="vw-sku-hint" class="vw-hint">The SKU finder searches every item in the demo data - it replaces the green screen&rsquo;s F3 search.</span>
+          </div>
+          <button type="button" class="vw-btn vw-btn-xl" data-fkey="Enter" onclick="return VW.submit('ENTER', { inumbr: (document.getElementById('vw-sku').value.replace(/\D/g, '') || '0') })" data-cmd="Look up this SKU" data-cmd-key="Enter">
+            Look up <span class="vw-kbd">Enter</span>
+          </button>
+        </div>
+        <% if (T(msg)) { %>
+        <div class="vw-alert is-bad" role="alert" style="margin-top:14px"><%- ICON('alert', 20) %><div><b><%= T(msg) %></b>Check the number, or pick a SKU from the finder.</div></div>
+        <% } %>
+      </div>
+    </section>
+
+    <div class="vw-grid-2">
+      <section class="vw-card">
+        <div class="vw-card-head"><h2><%- ICON('rows') %> Recently viewed <span class="vw-sub">on this browser</span></h2></div>
+        <div class="vw-card-body">
+          <% if (vwRecent.length) { %>
+          <div class="vw-recents">
+            <% vwRecent.forEach(function (r) { %>
+            <button type="button" onclick="return VW.submit('ENTER', { inumbr: '<%= r.v %>' })" data-cmd="Open SKU <%= r.v %> <%= r.l %>" data-cmd-group="Recently viewed"><b><%= r.v %></b> <%= r.l %></button>
+            <% }); %>
+          </div>
+          <% } else { %>
+          <div class="vw-hint">SKUs you open appear here, so you can jump back with one click.</div>
+          <% } %>
+        </div>
+      </section>
+      <section class="vw-card">
+        <div class="vw-card-head"><h2><%- ICON('spark') %> Worth a look <span class="vw-sub">demo highlights</span></h2></div>
+        <div class="vw-card-body">
+          <div class="vw-recents vw-feature-grid">
+            <% vwFeatured.forEach(function (r) { %>
+            <button type="button" onclick="return VW.submit('ENTER', { inumbr: '<%= r[0] %>' })" data-cmd="Open SKU <%= r[0] %> <%= r[1] %>" data-cmd-group="Demo highlights"><b><%= r[0] %></b> <%= r[1] %> <span class="vw-pill is-mute"><%= r[2] %></span></button>
+            <% }); %>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="vw-actions vw-noprint">
+      <button type="button" class="vw-btn-ghost" data-fkey="F1" onclick="return VW.submit('F01')" data-cmd="Exit to the menu" data-cmd-key="F1"><%- ICON('exit') %> Exit <span class="vw-kbd">F1</span></button>
+    </div>
+  </main>
+<%# include:footer %>
+</div>

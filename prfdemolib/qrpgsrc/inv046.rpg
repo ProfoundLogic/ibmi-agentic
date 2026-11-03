@@ -36,6 +36,11 @@
      F* -------------------------------------------------------------*
      F* 06/06/12 Moss - Modified to add POS flag for stores.         *
      F*                                                              *
+     F* 11/03/26 - PRF2 Demo build: calls to programs that are not   *
+     F*            in the PRFDEMOLIB restore are commented out       *
+     F*            (C*prf): F3, F4, F6, F7, F8 and option I now      *
+     F*            just redisplay the screen.                        *
+     F*                                                              *
      F*****************************************************************
      FINV046FMCF  E                    WORKSTN      KINFDS INFDS
      F                                        RRN   KSFILE SCRN2
@@ -180,8 +185,8 @@
      C* CMD 3 SKU SEARCH
      C*
      C           *INKC     IFEQ '1'
-     C                     CALL 'INV002'
-     C                     PARM           INUMBR
+     C*prf                 CALL 'INV002'
+     C*prf                 PARM           INUMBR
      C                     MOVE *BLANKS   IDESCR
      C           INUMBR    CHAININVMST               99
      C           *IN99     IFEQ '1'
@@ -209,36 +214,37 @@
      C           *INKD     IFEQ '1'
      C                     SELEC
      C           INRDS     WHEQ 'R'
-     C                     CALL 'TBL048'
-     C                     PARM 0         INREGX  30
+     C*prf                 CALL 'TBL048'
+     C*prf                 PARM 0         INREGX  30
+     C                     Z-ADD0         INREGX  30
      C           INREGX    IFNE 0
      C                     Z-ADDINREGX    INSTR
      C                     END
      C*
      C           INRDS     WHEQ 'D'
-     C                     CALL 'TBL049'
-     C                     PARM 0         INREGX
+     C*prf                 CALL 'TBL049'
+     C*prf                 PARM 0         INREGX
      C           INREGX    IFNE 0
      C                     Z-ADDINREGX    INSTR
      C                     END
      C*
      C           INRDS     WHEQ 'S'
-     C                     CALL 'TBL009'
-     C                     PARM 0         XXSTR
+     C*prf                 CALL 'TBL009'
+     C*prf                 PARM 0         XXSTR
      C           XXSTR     IFNE 0
      C                     Z-ADDXXSTR     INSTR
      C                     END
      C*
      C           INRDS     WHEQ 'G'
-     C                     CALL 'TBL018'
-     C                     PARM 0         INREGX
+     C*prf                 CALL 'TBL018'
+     C*prf                 PARM 0         INREGX
      C           INREGX    IFNE 0
      C                     Z-ADDINREGX    INSTR
      C                     END
      C*
      C           INRDS     WHEQ 'I'
-     C                     CALL 'TBL064'
-     C                     PARM 0         INREGX
+     C*prf                 CALL 'TBL064'
+     C*prf                 PARM 0         INREGX
      C           INREGX    IFNE 0
      C                     Z-ADDINREGX    INSTR
      C                     END
@@ -261,21 +267,21 @@
      C                     CALL 'QCMDEXC' CMDEXC       30
      C                     ENDIF
      C*
-     C                     CALL 'INV860'  INV860
-     C                     CALL 'INV861'  INV861
+     C*prf                 CALL 'INV860'  INV860
+     C*prf                 CALL 'INV861'  INV861
      C                     ENDIF
      C*
      C*
      C* F7 = INV EVALUATION INQ W/ PRICE & COST
      C           *INKG     IFEQ '1'
      C                     MOVE *ON       FLG417
-     C                     CALL 'INV417'  INV417
+     C*prf                 CALL 'INV417'  INV417
      C                     END
      C*
      C* F8 = CHAIN INVENTORY INQS
      C           *INKH     IFEQ '1'
-     C                     CALL 'INV416'
-     C                     PARM INUMBR    XXSKU
+     C*prf                 CALL 'INV416'
+     C*prf                 PARM INUMBR    XXSKU
      C                     END
      C*
      C*-------------------------------------------------------
@@ -868,9 +874,9 @@
      C                     MOVE INUMBR    XNUMBR
      C                     MOVE STRNUM    XSTORE
      C*
-     C                     CALL 'INV042'
-     C                     PARM           XNUMBR
-     C                     PARM           XSTORE
+     C*prf                 CALL 'INV042'
+     C*prf                 PARM           XNUMBR
+     C*prf                 PARM           XSTORE
      C*
      C                     ENDSR
      C*
@@ -1010,7 +1016,7 @@
      C*
      C           FLG417    IFEQ *ON
      C                     MOVE *ALL'LR'  CANCOD
-     C                     CALL 'INV417'  INV417
+     C*prf                 CALL 'INV417'  INV417
      C                     END
      C*
      C                     SETON                     LR

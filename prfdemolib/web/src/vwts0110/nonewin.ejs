@@ -1,0 +1,27 @@
+<%# include:helpers %>
+<%
+var vwApp = 'Ticket Item Inventory';
+var vwSub = 'Nothing to distribute yet';
+var vwPgm = 'TS0110W';
+var vwDate = new Date().toLocaleDateString('en-US');
+var vwKeys = [['Enter', 'Back to the list']];
+try { vwG.localStorage.removeItem('vw.notice'); } catch (vwErr) { vwPgm = 'TS0110W'; }
+%>
+<div class="vw-app vw-ts0110 vw-ts-none" data-theme="<%= vwTheme %>" data-density="<%= vwDensity %>">
+<%# include:topbar %>
+  <main class="vw-main vw-confirm-main">
+    <section class="vw-dialog vw-confirm" role="alertdialog" aria-labelledby="vw-none-h">
+      <div class="vw-dialog-head">
+        <span class="vw-ico vw-ico-warn"><%- ICON('alert', 24) %></span>
+        <div><span class="vw-eyebrow">Notice</span><h2 id="vw-none-h">No pack quantities were keyed</h2></div>
+      </div>
+      <div class="vw-dialog-body">
+        <p>You pressed F10 to create a distribution, but no SKU has a quantity. Key packs in the <b>Pks</b> column next to the SKUs to distribute - or try <b>Smart fill</b> - then press F10 again.</p>
+      </div>
+      <div class="vw-dialog-foot">
+        <button type="button" class="vw-btn" data-fkey="Enter" onclick="return VW.submit('ENTER')" data-cmd="Back to the list" data-cmd-key="Enter" autofocus><%- ICON('back') %> Back to the list <span class="vw-kbd">Enter</span></button>
+      </div>
+    </section>
+  </main>
+<%# include:footer %>
+</div>

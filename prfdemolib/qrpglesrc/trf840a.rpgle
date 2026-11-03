@@ -20,6 +20,9 @@
       *
       **********************************************************************
       *
+      * codermake: compile options from the PRFDEMOLIB README (CRTBNDRPG
+      * DFTACTGRP(*NO) ACTGRP(*CALLER)) carried in the source.
+     H DFTACTGRP(*NO) ACTGRP(*CALLER)
      H OPTION(*NODEBUGIO)
 0001 F***TrfDtl11  IF   E           K DISK
 0001 FTrfDtll2  IF   E           K DISK

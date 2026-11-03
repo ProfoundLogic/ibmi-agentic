@@ -1,0 +1,136 @@
+<% if (typeof screen2s !== 'undefined' && screen2s) { %>
+<%
+/* plain-screen helpers - injected by prfdemolib/web/build.py */
+var vwErr = null;
+function N(v) { var n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; }
+function F(v, d) { return N(v).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+function T(v) { return String(v == null ? '' : v).replace(/\s+$/, ''); }
+function MDY(v) { var s = String(Math.round(N(v))); if (s === '0') { return '0/00/00'; } while (s.length < 6) { s = '0' + s; } return Number(s.slice(0, 2)) + '/' + s.slice(2, 4) + '/' + s.slice(4, 6); }
+function IND(n) { return String(inds).charAt(n - 1) === '1'; }
+var vpNow = new Date();
+var vpDate = (vpNow.getMonth() + 1) + '/' + ('0' + vpNow.getDate()).slice(-2) + '/' + String(vpNow.getFullYear()).slice(2);
+var vpTime = vpNow.toLocaleTimeString('en-US', { hour12: false });
+%>
+<% var whs = (typeof screen2s !== 'undefined' && screen2s) ? screen2s : []; %>
+<div class="vp-app vp-inv502">
+  <header class="vp-head">
+    <div class="vp-head-row"><span class="vp-pgm">INV502E <%= T(screen) %></span><span class="vp-banner"><%= T(ctlctr) %></span><span class="vp-meta">Date: <%= vpDate %></span></div>
+    <div class="vp-head-row"><span></span><span class="vp-title">Item Inquiry</span><span class="vp-meta">Time: <%= vpTime %></span></div>
+  </header>
+  <main class="vp-main">
+    <section class="vp-panel">
+      <div class="vp-row" style="grid-template-columns: 60px auto minmax(0, 1fr)"><label class="vp-lbl" for="vp-newsku">SKU:</label>
+        <input id="vp-newsku" class="vp-in num<%= IND(42) && IND(99) ? ' is-err' : '' %>" type="text" name="newsku" maxlength="9" size="11" value="<%= T(newsku) %>" autofocus>
+        <span class="vp-val"><b><%= T(idescr) %></b></span></div>
+    </section>
+    <% if (T(msg)) { %><div class="vp-msg" role="alert"><%= T(msg) %></div><% } %>
+    <section class="vp-panel">
+      <div class="vp-grid3">
+        <div class="vp-kv"><b>Vendor...:</b><span><%= T(asnum) %>  <%= T(vnddesc) %></span></div>
+        <div class="vp-kv"><b>Set Code.:</b><span><%= T(iset) %>  <%= T(setdesc) %></span></div>
+        <div class="vp-kv"><b>Vndr Cost:</b><span><%= F(ifccst, 3) %></span></div>
+        <div class="vp-kv"><b>Vndr Prt#:</b><span><%= T(ivndpn) %></span></div>
+        <div class="vp-kv"><b>Spcl Hndl:</b><span><%= T(ihazcd) %>  <%= T(hazdesc) %></span></div>
+        <div class="vp-kv"><b>Avg Cost.:</b><span><%= F(cbavgc, 4) %></span></div>
+        <div class="vp-kv"><b>Dept.....:</b><span><%= T(idept) %>  <%= T(dptdesc) %></span></div>
+        <div class="vp-kv"><b>Repl Code:</b><span><%= T(irplcd) %>  <%= T(rpldesc) %></span></div>
+        <div class="vp-kv"><b>Orig Pric:</b><span><%= F(origrtl, 2) %></span></div>
+        <div class="vp-kv"><b>Subdept..:</b><span><%= T(isdept) %>  <%= T(sdpdesc) %></span></div>
+        <div class="vp-kv"><b>Vel Rank.:</b><span><%= T(ivlrk4) %></span></div>
+        <div class="vp-kv"><b>Chn Pric.:</b><span><%= F(regprc, 2) %></span></div>
+        <div class="vp-kv"><b>Class....:</b><span><%= T(iclas) %>  <%= T(clsdesc) %></span></div>
+        <div class="vp-kv"><b>No Dwnld.:</b><span><%= T(iprvnt) %></span></div>
+        <div class="vp-kv"><b>Zn 2 Pric:</b><span><%= F(z2rtl, 2) %></span></div>
+        <div class="vp-kv"><b>Status...:</b><span><%= T(idsccd) %>  <%= T(stsdesc) %></span></div>
+        <div class="vp-kv"><b>Closeout.:</b><span><%= T(iatrb1) %>  <%= T(at1desc) %></span></div>
+        <div class="vp-kv"><b>Zn 3 Pric:</b><span><%= F(z3rtl, 2) %></span></div>
+        <div class="vp-kv"><b>&nbsp;</b><span></span></div>
+        <div class="vp-kv"><b>Stor Ordr:</b><span><%= T(iatrb2) %>  <%= T(at2desc) %></span></div>
+        <div class="vp-kv"><b>1st Sale.:</b><span><%= MDY(frstsalmdy) %></span></div>
+        <div class="vp-kv"><b>Season...:</b><span><%= T(iseasn) %>  <%= T(seadesc) %></span></div>
+        <div class="vp-kv"><b>Hard/Soft:</b><span><%= T(iatrb3) %>  <%= T(at3desc) %></span></div>
+        <div class="vp-kv"><b>Last Sale:</b><span><%= MDY(lastsalmdy) %></span></div>
+        <div class="vp-kv"><b>Prc Label:</b><span><%= T(itkttr) %>  <%= T(lbldesc) %></span></div>
+        <div class="vp-kv"><b>Ctn Label:</b><span><%= T(iatrb4) %>  <%= T(at4desc) %></span></div>
+        <div class="vp-kv"><b>Case.CuFt:</b><span><%= F(icube, 3) %></span></div>
+        <div class="vp-kv"><b>Order Bk.:</b><span><%= T(obknum) %>&nbsp;&nbsp; <%= T(ordst1) %>&nbsp; <%= T(ordst2) %>&nbsp; <%= T(ordst3) %>&nbsp; <%= T(ordst4) %>&nbsp; <%= T(ordst5) %>&nbsp; <%= T(ovmcde) %></span></div>
+        <div class="vp-kv"><b>Import...:</b><span><%= T(iatrb5) %>  <%= T(at5desc) %></span></div>
+        <div class="vp-kv"><b>Case Lbs.:</b><span><%= F(iwght, 3) %></span></div>
+      </div>
+    </section>
+    <div class="vp-tablewrap">
+      <table class="vp-table">
+        <thead><tr><th class="num">Whse</th><th class="num">On Hnd</th><th class="num">OOS</th><th class="num">On Ord</th><th class="num">Last Ord</th><th class="num">Lst Rcvd</th>
+          <th class="num">Rpk Ord</th><th class="num">Alloc'd</th><th class="num">In Trns</th><th class="num">Pak&amp;Hld</th><th class="num">Next Out</th><th class="num">Cas Pak</th><th class="num">Shp Pak</th></tr></thead>
+        <tbody>
+        <% whs.forEach(function (w) { %>
+          <tr><td class="num"><%= T(w.strnum) %></td><td class="num"><%= F(w.onhand) %></td><td class="num"><%= MDY(w.oosmdy) %></td><td class="num"><%= F(w.onorder) %></td>
+            <td class="num"><%= MDY(w.lastordmdy) %></td><td class="num"><%= MDY(w.lastrcvmdy) %></td><td class="num"><%= F(w.rpkonorder) %></td><td class="num"><%= F(w.allocated) %></td>
+            <td class="num"><%= F(w.intransit) %></td><td class="num"><%= F(w.packnhold) %></td><td class="num"><%= MDY(w.nextoutmdy) %></td><td class="num"><%= F(w.casepack) %></td><td class="num"><%= F(w.shippack) %></td></tr>
+        <% }); %>
+        </tbody>
+      </table>
+    </div>
+    <div class="vp-ctlscr"><%= T(ctlscr) %></div>
+    <div class="vp-keys">
+      <button type="button" class="vp-key is-main" data-fkey="Enter" onclick="pui.submit({ newsku: (document.getElementById('vp-newsku').value.replace(/\D/g, '') || '0'), action: 'ENTER' }); return false;"><b>Enter</b></button>
+      <button type="button" class="vp-key" data-fkey="PageUp" onclick="pui.submit({ action: 'PAGEUP' }); return false;"><b>Page Up</b>=Prev SKU</button>
+      <button type="button" class="vp-key" data-fkey="PageDown" onclick="pui.submit({ action: 'PAGEDOWN' }); return false;"><b>Page Down</b>=Next SKU</button>
+      <button type="button" class="vp-key" data-fkey="F1" onclick="pui.submit({ action: 'F01' }); return false;"><b>F1</b>=Exit</button>
+      <button type="button" class="vp-key" data-fkey="F2" onclick="pui.submit({ action: 'F02' }); return false;"><b>F2</b>=BYR</button>
+      <button type="button" class="vp-key" data-fkey="F3" onclick="pui.submit({ action: 'F03' }); return false;"><b>F3</b>=DistHd</button>
+      <button type="button" class="vp-key" data-fkey="F4" onclick="pui.submit({ action: 'F04' }); return false;"><b>F4</b>=OrderBook</button>
+      <button type="button" class="vp-key" data-fkey="F5" onclick="pui.submit({ action: 'F05' }); return false;"><b>F5</b>=Open POs</button>
+      <button type="button" class="vp-key" data-fkey="F7" onclick="pui.submit({ action: 'F07' }); return false;"><b>F7</b>=Sets</button>
+      <button type="button" class="vp-key" data-fkey="F8" onclick="pui.submit({ action: 'F08' }); return false;"><b>F8</b>=UPCs</button>
+      <button type="button" class="vp-key" data-fkey="F9" onclick="pui.submit({ action: 'F09' }); return false;"><b>F9</b>=TrfDtl</button>
+      <button type="button" class="vp-key" data-fkey="F10" onclick="pui.submit({ action: 'F10' }); return false;"><b>F10</b>=ShpPt</button>
+      <button type="button" class="vp-key" data-fkey="F11" onclick="pui.submit({ action: 'F11' }); return false;"><b>F11</b>=Count</button>
+      <button type="button" class="vp-key" data-fkey="F12" onclick="pui.submit({ action: 'F12' }); return false;"><b>F12</b>=RcvHst</button>
+      <button type="button" class="vp-key" data-fkey="F13" onclick="pui.submit({ action: 'F13' }); return false;"><b>F13</b>=VndMst</button>
+      <button type="button" class="vp-key" data-fkey="F14" onclick="pui.submit({ action: 'F14' }); return false;"><b>F14</b>=OldP&amp;H</button>
+      <button type="button" class="vp-key" data-fkey="F16" onclick="pui.submit({ action: 'F16' }); return false;"><b>F16</b>=WhsInvAdj</button>
+      <button type="button" class="vp-key" data-fkey="F17" onclick="pui.submit({ action: 'F17' }); return false;"><b>F17</b>=NewP&amp;H</button>
+      <button type="button" class="vp-key" data-fkey="F18" onclick="pui.submit({ action: 'F18' }); return false;"><b>F18</b>=SKU Aud</button>
+      <button type="button" class="vp-key" data-fkey="F19" onclick="pui.submit({ action: 'F19' }); return false;"><b>F19</b>=Prc Chgs</button>
+      <button type="button" class="vp-key" data-fkey="F20" onclick="pui.submit({ action: 'F20' }); return false;"><b>F20</b>=InvBal</button>
+      <button type="button" class="vp-key" data-fkey="F21" onclick="pui.submit({ action: 'F21' }); return false;"><b>F21</b>=POGs</button>
+      <button type="button" class="vp-key" data-fkey="F22" onclick="pui.submit({ action: 'F22' }); return false;"><b>F22</b>=ItmAtr</button>
+      <button type="button" class="vp-key" data-fkey="F23" onclick="pui.submit({ action: 'F23' }); return false;"><b>F23</b>=JDA Distr</button>
+    </div>
+  </main>
+  <footer class="vp-foot">INV502 item inquiry &middot; web version of the 5250 screen</footer>
+</div>
+<% } else { %>
+<%
+/* plain-screen helpers - injected by prfdemolib/web/build.py */
+var vwErr = null;
+function N(v) { var n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; }
+function F(v, d) { return N(v).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+function T(v) { return String(v == null ? '' : v).replace(/\s+$/, ''); }
+function MDY(v) { var s = String(Math.round(N(v))); if (s === '0') { return '0/00/00'; } while (s.length < 6) { s = '0' + s; } return Number(s.slice(0, 2)) + '/' + s.slice(2, 4) + '/' + s.slice(4, 6); }
+function IND(n) { return String(inds).charAt(n - 1) === '1'; }
+var vpNow = new Date();
+var vpDate = (vpNow.getMonth() + 1) + '/' + ('0' + vpNow.getDate()).slice(-2) + '/' + String(vpNow.getFullYear()).slice(2);
+var vpTime = vpNow.toLocaleTimeString('en-US', { hour12: false });
+%>
+<div class="vp-app vp-inv502">
+  <header class="vp-head">
+    <div class="vp-head-row"><span class="vp-pgm">INV502E <%= T(screen) %></span><span class="vp-banner"><%= T(ctlctr) %></span><span class="vp-meta">Date: <%= vpDate %></span></div>
+    <div class="vp-head-row"><span></span><span class="vp-title">Item Inquiry</span><span class="vp-meta">Time: <%= vpTime %></span></div>
+  </header>
+  <main class="vp-main">
+    <section class="vp-panel" style="text-align:center;padding:40px 16px">
+      <label class="vp-lbl" for="vp-inumbr">SKU:</label>
+      <input id="vp-inumbr" class="vp-in num<%= IND(41) && IND(99) ? ' is-err' : '' %>" type="text" name="inumbr" maxlength="9" size="11" value="<%= N(inumbr) ? T(inumbr) : '' %>" autofocus>
+    </section>
+    <% if (T(msg)) { %><div class="vp-msg" role="alert"><%= T(msg) %></div><% } %>
+    <div class="vp-ctlscr"><%= T(ctlscr) %></div>
+    <div class="vp-keys">
+      <button type="button" class="vp-key is-main" data-fkey="Enter" onclick="pui.submit({ inumbr: (document.getElementById('vp-inumbr').value.replace(/\D/g, '') || '0'), action: 'ENTER' }); return false;"><b>Enter</b></button>
+      <button type="button" class="vp-key" data-fkey="F1" onclick="pui.submit({ action: 'F01' }); return false;"><b>F1</b>=Exit</button>
+    </div>
+  </main>
+  <footer class="vp-foot">INV502 item inquiry &middot; web version of the 5250 screen</footer>
+</div>
+<% } %>

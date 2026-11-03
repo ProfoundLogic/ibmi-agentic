@@ -25,7 +25,9 @@ products2l.file: qddssrc/products2l.lf | productsp.file
 
 # Message file and menu
 menu.msgf: menu.msgf
-menu.menu: menu.msgf | menu.file
+# .menu needs BOTH the display file and message file as normal prerequisites;
+# with menu.file order-only codermake silently drops the CRTMNU recipe.
+menu.menu: menu.file menu.msgf
 
 # Simple program
 hellor.pgm: qrpglesrc/hellor.rpgle qddssrc/hellod.dspf | hellod.file

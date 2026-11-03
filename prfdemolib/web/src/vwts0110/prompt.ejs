@@ -1,0 +1,99 @@
+<%# include:helpers %>
+<%
+var vwApp = 'Ticket Item Inventory';
+var vwSub = 'Sell-through by store and department, then build a distribution';
+var vwPgm = T(prog) || 'TS0110W';
+var vwDate = new Date().toLocaleDateString('en-US');
+var vwKeys = [['Enter', 'Show the SKUs'], ['F1', 'Exit to the menu']];
+var badStore = IND(90);
+var badDept = IND(91);
+var seas = T(dfseas) || 'ALL';
+var vwRecentTs = [];
+try { vwRecentTs = JSON.parse(vwG.localStorage.getItem('vw.recentTs')) || []; } catch (vwErr) { vwRecentTs = []; }
+var quick = [['205', '12', 'Laurel, MS - Ladies Intimate Basics'], ['205', '86', 'Laurel, MS - Seasonal Candy'], ['406', '86', 'South Hill, VA - Seasonal Candy'],
+             ['458', '59', 'Greensboro, NC - Bedding'], ['262', '12', 'Pearl, MS - Ladies Intimate Basics']];
+var fieldsJs = "{ dfstor: (document.getElementById('vw-dfstor').value.replace(/\\D/g, '') || '0'), dfdept: (document.getElementById('vw-dfdept').value.replace(/\\D/g, '') || '0'), " +
+               "dfseas: document.getElementById('vw-dfseas').value, tckyn: document.getElementById('vw-tckyn').value, avlyn: document.getElementById('vw-avlyn').value, dfyear: document.getElementById('vw-dfyear').value }";
+function sw(id, val, label, hint) {
+  return '<label class="vw-switch"><input type="checkbox"' + (val === 'Y' ? ' checked' : '') +
+    ' onchange="document.getElementById(\'' + id + '\').value = this.checked ? \'Y\' : \'N\'"><span class="vw-track"></span><span>' + label +
+    '<small class="vw-sub-line">' + hint + '</small></span></label>';
+}
+%>
+<div class="vw-app vw-ts0110 vw-ts-prompt" data-theme="<%= vwTheme %>" data-density="<%= vwDensity %>">
+<%# include:topbar %>
+  <section class="vw-hero">
+    <div class="vw-hero-inner">
+      <span class="vw-eyebrow">Store merchandising &middot; Ticketed items</span>
+      <h1>How is a department selling at a store?</h1>
+      <p class="vw-lead">Pick a store and department to see every ticketed SKU: what was shipped, what sold, sell-through, and what the store&rsquo;s distribution center can still send. Then key packs and create a distribution in one step.</p>
+    </div>
+  </section>
+  <main class="vw-main">
+    <section class="vw-card">
+      <div class="vw-card-body">
+        <div class="vw-ts-form">
+          <div class="vw-field vw-picker">
+            <label for="vw-dfstor">Store</label>
+            <div class="vw-input-wrap"><%- ICON('store') %>
+              <input id="vw-dfstor" class="vw-input<%= badStore ? ' is-error' : '' %>" type="text" name="dfstor" inputmode="numeric" maxlength="5" autocomplete="off"
+                     value="<%= N(dfstor) ? T(dfstor) : '' %>" placeholder="e.g. 205 or a town" data-kind="store" data-pick-enter="1" data-vw-search autofocus
+                     onfocus="VW.pickInput(this)" oninput="VW.pickInput(this)" onkeydown="VW.pickKey(this, event)" onblur="VW.pickBlur(this)" aria-invalid="<%= badStore %>">
+            </div>
+            <ul class="vw-picker-list" role="listbox" hidden></ul>
+            <% if (badStore) { %><span class="vw-field-err">Invalid store number - pick one from the list.</span><% } else { %><span class="vw-hint" data-pick-label><%= N(dfstor) ? LOCN(dfstor) + ' ' + LOCC(dfstor) : 'Type a number or a town name' %></span><% } %>
+          </div>
+          <div class="vw-field vw-picker">
+            <label for="vw-dfdept">Department</label>
+            <div class="vw-input-wrap"><%- ICON('grid') %>
+              <input id="vw-dfdept" class="vw-input<%= badDept ? ' is-error' : '' %>" type="text" name="dfdept" inputmode="numeric" maxlength="3" autocomplete="off"
+                     value="<%= N(dfdept) ? T(dfdept) : '' %>" placeholder="e.g. 12 or candy" data-kind="dept" data-pick-enter="1"
+                     onfocus="VW.pickInput(this)" oninput="VW.pickInput(this)" onkeydown="VW.pickKey(this, event)" onblur="VW.pickBlur(this)" aria-invalid="<%= badDept %>">
+            </div>
+            <ul class="vw-picker-list" role="listbox" hidden></ul>
+            <% if (badDept) { %><span class="vw-field-err">Invalid department number - pick one from the list.</span><% } else { %><span class="vw-hint" data-pick-label>Departments with SKU counts in the demo data</span><% } %>
+          </div>
+          <div class="vw-field">
+            <label for="vw-dfseas">Season</label>
+            <select id="vw-dfseas" class="vw-select" name="dfseas">
+              <option value="ALL"<%= seas === 'ALL' ? ' selected' : '' %>>All seasons</option>
+              <% VWSEA.forEach(function (x) { %><option value="<%= x[0] %>"<%= seas === T(x[0]) ? ' selected' : '' %>><%= x[0] %> - <%= x[1] %></option><% }); %>
+            </select>
+            <span class="vw-hint">Season code on the item master</span>
+          </div>
+        </div>
+        <input type="hidden" id="vw-tckyn" name="tckyn" value="<%= T(tckyn) || 'Y' %>">
+        <input type="hidden" id="vw-avlyn" name="avlyn" value="<%= T(avlyn) || 'Y' %>">
+        <input type="hidden" id="vw-dfyear" name="dfyear" value="<%= T(dfyear) || 'Y' %>">
+        <div class="vw-ts-switches">
+          <%- sw('vw-tckyn', T(tckyn) || 'Y', 'Ticketed SKUs only', 'hang, tear or pre-ticketed items') %>
+          <%- sw('vw-avlyn', T(avlyn) || 'Y', 'Warehouse can ship', 'only SKUs with packs available') %>
+          <%- sw('vw-dfyear', T(dfyear) || 'Y', 'Include last year', 'adds LY sales to shipped and sold') %>
+        </div>
+        <div class="vw-actions" style="margin-top:18px">
+          <button type="button" class="vw-btn" data-fkey="Enter" onclick="return VW.submit('ENTER', <%= fieldsJs %>)" data-cmd="Show the SKUs" data-cmd-key="Enter"><%- ICON('rows') %> Show SKUs <span class="vw-kbd">Enter</span></button>
+          <button type="button" class="vw-btn-ghost" data-fkey="F1" onclick="return VW.submit('F01')" data-cmd="Exit to the menu" data-cmd-key="F1"><%- ICON('exit') %> Exit <span class="vw-kbd">F1</span></button>
+        </div>
+      </div>
+    </section>
+    <div class="vw-grid-2">
+      <section class="vw-card">
+        <div class="vw-card-head"><h2><%- ICON('spark') %> Quick picks <span class="vw-sub">store and department with demo depth</span></h2></div>
+        <div class="vw-card-body vw-recents vw-quick">
+          <% quick.forEach(function (q) { %>
+          <button type="button" onclick="return VW.submit('ENTER', { dfstor: '<%= q[0] %>', dfdept: '<%= q[1] %>', dfseas: 'ALL', tckyn: 'N', avlyn: 'N', dfyear: 'Y' })" data-cmd="Open store <%= q[0] %> dept <%= q[1] %>" data-cmd-group="Quick picks"><b><%= q[0] %> / <%= q[1] %></b> <%= q[2] %></button>
+          <% }); %>
+        </div>
+      </section>
+      <section class="vw-card">
+        <div class="vw-card-head"><h2><%- ICON('rows') %> Recently opened <span class="vw-sub">on this browser</span></h2></div>
+        <div class="vw-card-body vw-recents vw-quick">
+          <% if (vwRecentTs.length) { vwRecentTs.forEach(function (r) { var p = String(r.v).split('/'); %>
+          <button type="button" onclick="return VW.submit('ENTER', { dfstor: '<%= p[0] %>', dfdept: '<%= p[1] %>' })" data-cmd="Reopen store <%= p[0] %> dept <%= p[1] %>" data-cmd-group="Recently opened"><b><%= r.v %></b> <%= r.l %></button>
+          <% }); } else { %><span class="vw-hint">Store and department lists you open appear here.</span><% } %>
+        </div>
+      </section>
+    </div>
+  </main>
+<%# include:footer %>
+</div>

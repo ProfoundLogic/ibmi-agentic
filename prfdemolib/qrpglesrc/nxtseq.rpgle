@@ -14,6 +14,9 @@
       *
       *================================================================
 
+      * codermake: compile options from the PRFDEMOLIB README (CRTBNDRPG
+      * DFTACTGRP(*NO) ACTGRP(*CALLER)) carried in the source.
+     H DFTACTGRP(*NO) ACTGRP(*CALLER)
      DNextSeq          DS
      D  SeqNum                 1      7S 0 INZ(0)
 

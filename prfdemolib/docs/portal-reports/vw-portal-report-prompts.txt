@@ -1,0 +1,380 @@
+VARIETY WHOLESALERS - CODERFLOW FOR BUSINESS REPORT PROMPTS
+22 insight and exception reports over the JDA merchandising sample in library PRFDEMOLIB.
+
+How to use: copy the text between two dashed lines (start at "New report:") and paste it into CoderFlow for Business as one request. One prompt makes one report. Every prompt stands on its own, so you can build them in any order.
+
+Reports in this file:
+01 Stockout Watch - store SKUs below their order point
+02 Out of Stock Today - estimated lost sales
+03 Chronic Out-of-Stocks - the same shelf empty week after week
+04 DC Allocation Shortfall - promises the warehouse cannot keep
+05 Store-to-Store Rebalancing - move stock instead of buying more
+06 Slow-Moving Inventory
+07 Excess Weeks of Supply - cash tied up in overstock
+08 Never-Sold Inventory
+09 Class Sell-Through and Markdown Candidates
+10 Trending Items - risers and fallers
+11 Replenishment Forecast Accuracy
+12 GMROI and Turns by Class
+13 Margin and Price Integrity Watch
+14 Alternate Vendor Cost Savings
+15 Vendor Scorecard
+16 Shrink and Inventory Adjustments
+17 Customer Returns Watch
+18 Store Scorecard
+19 Inventory Data Integrity Exceptions
+20 DC Inventory Position and Pack-and-Hold Calendar
+21 Assortment Rationalization - the long tail
+22 Weekly Merchandising Briefing
+
+
+----------------------------------------------------------------------
+REPORT 01
+----------------------------------------------------------------------
+New report: Stockout Watch - store SKUs below their order point
+
+I'm a replenishment analyst at Variety Wholesalers (Roses stores). Every morning I want one list of the store and SKU combinations that will run out before the next delivery, worst first, so I can push orders before the shelf goes empty.
+
+Data, all in library PRFDEMOLIB: INVBAL holds one row per SKU (INUMBR) and location (ISTORE) with on hand IBHAND, in transit IBINTQ, transfer on order IBTOOQ, average cost IBAVGC and weekly unit sales IBWK01 to IBWK08. RPLPRF holds the replenishment profile per SKU and store: order-at point RFMIN, order-up-to point RFMAX and vendor lead time RFLEAD in days. INVMST has the item description IDESCR. ITMRTL has the retail price REGPRC for a selling multiple REGMLT, keyed by SKU. TBLSTR has the store city STCITY, state STPVST and supplying warehouse STRWHS.
+
+How it works: only stores (location below 9000) that have a replenishment profile. Average weekly sales is the eight weekly sales columns added up and divided by 8; skip rows that sold nothing in those eight weeks. Available is on hand plus in transit plus transfer on order. Flag the row when available is below the order-at point. Days of cover is on hand divided by average weekly sales times 7. Suggested order is the order-up-to point minus available.
+
+What I'd like to see: store, city, SKU, description, on hand, available, order-at, order-up-to, average weekly sales, days of cover, suggested order units and the retail value of that order. Sort by days of cover, lowest first. Up top: rows flagged, SKUs affected and how many are already at zero.
+
+General: read-only. Trim text fields. Store numbers 9001 and up are distribution centers, not stores. Weekly sales week 01 is the most recent completed week. Severity: red when on hand is zero or less, amber when days of cover is under 7, otherwise yellow. Give every row a plain-English action such as "Order 24 units today".
+
+
+----------------------------------------------------------------------
+REPORT 02
+----------------------------------------------------------------------
+New report: Out of Stock Today - estimated lost sales
+
+I'm the director of store operations. I want to know which shelves are empty right now on items customers are still buying, and roughly what that costs us every week we leave them empty, so I can lean on the warehouse for the ones that matter.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with on hand IBHAND, in transit IBINTQ and weekly unit sales IBWK01 to IBWK08. ITMRTL has the retail price REGPRC for a selling multiple REGMLT, keyed by SKU, so the unit retail is REGPRC divided by REGMLT. INVMST has the description IDESCR. TBLSTR has the store city STCITY, state STPVST and the warehouse that supplies it, STRWHS. The warehouse's own stock is the INVBAL row for that SKU at the warehouse location number.
+
+How it works: only stores (location below 9000). Average weekly sales is the eight weekly columns added up and divided by 8. A row is out of stock today when on hand is zero or less and the item sold something in the last eight weeks. Estimated weekly lost units is the average weekly sales; estimated weekly lost retail is that times the unit retail. Look up whether the supplying warehouse has stock of the SKU and whether anything is already in transit to the store.
+
+What I'd like to see: store, city, SKU, description, on hand, average weekly sales, estimated weekly lost units and lost retail, units in transit, and the supplying warehouse with its on hand. Sort by lost retail, highest first. Summary at the top: empty shelves, SKUs, total weekly lost units and lost retail, and how many of them the warehouse could fill today.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Red when the warehouse has stock but nothing is in transit (a shipping problem we can fix today), amber when the warehouse is also out, green when stock is already in transit. Add a plain-English action on every row.
+
+
+----------------------------------------------------------------------
+REPORT 03
+----------------------------------------------------------------------
+New report: Chronic Out-of-Stocks - the same shelf empty week after week
+
+I'm the VP of merchandising. One empty week is bad luck; four or more out of eight is a broken replenishment setting or a vendor problem, and customers stop coming back for that item. I want the list of repeat offenders so the buyers fix the root cause.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with out-of-stock flags for the current week IBOSCR and for each of the last eight weeks IBOS01 to IBOS08 (Y means the item was out of stock at some point that week), weekly unit sales IBWK01 to IBWK08, on hand IBHAND and the date it last went out of stock IBALD5 (YYMMDD with century code IBCEN5, 1 = 2000s). INVMST has the description IDESCR, the vendor ASNUM and the department, sub-department and class IDEPT, ISDEPT, ICLAS. APSUPP has the vendor name ASNAME by ASNUM. INVDPT has the class name DPTNAM for the matching IDEPT, ISDEPT and ICLAS where ISCLAS is 0. TBLSTR has the store city STCITY.
+
+How it works: only stores (location below 9000). Count the Y flags across IBOS01 to IBOS08. Keep rows with 4 or more out-of-stock weeks. Estimate lost units as the average sales of the in-stock weeks multiplied by the number of out-of-stock weeks.
+
+What I'd like to see: a summary by vendor and by class (rows, SKUs, average out-of-stock weeks), then the detail with store, SKU, description, class, vendor, weeks out of stock, a little 8-week pattern such as "YYNYYNYY", on hand now and estimated lost units. Sort by weeks out of stock, then lost units.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Week 01 is the most recent week. Red for 6 or more weeks out, amber for 4 or 5. Plain-English action per row, for example "Raise the order-at point" or "Talk to the vendor about fill rate".
+
+
+----------------------------------------------------------------------
+REPORT 04
+----------------------------------------------------------------------
+New report: DC Allocation Shortfall - promises the warehouse cannot keep
+
+I run allocation for our distribution centers. Stores have open transfer requests against each DC, and I need to know where the requests add up to more than the DC actually has on the shelf, before the pickers find out the hard way.
+
+Data, all in library PRFDEMOLIB: TRFDTL is the transfer detail, one line per request, with the shipping location TRFFLC, the receiving store TRFTLC, the SKU INUMBR, quantity requested TRFREQ, quantity shipped TRFSHP, status TRFSTS and batch TRFBCH. INVBAL has on hand IBHAND for every SKU (INUMBR) and location (ISTORE), including the DCs. INVMST has the description IDESCR and vendor ASNUM; APSUPP has the vendor name ASNAME. TBLSTR names the locations by STRNUM with STRNAM.
+
+How it works: every transfer line in the file is still open (nothing has shipped yet). Add up the requested quantity by shipping location and SKU and count the distinct receiving stores. Compare it with the shipping location's on hand from INVBAL for that SKU (no INVBAL row means zero). Shortfall is requested minus on hand when that is positive. Coverage percent is on hand divided by requested.
+
+What I'd like to see: summary by DC (SKUs with open requests, SKUs short, total units short), then the detail: DC name, SKU, description, vendor, open lines, stores waiting, units requested, DC on hand, shortfall and coverage percent. Sort by shortfall, largest first. A chart of shortfall units by DC would be great.
+
+General: read-only. Trim text fields. Receiving store numbers may not all be in TBLSTR; show the number when there is no name. Red when the DC has nothing at all, amber when coverage is under 50 percent, yellow otherwise. Plain-English action per row, such as "Short 576 units: expedite the vendor PO or cut allocations to 19 stores".
+
+
+----------------------------------------------------------------------
+REPORT 05
+----------------------------------------------------------------------
+New report: Store-to-Store Rebalancing - move stock instead of buying more
+
+I'm an inventory planner. Some stores are about to run out of an item while another store is sitting on months of the same item. Before we buy more, I want to see where a store-to-store transfer would fix both problems.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with on hand IBHAND, in transit IBINTQ, transfer on order IBTOOQ and weekly unit sales IBWK01 to IBWK08. RPLPRF has the order-at point RFMIN and order-up-to point RFMAX per SKU and store. INVMST has the description IDESCR. TBLSTR has the city STCITY, state STPVST and region REGNUM of each store. ITMRTL has the retail REGPRC and multiple REGMLT by SKU.
+
+How it works: only stores (location below 9000). Average weekly sales is the eight weekly columns divided by 8. A store needs stock when it sold something in eight weeks and on hand plus in transit plus transfer on order is below its order-at point; it needs enough to reach the order-up-to point. A store can give when it has more than 26 weeks of supply (spare units are on hand minus 13 weeks of sales), or when it sold nothing in eight weeks and has 6 or more on hand (all of it is spare). For each needing store and SKU, pick the giving store with the most spare units. Suggested move is the smaller of the need and the spare.
+
+What I'd like to see: SKU, description, receiving store and city, its need, giving store and city, its spare units and weeks of supply, suggested units to move and their retail value, and whether both stores are in the same region. Sort by retail value moved, highest first. Summary: moves suggested, units and retail.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Green for moves within the same region, amber across regions. Plain-English action per row, such as "Transfer 12 units from Glen Burnie (535) to Laurel (205)".
+
+
+----------------------------------------------------------------------
+REPORT 06
+----------------------------------------------------------------------
+New report: Slow-Moving Inventory
+
+I'm the buyer for Ladies Intimate Basics. I want to see the stock sitting in stores that hasn't sold for two months or more, what it's costing us, and whether to mark it down, move it or send it back.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with on hand IBHAND, average cost IBAVGC, weekly unit sales IBWK01 to IBWK08, year-to-date units IBRSUY, date last sold IBALD4 with century IBCEN4 and date last received IBALD2 with century IBCEN2. The dates are YYMMDD numbers, century 1 means 2000s and zero means never. INVMST has the description IDESCR, vendor ASNUM, buyer BYRNUM and department, sub-department and class IDEPT, ISDEPT, ICLAS. INVDPT gives the class name DPTNAM for the matching three codes with ISCLAS 0. APSUPP has the vendor name ASNAME. TBLBYR has the buyer name BYRNAM by BYRNUM.
+
+How it works: only stores (location below 9000) with stock on hand and no sales at all in the last eight weeks. Inventory cost is on hand times average cost. Days since last sale is from the last-sold date to the as-of date; show "never" when there is no last-sold date. This is a snapshot, so the as-of date is the latest last-sold date found anywhere in INVBAL.
+
+What I'd like to see: a summary by class and by vendor (rows, units, cost), then the detail: store, SKU, description, class, vendor, buyer, on hand, cost, days since last sale, days since last receipt and year-to-date units. Sort by cost, highest first.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Red when it has never sold or not sold in 180 days, amber at 90 days, yellow otherwise. Plain-English action per row: mark down, transfer to a store that sells it, or return to vendor.
+
+
+----------------------------------------------------------------------
+REPORT 07
+----------------------------------------------------------------------
+New report: Excess Weeks of Supply - cash tied up in overstock
+
+I'm the merchandise planning manager. Finance wants to know how much of our store inventory is more than we need. I want every store and SKU carrying more than six months of supply at today's selling rate, and the dollars above a healthy quarter's worth.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with on hand IBHAND, average cost IBAVGC and weekly unit sales IBWK01 to IBWK08. RPLPRF has the order-up-to point RFMAX per SKU and store. INVMST has the description IDESCR, vendor ASNUM and department, sub-department and class IDEPT, ISDEPT, ICLAS. INVDPT has the class name DPTNAM for the matching codes with ISCLAS 0. TBLSTR has the store city STCITY.
+
+How it works: only stores (location below 9000) that sold something in the last eight weeks. Average weekly sales is the eight weekly columns divided by 8. Weeks of supply is on hand divided by average weekly sales. Flag rows over 26 weeks. Excess units are on hand minus 13 weeks of sales, and excess cost is excess units times average cost. Also show how many times the order-up-to point the store is holding, when a profile exists.
+
+What I'd like to see: totals by class and by store (rows, excess units, excess cost), then the detail: store, SKU, description, class, on hand, average weekly sales, weeks of supply, order-up-to, excess units and excess cost. Sort by excess cost, largest first. A bar chart of excess cost by class.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Red over 52 weeks of supply, amber over 39, yellow over 26. Plain-English action per row, such as "Stop replenishing; 31 weeks of supply" or "Rebalance to stores that are short".
+
+
+----------------------------------------------------------------------
+REPORT 08
+----------------------------------------------------------------------
+New report: Never-Sold Inventory
+
+I'm a buyer. Some items reached the store shelf and have never rung through a register there. That usually means a bad allocation, the wrong store profile, or merchandise that never made it to the floor. I want the list so we can find out which.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with on hand IBHAND, average cost IBAVGC, date last sold IBALD4 (zero means never), date first received IBFRDT with century IBFRCN, date last received IBALD2 with century IBCEN2, and receipt units year to date IBRCUY. Dates are YYMMDD numbers, century 1 means 2000s. INVMST has the description IDESCR, vendor ASNUM, status IDSCCD and class codes IDEPT, ISDEPT, ICLAS. INVDPT has the class name DPTNAM for the matching codes with ISCLAS 0. TBLSTR has the store city STCITY.
+
+How it works: only stores (location below 9000) with on hand above zero and a last-sold date of zero. Cost is on hand times average cost. For each SKU, also count how many other stores have sold it, using a non-zero last-sold date at those stores; if it sells elsewhere, the problem is this store.
+
+What I'd like to see: a summary by SKU (stores holding it unsold, units, cost, stores where it does sell), then the detail: store, city, SKU, description, class, on hand, cost, first received date and last received date. Sort the summary by cost, highest first.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Red when no store has ever sold the SKU (an assortment problem), amber when other stores sell it (a store or allocation problem). Plain-English action per row, such as "Sells in 6 other stores: check it is on the floor at Pearl".
+
+
+----------------------------------------------------------------------
+REPORT 09
+----------------------------------------------------------------------
+New report: Class Sell-Through and Markdown Candidates
+
+I'm the merchant for Ladies Intimate Basics (department 12). I want to see each class's sell-through this year next to what's left on the shelf, so I can decide where to take markdowns and where to buy deeper, and I want the markdown history for the items I'm about to cut.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with year-to-date regular unit sales IBRSUY, year-to-date sales dollars IBRSDY, on hand IBHAND, average cost IBAVGC and weekly sales IBWK01 to IBWK08. INVMST has the description IDESCR and IDEPT, ISDEPT, ICLAS. INVDPT gives the sub-department name (row with ICLAS 0 and ISCLAS 0) and the class name (ISCLAS 0) in DPTNAM. INVFSD is keyed by FSSKU and holds the original retail ORIGRT, current regular price CURRTL, the last markdown retail LMDRTL with its date LMDYR, LMDMTH, LMDDAY, and the first-sold date FSYR, FSMTH, FSDAY.
+
+How it works: only stores (location below 9000), department 12. Sell-through percent is year-to-date units divided by year-to-date units plus on hand. Weeks of supply is on hand divided by average weekly sales over eight weeks. A class is a markdown candidate when sell-through is under 50 percent; a SKU inside it is a candidate when its own sell-through is under 50 percent and it has more than 13 weeks of supply.
+
+What I'd like to see: a class table (sub-department, class, SKUs, units sold, on hand, sell-through, inventory cost) sorted by sell-through, lowest first, with a bar chart. Below it, the candidate SKUs with on hand, cost, sell-through, weeks of supply, original and current price, last markdown price and date.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Red under 25 percent sell-through, amber under 50, green 75 and up. Plain-English action per class and SKU, such as "Take 30 percent off" or "Sells through: buy deeper".
+
+
+----------------------------------------------------------------------
+REPORT 10
+----------------------------------------------------------------------
+New report: Trending Items - risers and fallers
+
+I'm a buyer. I want an early warning on items whose chain sales have suddenly jumped, before they sell out at the DC, and on items that have suddenly stalled, before we reorder them.
+
+Data, all in library PRFDEMOLIB: INVCBL is the chain-level balance, one row per SKU (INUMBR), with weekly unit sales CBWK01 to CBWK08 (01 is the most recent week), chain on hand CBHAND, PO on order CBPOOQ and moving annual units CBMASU. INVBAL holds on hand IBHAND by SKU and location (ISTORE); the distribution centers are locations 9001 and up. INVMST has the description IDESCR, vendor ASNUM and buyer BYRNUM. APSUPP has the vendor name ASNAME and plan lead time ASLEAD in days. TBLBYR has the buyer name BYRNAM.
+
+How it works: recent sales are weeks 01 to 04 added up; prior sales are weeks 05 to 08 added up. A riser has recent sales more than 1.5 times prior sales and at least 20 recent units. A faller has recent sales under half of prior sales, with at least 20 prior units. For risers, add DC on hand across the distribution centers and work out DC weeks of supply as DC on hand divided by the recent weekly rate (recent sales divided by 4).
+
+What I'd like to see: two sections. Risers: SKU, description, vendor, buyer, prior 4 weeks, recent 4 weeks, percent change, DC on hand, DC weeks of supply and on order, sorted by percent change. Fallers: SKU, description, prior, recent, percent change, chain on hand and weeks of supply at the new rate. Include a small 8-week sales sparkline per SKU if possible, oldest week on the left.
+
+General: read-only. Trim text fields. For risers, red when DC weeks of supply is under the vendor lead time in weeks, amber under 8 weeks. For fallers, amber. A brand-new item with no prior sales shows as "new". Plain-English action per row, such as "Rising 1,532 percent: reorder now" or "Stalled: hold the next order".
+
+
+----------------------------------------------------------------------
+REPORT 11
+----------------------------------------------------------------------
+New report: Replenishment Forecast Accuracy
+
+I manage the replenishment system. Store orders are driven by the forecast in each item's replenishment profile, and when the forecast is wrong we either overstock or run out. I want to see where the profile forecast and actual sales have drifted apart, so the team can re-tune those profiles.
+
+Data, all in library PRFDEMOLIB: RPLPRF is one row per SKU (INUMBR) and store (ISTORE) with the forecast average weekly sales RFASWF, base sales RFBSLS, order-at point RFMIN, order-up-to point RFMAX, profile name RFPROF and vendor lead time RFLEAD. INVBAL has, for the same SKU and store, weekly unit sales IBWK01 to IBWK08 and on hand IBHAND. INVMST has the description IDESCR and class codes IDEPT, ISDEPT, ICLAS. INVDPT gives the class name DPTNAM for the matching codes with ISCLAS 0.
+
+How it works: actual weekly sales is the eight weekly columns divided by 8. Only profile rows that sold at least 8 units in those eight weeks. Forecast ratio is forecast divided by actual. Over-forecast when the ratio is above 1.5, under-forecast when it is below 0.67. The error in units per week is forecast minus actual.
+
+What I'd like to see: a summary (profiles checked, over, under, within range, and the average ratio), a breakdown by class with how many profiles are over and under, and the detail: store, SKU, description, profile, forecast, actual, ratio, order-at, order-up-to and on hand. Sort by the size of the error, largest first. A scatter chart of forecast against actual would make the point nicely.
+
+General: read-only. Trim text fields. Red for under-forecast (stockout risk), amber for over-forecast (overstock risk), green within range. Plain-English action per row, such as "Forecast 3 a week, selling 9: raise the forecast".
+
+
+----------------------------------------------------------------------
+REPORT 12
+----------------------------------------------------------------------
+New report: GMROI and Turns by Class
+
+I'm the CFO. I want to know which classes earn their keep: gross margin dollars returned for every dollar we hold in inventory, and how fast the stock turns. The ones at the bottom should get less space and less open-to-buy.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with year-to-date sales dollars IBRSDY, year-to-date cost of those sales IBRCSY, on hand IBHAND, average cost IBAVGC, and the system's own GMROI IBGMRI and turns IBTRNS for that row. INVMST has IDEPT, ISDEPT, ICLAS and the description IDESCR. INVDPT gives the sub-department name (ICLAS 0 and ISCLAS 0) and class name (ISCLAS 0) in DPTNAM.
+
+How it works: only stores (location below 9000). Gross margin dollars are sales dollars minus cost dollars. Inventory at cost is on hand times average cost. For a class, take the GMROI and turns fields weighted by sales dollars (sum of field times sales, divided by total sales). Margin percent is margin dollars divided by sales dollars. Share of sales is the class's sales divided by all sales.
+
+What I'd like to see: a ranked class table (sub-department, class, SKUs, sales, margin dollars, margin percent, inventory at cost, GMROI, turns, share of sales and share of inventory), sorted by GMROI, lowest first. A quadrant chart of GMROI against turns, or a bar chart of GMROI by class. Underneath, the ten SKUs with the most inventory dollars and a GMROI under 2.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Red for GMROI under 2, amber 2 to 5, green above 5. Plain-English action per class, such as "Earns 16 dollars per inventory dollar: protect the space" or "Earns nothing: cut the assortment".
+
+
+----------------------------------------------------------------------
+REPORT 13
+----------------------------------------------------------------------
+New report: Margin and Price Integrity Watch
+
+I'm the pricing analyst. Before the next ad I want to catch items whose retail no longer covers our cost, items whose zone prices disagree, and items with a missing price or cost.
+
+Data, all in library PRFDEMOLIB: ITMRTL is keyed by SKU and has the regular retail REGPRC for a selling multiple REGMLT, the original retail ORIGRTL and the zone prices Z1RTL, Z2RTL and Z3RTL. INVMST has the description IDESCR, status IDSCCD, vendor ASNUM, current home cost ICUCST, vendor cost IFCCST and the class codes IDEPT, ISDEPT, ICLAS. INVBAL has the average cost IBAVGC per SKU (INUMBR) and location (ISTORE). APSUPP has the vendor name ASNAME.
+
+How it works: unit retail is REGPRC divided by REGMLT. Margin percent is unit retail minus current cost, divided by unit retail. Check four things per SKU. Margin under 40 percent. Any zone price different from the regular price. A retail of zero or a cost of zero. And average cost at the distribution centers (locations 9001 and up) more than 5 percent above the current cost, which means margin is leaking through older, more expensive stock.
+
+What I'd like to see: one row per SKU with an issue: SKU, description, vendor, cost, average DC cost, regular retail, original retail, the three zone prices, margin percent, and the issues found as short labels. Sort by margin percent, lowest first. Up top, a count of SKUs for each issue.
+
+General: read-only. Trim text fields. Red under 30 percent margin or a missing price or cost, amber 30 to 40 percent, yellow for zone differences only. Plain-English action per row, such as "Raise retail to 1.49 for 38 percent margin" or "Zone 3 is 1.00 lower: confirm it is intended".
+
+
+----------------------------------------------------------------------
+REPORT 14
+----------------------------------------------------------------------
+New report: Alternate Vendor Cost Savings
+
+I'm in sourcing. Many of our items are set up with more than one vendor. I want to see where we are still buying from the primary vendor even though another set-up vendor quotes a meaningfully lower cost, and what switching could be worth over a year.
+
+Data, all in library PRFDEMOLIB: INVMST has the primary vendor ASNUM, the current home cost ICUCST, the buy unit IBYUM, the description IDESCR and the case pack ISTDPK, keyed by SKU INUMBR. INVVEN is the alternate-vendor file, one row per SKU, vendor IVVNUM and warehouse IVSTOR, with that vendor's current cost IVCCST, buy unit IVBYUM, case pack IVSDPK, minimum order IVMQTY and lead time IVLEAD. INVCBL has the chain moving annual sales units CBMASU per SKU. APSUPP has vendor names ASNAME by ASNUM; some alternate vendors are not in APSUPP, so show their number.
+
+How it works: compare each SKU's alternate vendors (not the primary) with a cost above zero against the primary cost. Use the lowest cost per alternate vendor across warehouses. Keep alternates at least 5 percent cheaper. Annual savings is the cost difference times the chain moving annual units. Show the best alternate per SKU first, then any others.
+
+What I'd like to see: SKU, description, primary vendor and cost, best alternate vendor and cost, savings per unit and percent, buy unit and case pack for both, minimum order, lead time and estimated annual savings. Sort by annual savings, highest first, with a total at the top.
+
+General: read-only. Trim text fields. Green when the buy unit and case pack match the primary (a like-for-like quote), amber when they differ (check before switching). Plain-English action per row, such as "Ask vendor 79367 to confirm 0.146 for the same pack".
+
+
+----------------------------------------------------------------------
+REPORT 15
+----------------------------------------------------------------------
+New report: Vendor Scorecard
+
+I'm the vendor relations manager and I have quarterly reviews coming up. I want one scorecard per vendor showing what they sell for us, how well we keep their items in stock, how productive their inventory is and how often customers bring it back.
+
+Data, all in library PRFDEMOLIB: APSUPP is the vendor master keyed by ASNUM with the name ASNAME, buyer ASBUYR and plan lead time ASLEAD. INVMST has the vendor ASNUM and description IDESCR for every SKU INUMBR. INVBAL has one row per SKU and location (ISTORE) with year-to-date sales dollars IBRSDY, year-to-date units IBRSUY, on hand IBHAND, average cost IBAVGC, the current-week out-of-stock flag IBOSCR (Y), customer returns IBRETS, GMROI IBGMRI and the weekly sales IBWK01 to IBWK08.
+
+How it works: only stores (location below 9000). Group by the item's primary vendor. In-stock percent is the share of store and SKU rows that are not out of stock, where out of stock means the current-week flag is Y or on hand is zero or less. GMROI is the GMROI field weighted by sales dollars. Return rate is returns divided by year-to-date units. Trend is the last four weeks of sales against the four before.
+
+What I'd like to see: one row per vendor with SKUs, sales dollars, share of total sales, inventory at cost, in-stock percent, GMROI, return rate, lead time and trend, sorted by sales. A chart of in-stock percent by vendor for the top ten. Then a drill-down per vendor listing their out-of-stock store and SKU rows.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Red when in-stock is under 80 percent or the return rate is over 5 percent, amber under 90 percent, green otherwise. Plain-English talking point per vendor for the review, such as "In stock only 49 percent of the time across 41 SKUs: fill rate is the first agenda item".
+
+
+----------------------------------------------------------------------
+REPORT 16
+----------------------------------------------------------------------
+New report: Shrink and Inventory Adjustments
+
+I'm the loss prevention manager. I want to see where inventory is disappearing: physical-count adjustments, other adjustments, and store records that have gone negative, which usually means something was sold that the system never received.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with physical-count adjustment units IBPHUY and dollars IBPHDY year to date, other adjustment units IBAJUY and dollars IBAJDY year to date, on hand IBHAND, average cost IBAVGC, year-to-date sales dollars IBRSDY and the date last adjusted IBALD3 with century IBCEN3 (YYMMDD, century 1 is 2000s). INVMST has the description IDESCR and the class codes IDEPT, ISDEPT, ICLAS. INVDPT gives the class name DPTNAM for the matching codes with ISCLAS 0. TBLSTR has the store city STCITY, state STPVST, district STRDST and region REGNUM.
+
+How it works: only stores (location below 9000). Shrink dollars are the negative physical-count adjustment dollars shown as a positive loss. Shrink percent of sales is shrink dollars divided by sales dollars. Separately, list every row where on hand is below zero, valued at average cost.
+
+What I'd like to see: a store table (city, district, region, physical-adjustment units and dollars, other adjustment units and dollars, sales, shrink percent), sorted by shrink dollars, highest first, with a chart. Then the top 20 SKU and store combinations by shrink dollars with the class. Then the negative on-hand list: store, SKU, description, on hand, value and date last adjusted.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Red for shrink over 2 percent of sales or any negative on hand, amber over 1 percent. Plain-English action per row, such as "Recount SKU 789514 at Laurel: on hand is -14".
+
+
+----------------------------------------------------------------------
+REPORT 17
+----------------------------------------------------------------------
+New report: Customer Returns Watch
+
+I'm a quality and merchandising manager. When customers return an item more than usual, something is wrong: fit, sizing, quality or labeling. I want the items and stores where returns are out of line.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with customer return units year to date IBRETS, year-to-date regular unit sales IBRSUY and dollars IBRSDY. INVMST has the description IDESCR, vendor ASNUM, size ISSIZE, color ISCOLR and class codes IDEPT, ISDEPT, ICLAS. APSUPP has the vendor name ASNAME. INVDPT gives the class name DPTNAM for the matching codes with ISCLAS 0. ITMRTL has the retail REGPRC for a multiple REGMLT. TBLSTR has the store city STCITY.
+
+How it works: only stores (location below 9000) that sold at least 20 units this year. Return rate is return units divided by units sold. Flag rows over 5 percent. Returned retail is return units times unit retail (REGPRC divided by REGMLT). Also roll up to SKU across all stores and to vendor, so we can tell a product problem (high everywhere) from a store problem (high in one place).
+
+What I'd like to see: a vendor summary (units sold, returns, return rate), a SKU summary (stores flagged, chain return rate, returned retail) and the store and SKU detail with city, description, size, color, units sold, returns, return rate and returned retail. Sort by returned retail, highest first.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Red over 10 percent, amber 5 to 10 percent. Plain-English action per row: "Product issue: high in 7 stores, raise with the vendor" or "Store issue: only Griffin, check fitting and labels".
+
+
+----------------------------------------------------------------------
+REPORT 18
+----------------------------------------------------------------------
+New report: Store Scorecard
+
+I'm a regional operations director. I want one line per store that tells me who is selling, who is keeping the shelves full, who is losing inventory and who is trending up or down, so my district visits go to the right places.
+
+Data, all in library PRFDEMOLIB: TBLSTR is the store master keyed by STRNUM with the city STCITY, state STPVST, district STRDST, region REGNUM, retail square feet STRETL, manager STMNGR, date opened STSDAT with century STSCEN, and STRHDO (S for store). TBLREG has the region name REGNAM; TBLDST has the district name DSTNAM. INVBAL has one row per SKU (INUMBR) and location (ISTORE) with year-to-date sales dollars IBRSDY, on hand IBHAND, average cost IBAVGC, the current-week out-of-stock flag IBOSCR, physical-adjustment dollars IBPHDY, customer returns IBRETS and weekly units IBWK01 to IBWK08.
+
+How it works: stores only (STRHDO is S, number below 9000). Sales per square foot is year-to-date sales dollars divided by retail square feet. In-stock percent is the share of the store's SKU rows that are not out of stock (out of stock means current-week flag Y or on hand zero or less). Trend is the last four weeks of units against the four weeks before. Rank stores on each measure.
+
+What I'd like to see: one row per store (city, state, region, district, square feet, sales, sales per square foot, inventory at cost, in-stock percent, out-of-stock SKU count, shrink dollars, returns and trend percent), sorted by sales per square foot. A chart of sales per square foot next to in-stock percent per store. Totals and averages by region underneath.
+
+General: read-only. Trim text fields. Color in-stock percent red under 75, amber under 90, green otherwise; trend green up, red down more than 10 percent. One plain-English sentence per store, for example "Best sales per square foot in the chain but only 62 percent in stock: fix replenishment first".
+
+
+----------------------------------------------------------------------
+REPORT 19
+----------------------------------------------------------------------
+New report: Inventory Data Integrity Exceptions
+
+I'm the inventory control manager. Bad master data quietly breaks replenishment, pricing and reporting. I want a single worklist of records that don't make sense, grouped by type of problem, so my team can clean them up.
+
+Data, all in library PRFDEMOLIB: INVMST is the item master keyed by INUMBR with description IDESCR, status IDSCCD (A active, I inactive, P pending), replenishment code IRPLCD (4 means system replenished), current cost ICUCST, vendor ASNUM and the dead date IDEADD with century IDEADC (YYMMDD, century 1 is 2000s). ITMRTL has the retail REGPRC by SKU. INVBAL has on hand IBHAND by SKU (INUMBR) and location (ISTORE). RPLPRF holds the replenishment profile per SKU (INUMBR) and store (ISTORE). APSUPP is the vendor master keyed by ASNUM. TRFDTL holds open transfers from TRFFLC to TRFTLC by SKU. TBLSTR is the store master keyed by STRNUM.
+
+How it works: check each of these and report the rows that fail. On hand below zero at any location. A store (below 9000) holding a system-replenished SKU (code 4) with no replenishment profile for that store. An item with no retail price or zero cost. An item whose primary vendor is not in APSUPP. An active item whose dead date has already passed. An inactive or pending item still holding stock. A transfer whose receiving store is not in TBLSTR (count these by store number rather than listing every line).
+
+What I'd like to see: a summary table with one line per check and its count, then a section per check with the offending records and the key fields that prove the problem. Sort each section by the biggest inventory or value at stake.
+
+General: read-only. Trim text fields. Red for problems that stop replenishment or pricing (negative on hand, missing profile, missing price or cost), amber for the rest. Plain-English fix on every row, such as "Create a replenishment profile for SKU 100001 at store 406".
+
+
+----------------------------------------------------------------------
+REPORT 20
+----------------------------------------------------------------------
+New report: DC Inventory Position and Pack-and-Hold Calendar
+
+I'm the distribution center inventory planner. I want to see, for each DC, stock that has nowhere to go (no open store requests and no store sales), and a calendar of the pack-and-hold quantities we're holding for future release, so I can plan space and labor.
+
+Data, all in library PRFDEMOLIB: INVBAL has on hand IBHAND, average cost IBAVGC and date last received IBALD2 (century IBCEN2) by SKU (INUMBR) and location (ISTORE); the distribution centers are locations 9001 and up, named in TBLSTR (STRNUM, STRNAM). TRFDTL holds the open store transfer requests by shipping location TRFFLC, SKU INUMBR and quantity requested TRFREQ. The store rows in INVBAL (below 9000) carry weekly unit sales IBWK01 to IBWK08. PHPF is the pack-and-hold file, keyed by SKU PHSKU, with warehouse PHWHSE and up to five holds: quantities PHQTY, PHQTY2 to PHQTY5 and out dates PHOUT, PHOUT2 to PHOUT5 (YYMMDD, all 2000s; zero means no hold). INVMST has the description IDESCR.
+
+How it works: Part one, idle DC stock: a DC row with on hand above zero, no open transfer request for that SKU from that DC, and no sales of the SKU at any store in the last eight weeks. Value it at average cost. Part two, pack-and-hold: turn each non-zero hold into its own line with SKU, warehouse, quantity and release date, and compare the total held with the DC's on hand.
+
+What I'd like to see: for each DC, a summary (SKUs, units, cost on hand, idle SKUs, idle cost), then the idle stock detail sorted by cost. Then the pack-and-hold calendar sorted by release date, grouped by month, with the units releasing each month and a chart of units by month.
+
+General: read-only. Trim text fields. Red for idle stock not received in over 180 days, amber otherwise. Holds releasing within 60 days of the as-of date in amber; the as-of date is the latest date last sold in INVBAL. Plain-English action per row.
+
+
+----------------------------------------------------------------------
+REPORT 21
+----------------------------------------------------------------------
+New report: Assortment Rationalization - the long tail
+
+I'm the VP of merchandising. We carry a lot of SKUs that barely sell. I want a Pareto view: which SKUs bring in 80 percent of sales, which bring in the last 5 percent, and how much inventory and how many vendor relationships the tail costs us.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with year-to-date sales dollars IBRSDY, year-to-date margin as IBRSDY minus cost IBRCSY, on hand IBHAND and average cost IBAVGC. INVMST has the description IDESCR, vendor ASNUM, status IDSCCD and class codes IDEPT, ISDEPT, ICLAS. INVDPT gives the class name DPTNAM for the matching codes with ISCLAS 0. APSUPP has the vendor name ASNAME.
+
+How it works: only stores (location below 9000). Total each SKU's sales, margin and inventory at cost across stores. Rank SKUs by sales, highest first, and keep a running total. Band A is the SKUs that make the first 80 percent of sales, band B the next 15 percent, band C the last 5 percent. For band C, count how many distinct vendors would drop out entirely if those SKUs were cut.
+
+What I'd like to see: a band summary (SKUs, share of SKUs, sales, share of sales, margin, inventory at cost, share of inventory) with a Pareto chart (bars for SKU sales, line for cumulative percent). Then the band C list with SKU, description, class, vendor, sales, margin, inventory at cost and store count, sorted by inventory cost, highest first.
+
+General: read-only. Trim text fields. Locations 9001 and up are distribution centers. Band A green, band B yellow, band C red. Plain-English action per band C SKU: "Discontinue and clear", "Keep: only vendor for this class" or "Review: new item".
+
+
+----------------------------------------------------------------------
+REPORT 22
+----------------------------------------------------------------------
+New report: Weekly Merchandising Briefing
+
+I'm the president of the company. On Monday morning I want one page that tells me how the stores did, where we are about to lose sales, where cash is tied up and the five things the team should do this week.
+
+Data, all in library PRFDEMOLIB: INVBAL has one row per SKU (INUMBR) and location (ISTORE) with on hand IBHAND, average cost IBAVGC, weekly units IBWK01 to IBWK08 (01 is the most recent week), year-to-date sales dollars IBRSDY and cost IBRCSY, the current-week out-of-stock flag IBOSCR, physical-adjustment dollars IBPHDY and in transit IBINTQ. RPLPRF has the order-at point RFMIN per SKU and store. TRFDTL has open store requests by shipping location TRFFLC and SKU with quantity TRFREQ. INVMST has the description IDESCR. ITMRTL has the retail REGPRC for a multiple REGMLT. TBLSTR has the store cities.
+
+How it works: stores are locations below 9000, DCs 9001 and up. Show headline tiles: year-to-date sales and margin percent; units last week against the average of the seven weeks before; chain in-stock percent (rows not flagged out of stock and with on hand above zero); store SKUs below their order point; empty shelves on items that sold in the last eight weeks, with their weekly lost retail; excess inventory cost (stores over 26 weeks of supply, valued above 13 weeks); slow-moving cost (stock with no sales in eight weeks); and DC shortfall units where open requests exceed DC on hand.
+
+What I'd like to see: the tiles across the top, a small chart of chain units for the last eight weeks, the five stores with the lowest in-stock, the five items losing the most retail while out of stock, and a closing list of five recommended actions written in plain English with the numbers behind them.
+
+General: read-only. Trim text fields. Keep it to one screen. Color each tile green, amber or red against sensible retail targets: in-stock above 95 percent is green and below 85 percent is red.

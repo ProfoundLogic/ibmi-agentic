@@ -1,0 +1,35 @@
+<%# include:phelpers %>
+<%
+var vals = "{ dfstor: (document.getElementById('vp-dfstor').value.replace(/\\D/g, '') || '0'), dfdept: (document.getElementById('vp-dfdept').value.replace(/\\D/g, '') || '0'), " +
+           "dfseas: document.getElementById('vp-dfseas').value.toUpperCase(), tckyn: document.getElementById('vp-tckyn').value.toUpperCase(), " +
+           "avlyn: document.getElementById('vp-avlyn').value.toUpperCase(), dfyear: document.getElementById('vp-dfyear').value.toUpperCase() }";
+%>
+<div class="vp-app vp-ts0110">
+  <header class="vp-head">
+    <div class="vp-head-row"><span class="vp-meta"><%= vpDate %> &nbsp; <%= vpTime %></span><span class="vp-banner">Variety Wholesalers, Inc.</span><span class="vp-pgm"><%= T(prog) %> PROMPT</span></div>
+    <div class="vp-head-row"><span></span><span class="vp-title">TICKET ITEM INVENTORY FOR STORE BY DEPT</span><span></span></div>
+  </header>
+  <main class="vp-main">
+    <section class="vp-panel vp-rows vp-wide">
+      <div class="vp-row"><label class="vp-lbl" for="vp-dfstor">Store:</label>
+        <input id="vp-dfstor" class="vp-in num<%= IND(90) ? ' is-err' : '' %>" type="text" name="dfstor" maxlength="5" size="7" value="<%= T(dfstor) %>" autofocus><span></span></div>
+      <div class="vp-row"><label class="vp-lbl" for="vp-dfdept">Dept:</label>
+        <input id="vp-dfdept" class="vp-in num<%= IND(91) ? ' is-err' : '' %>" type="text" name="dfdept" maxlength="3" size="5" value="<%= ('000' + String(Math.round(N(dfdept)))).slice(-3) %>"><span></span></div>
+      <div class="vp-row"><label class="vp-lbl" for="vp-dfseas">Season:</label>
+        <input id="vp-dfseas" class="vp-in" type="text" name="dfseas" maxlength="3" size="5" value="<%= T(dfseas) %>"><span class="vp-hint">(Enter ALL for all seasons)</span></div>
+      <div class="vp-row"><label class="vp-lbl" for="vp-tckyn">Ticketed skus only:</label>
+        <input id="vp-tckyn" class="vp-in" type="text" name="tckyn" maxlength="1" size="2" value="<%= T(tckyn) %>"><span></span></div>
+      <div class="vp-row"><label class="vp-lbl" for="vp-avlyn">Show skus with whse available qty only:</label>
+        <input id="vp-avlyn" class="vp-in" type="text" name="avlyn" maxlength="1" size="2" value="<%= T(avlyn) %>"><span></span></div>
+      <div class="vp-row"><label class="vp-lbl" for="vp-dfyear">Include Last Year?:</label>
+        <input id="vp-dfyear" class="vp-in" type="text" name="dfyear" maxlength="1" size="2" value="<%= T(dfyear) %>"><span class="vp-hint">(Y/N, N = this year only)</span></div>
+    </section>
+    <% if (IND(90)) { %><div class="vp-msg" role="alert">ERROR: Invalid store number</div><% } %>
+    <% if (IND(91)) { %><div class="vp-msg" role="alert">ERROR: Invalid dept number</div><% } %>
+    <div class="vp-keys">
+      <button type="button" class="vp-key is-main" data-fkey="Enter" onclick="pui.submit(Object.assign(<%= vals %>, { action: 'ENTER' })); return false;"><b>Enter</b></button>
+      <button type="button" class="vp-key" data-fkey="F1" onclick="pui.submit({ action: 'F01' }); return false;"><b>F1</b>=exit</button>
+    </div>
+  </main>
+  <footer class="vp-foot">TS0110 ticket item inventory &middot; web version of the 5250 screen</footer>
+</div>

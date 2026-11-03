@@ -1,0 +1,332 @@
+<%
+/* shared helpers - injected by prfdemolib/web/build.py */
+/* Bootstrap: templates render before (or without) app.js, so the screen
+   must already work. Define a minimal VW with a real submit and safe no-op
+   versions of every handler the markup calls; app.js upgrades it. */
+var vwG = (function () { return this; })() || {};
+var vwErr = null;
+if (!vwG.VW) {
+  vwG.VW = { submit: function (a, f) { var o = f || {}; if (a) { o.action = a; } if (vwG.pui && vwG.pui.submit) { vwG.pui.submit(o); } return false; } };
+  ['pickInput', 'pickKey', 'pickBlur', 'pickChoose', 'open', 'close', 'toggleTheme', 'toggleDensity', 'copy', 'exportCsv',
+   'sort', 'filter', 'paletteFilter', 'paletteKey', 'paletteRun', 'toast', 'remember'].forEach(function (k) { vwG.VW[k] = function () { return false; }; });
+}
+var vwTheme = 'light';
+var vwDensity = 'comfortable';
+try { var vwT = JSON.parse(vwG.localStorage.getItem('vw.theme')); if (vwT) { vwTheme = vwT; } else if (vwG.matchMedia && vwG.matchMedia('(prefers-color-scheme: dark)').matches) { vwTheme = 'dark'; } } catch (vwErr) { vwTheme = 'light'; }
+try { var vwD = JSON.parse(vwG.localStorage.getItem('vw.density')); if (vwD) { vwDensity = vwD; } } catch (vwErr) { vwDensity = 'comfortable'; }
+function N(v) { var n = parseFloat(String(v == null ? '' : v).replace(/,/g, '')); return isNaN(n) ? 0 : n; }
+function F(v, d) { return N(v).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+function M(v) { var n = N(v); return (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function T(v) { return String(v == null ? '' : v).replace(/\s+$/, ''); }
+function MDY(v) { var s = String(Math.round(N(v))); if (s === '0') { return ''; } while (s.length < 6) { s = '0' + s; } return Number(s.slice(0, 2)) + '/' + s.slice(2, 4) + '/' + s.slice(4, 6); }
+var VWLOC = {"188":["188 ELIZ","Elizabethtown, KY","S",9002],"205":["205 LAUR","Laurel, MS","S",9002],"215":["215 MACO","Macon, GA","S",9002],"257":["257 GRIF","Griffin, GA","S",9002],"262":["262 JACK","Pearl, MS","S",9002],"406":["406 SOUT","South Hill, VA","S",9001],"458":["458 GRNS","Greensboro, NC","S",9001],"499":["499JCKSN","Jacksonville, FL","S",9002],"535":["535GLEN","Glen Burnie, MD","S",9001],"1838":["1838FARM","Farmville, NC","S",9001],"9001":["Henderson DC","Henderson, NC","W",9001],"9002":["Newnan GA DC","Newnan, GA","W",9002],"9006":["Henderson Return Ctr","Henderson, NC","W",9001],"9007":["Newnan Repack","Newnan, GA","W",9002],"9151":["Blots Henderson DC","Henderson, NC","W",9151],"9152":["Blots Newnan DC","Newnan, GA","W",9152]};
+var VWSEA = [["0","Non Seasonal Item"],["6","Spring/Summer 2026"],["7","Fall/Winter 2026"]];
+function LOCN(n) { var l = VWLOC[String(Math.round(N(n)))]; return l ? l[0] : String(n); }
+function LOCC(n) { var l = VWLOC[String(Math.round(N(n)))]; return l ? l[1] : ''; }
+function IND(n) { return String(inds).charAt(n - 1) === '1'; }
+function CLS(n) { return n < 0 ? ' vw-neg' : (n === 0 ? ' vw-zero' : ''); }
+function ICON(name, sz) {
+  var p = {
+    search: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16-4.3-4.3',
+    back: 'M15 18l-6-6 6-6',
+    next: 'M9 6l6 6-6 6',
+    prev: 'M15 6l-6 6 6 6',
+    moon: 'M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z',
+    cmd: 'M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3z',
+    key: 'M3 8h18v10H3zM7 12h.01M11 12h.01M15 12h.01M7 15h10',
+    copy: 'M9 9h10v10H9zM5 15V5h10',
+    dl: 'M12 4v11m0 0 4-4m-4 4-4-4M5 19h14',
+    print: 'M7 9V4h10v5M7 17H5v-6h14v6h-2M7 14h10v6H7z',
+    box: 'M4 8l8-4 8 4v8l-8 4-8-4zM4 8l8 4 8-4M12 12v8',
+    store: 'M4 10l1-5h14l1 5M5 10v9h14v-9M9 19v-5h6v5',
+    truck: 'M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-.1M17 19a2 2 0 1 0 0-.1',
+    chart: 'M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6',
+    spark: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
+    alert: 'M12 8v5M12 16.5v.5M4 20h16L12 4z',
+    ok: 'M5 12.5l4.5 4.5L19 7.5',
+    tag: 'M4 4h8l8 8-8 8-8-8zM8 8h.01',
+    cal: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+    exit: 'M10 17l-5-5 5-5M5 12h11M14 4h6v16h-6',
+    filter: 'M4 5h16l-6 8v6l-4-2v-4z',
+    grid: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
+    rows: 'M4 6h16M4 12h16M4 18h16',
+    pack: 'M3 7l9-4 9 4-9 4zM3 7v10l9 4 9-4V7M12 11v10'
+  }[name] || '';
+  return '<svg width="' + (sz || 18) + '" height="' + (sz || 18) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + p + '"/></svg>';
+}
+%>
+<%
+var vwApp = 'Inventory by Store';
+var vwSub = N(inumbr) ? ('SKU ' + T(inumbr) + ' - ' + T(idescr)) : 'Current period and year-to-date balances';
+var vwPgm = 'INV046W';
+var vwDate = MDY(qdate) || new Date().toLocaleDateString('en-US');
+var vwKeys = [['Enter', 'Search'], ['F5', 'Switch period to date / year to date'], ['Page Down', 'Load more stores'], ['F1', 'Return to the menu']];
+var rows = (typeof scrn2 !== 'undefined' && scrn2) ? scrn2 : [];
+var ytd = IND(41);
+var hasTot = IND(66);
+var more = rows.length > 0 && !IND(55) && !IND(20);
+var types = [['A', 'All'], ['S', 'Stores'], ['O', 'Offices'], ['W', 'Whse'], ['I', 'Inv loc']];
+var finds = [['R', 'Region', 'Region number'], ['D', 'District', 'District number'], ['S', 'Store', 'Store / warehouse'],
+             ['G', 'Group', 'Store group'], ['I', 'Inv group', 'Inventory group']];
+var curType = T(intype) || 'A';
+var curFind = T(inrds) || 'S';
+var findLabel = 'Store / warehouse';
+finds.forEach(function (f) { if (f[0] === curFind) { findLabel = f[2]; } });
+var maxOh = 1;
+var maxSl = 1;
+rows.forEach(function (r) { maxOh = Math.max(maxOh, N(r.qtyoh)); maxSl = Math.max(maxSl, N(r.qtysls)); });
+function wos(w) {
+  var n = N(w);
+  if (!n) { return '<span class="vw-pill is-mute">-</span>'; }
+  if (n <= 4) { return '<span class="vw-pill is-bad" title="Low cover - reorder">' + F(n) + ' wk</span>'; }
+  if (n <= 8) { return '<span class="vw-pill is-warn" title="Watch">' + F(n) + ' wk</span>'; }
+  if (n <= 26) { return '<span class="vw-pill is-ok" title="Healthy">' + F(n) + ' wk</span>'; }
+  return '<span class="vw-pill is-info" title="Deep cover">' + F(n) + ' wk</span>';
+}
+var share = N(coh) ? N(toh) / N(coh) * 100 : 0;
+var sellThru = (N(toh) + N(tsls)) ? N(tsls) / (N(toh) + N(tsls)) * 100 : 0;
+var lowCover = 0;
+rows.forEach(function (r) { if (N(r.supwks) && N(r.supwks) <= 4) { lowCover++; } });
+var periodWord = ytd ? 'year to date' : 'this period';
+var fieldsJs = "{ inumbr: (document.getElementById('vw-inumbr').value.replace(/\\D/g, '') || '0'), intype: document.getElementById('vw-intype').value, " +
+               "inrds: document.getElementById('vw-inrds').value, instr: (document.getElementById('vw-instr').value.replace(/\\D/g, '') || '0') }";
+%>
+<div class="vw-app vw-inv046" data-theme="<%= vwTheme %>" data-density="<%= vwDensity %>" data-sku="<%= N(inumbr) && !IND(21) ? T(inumbr) : '' %>" data-desc="<%= T(idescr) %>">
+  <div class="vw-busy" aria-hidden="true"><div class="vw-spinner"></div></div>
+  <header class="vw-topbar">
+    <a class="vw-brand" href="javascript:void(0)" title="Variety Wholesalers, Inc.">
+      <span class="vw-logo" role="img" aria-label="Variety Wholesalers logo"></span>
+      <span class="vw-wordmark"><strong>VARIETY</strong><small>WHOLESALERS INCORPORATED</small></span>
+    </a>
+    <div class="vw-appname"><b><%= vwApp %></b><span><%= vwSub %></span></div>
+    <div class="vw-topbar-spacer"></div>
+    <div class="vw-topbar-tools vw-noprint">
+      <span class="vw-chip-date" title="Merchandise date from SYSGET / browser clock"><%- ICON('cal', 14) %> <b><%= vwDate %></b> <span data-vw-clock></span></span>
+      <span class="vw-pgm" title="IBM i program behind this screen"><%= vwPgm %></span>
+      <button type="button" class="vw-iconbtn" onclick="VW.open('vw-palette')" title="Command palette (Ctrl+K)" data-cmd-skip><%- ICON('cmd') %><span class="vw-sr">Command palette</span></button>
+      <button type="button" class="vw-iconbtn" onclick="VW.open('vw-keys')" title="Keyboard shortcuts (?)"><%- ICON('key') %><span class="vw-sr">Keyboard shortcuts</span></button>
+      <button type="button" class="vw-iconbtn" onclick="VW.toggleTheme()" title="Dark / light theme (Alt+T)"><%- ICON('moon') %><span class="vw-sr">Toggle theme</span></button>
+    </div>
+  </header>
+  <div class="vw-toasts" aria-live="polite"><div></div></div>
+  <section class="vw-hero">
+    <div class="vw-hero-inner">
+      <div class="vw-hero-row">
+        <div style="min-width:0">
+          <span class="vw-eyebrow">Merchandise inquiry &middot; <%= ytd ? 'Year to date' : 'Current period' %> inventory history</span>
+          <h1><%= N(inumbr) && T(idescr) ? T(idescr) : 'Inventory by store' %></h1>
+          <div class="vw-hero-meta">
+            <% if (N(inumbr) && T(idescr)) { %>
+            <button type="button" class="vw-skubadge" onclick="VW.copy('<%= T(inumbr) %>', 'SKU')" title="Copy SKU" data-cmd="Copy SKU number"><span>SKU</span><b><%= T(inumbr) %></b><%- ICON('copy', 14) %></button>
+            <% } %>
+            <% if (T(rdsdsc)) { %><span class="vw-pill is-info"><%- ICON('store', 12) %> <%= T(outrds).replace(/[.:]+$/, '') %> <%= T(instr) %> &middot; <%= T(rdsdsc) %></span><% } %>
+            <span class="vw-pill"><%= T(title) || (ytd ? 'Year to Date Inventory History' : 'Current Period Inventory History') %></span>
+          </div>
+        </div>
+        <div class="vw-seg vw-period vw-noprint" role="group" aria-label="Period">
+          <button type="button" class="vw-seg-btn<%= ytd ? '' : ' is-on' %>" aria-pressed="<%= !ytd %>" <%- ytd ? 'onclick="return VW.submit(\'F05\')"' : '' %> data-cmd="Show current period" title="F5">Current period</button>
+          <button type="button" class="vw-seg-btn<%= ytd ? ' is-on' : '' %>" aria-pressed="<%= ytd %>" <%- ytd ? '' : 'onclick="return VW.submit(\'F05\')"' %> data-cmd="Show year to date" title="F5">Year to date</button>
+          <button type="button" class="vw-sr" data-fkey="F5" onclick="return VW.submit('F05')">F5</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="vw-main">
+    <section class="vw-card vw-noprint">
+      <div class="vw-card-body vw-search">
+        <div class="vw-field vw-picker vw-f-sku">
+          <label for="vw-inumbr">SKU number</label>
+          <div class="vw-input-wrap"><%- ICON('search') %>
+            <input id="vw-inumbr" class="vw-input<%= IND(21) ? ' is-error' : '' %>" type="text" name="inumbr" inputmode="numeric" maxlength="9" autocomplete="off"
+                   value="<%= N(inumbr) ? T(inumbr) : '' %>" placeholder="e.g. 262657 or a description" data-kind="sku" data-pick-enter="1" data-vw-search
+                   oninput="VW.pickInput(this)" onkeydown="VW.pickKey(this, event)" onblur="VW.pickBlur(this)" aria-invalid="<%= IND(21) %>">
+          </div>
+          <ul class="vw-picker-list" role="listbox" hidden></ul>
+        </div>
+        <div class="vw-field vw-f-type">
+          <span class="vw-label" id="vw-type-l">Store type</span>
+          <input type="hidden" id="vw-intype" name="intype" value="<%= curType %>">
+          <div class="vw-seg<%= IND(25) ? ' is-error' : '' %>" role="group" aria-labelledby="vw-type-l">
+            <% types.forEach(function (t) { %>
+            <button type="button" class="vw-seg-btn<%= t[0] === curType ? ' is-on' : '' %>" aria-pressed="<%= t[0] === curType %>" data-v="<%= t[0] %>"
+                    onclick="var g=this.parentNode; Array.prototype.forEach.call(g.children, function (b) { b.classList.remove('is-on'); b.setAttribute('aria-pressed','false'); }); this.classList.add('is-on'); this.setAttribute('aria-pressed','true'); document.getElementById('vw-intype').value=this.getAttribute('data-v');"><%= t[1] %> <span class="vw-code"><%= t[0] %></span></button>
+            <% }); %>
+          </div>
+        </div>
+        <div class="vw-field vw-f-find">
+          <span class="vw-label" id="vw-find-l">Search for</span>
+          <input type="hidden" id="vw-inrds" name="inrds" value="<%= curFind %>">
+          <div class="vw-seg<%= IND(22) ? ' is-error' : '' %>" role="group" aria-labelledby="vw-find-l">
+            <% finds.forEach(function (f) { %>
+            <button type="button" class="vw-seg-btn<%= f[0] === curFind ? ' is-on' : '' %>" aria-pressed="<%= f[0] === curFind %>" data-v="<%= f[0] %>" data-label="<%= f[2] %>"
+                    onclick="var g=this.parentNode; Array.prototype.forEach.call(g.children, function (b) { b.classList.remove('is-on'); b.setAttribute('aria-pressed','false'); }); this.classList.add('is-on'); this.setAttribute('aria-pressed','true'); document.getElementById('vw-inrds').value=this.getAttribute('data-v'); var i=document.getElementById('vw-instr'); if (i.getAttribute('data-kind') !== this.getAttribute('data-v')) { i.value=''; } i.setAttribute('data-kind', this.getAttribute('data-v')); document.getElementById('vw-instr-l').textContent=this.getAttribute('data-label'); i.focus(); if (window.VW &amp;&amp; VW.pickInput) { VW.pickInput(i); }"><%= f[1] %> <span class="vw-code"><%= f[0] %></span></button>
+            <% }); %>
+          </div>
+        </div>
+        <div class="vw-field vw-picker vw-f-num">
+          <label for="vw-instr" id="vw-instr-l"><%= findLabel %></label>
+          <input id="vw-instr" class="vw-input num<%= IND(26) ? ' is-error' : '' %>" type="text" name="instr" inputmode="numeric" maxlength="5" autocomplete="off"
+                 value="<%= N(instr) ? T(instr) : '' %>" placeholder="pick or type" data-kind="<%= curFind %>" data-pick-enter="1"
+                 onfocus="VW.pickInput(this)" oninput="VW.pickInput(this)" onkeydown="VW.pickKey(this, event)" onblur="VW.pickBlur(this)" aria-invalid="<%= IND(26) %>">
+          <ul class="vw-picker-list" role="listbox" hidden></ul>
+        </div>
+        <div class="vw-f-go">
+          <button type="button" class="vw-btn" data-fkey="Enter" onclick="return VW.submit('ENTER', <%= fieldsJs %>)" data-cmd="Search" data-cmd-key="Enter"><%- ICON('search') %> Search <span class="vw-kbd">Enter</span></button>
+          <button type="button" class="vw-btn-ghost" data-fkey="F1" onclick="return VW.submit('F01')" data-cmd="Return to the menu" data-cmd-key="F1"><%- ICON('exit') %> Return <span class="vw-kbd">F1</span></button>
+        </div>
+      </div>
+      <% if (IND(20) && T(error)) { %>
+      <div class="vw-card-body" style="padding-top:0"><div class="vw-alert is-bad" role="alert"><%- ICON('alert', 20) %><div><b><%= T(error) %></b>Correct the highlighted entry and search again.</div></div></div>
+      <% } %>
+    </section>
+
+    <% if (hasTot) { %>
+    <section class="vw-kpis" aria-label="<%= T(grpnam) %> totals">
+      <div class="vw-kpi"><div class="vw-kpi-label"><%= T(grpnam) %> on hand</div><div class="vw-kpi-value"><%= F(toh) %></div><div class="vw-kpi-note"><%= F(share, 1) %>% of chain (<%= F(coh) %>)</div><div class="vw-meter"><span style="width:<%= Math.min(100, share) %>%"></span></div></div>
+      <div class="vw-kpi"><div class="vw-kpi-label">Sales <%= periodWord %></div><div class="vw-kpi-value"><%= F(tsls) %></div><div class="vw-kpi-note"><%= F(sellThru, 1) %>% sell-through &middot; chain <%= F(csls) %></div></div>
+      <div class="vw-kpi"><div class="vw-kpi-label">8-week avg sales</div><div class="vw-kpi-value"><%= F(tavgs, 1) %></div><div class="vw-kpi-note">units a week &middot; chain <%= F(cavgs, 1) %></div></div>
+      <div class="vw-kpi <%= N(tsup) && N(tsup) <= 4 ? 'is-bad' : (N(tsup) <= 8 ? 'is-warn' : 'is-ok') %>"><div class="vw-kpi-label">Weeks of supply</div><div class="vw-kpi-value"><%= F(tsup) %></div><div class="vw-kpi-note"><%= lowCover %> location<%= lowCover === 1 ? '' : 's' %> under 4 weeks &middot; chain <%= F(csup) %></div></div>
+      <div class="vw-kpi"><div class="vw-kpi-label">On order &middot; received</div><div class="vw-kpi-value"><%= F(tord) %></div><div class="vw-kpi-note"><%= F(trec) %> received &middot; net transfers <%= F(ttfr) %></div></div>
+    </section>
+    <% } %>
+
+    <div class="vw-grid-2 vw-inv046-insight">
+      <section class="vw-card vw-chart-card">
+        <div class="vw-card-head"><h2><%- ICON('chart') %> On hand vs sales <span class="vw-sub"><%= periodWord %></span></h2></div>
+        <div class="vw-card-body">
+          <% if (rows.length) {
+               var top = rows.slice().sort(function (a, b) { return N(b.qtyoh) - N(a.qtyoh); }).slice(0, 12);
+               var mx = 1;
+               top.forEach(function (r) { mx = Math.max(mx, N(r.qtyoh), N(r.qtysls)); });
+               %>
+          <div class="vw-hbars" role="img" aria-label="On hand and sales by location">
+            <% top.forEach(function (r) {
+                 var w1 = Math.max(0, N(r.qtyoh)) / mx * 100;
+                 var w2 = Math.max(0, N(r.qtysls)) / mx * 100; %>
+            <div class="vw-hbar" title="<%= T(r.strnum) %>: <%= F(r.qtyoh) %> on hand, <%= F(r.qtysls) %> sold">
+              <span class="vw-key"><%= T(r.strnum) %></span>
+              <span class="vw-hbar-track"><b class="lg-oh" style="width:<%= w1.toFixed(1) %>%"></b><b class="lg-sl" style="width:<%= w2.toFixed(1) %>%"></b></span>
+              <span class="vw-hbar-val"><%= F(r.qtyoh) %> / <%= F(r.qtysls) %></span>
+            </div>
+            <% }); %>
+          </div>
+          <div class="vw-legend"><i class="lg-oh"></i> on hand <i class="lg-sl"></i> sales <%= periodWord %></div>
+          <% if (rows.length > 12) { %><div class="vw-hint" style="margin-top:6px">Top 12 of <%= rows.length %> by on hand.</div><% } %>
+          <% } else { %>
+          <div class="vw-hint">The chart fills in when a search returns locations.</div>
+          <% } %>
+        </div>
+      </section>
+      <section class="vw-card">
+        <div class="vw-card-head"><h2><%- ICON('pack') %> Weeks of supply mix <span class="vw-sub"><%= rows.length %> locations</span></h2></div>
+        <div class="vw-card-body">
+          <% var bands = [['Under 4 weeks', 'is-bad', 0], ['4 to 8 weeks', 'is-warn', 0], ['8 to 26 weeks', 'is-ok', 0], ['Over 26 weeks', 'is-info', 0], ['No sales', 'is-mute', 0]];
+             rows.forEach(function (r) { var w = N(r.supwks); bands[!w ? 4 : (w <= 4 ? 0 : (w <= 8 ? 1 : (w <= 26 ? 2 : 3)))][2]++; }); %>
+          <div class="vw-mix">
+            <% bands.forEach(function (b) { %>
+            <div class="vw-mix-row"><span class="vw-pill <%= b[1] %>"><%= b[2] %></span><span><%= b[0] %></span>
+              <i><b class="<%= b[1] %>" style="width:<%= rows.length ? (b[2] / rows.length * 100).toFixed(1) : 0 %>%"></b></i></div>
+            <% }); %>
+          </div>
+          <div class="vw-hint" style="margin-top:12px">Weeks of supply is on hand divided by the 8-week average sales the program calculates.</div>
+        </div>
+      </section>
+    </div>
+
+      <section class="vw-card">
+        <div class="vw-card-head">
+          <h2><%- ICON('store') %> <%= T(grpnam) || 'Locations' %> <span class="vw-sub" data-count-for="vw-stores"><%= rows.length %> rows</span></h2>
+          <div class="vw-actions vw-noprint">
+            <button type="button" class="vw-btn-ghost vw-btn-sm" onclick="VW.exportCsv('vw-stores', 'inv046-<%= T(inumbr) %>-<%= curFind %><%= T(instr) %>')" data-cmd="Export stores to CSV"><%- ICON('dl', 16) %> Export</button>
+            <button type="button" class="vw-btn-ghost vw-btn-sm" onclick="window.print()" data-cmd="Print"><%- ICON('print', 16) %> Print</button>
+          </div>
+        </div>
+        <% if (rows.length) { %>
+        <div class="vw-tablebar vw-noprint">
+          <div class="vw-input-wrap"><%- ICON('filter') %><input class="vw-input" type="text" placeholder="Filter stores by number or name..." oninput="VW.filter(this, 'vw-stores')" aria-label="Filter stores"></div>
+          <span class="vw-hint">Click a column to sort &middot; filtering stays in your browser</span>
+        </div>
+        <div class="vw-tablewrap">
+          <table class="vw-table vw-stack" id="vw-stores">
+            <thead><tr>
+              <th><button type="button" class="vw-sort" onclick="VW.sort(this,'st','num')">Store</button></th>
+              <th title="Point-of-sale store">POS</th>
+              <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'oh','num')">On hand</button></th>
+              <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'oo','num')">On order</button></th>
+              <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'sl','num')">Sales</button></th>
+              <th class="num vw-hide-md">Rec&rsquo;d</th>
+              <th class="num vw-hide-md">Net tfr</th>
+              <th class="num vw-hide-md">Adj</th>
+              <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'av','num')">8-wk avg</button></th>
+              <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'ws','num')">Supply</button></th>
+            </tr></thead>
+            <tbody>
+            <% rows.forEach(function (r) {
+                 var oh = N(r.qtyoh);
+                 var sl = N(r.qtysls); %>
+              <tr data-sortable data-search="<%= T(r.strnum) %> <%= T(r.xxshrt) %> <%= LOCC(r.strnum) %>">
+                <td class="vw-cell-head" data-label="Store" data-col="st" data-v="<%= T(r.strnum) %>"><span class="vw-whs"><span class="vw-key"><%= T(r.strnum) %></span><span class="vw-nowrap"><%= T(r.xxshrt).replace(/^\d+\s*/, '') %><small><%= LOCC(r.strnum) %></small></span></span></td>
+                <td data-label="POS"><%- T(r.posflg) === 'Y' ? '<span class="vw-pill is-ok">POS</span>' : '<span class="vw-pill is-mute">' + (T(r.posflg) || '-') + '</span>' %></td>
+                <td class="num" data-label="On hand" data-col="oh" data-v="<%= oh %>"><div class="vw-bar"><i><b style="width:<%= Math.max(0, oh) / maxOh * 100 %>%"></b></i><span class="<%= CLS(oh) %>"><%= F(oh) %></span></div></td>
+                <td class="num<%= CLS(N(r.qtyord)) %>" data-label="On order" data-col="oo" data-v="<%= N(r.qtyord) %>"><%= F(r.qtyord) %></td>
+                <td class="num" data-label="Sales" data-col="sl" data-v="<%= sl %>"><div class="vw-bar"><i><b class="is-ok" style="width:<%= Math.max(0, sl) / maxSl * 100 %>%"></b></i><span class="<%= CLS(sl) %>"><%= F(sl) %></span></div></td>
+                <td class="num vw-hide-md<%= CLS(N(r.qtyrec)) %>" data-label="Received" data-v="<%= N(r.qtyrec) %>"><%= F(r.qtyrec) %></td>
+                <td class="num vw-hide-md<%= CLS(N(r.tfrdif)) %>" data-label="Net transfers" data-v="<%= N(r.tfrdif) %>"><%= F(r.tfrdif) %></td>
+                <td class="num vw-hide-md<%= CLS(N(r.adjdif)) %>" data-label="Adjustments" data-v="<%= N(r.adjdif) %>"><%= F(r.adjdif) %></td>
+                <td class="num" data-label="8-week avg" data-col="av" data-v="<%= N(r.avgsls) %>"><%= F(r.avgsls, 1) %></td>
+                <td class="num" data-label="Weeks of supply" data-col="ws" data-v="<%= N(r.supwks) %>"><%- wos(r.supwks) %></td>
+              </tr>
+            <% }); %>
+            </tbody>
+            <% if (hasTot) { %>
+            <tfoot>
+              <tr><td data-label="Total"><%= T(grpnam) %></td><td class="vw-hide-sm"></td><td class="num" data-label="On hand"><%= F(toh) %></td><td class="num" data-label="On order"><%= F(tord) %></td><td class="num" data-label="Sales"><%= F(tsls) %></td>
+                  <td class="num vw-hide-md"><%= F(trec) %></td><td class="num vw-hide-md"><%= F(ttfr) %></td><td class="num vw-hide-md"><%= F(tadj) %></td><td class="num" data-label="8-week avg"><%= F(tavgs, 1) %></td><td class="num" data-label="Supply"><%= F(tsup) %> wk</td></tr>
+              <tr class="vw-chain"><td data-label="Total">Chain</td><td class="vw-hide-sm"></td><td class="num" data-label="On hand"><%= F(coh) %></td><td class="num" data-label="On order"><%= F(cord) %></td><td class="num" data-label="Sales"><%= F(csls) %></td>
+                  <td class="num vw-hide-md"><%= F(crec) %></td><td class="num vw-hide-md"><%= F(ctfr) %></td><td class="num vw-hide-md"><%= F(cadj) %></td><td class="num" data-label="8-week avg"><%= F(cavgs, 1) %></td><td class="num" data-label="Supply"><%= F(csup) %> wk</td></tr>
+            </tfoot>
+            <% } %>
+          </table>
+        </div>
+        <% if (more) { %>
+        <div class="vw-card-body vw-more vw-noprint">
+          <button type="button" class="vw-btn-ghost" data-fkey="PageDown" onclick="return VW.submit('PAGEDOWN')" data-cmd="Load more stores" data-cmd-key="Page Down"><%- ICON('rows') %> Load more stores <span class="vw-kbd">Page Down</span></button>
+        </div>
+        <% } %>
+        <% } else { %>
+        <div class="vw-empty">
+          <b><%= N(inumbr) ? 'Nothing to show for this search' : 'Pick a SKU and where to look' %></b>
+          <%= N(inumbr) ? 'Try another store type or search.' : 'Choose a SKU, then a region, district, store, store group or inventory group. The pickers list every value in the demo data.' %>
+        </div>
+        <% } %>
+      </section>
+
+  </main>
+  <footer class="vw-footer">
+    <div class="vw-footer-inner">
+      <span><b>&copy; 2026 Variety Wholesalers, Inc.</b> &middot; 218 South Garnett Street, Henderson, NC 27536 &middot; Big Lots &middot; Roses</span>
+      <span class="vw-noprint"><span class="vw-kbd">Ctrl</span>+<span class="vw-kbd">K</span> commands &nbsp; <span class="vw-kbd">?</span> shortcuts &nbsp; <span class="vw-kbd">/</span> search &nbsp; <%= vwPgm %> on IBM i</span>
+    </div>
+  </footer>
+  <div class="vw-backdrop" id="vw-palette" hidden data-vw-closable onmousedown="if (event.target === this) VW.close('vw-palette')">
+    <div class="vw-dialog vw-palette" role="dialog" aria-label="Command palette">
+      <div class="vw-input-wrap"><%- ICON('search') %><input class="vw-input" type="text" placeholder="Type a command or search..." oninput="VW.paletteFilter(this.value)" onkeydown="VW.paletteKey(this, event)" aria-label="Command"></div>
+      <ul id="vw-palette-list" role="listbox"></ul>
+    </div>
+  </div>
+  <div class="vw-backdrop" id="vw-keys" hidden data-vw-closable onmousedown="if (event.target === this) VW.close('vw-keys')">
+    <div class="vw-dialog" role="dialog" aria-label="Keyboard shortcuts" style="width:min(720px,100%)">
+      <div class="vw-dialog-head"><span class="vw-ico"><%- ICON('key', 22) %></span><div><h2>Keyboard shortcuts</h2><div class="vw-hint">Every green-screen function key still works, plus these browser extras.</div></div></div>
+      <div class="vw-shortcuts">
+        <% vwKeys.forEach(function (k) { %><div><span><%= k[1] %></span><span class="vw-kbd"><%= k[0] %></span></div><% }); %>
+        <div><span>Command palette</span><span class="vw-kbd">Ctrl+K</span></div>
+        <div><span>Focus search / filter</span><span class="vw-kbd">/</span></div>
+        <div><span>Dark / light theme</span><span class="vw-kbd">Alt+T</span></div>
+        <div><span>Compact / comfortable rows</span><span class="vw-kbd">Alt+D</span></div>
+        <div><span>Close dialog</span><span class="vw-kbd">Esc</span></div>
+      </div>
+      <div class="vw-dialog-foot"><button type="button" class="vw-btn-ghost" onclick="VW.close('vw-keys')">Close</button></div>
+    </div>
+  </div>
+</div>

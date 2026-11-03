@@ -1,0 +1,70 @@
+<%# include:phelpers %>
+<%
+var rows = (typeof scrn2 !== 'undefined' && scrn2) ? scrn2 : [];
+var keyVals = "{ inumbr: (document.getElementById('vp-inumbr').value.replace(/\\D/g, '') || '0'), intype: document.getElementById('vp-intype').value.toUpperCase(), " +
+              "inrds: document.getElementById('vp-inrds').value.toUpperCase(), instr: (document.getElementById('vp-instr').value.replace(/\\D/g, '') || '0') }";
+%>
+<div class="vp-app vp-inv046">
+  <header class="vp-head">
+    <div class="vp-head-row"><span class="vp-pgm"><%= T(qprog) %></span><span class="vp-banner"><%= T(ctlctr) %></span><span class="vp-meta">Date: <%= MDY(qdate) %></span></div>
+    <div class="vp-head-row"><span></span><span class="vp-title"><%= T(title) %></span><span class="vp-meta">Time: <%= vpTime %></span></div>
+  </header>
+  <main class="vp-main">
+    <section class="vp-panel vp-rows">
+      <div class="vp-row"><label class="vp-lbl" for="vp-inumbr">SKU Number....:</label>
+        <input id="vp-inumbr" class="vp-in num<%= IND(21) ? ' is-err' : '' %>" type="text" name="inumbr" maxlength="9" size="11" value="<%= N(inumbr) ? T(inumbr) : '' %>" autofocus>
+        <span class="vp-val"><%= T(idescr) %></span></div>
+      <div class="vp-row"><label class="vp-lbl" for="vp-intype">Store Type....:</label>
+        <input id="vp-intype" class="vp-in<%= IND(25) ? ' is-err' : '' %>" type="text" name="intype" maxlength="1" size="2" value="<%= T(intype) %>">
+        <span class="vp-hint">(A=All, S=Stores, O=Offices, W=Warehouses, I=Inv Loc)</span></div>
+      <div class="vp-row"><label class="vp-lbl" for="vp-inrds">Search For....:</label>
+        <input id="vp-inrds" class="vp-in<%= IND(22) ? ' is-err' : '' %>" type="text" name="inrds" maxlength="1" size="2" value="<%= T(inrds) %>">
+        <span class="vp-hint">(R=Region, D=District, S=Store, G=Str Group, I=Inv Group)</span></div>
+      <div class="vp-row"><label class="vp-lbl" for="vp-instr"><%= T(outrds) || 'Store Number..:' %></label>
+        <input id="vp-instr" class="vp-in num<%= IND(26) ? ' is-err' : '' %>" type="text" name="instr" maxlength="5" size="7" value="<%= N(instr) ? T(instr) : '' %>">
+        <span class="vp-val"><%= T(rdsdsc) %> <b style="float:right"><%= IND(41) ? 'Year to Date' : 'Current Period' %></b></span></div>
+    </section>
+
+    <% if (IND(20) && T(error)) { %><div class="vp-msg" role="alert"><%= T(error) %></div><% } %>
+
+    <div class="vp-tablewrap">
+      <table class="vp-table">
+        <thead><tr><th>I</th><th>Store Name</th><th>PS</th><th class="num">On Hand</th><th class="num">On Order</th><th class="num">Sales</th>
+          <th class="num">Rec'd</th><th class="num">Net Tfr's</th><th class="num">Tot Adj's</th><th class="num">8 Week Avg.Sls</th><th class="num">Wks Supply</th></tr></thead>
+        <tbody>
+        <% rows.forEach(function (r) { %>
+          <tr><td><input class="vp-in" type="text" name="scrn2.sel.<%= r._rrn %>" maxlength="1" size="1" value="<%= T(r.sel) %>" style="width:34px" aria-label="Option for store <%= T(r.strnum) %>"></td>
+            <td><%= T(r.xxshrt) %></td><td><%= T(r.posflg) %></td>
+            <td class="num"><%= F(r.qtyoh) %></td><td class="num"><%= F(r.qtyord) %></td><td class="num"><%= F(r.qtysls) %></td>
+            <td class="num"><%= F(r.qtyrec) %></td><td class="num"><%= F(r.tfrdif) %></td><td class="num"><%= F(r.adjdif) %></td>
+            <td class="num"><%= F(r.avgsls, 1) %></td><td class="num"><%= F(r.supwks) %></td></tr>
+        <% }); %>
+        <% if (!rows.length) { %><tr><td colspan="11" class="vp-hint">Enter a SKU and what to search for, then press Enter.</td></tr><% } %>
+        </tbody>
+        <% if (IND(66)) { %>
+        <tfoot>
+          <tr class="vp-fin"><td></td><td colspan="2"><%= T(grpnam) %></td><td class="num"><%= F(toh) %></td><td class="num"><%= F(tord) %></td><td class="num"><%= F(tsls) %></td>
+            <td class="num"><%= F(trec) %></td><td class="num"><%= F(ttfr) %></td><td class="num"><%= F(tadj) %></td><td class="num"><%= F(tavgs, 1) %></td><td class="num"><%= F(tsup) %></td></tr>
+          <tr class="vp-tot"><td></td><td colspan="2">Chain</td><td class="num"><%= F(coh) %></td><td class="num"><%= F(cord) %></td><td class="num"><%= F(csls) %></td>
+            <td class="num"><%= F(crec) %></td><td class="num"><%= F(ctfr) %></td><td class="num"><%= F(cadj) %></td><td class="num"><%= F(cavgs, 1) %></td><td class="num"><%= F(csup) %></td></tr>
+        </tfoot>
+        <% } %>
+      </table>
+    </div>
+
+    <div class="vp-ctlscr"><%= T(ctlscr) %></div>
+    <div class="vp-keys">
+      <button type="button" class="vp-key is-main" data-fkey="Enter" onclick="pui.submit(Object.assign(<%= keyVals %>, { action: 'ENTER' })); return false;"><b>Enter</b></button>
+      <button type="button" class="vp-key" data-fkey="F1" onclick="pui.submit({ action: 'F01' }); return false;"><b>F1</b>=Return</button>
+      <button type="button" class="vp-key" data-fkey="F3" onclick="pui.submit({ action: 'F03' }); return false;"><b>F3</b>=Sku Search</button>
+      <button type="button" class="vp-key" data-fkey="F4" onclick="pui.submit({ action: 'F04' }); return false;"><b>F4</b>=Search <%= T(cmd04) %></button>
+      <button type="button" class="vp-key" data-fkey="F5" onclick="pui.submit({ action: 'F05' }); return false;"><b>F5</b>=PTD/YTD</button>
+      <button type="button" class="vp-key" data-fkey="F6" onclick="pui.submit({ action: 'F06' }); return false;"><b>F6</b>=Str Group Inquiry</button>
+      <button type="button" class="vp-key" data-fkey="F7" onclick="pui.submit({ action: 'F07' }); return false;"><b>F7</b>=Cost and Price</button>
+      <button type="button" class="vp-key" data-fkey="F8" onclick="pui.submit({ action: 'F08' }); return false;"><b>F8</b>=Chain Inquiry</button>
+      <% if (!IND(20)) { %><button type="button" class="vp-key" data-fkey="PageDown" onclick="pui.submit({ action: 'PAGEDOWN' }); return false;"><b>Page Down</b>=More</button><% } %>
+      <span class="vp-hint" style="align-self:center">'I' to Inquire</span>
+    </div>
+  </main>
+  <footer class="vp-foot">INV046 inventory inquiry &middot; web version of the 5250 screen</footer>
+</div>

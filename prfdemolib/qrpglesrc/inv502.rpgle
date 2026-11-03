@@ -20,6 +20,10 @@ ba.01 * 05/06/25  B. Andrews  Fixed merchandise hierarchy display
 44658 * 01/16/26  Angela Kearsley - RTC RTC7744658
 44658 *           Include new Set types 5 & 6 for Set Inq
       *
+PRF2  * 11/03/26  Demo build: calls to programs that are not in the
+PRF2  *           PRFDEMOLIB restore are commented out (PRF2 c***),
+PRF2  *           so F3 on the prompt and F2-F23 just redisplay.
+      *
       *********************************************************************
      h Option(*NoDebugIO:*SrcStmt)
      h DftActGrp(*No)
@@ -252,9 +256,9 @@ ba.01f                                     prefix(TRF:3)
      c                   return
       * F3 = Search
      c                   when      KbdKey      = F03
-     c                   call      'INV002'
-     c                   parm                    INUMBR
-     c                   parm                    SysParm
+PRF2 c***                call      'INV002'
+PRF2 c***                parm                    INUMBR
+PRF2 c***                parm                    SysParm
      c                   if        INUMBR      = 0
      c                   return
      c                   endif
@@ -335,130 +339,130 @@ ba.01f                                     prefix(TRF:3)
 
 0001  * F2 = Buyers
 0001 c                   when      KbdKey      = F02
-0001 c                   call      'INQDPTBYR'
-0001 c                   parm                    Idept
+PRF2 c***                call      'INQDPTBYR'
+PRF2 c***                parm                    Idept
 0001 c                   return
 0001
       * F3 = Distributions
      c                   when      KbdKey      = F03
-     c                   call      'CLINQDST'
-     c                   parm                    skuA
+PRF2 c***                call      'CLINQDST'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F4 = Order book
      c                   when      KbdKey      = F04
-     c                   call      'INQOBK'
-     c                   parm                    skuA
+PRF2 c***                call      'INQOBK'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F5 = Open POs
      c                   when      KbdKey      = F05
-     c                   call      'INQOPO'
-     c                   parm                    skuA
+PRF2 c***                call      'INQOPO'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F7 = Sets
      c                   when      KbdKey      = F07
      c                   if        ISET        = '1'
 44658c                             OR ISET     = '5'
-     c                   call      'INQSET1'
-     c                   parm                    skuA
+PRF2 c***                call      'INQSET1'
+PRF2 c***                parm                    skuA
      c                   elseif    ISET        = '2'
 44658c                             OR ISET     = '6'
-     c                   call      'INQSET2'
-     c                   parm                    skuA
+PRF2 c***                call      'INQSET2'
+PRF2 c***                parm                    skuA
      c                   endif
      c                   return
 
       * F8 = UPCs
      c                   when      KbdKey      = F08
-     c                   call      'INQUPC'
-     c                   parm                    skuA
+PRF2 c***                call      'INQUPC'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F9 = Transfers
      c                   when      KbdKey      = F09
-     c                   call      'INQ_TRF'
-     c                   parm                    skuA
+PRF2 c***                call      'INQ_TRF'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F10 = Ship points
      c                   when      KbdKey      = F10
-     c                   call      'INQVSP'
-     c                   parm                    skuA
+PRF2 c***                call      'INQVSP'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F11 = Count bulletin
      c                   when      KbdKey      = F11
-     c                   call      'INQCNT'
-     c                   parm                    skuA
+PRF2 c***                call      'INQCNT'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F12 = Receiving history
      c                   when      KbdKey      = F12
-     c                   call      'INQ_RCV'
-     c                   parm                    INUMBR
+PRF2 c***                call      'INQ_RCV'
+PRF2 c***                parm                    INUMBR
      c                   return
 
       * F13 = Vendor inquiry
      c                   when      KbdKey      = F13
-     c                   call      'INQVND'
-     c                   parm                    vendorA
+PRF2 c***                call      'INQVND'
+PRF2 c***                parm                    vendorA
      c                   return
 
       * F14 = Pack & hold
      c                   when      KbdKey      = F14
-     c                   call      'INQPAH'
-     c                   parm                    skuA
+PRF2 c***                call      'INQPAH'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F16 = Warehouse inventory adjustments
      c                   when      KbdKey      = F16
-     c                   call      'INQ_AUD'
-     c                   parm                    skuA
+PRF2 c***                call      'INQ_AUD'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F17 = New pack & hold
      c                   when      KbdKey      = F17
-     c                   call      'PAHINQ'
-     c                   parm                    skuA
+PRF2 c***                call      'PAHINQ'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F18 = SKU audit log
      c                   when      KbdKey      = F18
-     c                   call      'INQSKU'
-     c                   parm                    skuA
+PRF2 c***                call      'INQSKU'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F19 = Price events
      c                   when      KbdKey      = F19
-     c                   call      'INQEVT'
-     c                   parm                    skuA
+PRF2 c***                call      'INQEVT'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F20 = Inventory balances
      c                   when      KbdKey      = F20
-     c                   call      'INQ_BAL'
-     c                   parm                    skuA
+PRF2 c***                call      'INQ_BAL'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F21 = Planograms
      c                   when      KbdKey      = F21
-     c                   call      'POG605'
-     c                   parm                    skuA
-     c                   parm                    pogType
+PRF2 c***                call      'POG605'
+PRF2 c***                parm                    skuA
+PRF2 c***                parm                    pogType
      c                   return
 
       * F22 = Item attributes
      c                   when      KbdKey      = F22
-     c                   call      'INQITA'
-     c                   parm                    skuA
+PRF2 c***                call      'INQITA'
+PRF2 c***                parm                    skuA
      c                   return
 
       * F23 = JDA distributions
      c                   when      KbdKey      = F23
-     c                   call      'INQDSQ'
-     c                   parm                    skuA
+PRF2 c***                call      'INQDSQ'
+PRF2 c***                parm                    skuA
      c                   return
 
       * Process subfile control option

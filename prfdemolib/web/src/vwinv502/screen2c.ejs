@@ -1,0 +1,217 @@
+<%# include:helpers %>
+<%
+var vwApp = 'Item Inquiry';
+var vwSub = 'SKU ' + T(newsku) + ' - ' + T(idescr);
+var vwPgm = 'INV502W';
+var vwDate = T(datlit).replace(/,/g, ', ') || new Date().toLocaleDateString('en-US');
+var vwKeys = [['Enter', 'Look up the SKU typed above'], ['Page Down', 'Next SKU'], ['Page Up', 'Previous SKU'],
+              ['Alt+Right', 'Next SKU'], ['Alt+Left', 'Previous SKU'], ['F1', 'Exit to the menu']];
+var whs = (typeof screen2s !== 'undefined' && screen2s) ? screen2s : [];
+var tot = { oh: 0, oo: 0, al: 0, it: 0, ph: 0, rp: 0 };
+var maxOh = 1;
+whs.forEach(function (w) {
+  tot.oh += N(w.onhand); tot.oo += N(w.onorder); tot.al += N(w.allocated); tot.it += N(w.intransit);
+  tot.ph += N(w.packnhold); tot.rp += N(w.rpkonorder);
+  maxOh = Math.max(maxOh, N(w.onhand), N(w.onorder), N(w.packnhold));
+});
+var avail = tot.oh - tot.al;
+var price = N(regprc);
+var cost = N(cbavgc) || N(ifccst);
+var margin = price > 0 ? (price - cost) / price * 100 : 0;
+var marginCls = margin >= 50 ? 'is-ok' : (margin >= 35 ? '' : 'is-warn');
+var statusCls = T(idsccd) === 'A' ? 'is-ok' : 'is-warn';
+var isErr = IND(42) && IND(99);
+var nextOut = '';
+whs.forEach(function (w) { if (N(w.packnhold) && N(w.nextoutmdy) && !nextOut) { nextOut = MDY(w.nextoutmdy); } });
+var lastSale = MDY(lastsalmdy);
+var daysSince = '';
+if (N(lastsalmdy)) {
+  var ls = String(Math.round(N(lastsalmdy))); while (ls.length < 6) { ls = '0' + ls; }
+  var lsd = new Date(2000 + Number(ls.slice(4, 6)), Number(ls.slice(0, 2)) - 1, Number(ls.slice(2, 4)));
+  var dd = Math.round((new Date() - lsd) / 86400000);
+  daysSince = dd <= 0 ? 'today' : (dd === 1 ? 'yesterday' : dd + ' days ago');
+}
+function attr(label, code, desc, good) {
+  var c = T(code);
+  var cls = good === undefined ? '' : (good ? ' is-ok' : ' is-warn');
+  return '<div class="vw-attr"><span class="vw-label">' + label + '</span><span class="vw-attr-v"><span class="vw-pill' + cls + '">' +
+         (c ? c : '-') + '</span> ' + T(desc).replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</span></div>';
+}
+%>
+<div class="vw-app vw-inv502 vw-inv502-s2" data-theme="<%= vwTheme %>" data-density="<%= vwDensity %>"
+     data-sku="<%= T(msg) ? '' : T(newsku) %>" data-desc="<%= T(idescr) %>">
+<%# include:topbar %>
+  <section class="vw-hero">
+    <div class="vw-hero-inner">
+      <div class="vw-hero-row">
+        <div class="vw-hero-title">
+          <span class="vw-eyebrow">Item inquiry &middot; <%= T(dptdesc) || ('Dept ' + T(idept)) %></span>
+          <h1><%= T(idescr) || 'SKU ' + T(newsku) %></h1>
+          <div class="vw-hero-meta">
+            <button type="button" class="vw-skubadge" onclick="VW.copy('<%= T(newsku) %>', 'SKU')" title="Copy SKU" data-cmd="Copy SKU number">
+              <span>SKU</span><b><%= T(newsku) %></b><%- ICON('copy', 14) %>
+            </button>
+            <span class="vw-pill <%= statusCls %>"><span class="vw-dot"></span> <%= T(stsdesc) || T(idsccd) %></span>
+            <% if (T(seadesc)) { %><span class="vw-pill is-info"><%- ICON('cal', 12) %> <%= T(seadesc) %></span><% } %>
+            <% if (T(iset) && T(iset) !== '0') { %><span class="vw-pill is-warn"><%- ICON('box', 12) %> <%= T(setdesc) %></span><% } %>
+            <% if (T(iatrb1) === 'Y') { %><span class="vw-pill is-bad">Closeout</span><% } %>
+            <span class="vw-hint">Vendor <b><%= T(asnum) %></b> <%= T(vnddesc) %><%= T(ivndpn) ? ' - part ' + T(ivndpn) : '' %></span>
+          </div>
+        </div>
+        <div class="vw-hero-nav vw-noprint">
+          <button type="button" class="vw-btn-ghost" data-fkey="PageUp" data-vw-prev onclick="return VW.submit('PAGEUP')" data-cmd="Previous SKU" data-cmd-key="Page Up" title="Previous SKU (Page Up)"><%- ICON('prev') %> Prev</button>
+          <button type="button" class="vw-btn-ghost" data-fkey="PageDown" data-vw-next onclick="return VW.submit('PAGEDOWN')" data-cmd="Next SKU" data-cmd-key="Page Down" title="Next SKU (Page Down)">Next <%- ICON('next') %></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="vw-main">
+    <section class="vw-card vw-lookup-card vw-noprint">
+      <div class="vw-card-body vw-lookup-row">
+        <div class="vw-field vw-picker">
+          <label for="vw-newsku">Look up another SKU</label>
+          <div class="vw-input-wrap">
+            <%- ICON('search') %>
+            <input id="vw-newsku" class="vw-input<%= isErr ? ' is-error' : '' %>" type="text" name="newsku" inputmode="numeric" maxlength="9" autocomplete="off"
+                   value="<%= T(newsku) %>" data-kind="sku" data-pick-enter="1" data-vw-search
+                   oninput="VW.pickInput(this)" onkeydown="VW.pickKey(this, event)" onblur="VW.pickBlur(this)" aria-invalid="<%= isErr ? 'true' : 'false' %>">
+          </div>
+          <ul class="vw-picker-list" role="listbox" hidden></ul>
+        </div>
+        <button type="button" class="vw-btn" data-fkey="Enter" onclick="return VW.submit('ENTER', { newsku: (document.getElementById('vw-newsku').value.replace(/\D/g, '') || '0') })" data-cmd="Look up the SKU typed above" data-cmd-key="Enter">Look up <span class="vw-kbd">Enter</span></button>
+        <div class="vw-actions">
+          <button type="button" class="vw-btn-ghost" onclick="VW.exportCsv('vw-whs', 'sku-<%= T(newsku) %>-warehouses')" data-cmd="Export warehouse balances to CSV"><%- ICON('dl') %> Export</button>
+          <button type="button" class="vw-btn-ghost" onclick="window.print()" data-cmd="Print this item"><%- ICON('print') %> Print</button>
+          <button type="button" class="vw-btn-ghost" data-fkey="F1" onclick="return VW.submit('F01')" data-cmd="Exit to the menu" data-cmd-key="F1"><%- ICON('exit') %> Exit <span class="vw-kbd">F1</span></button>
+        </div>
+      </div>
+      <% if (T(msg)) { %>
+      <div class="vw-card-body" style="padding-top:0"><div class="vw-alert is-bad" role="alert"><%- ICON('alert', 20) %><div><b><%= T(msg) %></b>The details below are still for the previous SKU - pick a valid SKU to switch.</div></div></div>
+      <% } %>
+    </section>
+
+    <section class="vw-kpis" aria-label="Network position">
+      <div class="vw-kpi"><div class="vw-kpi-label">Network on hand</div><div class="vw-kpi-value"><%= F(tot.oh) %></div><div class="vw-kpi-note">units across <%= whs.length %> DCs</div></div>
+      <div class="vw-kpi <%= avail > 0 ? 'is-ok' : 'is-warn' %>"><div class="vw-kpi-label">Available to ship</div><div class="vw-kpi-value"><%= F(avail) %></div><div class="vw-kpi-note">on hand less <%= F(tot.al) %> allocated</div></div>
+      <div class="vw-kpi"><div class="vw-kpi-label">On order</div><div class="vw-kpi-value"><%= F(tot.oo) %></div><div class="vw-kpi-note"><%= F(tot.it) %> in transit &middot; <%= F(tot.rp) %> repack</div></div>
+      <div class="vw-kpi <%= tot.ph ? 'is-warn' : '' %>"><div class="vw-kpi-label">Pack &amp; hold</div><div class="vw-kpi-value"><%= F(tot.ph) %></div><div class="vw-kpi-note"><%= nextOut ? 'next release ' + nextOut : 'nothing held' %></div></div>
+      <div class="vw-kpi <%= marginCls %>"><div class="vw-kpi-label">Chain price</div><div class="vw-kpi-value"><%= M(price) %></div><div class="vw-kpi-note"><%= F(margin, 1) %>% margin on avg cost <%= M(cost) %></div>
+        <div class="vw-meter" title="Margin"><span style="width:<%= Math.max(0, Math.min(100, margin)) %>%"></span></div></div>
+    </section>
+
+    <div class="vw-grid-3">
+      <section class="vw-card">
+        <div class="vw-card-head"><h2><%- ICON('tag') %> Pricing &amp; cost</h2></div>
+        <div class="vw-card-body vw-defs">
+          <div><span class="vw-label">Chain price</span><b><%= M(regprc) %></b></div>
+          <div><span class="vw-label">Original price</span><b><%= M(origrtl) %></b></div>
+          <div><span class="vw-label">Zone 2 / Zone 3</span><b><%= M(z2rtl) %> / <%= M(z3rtl) %></b></div>
+          <div><span class="vw-label">Vendor cost</span><b><%= '$' + F(ifccst, 3) %></b></div>
+          <div><span class="vw-label">Average cost</span><b><%= '$' + F(cbavgc, 4) %></b></div>
+          <div><span class="vw-label">Markdown from original</span><b><%= N(origrtl) > 0 ? F((1 - price / N(origrtl)) * 100, 1) + '%' : '-' %></b></div>
+        </div>
+      </section>
+      <section class="vw-card">
+        <div class="vw-card-head"><h2><%- ICON('grid') %> Merchandise hierarchy</h2></div>
+        <div class="vw-card-body vw-defs">
+          <div><span class="vw-label">Department</span><b><%= T(idept) %> &middot; <%= T(dptdesc) %></b></div>
+          <div><span class="vw-label">Sub-department</span><b><%= T(isdept) %> &middot; <%= T(sdpdesc) %></b></div>
+          <div><span class="vw-label">Class</span><b><%= T(iclas) %> &middot; <%= T(clsdesc) %></b></div>
+          <div><span class="vw-label">Vendor</span><b><%= T(asnum) %> &middot; <%= T(vnddesc) %></b></div>
+          <div><span class="vw-label">Vendor part #</span><b><%= T(ivndpn) || '-' %></b></div>
+          <div><span class="vw-label">Replenishment</span><b><%= T(irplcd) %> &middot; <%= T(rpldesc) %><%= T(ivlrk4) ? ' (rank ' + T(ivlrk4) + ')' : '' %></b></div>
+        </div>
+      </section>
+      <section class="vw-card">
+        <div class="vw-card-head"><h2><%- ICON('chart') %> Selling &amp; handling</h2></div>
+        <div class="vw-card-body vw-defs">
+          <div><span class="vw-label">First sale</span><b><%= MDY(frstsalmdy) || '-' %></b></div>
+          <div><span class="vw-label">Last sale</span><b><%= lastSale || '-' %> <span class="vw-hint"><%= daysSince %></span></b></div>
+          <div><span class="vw-label">Season</span><b><%= T(iseasn) %> &middot; <%= T(seadesc) %></b></div>
+          <div><span class="vw-label">Price label</span><b><%= T(itkttr) %> &middot; <%= T(lbldesc) %></b></div>
+          <div><span class="vw-label">Case cube / weight</span><b><%= F(icube, 3) %> cu ft &middot; <%= F(iwght, 3) %> lb</b></div>
+          <div><span class="vw-label">Order book</span><b class="vw-obk"><span><%= T(obknum) %></span><span><%= T(ordst1) %></span><span><%= T(ordst2) %></span><span><%= T(ordst3) %></span><span><%= T(ordst4) %></span><span><%= T(ordst5) %></span><span><%= T(ovmcde) %></span></b></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="vw-card">
+      <div class="vw-card-head"><h2><%- ICON('spark') %> Attributes</h2><span class="vw-sub">Codes from the JDA attribute tables</span></div>
+      <div class="vw-card-body vw-attrs">
+        <%- attr('Closeout', iatrb1, at1desc, T(iatrb1) !== 'Y') %>
+        <%- attr('Store orderable', iatrb2, at2desc) %>
+        <%- attr('Hard / soft', iatrb3, at3desc) %>
+        <%- attr('Carton label', iatrb4, at4desc) %>
+        <%- attr('Import', iatrb5, at5desc) %>
+        <%- attr('Special handling', ihazcd, hazdesc || 'None') %>
+        <%- attr('Set code', iset, setdesc || 'Not part of a set') %>
+        <%- attr('No POS download', iprvnt, T(iprvnt) === 'Y' ? 'Excluded from POS download' : 'Downloads to POS') %>
+      </div>
+    </section>
+
+    <section class="vw-card">
+      <div class="vw-card-head">
+        <h2><%- ICON('truck') %> Distribution centers <span class="vw-sub"><%= whs.length %> locations &middot; bars scale to the largest quantity</span></h2>
+        <span class="vw-legend vw-hide-sm"><i class="lg-oh"></i> on hand <i class="lg-oo"></i> on order <i class="lg-ph"></i> pack &amp; hold</span>
+      </div>
+      <% if (whs.length) { %>
+      <div class="vw-tablewrap">
+        <table class="vw-table vw-stack" id="vw-whs">
+          <thead><tr>
+            <th>Warehouse</th>
+            <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'oh','num')">On hand</button></th>
+            <th class="vw-hide-sm" data-noexport>Position</th>
+            <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'av','num')">Available</button></th>
+            <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'oo','num')">On order</button></th>
+            <th class="num">Allocated</th>
+            <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'ph','num')">Pack &amp; hold</button></th>
+            <th>Out of stock</th>
+            <th>Last order &rarr; receipt</th>
+            <th class="num vw-hide-md">Case / ship</th>
+          </tr></thead>
+          <tbody>
+          <% whs.forEach(function (w) {
+               var oh = N(w.onhand);
+               var oo = N(w.onorder);
+               var ph = N(w.packnhold);
+               var al = N(w.allocated);
+               var av = oh - al; %>
+            <tr data-sortable data-search="<%= T(w.strnum) %> <%= LOCN(w.strnum) %> <%= LOCC(w.strnum) %>">
+              <td class="vw-cell-head" data-label="Warehouse" data-v="<%= T(w.strnum) %>"><span class="vw-whs"><span class="vw-key"><%= T(w.strnum) %></span> <span class="vw-nowrap"><%= LOCN(w.strnum) %><small><%= LOCC(w.strnum) %></small></span></span></td>
+              <td class="num<%= CLS(oh) %>" data-label="On hand" data-col="oh" data-v="<%= oh %>"><b><%= F(oh) %></b></td>
+              <td class="vw-hide-sm" data-noexport><div class="vw-pos" title="on hand / on order / pack & hold">
+                <i class="lg-oh" style="width:<%= (oh / maxOh * 100).toFixed(1) %>%"></i>
+                <i class="lg-oo" style="width:<%= (oo / maxOh * 100).toFixed(1) %>%"></i>
+                <i class="lg-ph" style="width:<%= (ph / maxOh * 100).toFixed(1) %>%"></i></div></td>
+              <td class="num<%= CLS(av) %>" data-label="Available" data-col="av" data-v="<%= av %>"><%= F(av) %></td>
+              <td class="num<%= CLS(oo) %>" data-label="On order" data-col="oo" data-v="<%= oo %>"><%= F(oo) %><% if (N(w.intransit)) { %><small class="vw-sub-line"><%= F(w.intransit) %> in transit</small><% } %></td>
+              <td class="num<%= CLS(al) %>" data-label="Allocated" data-v="<%= al %>"><%= F(al) %></td>
+              <td class="num<%= CLS(ph) %>" data-label="Pack & hold" data-col="ph" data-v="<%= ph %>"><%= ph ? F(ph) : '-' %><% if (ph && MDY(w.nextoutmdy)) { %><small class="vw-sub-line">out <%= MDY(w.nextoutmdy) %></small><% } %></td>
+              <td data-label="Out of stock"><% if (MDY(w.oosmdy)) { %><span class="vw-pill is-warn"><%= MDY(w.oosmdy) %></span><% } else { %><span class="vw-zero">never</span><% } %></td>
+              <td data-label="Ordered / received" data-v="<%= MDY(w.lastordmdy) %> / <%= MDY(w.lastrcvmdy) %>"><% if (MDY(w.lastordmdy) || MDY(w.lastrcvmdy)) { %><span class="vw-nowrap"><%= MDY(w.lastordmdy) || '-' %> <span class="vw-zero">&rarr;</span> <%= MDY(w.lastrcvmdy) || '-' %></span><% } else { %><span class="vw-zero">-</span><% } %></td>
+              <td class="num vw-hide-md" data-label="Case / ship"><%= F(w.casepack) %> / <%= F(w.shippack) %></td>
+            </tr>
+          <% }); %>
+          </tbody>
+          <tfoot><tr>
+            <td data-label="Total">Network</td>
+            <td class="num" data-label="On hand"><%= F(tot.oh) %></td>
+            <td class="vw-hide-sm" data-noexport></td>
+            <td class="num" data-label="Available"><%= F(avail) %></td>
+            <td class="num" data-label="On order"><%= F(tot.oo) %></td>
+            <td class="num" data-label="Allocated"><%= F(tot.al) %></td>
+            <td class="num" data-label="Pack & hold"><%= F(tot.ph) %></td>
+            <td colspan="2" class="vw-hide-sm"></td><td class="vw-hide-md"></td>
+          </tr></tfoot>
+        </table>
+      </div>
+      <% } else { %>
+      <div class="vw-empty"><b>No warehouse balances</b>This SKU has no inventory records at the distribution centers.</div>
+      <% } %>
+    </section>
+
+    <div class="vw-alert is-info vw-noprint"><%- ICON('alert', 18) %><div>The green screen&rsquo;s F2-F23 shortcuts open other JDA inquiries (buyers, order book, open POs, transfers, UPCs...). Those programs are not part of this demo restore, so they are not offered here.</div></div>
+  </main>
+<%# include:footer %>
+</div>

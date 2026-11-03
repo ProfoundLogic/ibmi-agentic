@@ -1,0 +1,55 @@
+<%# include:helpers %>
+<%
+var vwApp = 'Ticket Item Inventory';
+var vwSub = 'Confirm the store distribution';
+var vwPgm = 'TS0110W';
+var vwDate = new Date().toLocaleDateString('en-US');
+var vwKeys = [['Enter', 'Create the distribution'], ['F1', 'Cancel and go back to the list']];
+var d = null;
+try { d = JSON.parse(vwG.sessionStorage.getItem('vw.dist')); } catch (vwErr) { d = null; }
+var notice = d && d.packs ? JSON.stringify({ text: 'Distribution submitted: ' + d.packs + ' packs (' + d.units + ' units) for store ' + d.store + ', dept ' + d.dept + '. CLTS0111 is processing it in batch.', kind: 'ok' }) : '';
+%>
+<div class="vw-app vw-ts0110 vw-ts-dist" data-theme="<%= vwTheme %>" data-density="<%= vwDensity %>">
+<%# include:topbar %>
+  <main class="vw-main vw-confirm-main">
+    <section class="vw-dialog vw-confirm" role="dialog" aria-labelledby="vw-dist-h">
+      <div class="vw-dialog-head">
+        <span class="vw-ico"><%- ICON('truck', 24) %></span>
+        <div>
+          <span class="vw-eyebrow">Create distribution</span>
+          <h2 id="vw-dist-h"><% if (d && d.packs) { %><%= d.packs %> pack<%= d.packs === 1 ? '' : 's' %> to store <%= d.store %><% } else { %>Create a distribution?<% } %></h2>
+          <% if (d && d.label) { %><div class="vw-hint"><%= d.label %></div><% } %>
+        </div>
+      </div>
+      <div class="vw-dialog-body">
+        <% if (d && d.lines && d.lines.length) { %>
+        <div class="vw-confirm-stats">
+          <div><span class="vw-label">SKUs</span><b><%= d.skus %></b></div>
+          <div><span class="vw-label">Packs</span><b><%= F(d.packs) %></b></div>
+          <div><span class="vw-label">Units</span><b><%= F(d.units) %></b></div>
+          <div><span class="vw-label">Retail</span><b><%= M(d.retail) %></b></div>
+        </div>
+        <table class="vw-table vw-confirm-table">
+          <thead><tr><th>SKU</th><th>Description</th><th class="num">Packs</th><th class="num">Units</th></tr></thead>
+          <tbody>
+          <% d.lines.forEach(function (l) { %>
+            <tr><td><span class="vw-key"><%= l.sku %></span></td><td><%= l.desc %><% if (l.over) { %> <span class="vw-pill is-warn">more than available</span><% } %></td><td class="num"><%= l.packs %></td><td class="num"><%= F(l.units) %></td></tr>
+          <% }); %>
+          </tbody>
+        </table>
+        <% if (d.over) { %><div class="vw-alert is-info" style="margin-top:12px"><%- ICON('alert', 18) %><div><%= d.over %> line<%= d.over === 1 ? ' asks' : 's ask' %> for more packs than the warehouse shows available. The program will still write the quantities you keyed.</div></div><% } %>
+        <% } else { %>
+        <p>Press Enter to create a distribution from the pack quantities on the list, or F1 to go back.</p>
+        <% } %>
+        <p class="vw-hint" style="margin-top:12px">TS0110W adds a new work member to STR001WK and submits CLTS0111 to process it in batch.</p>
+      </div>
+      <div class="vw-dialog-foot">
+        <button type="button" class="vw-btn-ghost" data-fkey="F1" onclick="return VW.submit('F01')" data-cmd="Cancel and go back" data-cmd-key="F1"><%- ICON('back') %> Back to the list <span class="vw-kbd">F1</span></button>
+        <button type="button" class="vw-btn" data-fkey="Enter" data-notice="<%= notice %>"
+                onclick="try { var n = this.getAttribute('data-notice'); if (n) { localStorage.setItem('vw.notice', n); } sessionStorage.removeItem('vw.dist'); } catch (e) {} return VW.submit('ENTER');"
+                data-cmd="Create the distribution" data-cmd-key="Enter" autofocus><%- ICON('ok') %> Create distribution <span class="vw-kbd">Enter</span></button>
+      </div>
+    </section>
+  </main>
+<%# include:footer %>
+</div>

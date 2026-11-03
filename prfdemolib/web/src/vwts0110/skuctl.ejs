@@ -1,0 +1,201 @@
+<%# include:helpers %>
+<%# include:skumap %>
+<%
+var vwApp = 'Ticket Item Inventory';
+var vwSub = 'Store ' + T(dfstor) + ' ' + T(dfname) + ' - Dept ' + T(dfdept) + ' ' + T(dfdnam);
+var vwPgm = T(prog) || 'TS0110W';
+var vwDate = new Date().toLocaleDateString('en-US');
+var vwKeys = [['F10', 'Create distribution'], ['F2', 'Back to the prompt'], ['F7', 'Top of the list'], ['F8', 'Bottom of the list'],
+              ['Up / Down', 'Move between pack quantities'], ['+ / -', 'Add or remove a pack'], ['F1', 'Exit to the prompt']];
+var rows = (typeof skusfl !== 'undefined' && skusfl) ? skusfl : [];
+function kind(r) {
+  var f = T(r.sfind) + '000000';
+  if (f.charAt(0) === '1') { return f.charAt(3) === '1' ? 'sub' : 'cls'; }
+  if (f.charAt(1) === '1') { return f.charAt(4) === '1' ? 'fin' : (f.charAt(3) === '1' ? 'subtot' : 'clstot'); }
+  return 'sku';
+}
+var fin = null;
+var skus = 0;
+var mapped = 0;
+var hot = 0;
+var curSub = '';
+var curCls = '';
+rows.forEach(function (r) {
+  r._k = kind(r);
+  if (r._k === 'fin') { fin = r; }
+  if (r._k === 'sub') { curSub = T(r.sfsku); }
+  if (r._k === 'cls') { curCls = T(r.sfsku); }
+  r._g = curSub + '-' + curCls;
+  if (r._k === 'sku') {
+    skus++;
+    r._map = T(r.sfdes1).slice(-1) === 'Y';
+    if (r._map) { mapped++; }
+    if (N(r.sfpcts) >= 85) { hot++; }
+  }
+});
+var finShp = fin ? N(fin.sfushp) : 0;
+var finSld = fin ? N(fin.sfusld) : 0;
+var finOnh = fin ? N(fin.sfuonh) : 0;
+var finAv = fin ? N(fin.sfpavl) : 0;
+var finPh = fin ? N(fin.sfphqt) : 0;
+var finPct = finShp ? finSld / finShp * 100 : 0;
+function pctCls(p) { return p >= 90 ? 'is-ok' : (p >= 75 ? '' : (p >= 50 ? 'is-warn' : 'is-bad')); }
+function desc(r) { var d = VWSKU[String(Math.round(N(r.sfsku)))]; return d ? d : T(r.sfdes1).slice(0, 13).trim(); }
+var cols = 13;
+%>
+<div class="vw-app vw-ts0110 vw-ts-list" data-theme="<%= vwTheme %>" data-density="<%= vwDensity %>"
+     data-store="<%= T(dfstor) %>" data-dept="<%= T(dfdept) %>" data-label="<%= T(dfname) %> <%= T(dfstat) %> - <%= T(dfdnam) %>" data-nbr="<%= N(nbr) %>">
+<%# include:topbar %>
+  <section class="vw-hero">
+    <div class="vw-hero-inner">
+      <div class="vw-hero-row">
+        <div style="min-width:0">
+          <span class="vw-eyebrow">Ticket item inventory &middot; ships from <%= T(whstxt) %></span>
+          <h1>Store <%= T(dfstor) %> <%= T(dfname) %>, <%= T(dfstat) %> &middot; Dept <%= N(dfdept) %> <%= T(dfdnam) %></h1>
+          <div class="vw-hero-meta">
+            <span class="vw-pill <%= T(tckyn) === 'Y' ? '' : 'is-mute' %>">Ticketed only: <%= T(tckyn) === 'Y' ? 'yes' : 'no' %></span>
+            <span class="vw-pill <%= T(avlyn) === 'Y' ? '' : 'is-mute' %>">Warehouse can ship: <%= T(avlyn) === 'Y' ? 'yes' : 'no' %></span>
+            <span class="vw-pill is-info">Season <%= T(dfseas) %></span>
+            <span class="vw-pill is-mute"><%= T(dfyrd) %></span>
+            <span class="vw-pill is-mute"><%= LOCN(N(T(whstxt).replace(/\D/g, ''))) %></span>
+          </div>
+        </div>
+        <div class="vw-actions vw-noprint">
+          <button type="button" class="vw-btn-ghost" data-fkey="F2" onclick="return VW.submit('F02')" data-cmd="Change store or department" data-cmd-key="F2"><%- ICON('back') %> Change <span class="vw-kbd">F2</span></button>
+          <button type="button" class="vw-btn-ghost" data-fkey="F1" onclick="return VW.submit('F01')" data-cmd="Exit to the prompt" data-cmd-key="F1"><%- ICON('exit') %> Exit <span class="vw-kbd">F1</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="vw-main">
+    <section class="vw-kpis">
+      <div class="vw-kpi"><div class="vw-kpi-label">SKUs listed</div><div class="vw-kpi-value"><%= F(N(skucnt) || skus) %></div><div class="vw-kpi-note"><%= mapped %> mapped to a replenishment profile</div></div>
+      <div class="vw-kpi"><div class="vw-kpi-label">Units shipped</div><div class="vw-kpi-value"><%= F(finShp) %></div><div class="vw-kpi-note"><%= F(finOnh) %> still on hand at the store</div></div>
+      <div class="vw-kpi <%= pctCls(finPct) %>"><div class="vw-kpi-label">Sell-through</div><div class="vw-kpi-value"><%= F(finPct, 1) %>%</div><div class="vw-kpi-note"><%= F(finSld) %> units sold &middot; <%= hot %> SKUs at 85%+</div><div class="vw-meter"><span style="width:<%= Math.min(100, finPct) %>%"></span></div></div>
+      <div class="vw-kpi is-ok"><div class="vw-kpi-label">Packs available</div><div class="vw-kpi-value"><%= F(finAv) %></div><div class="vw-kpi-note">at <%= T(whstxt) %> after allocations</div></div>
+      <div class="vw-kpi <%= finPh ? 'is-warn' : '' %>"><div class="vw-kpi-label">Pack &amp; hold</div><div class="vw-kpi-value"><%= F(finPh) %></div><div class="vw-kpi-note">packs held at the warehouse</div></div>
+    </section>
+
+    <section class="vw-card vw-dist vw-noprint" id="vw-dist" aria-live="polite">
+      <div class="vw-card-body vw-dist-row">
+        <div class="vw-dist-ico"><%- ICON('truck', 26) %></div>
+        <div class="vw-dist-sum">
+          <b data-dist="title">Build a distribution</b>
+          <span class="vw-hint" data-dist="detail">Key packs in the Pks column (or use Smart fill), then Create distribution. The totals update as you type.</span>
+        </div>
+        <div class="vw-dist-stats">
+          <div><span class="vw-label">SKUs</span><b data-dist="skus">0</b></div>
+          <div><span class="vw-label">Packs</span><b data-dist="packs">0</b></div>
+          <div><span class="vw-label">Units</span><b data-dist="units">0</b></div>
+          <div><span class="vw-label">Retail</span><b data-dist="retail">$0.00</b></div>
+        </div>
+        <div class="vw-actions">
+          <button type="button" class="vw-btn-ghost" onclick="window.VWts && VWts.smartFill()" data-cmd="Smart fill pack quantities" title="Suggest packs for fast sellers the warehouse can supply"><%- ICON('spark') %> Smart fill</button>
+          <button type="button" class="vw-btn-ghost" onclick="window.VWts && VWts.clearAll()" data-cmd="Clear all pack quantities">Clear</button>
+          <button type="button" class="vw-btn" data-fkey="F10" onclick="if (window.VWts) { VWts.beforeSubmit(); } return VW.submit('F10');" data-cmd="Create distribution" data-cmd-key="F10"><%- ICON('ok') %> Create distribution <span class="vw-kbd">F10</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="vw-card">
+      <div class="vw-tablebar vw-noprint">
+        <div class="vw-input-wrap"><%- ICON('filter') %><input class="vw-input" type="text" placeholder="Filter by SKU or description..." oninput="VW.filter(this, 'vw-skus')" data-vw-search aria-label="Filter SKUs"></div>
+        <div class="vw-chips" role="group" aria-label="Quick filters">
+          <button type="button" class="vw-chip" data-chip="map" onclick="window.VWts && VWts.chip(this)">Mapped</button>
+          <button type="button" class="vw-chip" data-chip="hot" onclick="window.VWts && VWts.chip(this)">Sell-through 85%+</button>
+          <button type="button" class="vw-chip" data-chip="avl" onclick="window.VWts && VWts.chip(this)">Warehouse can ship</button>
+          <button type="button" class="vw-chip" data-chip="qty" onclick="window.VWts && VWts.chip(this)">In distribution</button>
+        </div>
+        <span class="vw-hint" data-count-for="vw-skus"><%= skus %> SKUs</span>
+        <div class="vw-actions" style="margin-left:auto">
+          <button type="button" class="vw-btn-ghost vw-btn-sm" data-fkey="F7" onclick="window.VWts && VWts.go('top')" title="Top (F7)">Top <span class="vw-kbd">F7</span></button>
+          <button type="button" class="vw-btn-ghost vw-btn-sm" data-fkey="F8" onclick="window.VWts && VWts.go('bottom')" title="Bottom (F8)">Bottom <span class="vw-kbd">F8</span></button>
+          <button type="button" class="vw-btn-ghost vw-btn-sm" onclick="VW.exportCsv('vw-skus', 'ts0110-store<%= T(dfstor) %>-dept<%= N(dfdept) %>')" data-cmd="Export SKUs to CSV"><%- ICON('dl', 16) %> Export</button>
+        </div>
+      </div>
+      <% if (rows.length) { %>
+      <div class="vw-tablewrap" id="vw-skuwrap">
+        <table class="vw-table vw-stack" id="vw-skus">
+          <thead><tr>
+            <th data-noexport>Pks</th>
+            <th><button type="button" class="vw-sort" onclick="VW.sort(this,'sku','num')">SKU</button></th>
+            <th><button type="button" class="vw-sort" onclick="VW.sort(this,'ds','txt')">Description</button></th>
+            <th>Map</th>
+            <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'pr','num')">Price</button></th>
+            <th class="num">Pack</th>
+            <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'sh','num')">Shipped</button></th>
+            <th class="num">On hand</th>
+            <th class="num">Sold</th>
+            <th><button type="button" class="vw-sort" onclick="VW.sort(this,'pc','num')">Sell-through</button></th>
+            <th class="num" title="Units on transfers to the store">Resv</th>
+            <th class="num"><button type="button" class="vw-sort" onclick="VW.sort(this,'av','num')">Packs avail</button></th>
+            <th class="num" title="Pack and hold / reserved for new stores">P&amp;H / Rsrv</th>
+          </tr></thead>
+          <tbody>
+          <% rows.forEach(function (r) {
+               var k = r._k;
+               if (k === 'sub' || k === 'cls') { %>
+            <tr class="vw-grp vw-grp-<%= k %>" data-grp="<%= r._g %>">
+              <td colspan="<%= cols %>" class="vw-cell-head"><span class="vw-grp-tag"><%= k === 'sub' ? 'Subdept' : 'Class' %> <%= T(r.sfsku) %></span> <%= T(r.sfdes1) %></td>
+            </tr>
+          <%   } else if (k === 'subtot' || k === 'clstot') {
+                 var pc = N(r.sfushp) ? N(r.sfusld) / N(r.sfushp) * 100 : 0; %>
+            <tr class="vw-tot vw-tot-<%= k %>" data-grp="<%= r._g %>">
+              <td data-noexport></td>
+              <td colspan="4" class="vw-cell-head"><%= k === 'subtot' ? 'Subdept' : 'Class' %> total</td>
+              <td class="vw-hide-sm"></td>
+              <td class="num" data-label="Shipped"><%= F(r.sfushp) %></td>
+              <td class="num" data-label="On hand"><%= F(r.sfuonh) %></td>
+              <td class="num" data-label="Sold"><%= F(r.sfusld) %></td>
+              <td data-label="Sell-through"><span class="vw-pill <%= pctCls(pc) %>"><%= F(pc, 1) %>%</span></td>
+              <td class="num" data-label="Resv"><%= F(r.sfures) %></td>
+              <td class="num" data-label="Packs avail"><%= F(r.sfpavl) %></td>
+              <td class="num" data-label="P&H / Rsrv"><%= F(r.sfphqt) %> / <%= F(r.sfnewq) %></td>
+            </tr>
+          <%   } else if (k === 'sku') {
+                 var pct = N(r.sfpcts); var av = N(r.sfpavl); %>
+            <tr data-sortable data-group="<%= r._g %>" data-grp="<%= r._g %>" data-sku-row data-map="<%= r._map ? 1 : 0 %>" data-pct="<%= pct %>" data-avl="<%= av %>"
+                data-pack="<%= N(r.sfpack) %>" data-price="<%= N(r.sfpric) %>" data-rrn="<%= r._rrn %>" data-desc="<%= desc(r) %>"
+                data-search="<%= T(r.sfsku) %> <%= desc(r) %>">
+              <td data-label="Packs" data-noexport>
+                <span class="vw-step">
+                  <button type="button" tabindex="-1" aria-label="One pack less" onclick="window.VWts && VWts.step(this, -1)">&minus;</button>
+                  <input class="vw-qty" type="text" inputmode="numeric" maxlength="3" name="skusfl.sfqty.<%= r._rrn %>" value="<%= N(r.sfqty) ? T(r.sfqty) : '' %>"
+                         aria-label="Packs of <%= T(r.sfsku) %>" oninput="window.VWts && VWts.recalc()" onkeydown="window.VWts && VWts.key(this, event)">
+                  <button type="button" tabindex="-1" aria-label="One pack more" onclick="window.VWts && VWts.step(this, 1)">+</button>
+                </span>
+              </td>
+              <td class="num" data-label="SKU" data-col="sku" data-v="<%= T(r.sfsku) %>"><span class="vw-key"><%= T(r.sfsku) %></span></td>
+              <td class="vw-cell-desc" data-label="Description" data-col="ds" data-v="<%= desc(r) %>"><%= desc(r) %></td>
+              <td data-label="Map" data-v="<%= r._map ? 'Y' : 'N' %>"><span class="vw-pill <%= r._map ? 'is-ok' : 'is-mute' %>"><%= r._map ? 'Y' : 'N' %></span></td>
+              <td class="num" data-label="Price" data-col="pr" data-v="<%= N(r.sfpric) %>"><%= M(r.sfpric) %></td>
+              <td class="num" data-label="Pack" data-v="<%= N(r.sfpack) %>"><%= F(r.sfpack) %></td>
+              <td class="num" data-label="Shipped" data-col="sh" data-v="<%= N(r.sfushp) %>"><%= F(r.sfushp) %></td>
+              <td class="num<%= CLS(N(r.sfuonh)) %>" data-label="On hand" data-v="<%= N(r.sfuonh) %>"><%= F(r.sfuonh) %></td>
+              <td class="num" data-label="Sold" data-v="<%= N(r.sfusld) %>"><%= F(r.sfusld) %></td>
+              <td data-label="Sell-through" data-col="pc" data-v="<%= pct %>"><div class="vw-bar"><i><b class="<%= pctCls(pct) %>" style="width:<%= Math.min(100, pct) %>%"></b></i><span><%= F(pct, 1) %>%</span></div></td>
+              <td class="num<%= CLS(N(r.sfures)) %>" data-label="Resv" data-v="<%= N(r.sfures) %>"><%= F(r.sfures) %></td>
+              <td class="num" data-label="Packs avail" data-col="av" data-v="<%= av %>"><%- av > 0 ? '<b>' + F(av) + '</b>' : '<span class="vw-zero">0</span>' %></td>
+              <td class="num<%= CLS(N(r.sfphqt) + N(r.sfnewq)) %>" data-label="P&H / Rsrv" data-v="<%= N(r.sfphqt) %>"><%= F(r.sfphqt) %> / <%= F(r.sfnewq) %></td>
+            </tr>
+          <%   }
+             }); %>
+          </tbody>
+          <% if (fin) { %>
+          <tfoot><tr>
+            <td data-noexport></td><td colspan="4" class="vw-cell-head">Final totals &middot; Dept <%= N(dfdept) %></td><td class="vw-hide-sm"></td>
+            <td class="num" data-label="Shipped"><%= F(finShp) %></td><td class="num" data-label="On hand"><%= F(finOnh) %></td><td class="num" data-label="Sold"><%= F(finSld) %></td>
+            <td data-label="Sell-through"><span class="vw-pill <%= pctCls(finPct) %>"><%= F(finPct, 1) %>%</span></td>
+            <td class="num" data-label="Resv"><%= F(fin.sfures) %></td><td class="num" data-label="Packs avail"><%= F(finAv) %></td><td class="num" data-label="P&H / Rsrv"><%= F(finPh) %> / <%= F(fin.sfnewq) %></td>
+          </tr></tfoot>
+          <% } %>
+        </table>
+      </div>
+      <% } else { %>
+      <div class="vw-empty"><b>No SKUs match</b>Try turning off &ldquo;Ticketed SKUs only&rdquo; or &ldquo;Warehouse can ship&rdquo; on the prompt (F2).</div>
+      <% } %>
+    </section>
+  </main>
+<%# include:footer %>
+</div>

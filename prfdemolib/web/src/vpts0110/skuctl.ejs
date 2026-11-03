@@ -1,0 +1,56 @@
+<%# include:phelpers %>
+<%
+var rows = (typeof skusfl !== 'undefined' && skusfl) ? skusfl : [];
+function kind(r) {
+  var f = T(r.sfind) + '000000';
+  if (f.charAt(0) === '1') { return 'head'; }
+  if (f.charAt(1) === '1') { return f.charAt(4) === '1' ? 'fin' : 'tot'; }
+  return 'sku';
+}
+var focusRrn = Math.round(N(nbr)) || 1;
+%>
+<div class="vp-app vp-ts0110">
+  <header class="vp-head">
+    <div class="vp-head-row"><span class="vp-meta"><%= vpDate %> &nbsp; <%= vpTime %> &nbsp; <b><%= T(whstxt) %></b></span><span class="vp-banner">Variety Wholesalers, Inc.</span><span class="vp-pgm"><%= T(prog) %> SKUSFL</span></div>
+    <div class="vp-head-row"><span></span><span class="vp-title">TICKET ITEM INVENTORY FOR STORE BY DEPT</span><span></span></div>
+  </header>
+  <main class="vp-main">
+    <section class="vp-panel">
+      <div><b>Store:</b> <%= T(dfstor) %> <%= T(dfname) %> <%= T(dfstat) %> &nbsp;&nbsp; <b>Dept:</b> <%= ('000' + String(Math.round(N(dfdept)))).slice(-3) %> <%= T(dfdnam) %></div>
+      <div class="vp-hint" style="margin-top:4px"><b>Ticketed only</b> = <%= T(tckyn) %> &nbsp; <b>Available only</b> = <%= T(avlyn) %> &nbsp; <b>Season</b> = <%= T(dfseas) %> &nbsp; <b>Years</b> = <%= T(dfyrd) %></div>
+    </section>
+    <div class="vp-tablewrap">
+      <table class="vp-table">
+        <thead><tr><th>Pks</th><th class="num">SkuNo</th><th>Description</th><th>Map</th><th class="num">Price</th><th class="num">Pack</th><th class="num">EaShp</th><th class="num">EaOnh</th>
+          <th class="num">EaSld</th><th class="num">%Sold</th><th class="num">Resv</th><th class="num">PksAv</th><th class="num">P&amp;H</th><th class="num">Rsrv</th></tr></thead>
+        <tbody>
+        <% rows.forEach(function (r) { var k = kind(r); %>
+          <% if (k === 'head') { %>
+          <tr class="vp-sub"><td></td><td class="num"><%= T(r.sfsku) %></td><td colspan="12"><%= T(r.sfdes1) %></td></tr>
+          <% } else if (k === 'tot' || k === 'fin') { %>
+          <tr class="<%= k === 'fin' ? 'vp-fin' : 'vp-tot' %>"><td></td><td class="num"><%= k === 'fin' ? '' : T(r.sfsku) %></td><td colspan="4"><%= T(r.sfdes1) %></td>
+            <td class="num"><%= F(r.sfushp) %></td><td class="num"><%= F(r.sfuonh) %></td><td class="num"><%= F(r.sfusld) %></td><td class="num"><%= F(r.sfpcts, 1) %></td>
+            <td class="num"><%= F(r.sfures) %></td><td class="num"><%= F(r.sfpavl) %></td><td class="num"><%= F(r.sfphqt) %></td><td class="num"><%= F(r.sfnewq) %></td></tr>
+          <% } else { %>
+          <tr><td><input class="vp-in num" type="text" name="skusfl.sfqty.<%= r._rrn %>" maxlength="3" value="<%= N(r.sfqty) ? T(r.sfqty) : '' %>"<%= r._rrn === focusRrn ? ' autofocus' : '' %> aria-label="Packs of <%= T(r.sfsku) %>"></td>
+            <td class="num"><%= T(r.sfsku) %></td><td><%= T(r.sfdes1).slice(0, 13) %></td><td><%= T(r.sfdes1).slice(13).trim() %></td>
+            <td class="num"><%= F(r.sfpric, 2) %></td><td class="num"><%= F(r.sfpack) %></td><td class="num"><%= F(r.sfushp) %></td><td class="num"><%= F(r.sfuonh) %></td>
+            <td class="num"><%= F(r.sfusld) %></td><td class="num"><%= F(r.sfpcts, 1) %></td><td class="num"><%= F(r.sfures) %></td><td class="num"><%= F(r.sfpavl) %></td>
+            <td class="num"><%= F(r.sfphqt) %></td><td class="num"><%= F(r.sfnewq) %></td></tr>
+          <% } %>
+        <% }); %>
+        </tbody>
+      </table>
+    </div>
+    <div class="vp-count"><%= F(skucnt) %> skus listed</div>
+    <div class="vp-keys">
+      <button type="button" class="vp-key is-main" data-fkey="Enter" onclick="pui.submit({ action: 'ENTER' }); return false;"><b>Enter</b></button>
+      <button type="button" class="vp-key" data-fkey="F1" onclick="pui.submit({ action: 'F01' }); return false;"><b>F1</b>=exit</button>
+      <button type="button" class="vp-key" data-fkey="F2" onclick="pui.submit({ action: 'F02' }); return false;"><b>F2</b>=prompt</button>
+      <button type="button" class="vp-key" data-fkey="F7" onclick="pui.submit({ action: 'F07' }); return false;"><b>F7</b>=top</button>
+      <button type="button" class="vp-key" data-fkey="F8" onclick="pui.submit({ action: 'F08' }); return false;"><b>F8</b>=bottom</button>
+      <button type="button" class="vp-key" data-fkey="F10" onclick="pui.submit({ action: 'F10' }); return false;"><b>F10</b>=create distribution</button>
+    </div>
+  </main>
+  <footer class="vp-foot">TS0110 ticket item inventory &middot; web version of the 5250 screen</footer>
+</div>
