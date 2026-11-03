@@ -1,0 +1,122 @@
+/*===================================================================*/
+/* SYSGET  DEMO STUB - replaces MMS program SYSGET for the INV046    */
+/*         Profound Logic demo.                                      */
+/*                                                                   */
+/* The real SYSGET (MM4R4SYS/SYSGET) fills the 256-byte system data  */
+/* structure SYS001ED from MENUCTL rec 1, INVDAT rec 1, TBLCNTL1,     */
+/* and programs GETSTR and DATGET. This stub returns the same values */
+/* production returned on 2026-10-28, with QDATE taken from the job  */
+/* date. No files are opened.                                        */
+/*                                                                   */
+/* SYS001ED layout (buffer positions):                               */
+/*   CANCOD   1-8    A 8     left as passed in by the caller         */
+/*   CTLSCR   9-86   A 78    menu message 80                         */
+/*   CTLCTR  87-126  A 40    menu message 40 (company banner)        */
+/*   DFTSTR 127-129  P 5,0   default store (GETSTR) - 0 in demo      */
+/*   DATCEN 130      P 1,0   current century                         */
+/*   DATCUR 131-134  P 6,0   current merch date YYMMDD               */
+/*   DATCYR 135-136  P 2,0   current fiscal year                     */
+/*   DATPER 137-138  P 2,0   current fiscal period                   */
+/*   DATCDY 139-140  P 3,0   current day of fiscal year              */
+/*   DATDAY 141      P 1,0   day of week                             */
+/*   DATLIT 142-176  A 35    date literal                            */
+/*   DATWKP 177      P 1,0   weeks in period                         */
+/*   DATWKY 178-179  P 2,0   weeks in year                           */
+/*   QDATE  180-183  P 6,0   system date MMDDYY (DATGET)             */
+/*   HOMCNT 184-186  A 3     home country                            */
+/*   HOMCUR 187-189  A 3     home currency                           */
+/*   HOMDEC 190      S 1,0   home decimal places (zoned)             */
+/*   HOMMTR 191      A 1     metric Y/N                              */
+/*   DATCCN 192      P 1,0   fiscal century                          */
+/*                                                                   */
+/* Compile: CRTBNDCL PGM(PRFDEMOLIB/SYSGET)                          */
+/*                   SRCFILE(PRFDEMOLIB/QCLSRC) SRCMBR(SYSGET)       */
+/* PRFDEMOLIB must be ahead of MM4R4SYS in the library list when     */
+/* testing on our system, or INV046 will call the real SYSGET.       */
+/*===================================================================*/
+             PGM        PARM(&PARM1)
+
+             DCL        VAR(&PARM1)  TYPE(*CHAR) LEN(256)
+
+             DCL        VAR(&DS)     TYPE(*CHAR) LEN(256)
+             DCL        VAR(&CTLSCR) TYPE(*CHAR) LEN(78) +
+                          STG(*DEFINED) DEFVAR(&DS 9)
+             DCL        VAR(&CTLCTR) TYPE(*CHAR) LEN(40) +
+                          STG(*DEFINED) DEFVAR(&DS 87)
+             DCL        VAR(&DFTSTR) TYPE(*DEC)  LEN(5 0) +
+                          STG(*DEFINED) DEFVAR(&DS 127)
+             DCL        VAR(&DATCEN) TYPE(*DEC)  LEN(1 0) +
+                          STG(*DEFINED) DEFVAR(&DS 130)
+             DCL        VAR(&DATCUR) TYPE(*DEC)  LEN(6 0) +
+                          STG(*DEFINED) DEFVAR(&DS 131)
+             DCL        VAR(&DATCYR) TYPE(*DEC)  LEN(2 0) +
+                          STG(*DEFINED) DEFVAR(&DS 135)
+             DCL        VAR(&DATPER) TYPE(*DEC)  LEN(2 0) +
+                          STG(*DEFINED) DEFVAR(&DS 137)
+             DCL        VAR(&DATCDY) TYPE(*DEC)  LEN(3 0) +
+                          STG(*DEFINED) DEFVAR(&DS 139)
+             DCL        VAR(&DATDAY) TYPE(*DEC)  LEN(1 0) +
+                          STG(*DEFINED) DEFVAR(&DS 141)
+             DCL        VAR(&DATLIT) TYPE(*CHAR) LEN(35) +
+                          STG(*DEFINED) DEFVAR(&DS 142)
+             DCL        VAR(&DATWKP) TYPE(*DEC)  LEN(1 0) +
+                          STG(*DEFINED) DEFVAR(&DS 177)
+             DCL        VAR(&DATWKY) TYPE(*DEC)  LEN(2 0) +
+                          STG(*DEFINED) DEFVAR(&DS 178)
+             DCL        VAR(&QDATE)  TYPE(*DEC)  LEN(6 0) +
+                          STG(*DEFINED) DEFVAR(&DS 180)
+             DCL        VAR(&HOMCNT) TYPE(*CHAR) LEN(3) +
+                          STG(*DEFINED) DEFVAR(&DS 184)
+             DCL        VAR(&HOMCUR) TYPE(*CHAR) LEN(3) +
+                          STG(*DEFINED) DEFVAR(&DS 187)
+             DCL        VAR(&HOMDEC) TYPE(*CHAR) LEN(1) +
+                          STG(*DEFINED) DEFVAR(&DS 190)
+             DCL        VAR(&HOMMTR) TYPE(*CHAR) LEN(1) +
+                          STG(*DEFINED) DEFVAR(&DS 191)
+             DCL        VAR(&DATCCN) TYPE(*DEC)  LEN(1 0) +
+                          STG(*DEFINED) DEFVAR(&DS 192)
+
+             DCL        VAR(&JOBDATE) TYPE(*CHAR) LEN(6)
+             DCL        VAR(&MDY)     TYPE(*CHAR) LEN(6)
+
+/* Keep whatever the caller passed (CANCOD in 1-8, unused tail)      */
+             CHGVAR     VAR(&DS) VALUE(&PARM1)
+
+/* MENUCTL record 1                                                  */
+             CHGVAR     VAR(&CTLSCR) VALUE('============================ +
+                          JDA Software (4R4) +
+                          ==============================')
+             CHGVAR     VAR(&CTLCTR) VALUE('       Variety +
+                          Wholesalers, Inc.')
+
+/* GETSTR - default store for the user                               */
+             CHGVAR     VAR(&DFTSTR) VALUE(0)
+
+/* INVDAT record 1 as of 2026-10-28                                  */
+             CHGVAR     VAR(&DATCEN) VALUE(1)
+             CHGVAR     VAR(&DATCUR) VALUE(261028)
+             CHGVAR     VAR(&DATCYR) VALUE(26)
+             CHGVAR     VAR(&DATPER) VALUE(9)
+             CHGVAR     VAR(&DATCDY) VALUE(270)
+             CHGVAR     VAR(&DATDAY) VALUE(4)
+             CHGVAR     VAR(&DATLIT) VALUE('Wednesday,Oct the +
+                          28th,2026')
+             CHGVAR     VAR(&DATWKP) VALUE(4)
+             CHGVAR     VAR(&DATWKY) VALUE(39)
+             CHGVAR     VAR(&DATCCN) VALUE(1)
+
+/* TBLCNTL1 first record                                             */
+             CHGVAR     VAR(&HOMCNT) VALUE('US')
+             CHGVAR     VAR(&HOMCUR) VALUE('USD')
+             CHGVAR     VAR(&HOMDEC) VALUE('0')
+             CHGVAR     VAR(&HOMMTR) VALUE('N')
+
+/* DATGET - system date as MMDDYY                                    */
+             RTVJOBA    DATE(&JOBDATE)
+             CVTDAT     DATE(&JOBDATE) TOVAR(&MDY) FROMFMT(*JOB) +
+                          TOFMT(*MDY) TOSEP(*NONE)
+             CHGVAR     VAR(&QDATE) VALUE(&MDY)
+
+             CHGVAR     VAR(&PARM1) VALUE(&DS)
+             RETURN
+             ENDPGM

@@ -1,0 +1,289 @@
+/*===================================================================*/
+/* PRFDUP01  Build Profound Logic demo library for INV046CL          */
+/*                                                                   */
+/* Creates source files in PRFDEMOLIB, copies the three verified     */
+/* program/screen source members, and duplicates the 22 file objects */
+/* needed to compile INV046CL / INV046 / INV046FM.                   */
+/*                                                                   */
+/* Files are duplicated with DATA(*NO) CST(*NO) TRG(*NO).            */
+/* Nothing is deleted or replaced. Objects/members already in        */
+/* PRFDEMOLIB are skipped, so the program is safe to rerun.          */
+/*                                                                   */
+/* Compile: CRTBNDCL PGM(PRFDEMOLIB/PRFDUP01)                        */
+/*                   SRCFILE(PRFDEMOLIB/QCLSRC) SRCMBR(PRFDUP01)     */
+/* Run:     CALL PRFDEMOLIB/PRFDUP01                                 */
+/*===================================================================*/
+             PGM
+
+             DCL        VAR(&TOLIB)   TYPE(*CHAR) LEN(10) +
+                          VALUE('PRFDEMOLIB')
+             DCL        VAR(&OBJ)     TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FROMLIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCF)    TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FRMSRCL) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&FRMSRCF) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MBR)     TYPE(*CHAR) LEN(10)
+             DCL        VAR(&SRCTYPE) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&TEXT)    TYPE(*CHAR) LEN(50)
+             DCL        VAR(&MSG)     TYPE(*CHAR) LEN(256)
+             DCL        VAR(&MSGID)   TYPE(*CHAR) LEN(7)
+             DCL        VAR(&DONE)    TYPE(*DEC)  LEN(3 0) VALUE(0)
+             DCL        VAR(&SKIP)    TYPE(*DEC)  LEN(3 0) VALUE(0)
+             DCL        VAR(&FAIL)    TYPE(*DEC)  LEN(3 0) VALUE(0)
+             DCL        VAR(&DONEC)   TYPE(*CHAR) LEN(3)
+             DCL        VAR(&SKIPC)   TYPE(*CHAR) LEN(3)
+             DCL        VAR(&FAILC)   TYPE(*CHAR) LEN(3)
+
+/*-------------------------------------------------------------------*/
+/* Step 0: target library must exist                                 */
+/*-------------------------------------------------------------------*/
+             CHKOBJ     OBJ(QSYS/&TOLIB) OBJTYPE(*LIB)
+             MONMSG     MSGID(CPF9800) EXEC(DO)
+                SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                             MSGDTA('Library PRFDEMOLIB not +
+                             found. Nothing done.') MSGTYPE(*ESCAPE)
+             ENDDO
+
+/*-------------------------------------------------------------------*/
+/* Step 1: source files                                              */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&SRCF) VALUE('QCLSRC')
+             CHGVAR     VAR(&TEXT) VALUE('Profound demo - CL source')
+             CALLSUBR   SUBR(MAKESRCF)
+
+             CHGVAR     VAR(&SRCF) VALUE('QRPGSRC')
+             CHGVAR     VAR(&TEXT) VALUE('Profound demo - RPG source')
+             CALLSUBR   SUBR(MAKESRCF)
+
+             CHGVAR     VAR(&SRCF) VALUE('QDDSSRC')
+             CHGVAR     VAR(&TEXT) VALUE('Profound demo - DDS source')
+             CALLSUBR   SUBR(MAKESRCF)
+
+/*-------------------------------------------------------------------*/
+/* Step 2: copy the verified source members                          */
+/*   (compile timestamps match these members exactly)                */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&FRMSRCL) VALUE('MM4R4SRC')
+             CHGVAR     VAR(&FRMSRCF) VALUE('MMSRC')
+             CHGVAR     VAR(&SRCF)    VALUE('QCLSRC')
+             CHGVAR     VAR(&MBR)     VALUE('INV046CL')
+             CHGVAR     VAR(&SRCTYPE) VALUE('CLP')
+             CALLSUBR   SUBR(COPYMBR)
+
+             CHGVAR     VAR(&FRMSRCL) VALUE('MMVWISRC')
+             CHGVAR     VAR(&FRMSRCF) VALUE('MMSRC')
+             CHGVAR     VAR(&SRCF)    VALUE('QRPGSRC')
+             CHGVAR     VAR(&MBR)     VALUE('INV046')
+             CHGVAR     VAR(&SRCTYPE) VALUE('RPG')
+             CALLSUBR   SUBR(COPYMBR)
+
+             CHGVAR     VAR(&FRMSRCL) VALUE('MMVWISRC')
+             CHGVAR     VAR(&FRMSRCF) VALUE('MMSRC')
+             CHGVAR     VAR(&SRCF)    VALUE('QDDSSRC')
+             CHGVAR     VAR(&MBR)     VALUE('INV046FM')
+             CHGVAR     VAR(&SRCTYPE) VALUE('DSPF')
+             CALLSUBR   SUBR(COPYMBR)
+
+/*-------------------------------------------------------------------*/
+/* Step 3: duplicate file objects (no data, constraints, triggers)   */
+/*   Physical files first. TBLSTRL1/L2 must follow TBLSTR so they    */
+/*   are based on PRFDEMOLIB/TBLSTR, not the production file.        */
+/*-------------------------------------------------------------------*/
+/* Clear source-step variables so error messages name only the file  */
+             CHGVAR     VAR(&MBR)  VALUE(' ')
+             CHGVAR     VAR(&SRCF) VALUE(' ')
+
+/* MM4R4CTL - reference / control files                              */
+             CHGVAR     VAR(&FROMLIB) VALUE('MM4R4CTL')
+             CHGVAR     VAR(&OBJ) VALUE('JDAREF')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('OPTTAB')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('MENUCTL')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('OPTIONS')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('SYS001ED')
+             CALLSUBR   SUBR(DUPFILE)
+
+/* MM4R4LIB - application physical files                             */
+             CHGVAR     VAR(&FROMLIB) VALUE('MM4R4LIB')
+             CHGVAR     VAR(&OBJ) VALUE('INVMST')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('INVBAL')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('INVCBL')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('INVADI')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('INVUPC')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('TBLSTR')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('TBLREG')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('TBLDST')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('TBLADI')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('TBLIGH')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('TBLIGD')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('POMHDR')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('POMDTL')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('POMRCD')
+             CALLSUBR   SUBR(DUPFILE)
+
+/* MM4R4LIB - logical files over TBLSTR (after TBLSTR)               */
+             CHGVAR     VAR(&OBJ) VALUE('TBLSTRL1')
+             CALLSUBR   SUBR(DUPFILE)
+             CHGVAR     VAR(&OBJ) VALUE('TBLSTRL2')
+             CALLSUBR   SUBR(DUPFILE)
+
+/* CUSTOMR - VWI custom file                                         */
+             CHGVAR     VAR(&FROMLIB) VALUE('CUSTOMR')
+             CHGVAR     VAR(&OBJ) VALUE('TBL800')
+             CALLSUBR   SUBR(DUPFILE)
+
+/*-------------------------------------------------------------------*/
+/* Step 4: summary                                                   */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&DONEC) VALUE(&DONE)
+             CHGVAR     VAR(&SKIPC) VALUE(&SKIP)
+             CHGVAR     VAR(&FAILC) VALUE(&FAIL)
+             CHGVAR     VAR(&MSG) VALUE('PRFDUP01 complete. Created:' +
+                          *BCAT &DONEC *BCAT 'Skipped:' *BCAT &SKIPC +
+                          *BCAT 'Failed:' *BCAT &FAILC +
+                          *BCAT '(see job log)')
+             IF         COND(&FAIL *GT 0) THEN(DO)
+                SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                             MSGTYPE(*ESCAPE)
+             ENDDO
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                          MSGTYPE(*COMP)
+             RETURN
+
+/*===================================================================*/
+/* MAKESRCF: create a source file in &TOLIB if it does not exist     */
+/*===================================================================*/
+             SUBR       SUBR(MAKESRCF)
+             CHKOBJ     OBJ(&TOLIB/&SRCF) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+                CRTSRCPF   FILE(&TOLIB/&SRCF) RCDLEN(92) +
+                             CCSID(37) TEXT(&TEXT)
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAIL) VALUE(&FAIL + 1)
+                   CALLSUBR   SUBR(LOGERR)
+                   RTNSUBR
+                ENDDO
+                CHGVAR     VAR(&DONE) VALUE(&DONE + 1)
+                CALLSUBR   SUBR(LOGINFO)
+                RTNSUBR
+             ENDDO
+             CHGVAR     VAR(&SKIP) VALUE(&SKIP + 1)
+             CHGVAR     VAR(&MSG) VALUE('Source file' *BCAT &SRCF +
+                          *BCAT 'already exists - skipped')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                          MSGTYPE(*INFO)
+             ENDSUBR
+
+/*===================================================================*/
+/* COPYMBR: copy one source member, then set its source type         */
+/*===================================================================*/
+             SUBR       SUBR(COPYMBR)
+             CHKOBJ     OBJ(&TOLIB/&SRCF) OBJTYPE(*FILE) MBR(&MBR)
+             MONMSG     MSGID(CPF9815) EXEC(DO)
+                CPYSRCF    FROMFILE(&FRMSRCL/&FRMSRCF) +
+                             TOFILE(&TOLIB/&SRCF) FROMMBR(&MBR) +
+                             TOMBR(*FROMMBR) MBROPT(*ADD)
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAIL) VALUE(&FAIL + 1)
+                   CALLSUBR   SUBR(LOGERR)
+                   RTNSUBR
+                ENDDO
+                CHGPFM     FILE(&TOLIB/&SRCF) MBR(&MBR) +
+                             SRCTYPE(&SRCTYPE)
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAIL) VALUE(&FAIL + 1)
+                   CALLSUBR   SUBR(LOGERR)
+                   RTNSUBR
+                ENDDO
+                CHGVAR     VAR(&DONE) VALUE(&DONE + 1)
+                CHGVAR     VAR(&MSG) VALUE('Copied' *BCAT &FRMSRCL +
+                             *TCAT '/' *CAT &FRMSRCF *TCAT '(' *CAT +
+                             &MBR *TCAT ') to' *BCAT &SRCF)
+                SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                             MSGTYPE(*INFO)
+                RTNSUBR
+             ENDDO
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+                CHGVAR     VAR(&FAIL) VALUE(&FAIL + 1)
+                CHGVAR     VAR(&MSG) VALUE('Source file' *BCAT &SRCF +
+                             *BCAT 'missing - member' *BCAT &MBR +
+                             *BCAT 'not copied')
+                SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                             MSGTYPE(*DIAG)
+                RTNSUBR
+             ENDDO
+             CHGVAR     VAR(&SKIP) VALUE(&SKIP + 1)
+             CHGVAR     VAR(&MSG) VALUE('Member' *BCAT &MBR *BCAT +
+                          'already in' *BCAT &SRCF *BCAT '- skipped')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                          MSGTYPE(*INFO)
+             ENDSUBR
+
+/*===================================================================*/
+/* DUPFILE: duplicate one file object, no data/constraints/triggers  */
+/*===================================================================*/
+             SUBR       SUBR(DUPFILE)
+             CHKOBJ     OBJ(&TOLIB/&OBJ) OBJTYPE(*FILE)
+             MONMSG     MSGID(CPF9801) EXEC(DO)
+                CRTDUPOBJ  OBJ(&OBJ) FROMLIB(&FROMLIB) +
+                             OBJTYPE(*FILE) TOLIB(&TOLIB) +
+                             DATA(*NO) CST(*NO) TRG(*NO)
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAIL) VALUE(&FAIL + 1)
+                   CALLSUBR   SUBR(LOGERR)
+                   RTNSUBR
+                ENDDO
+                CHGVAR     VAR(&DONE) VALUE(&DONE + 1)
+                CHGVAR     VAR(&MSG) VALUE('Duplicated' *BCAT +
+                             &FROMLIB *TCAT '/' *CAT &OBJ)
+                SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                             MSGTYPE(*INFO)
+                RTNSUBR
+             ENDDO
+             CHGVAR     VAR(&SKIP) VALUE(&SKIP + 1)
+             CHGVAR     VAR(&MSG) VALUE(&OBJ *BCAT 'already in' +
+                          *BCAT &TOLIB *BCAT '- skipped')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                          MSGTYPE(*INFO)
+             ENDSUBR
+
+/*===================================================================*/
+/* LOGINFO: note a created source file                               */
+/*===================================================================*/
+             SUBR       SUBR(LOGINFO)
+             CHGVAR     VAR(&MSG) VALUE('Created source file' *BCAT +
+                          &TOLIB *TCAT '/' *CAT &SRCF)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                          MSGTYPE(*INFO)
+             ENDSUBR
+
+/*===================================================================*/
+/* LOGERR: pull the last escape message and log it as a diagnostic   */
+/*===================================================================*/
+             SUBR       SUBR(LOGERR)
+             RCVMSG     MSGTYPE(*EXCP) RMV(*NO) MSG(&MSG) MSGID(&MSGID)
+             MONMSG     MSGID(CPF0000)
+             CHGVAR     VAR(&MSG) VALUE('FAILED' *BCAT &OBJ *BCAT &MBR +
+                          *BCAT &SRCF *BCAT ':' *BCAT &MSGID *BCAT +
+                          &MSG)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                          MSGTYPE(*DIAG)
+             ENDSUBR
+
+             ENDPGM

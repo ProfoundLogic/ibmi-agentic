@@ -1,0 +1,220 @@
+/*===================================================================*/
+/* PRFLOAD03  Load sample data into PRFDEMOLIB for the TS0110 demo   */
+/*                                                                   */
+/* TS0110 lists a whole department for one store. Slice: every SKU   */
+/* in department 12 (145 in production, 1 already loaded: 849528)   */
+/* x the 10 demo stores from PRFLOAD01, plus the warehouses those    */
+/* stores ship from (9001, 9002).                                    */
+/*                                                                   */
+/* Expected new rows after a clean run (6,277 total, 9 statements):  */
+/*   INVMST 144  INVCBL 131  INVBAL 1,284 store + 258 warehouse      */
+/*   INVBAL1 1,030 (last year)  RPLPRF 1,230  ITMRTL 144             */
+/*   INVDPT 337 (all hierarchy levels of dept 12)                    */
+/*   TRFDTL 1,719 open transfers from 9001/9002                      */
+/* Not loaded: PHPF/PHPFW2 (no dept 12 rows in production), TRFZST   */
+/* (no matches), STR001WK (written by F10 only).                     */
+/*                                                                   */
+/* Rows are copied unchanged. The TRFDTL filter is the same open-    */
+/* transfer test TRF840A applies (status A, or S with shipped <      */
+/* allocated); closed transfers would not change any figure.         */
+/*                                                                   */
+/* Reads production with SELECT only. Writes only to PRFDEMOLIB.     */
+/* Every INSERT skips rows already present (NOT EXISTS), so the      */
+/* program is safe to rerun. Nothing is deleted.                     */
+/*                                                                   */
+/* Compile: CRTBNDCL PGM(PRFDEMOLIB/PRFLOAD03)                       */
+/*                   SRCFILE(PRFDEMOLIB/QCLSRC) SRCMBR(PRFLOAD03)    */
+/* Run:     CALL PRFDEMOLIB/PRFLOAD03                                */
+/*===================================================================*/
+             PGM
+
+             DCL        VAR(&SQL)   TYPE(*CHAR) LEN(2000)
+             DCL        VAR(&STEP)  TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MSG)   TYPE(*CHAR) LEN(256)
+             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7)
+             DCL        VAR(&OK)    TYPE(*DEC)  LEN(3 0) VALUE(0)
+             DCL        VAR(&FAIL)  TYPE(*DEC)  LEN(3 0) VALUE(0)
+             DCL        VAR(&OKC)   TYPE(*CHAR) LEN(3)
+             DCL        VAR(&FAILC) TYPE(*CHAR) LEN(3)
+
+/* Sample keys - change here only                                    */
+             DCL        VAR(&DEPT) TYPE(*CHAR) LEN(5) VALUE('12')
+             DCL        VAR(&STRS) TYPE(*CHAR) LEN(100) +
+                          VALUE('205,262,458,188,406,535,1838,499,+
+                          215,257')
+             DCL        VAR(&WHS) TYPE(*CHAR) LEN(30) +
+                          VALUE('9001,9002')
+/* Department SKUs, taken from production so step order is free      */
+             DCL        VAR(&DSKU) TYPE(*CHAR) LEN(80)
+             CHGVAR     VAR(&DSKU) VALUE('(SELECT X.INUMBR FROM +
+                          MM4R4LIB.INVMST X WHERE X.IDEPT = ' *TCAT +
+                          &DEPT *TCAT ')')
+
+             CHKOBJ     OBJ(QSYS/PRFDEMOLIB) OBJTYPE(*LIB)
+             MONMSG     MSGID(CPF9800) EXEC(DO)
+                SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                             MSGDTA('Library PRFDEMOLIB not +
+                             found. Nothing done.') MSGTYPE(*ESCAPE)
+             ENDDO
+
+/*-------------------------------------------------------------------*/
+/* Item master - all SKUs in the department                          */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&STEP) VALUE('INVMST')
+             CHGVAR     VAR(&SQL) VALUE('INSERT INTO +
+                          PRFDEMOLIB.INVMST SELECT P.* FROM +
+                          MM4R4LIB.INVMST P WHERE P.IDEPT = ' +
+                          *TCAT &DEPT *TCAT ' AND NOT EXISTS +
+                          (SELECT 1 FROM PRFDEMOLIB.INVMST D WHERE +
+                          D.INUMBR = P.INUMBR)')
+             CALLSUBR   SUBR(RUNIT)
+
+/*-------------------------------------------------------------------*/
+/* Chain balances (keeps INV046/INV502 consistent for the new SKUs)  */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&STEP) VALUE('INVCBL')
+             CHGVAR     VAR(&SQL) VALUE('INSERT INTO +
+                          PRFDEMOLIB.INVCBL SELECT P.* FROM +
+                          MM4R4LIB.INVCBL P WHERE P.INUMBR IN ' +
+                          *TCAT &DSKU *TCAT ' AND NOT EXISTS +
+                          (SELECT 1 FROM PRFDEMOLIB.INVCBL D WHERE +
+                          D.INUMBR = P.INUMBR)')
+             CALLSUBR   SUBR(RUNIT)
+
+/*-------------------------------------------------------------------*/
+/* Store balances - department x 10 demo stores                      */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&STEP) VALUE('INVBAL-STR')
+             CHGVAR     VAR(&SQL) VALUE('INSERT INTO +
+                          PRFDEMOLIB.INVBAL SELECT P.* FROM +
+                          MM4R4LIB.INVBAL P WHERE P.INUMBR IN ' +
+                          *TCAT &DSKU *TCAT ' AND P.ISTORE IN (' +
+                          *TCAT &STRS *TCAT ') AND NOT EXISTS +
+                          (SELECT 1 FROM PRFDEMOLIB.INVBAL D WHERE +
+                          D.INUMBR = P.INUMBR AND D.ISTORE = +
+                          P.ISTORE)')
+             CALLSUBR   SUBR(RUNIT)
+
+/*-------------------------------------------------------------------*/
+/* Warehouse balances - department x 9001/9002 (warehouse available) */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&STEP) VALUE('INVBAL-WHS')
+             CHGVAR     VAR(&SQL) VALUE('INSERT INTO +
+                          PRFDEMOLIB.INVBAL SELECT P.* FROM +
+                          MM4R4LIB.INVBAL P WHERE P.INUMBR IN ' +
+                          *TCAT &DSKU *TCAT ' AND P.ISTORE IN (' +
+                          *TCAT &WHS *TCAT ') AND NOT EXISTS +
+                          (SELECT 1 FROM PRFDEMOLIB.INVBAL D WHERE +
+                          D.INUMBR = P.INUMBR AND D.ISTORE = +
+                          P.ISTORE)')
+             CALLSUBR   SUBR(RUNIT)
+
+/*-------------------------------------------------------------------*/
+/* Last-year balances - department x 10 demo stores (TY & LY)        */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&STEP) VALUE('INVBAL1')
+             CHGVAR     VAR(&SQL) VALUE('INSERT INTO +
+                          PRFDEMOLIB.INVBAL1 SELECT P.* FROM +
+                          MM4R4LIB.INVBAL1 P WHERE P.INUMBR IN ' +
+                          *TCAT &DSKU *TCAT ' AND P.ISTORE IN (' +
+                          *TCAT &STRS *TCAT ') AND NOT EXISTS +
+                          (SELECT 1 FROM PRFDEMOLIB.INVBAL1 D WHERE +
+                          D.INUMBR = P.INUMBR AND D.ISTORE = +
+                          P.ISTORE)')
+             CALLSUBR   SUBR(RUNIT)
+
+/*-------------------------------------------------------------------*/
+/* Replenishment profile cross-reference (drives the Y/N flag)       */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&STEP) VALUE('RPLPRF')
+             CHGVAR     VAR(&SQL) VALUE('INSERT INTO +
+                          PRFDEMOLIB.RPLPRF SELECT P.* FROM +
+                          MM4R4LIB.RPLPRF P WHERE P.INUMBR IN ' +
+                          *TCAT &DSKU *TCAT ' AND P.ISTORE IN (' +
+                          *TCAT &STRS *TCAT ') AND NOT EXISTS +
+                          (SELECT 1 FROM PRFDEMOLIB.RPLPRF D WHERE +
+                          D.INUMBR = P.INUMBR AND D.ISTORE = +
+                          P.ISTORE)')
+             CALLSUBR   SUBR(RUNIT)
+
+/*-------------------------------------------------------------------*/
+/* Current retail by price zone                                      */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&STEP) VALUE('ITMRTL')
+             CHGVAR     VAR(&SQL) VALUE('INSERT INTO +
+                          PRFDEMOLIB.ITMRTL SELECT P.* FROM +
+                          CUSTOMR.ITMRTL P WHERE P.SKU IN ' +
+                          *TCAT &DSKU *TCAT ' AND NOT EXISTS +
+                          (SELECT 1 FROM PRFDEMOLIB.ITMRTL D WHERE +
+                          D.SKU = P.SKU)')
+             CALLSUBR   SUBR(RUNIT)
+
+/*-------------------------------------------------------------------*/
+/* Merchandise hierarchy - every level of the department             */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&STEP) VALUE('INVDPT')
+             CHGVAR     VAR(&SQL) VALUE('INSERT INTO +
+                          PRFDEMOLIB.INVDPT SELECT P.* FROM +
+                          MM4R4LIB.INVDPT P WHERE P.IDEPT = ' +
+                          *TCAT &DEPT *TCAT ' AND NOT EXISTS +
+                          (SELECT 1 FROM PRFDEMOLIB.INVDPT D WHERE +
+                          D.IDEPT = P.IDEPT AND D.ISDEPT = P.ISDEPT +
+                          AND D.ICLAS = P.ICLAS AND D.ISCLAS = +
+                          P.ISCLAS)')
+             CALLSUBR   SUBR(RUNIT)
+
+/*-------------------------------------------------------------------*/
+/* Open transfers from 9001/9002 (TRF840A allocated quantity)        */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&STEP) VALUE('TRFDTL')
+             CHGVAR     VAR(&SQL) VALUE('INSERT INTO +
+                          PRFDEMOLIB.TRFDTL SELECT P.* FROM +
+                          MM4R4LIB.TRFDTL P WHERE P.INUMBR IN ' +
+                          *TCAT &DSKU *TCAT ' AND P.TRFFLC IN (' +
+                          *TCAT &WHS *TCAT ') AND (P.TRFSTS = +
+                          ''A'' OR (P.TRFSTS = ''S'' AND P.TRFSHP < +
+                          P.TRFALC)) AND NOT EXISTS (SELECT 1 FROM +
+                          PRFDEMOLIB.TRFDTL D WHERE D.TRFBCH = +
+                          P.TRFBCH AND D.INUMBR = P.INUMBR)')
+             CALLSUBR   SUBR(RUNIT)
+
+/*-------------------------------------------------------------------*/
+/* Summary                                                           */
+/*-------------------------------------------------------------------*/
+             CHGVAR     VAR(&OKC)   VALUE(&OK)
+             CHGVAR     VAR(&FAILC) VALUE(&FAIL)
+             CHGVAR     VAR(&MSG) VALUE('PRFLOAD03 complete. +
+                          Statements OK:' *BCAT &OKC *BCAT +
+                          'Failed:' *BCAT &FAILC *BCAT +
+                          '(see job log)')
+             IF         COND(&FAIL *GT 0) THEN(DO)
+                SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                             MSGTYPE(*ESCAPE)
+             ENDDO
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                          MSGTYPE(*COMP)
+             RETURN
+
+/*===================================================================*/
+/* RUNIT: run one INSERT, log the outcome                            */
+/*===================================================================*/
+             SUBR       SUBR(RUNIT)
+             RUNSQL     SQL(&SQL) COMMIT(*NONE) NAMING(*SQL)
+             MONMSG     MSGID(CPF0000 SQL0000) EXEC(DO)
+                CHGVAR     VAR(&FAIL) VALUE(&FAIL + 1)
+                RCVMSG     MSGTYPE(*EXCP) RMV(*NO) MSG(&MSG) +
+                             MSGID(&MSGID)
+                MONMSG     MSGID(CPF0000)
+                CHGVAR     VAR(&MSG) VALUE('FAILED' *BCAT &STEP +
+                             *BCAT ':' *BCAT &MSGID *BCAT &MSG)
+                SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                             MSGTYPE(*DIAG)
+                RTNSUBR
+             ENDDO
+             CHGVAR     VAR(&OK) VALUE(&OK + 1)
+             CHGVAR     VAR(&MSG) VALUE('Loaded' *BCAT &STEP)
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                          MSGTYPE(*INFO)
+             ENDSUBR
+
+             ENDPGM

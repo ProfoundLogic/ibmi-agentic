@@ -1,0 +1,43 @@
+/*===================================================================*/
+/* CLTS0111  DEMO STUB - replaces IMSLIB/CLTS0111 in PRFDEMOLIB      */
+/*                                                                   */
+/* TS0110 F10 (Create Distribution) submits this program with        */
+/* SBMJOB ... JOBD(IMSJOB1) INLLIBL(*JOBD). PRFDEMOLIB/IMSJOB1 runs  */
+/* it with library list QTEMP PRFDEMOLIB QGPL, so this stub is the   */
+/* CLTS0111 found.                                                   */
+/*                                                                   */
+/* The production program copies the STR001WK member into the JDA    */
+/* interface file and calls SDI195CL to create JDA transfers. This   */
+/* stub does none of that. It only reports the member and its record */
+/* count in the job log and leaves the member in place so the        */
+/* distribution F10 wrote can be inspected.                          */
+/*                                                                   */
+/* Compile: CRTBNDCL PGM(PRFDEMOLIB/CLTS0111)                        */
+/*                   SRCFILE(PRFDEMOLIB/QCLSRC) SRCMBR(CLTS0111)     */
+/*===================================================================*/
+             PGM        PARM(&MEMBER)
+
+             DCL        VAR(&MEMBER) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&NBR)    TYPE(*DEC)  LEN(10 0) VALUE(0)
+             DCL        VAR(&NBRC)   TYPE(*CHAR) LEN(10)
+             DCL        VAR(&MSG)    TYPE(*CHAR) LEN(256)
+
+             RTVMBRD    FILE(STR001WK) MBR(&MEMBER) NBRCURRCD(&NBR)
+             MONMSG     MSGID(CPF0000) EXEC(DO)
+                CHGVAR     VAR(&MSG) VALUE('Demo CLTS0111: member' +
+                             *BCAT &MEMBER *BCAT 'not found in +
+                             STR001WK. No transfers created.')
+                SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                             MSGTYPE(*COMP)
+                RETURN
+             ENDDO
+
+             CHGVAR     VAR(&NBRC) VALUE(&NBR)
+             CHGVAR     VAR(&MSG) VALUE('Demo CLTS0111: distribution +
+                          member' *BCAT &MEMBER *BCAT 'has' *BCAT +
+                          &NBRC *BCAT 'record(s). No JDA transfers +
+                          created (demo stub).')
+             SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&MSG) +
+                          MSGTYPE(*COMP)
+
+             ENDPGM

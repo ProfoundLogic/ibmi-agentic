@@ -1,0 +1,1186 @@
+      * @MBRTEXT: INQ - CURRENT MONTH INVENTORY BAL FOR ALL STORES
+/* @#$* Copyright Statement ********* Do not remove *********/
+/************************************************************/
+/************************************************************/
+/******                                                 *****/
+/******  Copyright JDA Software Services Inc. All       *****/
+/******  rights reserved. This program is protected     *****/
+/******  by the copyright Act of 1976, as amended, as   *****/
+/******  an unpublished work and the foregoing notice   *****/
+/******  and legend shall not be deemed to constitute   *****/
+/******  publication or an intent to publish thereunder.*****/
+/******  This program is proprietary and confidential   *****/
+/******  information of JDA Software Services Inc., and *****/
+/******  may be disclosed and used only as authorized   *****/
+/******  in the license Agreement controlling such      *****/
+/******  disclosure and use.                            *****/
+/******                                                 *****/
+/************************************************************/
+/************************************************************/
+     F*****************************************************************
+     F*    THIS PROGRAM WAS WRITTEN BY YUEY LOW  -  JULY 31,1986      *
+     F*****************************************************************
+     F*                                                               *
+     F*  PROGRAM DOES THE FOLLOWING:                                  *
+     F*                                                               *
+     F*    CURRENT PERIOD INQUIRY TO INVENTORY BALANCES FOR ALL
+     F*    STORES                                                     *
+     F*                                                               *
+     F*****************************************************************
+     F* 01/16/02 - MODIFIED TO ADD STORE GROUP INVENTORY INQUIRY     *
+     F*            FUNCTIONALITY (F6).                      BWE      *
+     F*****************************************************************
+     F* 03/27/02 - Kay R. Ayscue                                     *
+     F*            Modified crtpf command to not print source listing*
+     F*            when file is created.                             *
+     F* -------------------------------------------------------------*
+     F* 06/06/12 Moss - Modified to add POS flag for stores.         *
+     F*                                                              *
+     F*****************************************************************
+     FINV046FMCF  E                    WORKSTN      KINFDS INFDS
+     F                                        RRN   KSFILE SCRN2
+     FOPTIONS IF  E           K        DISK                           UC
+     FINVMST  IF  E           K        DISK
+     FINVBAL  IF  E           K        DISK
+     FTBLSTR  IF  E           K        DISK
+     FTBLSTRL1IF  E           K        DISK
+     F            RTBLSTR                           KRENAMEL1FILE
+     FTBLSTRL2IF  E           K        DISK
+     F            RTBLSTR                           KRENAMEL2FILE
+     FTBLREG  IF  E           K        DISK
+     FTBLDST  IF  E           K        DISK
+     FTBLADI  IF  E           K        DISK
+     FINVADI  IF  E           K        DISK
+     FTBLIGH  IF  E           K        DISK
+     FTBLIGD  IF  E           K        DISK
+     FINVCBL  IF  E           K        DISK
+     FTBL800  IF  E           K        DISK
+     E* ------------------------------------------------------------------
+     E*           A R R A Y            S P E C I F I C A T I O N S
+     E* ------------------------------------------------------------------
+     E                    MSG     1  13 60
+     E                    TTL     1   2 40                TITLES
+     E                    RDS     1   5 15               RDS DESC
+     E                    SRC     1   5 11               SEARCH
+     E                    ASL         8  5 0              8 Wk Sls Avg
+     E                    CASL        8  7 0              8 Wk Sls Avg
+     E                    CMD     1   2 64               Message data
+     I              'CRTPF FILE(QTEMP/WRK-C         CRTPFC
+     I              'SGB) SRCFILE(CUSTOMR-
+     I              '/QDDSSRC) SRCMBR(WRK-
+     I              'SGB) OPTION(*NOSRC *-
+     I              'NOLIST)'
+     I            DS
+     I                                        1  400ASL
+     I                                        1   50IBWK01
+     I                                        6  100IBWK02
+     I                                       11  150IBWK03
+     I                                       16  200IBWK04
+     I                                       21  250IBWK05
+     I                                       26  300IBWK06
+     I                                       31  350IBWK07
+     I                                       36  400IBWK08
+     I            DS
+     I                                        1  560CASL
+     I                                        1   70CBWK01
+     I                                        8  140CBWK02
+     I                                       15  210CBWK03
+     I                                       22  280CBWK04
+     I                                       29  350CBWK05
+     I                                       36  420CBWK06
+     I                                       43  490CBWK07
+     I                                       50  560CBWK08
+     I*
+     I          E DSSYS001ED
+     I*           SYSTEM EXTERNAL DATA STRUCTURE
+     I                                        1 256 PARM1
+     I*
+     I           SDS
+     I*           PROGRAM DATA STRUCTURE
+     I                                     *PROGRAM QPROG                 Screen
+     I                                     *PARMS   QPARMS                Number
+     I                                      244 253 QJOBN                 System
+     I                                      254 263 QUSER                 System
+     IINFDS       DS
+     I                                    B 378 3790SFLLOC
+     C*
+     C           *ENTRY    PLIST
+     C                     PARM           INSKU
+     C*
+     C                     EXSR HSEKPG
+     C*
+     C                     MOVE 'INZ01 '  STEP    6
+     C*
+     C********************************************************************
+     C* M A I N L I N E
+     C* ------------------------------------------------------------------
+     C*
+     C           STEP      DOUEQ*BLANK
+     C*
+     C           STEP      CASEQ'INZ01 '  INZ01
+     C*
+     C           STEP      CASEQ'DSP01 '  DSP01
+     C*
+     C           STEP      CASEQ'EDT01 '  EDT01
+     C*
+     C           STEP      CASEQ'EDT02 '  EDT02
+     C*
+     C                     CAS            ENDJOB
+     C*
+     C                     ENDCS
+     C*
+     C                     ENDDO
+     C*****************************************************************
+     C* S U B R O U T I N E S
+     C* ---------------------------------------------------------------
+     C* INZ01  - INITIALIZE SCREEN 1
+     C* ---------------------------------------------------------------
+     C*
+     C           INZ01     BEGSR
+     C*
+     C                     MOVE 'DSP01 '  STEP
+     C*
+     C           INUMBR    IFGT 0
+     C                     SETON                     02
+     C           INUMBR    CHAININVMST               99
+     C           *IN99     IFEQ '1'
+     C                     GOTO INZ01Z
+     C                     END
+     C                     ELSE
+     C                     GOTO INZ01Z
+     C                     END
+     C*
+     C                     EXSR NOP01
+     C*
+     C           INZ01Z    ENDSR
+     C* ------------------------------------------------------------------
+     C* DSP01    DISPLAY SCREEN 1
+     C* ------------------------------------------------------------------
+     C           DSP01     BEGSR
+     C*
+     C                     WRITESCRN3
+     C                     EXFMTSCRN1                      SCRN1
+     C*
+     C                     MOVE *BLANKS   ERROR
+     C                     MOVEA'00'      *IN,20
+     C                     MOVEA'000'     *IN,26
+     C*
+     C* CMD 1 EXIT PROGRAM
+     C*
+     C           *INKA     IFEQ '1'
+     C           QPARMS    IFLE 1
+     C                     EXSR ENDJOB
+     C                     ELSE
+     C                     EXSR EXIT
+     C                     END
+     C                     END
+     C*
+     C                     Z-ADDSFLLOC    SFSTRT
+     C*
+     C* CMD 3 SKU SEARCH
+     C*
+     C           *INKC     IFEQ '1'
+     C                     CALL 'INV002'
+     C                     PARM           INUMBR
+     C                     MOVE *BLANKS   IDESCR
+     C           INUMBR    CHAININVMST               99
+     C           *IN99     IFEQ '1'
+     C                     MOVE MSG,1     ERROR
+     C                     SETON                     022021
+     C                     MOVE 'INZ01 '  STEP
+     C                     GOTO DSP01Z
+     C                     END
+     C                     SETON                     02
+     C                     MOVE 'INZ01 '  STEP
+     C                     GOTO DSP01Z
+     C                     END                             END IF KC
+     C*
+     C* CMD 5 TOGGLE PTD/YTD
+     C*
+     C           *INKE     IFEQ '1'
+     C           1         SUB  TOG       TOG
+     C                     MOVE TOG       *IN,41
+     C                     SETON                     02
+     C                     MOVE 'INZ01 '  STEP
+     C                     GOTO DSP01Z
+     C                     END
+     C*
+     C* SEARCH GROUP
+     C           *INKD     IFEQ '1'
+     C                     SELEC
+     C           INRDS     WHEQ 'R'
+     C                     CALL 'TBL048'
+     C                     PARM 0         INREGX  30
+     C           INREGX    IFNE 0
+     C                     Z-ADDINREGX    INSTR
+     C                     END
+     C*
+     C           INRDS     WHEQ 'D'
+     C                     CALL 'TBL049'
+     C                     PARM 0         INREGX
+     C           INREGX    IFNE 0
+     C                     Z-ADDINREGX    INSTR
+     C                     END
+     C*
+     C           INRDS     WHEQ 'S'
+     C                     CALL 'TBL009'
+     C                     PARM 0         XXSTR
+     C           XXSTR     IFNE 0
+     C                     Z-ADDXXSTR     INSTR
+     C                     END
+     C*
+     C           INRDS     WHEQ 'G'
+     C                     CALL 'TBL018'
+     C                     PARM 0         INREGX
+     C           INREGX    IFNE 0
+     C                     Z-ADDINREGX    INSTR
+     C                     END
+     C*
+     C           INRDS     WHEQ 'I'
+     C                     CALL 'TBL064'
+     C                     PARM 0         INREGX
+     C           INREGX    IFNE 0
+     C                     Z-ADDINREGX    INSTR
+     C                     END
+     C                     ENDSL
+     C*
+     C           INSTR     IFGT 0
+     C                     SETON                     02
+     C                     ENDIF
+     C                     END                             *INKD='1'
+     C*
+     C* F6 = STORE GROUP INVENTORY INQUIRY
+     C           *INKF     IFEQ '1'
+     C*
+     C                     MOVELCMD,1     SBM
+     C                     CALL 'QCMDEXC' CMDEXC       30  Clear workfile
+     C           *IN30     IFEQ '1'                        If error,
+     C*kra                 MOVELCMD,2     SBM              Create workfile
+     C                     MOVE *BLANKS   SBM
+     C                     MOVELCRTPFC    SBM              Create workfile
+     C                     CALL 'QCMDEXC' CMDEXC       30
+     C                     ENDIF
+     C*
+     C                     CALL 'INV860'  INV860
+     C                     CALL 'INV861'  INV861
+     C                     ENDIF
+     C*
+     C*
+     C* F7 = INV EVALUATION INQ W/ PRICE & COST
+     C           *INKG     IFEQ '1'
+     C                     MOVE *ON       FLG417
+     C                     CALL 'INV417'  INV417
+     C                     END
+     C*
+     C* F8 = CHAIN INVENTORY INQS
+     C           *INKH     IFEQ '1'
+     C                     CALL 'INV416'
+     C                     PARM INUMBR    XXSKU
+     C                     END
+     C*
+     C*-------------------------------------------------------
+     C* SEE IF THERE WAS A SELECTION (IF SUBFILE NOT EMPTY)
+     C*
+     C           *IN51     IFEQ '1'
+     C                     SETOF                     90
+     C                     READCSCRN2                    90
+     C           *IN90     DOWEQ'0'
+     C*
+     C           SEL       IFEQ 'I'
+     C                     EXSR CALC
+     C                     END
+     C*
+     C                     MOVE ' '       SEL
+     C                     UPDATSCRN2
+     C*
+     C                     READCSCRN2                    90
+     C                     END                             END DO 90
+     C                     END                             END IF 51
+     C*
+     C*-------------------------------------------------------
+     C* NEW SEARCH FIELD ENTERED?
+     C*
+     C* INDICATOR 02 - ONE OR MORE FIELDS ON SCRN1 CHANGED.
+     C*
+     C* ONE OR MORE SELECTION FIELDS HAVE CHANGED.
+     C*
+     C           *IN02     IFEQ '1'
+     C                     MOVE 'EDT02 '  STEP
+     C                     GOTO DSP01Z
+     C                     END
+     C*
+     C*-------------------------------------------------------
+     C* ROLLUP KEY ACTIVATED, LOAD NEXT PAGE
+     C*
+     C* INDICATOR 03 MEANS THE ROLLUP KEY WAS PRESSED AND SUB-FILE
+     C* WAS FULL, THEREFORE, FILL UP ANOTHER SUBFILE PAGE.
+     C*
+     C           *IN03     IFEQ '1'
+     C                     EXSR LSF01
+     C                     END
+     C*
+     C* *IN51 IS SET TO "0" WHEN THE SUBFILE IS EMPTY.
+     C*
+     C  N51                GOTO DSP01Z
+     C*
+     C* OTHERWISE READ THE CHANGES TO THE SUBFILE AND EDIT.
+     C*
+     C                     MOVE 'EDT01 '  STEP
+     C*
+     C           DSP01Z    ENDSR
+     C********************************************************************
+     C* NOP01  - NEW OPTION ON SCREEN                                    *
+     C********************************************************************
+     C           NOP01     BEGSR
+     C*
+     C                     Z-ADD0         TOHAND
+     C                     Z-ADD0         TONORD
+     C                     Z-ADD0         TOTSLS
+     C                     Z-ADD0         TOTREC
+     C                     Z-ADD0         TOTIO
+     C                     Z-ADD0         TOTADF
+     C                     Z-ADD0         TOTWHS
+     C                     Z-ADD0         TOTDIV
+     C*
+     C                     Z-ADD0         TOH
+     C                     Z-ADD0         TORD
+     C                     Z-ADD0         TSLS
+     C                     Z-ADD0         TREC
+     C                     Z-ADD0         TTFR
+     C                     Z-ADD0         TADJ
+     C                     Z-ADD0         ASLTOT  90
+     C*
+     C                     Z-ADD0         COH
+     C                     Z-ADD0         CORD
+     C                     Z-ADD0         CSLS
+     C                     Z-ADD0         CREC
+     C                     Z-ADD0         CTFR
+     C                     Z-ADD0         CADJ
+     C*
+     C*   FIND THE UPPER LIMITS OF SEARCH                              *
+     C*   SET TO FIRST RECORD.
+     C*
+     C                     Z-ADD0         RRN     50
+     C                     Z-ADD0         SAVRRN  50
+     C                     Z-ADD0         SCRRN   50
+     C                     Z-SUB1         SVREG
+     C                     Z-SUB1         SVDST
+     C                     Z-SUB1         SVADI
+     C                     Z-SUB1         SVING
+     C                     SETON                     50
+     C                     WRITESCRN1
+     C                     SETOF                     505155
+     C                     SETOF                     66
+     C*
+     C*  CLEAR WORKING FIELDS
+     C*
+     C                     MOVE *BLANKS   RDSDSC
+     C                     MOVE '0'       *IN23
+     C*
+     C*  MOVE PARAMETER IF RETRIEVED FROM SEARCH
+     C*
+     C*
+     C*  BY REGION
+     C*
+     C           INRDS     IFEQ 'R'
+     C                     MOVE SRC,1     CMD04
+     C                     MOVE SRC,1     GRPNAM
+     C                     MOVE *BLANKS   REGNAM
+     C                     Z-ADDINSTR     INRDS3
+     C           KEYAST    CHAINTBLREG               99
+     C                     MOVELREGNAM    RDSDSC
+     C                     MOVE RDS,1     OUTRDS
+     C           KEYAST    SETLLTBLSTRL1
+     C                     ELSE
+     C*
+     C*  BY DISTRICT
+     C*
+     C           INRDS     IFEQ 'D'
+     C                     MOVE SRC,2     CMD04
+     C                     MOVE SRC,2     GRPNAM
+     C                     MOVE *BLANKS   DSTNAM
+     C                     Z-ADDINSTR     INRDS3
+     C           KEYAST    CHAINTBLDST               99
+     C                     MOVELDSTNAM    RDSDSC
+     C                     MOVE RDS,2     OUTRDS
+     C           KEYAST    SETLLTBLSTRL2
+     C                     ELSE
+     C*
+     C*  BY STORE
+     C*
+     C           INRDS     IFEQ 'S'
+     C                     MOVE '1'       *IN23
+     C                     MOVE SRC,3     CMD04
+     C                     MOVE SRC,3     GRPNAM
+     C                     MOVE *BLANKS   STRNAM
+     C           KEYLOC    CHAINTBLSTR               99
+     C                     MOVELSTRNAM    RDSDSC
+     C                     MOVE RDS,3     OUTRDS
+     C           KEYLOC    SETLLTBLSTR
+     C                     ELSE
+     C*
+     C*  BY STORE GROUP
+     C*
+     C           INRDS     IFEQ 'G'
+     C                     MOVE SRC,4     CMD04
+     C                     MOVE SRC,4     GRPNAM
+     C                     MOVE *BLANKS   ADINAM
+     C                     Z-ADDINSTR     INRDS3
+     C           KEYAST    CHAINTBLADI               99
+     C                     MOVELADINAM    RDSDSC
+     C                     MOVE RDS,4     OUTRDS
+     C           KEYAST    SETLLINVADI
+     C                     ELSE
+     C*
+     C*  BY INVENTORY GROUP
+     C*
+     C           INRDS     IFEQ 'I'
+     C                     MOVE SRC,5     CMD04
+     C                     MOVE SRC,5     GRPNAM
+     C                     MOVE *BLANKS   INGNAM
+     C                     Z-ADDINSTR     INRDS3
+     C           KEYAST    CHAINTBLIGH               99
+     C                     MOVELINGNAM    RDSDSC
+     C                     MOVE RDS,5     OUTRDS
+     C           KEYAST    SETLLTBLIGD
+     C*
+     C                     END
+     C                     END
+     C                     END
+     C                     END
+     C                     END
+     C*
+     C* IF THE ERROR INDICATOR IS ON, DON'T LOAD THE SUBFILE
+     C*
+     C           *IN20     IFEQ '0'
+     C                     EXSR LSF01
+     C                     EXSR CFILL
+     C                     END
+     C*
+     C                     ENDSR
+     C* ------------------------------------------------------------------
+     C* EDT01    EDIT DISPLAY 1 INPUT
+     C* ------------------------------------------------------------------
+     C           EDT01     BEGSR
+     C*
+     C                     MOVE 'DSP01 '  STEP
+     C*
+     C           EDT01Z    ENDSR
+     C* ------------------------------------------------------------------
+     C* EDT02 - EDIT THE SELECT TYPE CODE BEFORE RE-DISPLAY OF SUBFILE
+     C* ------------------------------------------------------------------
+     C*
+     C           EDT02     BEGSR
+     C*
+     C                     MOVE 'DSP01 '  STEP
+     C*
+     C  N41                MOVE TTL,1     TITLE
+     C   41                MOVE TTL,2     TITLE
+     C*
+     C                     MOVE *BLANKS   IDESCR
+     C           INUMBR    CHAININVMST               99
+     C           *IN99     IFEQ '1'
+     C                     MOVE MSG,1     ERROR
+     C                     SETON                     022021
+     C                     GOTO EDT02Z
+     C                     END
+     C*
+     C           INRDS     IFNE 'R'
+     C           INRDS     ANDNE'D'
+     C           INRDS     ANDNE'S'
+     C           INRDS     ANDNE'G'
+     C           INRDS     ANDNE'I'
+     C                     MOVE MSG,2     ERROR
+     C                     SETON                     022022
+     C                     GOTO EDT02Z
+     C                     END
+     C*
+     C* EDIT THE STORE TYPE VALUES
+     C*
+     C           INTYPE    IFNE 'A'
+     C           INTYPE    ANDNE'S'
+     C           INTYPE    ANDNE'O'
+     C           INTYPE    ANDNE'W'
+     C           INTYPE    ANDNE'I'
+     C                     SETON                     022025
+     C                     MOVE MSG,3     ERROR
+     C                     GOTO EDT02Z
+     C                     END
+     C*
+     C*
+     C*  CHECK REGION
+     C           INRDS     IFEQ 'R'
+     C                     MOVE SRC,1     CMD04
+     C                     MOVE SRC,1     GRPNAM
+     C                     MOVE *BLANKS   REGNAM
+     C                     Z-ADDINSTR     INRDS3
+     C*
+     C           INRDS3    IFEQ 0
+     C                     MOVE MSG,4     ERROR
+     C                     SETON                     022026
+     C                     GOTO EDT02Z
+     C                     END
+     C*
+     C           KEYAST    CHAINTBLREG               99
+     C           *IN99     IFEQ '1'
+     C                     MOVE MSG,5     ERROR
+     C                     SETON                     022026
+     C                     GOTO EDT02Z
+     C                     END
+     C*
+     C                     MOVELREGNAM    RDSDSC
+     C                     MOVE RDS,1     OUTRDS
+     C*
+     C                     ELSE
+     C*
+     C*  CHECK DISTRICT
+     C*
+     C           INRDS     IFEQ 'D'
+     C                     MOVE SRC,2     CMD04
+     C                     MOVE SRC,2     GRPNAM
+     C                     MOVE *BLANKS   DSTNAM
+     C                     Z-ADDINSTR     INRDS3
+     C*
+     C           INRDS3    IFEQ 0
+     C                     MOVE MSG,6     ERROR
+     C                     SETON                     022026
+     C                     GOTO EDT02Z
+     C                     END
+     C*
+     C           KEYAST    CHAINTBLDST               99
+     C           *IN99     IFEQ '1'
+     C                     MOVE MSG,7     ERROR
+     C                     SETON                     022026
+     C                     GOTO EDT02Z
+     C                     END
+     c*
+     C                     MOVELDSTNAM    RDSDSC
+     C                     MOVE RDS,2     OUTRDS
+     C                     ELSE
+     C*
+     C*  CHECK STORE
+     C*
+     C           INRDS     IFEQ 'S'
+     C                     MOVE '1'       *IN23
+     C                     MOVE SRC,3     CMD04
+     C                     MOVE SRC,3     GRPNAM
+     C                     MOVE *BLANKS   STRNAM
+     C*
+     C           INSTR     IFNE 0
+     C           KEYLOC    CHAINTBLSTR               99
+     C           *IN99     IFEQ '1'
+     C                     MOVE MSG,8     ERROR
+     C                     SETON                     022026
+     C                     GOTO EDT02Z
+     C                     END
+     C                     END
+     C*
+     C                     MOVELSTRNAM    RDSDSC
+     C                     MOVE RDS,3     OUTRDS
+     C                     ELSE
+     C*
+     C*  CHECK STORE GROUP
+     C*
+     C           INRDS     IFEQ 'G'
+     C                     MOVE SRC,4     CMD04
+     C                     MOVE SRC,4     GRPNAM
+     C                     MOVE *BLANKS   ADINAM
+     C                     Z-ADDINSTR     INRDS3
+     C*
+     C           INRDS3    IFEQ 0
+     C                     MOVE MSG,9     ERROR
+     C                     SETON                     022026
+     C                     GOTO EDT02Z
+     C                     END
+     C*
+     C           KEYAST    CHAINTBLADI               99
+     C           *IN99     IFEQ '1'
+     C                     MOVE MSG,10    ERROR
+     C                     SETON                     022026
+     C                     GOTO EDT02Z
+     C                     END
+     C*
+     C                     MOVELADINAM    RDSDSC
+     C                     MOVE RDS,4     OUTRDS
+     C                     ELSE
+     C*
+     C*  CHECK INVENTORY GROUP
+     C*
+     C           INRDS     IFEQ 'I'
+     C                     MOVE SRC,5     CMD04
+     C                     MOVE SRC,5     GRPNAM
+     C                     MOVE *BLANKS   INGNAM
+     C                     Z-ADDINSTR     INRDS3
+     C*
+     C           INRDS3    IFEQ 0
+     C                     MOVE MSG,11    ERROR
+     C                     SETON                     022026
+     C                     GOTO EDT02Z
+     C                     END
+     C*
+     C           KEYAST    CHAINTBLIGH               99
+     C           *IN99     IFEQ '1'
+     C                     MOVE MSG,12    ERROR
+     C                     SETON                     022026
+     C                     GOTO EDT02Z
+     C                     END
+     C*
+     C                     MOVELINGNAM    RDSDSC
+     C                     MOVE RDS,5     OUTRDS
+     C*
+     C                     END
+     C                     END
+     C                     END
+     C                     END
+     C                     END
+     C*
+     C                     MOVE 'INZ01 '  STEP
+     C*
+     C           EDT02Z    ENDSR
+     C********************************************************************
+     C* LSF01  - LOAD ONE PAGE OF SUBFILE.                               *
+     C********************************************************************
+     C           LSF01     BEGSR
+     C                     SETOF                     66
+     C*
+     C                     Z-ADDSAVRRN    RRN
+     C                     Z-ADD0         SCRRN
+     C*
+     C* LOAD BY REGION
+     C*
+     C           INRDS     IFEQ 'R'
+     C           READR     TAG
+     C           INRDS3    READETBLSTRL1                 55
+     C*
+     C           *IN55     DOWEQ'0'
+     C*
+     C           INTYPE    IFNE 'A'
+     C           INTYPE    ANDNE'I'
+     C           STRHDO    IFNE INTYPE
+     C                     GOTO NXTR
+     C                     END
+     C                     END
+     C*
+     C           INTYPE    IFEQ 'I'
+     C           STRHDO    IFNE 'S'
+     C           STRHDO    ANDNE'W'
+     C                     GOTO NXTR
+     C                     END
+     C                     END
+     C*
+     C                     MOVE '1'       *IN51
+     C*
+     C                     MOVELSTSHRT    XXSHRT
+     C                     EXSR GETPOS
+     C                     Z-ADD0         ASL
+     C                     Z-ADD0         TOTASL
+     C                     Z-ADD0         AVGSLS
+     C                     EXSR FILL
+     C                     ADD  1         RRN
+     C                     ADD  1         SCRRN
+     C                     WRITESCRN2
+     C           NXTR      TAG
+     C           INRDS3    READETBLSTRL1                 55
+     C                     END
+     C                     END
+     C*
+     C* LOAD BY DISTRICT
+     C*
+     C           INRDS     IFEQ 'D'
+     C           READD     TAG
+     C           INRDS3    READETBLSTRL2                 55
+     C*
+     C           *IN55     DOWEQ'0'
+     C*
+     C           INTYPE    IFNE 'A'
+     C           INTYPE    ANDNE'I'
+     C           STRHDO    IFNE INTYPE
+     C                     GOTO NXTD
+     C                     END
+     C                     END
+     C*
+     C           INTYPE    IFEQ 'I'
+     C           STRHDO    IFNE 'S'
+     C           STRHDO    ANDNE'W'
+     C                     GOTO NXTD
+     C                     END
+     C                     END
+     C*
+     C                     MOVE '1'       *IN51
+     C*
+     C                     MOVELSTSHRT    XXSHRT
+     C                     EXSR GETPOS
+     C                     Z-ADD0         ASL
+     C                     Z-ADD0         TOTASL
+     C                     Z-ADD0         AVGSLS
+     C                     EXSR FILL
+     C                     ADD  1         RRN
+     C                     ADD  1         SCRRN
+     C*
+     C                     WRITESCRN2
+     C           NXTD      TAG
+     C           INRDS3    READETBLSTRL2                 55
+     C                     END
+     C                     END
+     C*
+     C* LOAD BY STORE
+     C*
+     C           INRDS     IFEQ 'S'
+     C           READS     TAG
+     C                     READ TBLSTR                   55
+     C*
+     C           *IN55     DOWEQ'0'
+     C*
+     C                     MOVE '1'       *IN51
+     C*
+     C           INTYPE    IFNE 'A'
+     C           INTYPE    ANDNE'I'
+     C           STRHDO    IFNE INTYPE
+     C                     GOTO NXTS
+     C                     END
+     C                     END
+     C*
+     C           INTYPE    IFEQ 'I'
+     C           STRHDO    IFNE 'S'
+     C           STRHDO    ANDNE'W'
+     C                     GOTO NXTS
+     C                     END
+     C                     END
+     C*
+     C                     MOVELSTSHRT    XXSHRT
+     C                     EXSR GETPOS
+     C                     Z-ADD0         ASL
+     C                     Z-ADD0         TOTASL
+     C                     Z-ADD0         AVGSLS
+     C                     EXSR FILL
+     C                     ADD  1         RRN
+     C                     ADD  1         SCRRN
+     C                     WRITESCRN2
+     C           NXTS      TAG
+     C                     READ TBLSTR                   55
+     C*
+     C                     END
+     C                     END
+     C*
+     C* LOAD BY STORE GROUP
+     C*
+     C           INRDS     IFEQ 'G'
+     C           INRDS3    READEINVADI                   55
+     C           *IN55     DOWEQ'0'
+     C*
+     C           INTYPE    IFNE 'A'
+     C           INTYPE    ANDNE'I'
+     C           STRHDO    IFNE INTYPE
+     C                     GOTO NXTG
+     C                     END
+     C                     END
+     C*
+     C           INTYPE    IFEQ 'I'
+     C           STRHDO    IFNE 'S'
+     C           STRHDO    ANDNE'W'
+     C                     GOTO NXTG
+     C                     END
+     C                     END
+     C*
+     C                     MOVE '1'       *IN51
+     C*
+     C           STRNUM    CHAINTBLSTR               99
+     C                     MOVELSTSHRT    XXSHRT
+     C                     EXSR GETPOS
+     C                     Z-ADD0         ASL
+     C                     Z-ADD0         TOTASL
+     C                     Z-ADD0         AVGSLS
+     C                     EXSR FILL
+     C                     ADD  1         RRN
+     C                     ADD  1         SCRRN
+     C*
+     C                     WRITESCRN2
+     C           NXTG      TAG
+     C           INRDS3    READEINVADI                   55
+     C                     END
+     C                     END
+     C*
+     C* LOAD BY INV GROUP
+     C*
+     C           INRDS     IFEQ 'I'
+     C           INRDS3    READETBLIGD                   55
+     C           *IN55     DOWEQ'0'
+     C*
+     C           INTYPE    IFNE 'A'
+     C           INTYPE    ANDNE'I'
+     C           STRHDO    IFNE INTYPE
+     C                     GOTO NXTI
+     C                     END
+     C                     END
+     C*
+     C           INTYPE    IFEQ 'I'
+     C           STRHDO    IFNE 'S'
+     C           STRHDO    ANDNE'W'
+     C                     GOTO NXTI
+     C                     END
+     C                     END
+     C*
+     C                     MOVE '1'       *IN51
+     C*
+     C           STRNUM    CHAINTBLSTR               99
+     C                     MOVELSTSHRT    XXSHRT
+     C                     EXSR GETPOS
+     C                     Z-ADD0         ASL
+     C                     Z-ADD0         TOTASL
+     C                     Z-ADD0         AVGSLS
+     C                     EXSR FILL
+     C                     ADD  1         RRN
+     C                     ADD  1         SCRRN
+     C*
+     C                     WRITESCRN2
+     C           NXTI      TAG
+     C           INRDS3    READETBLIGD                   55
+     C                     END
+     C                     END
+     C*
+     C           *IN51     IFEQ '1'
+     C           ASLTOT    DIV  8         TAVGS     H
+     C*
+     C                     Z-ADD0         WRK80   80
+     C                     Z-ADD0         TSUP
+     C           TOH       ADD  TORD      WRK80
+     C           TAVGS     IFGT 0
+     C           WRK80     DIV  TAVGS     TSUP      H
+     C                     END
+     C                     END
+     C*
+     C* DO NOT DISPLAY SUBFILE IF EMPTY
+     C*
+     C           RRN       IFEQ 0
+     C                     MOVE '0'       *IN51
+     C                     END
+     C*
+     C*    ALLOW DISPLAY OF SUBFILE IF AT LEAST 1 RECORD READ.
+     C*
+     C   55                SETON                     66
+     C   65                Z-ADD1         SFSTRT
+     C  N65                Z-ADDRRN       SFSTRT
+     C                     Z-ADDRRN       SAVRRN  50
+     C                     ENDSR
+     C*****************************************************************
+     C           CALC      BEGSR
+     C*
+     C                     MOVE INUMBR    XNUMBR
+     C                     MOVE STRNUM    XSTORE
+     C*
+     C                     CALL 'INV042'
+     C                     PARM           XNUMBR
+     C                     PARM           XSTORE
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C           GETPOS    BEGSR
+     C*
+     C                     MOVE *BLANK    POSFLG
+     C           STRNUM    CHAINTBL800               47
+     C           *IN47     IFEQ '0'
+     C                     MOVE POSYN     POSFLG
+     C                     ENDIF
+     C*
+     C                     ENDSR
+     C*
+     C*****************************************************************
+     C           FILL      BEGSR
+     C*
+     C                     Z-ADD0         IBHAND
+     C                     Z-ADD0         IBPOOQ
+     C                     Z-ADD0         IBTOOQ
+     C                     Z-ADD0         IBRSUP
+     C                     Z-ADD0         IBASUP
+     C                     Z-ADD0         IBRCUP
+     C                     Z-ADD0         IBTIUP
+     C                     Z-ADD0         IBTOUP
+     C                     Z-ADD0         IBRVUP
+     C                     Z-ADD0         IBAJUP
+     C                     Z-ADD0         IBPHUP
+     C                     Z-ADD0         IBRSUY
+     C                     Z-ADD0         IBASUY
+     C                     Z-ADD0         IBRCUY
+     C                     Z-ADD0         IBTIUY
+     C                     Z-ADD0         IBTOUY
+     C                     Z-ADD0         IBRVUY
+     C                     Z-ADD0         IBAJUY
+     C                     Z-ADD0         IBPHUY
+     C*
+     C           STRNUM    IFEQ *ZEROS
+     C                     Z-ADDTOHAND    QTYOH
+     C                     Z-ADDTONORD    QTYORD
+     C                     Z-ADDTOTSLS    QTYSLS
+     C                     Z-ADDTOTREC    QTYREC
+     C                     Z-ADDTOTIO     TFRDIF
+     C                     Z-ADDTOTADF    ADJDIF
+     C                     Z-ADD0         SUPWKS
+     C           TOTDIV    IFGT 0
+     C           TOTWHS    DIV  TOTDIV    AVGSLS    H
+     C                     END
+     C                     ELSE
+     C           KEYBAL    CHAININVBAL               99
+     C                     Z-ADDIBHAND    QTYOH
+     C           IBPOOQ    ADD  IBTOOQ    QTYORD
+     C                     ADD  IBHAND    TOHAND
+     C                     ADD  QTYORD    TONORD
+     C                     XFOOTASL       TOTASL  60
+     C                     ADD  TOTASL    TOTWHS  70
+     C                     ADD  1         TOTDIV  40
+     C           TOTASL    DIV  8         AVGSLS    H
+     C  N41      IBRSUP    ADD  IBASUP    QTYSLS
+     C  N41                Z-ADDIBRCUP    QTYREC
+     C  N41      IBTIUP    SUB  IBTOUP    TFRDIF
+     C  N41      IBAJUP    ADD  IBPHUP    ADJDIF
+     C   41      IBRSUY    ADD  IBASUY    QTYSLS
+     C   41                Z-ADDIBRCUY    QTYREC
+     C   41      IBTIUY    SUB  IBTOUY    TFRDIF
+     C   41      IBAJUY    ADD  IBPHUY    ADJDIF
+     C                     ADD  QTYSLS    TOTSLS
+     C                     ADD  QTYREC    TOTREC
+     C                     ADD  TFRDIF    TOTIO
+     C                     ADD  ADJDIF    TOTADF
+     C*
+     C                     Z-ADD0         WRK80   80
+     C                     Z-ADD0         SUPWKS
+     C           QTYOH     ADD  QTYORD    WRK80
+     C           AVGSLS    IFGT 0
+     C           WRK80     DIV  AVGSLS    SUPWKS    H
+     C                     END
+     C*
+     C                     ADD  QTYOH     TOH
+     C                     ADD  QTYORD    TORD
+     C                     ADD  QTYSLS    TSLS
+     C                     ADD  QTYREC    TREC
+     C                     ADD  TFRDIF    TTFR
+     C                     ADD  ADJDIF    TADJ
+     C                     ADD  TOTASL    ASLTOT
+     C                     END
+     C                     ENDSR
+     C*****************************************************************
+     C           CFILL     BEGSR
+     C*
+     C                     CLEARRINVCBL
+     C                     Z-ADD*ZERO     CASL
+     C*
+     C           KEYMST    CHAININVCBL               99
+     C           *IN99     IFEQ '1'
+     C                     MOVE MSG,13    ERROR
+     C                     SETON                     0220
+     C                     Z-ADD0         COH
+     C                     Z-ADD0         CORD
+     C                     Z-ADD0         CSLS
+     C                     Z-ADD0         CREC
+     C                     Z-ADD0         CTFR
+     C                     Z-ADD0         CADJ
+     C                     Z-ADD0         CAVGS
+     C                     Z-ADD0         CSUP
+     C                     ELSE
+     C*
+     C                     Z-ADDCBHAND    COH
+     C           CBPOOQ    ADD  CBTOOQ    CORD
+     C                     XFOOTCASL      COTASL  60
+     C                     ADD  COTASL    COTWHS  70
+     C                     ADD  1         COTDIV  40
+     C           COTASL    DIV  8         CAVGS     H
+     C  N41      CBRSUP    ADD  CBASUP    CSLS
+     C  N41                Z-ADDCBRCUP    CREC
+     C  N41      CBTIUP    SUB  CBTOUP    CTFR
+     C  N41      CBAJUP    ADD  CBPHUP    CADJ
+     C   41      CBRSUY    ADD  CBASUY    CSLS
+     C   41                Z-ADDCBRCUY    CREC
+     C   41      CBTIUY    SUB  CBTOUY    CTFR
+     C   41      CBAJUY    ADD  CBPHUY    CADJ
+     C*
+     C                     Z-ADD0         WRK80   80
+     C                     Z-ADD0         CSUP
+     C           COH       ADD  CORD      WRK80
+     C           CAVGS     IFGT 0
+     C           WRK80     DIV  CAVGS     CSUP      H
+     C                     END
+     C*
+     C                     END
+     C*
+     C                     ENDSR
+     C* ------------------------------------------------------------------
+     C* ENDJOB   END THE JOB ROUTINE
+     C* ------------------------------------------------------------------
+     C           ENDJOB    BEGSR
+     C*
+     C           FLG417    IFEQ *ON
+     C                     MOVE *ALL'LR'  CANCOD
+     C                     CALL 'INV417'  INV417
+     C                     END
+     C*
+     C                     SETON                     LR
+     C                     EXSR EXIT
+     C           ENDJOZ    ENDSR
+     C* ------------------------------------------------------------------
+     C* EXIT     END PROGRAM ROUTINE
+     C* ------------------------------------------------------------------
+     C           EXIT      BEGSR
+     C*
+     C* TEST FOR PROGRAM PARAMETER INPUT/OUTPUT
+     C*
+     C***        W1SEL     IFEQ '1'
+     C***        QPARMS    ANDEQ1
+     C***                  MOVE S1STR     INSTR
+     C***                  END
+     C*
+     C***        QPARMS    IFGT 1
+     C***        W1SEL     ANDEQ'1'
+     C***                  MOVE S1STR     INSTR
+     C***                  END
+     C*
+     C                     MOVE '0'       W1SEL
+     C*
+     C                     RETRN
+     C*
+     C           EXITZ     ENDSR
+     C* ------------------------------------------------------------------
+     C* HSEKPG   FIRST CYCLE SUBROUTINE
+     C* ------------------------------------------------------------------
+     C           HSEKPG    BEGSR
+     C*
+     C*  RETRIEVE SYSTEM DATA STRUCTURE DATA IF NOT PASSED IN
+     C*
+     C                     CALL 'SYSGET'
+     C                     PARM           PARM1
+     C*
+     C                     Z-ADDDATPER    PERIOD  20
+     C*
+     C                     Z-ADD09        SCRNSZ  30
+     C*
+     C           *LOVAL    SETLLTBLSTR
+     C**
+     C                     OPEN OPTIONS
+     C           1632      CHAINOPTIONS              99
+     C           CTLQST    IFEQ 'Y'
+     C                     SETON                     65
+     C                     END
+     C                     CLOSEOPTIONS
+     C*
+     C                     Z-ADD0         TOG     10       DEF - PTD
+     C                     MOVE TOG       *IN,41
+     C                     MOVE TTL,1     TITLE
+     C*
+     C*  FIRST PASS PROCESSING DURING "INZ01" ROUTINE TO
+     C*  LOAD STORE FROM PARMS PASSED
+     C*
+     C                     MOVE 0         INSTR
+     C                     MOVE 'S'       INRDS
+     C                     MOVE 'S'       W1NRDS
+     C                     MOVE 'A'       WTYPE
+     C                     MOVE 'A'       INTYPE
+     C                     MOVE SRC,3     CMD04
+     C                     MOVE SRC,3     GRPNAM
+     C                     MOVE RDS,3     OUTRDS
+     C                     Z-ADDINSKU     INUMBR
+     C*
+     C                     ENDSR
+     C* ------------------------------------------------------------------
+     C* DEFINE   DEFINE FILE KEY AND SYNONYMS
+     C* ------------------------------------------------------------------
+     C           DEFINE    BEGSR
+     C*
+     C           *LIKE     DEFN *INLR     W1SEL
+     C           *LIKE     DEFN INRDS     W1NRDS
+     C           *LIKE     DEFN INTYPE    WTYPE
+     C           *LIKE     DEFN REGNUM    INRDS3
+     C           *LIKE     DEFN REGNUM    SVREG
+     C           *LIKE     DEFN STSDAT    S1SDAT
+     C           *LIKE     DEFN STRDST    SVDST
+     C           *LIKE     DEFN ADINUM    SVADI
+     C           *LIKE     DEFN INGNUM    SVING
+     C           *LIKE     DEFN STRNUM    INSTR#
+     C           *LIKE     DEFN RRN       MYRRN
+     C           *LIKE     DEFN RRN       X
+     C           *LIKE     DEFN IBHAND    TOHAND
+     C           *LIKE     DEFN QTYORD    TONORD
+     C           *LIKE     DEFN QTYSLS    TOTSLS
+     C           *LIKE     DEFN QTYREC    TOTREC
+     C           *LIKE     DEFN TFRDIF    TOTIO
+     C           *LIKE     DEFN ADJDIF    TOTADF
+     C           *LIKE     DEFN INUMBR    XNUMBR
+     C           *LIKE     DEFN INUMBR    INSKU
+     C           *LIKE     DEFN STRNUM    XSTORE
+     C           *LIKE     DEFN INUMBR    XXSKU
+     C           *LIKE     DEFN INTYPE    XXTYPE
+     C           *LIKE     DEFN INRDS     XXRDS
+     C           *LIKE     DEFN INSTR     XXSTR
+     C           *LIKE     DEFN *INLR     FLG417
+     C*
+     C           KEYAST    KLIST
+     C                     KFLD           INRDS3
+     C*
+     C           KEYLOC    KLIST
+     C                     KFLD           INSTR
+     C*
+     C           KEYBAL    KLIST
+     C                     KFLD           INUMBR
+     C                     KFLD           STRNUM
+     C*
+     C           KEYMST    KLIST
+     C                     KFLD           INUMBR
+     C*
+     C           INV417    PLIST
+     C                     PARM           PARM1
+     C                     PARM INUMBR    XXSKU
+     C                     PARM INTYPE    XXTYPE
+     C                     PARM INRDS     XXRDS
+     C                     PARM INSTR     XXSTR
+     C*
+     C           INV860    PLIST
+     C                     PARM INUMBR    SKUNBR  90
+     C                     PARM INTYPE    STRTYP  1
+     C                     PARM INRDS     SRCHBY  1
+     C                     PARM INSTR     STRGRP  50
+     C*
+     C           INV861    PLIST
+     C                     PARM INUMBR    SKUNBR  90
+     C                     PARM INSTR     STRGRP  50
+     C*
+     C           CMDEXC    PLIST
+     C*kra                 PARM           SBM    64
+     C                     PARM           SBM    87
+     C*kra                 PARM 64        LEN    155
+     C                     PARM 87        LEN    155
+     C*
+     C                     ENDSR
+     C*
+      ********************************************************************
+      * T A B L E S
+      * ------------------------------------------------------------------
+**   ERROR MESSAGES TABLE........60 LENGTH..................
+                The SKU Entered is Invalid                  01
+The "Search For" type code entry must be R, D, S, G or I    02
+   The "Store Type" code entry must be A, S, O, W or I      03
+                   Region must be entered                   04
+                    Region is not valid                     05
+                 District must be entered                   06
+                   District is not valid                    07
+                    Store is not valid                      08
+               Store Group must be entered                  09
+                 Store Group is not valid                   10
+                 Inv Group must be entered                  11
+                   Inv Group is not valid                   12
+    Chain level inventory balance for SKU does not exist    13
+** TTL
+   Current Period Inventory History
+    Year to Date Inventory History
+** RDS
+Region Number.: 01
+Dist Number...: 02
+Store Number..: 03
+Store Group...: 04
+Inv Group.....: 05
+** SRC
+Region      01
+District    02
+Store/Whs   03
+Store Group 04
+Inv Group   05
+** CMD
+CLRPFM FILE(QTEMP/WRKSGB)
+CRTPF FILE(QTEMP/WRKSGB) SRCFILE(CUSTOMR/QDDSSRC) SRCMBR(WRKSGB)
