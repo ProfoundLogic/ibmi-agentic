@@ -1,4 +1,4 @@
-New report: Lot integrity check
+New report: Lot integrity and expiry check
 
 I'm in inventory control at ACME Distribution. I want to find lot-controlled items whose on-hand quantity doesn't match their lot records, because untraceable stock is a recall risk.
 
@@ -13,11 +13,16 @@ How it works: compare each lot-controlled item's on-hand quantity with the total
 "On hand exceeds lots".
 "Lots exceed on hand".
 Value the difference at the preferred vendor's current price, and show when the item was last reconciled ("never" if no log entry).
+Also check expiry dates on lots that still hold stock:
+"Expired" (critical) when expiry_date is before today: quarantine and dispose.
+"Expiring soon" (amber) when it expires within the next 30 days: use first or return to vendor.
+"No expiry date" when the lot has no expiry_date but the item's other lots do.
 
 What I'd like to see:
-Tiles: items out of balance, untraceable units, untraceable value, and items never reconciled.
-A table sorted by value, with an action such as "Count bin A3-B15-S3 and create lot records for 35 units".
+Tiles: items out of balance, untraceable units, untraceable value, expired lots with stock, and lots expiring within 30 days.
+A table sorted by value, with an action such as "Count bin A9-B3-S2 and create lot records for 65 units".
+A second table of expired and expiring lots, soonest first, with an action such as "Quarantine lot OB260410 of LUB-003, expired 48 days ago".
 The reconciliation history.
 A printable count sheet sorted by bin.
 
-General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data was entered in July and August 2026, so overdue rows are expected. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.
+General: this is read-only. Use library PERPDEMO and only company code ACM (ACME Distribution). Trim the text fields, show names instead of codes, and work out every date relative to today. The demo data is dated relative to today: about six months of history, with open orders and deliveries due over the coming weeks. Cast po_number and requisition_number to integer in the results. Give every row a plain-English next step, and use red, orange, amber and green for severity.
