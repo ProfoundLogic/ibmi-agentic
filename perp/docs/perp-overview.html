@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PERP: PreSales ERP, progress so far</title>
+<style>
+  :root {
+    --navy: #0b1f3a;
+    --navy-2: #13315c;
+    --teal: #0e9aa7;
+    --teal-soft: #e3f5f6;
+    --amber: #e8a33d;
+    --amber-soft: #fdf3e2;
+    --green: #2e9d5b;
+    --green-soft: #e4f4ea;
+    --grey: #5b6675;
+    --line: #dde3ea;
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --ink: #1b2430;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.55 "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  a { color: var(--navy-2); }
+  code, kbd, .mono { font-family: "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace; }
+  code { background: #eef1f5; padding: 1px 6px; border-radius: 4px; font-size: .92em; }
+
+  /* ---------- top nav ---------- */
+  nav.top {
+    position: sticky; top: 0; z-index: 20; background: var(--navy);
+    display: flex; gap: 4px; padding: 0 24px; overflow-x: auto; white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  }
+  nav.top a {
+    color: #c9d6e8; text-decoration: none; padding: 13px 12px; font-size: 14px; font-weight: 600;
+    border-bottom: 3px solid transparent;
+  }
+  nav.top a:hover { color: #fff; border-bottom-color: var(--teal); }
+  nav.top .brand { color: #fff; margin-right: 14px; letter-spacing: .04em; }
+
+  /* ---------- hero ---------- */
+  header.hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 60%, #145b78 100%);
+    color: #fff; padding: 56px 24px 64px;
+  }
+  .wrap { max-width: 1160px; margin: 0 auto; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: 13px; color: #8fd8de; font-weight: 700; }
+  header.hero h1 { font-size: 44px; line-height: 1.12; margin: 10px 0 14px; }
+  header.hero p.lede { font-size: 19px; max-width: 800px; color: #dbe6f3; margin: 0 0 28px; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 600;
+    font-size: 14px; padding: 9px 15px; border-radius: 999px; border: 1px solid transparent;
+    transition: transform .08s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(11,31,58,.18); }
+  .btn .tag { font-size: 11px; font-weight: 800; letter-spacing: .06em; opacity: .85; }
+  .btn-light { background: #fff; color: var(--navy); }
+  .btn-ghost { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.35); }
+  .btn-jira { background: #e9f0fe; color: #0b4fb3; border-color: #c8d9fb; }
+  .btn-conf { background: var(--teal-soft); color: #0b6e78; border-color: #bfe6e9; }
+  .btn-git { background: #eef0f3; color: #24292f; border-color: #d7dbe0; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+  /* ---------- sections ---------- */
+  section { padding: 56px 24px; }
+  section:nth-of-type(even) { background: #fff; }
+  section h2 { font-size: 30px; margin: 0 0 6px; color: var(--navy); }
+  section .sub { color: var(--grey); margin: 0 0 28px; font-size: 17px; max-width: 860px; }
+  h3 { color: var(--navy); margin: 0 0 8px; font-size: 19px; }
+
+  .grid { display: grid; gap: 18px; }
+  .grid > * { min-width: 0; }
+  code { overflow-wrap: anywhere; }
+  .g2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .g3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .g4 { grid-template-columns: repeat(4, minmax(0,1fr)); }
+  @media (max-width: 960px) { .g3, .g4 { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  @media (max-width: 640px) { .g2, .g3, .g4 { grid-template-columns: 1fr; } header.hero h1 { font-size: 32px; } }
+
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px 22px; box-shadow: 0 1px 2px rgba(11,31,58,.04);
+  }
+  section:nth-of-type(even) .card { background: #fbfcfd; }
+  .card p { margin: 6px 0 0; color: #3a4553; }
+  .card ul { margin: 8px 0 0; padding-left: 20px; color: #3a4553; }
+  .card li { margin: 3px 0; }
+
+  /* ---------- stats ---------- */
+  .stats { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 14px; margin-top: 40px; }
+  @media (max-width: 960px) { .stats { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+  .stat { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); border-radius: var(--radius); padding: 16px; }
+  .stat .n { font-size: 34px; font-weight: 800; line-height: 1; }
+  .stat .l { font-size: 13px; color: #c9d6e8; margin-top: 6px; }
+
+  /* ---------- flow ---------- */
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0; margin: 10px 0 14px; }
+  .step {
+    flex: 1 1 120px; min-width: 112px; padding: 14px 12px 14px 22px; position: relative; font-weight: 700; font-size: 14px;
+    color: #fff; background: var(--green); margin-right: 14px; border-radius: 6px;
+  }
+  .step small { display: block; font-weight: 500; font-size: 12px; opacity: .9; }
+  .step::after {
+    content: ""; position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
+    border-top: 12px solid transparent; border-bottom: 12px solid transparent; border-left: 12px solid var(--green);
+  }
+  .step.plan { background: #b8c2cf; color: #23303f; }
+  .step.plan::after { border-left-color: #b8c2cf; }
+  .step:last-child::after { display: none; }
+  .legend { display: flex; gap: 18px; font-size: 14px; color: var(--grey); }
+  .dot { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+
+  /* ---------- epics ---------- */
+  .epic { display: flex; flex-direction: column; }
+  .epic .head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .epic .key { font-family: "Cascadia Mono", Consolas, monospace; font-weight: 700; color: var(--teal); font-size: 14px; }
+  .epic p { flex: 1; font-size: 15px; }
+  .epic .btn { align-self: flex-start; margin-top: 12px; }
+  .pill { font-size: 11px; font-weight: 800; letter-spacing: .06em; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+  .pill.done { background: var(--green-soft); color: #1d6b3d; }
+  .pill.prog { background: var(--amber-soft); color: #8a5a10; }
+  .pill.todo { background: #eceff3; color: #4a5562; }
+
+  .bar { height: 12px; background: #eceff3; border-radius: 999px; overflow: hidden; display: flex; margin: 12px 0 6px; }
+  .bar span { display: block; height: 100%; }
+
+  .phase-title { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 34px 0 14px; }
+  .phase-title:first-of-type { margin-top: 0; }
+  .phase-title h3 { margin: 0; }
+  .phase-title .dates { color: var(--grey); font-size: 14px; }
+
+  /* ---------- 5250 screens ---------- */
+  .screen {
+    background: #0a0a0a; border-radius: 8px; padding: 14px 16px; overflow-x: auto;
+    box-shadow: inset 0 0 0 1px #222, 0 6px 18px rgba(0,0,0,.18);
+  }
+  .screen pre { margin: 0; font: 13px/1.32 "Cascadia Mono", Consolas, "Courier New", monospace; color: #33d17a; }
+  .screen .g { color: #33d17a; } .screen .w { color: #f2f2f2; } .screen .b { color: #6aa8ff; }
+  .screen .r { color: #ff5a5a; } .screen .t { color: #40e0d0; } .screen .y { color: #f5e663; } .screen .p { color: #ff79c6; }
+  .screen .u { text-decoration: underline; }
+  .g2 .screen { padding: 12px 10px; }
+  .g2 .screen pre { font-size: 11px; }
+  .caption { font-size: 13px; color: var(--grey); margin-top: 8px; }
+
+  /* ---------- steps ---------- */
+  ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; }
+  ol.steps > li { counter-increment: s; position: relative; padding: 0 0 22px 52px; }
+  ol.steps > li::before {
+    content: counter(s); position: absolute; left: 0; top: -2px; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--navy); color: #fff; font-weight: 800; display: grid; place-items: center;
+  }
+  ol.steps > li h4 { margin: 0 0 4px; font-size: 17px; color: var(--navy); }
+  .cmd {
+    display: block; background: #0b1f3a; color: #e7f0ff; padding: 10px 14px; border-radius: 6px; margin: 8px 0;
+    font-family: "Cascadia Mono", Consolas, monospace; font-size: 15px;
+  }
+  .cmd::before { content: "===> "; color: #8fd8de; }
+
+  .callout { border-left: 4px solid var(--amber); background: var(--amber-soft); padding: 12px 16px; border-radius: 6px; margin: 14px 0 0; font-size: 15px; }
+  .callout.info { border-left-color: var(--teal); background: var(--teal-soft); }
+  .callout.warn { border-left-color: #d64545; background: #fdecec; }
+
+  /* ---------- menu map ---------- */
+  table.map { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  table.map th, table.map td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.map th { background: #eef2f6; color: var(--navy); font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
+  table.map td.opt { font-family: "Cascadia Mono", Consolas, monospace; font-weight: 700; color: var(--teal); width: 46px; }
+  table.map td .pg { font-family: "Cascadia Mono", Consolas, monospace; font-size: 13px; color: var(--grey); }
+
+  /* ---------- copy paths ---------- */
+  .path h3 { display: flex; gap: 10px; align-items: center; }
+  .path .letter { background: var(--teal); color: #fff; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-weight: 800; }
+  .path .fit { font-size: 13px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+
+  .link-group h3 { margin-bottom: 4px; }
+  .link-group p { color: var(--grey); margin: 0 0 6px; font-size: 15px; }
+
+  footer { background: var(--navy); color: #9fb2c9; padding: 28px 24px; font-size: 13px; }
+
+  @media print {
+    nav.top { display: none; }
+    section, header.hero { break-inside: avoid; padding: 28px 18px; }
+    .btn { border: 1px solid #999; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <a class="brand" href="#top">PERP</a>
+  <a href="#why">Why</a>
+  <a href="#built">What&rsquo;s built</a>
+  <a href="#tour">Tour</a>
+  <a href="#tryit">Try it</a>
+  <a href="#copy">Take a copy</a>
+  <a href="#learned">Lessons</a>
+  <a href="#next">What&rsquo;s next</a>
+  <a href="#links">All links</a>
+</nav>
+
+<!-- =============================== HERO =============================== -->
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow">Services &amp; Development briefing &middot; November 2026</div>
+    <h1>PERP: the PreSales ERP<br>Progress so far</h1>
+    <p class="lede">
+      We now have a working, journaled, multi-company ERP on IBM i that runs the purchasing flow
+      from requisition to receipt, loaded with a realistic demo company. We built it so pre-sales
+      can demo real business flows instead of isolated screens. You can sign on and use it today.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-light" href="#tryit">Sign on and try it &rarr;</a>
+      <a class="btn btn-ghost" href="https://plogic.atlassian.net/jira/core/projects/PERP" target="_blank" rel="noopener"><span class="tag">JIRA</span> PERP project</a>
+      <a class="btn btn-ghost" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2511470593/" target="_blank" rel="noopener"><span class="tag">CONFLUENCE</span> Project hub</a>
+      <a class="btn btn-ghost" href="https://github.com/ProfoundLogic/ibmi-agentic/tree/PERPDEMO/perp" target="_blank" rel="noopener"><span class="tag">GITHUB</span> Source (PERPDEMO branch)</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="n">11</div><div class="l">Jira epics, 115 tickets</div></div>
+      <div class="stat"><div class="n">22</div><div class="l">SQL tables, with FKs, CHECKs and journaling</div></div>
+      <div class="stat"><div class="n">33</div><div class="l">Free-form RPG / SQLRPGLE sources</div></div>
+      <div class="stat"><div class="n">31</div><div class="l">5250 display files</div></div>
+      <div class="stat"><div class="n">8</div><div class="l">Menus: one main menu and 7 functional menus</div></div>
+      <div class="stat"><div class="n">5</div><div class="l">Reusable service programs</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- =============================== WHY =============================== -->
+<section id="why">
+  <div class="wrap">
+    <h2>Why we&rsquo;re building PERP</h2>
+    <p class="sub">The ERP is how we deliver the demo. What we&rsquo;re really showing is what Profound Logic tooling does to a believable IBM i business application.</p>
+    <div class="grid g3">
+      <div class="card">
+        <h3>A real business flow for demos</h3>
+        <p>Pre-sales needed an end-to-end application that resonates across verticals: distribution, manufacturing, retail, F&amp;B, healthcare, financial services and public sector. A single CRUD screen doesn&rsquo;t do that.</p>
+      </div>
+      <div class="card">
+        <h3>An authentic &ldquo;before&rdquo;</h3>
+        <p>Every function starts as a proper 5250 green-screen program. That gives us a genuine baseline to modernise live with Profound UI Rich Display and Genie/EJS, all over the same RPG and DB2 tables.</p>
+      </div>
+      <div class="card">
+        <h3>A CoderFlow showcase</h3>
+        <p>Every step in the flow is a place for automation: auto-approval scoring, lot reconciliation, PO generation. CoderFlow agents delivered the module itself ticket by ticket, so the build history is part of the demo too.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:36px">The flow we are building toward</h3>
+    <div class="flow">
+      <div class="step">Requisition<small>REQENTR</small></div>
+      <div class="step">Approval<small>REQAPRR + auto-approve hook</small></div>
+      <div class="step">Purchase Order<small>POENTR / POREQR</small></div>
+      <div class="step">Receiving<small>RCVENTR + lots</small></div>
+      <div class="step">Inventory update<small>on-hand + reconciliation</small></div>
+      <div class="step plan">AP invoice match<small>planned</small></div>
+      <div class="step plan">Payment<small>planned</small></div>
+      <div class="step plan">GL posting<small>planned</small></div>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--green)"></span>Built and live in PERPDEMO</span>
+      <span><span class="dot" style="background:#b8c2cf"></span>Planned (Accounts Payable &amp; General Ledger)</span>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== BUILT =============================== -->
+<section id="built">
+  <div class="wrap">
+    <h2>What&rsquo;s been built</h2>
+    <p class="sub">Two phases so far. Phase 1 laid the foundation and closed the full requisition&nbsp;&rarr; PO&nbsp;&rarr; receipt loop. Phase 2 was hands-on polish from live testing: reusable prompt programs, screen fixes and consistent validation.</p>
+
+    <div class="phase-title">
+      <h3>Phase 1: Foundation to full purchasing loop</h3>
+      <span class="pill done">9 EPICS &middot; 41 STORIES &middot; ALL DONE</span>
+      <span class="dates">15 Jul &ndash; 7 Aug 2026</span>
+    </div>
+    <div class="grid g3">
+      <div class="card epic"><div class="head"><span class="key">PERP-1</span><span class="pill done">DONE</span></div>
+        <h3>Foundation</h3><p>New <code>perp/</code> module, SQL DDL conventions and style guide, RUNSQLSTM build integration, PERPJRN journal.</p>
+        <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-1" target="_blank" rel="noopener">Open PERP-1 &rarr;</a></div>
+      <div class="card epic"><div class="head"><span class="key">PERP-2</span><span class="pill done">DONE</span></div>
+        <h3>Company &amp; System Reference</h3><p>Company, code master, document sequences, config and users. Company selector, the DOCSEQ numbering service and the PERPMNU main menu.</p>
+        <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-2" target="_blank" rel="noopener">Open PERP-2 &rarr;</a></div>
+      <div class="card epic"><div class="head"><span class="key">PERP-3</span><span class="pill done">DONE</span></div>
+        <h3>Inventory Master</h3><p>UOM, item classes, items, UOM conversions and lots, with cross-linked maintenance programs.</p>
+        <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-3" target="_blank" rel="noopener">Open PERP-3 &rarr;</a></div>
+      <div class="card epic"><div class="head"><span class="key">PERP-4</span><span class="pill done">DONE</span></div>
+        <h3>3D Warehouse Map</h3><p>Warehouse layout per company, plus a coordinate query service (WHCOORD) that will feed a future 3D UI.</p>
+        <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-4" target="_blank" rel="noopener">Open PERP-4 &rarr;</a></div>
+      <div class="card epic"><div class="head"><span class="key">PERP-5</span><span class="pill done">DONE</span></div>
+        <h3>Vendor &amp; Pricing</h3><p>Vendors, item-vendor profiles and effective-dated price history, with the ITMVPRCQ price-history service.</p>
+        <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-5" target="_blank" rel="noopener">Open PERP-5 &rarr;</a></div>
+      <div class="card epic"><div class="head"><span class="key">PERP-6</span><span class="pill done">DONE</span></div>
+        <h3>Requisitioning</h3><p>Requisition entry and approval with a full approval audit trail, plus the REQAUTO CoderFlow auto-approval hook (confidence %, configurable thresholds).</p>
+        <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-6" target="_blank" rel="noopener">Open PERP-6 &rarr;</a></div>
+      <div class="card epic"><div class="head"><span class="key">PERP-7</span><span class="pill done">DONE</span></div>
+        <h3>Purchasing</h3><p>Manual PO entry, POs from approved requisitions (consolidated or split by vendor), blanket PO schedules, PO browse and inquiry.</p>
+        <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-7" target="_blank" rel="noopener">Open PERP-7 &rarr;</a></div>
+      <div class="card epic"><div class="head"><span class="key">PERP-8</span><span class="pill done">DONE</span></div>
+        <h3>Receiving &amp; Reconciliation</h3><p>Receipts against a PO with UOM conversion and lot capture, the LOTRECON reconciliation service and a reconciliation log browser.</p>
+        <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-8" target="_blank" rel="noopener">Open PERP-8 &rarr;</a></div>
+      <div class="card epic"><div class="head"><span class="key">PERP-9</span><span class="pill done">DONE</span></div>
+        <h3>ACME Seed Dataset</h3><p>&ldquo;ACME Distribution&rdquo;: 8 users, 50 items, 10 vendors, 24 months of prices, live reqs/POs/receipts, and lot drift seeded on purpose for the reconciliation demo. It&rsquo;s since been rebuilt by a generator in the repo (<code>perp/tools/acme_seed</code>): 102 items, 20 vendors and six months of activity.</p>
+        <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-9" target="_blank" rel="noopener">Open PERP-9 &rarr;</a></div>
+    </div>
+
+    <div class="phase-title">
+      <h3>Phase 2: Prompt programs and aesthetic improvements</h3>
+      <span class="pill prog">IN PROGRESS</span>
+      <span class="dates">7 &ndash; 26 Aug 2026</span>
+    </div>
+    <div class="grid g2">
+      <div class="card">
+        <div class="head" style="display:flex;justify-content:space-between;align-items:baseline"><span class="key mono" style="color:var(--teal);font-weight:700">PERP-51</span><span class="pill prog">47 TICKETS</span></div>
+        <h3>All 47 tickets built and live-verified. Final sign-off is in progress.</h3>
+        <div class="bar"><span style="width:17%;background:var(--green)"></span><span style="width:83%;background:var(--amber)"></span></div>
+        <div style="font-size:14px;color:var(--grey)"><b style="color:#1d6b3d">8 Done</b> (signed off after hands-on testing) &middot; <b style="color:#8a5a10">39 In Progress</b> (built, waiting for hands-on sign-off)</div>
+        <div class="btn-row">
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-51" target="_blank" rel="noopener">Open epic PERP-51 &rarr;</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/issues/?jql=parent%20%3D%20PERP-51%20ORDER%20BY%20key%20ASC" target="_blank" rel="noopener">All 47 child tickets</a>
+        </div>
+      </div>
+      <div class="card">
+        <h3>What Phase 2 delivered</h3>
+        <ul>
+          <li><b>Reusable lookup prompts:</b> <code>?</code>+Enter on item and vendor fields, F4 on PO number (ITMPRMT, VNDPRMT, POPRMT)</li>
+          <li><b>Screen fixes:</b> column headings, right-aligned numerics, MM/DD/YY dates, F-key footers, 80-column wrap</li>
+          <li><b>Navigation:</b> F12 steps back one screen instead of ending the program</li>
+          <li><b>Validation:</b> plain-English required-field messages instead of raw SQLCODEs, across 13 programs</li>
+          <li><b>Company maintenance:</b> mixed-case input, F6=Add and 2=Change</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase-title">
+      <h3>Backlog / icebox</h3>
+      <span class="pill todo">RUNNING LIST</span>
+    </div>
+    <div class="card" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px">
+      <div><b class="mono" style="color:var(--teal)">PERP-99</b>: ideas and to-dos we&rsquo;ve noted but not scheduled. There are 16 so far, including <b>PERP-100</b> (3=Delete company), <b>PERP-103</b> (remove hard-coded PERPDEMO names) and <b>PERP-106</b> (a one-step entry command).</div>
+      <div class="btn-row" style="margin:0">
+        <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-99" target="_blank" rel="noopener">Open PERP-99</a>
+        <a class="btn btn-jira" href="https://plogic.atlassian.net/issues/?jql=parent%20%3D%20PERP-99%20ORDER%20BY%20key%20ASC" target="_blank" rel="noopener">All 16 icebox tickets</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== TOUR =============================== -->
+<section id="tour">
+  <div class="wrap">
+    <h2>A quick tour</h2>
+    <p class="sub">These are real screens, captured live from idev on 16 Oct 2026 by signing on, running <code>ADDLIBLE PERPDEMO</code> and <code>GO PERPMNU</code>.</p>
+    <div class="grid g2">
+      <div>
+        <div class="screen"><pre><span class="g"> </span><span class="b">PERPMNU</span><span class="g">                </span><span class="w">PreSales ERP (PERP) - Main Menu</span><span class="g">                         </span>
+<span class="g">                                                                                </span>
+<span class="g"> </span><span class="b">Select one of the following:</span><span class="g">                                                   </span>
+<span class="g">                                                                                </span>
+<span class="g">      1. Select company for session                                             </span>
+<span class="g">      2. System Maintenance                                                     </span>
+<span class="g">      3. Inventory Master Data                                                  </span>
+<span class="g">      4. Vendor &amp; Pricing                                                       </span>
+<span class="g">      5. Diagnostics / Smoke Tests                                              </span>
+<span class="g">      6. Requisitioning                                                         </span>
+<span class="g">      7. Purchasing                                                             </span>
+<span class="g">      8. Receiving                                                              </span>
+<span class="g">     90. Sign off                                                               </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g"> Selection:                                                                     </span>
+<span class="g"> ===&gt; </span><span class="g u">                                                                          </span>
+<span class="g u">                                                                               </span><span class="g"> </span>
+<span class="g">                                                                                </span></pre></div>
+        <div class="caption">PERPMNU, the PERP main menu. Each option opens a functional sub-menu.</div>
+      </div>
+      <div>
+        <div class="screen"><pre><span class="g">                             </span><span class="w">Select PERP Company</span><span class="g">                                </span>
+<span class="g"> Currently selected  . . :                                                      </span>
+<span class="g">                                                                                </span>
+<span class="g"> Type option, press Enter.                                                      </span>
+<span class="g">   1=Select this company   2=Change company info                                </span>
+<span class="g">                                                                                </span>
+<span class="g">   </span><span class="g u">Opt</span><span class="g">  </span><span class="g u">Code</span><span class="g">  </span><span class="g u">Company name</span><span class="g">                                                 </span><span class="g u">Curr</span><span class="g"> </span>
+<span class="g">   </span><span class="g u"> </span><span class="g">    ACM   ACME Distribution                                            USD  </span>
+<span class="g">                                                                                </span>
+<span class="g">   </span><span class="g u"> </span><span class="g">    BET   Beta Distributors (demo)                                     USD  </span>
+<span class="g">                                                                                </span>
+<span class="g">   </span><span class="g u"> </span><span class="g">    GJ    GJ Test Company                                              USD  </span>
+<span class="g">                                                                                </span>
+<span class="g">   </span><span class="g u"> </span><span class="g">    ZZT   Zeta Test Co                                                 USD  </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                   </span><span class="w">      Bottom</span><span class="g"> </span>
+<span class="g"> </span><span class="b">F3=Exit   F5=Refresh   F6=Add   F12=Cancel</span><span class="g">                                     </span>
+<span class="g">                                                                                </span></pre></div>
+        <div class="caption">Option 1, Select PERP Company. Every program is scoped to the company you pick here.</div>
+      </div>
+    </div>
+    <div style="margin-top:22px">
+      <div class="screen" style="max-width:720px"><pre><span class="g">                               </span><span class="w">Work with Items</span><span class="g">                                  </span>
+<span class="g"> Company: ACM  Class: </span><span class="g u">          </span><span class="g">   Active only (Y/N): </span><span class="g u">N</span><span class="g">                         </span>
+<span class="g"> Low stock only (Y/N): </span><span class="g u">N</span><span class="g">                                                        </span>
+<span class="g"> Position To / Filter: </span><span class="g u">                              </span><span class="g">                           </span>
+<span class="g"> Type option, press Enter.                                                      </span>
+<span class="g">   2=Change  4=Delete  5=Display 6=UOM Conversions  7=Lots                      </span>
+<span class="g"> </span><span class="g u">Opt</span><span class="g"> </span><span class="g u">Item</span><span class="g">                     </span><span class="g u">Description</span><span class="g">                    </span><span class="g u">Class</span><span class="g">      </span><span class="g u">Lot</span><span class="g"> </span><span class="g u">Low</span><span class="g"> </span>
+<span class="g"> </span><span class="g u"> </span><span class="g">  CON-001                   Industrial Hand Cleaner 1gal   CONSUMABL  N       </span>
+<span class="g"> </span><span class="g u"> </span><span class="g">  CON-002                   Shop Rags Bale 25lb            CONSUMABL  N       </span>
+<span class="g"> </span><span class="g u"> </span><span class="g">  CON-003                   Cyanoacrylate Adhesive 1oz     CONSUMABL  Y       </span>
+<span class="g"> </span><span class="g u"> </span><span class="g">  CON-004                   Silicone Sealant Cartridge     CONSUMABL  Y       </span>
+<span class="g"> </span><span class="g u"> </span><span class="g">  CON-005                   Aerosol Degreaser 20oz         CONSUMABL  Y       </span>
+<span class="g"> </span><span class="g u"> </span><span class="g">  CON-006                   Absorbent Pads Bale 50ct       CONSUMABL  N *     </span>
+<span class="g"> </span><span class="g u"> </span><span class="g">  CON-007                   Cotton Wiping Cloths 50lb      CONSUMABL  N       </span>
+<span class="g">                                                                   </span><span class="w">     More...</span><span class="g"> </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g">                                                                                </span>
+<span class="g"> </span><span class="b">F3=Exit  F5=Refresh  F6=Add  F12=Cancel</span><span class="g">                                        </span>
+<span class="g">                                                                                </span></pre></div>
+      <div class="caption">3 &rarr; 4, Work with Items for ACME Distribution. The subfile has filters, options 2/4/5/6/7 and a low-stock flag.</div>
+    </div>
+
+    <h3 style="margin-top:40px">Four demo storylines the data model was designed for</h3>
+    <div class="grid g4">
+      <div class="card"><h3>3D warehouse walkthrough</h3><p>Every bin is real inventory. Click a bin to see the item and its balances. Low stock glows red. <i>The data and coordinate service are ready; the 3D UI is still to come.</i></p></div>
+      <div class="card"><h3>Pricing history graph</h3><p>Effective-dated prices for each item and vendor, with past and announced increases, expired quotes, and preferred vendors that aren&rsquo;t the cheapest.</p></div>
+      <div class="card"><h3>Lot reconciliation</h3><p>On some items the lots add up to less than on-hand, on others to more. CoderFlow finds the drift, repairs it and writes the audit trail.</p></div>
+      <div class="card"><h3>Auto-approval</h3><p>CoderFlow scores each requisition. At 85% confidence or more and $500 or less, it&rsquo;s approved automatically with a full audit trail. Anything else goes to a human approver.</p></div>
+    </div>
+    <div class="btn-row" style="margin-top:16px">
+      <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2511962114/" target="_blank" rel="noopener"><span class="tag">CONFLUENCE</span> Demo Storylines</a>
+      <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2512060417/" target="_blank" rel="noopener"><span class="tag">CONFLUENCE</span> ACME Seed Dataset Spec</a>
+      <a class="btn btn-git" href="https://github.com/ProfoundLogic/ibmi-agentic/tree/PERPDEMO/perp/tools/acme_seed" target="_blank" rel="noopener"><span class="tag">GITHUB</span> ACME data generator</a>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== TRY IT =============================== -->
+<section id="tryit">
+  <div class="wrap">
+    <h2>Try it yourself on idev</h2>
+    <p class="sub">PERP runs in the <b>PERPDEMO</b> library on the <b>idev</b> partition. It takes about two minutes to get from sign-on to a live ERP screen.</p>
+
+    <div class="grid g2">
+      <div>
+        <ol class="steps">
+          <li>
+            <h4>Connect to idev</h4>
+            Open a 5250 session to <code>idev.profoundlogic.com</code> with IBM i Access Client Solutions or any TN5250 emulator.
+            You can also use Genie in a browser at
+            <a href="http://idev.profoundlogic.com:8098/profoundui/genie" target="_blank" rel="noopener"><code>http://idev.profoundlogic.com:8098/profoundui/genie</code></a>.
+          </li>
+          <li>
+            <h4>Sign on with your own idev user profile</h4>
+            You need a profile with a command line (<code>===&gt;</code>). The shared <code>AIDEMO</code> agent profile signs on to a menu without one, so use your own profile.
+          </li>
+          <li>
+            <h4>Add the PERP library to your library list</h4>
+            <span class="cmd">ADDLIBLE PERPDEMO</span>
+            You should see <i>&ldquo;Library PERPDEMO added to library list.&rdquo;</i> The menus are library-qualified, but the programs behind them aren&rsquo;t. Without this step the menus display, but every option fails because the program can&rsquo;t be found.
+          </li>
+          <li>
+            <h4>Go to the PERP main menu</h4>
+            <span class="cmd">GO PERPMNU</span>
+          </li>
+          <li>
+            <h4>Pick a company first (option 1)</h4>
+            Type <b>1</b> next to <b>ACM &ndash; ACME Distribution</b> and press Enter. The choice is saved in your job&rsquo;s *LDA. Every PERP program reads it, and without it you&rsquo;ll get <i>&ldquo;No company selected &ndash; run Select Company (PERPSELR) first.&rdquo;</i> Repeat this each time you sign on.
+          </li>
+          <li>
+            <h4>Explore</h4>
+            Start with <b>3 &rarr; 4 Work with Items</b>, <b>7 &rarr; 4 Browse POs</b> and <b>8 &rarr; 2 Reconciliation log</b>. F3 exits and F12 goes back.
+          </li>
+        </ol>
+        <div class="callout warn">
+          <b>PERPDEMO is shared, live demo data.</b> Pre-sales demos run on ACME. To try adds, changes or deletes, press <b>F6=Add</b> on the Select Company screen to create your own company and work in that.
+          Don&rsquo;t run the <b>Diagnostics / Smoke Tests</b> menu (option 5) against ACM. Those programs change data: lot reconciliation <i>repairs</i> the lot mismatches that were planted on purpose for the reconciliation demo and the portal reports.
+        </div>
+        <div class="callout info">
+          <b>Shortcut:</b> every PERP program also has a direct launcher named PL plus the program name, for example <code>CALL PERPDEMO/PLWRKITMR</code> for Work with Items. It adds PERPDEMO to your library list, sets the company to <b>ACM</b> and opens the screen, skipping the menus and Select Company. They were built as menu options for the CoderFlow for Business Portal and always use ACM.
+        </div>
+      </div>
+
+      <div>
+        <table class="map">
+          <thead><tr><th colspan="2">PERPMNU menu map</th><th>Program</th></tr></thead>
+          <tbody>
+            <tr><td class="opt">1</td><td><b>Select company for session</b></td><td class="pg">PERPSELR</td></tr>
+            <tr><td class="opt">2</td><td><b>System Maintenance</b><br>1 System codes (code_master) &middot; 2 PERP users</td><td class="pg">WRKCMR<br>WRKUSRR</td></tr>
+            <tr><td class="opt">3</td><td><b>Inventory Master Data</b><br>1 Units of measure &middot; 2 UOM conversions &middot; 3 Item classes &middot; 4 Items &middot; 5 Item lots &middot; 6 Warehouse layout</td><td class="pg">WRKUOMR &middot; WRKCNVR<br>WRKICLR &middot; WRKITMR<br>WRKLOTR &middot; WLMR</td></tr>
+            <tr><td class="opt">4</td><td><b>Vendor &amp; Pricing</b><br>1 Vendors &middot; 2 Item-vendor profiles &middot; 3 Item-vendor prices</td><td class="pg">WRKVNDR &middot; WRKIVNR<br>WRKIVPR</td></tr>
+            <tr><td class="opt">5</td><td><b>Diagnostics / Smoke Tests</b><br>Service-program smoke tests (they change data)</td><td class="pg">DOCSEQSMK, IVPRCQSMK, WHCOORDSMK, REQAUTOSMK, LOTRCNSMK</td></tr>
+            <tr><td class="opt">6</td><td><b>Requisitioning</b><br>1 Enter/submit &middot; 2 Approve/reject</td><td class="pg">REQENTR<br>REQAPRR</td></tr>
+            <tr><td class="opt">7</td><td><b>Purchasing</b><br>1 Manual PO entry &middot; 2 POs from approved reqs &middot; 3 Blanket schedules &middot; 4 Browse / inquire</td><td class="pg">POENTR &middot; POREQR<br>POSCHR &middot; POBRWR</td></tr>
+            <tr><td class="opt">8</td><td><b>Receiving</b><br>1 Receive against a PO &middot; 2 Reconciliation log</td><td class="pg">RCVENTR<br>RCNBRWR</td></tr>
+            <tr><td class="opt">90</td><td>Sign off</td><td></td></tr>
+          </tbody>
+        </table>
+        <div class="callout info">
+          <b>What&rsquo;s in there today</b> (live counts on 23 Nov 2026): 4 companies (ACM plus test companies). For ACM: 102 items, 20 vendors, 778 price-history rows, 88 requisitions, 104 POs and 157 receipts.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== TAKE A COPY =============================== -->
+<section id="copy">
+  <div class="wrap">
+    <h2>Taking a copy for your own work</h2>
+    <p class="sub">There are three ways to work with PERP, from lightest to heaviest. One thing affects all of them: the programs refer to <code>PERPDEMO</code> by name in about 215 places across nearly 60 sources (SQL like <code>perpdemo.item</code>, menus like <code>go perpdemo/perpinvm</code>, the journal CLs and the PL launchers).</p>
+
+    <div class="grid g3">
+      <div class="card path">
+        <div class="fit">Demos &amp; exploring</div>
+        <h3><span class="letter">A</span>Use it in place</h3>
+        <p>Sign on to idev, run <code>ADDLIBLE PERPDEMO</code>, then <code>GO PERPMNU</code>. Create your own company code so your changes don&rsquo;t touch ACME.</p>
+        <ul>
+          <li>No setup at all</li>
+          <li>Shared with pre-sales, so be a good neighbour</li>
+        </ul>
+      </div>
+      <div class="card path">
+        <div class="fit">Customer / partner IBM i</div>
+        <h3><span class="letter">B</span>Save &amp; restore the library</h3>
+        <p><code>SAVLIB LIB(PERPDEMO)</code> to a save file, move it, then <code>RSTLIB</code> on the other system. You get code, objects, ACME data and the journal together.</p>
+        <ul>
+          <li>Keep the library name <b>PERPDEMO</b> so the hard-coded references still resolve</li>
+          <li>The objects are compiled for V7R4M0, so the target system must be on 7.4 or later</li>
+          <li>The quickest way to get a full working copy, data included</li>
+        </ul>
+      </div>
+      <div class="card path">
+        <div class="fit">Developing &amp; extending</div>
+        <h3><span class="letter">C</span>Build from source</h3>
+        <p>Clone <code>ProfoundLogic/ibmi-agentic</code>, check out branch <b>PERPDEMO</b> and work in <code>perp/</code>. Build with <code>codermake</code> (or a CoderFlow task). Read <code>perp/AGENTS.md</code> and the Delivery Playbook first.</p>
+        <ul>
+          <li>Create the journal first: build and <code>CALL PERPJRN</code></li>
+          <li>Delete the committed stamps in <code>perp/build/</code> first, or codermake will assume everything is already built</li>
+          <li>Load the ACME data with <code>perp/tools/acme_seed</code>. The generator writes <code>qddlsrc/seed/030_acme_demo_data.sql</code> and <code>load.sh</code> runs it. A load replaces every ACM row</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <b>Watch out:</b> <code>CPYLIB PERPDEMO MYLIB</code> on idev does <u>not</u> give you an isolated copy. The copied programs still read and write <code>PERPDEMO</code>&rsquo;s tables, and the menus still jump to <code>PERPDEMO</code> menus. A copy under a different library name only works after the <code>perpdemo.</code> qualifiers are taken out of the source.
+    </div>
+
+    <div class="callout info">
+      <b>Known limitations, tracked for fixing.</b> These copy caveats are on the backlog:
+      hard-coded PERPDEMO library names (<a href="https://plogic.atlassian.net/browse/PERP-103" target="_blank" rel="noopener">PERP-103</a>)
+      and committed build stamps (<a href="https://plogic.atlassian.net/browse/PERP-104" target="_blank" rel="noopener">PERP-104</a>).
+      Once they&rsquo;re done, options B and C become a clean, any-library copy.
+    </div>
+
+    <div class="btn-row" style="margin-top:18px">
+      <a class="btn btn-git" href="https://github.com/ProfoundLogic/ibmi-agentic/tree/PERPDEMO/perp" target="_blank" rel="noopener"><span class="tag">GITHUB</span> perp/ on PERPDEMO</a>
+      <a class="btn btn-git" href="https://github.com/ProfoundLogic/ibmi-agentic/blob/PERPDEMO/perp/AGENTS.md" target="_blank" rel="noopener"><span class="tag">GITHUB</span> perp/AGENTS.md</a>
+      <a class="btn btn-git" href="https://github.com/ProfoundLogic/ibmi-agentic/blob/PERPDEMO/perp/DDL_STYLE_GUIDE.md" target="_blank" rel="noopener"><span class="tag">GITHUB</span> DDL Style Guide</a>
+      <a class="btn btn-git" href="https://github.com/ProfoundLogic/ibmi-agentic/tree/PERPDEMO/perp/tools/acme_seed" target="_blank" rel="noopener"><span class="tag">GITHUB</span> ACME data generator</a>
+      <a class="btn btn-git" href="https://github.com/ProfoundLogic/ibmi-agentic/tree/PERPDEMO/perp/docs/portal-reports" target="_blank" rel="noopener"><span class="tag">GITHUB</span> Portal report prompts</a>
+      <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2512191489/" target="_blank" rel="noopener"><span class="tag">CONFLUENCE</span> PERP Delivery Playbook (runbook)</a>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== LESSONS =============================== -->
+<section id="learned">
+  <div class="wrap">
+    <h2>How it&rsquo;s engineered, and what we learned</h2>
+    <p class="sub">PERP is new code, and it sets conventions on purpose. Most of the lessons below are bugs that compiled cleanly and only showed up at runtime. They&rsquo;re now written into the standards so nobody has to find them again.</p>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Conventions</h3>
+        <ul>
+          <li><b>SQL DDL, not DDS:</b> one <code>.table.sql</code> per table, explicit <code>FOR SYSTEM NAME</code> / <code>FOR COLUMN</code></li>
+          <li><b>Integrity in the database:</b> FKs and CHECK constraints declared in DDL, not in app code</li>
+          <li><b>Multi-company:</b> <code>company_code</code> leads every business key</li>
+          <li><b>Journaled from day one</b> to PERPJRN, with real commitment control (no <code>COMMIT=*NONE</code>)</li>
+          <li><b>Free-form RPG only</b>, with service programs for shared logic (DOCSEQ, ITMVPRCQ, WHCOORD, REQAUTO, LOTRECON)</li>
+          <li><b>Standard audit block</b> on every table (created/updated at/by, is_active)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Gotchas that compile cleanly</h3>
+        <ul>
+          <li><code>ctl-opt datfmt(*iso)</code> is required. The job date format is *MDY, so dates outside 1940&ndash;2039 crash with RNQ0114</li>
+          <li><code>return;</code> inside a <code>begsr</code> ends the <i>whole program</i>. Use <code>leavesr;</code></li>
+          <li>Every WRITE/EXFMT format needs OVERLAY, or the subfile and messages are wiped before they display</li>
+          <li>Adjacent DDS fields can collide on the attribute byte (CPD7866), which silently drops column headings</li>
+          <li>A stale object earlier in the library list can shadow a fixed one. If a rebuild changes nothing, check <code>DSPLIBL</code></li>
+        </ul>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:16px">
+      <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2609774626/PERP+5250+Coding+UX+Standards" target="_blank" rel="noopener"><span class="tag">CONFLUENCE</span> 5250 Coding &amp; UX Standards</a>
+      <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2511831043/" target="_blank" rel="noopener"><span class="tag">CONFLUENCE</span> Design Decisions &amp; Conventions</a>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== NEXT =============================== -->
+<section id="next">
+  <div class="wrap">
+    <h2>What&rsquo;s next</h2>
+    <p class="sub">Roughly in priority order. The direction is set; the Jira epics for later phases aren&rsquo;t scoped yet.</p>
+    <div class="grid g3">
+      <div class="card"><h3>Close out Phase 2</h3><p>Sign off the 39 remaining PERP-51 tickets after hands-on testing.</p></div>
+      <div class="card"><h3>Modernised UI layer</h3><p>Clone the Phase 1 green screens as Profound UI Rich Display and Genie/EJS versions over the same RPG. Includes the 3D warehouse view.</p></div>
+      <div class="card"><h3>Accounts Payable &amp; GL</h3><p>Invoice matching against PO and receipt, payments, and automatic journal entries. This completes the purchase-to-ledger story.</p></div>
+      <div class="card"><h3>More CoderFlow automation</h3><p>Turn the auto-approval and reconciliation hooks into live CoderFlow flows: routing, escalation and notifications.</p></div>
+      <div class="card"><h3>Make PERP portable</h3><p>Remove hard-coded library names and drop the committed build stamps, so anyone can build or copy PERP into their own library. The ACME data is already in the repo. Tracked as
+        <a href="https://plogic.atlassian.net/browse/PERP-103" target="_blank" rel="noopener">PERP-103</a> and
+        <a href="https://plogic.atlassian.net/browse/PERP-104" target="_blank" rel="noopener">PERP-104</a>. This also clears the way for PERP&rsquo;s move to its own &ldquo;PERP Dev&rdquo; repo and CoderFlow environment.</p></div>
+      <div class="card"><h3>Vertical extensions</h3><p>Sales orders/AR, CRM-lite, manufacturing/BOM, WMS, added as pre-sales opportunities call for them.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== LINKS =============================== -->
+<section id="links">
+  <div class="wrap">
+    <h2>Read further</h2>
+    <p class="sub">Everything in one place.</p>
+    <div class="grid g3">
+      <div class="card link-group">
+        <h3>Jira: PERP project</h3>
+        <p>plogic.atlassian.net</p>
+        <div class="btn-row">
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/jira/core/projects/PERP" target="_blank" rel="noopener">PERP project</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/issues/?jql=project%20%3D%20PERP%20AND%20issuetype%20%3D%20Epic%20ORDER%20BY%20key%20ASC" target="_blank" rel="noopener">All epics</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/issues/?jql=project%20%3D%20PERP%20ORDER%20BY%20key%20ASC" target="_blank" rel="noopener">All tickets</a>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-1" target="_blank" rel="noopener">PERP-1</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-2" target="_blank" rel="noopener">PERP-2</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-3" target="_blank" rel="noopener">PERP-3</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-4" target="_blank" rel="noopener">PERP-4</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-5" target="_blank" rel="noopener">PERP-5</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-6" target="_blank" rel="noopener">PERP-6</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-7" target="_blank" rel="noopener">PERP-7</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-8" target="_blank" rel="noopener">PERP-8</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-9" target="_blank" rel="noopener">PERP-9</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-51" target="_blank" rel="noopener">PERP-51</a>
+          <a class="btn btn-jira" href="https://plogic.atlassian.net/browse/PERP-99" target="_blank" rel="noopener">PERP-99</a>
+        </div>
+      </div>
+      <div class="card link-group">
+        <h3>Confluence: project &amp; process</h3>
+        <p>CPP space &rsaquo; Pre-Sales Team</p>
+        <div class="btn-row">
+          <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2511470593/" target="_blank" rel="noopener">PERP project hub</a>
+          <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2512191489/" target="_blank" rel="noopener">Delivery Playbook (runbook)</a>
+          <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2609774626/PERP+5250+Coding+UX+Standards" target="_blank" rel="noopener">5250 Coding &amp; UX Standards</a>
+          <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2511273987/" target="_blank" rel="noopener">Delivery Plan: Epics &amp; Roadmap</a>
+          <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2511831043/" target="_blank" rel="noopener">Design Decisions &amp; Conventions</a>
+        </div>
+      </div>
+      <div class="card link-group">
+        <h3>Confluence: module components</h3>
+        <p>Inventory &amp; Purchasing module pages</p>
+        <div class="btn-row">
+          <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2510716932/" target="_blank" rel="noopener">Module overview</a>
+          <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2511994881/" target="_blank" rel="noopener">Data Model: Reference &amp; Config</a>
+          <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2510684164/" target="_blank" rel="noopener">Data Model: Master Data</a>
+          <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2512027649/" target="_blank" rel="noopener">Data Model: Transactional &amp; Audit</a>
+          <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2512060417/" target="_blank" rel="noopener">ACME Seed Dataset Spec</a>
+          <a class="btn btn-conf" href="https://profoundlogicsupport.atlassian.net/wiki/spaces/CPP/pages/2511962114/" target="_blank" rel="noopener">Demo Storylines</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    PERP &middot; PreSales ERP Development &middot; Source: <code style="background:transparent;color:#c9d6e8">ProfoundLogic/ibmi-agentic</code> branch PERPDEMO, folder <code style="background:transparent;color:#c9d6e8">perp/</code> &middot; Runtime library: PERPDEMO on idev.profoundlogic.com &middot; Figures as of 23 Nov 2026.
+  </div>
+</footer>
+
+</body>
+</html>

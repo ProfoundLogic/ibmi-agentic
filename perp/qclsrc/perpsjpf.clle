@@ -1,0 +1,15 @@
+/* PERPSJPF - Start journaling for a single PERP physical file.     */
+/* Called after RUNSQLSTM creates a SQL table in PERPDEMO.          */
+/* Parameter: &FILE - system name of the file, e.g. 'INVMSTR'.      */
+/* Idempotent - silently ignores CPF7030 (already journaled).       */
+
+PGM PARM(&FILE)
+  DCL VAR(&FILE) TYPE(*CHAR) LEN(10)
+
+  STRJRNPF FILE(PERPDEMO/&FILE) +
+           JRN(PERPDEMO/PERPJRN) +
+           IMAGES(*BOTH) +
+           OMTJRNE(*OPNCLO)
+  MONMSG MSGID(CPF7030)
+
+ENDPGM

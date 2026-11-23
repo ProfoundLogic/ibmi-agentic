@@ -1,0 +1,56 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA12(12 'Cancel')
+     A          R PPSFL                     SFL
+     A  51                                  SFLNXTCHG
+     A            SOPT           1A  B  8  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SIPONBR       15Y 0O  8  5EDTCDE(3)
+     A            SIVNDR        10A  O  8 22
+     A            SIVNDNM       30A  O  8 33
+     A            SISTAT        10A  O  8 65
+     A          R PPCTL                     SFLCTL(PPSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 26'PO Number Prompt'
+     A                                      DSPATR(HI)
+     A                                  2  2'Search (PO # or vendor):'
+     A            SSEARCH       30A  B  2 28
+     A                                  4  2'Type 1 to select a PO.'
+     A                                  7  2'Opt'
+     A                                      DSPATR(UL)
+     A                                  7  6'PO #'
+     A                                      DSPATR(UL)
+     A                                  7 22'Vendor'
+     A                                      DSPATR(UL)
+     A                                  7 33'Vendor Name'
+     A                                      DSPATR(UL)
+     A                                  7 65'Status'
+     A                                      DSPATR(UL)
+     A          R PPFOOT
+     A                                 23  2'F3=Exit   F5=Refresh   F12=Ca-
+     A                                      ncel'
+     A                                      COLOR(BLU)
+     A          R PPNONE
+     A                                      OVERLAY
+     A                                 10 20'** No POs awaiting receipt for -
+     A                                      this search **'
+     A          R PPMSGSFL                  SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R PPMSGCTL                  SFLCTL(PPMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)

@@ -1,0 +1,117 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA06(06 'Approve')
+     A                                      CA07(07 'Reject')
+     A                                      CA12(12 'Cancel')
+     A          R ASFL                      SFL
+     A  51                                  SFLNXTCHG
+     A            ASOPT          1A  B  9  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            ASREQNBR       8A  O  9  5
+     A            ASREQBY       10A  O  9 14
+     A            ASNEEDBY        L  O  9 25DATFMT(*MDY)
+     A            ASPRICD       10A  O  9 36
+     A            ASTOTEST      15Y 2O  9 47EDTCDE(3)
+     A            ASCONF         8A  O  9 65
+     A          R ASCTL                     SFLCTL(ASFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 24'Requisitions Awaiting Approval'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            LCOMPDSP       3A  O  2 11
+     A                                  6  2'Type option 5=Review, press Enter.'
+     A                                  8  2'Opt'
+     A                                      DSPATR(UL)
+     A                                  8  6'Req #'
+     A                                      DSPATR(UL)
+     A                                  8 14'Requested By'
+     A                                      DSPATR(UL)
+     A                                  8 27'Need By'
+     A                                      DSPATR(UL)
+     A                                  8 36'Priority'
+     A                                      DSPATR(UL)
+     A                                  8 47'Est Cost'
+     A                                      DSPATR(UL)
+     A                                  8 65'Confid.'
+     A                                      DSPATR(UL)
+     A          R RLFOOT
+     A                                      OVERLAY
+     A                                 23  2'F3=Exit  F5=Refresh  F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R RNOSUB
+     A                                      OVERLAY
+     A                                 11 24'No requisitions to review.'
+     A          R RDETAIL
+     A                                      OVERLAY
+     A                                  1 28'Requisition Detail'
+     A                                      DSPATR(HI)
+     A                                  2  2'Req #:'
+     A            DDREQNBR       8A  O  2  9
+     A                                  2 30'Requested By:'
+     A            DDREQBY       10A  O  2 44
+     A                                  3  2'Need By:'
+     A            DDNEEDBY        L  O  3 11DATFMT(*MDY)
+     A                                  3 30'Priority:'
+     A            DDPRICD       20A  O  3 40
+     A                                  4  2'Total Est Cost:'
+     A            DDTOTEST      15Y 2O  4 18EDTCDE(3)
+     A                                  4 40'Confidence:'
+     A            DDCONF        10A  O  4 52
+     A                                  6  2'Lines:'
+     A                                  7  2'Item'
+     A                                      DSPATR(UL)
+     A                                  7 29'Qty'
+     A                                      DSPATR(UL)
+     A                                  7 47'UOM'
+     A                                      DSPATR(UL)
+     A                                  7 54'Cost'
+     A                                      DSPATR(UL)
+     A  60        L1ITEM        25A  O  8  2
+     A  60        L1QTY         15Y 4O  8 29EDTCDE(3)
+     A  60        L1UOM          5A  O  8 47
+     A  60        L1COST        15Y 4O  8 54EDTCDE(3)
+     A  61        L2ITEM        25A  O  9  2
+     A  61        L2QTY         15Y 4O  9 29EDTCDE(3)
+     A  61        L2UOM          5A  O  9 47
+     A  61        L2COST        15Y 4O  9 54EDTCDE(3)
+     A  62        L3ITEM        25A  O 10  2
+     A  62        L3QTY         15Y 4O 10 29EDTCDE(3)
+     A  62        L3UOM          5A  O 10 47
+     A  62        L3COST        15Y 4O 10 54EDTCDE(3)
+     A  63        L4ITEM        25A  O 11  2
+     A  63        L4QTY         15Y 4O 11 29EDTCDE(3)
+     A  63        L4UOM          5A  O 11 47
+     A  63        L4COST        15Y 4O 11 54EDTCDE(3)
+     A  64        L5ITEM        25A  O 12  2
+     A  64        L5QTY         15Y 4O 12 29EDTCDE(3)
+     A  64        L5UOM          5A  O 12 47
+     A  64        L5COST        15Y 4O 12 54EDTCDE(3)
+     A  65        L6ITEM        25A  O 13  2
+     A  65        L6QTY         15Y 4O 13 29EDTCDE(3)
+     A  65        L6UOM          5A  O 13 47
+     A  65        L6COST        15Y 4O 13 54EDTCDE(3)
+     A  34                             15  2'More lines exist -- not all shown.'
+     A                                 17  2'Approval Notes:'
+     A            ENOTES2       50A  B 17 18
+     A                                 23  2'F6=Approve  F7=Reject  F12=Back'
+     A                                      COLOR(BLU)
+     A          R RMSGSFL                   SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R RMSGCTL                   SFLCTL(RMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)

@@ -1,0 +1,131 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA05(05 'Refresh')
+     A                                      CA06(06 'Add')
+     A                                      CA12(12 'Cancel')
+     A          R WISFL                     SFL
+     A  51                                  SFLNXTCHG
+     A            SOPT           1A  B  8  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SIITEM        25A  O  8  5
+     A            SIDESC        30A  O  8 31
+     A            SICLASS       10A  O  8 62
+     A            SILOT          1A  O  8 73
+     A            SILOW          1A  O  8 75
+     A          R WICTL                     SFLCTL(WISFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 32'Work with Items'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            SCOMPDSP       3A  O  2 11
+     A                                  2 16'Class:'
+     A            SFCLASS       10A  B  2 23
+     A                                  2 36'Active only (Y/N):'
+     A            SFACT          1A  B  2 55
+     A                                  3  2'Low stock only (Y/N):'
+     A            SFLOW          1A  B  3 24
+     A                                  4  2'Position To / Filter:'
+     A            SPOSTO        30A  B  4 24
+     A                                  5  2'Type option, press Enter.'
+     A                                  6  4'2=Change  4=Delete  5=Display -
+     A                                      6=UOM Conversions  7=Lots'
+     A                                  7  2'Opt'
+     A                                      DSPATR(UL)
+     A                                  7  6'Item'
+     A                                      DSPATR(UL)
+     A                                  7 31'Description'
+     A                                      DSPATR(UL)
+     A                                  7 62'Class'
+     A                                      DSPATR(UL)
+     A                                  7 73'Lot'
+     A                                      DSPATR(UL)
+     A                                  7 77'Low'
+     A                                      DSPATR(UL)
+     A          R WIFOOT
+     A                                 23  2'F3=Exit  F5=Refresh  F6=Add  -
+     A                                      F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R WINONE
+     A                                      OVERLAY
+     A                                 11 20'** No items match this filte-
+     A                                      r **'
+     A          R WINOCO
+     A                                      OVERLAY
+     A                                 11 20'** No company selected - run-
+     A                                       Select Company first **'
+     A          R WIEDIT
+     A                                      OVERLAY
+     A                                  1 30'Edit Item'
+     A                                      DSPATR(HI)
+     A                                  2  2'Mode:'
+     A            EMODE          1A  O  2  8
+     A                                  2 15'Item:'
+     A            EITEM         25A  B  2 25
+     A N60                              2 51'(? = prompt)'
+     A                                  3  2'Description:'
+     A            EDESC         60A  B  3 15
+     A                                  4  2'Short Desc:'
+     A            ESHORT        20A  B  4 15
+     A                                  5  2'Class:'
+     A            ECLASS        10A  B  5 15
+     A                                  6  2'Inventory UOM:'
+     A            EINVUOM        5A  B  6 17
+     A                                  6 30'Stocking UOM:'
+     A            ESTKUOM        5A  B  6 44
+     A                                  7  2'Lot Controlled (Y/N):'
+     A            ELOTCTL        1A  B  7 24
+     A                                  8  2'Balances (read-only -- adjus-
+     A                                      ted via receipt/reconciliatio-
+     A                                      n):'
+     A                                      DSPATR(UL)
+     A                                  9  2'On Hand:'
+     A            EQOH          15Y 4O  9 11EDTCDE(3)
+     A                                  9 35'Available:'
+     A            EQAVL         15Y 4O  9 46EDTCDE(3)
+     A                                 10  2'Frozen:'
+     A            EQFRZ         15Y 4O 10 11EDTCDE(3)
+     A                                 10 35'On Order:'
+     A            EQOO          15Y 4O 10 46EDTCDE(3)
+     A                                 11  2'Reorder:'
+     A                                      DSPATR(UL)
+     A                                 12  2'Reorder Pt:'
+     A            ERORDPT       15Y 4B 12 14EDTCDE(3)
+     A                                 12 35'Critical:'
+     A            ECRITLV       15Y 4B 12 46EDTCDE(3)
+     A                                 13  2'Min:'
+     A            EMINQTY       15Y 4B 13  8EDTCDE(3)
+     A                                 13 35'Max:'
+     A            EMAXQTY       15Y 4B 13 41EDTCDE(3)
+     A                                 14  2'Safety Stock:'
+     A            ESAFSTK       15Y 4B 14 16EDTCDE(3)
+     A                                 14 35'Lead Time (days):'
+     A            ELEADTM        5Y 0B 14 53EDTCDE(3)
+     A                                 15  2'Location:'
+     A                                      DSPATR(UL)
+     A                                 16  2'Aisle:'
+     A            EAISLE        10A  B 16 10
+     A                                 16 22'Bay:'
+     A            EBAY          10A  B 16 30
+     A                                 16 44'Shelf:'
+     A            ESHELF        10A  B 16 52
+     A                                 23  2'Enter=Save   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R WIMSGSFL                  SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R WIMSGCTL                  SFLCTL(WIMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)

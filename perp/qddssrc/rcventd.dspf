@@ -1,0 +1,118 @@
+     A                                      DSPSIZ(24 80 *DS3)
+     A                                      PRINT
+     A                                      CA03(03 'Exit')
+     A                                      CA04(04 'Prompt')
+     A                                      CA05(05 'Refresh')
+     A                                      CA12(12 'Cancel')
+     A          R RHEAD
+     A                                      OVERLAY
+     A                                  1 28'Receipt Entry'
+     A                                      DSPATR(HI)
+     A                                  2  2'Company:'
+     A            HCOMPDSP       3A  O  2 11
+     A                                  3  2'PO Number:'
+     A            HPONBR        15Y 0B  3 13EDTCDE(3)
+     A                                  3 31'Vendor:'
+     A            HVNDNM        30A  O  3 39
+     A                                  4  2'PO Status:'
+     A            HPOSTAT       20A  O  4 13
+     A                                  5  2'Receipt Date:'
+     A            HRCPDT          L  B  5 16DATFMT(*ISO)
+     A                                  5 28'(YYYY-MM-DD)'
+     A                                  6  2'Received By:'
+     A            HRCVBY        10A  B  6 16
+     A            HRCVNM        30A  O  6 28
+     A                                  7  2'Notes:'
+     A            HNOTES        50A  B  7  9
+     A                                 23  2'F3=Exit  F4=Prompt  F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R RLSFL                     SFL
+     A  51                                  SFLNXTCHG
+     A            SLOPT          1A  B  9  2
+     A  50                                  DSPATR(RI)
+     A  50                                  DSPATR(PC)
+     A            SLLINE         3Y 0O  9  7EDTCDE(3)
+     A            SLITEM        25A  O  9 12
+     A            SLDESC        20A  O  9 38
+     A            SLOPEN        11Y 4O  9 59EDTCDE(3)
+     A            SLUOM          5A  O  9 72
+     A          R RLCTL                     SFLCTL(RLSFL)
+     A                                      SFLSIZ(0099)
+     A                                      SFLPAG(0007)
+     A                                      OVERLAY
+     A                                      SFLDSPCTL
+     A N31 30                               SFLDSP
+     A  31                                  SFLCLR
+     A N31 30                               SFLEND(*MORE)
+     A                                  1 27'Purchase Order Receiving'
+     A                                      DSPATR(HI)
+     A                                  2  2'PO #:'
+     A            DPONBR        15A  O  2  8
+     A                                  2 30'Vendor:'
+     A            DVNDR         10A  O  2 38
+     A            DVNDNM        25A  O  2 49
+     A                                  3  2'Received By:'
+     A            DRCVBY        10A  O  3 16
+     A            DRCVNM        30A  O  3 28
+     A                                  4  2'Receipt Date:'
+     A            DRCPDT          L  O  4 16DATFMT(*ISO)
+     A                                  4 30'PO Status:'
+     A            DPOSTAT       20A  O  4 41
+     A                                  6  2'Type 1=Receive next to a line, -
+     A                                      press Enter.'
+     A                                  7  2'Opt'
+     A                                      DSPATR(UL)
+     A                                  7  7'Line'
+     A                                      DSPATR(UL)
+     A                                  7 12'Item'
+     A                                      DSPATR(UL)
+     A                                  7 38'Description'
+     A                                      DSPATR(UL)
+     A                                  7 59'Open Qty'
+     A                                      DSPATR(UL)
+     A                                  7 72'UOM'
+     A                                      DSPATR(UL)
+     A          R RLFOOT
+     A                                      OVERLAY
+     A                                 23  2'F3=Exit  F5=Refresh  F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R RNOLIN
+     A                                      OVERLAY
+     A                                 11 15'No open lines for this PO -- eve-
+     A                                      rything has been received.'
+     A          R RLEDIT
+     A                                      OVERLAY
+     A                                  1 25'Receive PO Line'
+     A                                      DSPATR(HI)
+     A                                  2  2'Line:'
+     A            ELINE          3Y 0O  2  8EDTCDE(3)
+     A                                  2 20'Item:'
+     A            EITEM         25A  O  2 26
+     A                                  3  2'Description:'
+     A            EDESC         30A  O  3 16
+     A                                  4  2'Open Qty:'
+     A            EOPEN         11Y 4O  4 12EDTCDE(3)
+     A                                  4 30'Vendor UOM:'
+     A            EUOM           5A  O  4 42
+     A                                  5  2'Qty Received (vendor UOM):'
+     A            EQTY          11Y 4B  5 30EDTCDE(3)
+     A                                  6  2'Lot Controlled:'
+     A            ELOTCTL        1A  O  6 18
+     A                                  7  2'Lot Number:'
+     A            ELOT          20A  B  7 14
+     A                                  7 36'(required if lot controlled)'
+     A                                  8  2'Notes:'
+     A            ENOTES        50A  B  8  9
+     A                                 23  2'Enter=Save   F12=Cancel'
+     A                                      COLOR(BLU)
+     A          R RMSGSFL                   SFL
+     A                                      SFLMSGRCD(24)
+     A            SMSGKEY                   SFLMSGKEY
+     A            SPGMQ                     SFLPGMQ(10)
+     A          R RMSGCTL                   SFLCTL(RMSGSFL)
+     A                                      OVERLAY
+     A N41 40                               SFLDSP
+     A  41                                  SFLCLR
+     A N41 40                               SFLEND
+     A                                      SFLSIZ(0002)
+     A                                      SFLPAG(0001)
